@@ -10,7 +10,7 @@ type ListingCardProps = {
 
 const toneClasses: Record<Listing["imageTone"], string> = {
   amber: "from-amber-200 via-white to-orange-300",
-  emerald: "from-emerald-200 via-white to-teal-300",
+  gold: "from-stone-200 via-white to-yellow-200",
   rose: "from-rose-200 via-white to-pink-300",
   sky: "from-sky-200 via-white to-blue-300",
   slate: "from-slate-200 via-white to-slate-400",

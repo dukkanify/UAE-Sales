@@ -51,7 +51,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link
           href={`/checkout?listing=${listing.slug}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-black text-white shadow-lg shadow-emerald-900/10 transition hover:bg-primary-dark"
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-black text-white shadow-[var(--shadow-soft)] transition hover:bg-primary-dark"
         >
           شراء الآن
         </Link>

@@ -46,7 +46,7 @@ export type Listing = {
     name: string;
     rating: number;
   };
-  imageTone: "emerald" | "amber" | "sky" | "rose" | "slate";
+  imageTone: "gold" | "amber" | "sky" | "rose" | "slate";
 };
 
 export type City = {

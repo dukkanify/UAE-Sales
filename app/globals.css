@@ -5,8 +5,9 @@
   --color-primary: var(--color-primary);
   --color-primary-dark: var(--color-primary-dark);
   --color-primary-soft: var(--color-primary-soft);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-soft: var(--color-secondary-soft);
   --color-uae-red: var(--color-uae-red);
-  --color-uae-green: var(--color-uae-green);
   --color-uae-black: var(--color-uae-black);
   --color-uae-white: var(--color-uae-white);
   --color-accent: var(--color-accent);
@@ -37,9 +38,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at 78% -8%, rgb(0 184 122 / 20%), transparent 34rem),
-    radial-gradient(circle at 4% 16%, rgb(244 182 63 / 16%), transparent 28rem),
-    linear-gradient(180deg, #fbfffd 0%, var(--color-background) 42%, #ffffff 100%);
+    radial-gradient(circle at 78% -8%, rgb(200 164 93 / 22%), transparent 34rem),
+    radial-gradient(circle at 4% 16%, rgb(185 28 28 / 10%), transparent 28rem),
+    linear-gradient(180deg, #fffdfa 0%, var(--color-background) 42%, #ffffff 100%);
   color: var(--color-ink);
   font-family: var(--font-arabic);
 }
@@ -85,10 +86,10 @@ textarea {
 
 .luxury-gradient {
   background:
-    linear-gradient(90deg, rgb(227 27 35 / 88%) 0 0.65rem, transparent 0.65rem),
-    radial-gradient(circle at 16% 12%, rgb(0 154 87 / 26%), transparent 20rem),
-    radial-gradient(circle at 88% 0%, rgb(244 182 63 / 20%), transparent 24rem),
-    linear-gradient(135deg, var(--color-uae-black) 0%, #0d2b22 48%, #06100d 100%);
+    linear-gradient(90deg, rgb(185 28 28 / 86%) 0 0.65rem, transparent 0.65rem),
+    radial-gradient(circle at 16% 12%, rgb(200 164 93 / 24%), transparent 20rem),
+    radial-gradient(circle at 88% 0%, rgb(255 255 255 / 10%), transparent 24rem),
+    linear-gradient(135deg, var(--color-uae-black) 0%, #1f2937 52%, #030712 100%);
 }
 
 .uae-flag-strip {
@@ -96,7 +97,7 @@ textarea {
     linear-gradient(90deg, var(--color-uae-red) 0 18%, transparent 18%),
     linear-gradient(
       180deg,
-      var(--color-uae-green) 0 33.333%,
+      var(--color-secondary) 0 33.333%,
       var(--color-uae-white) 33.333% 66.666%,
       var(--color-uae-black) 66.666% 100%
     );
@@ -126,7 +127,7 @@ textarea {
   inset: -1px;
   z-index: -1;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgb(37 255 208 / 60%), rgb(244 182 63 / 55%), transparent);
+  background: linear-gradient(135deg, rgb(200 164 93 / 70%), rgb(185 28 28 / 45%), transparent);
 }
 
 .focus-ring {

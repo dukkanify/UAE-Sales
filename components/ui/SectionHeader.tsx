@@ -17,7 +17,7 @@ export function SectionHeader({
     <div className="mb-9 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div className="max-w-2xl">
         {eyebrow ? (
-          <p className="mb-3 inline-flex rounded-full border border-primary/15 bg-primary-soft px-3.5 py-1.5 text-xs font-black text-primary">
+          <p className="mb-3 inline-flex rounded-full border border-secondary/30 bg-secondary-soft px-3.5 py-1.5 text-xs font-black text-primary">
             {eyebrow}
           </p>
         ) : null}

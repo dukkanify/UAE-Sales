@@ -38,7 +38,7 @@ export function SiteHeader() {
               <span className="block text-lg font-black text-ink">
                 UAE Sales
               </span>
-              <span className="block text-xs font-black text-uae-red">
+              <span className="block text-xs font-black text-secondary">
                 سوق إماراتي بضمان آمن
               </span>
             </span>
@@ -68,7 +68,7 @@ export function SiteHeader() {
               type="search"
             />
             <button
-              className="rounded-full bg-uae-black px-4 text-sm font-black text-white transition hover:bg-uae-green"
+              className="rounded-full bg-uae-black px-4 text-sm font-black text-white transition hover:bg-secondary hover:text-primary"
               type="submit"
             >
               بحث
@@ -102,7 +102,7 @@ export function SiteHeader() {
             )}
             <Link
               href="/listings/new"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-l from-uae-green via-primary to-uae-black px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
             >
               أضف إعلان
             </Link>

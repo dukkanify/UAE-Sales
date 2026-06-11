@@ -122,7 +122,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         name: user.fullName,
         rating: 4.8,
       },
-      imageTone: "emerald",
+      imageTone: "gold",
     };
 
     saveLocalListing(listing);

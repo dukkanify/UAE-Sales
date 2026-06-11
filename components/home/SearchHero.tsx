@@ -24,7 +24,7 @@ export function SearchHero({ categories }: SearchHeroProps) {
         <div className="absolute -right-24 -top-24 size-96 rounded-full bg-primary/25 blur-3xl" />
         <div className="relative grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
-            <Badge className="border-white/15 bg-white/10 text-emerald-100">
+            <Badge className="border-white/15 bg-white/10 text-secondary">
               منصة إماراتية للبيع والشراء بضمان مالي
             </Badge>
             <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight tracking-tight md:text-6xl lg:text-7xl">
@@ -114,7 +114,7 @@ export function SearchHero({ categories }: SearchHeroProps) {
                       دبي مارينا
                     </span>
                   </div>
-                  <div className="relative mt-5 h-56 overflow-hidden rounded-[1.6rem] bg-[radial-gradient(circle_at_30%_20%,rgba(0,154,87,0.34),transparent_38%),linear-gradient(135deg,#e9fff7,#fff4d8)]">
+                  <div className="relative mt-5 h-56 overflow-hidden rounded-[1.6rem] bg-[radial-gradient(circle_at_30%_20%,rgba(200,164,93,0.35),transparent_38%),linear-gradient(135deg,#fffaf0,#f4efe6)]">
                     <div className="uae-flag-strip absolute bottom-5 right-5 h-14 w-24 rounded-2xl shadow-lg" />
                   </div>
                   <div className="mt-5">

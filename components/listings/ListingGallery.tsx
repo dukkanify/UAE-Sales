@@ -7,7 +7,7 @@ type ListingGalleryProps = {
 
 const toneClasses: Record<Listing["imageTone"], string> = {
   amber: "from-amber-100 via-white to-orange-200",
-  emerald: "from-emerald-100 via-white to-teal-200",
+  gold: "from-stone-100 via-white to-yellow-200",
   rose: "from-rose-100 via-white to-pink-200",
   sky: "from-sky-100 via-white to-blue-200",
   slate: "from-slate-100 via-white to-slate-300",

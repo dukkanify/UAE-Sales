@@ -139,7 +139,7 @@ export const mockListings: Listing[] = [
       name: "معرض النخبة",
       rating: 4.9,
     },
-    imageTone: "emerald",
+    imageTone: "gold",
   },
   {
     id: "listing-002",
@@ -271,7 +271,7 @@ export const mockListings: Listing[] = [
       name: "استوديو لقطة",
       rating: 4.9,
     },
-    imageTone: "emerald",
+    imageTone: "gold",
   },
   {
     id: "listing-008",
@@ -315,7 +315,7 @@ export const mockListings: Listing[] = [
       name: "الخليج للتوظيف",
       rating: 4.5,
     },
-    imageTone: "emerald",
+    imageTone: "gold",
   },
   {
     id: "listing-010",
@@ -362,7 +362,7 @@ export const mockUserListings: Listing[] = [
       name: "أحمد المنصوري",
       rating: 4.8,
     },
-    imageTone: "emerald",
+    imageTone: "gold",
   },
   {
     id: "user-listing-002",
