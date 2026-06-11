@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { OtpVerification } from "@/components/auth/OtpVerification";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { setSessionUser } from "@/services/clientStorage";
 
 type LoginErrors = {
   identifier?: string;
@@ -27,6 +29,7 @@ export function LoginForm() {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [identifier, setIdentifier] = useState("");
   const [showOtp, setShowOtp] = useState(false);
+  const router = useRouter();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -58,6 +61,20 @@ export function LoginForm() {
       <OtpVerification
         identifier={identifier}
         onBack={() => setShowOtp(false)}
+        onVerified={() => {
+          setSessionUser({
+            id: "mock-session-user",
+            accountType: "individual",
+            city: "دبي",
+            email: identifier.includes("@") ? identifier : "user@uaesales.ae",
+            fullName: "مستخدم UAE Sales",
+            isVerified: true,
+            joinedAt: new Date().toISOString().slice(0, 10),
+            phone: identifier.includes("@") ? "0500000000" : identifier,
+          });
+          const nextPath = new URLSearchParams(window.location.search).get("next");
+          router.push(nextPath || "/profile");
+        }}
       />
     );
   }

@@ -14,6 +14,7 @@ type SearchFiltersProps = {
   selectedFilters: {
     category?: string;
     city?: string;
+    condition?: string;
     country?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -77,6 +78,17 @@ export function SearchFilters({
           ]}
         />
       ) : null}
+      <Select
+        defaultValue={selectedFilters.condition}
+        label="حالة المنتج"
+        name="condition"
+        options={[
+          { label: "كل الحالات", value: "" },
+          { label: "جديد", value: "new" },
+          { label: "مستعمل", value: "used" },
+          { label: "ممتاز", value: "excellent" },
+        ]}
+      />
       <Input
         defaultValue={selectedFilters.minPrice}
         inputMode="numeric"

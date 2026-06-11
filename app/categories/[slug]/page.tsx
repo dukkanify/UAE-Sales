@@ -82,6 +82,7 @@ export default async function CategoryPage({
 
   const selectedFilters = {
     city: getParam(queryParams, "city") ?? "",
+    condition: getParam(queryParams, "condition") ?? "",
     country: getParam(queryParams, "country") ?? "",
     maxPrice: getParam(queryParams, "maxPrice") ?? "",
     minPrice: getParam(queryParams, "minPrice") ?? "",
@@ -94,6 +95,12 @@ export default async function CategoryPage({
     searchListings({
       categoryId: category.id,
       city: selectedFilters.city || undefined,
+      condition:
+        selectedFilters.condition === "new" ||
+        selectedFilters.condition === "used" ||
+        selectedFilters.condition === "excellent"
+          ? selectedFilters.condition
+          : undefined,
       country: selectedFilters.country || undefined,
       maxPrice: getNumberParam(queryParams, "maxPrice"),
       minPrice: getNumberParam(queryParams, "minPrice"),
@@ -167,7 +174,12 @@ export default async function CategoryPage({
           </div>
 
           <div className="mt-6">
-            <SearchResultsList categories={categories} listings={listings} />
+            <SearchResultsList
+              categoryId={category.id}
+              categories={categories}
+              listings={listings}
+              selectedFilters={selectedFilters}
+            />
           </div>
         </section>
       </main>

@@ -73,6 +73,38 @@ export const mockCategories: Category[] = [
     listingCount: 720,
     subcategories: ["صيانة", "تنظيف", "نقل", "تصميم"],
   },
+  {
+    id: "kids",
+    name: "الأطفال",
+    slug: "kids",
+    icon: "🧸",
+    listingCount: 340,
+    subcategories: ["عربات أطفال", "ألعاب", "ملابس أطفال", "مستلزمات"],
+  },
+  {
+    id: "books",
+    name: "الكتب",
+    slug: "books",
+    icon: "📚",
+    listingCount: 190,
+    subcategories: ["كتب عربية", "كتب جامعية", "روايات", "مناهج"],
+  },
+  {
+    id: "sports",
+    name: "الرياضة",
+    slug: "sports",
+    icon: "⚽",
+    listingCount: 410,
+    subcategories: ["معدات رياضية", "دراجات", "لياقة", "تخييم"],
+  },
+  {
+    id: "food",
+    name: "الطعام",
+    slug: "food",
+    icon: "🍽️",
+    listingCount: 260,
+    subcategories: ["أكلات منزلية", "تمور", "حلويات", "ضيافة"],
+  },
 ];
 
 export const mockCurrentUser: UserProfile = {

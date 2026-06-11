@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing, ListingStatus } from "@/types";
 import {
   listingStatusDescriptions,
@@ -6,6 +9,10 @@ import {
 } from "@/constants/listingStatuses";
 import { ListingStatusBadge } from "@/components/listings/ListingStatusBadge";
 import { Card } from "@/components/ui/Card";
+import {
+  deleteLocalListing,
+  getLocalListings,
+} from "@/services/clientStorage";
 
 type MyListingsDashboardProps = {
   categories: Category[];
@@ -28,14 +35,29 @@ export function MyListingsDashboard({
   categories,
   listings,
 }: MyListingsDashboardProps) {
+  const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const allListings = useMemo(
+    () => [...localListings, ...listings],
+    [listings, localListings],
+  );
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
   );
 
   const counts = statusOrder.map((status) => ({
-    count: listings.filter((listing) => listing.status === status).length,
+    count: allListings.filter((listing) => listing.status === status).length,
     status,
   }));
+
+  useEffect(() => {
+    const syncLocalListings = () => setLocalListings(getLocalListings());
+
+    syncLocalListings();
+    window.addEventListener("uae-sales-listings-change", syncLocalListings);
+
+    return () =>
+      window.removeEventListener("uae-sales-listings-change", syncLocalListings);
+  }, []);
 
   return (
     <div className="grid gap-6">
@@ -69,7 +91,7 @@ export function MyListingsDashboard({
       </Card>
 
       {statusOrder.map((status) => {
-        const statusListings = listings.filter(
+        const statusListings = allListings.filter(
           (listing) => listing.status === status,
         );
 
@@ -118,17 +140,34 @@ export function MyListingsDashboard({
 
                       <div className="flex flex-wrap gap-2 lg:justify-end">
                         <Link
-                          href={`/listings/${listing.slug}`}
+                          href={
+                            listing.id.startsWith("local-")
+                              ? `/listings/local/${listing.id}`
+                              : `/listings/${listing.slug}`
+                          }
                           className="rounded-full border border-border px-4 py-2 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
                         >
                           عرض
                         </Link>
                         <Link
-                          href={`/listings/${listing.slug}/edit`}
+                          href={
+                            listing.id.startsWith("local-")
+                              ? `/listings/local/${listing.id}/edit`
+                              : `/listings/${listing.slug}/edit`
+                          }
                           className="rounded-full bg-primary-soft px-4 py-2 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
                         >
                           تعديل
                         </Link>
+                        {listing.id.startsWith("local-") ? (
+                          <button
+                            className="rounded-full bg-rose-50 px-4 py-2 text-sm font-black text-rose-700 transition hover:bg-rose-100"
+                            onClick={() => deleteLocalListing(listing.id)}
+                            type="button"
+                          >
+                            حذف
+                          </button>
+                        ) : null}
                         {listing.status === "expired" ? (
                           <button
                             className="rounded-full bg-accent-soft px-4 py-2 text-sm font-black text-amber-800"

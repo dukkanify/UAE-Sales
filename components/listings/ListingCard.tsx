@@ -27,10 +27,14 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 });
 
 export function ListingCard({ categoryName, listing }: ListingCardProps) {
+  const listingHref = listing.id.startsWith("local-")
+    ? `/listings/local/${listing.id}`
+    : `/listings/${listing.slug}`;
+
   return (
     <Card className="group h-full overflow-hidden transition duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl">
       <div className="relative">
-        <Link href={`/listings/${listing.slug}`}>
+        <Link href={listingHref}>
           <span className="sr-only">{listing.title}</span>
           <div
             className={`relative h-56 overflow-hidden bg-gradient-to-br ${toneClasses[listing.imageTone]} p-4`}
@@ -67,7 +71,7 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
         </button>
       </div>
       <div className="p-5">
-        <Link href={`/listings/${listing.slug}`}>
+        <Link href={listingHref}>
           <h3 className="line-clamp-2 min-h-14 text-lg font-black leading-7 text-ink transition group-hover:text-primary">
             {listing.title}
           </h3>

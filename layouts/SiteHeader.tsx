@@ -1,7 +1,27 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { primaryNavigation } from "@/constants/navigation";
+import {
+  clearSessionUser,
+  getSessionUser,
+} from "@/services/clientStorage";
+import type { UserProfile } from "@/types";
 
 export function SiteHeader() {
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    const syncSession = () => setUser(getSessionUser());
+
+    syncSession();
+    window.addEventListener("uae-sales-session-change", syncSession);
+
+    return () =>
+      window.removeEventListener("uae-sales-session-change", syncSession);
+  }, []);
+
   return (
     <header className="sticky top-0 z-30 py-3">
       <div className="app-container">
@@ -56,18 +76,30 @@ export function SiteHeader() {
           </form>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/profile"
-              className="hidden rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary md:inline-flex"
-            >
-              حسابي
-            </Link>
-            <Link
-              href="/login"
-              className="rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary"
-            >
-              دخول
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  href="/profile"
+                  className="hidden rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary md:inline-flex"
+                >
+                  حسابي
+                </Link>
+                <button
+                  className="rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary"
+                  onClick={clearSessionUser}
+                  type="button"
+                >
+                  خروج
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary"
+              >
+                دخول
+              </Link>
+            )}
             <Link
               href="/listings/new"
               className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-l from-uae-green via-primary to-uae-black px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5"

@@ -39,6 +39,7 @@ export default async function SearchPage({
   const selectedFilters = {
     category: getParam(params, "category") ?? "",
     city: getParam(params, "city") ?? "",
+    condition: getParam(params, "condition") ?? "",
     country: getParam(params, "country") ?? "",
     maxPrice: getParam(params, "maxPrice") ?? "",
     minPrice: getParam(params, "minPrice") ?? "",
@@ -51,6 +52,12 @@ export default async function SearchPage({
     searchListings({
       categoryId: selectedFilters.category || undefined,
       city: selectedFilters.city || undefined,
+      condition:
+        selectedFilters.condition === "new" ||
+        selectedFilters.condition === "used" ||
+        selectedFilters.condition === "excellent"
+          ? selectedFilters.condition
+          : undefined,
       country: selectedFilters.country || undefined,
       maxPrice: getNumberParam(params, "maxPrice"),
       minPrice: getNumberParam(params, "minPrice"),
@@ -81,14 +88,18 @@ export default async function SearchPage({
           />
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm font-bold text-muted">
-              {listings.length.toLocaleString("ar-AE")} نتيجة متاحة
+              {listings.length.toLocaleString("ar-AE")} نتيجة من البيانات الأساسية
             </p>
             <p className="rounded-full bg-primary-soft px-4 py-2 text-xs font-black text-primary">
               الضمان المالي متاح عند الشراء
             </p>
           </div>
           <div className="mt-6">
-            <SearchResultsList categories={categories} listings={listings} />
+            <SearchResultsList
+              categories={categories}
+              listings={listings}
+              selectedFilters={selectedFilters}
+            />
           </div>
         </section>
       </main>

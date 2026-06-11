@@ -22,7 +22,7 @@ export type UserProfile = {
   email: string;
   phone: string;
   city: string;
-  accountType: "buyer" | "seller" | "business";
+  accountType: "buyer" | "seller" | "business" | "individual" | "company";
   isVerified: boolean;
   joinedAt: string;
 };

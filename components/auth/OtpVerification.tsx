@@ -3,9 +3,14 @@
 type OtpVerificationProps = {
   identifier: string;
   onBack: () => void;
+  onVerified?: () => void;
 };
 
-export function OtpVerification({ identifier, onBack }: OtpVerificationProps) {
+export function OtpVerification({
+  identifier,
+  onBack,
+  onVerified,
+}: OtpVerificationProps) {
   return (
     <div className="grid gap-5">
       <div>
@@ -33,6 +38,7 @@ export function OtpVerification({ identifier, onBack }: OtpVerificationProps) {
 
       <button
         className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-black text-white transition hover:bg-primary-dark"
+        onClick={onVerified}
         type="button"
       >
         تأكيد الرمز

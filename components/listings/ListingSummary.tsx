@@ -62,6 +62,20 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
           محادثة البائع
         </Link>
       </div>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <button
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          type="button"
+        >
+          ♡ إضافة للمفضلة
+        </button>
+        <button
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          type="button"
+        >
+          مشاركة الإعلان
+        </button>
+      </div>
     </Card>
   );
 }

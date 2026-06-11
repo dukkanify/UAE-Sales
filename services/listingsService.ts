@@ -3,6 +3,7 @@ import { mockListings, mockUserListings } from "./mockData";
 type SearchListingsFilters = {
   categoryId?: string;
   city?: string;
+  condition?: "new" | "used" | "excellent";
   country?: string;
   maxPrice?: number;
   minPrice?: number;
@@ -55,6 +56,9 @@ export async function searchListings(filters: SearchListingsFilters = {}) {
       filters.categoryId ? listing.categoryId === filters.categoryId : true,
     )
     .filter((listing) => (filters.city ? listing.city === filters.city : true))
+    .filter((listing) =>
+      filters.condition ? listing.condition === filters.condition : true,
+    )
     .filter((listing) =>
       filters.country ? listing.country === filters.country : true,
     )
