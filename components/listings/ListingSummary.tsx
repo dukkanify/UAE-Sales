@@ -20,22 +20,26 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
   return (
-    <Card className="p-6">
+    <Card className="overflow-hidden p-6">
+      <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
       <div className="flex flex-wrap items-center gap-3">
         {category ? <Badge>{category.name}</Badge> : null}
-        <span className="rounded-full bg-surface-muted px-3 py-1 text-xs font-black text-muted">
+        <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-black text-primary">
           الحالة: {conditionLabels[listing.condition]}
+        </span>
+        <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-black text-uae-red">
+          ضمان مالي 100%
         </span>
       </div>
 
       <h1 className="mt-5 text-3xl font-black leading-tight text-ink md:text-4xl">
         {listing.title}
       </h1>
-      <p className="mt-5 text-3xl font-black text-primary">
+      <p className="mt-5 text-4xl font-black text-primary">
         {priceFormatter.format(listing.price)} د.إ
       </p>
 
-      <div className="mt-6 grid gap-3 rounded-3xl bg-surface-muted p-4 text-sm font-bold text-muted sm:grid-cols-2">
+      <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-surface-muted p-4 text-sm font-bold text-muted sm:grid-cols-2">
         <div>
           <span className="block text-xs text-muted">الموقع</span>
           <span className="mt-1 block text-ink">
@@ -44,7 +48,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         </div>
         <div>
           <span className="block text-xs text-muted">حالة الإعلان</span>
-          <span className="mt-1 block text-ink">نشط وجاهز للتواصل</span>
+          <span className="mt-1 block text-ink">نشط + محمي بالضمان</span>
         </div>
       </div>
 
@@ -57,20 +61,20 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         </Link>
         <Link
           href={`/chat?listing=${listing.slug}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-border bg-white px-5 py-3 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          className="inline-flex min-h-12 items-center justify-center rounded-full border border-secondary/50 bg-white px-5 py-3 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
         >
           محادثة البائع
         </Link>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
           type="button"
         >
           ♡ إضافة للمفضلة
         </button>
         <button
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
           type="button"
         >
           مشاركة الإعلان

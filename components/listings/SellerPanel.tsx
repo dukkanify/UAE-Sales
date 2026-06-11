@@ -10,7 +10,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
     <Card className="p-6">
       <h2 className="text-xl font-black text-ink">بيانات البائع</h2>
       <div className="mt-5 flex items-center gap-4">
-        <div className="grid size-14 place-items-center rounded-2xl bg-primary-soft text-lg font-black text-primary">
+        <div className="grid size-14 place-items-center rounded-2xl bg-secondary-soft text-lg font-black text-primary">
           {listing.seller.name.slice(0, 2)}
         </div>
         <div>
@@ -24,7 +24,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
       <div className="mt-6 grid gap-3 text-sm font-bold">
         <div className="flex items-center justify-between rounded-2xl bg-surface-muted p-4">
           <span className="text-muted">هوية موثقة</span>
-          <span className="text-primary">جاهز لاحقاً</span>
+          <span className="text-primary">UAE Verified</span>
         </div>
         <div className="flex items-center justify-between rounded-2xl bg-surface-muted p-4">
           <span className="text-muted">الرد على الرسائل</span>

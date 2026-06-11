@@ -130,13 +130,16 @@ export default async function CategoryPage({
             <span className="text-ink">{category.name}</span>
           </nav>
 
-          <SectionHeader
-            eyebrow="صفحة القسم"
-            title={category.name}
-            description={`تصفح ${category.listingCount.toLocaleString(
-              "ar-AE",
-            )} إعلان في قسم ${category.name} مع فلاتر جاهزة للربط بالـ API.`}
-          />
+          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)] md:p-8">
+            <div className="uae-flag-strip mb-6 h-2 w-36 rounded-full" />
+            <SectionHeader
+              eyebrow="صفحة القسم"
+              title={category.name}
+              description={`تصفح ${category.listingCount.toLocaleString(
+                "ar-AE",
+              )} إعلان في قسم ${category.name} مع فلاتر دقيقة وتجربة premium تناسب سوق الإمارات.`}
+            />
+          </div>
 
           <div className="mb-6 flex flex-wrap gap-2">
             {category.subcategories.map((subcategory) => (
@@ -145,7 +148,7 @@ export default async function CategoryPage({
                 href={`/categories/${category.slug}?q=${encodeURIComponent(
                   subcategory,
                 )}`}
-                className="rounded-full border border-border bg-white px-4 py-2 text-sm font-bold text-muted transition hover:border-primary hover:bg-primary-soft hover:text-primary"
+                className="rounded-full border border-border bg-white px-4 py-2 text-sm font-bold text-muted shadow-sm transition hover:border-secondary hover:bg-secondary-soft hover:text-primary"
               >
                 {subcategory}
               </Link>
@@ -167,7 +170,7 @@ export default async function CategoryPage({
             </p>
             <Link
               href={`/search?category=${category.id}`}
-              className="rounded-full bg-primary-soft px-4 py-2 text-xs font-black text-primary transition hover:bg-primary hover:text-white"
+              className="rounded-full bg-secondary-soft px-4 py-2 text-xs font-black text-primary transition hover:bg-secondary hover:text-primary"
             >
               عرض في نتائج البحث العامة
             </Link>

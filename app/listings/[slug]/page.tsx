@@ -88,6 +88,14 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             ) : null}
           </nav>
 
+          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)]">
+            <div className="uae-flag-strip mb-5 h-2 w-32 rounded-full" />
+            <p className="text-sm font-black text-muted">تفاصيل الإعلان</p>
+            <h1 className="mt-2 text-3xl font-black text-primary md:text-5xl">
+              {listing.title}
+            </h1>
+          </div>
+
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <ListingGallery listing={listing} />
             <div className="grid gap-5">

@@ -75,11 +75,14 @@ export default async function SearchPage({
       <SiteHeader />
       <main>
         <section className="app-container py-12 lg:py-16">
-          <SectionHeader
-            eyebrow="نتائج البحث"
-            title="ابحث بين إعلانات UAE Sales"
-            description="واجهة نتائج مجهزة بفلاتر الدولة والمدينة والتصنيف والسعر والترتيب، وقابلة للربط مع API البحث لاحقاً."
-          />
+          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)] md:p-8">
+            <div className="uae-flag-strip mb-6 h-2 w-36 rounded-full" />
+            <SectionHeader
+              eyebrow="بحث متقدم"
+              title="اعثر على الإعلان المناسب بسرعة"
+              description="فلترة احترافية حسب المدينة، القسم، السعر، وحالة المنتج مع دعم الإعلانات المنشورة محلياً في التجربة."
+            />
+          </div>
           <SearchFilters
             categories={categories}
             cities={cities}
@@ -90,7 +93,7 @@ export default async function SearchPage({
             <p className="text-sm font-bold text-muted">
               {listings.length.toLocaleString("ar-AE")} نتيجة من البيانات الأساسية
             </p>
-            <p className="rounded-full bg-primary-soft px-4 py-2 text-xs font-black text-primary">
+            <p className="rounded-full bg-secondary-soft px-4 py-2 text-xs font-black text-primary">
               الضمان المالي متاح عند الشراء
             </p>
           </div>
