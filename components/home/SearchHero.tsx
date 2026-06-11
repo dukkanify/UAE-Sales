@@ -7,8 +7,8 @@ import { Select } from "@/components/ui/Select";
 
 const stats = [
   { label: "إعلان نشط", value: "+18K" },
-  { label: "متوسط حماية", value: "100%" },
-  { label: "عمليات آمنة", value: "+4.8K" },
+  { label: "إمارات مغطاة", value: "7" },
+  { label: "عمليات بضمان", value: "+4.8K" },
 ];
 
 type SearchHeroProps = {
@@ -18,20 +18,21 @@ type SearchHeroProps = {
 export function SearchHero({ categories }: SearchHeroProps) {
   return (
     <section className="app-container py-8 lg:py-12">
-      <div className="luxury-gradient relative overflow-hidden rounded-[2.8rem] p-5 text-white shadow-[var(--shadow-glow)] md:p-8 lg:p-10">
+      <div className="luxury-gradient uae-pattern relative overflow-hidden rounded-[2.8rem] p-5 text-white shadow-[var(--shadow-glow)] md:p-8 lg:p-10">
+        <div className="uae-flag-strip absolute left-0 top-0 h-full w-3 md:w-4" />
         <div className="absolute -left-24 top-12 size-72 rounded-full bg-accent/20 blur-3xl" />
         <div className="absolute -right-24 -top-24 size-96 rounded-full bg-primary/25 blur-3xl" />
         <div className="relative grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <Badge className="border-white/15 bg-white/10 text-emerald-100">
-              Marketplace بتجربة دفع محمية
+              منصة إماراتية للبيع والشراء بضمان مالي
             </Badge>
             <h1 className="mt-6 max-w-4xl text-4xl font-black leading-tight tracking-tight md:text-6xl lg:text-7xl">
-              سوق إماراتي حديث يخلّي البيع والشراء أوضح، أسرع، وأكثر أماناً.
+              سوق الإمارات الجديد لإعلانات موثوقة وصفقات محمية.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-9 text-white/72">
-              واجهة عربية فاخرة للإعلانات المبوبة مع بحث ذكي، تصنيفات واضحة،
-              وتجربة ضمان مالي جاهزة للتوسع وربط الـ Backend.
+              تجربة عربية بهوية إماراتية تجمع دبي، أبوظبي، الشارقة وباقي
+              الإمارات في سوق واحد للسيارات والعقارات والموبايلات والخدمات.
             </p>
 
             <form
@@ -107,16 +108,18 @@ export function SearchHero({ categories }: SearchHeroProps) {
                 <div className="rounded-[1.8rem] bg-white p-5 text-ink shadow-2xl">
                   <div className="flex items-center justify-between">
                     <span className="rounded-full bg-primary-soft px-4 py-2 text-xs font-black text-primary">
-                      صفقة محمية الآن
+                      صفقة إماراتية محمية
                     </span>
                     <span className="text-sm font-black text-muted">
                       دبي مارينا
                     </span>
                   </div>
-                  <div className="mt-5 h-56 rounded-[1.6rem] bg-[radial-gradient(circle_at_30%_20%,rgba(37,255,208,0.45),transparent_38%),linear-gradient(135deg,#e9fff7,#fff4d8)]" />
+                  <div className="relative mt-5 h-56 overflow-hidden rounded-[1.6rem] bg-[radial-gradient(circle_at_30%_20%,rgba(0,154,87,0.34),transparent_38%),linear-gradient(135deg,#e9fff7,#fff4d8)]">
+                    <div className="uae-flag-strip absolute bottom-5 right-5 h-14 w-24 rounded-2xl shadow-lg" />
+                  </div>
                   <div className="mt-5">
                     <h2 className="text-2xl font-black">
-                      ساعة فاخرة بحالة ممتازة
+                      ساعة فاخرة في دبي بحالة ممتازة
                     </h2>
                     <div className="mt-4 flex items-end justify-between gap-4">
                       <div>
@@ -127,8 +130,8 @@ export function SearchHero({ categories }: SearchHeroProps) {
                           2,800 د.إ
                         </p>
                       </div>
-                      <span className="rounded-2xl bg-night px-4 py-3 text-sm font-black text-white">
-                        مطابق ✓
+                      <span className="rounded-2xl bg-uae-black px-4 py-3 text-sm font-black text-white">
+                        UAE Verified
                       </span>
                     </div>
                   </div>
@@ -136,7 +139,7 @@ export function SearchHero({ categories }: SearchHeroProps) {
               </div>
             </div>
             <div className="absolute -bottom-5 right-6 rounded-3xl border border-white/15 bg-night/80 p-4 text-white shadow-2xl backdrop-blur">
-              <p className="text-xs font-black text-white/55">Wallet hold</p>
+              <p className="text-xs font-black text-white/55">UAE Escrow</p>
               <p className="mt-1 text-xl font-black text-accent">محمي 100%</p>
             </div>
           </div>

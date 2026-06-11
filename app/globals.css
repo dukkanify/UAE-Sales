@@ -5,6 +5,10 @@
   --color-primary: var(--color-primary);
   --color-primary-dark: var(--color-primary-dark);
   --color-primary-soft: var(--color-primary-soft);
+  --color-uae-red: var(--color-uae-red);
+  --color-uae-green: var(--color-uae-green);
+  --color-uae-black: var(--color-uae-black);
+  --color-uae-white: var(--color-uae-white);
   --color-accent: var(--color-accent);
   --color-accent-soft: var(--color-accent-soft);
   --color-ink: var(--color-ink);
@@ -81,9 +85,35 @@ textarea {
 
 .luxury-gradient {
   background:
-    radial-gradient(circle at 16% 12%, rgb(37 255 208 / 20%), transparent 20rem),
-    radial-gradient(circle at 88% 0%, rgb(244 182 63 / 18%), transparent 24rem),
-    linear-gradient(135deg, var(--color-night) 0%, #0d2b22 48%, #06100d 100%);
+    linear-gradient(90deg, rgb(227 27 35 / 88%) 0 0.65rem, transparent 0.65rem),
+    radial-gradient(circle at 16% 12%, rgb(0 154 87 / 26%), transparent 20rem),
+    radial-gradient(circle at 88% 0%, rgb(244 182 63 / 20%), transparent 24rem),
+    linear-gradient(135deg, var(--color-uae-black) 0%, #0d2b22 48%, #06100d 100%);
+}
+
+.uae-flag-strip {
+  background:
+    linear-gradient(90deg, var(--color-uae-red) 0 18%, transparent 18%),
+    linear-gradient(
+      180deg,
+      var(--color-uae-green) 0 33.333%,
+      var(--color-uae-white) 33.333% 66.666%,
+      var(--color-uae-black) 66.666% 100%
+    );
+}
+
+.uae-pattern {
+  background-image:
+    linear-gradient(135deg, rgb(255 255 255 / 8%) 25%, transparent 25%),
+    linear-gradient(225deg, rgb(255 255 255 / 8%) 25%, transparent 25%),
+    linear-gradient(45deg, rgb(255 255 255 / 5%) 25%, transparent 25%),
+    linear-gradient(315deg, rgb(255 255 255 / 5%) 25%, transparent 25%);
+  background-position:
+    12px 0,
+    12px 0,
+    0 0,
+    0 0;
+  background-size: 24px 24px;
 }
 
 .premium-ring {

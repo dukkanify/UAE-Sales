@@ -36,6 +36,7 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
             className={`relative h-56 overflow-hidden bg-gradient-to-br ${toneClasses[listing.imageTone]} p-4`}
           >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.85),transparent_30%),linear-gradient(180deg,transparent,rgba(7,19,15,0.08))]" />
+            <div className="uae-flag-strip absolute bottom-0 right-0 h-2 w-full" />
             <div className="relative flex justify-between gap-3">
               {listing.isFeatured ? (
                 <Badge className="border-white/20 bg-night/85 text-white">
@@ -51,9 +52,9 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
               </span>
             </div>
             <div className="relative grid h-full place-items-center pb-8">
-              <span className="rounded-[1.5rem] border border-white/50 bg-white/30 px-8 py-5 text-5xl font-black text-ink/12 backdrop-blur">
-                UAE
-              </span>
+              <div className="rounded-[1.5rem] border border-white/50 bg-white/35 p-4 backdrop-blur">
+                <div className="uae-flag-strip h-14 w-24 rounded-2xl shadow-lg" />
+              </div>
             </div>
           </div>
         </Link>

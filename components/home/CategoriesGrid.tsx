@@ -11,9 +11,9 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
   return (
     <section className="app-container py-14">
       <SectionHeader
-        eyebrow="الأقسام الذكية"
-        title="كل ما تحتاجه في سوق واحد"
-        description="تصنيفات منظمة بتجربة سريعة وواضحة، من السيارات والعقارات إلى الخدمات والحيوانات."
+        eyebrow="أقسام سوق الإمارات"
+        title="كل احتياجاتك داخل الإمارات في سوق واحد"
+        description="تصنيفات محلية منظمة بتجربة سريعة وواضحة، من السيارات والعقارات إلى الخدمات والحيوانات."
         action={
           <Link
             href="/categories"
@@ -29,8 +29,9 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
           <Link key={category.id} href={`/categories/${category.slug}`}>
             <Card className="group relative h-full overflow-hidden p-6 transition duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-2xl">
               <div className="absolute -left-12 -top-12 size-32 rounded-full bg-primary/10 blur-2xl transition group-hover:bg-primary/20" />
+              <div className="uae-flag-strip absolute inset-x-0 top-0 h-1.5" />
               <div className="relative mb-6 flex items-start justify-between gap-4">
-                <span className="grid size-16 place-items-center rounded-[1.35rem] bg-gradient-to-br from-primary-soft to-white text-3xl shadow-sm transition group-hover:scale-105">
+                <span className="grid size-16 place-items-center rounded-[1.35rem] bg-gradient-to-br from-primary-soft via-white to-accent-soft text-3xl shadow-sm transition group-hover:scale-105">
                   {category.icon}
                 </span>
                 <span className="rounded-full bg-surface-muted px-3 py-1 text-xs font-bold text-muted">

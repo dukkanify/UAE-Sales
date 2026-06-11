@@ -8,13 +8,18 @@ export function SiteHeader() {
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.7rem] border border-white/80 bg-white/82 px-3 py-3 shadow-[var(--shadow-soft)] backdrop-blur-2xl lg:flex-nowrap lg:px-4">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative grid size-12 place-items-center overflow-hidden rounded-2xl bg-night text-lg font-black text-white shadow-[var(--shadow-glow)]">
-              <span className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(37,255,208,0.55),transparent_42%),linear-gradient(135deg,rgba(0,184,122,0.8),rgba(244,182,63,0.35))]" />
-              <span className="relative">US</span>
+              <span className="uae-flag-strip absolute inset-0" />
+              <span className="absolute inset-y-0 right-0 w-1/4 bg-uae-red" />
+              <span className="relative rounded-xl bg-uae-black/80 px-2 py-1 text-xs tracking-wide">
+                UAE
+              </span>
             </span>
             <span>
-              <span className="block text-lg font-black text-ink">UAE Sales</span>
-              <span className="block text-xs font-black text-primary">
-                سوق الضمان الذكي
+              <span className="block text-lg font-black text-ink">
+                UAE Sales
+              </span>
+              <span className="block text-xs font-black text-uae-red">
+                سوق إماراتي بضمان آمن
               </span>
             </span>
           </Link>
@@ -43,7 +48,7 @@ export function SiteHeader() {
               type="search"
             />
             <button
-              className="rounded-full bg-night px-4 text-sm font-black text-white transition hover:bg-primary"
+              className="rounded-full bg-uae-black px-4 text-sm font-black text-white transition hover:bg-uae-green"
               type="submit"
             >
               بحث
@@ -65,7 +70,7 @@ export function SiteHeader() {
             </Link>
             <Link
               href="/listings/new"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-l from-primary to-primary-dark px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-gradient-to-l from-uae-green via-primary to-uae-black px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5"
             >
               أضف إعلان
             </Link>
