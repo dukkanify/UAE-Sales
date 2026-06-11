@@ -13,6 +13,7 @@
   --color-surface: var(--color-surface);
   --color-surface-muted: var(--color-surface-muted);
   --color-background: var(--color-background);
+  --shadow-soft: var(--shadow-soft);
   --font-sans: var(--font-arabic);
 }
 
@@ -29,8 +30,9 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgb(209 250 229 / 55%), transparent 34rem),
-    linear-gradient(180deg, #ffffff 0%, var(--color-background) 38%, #ffffff 100%);
+    radial-gradient(circle at top right, rgb(0 138 91 / 13%), transparent 34rem),
+    radial-gradient(circle at 10% 18%, rgb(217 144 32 / 10%), transparent 26rem),
+    linear-gradient(180deg, #ffffff 0%, var(--color-background) 42%, #ffffff 100%);
   color: var(--color-ink);
   font-family: var(--font-arabic);
 }
@@ -48,8 +50,25 @@ textarea {
 }
 
 .app-container {
-  width: min(100% - 2rem, var(--container-width));
+  width: min(100% - 1.5rem, var(--container-width));
   margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    width: min(100% - 3rem, var(--container-width));
+  }
+}
+
+.section-padding {
+  padding-block: clamp(2.5rem, 5vw, 5rem);
+}
+
+.glass-panel {
+  border: 1px solid rgb(255 255 255 / 70%);
+  background: rgb(255 255 255 / 82%);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px);
 }
 
 .focus-ring {

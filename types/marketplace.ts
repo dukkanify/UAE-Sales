@@ -16,10 +16,22 @@ export type Category = {
   subcategories: string[];
 };
 
+export type UserProfile = {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  city: string;
+  accountType: "buyer" | "seller" | "business";
+  isVerified: boolean;
+  joinedAt: string;
+};
+
 export type Listing = {
   id: string;
   title: string;
   slug: string;
+  description: string;
   categoryId: string;
   city: string;
   country: string;
@@ -28,6 +40,7 @@ export type Listing = {
   condition: ListingCondition;
   status: ListingStatus;
   isFeatured: boolean;
+  views: number;
   seller: {
     id: string;
     name: string;

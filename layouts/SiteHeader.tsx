@@ -3,10 +3,10 @@ import { primaryNavigation } from "@/constants/navigation";
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/70 bg-white/85 backdrop-blur-xl">
-      <div className="app-container flex min-h-20 items-center justify-between gap-4">
+    <header className="sticky top-0 z-30 border-b border-white/70 bg-white/90 backdrop-blur-xl">
+      <div className="app-container flex min-h-20 flex-wrap items-center justify-between gap-3 py-3 lg:flex-nowrap">
         <Link href="/" className="flex items-center gap-3">
-          <span className="grid size-11 place-items-center rounded-2xl bg-primary text-lg font-black text-white">
+          <span className="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-primary to-primary-dark text-lg font-black text-white shadow-[var(--shadow-soft)]">
             US
           </span>
           <span>
@@ -17,7 +17,26 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm font-bold text-muted lg:flex">
+        <form
+          action="/search"
+          className="order-3 grid w-full grid-cols-[1fr_auto] rounded-full border border-border bg-surface-muted p-1 lg:order-none lg:max-w-sm"
+        >
+          <input
+            aria-label="بحث سريع"
+            className="min-h-10 rounded-full bg-transparent px-4 text-sm font-bold text-ink outline-none placeholder:text-muted"
+            name="q"
+            placeholder="ابحث في السوق..."
+            type="search"
+          />
+          <button
+            className="rounded-full bg-primary px-4 text-sm font-black text-white transition hover:bg-primary-dark"
+            type="submit"
+          >
+            بحث
+          </button>
+        </form>
+
+        <nav className="hidden items-center gap-5 text-sm font-bold text-muted xl:flex">
           {primaryNavigation.map((item) => (
             <Link
               key={item.href}
@@ -31,8 +50,14 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <Link
+            href="/profile"
+            className="hidden rounded-full px-4 py-2.5 text-sm font-bold text-muted transition hover:bg-primary-soft hover:text-primary md:inline-flex"
+          >
+            حسابي
+          </Link>
+          <Link
             href="/login"
-            className="hidden rounded-full px-4 py-2.5 text-sm font-bold text-muted transition hover:bg-primary-soft hover:text-primary sm:inline-flex"
+            className="rounded-full px-4 py-2.5 text-sm font-bold text-muted transition hover:bg-primary-soft hover:text-primary"
           >
             دخول
           </Link>

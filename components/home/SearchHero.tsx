@@ -1,4 +1,5 @@
 import { cities, countries } from "@/constants/locations";
+import type { Category } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -10,7 +11,11 @@ const stats = [
   { label: "عمليات آمنة", value: "+4.8K" },
 ];
 
-export function SearchHero() {
+type SearchHeroProps = {
+  categories: Category[];
+};
+
+export function SearchHero({ categories }: SearchHeroProps) {
   return (
     <section className="app-container grid gap-10 py-12 lg:grid-cols-[1fr_0.82fr] lg:items-center lg:py-20">
       <div>
@@ -23,10 +28,14 @@ export function SearchHero() {
           عربية سريعة ومجهزة للربط مع خدمات الدفع، المحفظة، والمحادثات.
         </p>
 
-        <form className="mt-8 grid gap-4 rounded-[var(--radius-xl)] border border-border bg-white p-4 shadow-[var(--shadow-card)] md:grid-cols-[1.4fr_1fr_1fr_auto]">
+        <form
+          action="/search"
+          className="glass-panel mt-8 grid gap-4 rounded-[var(--radius-xl)] p-4 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr_auto]"
+        >
           <Input
             aria-label="ابحث عن إعلان"
-            name="query"
+            label="كلمة البحث"
+            name="q"
             placeholder="ابحث عن سيارة، هاتف، عقار..."
           />
           <Select
@@ -35,17 +44,32 @@ export function SearchHero() {
             name="country"
             options={countries.map((country) => ({
               label: country.name,
-              value: country.id,
+              value: country.name,
             }))}
           />
           <Select
             aria-label="المدينة"
             label="المدينة"
             name="city"
-            options={cities.map((city) => ({
-              label: city.name,
-              value: city.id,
-            }))}
+            options={[
+              { label: "كل المدن", value: "" },
+              ...cities.map((city) => ({
+                label: city.name,
+                value: city.name,
+              })),
+            ]}
+          />
+          <Select
+            aria-label="القسم"
+            label="القسم"
+            name="category"
+            options={[
+              { label: "كل الأقسام", value: "" },
+              ...categories.map((category) => ({
+                label: category.name,
+                value: category.id,
+              })),
+            ]}
           />
           <Button className="self-end" type="submit">
             بحث
