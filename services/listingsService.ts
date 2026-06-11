@@ -14,8 +14,20 @@ export async function getListings() {
   return mockListings;
 }
 
+export async function getListingBySlug(slug: string) {
+  return mockListings.find((listing) => listing.slug === slug);
+}
+
 export async function getFeaturedListings() {
   return mockListings.filter((listing) => listing.isFeatured);
+}
+
+export async function getRelatedListings(categoryId: string, excludedId: string) {
+  return mockListings
+    .filter((listing) => listing.status === "active")
+    .filter((listing) => listing.categoryId === categoryId)
+    .filter((listing) => listing.id !== excludedId)
+    .slice(0, 3);
 }
 
 export async function searchListings(filters: SearchListingsFilters = {}) {
