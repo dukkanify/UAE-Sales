@@ -1,20 +1,21 @@
 :root {
-  --color-primary: #047857;
-  --color-primary-dark: #065f46;
-  --color-primary-soft: #d1fae5;
-  --color-accent: #f59e0b;
-  --color-accent-soft: #fef3c7;
-  --color-ink: #10201a;
-  --color-muted: #64748b;
-  --color-border: #dbe4df;
+  --color-primary: #008a5b;
+  --color-primary-dark: #006b49;
+  --color-primary-soft: #e4f8ef;
+  --color-accent: #d99020;
+  --color-accent-soft: #fff1d6;
+  --color-ink: #10231d;
+  --color-muted: #63746f;
+  --color-border: #dfe8e4;
   --color-surface: #ffffff;
-  --color-surface-muted: #f5f7f6;
-  --color-background: #f8faf9;
-  --shadow-card: 0 18px 45px rgb(15 23 42 / 8%);
+  --color-surface-muted: #f4f8f6;
+  --color-background: #f7fbf9;
+  --shadow-card: 0 18px 48px rgb(16 35 29 / 8%);
+  --shadow-soft: 0 10px 30px rgb(16 35 29 / 6%);
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
   --radius-lg: 1.5rem;
   --radius-xl: 2rem;
-  --container-width: 1180px;
-  --font-arabic: Tahoma, Arial, "Helvetica Neue", sans-serif;
+  --container-width: 1200px;
+  --font-arabic: "Tajawal", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
 }

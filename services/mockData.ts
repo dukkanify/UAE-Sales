@@ -21,9 +21,17 @@ export const mockCategories: Category[] = [
     id: "electronics",
     name: "إلكترونيات",
     slug: "electronics",
-    icon: "📱",
+    icon: "💻",
     listingCount: 2140,
-    subcategories: ["هواتف", "لابتوبات", "ألعاب", "كاميرات"],
+    subcategories: ["لابتوبات", "ألعاب", "كاميرات", "سماعات"],
+  },
+  {
+    id: "mobiles",
+    name: "موبايلات",
+    slug: "mobiles",
+    icon: "📱",
+    listingCount: 1650,
+    subcategories: ["آيفون", "سامسونج", "إكسسوارات", "أرقام مميزة"],
   },
   {
     id: "furniture",
@@ -48,6 +56,22 @@ export const mockCategories: Category[] = [
     icon: "⌚",
     listingCount: 615,
     subcategories: ["ساعات", "حقائب", "ملابس", "عطور"],
+  },
+  {
+    id: "pets",
+    name: "الحيوانات",
+    slug: "pets",
+    icon: "🐾",
+    listingCount: 284,
+    subcategories: ["قطط", "كلاب", "طيور", "مستلزمات"],
+  },
+  {
+    id: "services",
+    name: "الخدمات",
+    slug: "services",
+    icon: "🛠️",
+    listingCount: 720,
+    subcategories: ["صيانة", "تنظيف", "نقل", "تصميم"],
   },
 ];
 
@@ -77,6 +101,7 @@ export const mockListings: Listing[] = [
     condition: "excellent",
     status: "active",
     isFeatured: true,
+    views: 1240,
     seller: {
       id: "seller-1",
       name: "معرض النخبة",
@@ -90,7 +115,7 @@ export const mockListings: Listing[] = [
     slug: "iphone-15-pro-max-256gb",
     description:
       "جهاز جديد بضمان محلي، اللون تيتانيوم طبيعي مع كامل الملحقات الأصلية.",
-    categoryId: "electronics",
+    categoryId: "mobiles",
     city: "أبوظبي",
     country: "الإمارات العربية المتحدة",
     price: 3950,
@@ -98,6 +123,7 @@ export const mockListings: Listing[] = [
     condition: "new",
     status: "active",
     isFeatured: true,
+    views: 980,
     seller: {
       id: "seller-2",
       name: "سارة للتقنية",
@@ -119,6 +145,7 @@ export const mockListings: Listing[] = [
     condition: "excellent",
     status: "active",
     isFeatured: true,
+    views: 760,
     seller: {
       id: "seller-3",
       name: "دار الخليج العقارية",
@@ -140,6 +167,7 @@ export const mockListings: Listing[] = [
     condition: "used",
     status: "active",
     isFeatured: true,
+    views: 420,
     seller: {
       id: "seller-4",
       name: "بيت الأناقة",
@@ -161,6 +189,7 @@ export const mockListings: Listing[] = [
     condition: "excellent",
     status: "active",
     isFeatured: false,
+    views: 360,
     seller: {
       id: "seller-5",
       name: "أوتو الإمارات",
@@ -182,6 +211,7 @@ export const mockListings: Listing[] = [
     condition: "excellent",
     status: "active",
     isFeatured: false,
+    views: 295,
     seller: {
       id: "seller-2",
       name: "سارة للتقنية",
@@ -195,7 +225,7 @@ export const mockListings: Listing[] = [
     slug: "product-photography-service",
     description:
       "جلسات تصوير احترافية للمنتجات مع تحرير صور جاهزة للمتاجر والإعلانات.",
-    categoryId: "jobs",
+    categoryId: "services",
     city: "الشارقة",
     country: "الإمارات العربية المتحدة",
     price: 750,
@@ -203,6 +233,7 @@ export const mockListings: Listing[] = [
     condition: "new",
     status: "active",
     isFeatured: false,
+    views: 188,
     seller: {
       id: "seller-6",
       name: "استوديو لقطة",
@@ -224,12 +255,57 @@ export const mockListings: Listing[] = [
     condition: "used",
     status: "active",
     isFeatured: false,
+    views: 540,
     seller: {
       id: "seller-7",
       name: "زمن الفخامة",
       rating: 4.6,
     },
     imageTone: "amber",
+  },
+  {
+    id: "listing-009",
+    title: "فرصة عمل لمندوب مبيعات",
+    slug: "sales-representative-job",
+    description:
+      "شركة محلية تبحث عن مندوب مبيعات بخبرة في السوق الإماراتي وعمولات مجزية.",
+    categoryId: "jobs",
+    city: "دبي",
+    country: "الإمارات العربية المتحدة",
+    price: 5000,
+    currency: "AED",
+    condition: "new",
+    status: "active",
+    isFeatured: false,
+    views: 142,
+    seller: {
+      id: "seller-8",
+      name: "الخليج للتوظيف",
+      rating: 4.5,
+    },
+    imageTone: "emerald",
+  },
+  {
+    id: "listing-010",
+    title: "قطة شيرازي مع مستلزماتها",
+    slug: "persian-cat-with-supplies",
+    description:
+      "قطة أليفة مطعمة ومعها مستلزمات كاملة، مناسبة لعائلة تهتم بالحيوانات.",
+    categoryId: "pets",
+    city: "الشارقة",
+    country: "الإمارات العربية المتحدة",
+    price: 1200,
+    currency: "AED",
+    condition: "excellent",
+    status: "active",
+    isFeatured: false,
+    views: 210,
+    seller: {
+      id: "seller-9",
+      name: "مركز الرفق",
+      rating: 4.8,
+    },
+    imageTone: "rose",
   },
 ];
 
@@ -248,6 +324,7 @@ export const mockUserListings: Listing[] = [
     condition: "excellent",
     status: "active",
     isFeatured: false,
+    views: 89,
     seller: {
       id: "user-current",
       name: "أحمد المنصوري",
@@ -269,6 +346,7 @@ export const mockUserListings: Listing[] = [
     condition: "used",
     status: "pending_review",
     isFeatured: false,
+    views: 0,
     seller: {
       id: "user-current",
       name: "أحمد المنصوري",
@@ -290,6 +368,7 @@ export const mockUserListings: Listing[] = [
     condition: "excellent",
     status: "draft",
     isFeatured: false,
+    views: 0,
     seller: {
       id: "user-current",
       name: "أحمد المنصوري",
@@ -311,6 +390,7 @@ export const mockUserListings: Listing[] = [
     condition: "excellent",
     status: "expired",
     isFeatured: false,
+    views: 330,
     seller: {
       id: "user-current",
       name: "أحمد المنصوري",
@@ -332,6 +412,7 @@ export const mockUserListings: Listing[] = [
     condition: "used",
     status: "rejected",
     isFeatured: false,
+    views: 0,
     seller: {
       id: "user-current",
       name: "أحمد المنصوري",

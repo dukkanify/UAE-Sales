@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 
 type SearchFiltersProps = {
+  action?: string;
   categories: Category[];
   cities: City[];
   countries: {
@@ -19,18 +20,21 @@ type SearchFiltersProps = {
     query?: string;
     sort?: string;
   };
+  showCategory?: boolean;
 };
 
 export function SearchFilters({
+  action = "/search",
   categories,
   cities,
   countries,
   selectedFilters,
+  showCategory = true,
 }: SearchFiltersProps) {
   return (
     <form
-      action="/search"
-      className="grid gap-4 rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-[var(--shadow-card)] lg:grid-cols-4 xl:grid-cols-7"
+      action={action}
+      className="grid gap-4 rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
     >
       <Input
         defaultValue={selectedFilters.query}
@@ -59,18 +63,20 @@ export function SearchFilters({
           ...cities.map((city) => ({ label: city.name, value: city.name })),
         ]}
       />
-      <Select
-        defaultValue={selectedFilters.category}
-        label="التصنيف"
-        name="category"
-        options={[
-          { label: "كل التصنيفات", value: "" },
-          ...categories.map((category) => ({
-            label: category.name,
-            value: category.id,
-          })),
-        ]}
-      />
+      {showCategory ? (
+        <Select
+          defaultValue={selectedFilters.category}
+          label="التصنيف"
+          name="category"
+          options={[
+            { label: "كل التصنيفات", value: "" },
+            ...categories.map((category) => ({
+              label: category.name,
+              value: category.id,
+            })),
+          ]}
+        />
+      ) : null}
       <Input
         defaultValue={selectedFilters.minPrice}
         inputMode="numeric"

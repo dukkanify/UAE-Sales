@@ -16,7 +16,7 @@ export default async function Home() {
     <>
       <SiteHeader />
       <main>
-        <SearchHero />
+        <SearchHero categories={categories} />
         <CategoriesGrid categories={categories} />
         <FeaturedListings listings={featuredListings} />
         <section className="app-container py-12">

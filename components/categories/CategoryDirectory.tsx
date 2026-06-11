@@ -10,15 +10,18 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
   return (
     <div className="grid gap-5 md:grid-cols-2">
       {categories.map((category) => (
-        <Card key={category.id} className="p-6">
-          <div className="flex items-start gap-4">
+        <Card
+          key={category.id}
+          className="p-6 transition hover:-translate-y-1 hover:border-primary hover:shadow-2xl"
+        >
+          <div className="grid gap-4 sm:flex sm:items-start">
             <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-primary-soft text-3xl">
               {category.icon}
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
-                  href={`/search?category=${category.id}`}
+                  href={`/categories/${category.slug}`}
                   className="text-xl font-black text-ink transition hover:text-primary"
                 >
                   {category.name}
@@ -31,7 +34,7 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
                 {category.subcategories.map((subcategory) => (
                   <Link
                     key={subcategory}
-                    href={`/search?category=${category.id}&q=${encodeURIComponent(
+                    href={`/categories/${category.slug}?q=${encodeURIComponent(
                       subcategory,
                     )}`}
                     className="rounded-2xl border border-border px-4 py-3 text-sm font-bold text-muted transition hover:border-primary hover:bg-primary-soft hover:text-primary"

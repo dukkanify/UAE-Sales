@@ -40,6 +40,7 @@ export type Listing = {
   condition: ListingCondition;
   status: ListingStatus;
   isFeatured: boolean;
+  views: number;
   seller: {
     id: string;
     name: string;
