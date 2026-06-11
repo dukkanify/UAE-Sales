@@ -1,0 +1,26 @@
+import { AuthShell } from "@/components/auth/AuthShell";
+import { RegisterForm } from "@/components/auth/RegisterForm";
+import { SiteFooter } from "@/layouts/SiteFooter";
+import { SiteHeader } from "@/layouts/SiteHeader";
+
+export default function RegisterPage() {
+  return (
+    <>
+      <SiteHeader />
+      <main>
+        <AuthShell
+          description="ابدأ حسابك في UAE Sales لإضافة الإعلانات، متابعة المحادثات، وإدارة الطلبات والمدفوعات لاحقاً."
+          footerAction={{
+            href: "/login",
+            label: "سجّل الدخول",
+            prompt: "لديك حساب بالفعل؟",
+          }}
+          title="أنشئ حسابك وابدأ البيع والشراء."
+        >
+          <RegisterForm />
+        </AuthShell>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
