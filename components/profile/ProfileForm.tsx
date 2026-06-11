@@ -25,7 +25,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
   const [displayUser, setDisplayUser] = useState(user);
 
   useEffect(() => {
-    setDisplayUser(getSessionUser() ?? user);
+    const timeoutId = window.setTimeout(() => {
+      setDisplayUser(getSessionUser() ?? user);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [user]);
 
   return (

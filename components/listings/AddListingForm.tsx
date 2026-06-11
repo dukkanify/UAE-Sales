@@ -45,12 +45,16 @@ export function AddListingForm({ categories }: AddListingFormProps) {
   );
 
   useEffect(() => {
-    if (getSessionUser()) {
-      setIsAllowed(true);
-      return;
-    }
+    const timeoutId = window.setTimeout(() => {
+      if (getSessionUser()) {
+        setIsAllowed(true);
+        return;
+      }
 
-    router.replace("/login?next=/listings/new");
+      router.replace("/login?next=/listings/new");
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [router]);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {

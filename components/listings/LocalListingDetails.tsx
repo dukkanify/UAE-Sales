@@ -22,7 +22,11 @@ export function LocalListingDetails({
   const [listing, setListing] = useState<Listing | null>(null);
 
   useEffect(() => {
-    setListing(getLocalListingById(listingId) ?? null);
+    const timeoutId = window.setTimeout(() => {
+      setListing(getLocalListingById(listingId) ?? null);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [listingId]);
 
   if (!listing) {

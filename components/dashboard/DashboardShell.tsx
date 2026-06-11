@@ -35,14 +35,18 @@ export function DashboardShell({
   const router = useRouter();
 
   useEffect(() => {
-    const sessionUser = getSessionUser();
-    if (sessionUser) {
-      setDisplayUser(sessionUser);
-      setIsAllowed(true);
-      return;
-    }
+    const timeoutId = window.setTimeout(() => {
+      const sessionUser = getSessionUser();
+      if (sessionUser) {
+        setDisplayUser(sessionUser);
+        setIsAllowed(true);
+        return;
+      }
 
-    router.replace(`/login?next=${activePath}`);
+      router.replace(`/login?next=${activePath}`);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [activePath, router, user]);
 
   if (!isAllowed) {
