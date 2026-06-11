@@ -26,10 +26,12 @@ export function AuthShell({
   title,
 }: AuthShellProps) {
   return (
-    <section className="app-container grid gap-8 py-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:py-16">
-      <div className="rounded-[var(--radius-xl)] bg-ink p-8 text-white shadow-[var(--shadow-card)]">
+    <section className="app-container grid gap-8 py-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:py-16">
+      <div className="luxury-gradient relative overflow-hidden rounded-[var(--radius-xl)] p-8 text-white shadow-[var(--shadow-glow)]">
+        <div className="absolute -left-20 top-10 size-64 rounded-full bg-accent/20 blur-3xl" />
+        <div className="absolute -right-20 -top-20 size-72 rounded-full bg-primary/25 blur-3xl" />
         <Link href="/" className="inline-flex items-center gap-3">
-          <span className="grid size-12 place-items-center rounded-2xl bg-primary text-lg font-black text-white">
+          <span className="relative grid size-12 place-items-center rounded-2xl bg-white/10 text-lg font-black text-white shadow-[var(--shadow-soft)]">
             US
           </span>
           <span>
@@ -40,18 +42,20 @@ export function AuthShell({
           </span>
         </Link>
 
-        <h1 className="mt-10 text-3xl font-black leading-tight md:text-5xl">
+        <h1 className="relative mt-10 text-3xl font-black leading-tight md:text-5xl">
           {title}
         </h1>
-        <p className="mt-5 max-w-xl leading-9 text-white/72">{description}</p>
+        <p className="relative mt-5 max-w-xl leading-9 text-white/72">
+          {description}
+        </p>
 
-        <div className="mt-8 grid gap-3">
+        <div className="relative mt-8 grid gap-3">
           {trustPoints.map((point) => (
             <div
               key={point}
-              className="flex items-center gap-3 rounded-2xl bg-white/10 p-4 text-sm font-bold"
+              className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 text-sm font-bold backdrop-blur"
             >
-              <span className="grid size-6 place-items-center rounded-full bg-primary text-xs text-white">
+              <span className="grid size-6 place-items-center rounded-full bg-primary text-xs text-white shadow-[var(--shadow-glow)]">
                 ✓
               </span>
               <span>{point}</span>

@@ -7,7 +7,7 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 export function Badge({ children, className = "", ...props }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary ${className}`}
+      className={`inline-flex items-center rounded-full border border-primary/15 bg-primary-soft px-3.5 py-1.5 text-xs font-black text-primary shadow-sm ${className}`}
       {...props}
     >
       {children}
