@@ -20,6 +20,7 @@ export type Listing = {
   id: string;
   title: string;
   slug: string;
+  description: string;
   categoryId: string;
   city: string;
   country: string;
