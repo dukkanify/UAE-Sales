@@ -1,4 +1,4 @@
-import type { Category, Listing } from "@/types";
+import type { Category, Listing, UserProfile } from "@/types";
 
 export const mockCategories: Category[] = [
   {
@@ -50,6 +50,17 @@ export const mockCategories: Category[] = [
     subcategories: ["ساعات", "حقائب", "ملابس", "عطور"],
   },
 ];
+
+export const mockCurrentUser: UserProfile = {
+  id: "user-current",
+  fullName: "أحمد المنصوري",
+  email: "ahmed@example.com",
+  phone: "0501234567",
+  city: "دبي",
+  accountType: "seller",
+  isVerified: false,
+  joinedAt: "2026-01-15",
+};
 
 export const mockListings: Listing[] = [
   {
@@ -219,5 +230,113 @@ export const mockListings: Listing[] = [
       rating: 4.6,
     },
     imageTone: "amber",
+  },
+];
+
+export const mockUserListings: Listing[] = [
+  {
+    id: "user-listing-001",
+    title: "نيسان باترول 2020 للبيع",
+    slug: "my-nissan-patrol-2020",
+    description:
+      "سيارة عائلية بحالة ممتازة، صيانة وكالة، جاهزة للفحص في دبي.",
+    categoryId: "cars",
+    city: "دبي",
+    country: "الإمارات العربية المتحدة",
+    price: 168000,
+    currency: "AED",
+    condition: "excellent",
+    status: "active",
+    isFeatured: false,
+    seller: {
+      id: "user-current",
+      name: "أحمد المنصوري",
+      rating: 4.8,
+    },
+    imageTone: "emerald",
+  },
+  {
+    id: "user-listing-002",
+    title: "كاميرا كانون احترافية",
+    slug: "my-canon-camera",
+    description:
+      "كاميرا مع عدسة أساسية وحقيبة، مناسبة للتصوير الاحترافي والهواة.",
+    categoryId: "electronics",
+    city: "دبي",
+    country: "الإمارات العربية المتحدة",
+    price: 3200,
+    currency: "AED",
+    condition: "used",
+    status: "pending_review",
+    isFeatured: false,
+    seller: {
+      id: "user-current",
+      name: "أحمد المنصوري",
+      rating: 4.8,
+    },
+    imageTone: "sky",
+  },
+  {
+    id: "user-listing-003",
+    title: "طاولة طعام خشب طبيعي",
+    slug: "my-wooden-dining-table",
+    description:
+      "مسودة إعلان لطاولة طعام ستة كراسي، بحاجة لإضافة صور قبل النشر.",
+    categoryId: "furniture",
+    city: "الشارقة",
+    country: "الإمارات العربية المتحدة",
+    price: 1800,
+    currency: "AED",
+    condition: "excellent",
+    status: "draft",
+    isFeatured: false,
+    seller: {
+      id: "user-current",
+      name: "أحمد المنصوري",
+      rating: 4.8,
+    },
+    imageTone: "amber",
+  },
+  {
+    id: "user-listing-004",
+    title: "شقة استوديو للإيجار الشهري",
+    slug: "my-studio-apartment-rent",
+    description:
+      "إعلان منتهي لشقة استوديو مفروشة، يمكن إعادة تنشيطه بعد تحديث السعر.",
+    categoryId: "real-estate",
+    city: "عجمان",
+    country: "الإمارات العربية المتحدة",
+    price: 3200,
+    currency: "AED",
+    condition: "excellent",
+    status: "expired",
+    isFeatured: false,
+    seller: {
+      id: "user-current",
+      name: "أحمد المنصوري",
+      rating: 4.8,
+    },
+    imageTone: "rose",
+  },
+  {
+    id: "user-listing-005",
+    title: "ساعة ذكية مستعملة",
+    slug: "my-used-smart-watch",
+    description:
+      "إعلان مرفوض مؤقتاً بسبب نقص تفاصيل الحالة والصور، جاهز للتعديل.",
+    categoryId: "fashion",
+    city: "دبي",
+    country: "الإمارات العربية المتحدة",
+    price: 450,
+    currency: "AED",
+    condition: "used",
+    status: "rejected",
+    isFeatured: false,
+    seller: {
+      id: "user-current",
+      name: "أحمد المنصوري",
+      rating: 4.8,
+    },
+    imageTone: "slate",
   },
 ];

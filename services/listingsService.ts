@@ -1,4 +1,4 @@
-import { mockListings } from "./mockData";
+import { mockListings, mockUserListings } from "./mockData";
 
 type SearchListingsFilters = {
   categoryId?: string;
@@ -14,8 +14,14 @@ export async function getListings() {
   return mockListings;
 }
 
+export async function getMyListings() {
+  return mockUserListings;
+}
+
 export async function getListingBySlug(slug: string) {
-  return mockListings.find((listing) => listing.slug === slug);
+  return [...mockListings, ...mockUserListings].find(
+    (listing) => listing.slug === slug,
+  );
 }
 
 export async function getFeaturedListings() {

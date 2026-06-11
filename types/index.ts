@@ -4,4 +4,5 @@ export type {
   Listing,
   ListingCondition,
   ListingStatus,
+  UserProfile,
 } from "./marketplace";
