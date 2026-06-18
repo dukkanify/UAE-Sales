@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "UAE Sales | سوق الإمارات للبيع والشراء",
+  title: "UAE Sales | السوق الإماراتي الآمن",
   description:
-    "منصة إعلانات مبوبة عربية في الإمارات مع حماية الدفع، المحفظة، الدردشة، وإدارة الإعلانات.",
+    "منصة إعلانات مبوبة بهوية إماراتية للبيع والشراء داخل الإمارات مع حماية الدفع، المحفظة، الدردشة، وإدارة الإعلانات.",
 };
 
 export default function RootLayout({

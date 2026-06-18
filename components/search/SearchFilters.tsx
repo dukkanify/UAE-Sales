@@ -14,6 +14,7 @@ type SearchFiltersProps = {
   selectedFilters: {
     category?: string;
     city?: string;
+    condition?: string;
     country?: string;
     maxPrice?: string;
     minPrice?: string;
@@ -34,7 +35,7 @@ export function SearchFilters({
   return (
     <form
       action={action}
-      className="grid gap-4 rounded-[var(--radius-xl)] border border-border bg-white p-5 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
+      className="grid gap-4 rounded-[var(--radius-xl)] border border-white bg-white/95 p-5 shadow-[0_20px_60px_rgb(17_24_39/10%)] backdrop-blur md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
     >
       <Input
         defaultValue={selectedFilters.query}
@@ -56,7 +57,7 @@ export function SearchFilters({
       />
       <Select
         defaultValue={selectedFilters.city}
-        label="المدينة"
+        label="الإمارة / المدينة"
         name="city"
         options={[
           { label: "كل المدن", value: "" },
@@ -77,6 +78,17 @@ export function SearchFilters({
           ]}
         />
       ) : null}
+      <Select
+        defaultValue={selectedFilters.condition}
+        label="حالة المنتج"
+        name="condition"
+        options={[
+          { label: "كل الحالات", value: "" },
+          { label: "جديد", value: "new" },
+          { label: "مستعمل", value: "used" },
+          { label: "ممتاز", value: "excellent" },
+        ]}
+      />
       <Input
         defaultValue={selectedFilters.minPrice}
         inputMode="numeric"

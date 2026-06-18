@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
 import { Card } from "@/components/ui/Card";
+import { getSessionUser } from "@/services/clientStorage";
 
 type DashboardShellProps = {
   activePath: "/profile" | "/dashboard/listings";
@@ -25,18 +30,50 @@ export function DashboardShell({
   title,
   user,
 }: DashboardShellProps) {
+  const [isAllowed, setIsAllowed] = useState(false);
+  const [displayUser, setDisplayUser] = useState(user);
+  const router = useRouter();
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const sessionUser = getSessionUser();
+      if (sessionUser) {
+        setDisplayUser(sessionUser);
+        setIsAllowed(true);
+        return;
+      }
+
+      router.replace(`/login?next=${activePath}`);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activePath, router, user]);
+
+  if (!isAllowed) {
+    return (
+      <section className="app-container py-14">
+        <Card className="p-8 text-center">
+          <h1 className="text-2xl font-black text-ink">جاري التحقق من الجلسة</h1>
+          <p className="mt-3 text-muted">
+            سيتم توجيهك لتسجيل الدخول للوصول إلى هذه الصفحة.
+          </p>
+        </Card>
+      </section>
+    );
+  }
+
   return (
     <section className="app-container grid gap-6 py-10 lg:grid-cols-[18rem_1fr] lg:py-14">
       <aside>
         <Card className="sticky top-28 p-5">
           <div className="flex items-center gap-4">
             <div className="grid size-14 place-items-center rounded-2xl bg-primary-soft text-lg font-black text-primary">
-              {user.fullName.slice(0, 2)}
+              {displayUser.fullName.slice(0, 2)}
             </div>
             <div>
-              <p className="font-black text-ink">{user.fullName}</p>
+              <p className="font-black text-ink">{displayUser.fullName}</p>
               <p className="mt-1 text-xs font-bold text-muted">
-                {user.isVerified ? "حساب موثق" : "بانتظار التوثيق"}
+                {displayUser.isVerified ? "حساب موثق" : "بانتظار التوثيق"}
               </p>
             </div>
           </div>

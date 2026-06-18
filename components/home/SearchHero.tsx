@@ -1,15 +1,6 @@
 import { cities, countries } from "@/constants/locations";
 import type { Category } from "@/types";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
-
-const stats = [
-  { label: "إعلان نشط", value: "+18K" },
-  { label: "مدينة مغطاة", value: "7" },
-  { label: "عمليات آمنة", value: "+4.8K" },
-];
 
 type SearchHeroProps = {
   categories: Category[];
@@ -17,103 +8,104 @@ type SearchHeroProps = {
 
 export function SearchHero({ categories }: SearchHeroProps) {
   return (
-    <section className="app-container grid gap-10 py-12 lg:grid-cols-[1fr_0.82fr] lg:items-center lg:py-20">
-      <div>
-        <Badge>سوق إماراتي بواجهة عربية واتجاه RTL</Badge>
-        <h1 className="mt-6 max-w-3xl text-4xl font-black leading-tight tracking-tight text-ink md:text-6xl">
-          بيع واشتري في الإمارات بثقة مع حماية الدفع والضمان المالي.
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg leading-9 text-muted">
-          ابدأ البحث عن السيارات، العقارات، الإلكترونيات، والأثاث في واجهة
-          عربية سريعة ومجهزة للربط مع خدمات الدفع، المحفظة، والمحادثات.
-        </p>
-
-        <form
-          action="/search"
-          className="glass-panel mt-8 grid gap-4 rounded-[var(--radius-xl)] p-4 md:grid-cols-2 xl:grid-cols-[1.5fr_1fr_1fr_1fr_auto]"
-        >
-          <Input
-            aria-label="ابحث عن إعلان"
-            label="كلمة البحث"
-            name="q"
-            placeholder="ابحث عن سيارة، هاتف، عقار..."
-          />
-          <Select
-            aria-label="الدولة"
-            label="الدولة"
-            name="country"
-            options={countries.map((country) => ({
-              label: country.name,
-              value: country.name,
-            }))}
-          />
-          <Select
-            aria-label="المدينة"
-            label="المدينة"
-            name="city"
-            options={[
-              { label: "كل المدن", value: "" },
-              ...cities.map((city) => ({
-                label: city.name,
-                value: city.name,
-              })),
-            ]}
-          />
-          <Select
-            aria-label="القسم"
-            label="القسم"
-            name="category"
-            options={[
-              { label: "كل الأقسام", value: "" },
-              ...categories.map((category) => ({
-                label: category.name,
-                value: category.id,
-              })),
-            ]}
-          />
-          <Button className="self-end" type="submit">
-            بحث
-          </Button>
-        </form>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {stats.map((stat) => (
-            <div key={stat.label} className="rounded-3xl bg-white/75 p-5">
-              <p className="text-3xl font-black text-primary">{stat.value}</p>
-              <p className="mt-1 text-sm font-bold text-muted">{stat.label}</p>
-            </div>
-          ))}
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#fff7ec_0%,#f8f7f4_78%,#ffffff_100%)]">
+      <div className="absolute inset-x-0 top-0 h-[28rem] bg-[radial-gradient(circle_at_18%_20%,rgba(185,28,28,0.10),transparent_22rem),radial-gradient(circle_at_78%_12%,rgba(200,164,93,0.22),transparent_30rem)]" />
+      <div className="pointer-events-none absolute right-[8%] top-20 hidden opacity-20 lg:block">
+        <div className="inline-flex items-end gap-4">
+          <div className="h-40 w-10 rounded-t-full bg-primary" />
+          <div className="h-72 w-12 rounded-t-full bg-primary" />
+          <div className="h-52 w-16 rounded-t-full bg-primary" />
+          <div className="h-44 w-20 rounded-t-full bg-primary" />
         </div>
+        <div className="mt-3 h-10 w-96 rounded-full bg-primary/20 blur-md" />
       </div>
 
-      <div className="relative">
-        <div className="absolute -inset-6 rounded-[2.5rem] bg-primary-soft blur-3xl" />
-        <div className="relative overflow-hidden rounded-[2rem] border border-white bg-ink p-6 text-white shadow-[var(--shadow-card)]">
-          <div className="rounded-[1.5rem] bg-white/10 p-5">
-            <p className="text-sm font-bold text-emerald-100">
-              طلب شراء محمي بالضمان
+      <div className="app-container relative py-10 lg:py-14">
+        <div className="mx-auto max-w-6xl text-center">
+            <Badge className="bg-white/85 text-primary shadow-sm">
+              منصة إماراتية للبيع والشراء بضمان مالي
+            </Badge>
+            <h1 className="mx-auto mt-6 max-w-4xl text-5xl font-black leading-[1.15] tracking-tight text-primary md:text-7xl">
+              اشتري وبيع بثقة وأمان
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-lg font-bold leading-8 text-primary/80">
+              إعلانات مبوبة في جميع الإمارات مع ضمان مالي يحمي حقوقك
             </p>
-            <div className="mt-8 rounded-3xl bg-white p-5 text-ink">
-              <div className="h-44 rounded-3xl bg-gradient-to-br from-emerald-100 via-white to-amber-100" />
-              <div className="mt-5 flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="font-black">ساعة فاخرة بحالة ممتازة</h2>
-                  <p className="mt-2 text-sm font-bold text-muted">دبي مارينا</p>
-                </div>
-                <p className="text-lg font-black text-primary">2,800 د.إ</p>
+
+            <form
+              action="/search"
+              className="mx-auto mt-9 max-w-5xl rounded-[1.7rem] border border-white bg-white/95 p-3 text-ink shadow-[0_24px_70px_rgb(17_24_39/14%)] backdrop-blur-xl"
+            >
+              <div className="grid gap-2 md:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span className="text-muted">⌕</span>
+                  <input
+                    aria-label="كلمة البحث"
+                    className="w-full bg-transparent text-sm font-bold text-primary outline-none placeholder:text-muted"
+                    name="q"
+                    placeholder="ما الذي تبحث عنه؟"
+                    type="search"
+                  />
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>▦</span>
+                  <select
+                    aria-label="اختر التصنيف"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="category"
+                  >
+                    <option value="">اختر التصنيف</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>⌖</span>
+                  <select
+                    aria-label="اختر الإمارة"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="city"
+                  >
+                    <option value="">اختر الإمارة</option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>▾</span>
+                  <select
+                    aria-label="اختر المدينة"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="country"
+                  >
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-secondary px-6 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
+                  type="submit"
+                >
+                  بحث <span>⌕</span>
+                </button>
               </div>
+            </form>
+
+            <div className="mx-auto mt-5 grid max-w-5xl gap-2 rounded-[1.35rem] bg-white/70 px-4 py-3 text-sm font-black text-muted shadow-sm backdrop-blur md:grid-cols-4">
+              <span>ضمان مالي 100%</span>
+              <span>تحقق من الهوية</span>
+              <span>دفع آمن</span>
+              <span>دعم على مدار الساعة</span>
             </div>
-            <div className="mt-5 grid gap-3 text-sm font-bold">
-              <div className="flex items-center justify-between rounded-2xl bg-white/10 p-4">
-                <span>المبلغ محجوز بأمان</span>
-                <span>✓</span>
-              </div>
-              <div className="flex items-center justify-between rounded-2xl bg-white/10 p-4">
-                <span>تحرير المبلغ بعد التأكيد</span>
-                <span>✓</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

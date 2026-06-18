@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
+import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
@@ -9,11 +10,11 @@ type ListingCardProps = {
 };
 
 const toneClasses: Record<Listing["imageTone"], string> = {
-  amber: "from-amber-100 via-white to-orange-200",
-  emerald: "from-emerald-100 via-white to-teal-200",
-  rose: "from-rose-100 via-white to-pink-200",
-  sky: "from-sky-100 via-white to-blue-200",
-  slate: "from-slate-100 via-white to-slate-300",
+  amber: "from-amber-200 via-white to-orange-300",
+  gold: "from-stone-200 via-white to-yellow-200",
+  rose: "from-rose-200 via-white to-pink-300",
+  sky: "from-sky-200 via-white to-blue-300",
+  slate: "from-slate-200 via-white to-slate-400",
 };
 
 const conditionLabels: Record<Listing["condition"], string> = {
@@ -27,58 +28,73 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 });
 
 export function ListingCard({ categoryName, listing }: ListingCardProps) {
+  const listingHref = listing.id.startsWith("local-")
+    ? `/listings/local/${listing.id}`
+    : `/listings/${listing.slug}`;
+
   return (
-    <Card className="group h-full overflow-hidden transition hover:-translate-y-1 hover:border-primary hover:shadow-2xl">
+    <Card className="group h-full overflow-hidden rounded-2xl border-border bg-white transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl">
       <div className="relative">
-        <Link href={`/listings/${listing.slug}`}>
+        <Link href={listingHref}>
           <span className="sr-only">{listing.title}</span>
           <div
-            className={`h-48 bg-gradient-to-br ${toneClasses[listing.imageTone]} p-4`}
+            className={`relative h-40 overflow-hidden bg-gradient-to-br ${toneClasses[listing.imageTone]} p-3`}
           >
-            <div className="flex justify-between gap-3">
+            {listing.imageUrl ? (
+              <div
+                aria-label={listing.title}
+                className="absolute inset-0 bg-cover bg-center"
+                role="img"
+                style={{ backgroundImage: `url(${listing.imageUrl})` }}
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(17,24,39,0.16))]" />
+            <div className="relative flex justify-end">
               {listing.isFeatured ? (
-                <Badge className="bg-white/85 text-primary">إعلان مميز</Badge>
+                <Badge className="border-white/40 bg-white/90 text-primary">
+                  إعلان مميز
+                </Badge>
               ) : (
-                <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-black text-primary">
+                <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-primary shadow-sm">
                   {categoryName ?? "إعلان"}
                 </span>
               )}
-              <span className="rounded-full bg-ink/80 px-3 py-1 text-xs font-black text-white">
-                {conditionLabels[listing.condition]}
-              </span>
             </div>
-            <div className="grid h-full place-items-center pb-8">
-              <span className="text-5xl font-black text-ink/10">UAE</span>
-            </div>
+            {!listing.imageUrl ? (
+              <div className="relative grid h-full place-items-center pb-7">
+                <div className="rounded-2xl border border-white/60 bg-white/35 p-3 backdrop-blur">
+                  <div className="uae-flag-strip h-10 w-16 rounded-xl shadow-lg" />
+                </div>
+              </div>
+            ) : null}
           </div>
         </Link>
-        <button
-          aria-label="إضافة إلى المفضلة"
-          className="absolute bottom-4 left-4 grid size-11 place-items-center rounded-full bg-white text-lg shadow-[var(--shadow-soft)] transition hover:scale-105 hover:text-primary"
-          type="button"
-        >
-          ♡
-        </button>
+        <FavoriteButton
+          className="absolute left-3 top-3 grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm transition hover:scale-105 hover:text-uae-red"
+          label=""
+        />
       </div>
-      <div className="p-5">
-        <Link href={`/listings/${listing.slug}`}>
-          <h3 className="line-clamp-2 min-h-14 text-lg font-black leading-7 text-ink transition group-hover:text-primary">
+      <div className="p-4">
+        <Link href={listingHref}>
+          <h3 className="line-clamp-2 min-h-12 text-sm font-black leading-6 text-ink transition group-hover:text-primary">
             {listing.title}
           </h3>
         </Link>
-        <p className="mt-3 line-clamp-2 min-h-14 text-sm leading-7 text-muted">
+        <p className="mt-2 line-clamp-1 text-xs font-bold text-muted">
           {listing.description}
         </p>
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <p className="text-xl font-black text-primary">
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <p className="text-lg font-black text-uae-red">
             {priceFormatter.format(listing.price)} د.إ
           </p>
-          <p className="text-sm font-bold text-muted">{listing.city}</p>
+          <p className="text-xs font-black text-muted">{listing.city}</p>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-4 text-sm font-bold text-muted">
-          <span className="truncate">{listing.seller.name}</span>
-          <span className="text-left">
-            {listing.views.toLocaleString("ar-AE")} مشاهدة
+        <div className="mt-3 flex items-center justify-between gap-2 border-t border-border pt-3 text-xs font-black">
+          <span className="rounded-full bg-secondary-soft px-3 py-1 text-primary">
+            ضمان مالي
+          </span>
+          <span className="rounded-full bg-surface-muted px-3 py-1 text-muted">
+            {conditionLabels[listing.condition]}
           </span>
         </div>
       </div>

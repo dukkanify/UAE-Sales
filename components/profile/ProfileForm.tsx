@@ -1,9 +1,13 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { cities } from "@/constants/locations";
 import type { UserProfile } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { getSessionUser } from "@/services/clientStorage";
 
 type ProfileFormProps = {
   user: UserProfile;
@@ -12,23 +16,35 @@ type ProfileFormProps = {
 const accountTypeLabels: Record<UserProfile["accountType"], string> = {
   business: "متجر أو معرض",
   buyer: "مشتري",
+  company: "شركة",
+  individual: "فرد",
   seller: "بائع فردي",
 };
 
 export function ProfileForm({ user }: ProfileFormProps) {
+  const [displayUser, setDisplayUser] = useState(user);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDisplayUser(getSessionUser() ?? user);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [user]);
+
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
       <Card className="p-6">
-        <form className="grid gap-5">
+        <form key={displayUser.id} className="grid gap-5">
           <div className="grid gap-4 md:grid-cols-2">
             <Input
-              defaultValue={user.fullName}
+              defaultValue={displayUser.fullName}
               label="الاسم الكامل"
               name="fullName"
               type="text"
             />
             <Input
-              defaultValue={user.email}
+              defaultValue={displayUser.email}
               label="البريد الإلكتروني"
               name="email"
               type="email"
@@ -37,14 +53,14 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
           <div className="grid gap-4 md:grid-cols-2">
             <Input
-              defaultValue={user.phone}
+              defaultValue={displayUser.phone}
               label="رقم الهاتف"
               name="phone"
               type="tel"
             />
             <Select
-              defaultValue={cities.find((city) => city.name === user.city)?.id}
-              label="المدينة"
+              defaultValue={cities.find((city) => city.name === displayUser.city)?.id}
+              label="الإمارة / المدينة"
               name="city"
               options={cities.map((city) => ({
                 label: city.name,
@@ -54,10 +70,12 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </div>
 
           <Select
-            defaultValue={user.accountType}
+            defaultValue={displayUser.accountType}
             label="نوع الحساب"
             name="accountType"
             options={[
+              { label: "فرد", value: "individual" },
+              { label: "شركة", value: "company" },
               { label: "مشتري", value: "buyer" },
               { label: "بائع فردي", value: "seller" },
               { label: "متجر أو معرض", value: "business" },
@@ -79,17 +97,23 @@ export function ProfileForm({ user }: ProfileFormProps) {
           <div className="mt-5 grid gap-3 text-sm font-bold">
             <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
               <span className="text-muted">نوع الحساب</span>
-              <span className="text-ink">{accountTypeLabels[user.accountType]}</span>
+              <span className="text-ink">
+                {accountTypeLabels[displayUser.accountType]}
+              </span>
             </div>
             <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
               <span className="text-muted">التوثيق</span>
-              <span className={user.isVerified ? "text-primary" : "text-amber-700"}>
-                {user.isVerified ? "موثق" : "بانتظار UAE PASS"}
+              <span
+                className={
+                  displayUser.isVerified ? "text-primary" : "text-amber-700"
+                }
+              >
+                {displayUser.isVerified ? "موثق" : "بانتظار UAE PASS"}
               </span>
             </div>
             <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
               <span className="text-muted">تاريخ الانضمام</span>
-              <span className="text-ink">{user.joinedAt}</span>
+              <span className="text-ink">{displayUser.joinedAt}</span>
             </div>
           </div>
         </Card>

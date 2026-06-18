@@ -12,17 +12,19 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
       {categories.map((category) => (
         <Card
           key={category.id}
-          className="p-6 transition hover:-translate-y-1 hover:border-primary hover:shadow-2xl"
+          className="group relative overflow-hidden p-6 transition duration-300 hover:-translate-y-1.5 hover:border-secondary hover:shadow-2xl"
         >
+          <div className="uae-flag-strip absolute inset-x-0 top-0 h-1.5" />
+          <div className="absolute -left-10 -top-10 size-28 rounded-full bg-secondary/15 blur-2xl transition group-hover:bg-secondary/25" />
           <div className="grid gap-4 sm:flex sm:items-start">
-            <span className="grid size-16 shrink-0 place-items-center rounded-3xl bg-primary-soft text-3xl">
+            <span className="relative grid size-16 shrink-0 place-items-center rounded-3xl bg-secondary-soft text-3xl shadow-sm">
               {category.icon}
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <Link
                   href={`/categories/${category.slug}`}
-                  className="text-xl font-black text-ink transition hover:text-primary"
+                  className="text-xl font-black text-ink transition group-hover:text-secondary"
                 >
                   {category.name}
                 </Link>
@@ -37,7 +39,7 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
                     href={`/categories/${category.slug}?q=${encodeURIComponent(
                       subcategory,
                     )}`}
-                    className="rounded-2xl border border-border px-4 py-3 text-sm font-bold text-muted transition hover:border-primary hover:bg-primary-soft hover:text-primary"
+                    className="rounded-2xl border border-border bg-white/70 px-4 py-3 text-sm font-bold text-muted transition hover:border-secondary hover:bg-secondary-soft hover:text-primary"
                   >
                     {subcategory}
                   </Link>

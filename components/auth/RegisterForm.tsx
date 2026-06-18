@@ -2,11 +2,13 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { cities } from "@/constants/locations";
+import { useRouter } from "next/navigation";
+import { cities, countries } from "@/constants/locations";
 import { OtpVerification } from "@/components/auth/OtpVerification";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { setSessionUser } from "@/services/clientStorage";
 
 type RegisterErrors = {
   confirmPassword?: string;
@@ -15,6 +17,14 @@ type RegisterErrors = {
   password?: string;
   phone?: string;
   terms?: string;
+};
+
+type PendingUser = {
+  accountType: "individual" | "company";
+  city: string;
+  email: string;
+  fullName: string;
+  phone: string;
 };
 
 function isValidEmail(value: string) {
@@ -32,7 +42,9 @@ function isStrongPassword(value: string) {
 export function RegisterForm() {
   const [errors, setErrors] = useState<RegisterErrors>({});
   const [identifier, setIdentifier] = useState("");
+  const [pendingUser, setPendingUser] = useState<PendingUser | null>(null);
   const [showOtp, setShowOtp] = useState(false);
+  const router = useRouter();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,6 +53,10 @@ export function RegisterForm() {
     const fullName = String(formData.get("fullName") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
     const phone = String(formData.get("phone") ?? "").trim();
+    const city = String(formData.get("city") ?? "dubai");
+    const accountType = String(formData.get("accountType") ?? "individual") as
+      | "individual"
+      | "company";
     const password = String(formData.get("password") ?? "");
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
     const termsAccepted = formData.get("terms") === "on";
@@ -75,6 +91,13 @@ export function RegisterForm() {
 
     if (Object.keys(nextErrors).length === 0) {
       setIdentifier(phone || email);
+      setPendingUser({
+        accountType,
+        city: cities.find((item) => item.id === city)?.name ?? "دبي",
+        email,
+        fullName,
+        phone,
+      });
       setShowOtp(true);
     }
   }
@@ -84,6 +107,19 @@ export function RegisterForm() {
       <OtpVerification
         identifier={identifier}
         onBack={() => setShowOtp(false)}
+        onVerified={() => {
+          if (!pendingUser) {
+            return;
+          }
+
+          setSessionUser({
+            id: `user-${Date.now()}`,
+            ...pendingUser,
+            isVerified: true,
+            joinedAt: new Date().toISOString().slice(0, 10),
+          });
+          router.push("/profile");
+        }}
       />
     );
   }
@@ -135,6 +171,25 @@ export function RegisterForm() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
+        <Select
+          label="الدولة"
+          name="country"
+          options={countries.map((country) => ({
+            label: country.name,
+            value: country.id,
+          }))}
+        />
+        <Select
+          label="الإمارة / المدينة"
+          name="city"
+          options={cities.map((city) => ({
+            label: city.name,
+            value: city.id,
+          }))}
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
           <Input
             autoComplete="tel"
@@ -151,23 +206,14 @@ export function RegisterForm() {
           ) : null}
         </div>
         <Select
-          label="المدينة"
-          name="city"
-          options={cities.map((city) => ({
-            label: city.name,
-            value: city.id,
-          }))}
+          label="نوع الحساب"
+          name="accountType"
+          options={[
+            { label: "فرد", value: "individual" },
+            { label: "شركة", value: "company" },
+          ]}
         />
       </div>
-
-      <Select
-        label="نوع الحساب"
-        name="accountType"
-        options={[
-          { label: "فرد", value: "individual" },
-          { label: "شركة", value: "company" },
-        ]}
-      />
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>

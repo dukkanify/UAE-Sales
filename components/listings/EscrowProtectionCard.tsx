@@ -8,7 +8,8 @@ const protectionSteps = [
 
 export function EscrowProtectionCard() {
   return (
-    <Card className="p-6">
+    <Card className="overflow-hidden p-6">
+      <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
       <h2 className="text-xl font-black text-ink">حماية الدفع</h2>
       <p className="mt-3 leading-8 text-muted">
         هذه الواجهة جاهزة لربط رحلة الشراء مع نظام الضمان المالي والمحفظة في
@@ -18,7 +19,7 @@ export function EscrowProtectionCard() {
         {protectionSteps.map((step, index) => (
           <li
             key={step}
-            className="flex gap-3 rounded-2xl bg-primary-soft p-4 text-sm font-bold text-primary"
+            className="flex gap-3 rounded-2xl border border-secondary/30 bg-secondary-soft p-4 text-sm font-bold text-primary"
           >
             <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-xs text-white">
               {index + 1}

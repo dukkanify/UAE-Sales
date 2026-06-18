@@ -9,10 +9,10 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white shadow-lg shadow-emerald-900/10 hover:bg-primary-dark",
+    "bg-primary text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary-dark",
   secondary:
-    "border border-border bg-white text-ink hover:border-primary hover:text-primary",
-  ghost: "text-muted hover:bg-primary-soft hover:text-primary",
+    "border border-secondary/45 bg-white/90 text-primary shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-secondary hover:text-primary",
+  ghost: "text-muted hover:bg-secondary-soft hover:text-primary",
 };
 
 export function Button({
@@ -23,7 +23,7 @@ export function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`focus-ring inline-flex min-h-11 items-center justify-center rounded-full px-5 py-2.5 text-sm font-bold transition ${variantClasses[variant]} ${className}`}
+      className={`focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-sm font-black transition duration-200 ${variantClasses[variant]} ${className}`}
       {...props}
     >
       {children}

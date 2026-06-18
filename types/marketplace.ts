@@ -22,7 +22,7 @@ export type UserProfile = {
   email: string;
   phone: string;
   city: string;
-  accountType: "buyer" | "seller" | "business";
+  accountType: "buyer" | "seller" | "business" | "individual" | "company";
   isVerified: boolean;
   joinedAt: string;
 };
@@ -41,12 +41,13 @@ export type Listing = {
   status: ListingStatus;
   isFeatured: boolean;
   views: number;
+  imageUrl?: string;
   seller: {
     id: string;
     name: string;
     rating: number;
   };
-  imageTone: "emerald" | "amber" | "sky" | "rose" | "slate";
+  imageTone: "gold" | "amber" | "sky" | "rose" | "slate";
 };
 
 export type City = {

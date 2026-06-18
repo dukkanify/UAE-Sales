@@ -4,15 +4,21 @@ import { footerLinks } from "@/constants/navigation";
 export function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-border bg-white">
+      <div className="uae-flag-strip h-1.5 w-full" />
       <div className="app-container grid gap-10 py-12 lg:grid-cols-[1.2fr_2fr]">
         <div>
           <div className="mb-4 flex items-center gap-3">
-            <span className="grid size-11 place-items-center rounded-2xl bg-primary text-lg font-black text-white">
-              US
+            <span className="relative grid size-11 place-items-center overflow-hidden rounded-2xl bg-uae-black text-lg font-black text-white">
+              <span className="uae-flag-strip absolute inset-0" />
+              <span className="relative rounded-lg bg-uae-black/80 px-1.5 text-[0.65rem]">
+                UAE
+              </span>
             </span>
             <div>
               <p className="text-lg font-black">UAE Sales</p>
-              <p className="text-sm font-bold text-muted">بيع وشراء بثقة</p>
+              <p className="text-sm font-bold text-muted">
+                سوق إماراتي للبيع والشراء بثقة
+              </p>
             </div>
           </div>
           <p className="max-w-md leading-8 text-muted">
