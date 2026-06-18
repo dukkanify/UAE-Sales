@@ -31,59 +31,14 @@ export function SearchHero({ categories }: SearchHeroProps) {
       </div>
 
       <div className="app-container relative py-10 lg:py-14">
-        <div className="grid gap-8 lg:grid-cols-[0.28fr_1fr] lg:items-end">
-          <div className="order-2 hidden lg:block">
-            <div className="relative max-w-xs rounded-[2rem] border border-white bg-white p-4 shadow-[0_24px_80px_rgb(17_24_39/16%)]">
-              <div className="mb-4 flex items-center justify-between gap-2 text-xs font-black">
-                <span className="rounded-2xl bg-secondary-soft px-3 py-2 text-primary">
-                  موثق إماراتياً
-                </span>
-                <span className="rounded-2xl bg-white px-3 py-2 text-muted shadow-sm">
-                  في دبي
-                </span>
-              </div>
-              <div className="relative h-44 overflow-hidden rounded-[1.5rem] bg-[linear-gradient(135deg,#f4dcb8,#fff8ed)]">
-                <div className="uae-flag-strip absolute bottom-8 right-8 h-14 w-24 rounded-2xl shadow-xl" />
-              </div>
-              <h2 className="mt-5 text-xl font-black leading-8 text-primary">
-                ساعة فاخرة في دبي بحالة ممتازة
-              </h2>
-              <div className="mt-5 grid gap-2 text-sm font-black text-muted">
-                <div className="flex justify-between">
-                  <span>الموقع</span>
-                  <span className="text-primary">دبي، الإمارات</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>الضمان</span>
-                  <span className="text-primary">ضمان مالي</span>
-                </div>
-              </div>
-              <div className="mt-5 flex items-end justify-between">
-                <span className="rounded-2xl bg-primary px-4 py-3 text-xs font-black text-white">
-                  UAE Verified
-                </span>
-                <div className="text-left">
-                  <p className="text-3xl font-black text-primary">2,800</p>
-                  <p className="text-xs font-black text-muted">درهم إماراتي</p>
-                </div>
-              </div>
-              <div className="absolute -bottom-5 left-6 rounded-3xl bg-primary p-4 text-white shadow-2xl">
-                <p className="text-xs font-black text-white/60">UAE Escrow</p>
-                <p className="mt-1 text-base font-black text-secondary">
-                  محمي 100%
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="order-1 text-center lg:text-right">
+        <div className="mx-auto max-w-6xl text-center">
             <Badge className="bg-white/85 text-primary shadow-sm">
               منصة إماراتية للبيع والشراء بضمان مالي
             </Badge>
-            <h1 className="mx-auto mt-6 max-w-4xl text-5xl font-black leading-[1.15] tracking-tight text-primary md:text-7xl lg:mx-0">
+            <h1 className="mx-auto mt-6 max-w-4xl text-5xl font-black leading-[1.15] tracking-tight text-primary md:text-7xl">
               اشتري وبيع بثقة وأمان
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg font-bold leading-8 text-primary/80 lg:mx-0">
+            <p className="mx-auto mt-4 max-w-2xl text-lg font-bold leading-8 text-primary/80">
               إعلانات مبوبة في جميع الإمارات مع ضمان مالي يحمي حقوقك
             </p>
 
@@ -167,7 +122,6 @@ export function SearchHero({ categories }: SearchHeroProps) {
                 </div>
               ))}
             </div>
-          </div>
         </div>
       </div>
     </section>
