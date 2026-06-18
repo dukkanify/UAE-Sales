@@ -2,13 +2,6 @@ import { cities, countries } from "@/constants/locations";
 import type { Category } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 
-const stats = [
-  { label: "مستخدم نشط", value: "+18K", icon: "🏷️" },
-  { label: "عمليات ضمان", value: "+4.8K", icon: "🛡️" },
-  { label: "ضمان مالي", value: "100%", icon: "✅" },
-  { label: "مدن إماراتية", value: "7", icon: "🏙️" },
-];
-
 type SearchHeroProps = {
   categories: Category[];
 };
@@ -112,25 +105,6 @@ export function SearchHero({ categories }: SearchHeroProps) {
               <span>تحقق من الهوية</span>
               <span>دفع آمن</span>
               <span>دعم على مدار الساعة</span>
-            </div>
-
-            <div className="mx-auto mt-6 grid max-w-5xl gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-3xl border border-white bg-white/78 p-5 shadow-[var(--shadow-soft)] backdrop-blur"
-                >
-                  <div className="mb-3 grid size-11 place-items-center rounded-2xl bg-secondary-soft text-xl">
-                    {stat.icon}
-                  </div>
-                  <p className="text-3xl font-black text-primary">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-sm font-black text-muted">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
             </div>
         </div>
       </div>
