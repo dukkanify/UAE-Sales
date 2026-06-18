@@ -40,7 +40,15 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
           <div
             className={`relative h-40 overflow-hidden bg-gradient-to-br ${toneClasses[listing.imageTone]} p-3`}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.9),transparent_32%),linear-gradient(180deg,transparent,rgba(17,24,39,0.10))]" />
+            {listing.imageUrl ? (
+              <div
+                aria-label={listing.title}
+                className="absolute inset-0 bg-cover bg-center"
+                role="img"
+                style={{ backgroundImage: `url(${listing.imageUrl})` }}
+              />
+            ) : null}
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(17,24,39,0.16))]" />
             <div className="relative flex justify-end">
               {listing.isFeatured ? (
                 <Badge className="border-white/40 bg-white/90 text-primary">
@@ -52,11 +60,13 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
                 </span>
               )}
             </div>
-            <div className="relative grid h-full place-items-center pb-7">
-              <div className="rounded-2xl border border-white/60 bg-white/35 p-3 backdrop-blur">
-                <div className="uae-flag-strip h-10 w-16 rounded-xl shadow-lg" />
+            {!listing.imageUrl ? (
+              <div className="relative grid h-full place-items-center pb-7">
+                <div className="rounded-2xl border border-white/60 bg-white/35 p-3 backdrop-blur">
+                  <div className="uae-flag-strip h-10 w-16 rounded-xl shadow-lg" />
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </Link>
         <FavoriteButton

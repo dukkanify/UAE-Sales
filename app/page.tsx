@@ -23,7 +23,7 @@ export default async function Home() {
         <FeaturedListings listings={featuredListings} />
         <EscrowSection />
         <TrustSafetySection />
-        <section className="app-container py-12">
+        <section className="app-container py-8">
           <div className="luxury-gradient relative grid overflow-hidden rounded-[var(--radius-xl)] p-6 text-white shadow-[var(--shadow-glow)] md:grid-cols-3 md:p-8">
             <div className="absolute -left-20 -top-20 size-72 rounded-full bg-primary/20 blur-3xl" />
             <div>

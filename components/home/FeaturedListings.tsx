@@ -9,11 +9,11 @@ type FeaturedListingsProps = {
 
 export function FeaturedListings({ listings }: FeaturedListingsProps) {
   return (
-    <section className="app-container py-12">
+    <section className="app-container py-8">
       <SectionHeader
-        eyebrow="إعلانات مختارة"
-        title="إعلانات مميزة جاهزة للعرض"
-        description="بطاقات قابلة لإعادة الاستخدام تعرض السعر، المدينة، حالة المنتج، وتقييم البائع."
+        eyebrow="إعلانات مميزة"
+        title="مختارات نشطة من السوق"
+        description="إعلانات حقيقية الشكل مع صور، أسعار، ضمان مالي، وحالة المنتج."
         action={
           <Link
             href="/search"
@@ -24,7 +24,7 @@ export function FeaturedListings({ listings }: FeaturedListingsProps) {
         }
       />
 
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {listings.map((listing) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}

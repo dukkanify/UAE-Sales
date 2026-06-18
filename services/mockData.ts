@@ -134,6 +134,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: true,
     views: 1240,
+    imageUrl:
+      "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-1",
       name: "معرض النخبة",
@@ -156,6 +158,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: true,
     views: 980,
+    imageUrl:
+      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-2",
       name: "سارة للتقنية",
@@ -178,6 +182,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: true,
     views: 760,
+    imageUrl:
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-3",
       name: "دار الخليج العقارية",
@@ -200,6 +206,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: true,
     views: 420,
+    imageUrl:
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-4",
       name: "بيت الأناقة",
@@ -222,6 +230,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 360,
+    imageUrl:
+      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-5",
       name: "أوتو الإمارات",
@@ -244,6 +254,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 295,
+    imageUrl:
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-2",
       name: "سارة للتقنية",
@@ -266,6 +278,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 188,
+    imageUrl:
+      "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-6",
       name: "استوديو لقطة",
@@ -288,6 +302,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 540,
+    imageUrl:
+      "https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-7",
       name: "زمن الفخامة",
@@ -310,6 +326,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 142,
+    imageUrl:
+      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-8",
       name: "الخليج للتوظيف",
@@ -332,6 +350,8 @@ export const mockListings: Listing[] = [
     status: "active",
     isFeatured: false,
     views: 210,
+    imageUrl:
+      "https://images.unsplash.com/photo-1574158622682-e40e69881006?auto=format&fit=crop&w=900&q=80",
     seller: {
       id: "seller-9",
       name: "مركز الرفق",

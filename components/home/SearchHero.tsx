@@ -1,9 +1,6 @@
 import { cities, countries } from "@/constants/locations";
 import type { Category } from "@/types";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 
 const stats = [
   { label: "مستخدم نشط", value: "+18K", icon: "🏷️" },
@@ -44,57 +41,70 @@ export function SearchHero({ categories }: SearchHeroProps) {
 
             <form
               action="/search"
-              className="mx-auto mt-9 grid max-w-5xl gap-3 rounded-[1.7rem] border border-white bg-white/95 p-4 text-ink shadow-[0_24px_70px_rgb(17_24_39/14%)] backdrop-blur-xl md:grid-cols-2 xl:grid-cols-[1.7fr_1fr_1fr_1fr_auto]"
+              className="mx-auto mt-9 max-w-5xl rounded-[1.7rem] border border-white bg-white/95 p-3 text-ink shadow-[0_24px_70px_rgb(17_24_39/14%)] backdrop-blur-xl"
             >
-              <Input
-                aria-label="ابحث عن إعلان"
-                className="border-border bg-white text-ink"
-                label="كلمة البحث"
-                name="q"
-                placeholder="ما الذي تبحث عنه؟"
-              />
-              <Select
-                aria-label="الدولة"
-                className="border-border bg-white text-ink"
-                label="الدولة"
-                name="country"
-                options={countries.map((country) => ({
-                  label: country.name,
-                  value: country.name,
-                }))}
-              />
-              <Select
-                aria-label="الإمارة / المدينة"
-                className="border-border bg-white text-ink"
-                label="الإمارة / المدينة"
-                name="city"
-                options={[
-                  { label: "كل المدن", value: "" },
-                  ...cities.map((city) => ({
-                    label: city.name,
-                    value: city.name,
-                  })),
-                ]}
-              />
-              <Select
-                aria-label="القسم"
-                className="border-border bg-white text-ink"
-                label="القسم"
-                name="category"
-                options={[
-                  { label: "كل الأقسام", value: "" },
-                  ...categories.map((category) => ({
-                    label: category.name,
-                    value: category.id,
-                  })),
-                ]}
-              />
-              <Button
-                className="self-end bg-secondary text-primary hover:bg-primary hover:text-white"
-                type="submit"
-              >
-                بحث
-              </Button>
+              <div className="grid gap-2 md:grid-cols-[1.5fr_1fr_1fr_1fr_auto]">
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span className="text-muted">⌕</span>
+                  <input
+                    aria-label="كلمة البحث"
+                    className="w-full bg-transparent text-sm font-bold text-primary outline-none placeholder:text-muted"
+                    name="q"
+                    placeholder="ما الذي تبحث عنه؟"
+                    type="search"
+                  />
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>▦</span>
+                  <select
+                    aria-label="اختر التصنيف"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="category"
+                  >
+                    <option value="">اختر التصنيف</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>⌖</span>
+                  <select
+                    aria-label="اختر الإمارة"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="city"
+                  >
+                    <option value="">اختر الإمارة</option>
+                    {cities.map((city) => (
+                      <option key={city.id} value={city.name}>
+                        {city.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex min-h-14 items-center gap-3 rounded-2xl border border-border bg-white px-4">
+                  <span>▾</span>
+                  <select
+                    aria-label="اختر المدينة"
+                    className="w-full bg-transparent text-sm font-black text-primary outline-none"
+                    name="country"
+                  >
+                    {countries.map((country) => (
+                      <option key={country.id} value={country.name}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  className="inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-secondary px-6 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
+                  type="submit"
+                >
+                  بحث <span>⌕</span>
+                </button>
+              </div>
             </form>
 
             <div className="mx-auto mt-5 grid max-w-5xl gap-2 rounded-[1.35rem] bg-white/70 px-4 py-3 text-sm font-black text-muted shadow-sm backdrop-blur md:grid-cols-4">

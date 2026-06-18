@@ -41,6 +41,7 @@ export type Listing = {
   status: ListingStatus;
   isFeatured: boolean;
   views: number;
+  imageUrl?: string;
   seller: {
     id: string;
     name: string;
