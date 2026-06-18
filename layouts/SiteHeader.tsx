@@ -23,9 +23,9 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 py-3">
+    <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur-xl">
       <div className="app-container">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.7rem] border border-white/80 bg-white/82 px-3 py-3 shadow-[var(--shadow-soft)] backdrop-blur-2xl lg:flex-nowrap lg:px-4">
+        <div className="flex min-h-16 flex-wrap items-center justify-between gap-3 py-2 lg:flex-nowrap">
           <Link href="/" className="flex items-center gap-3">
             <span className="relative grid size-12 place-items-center overflow-hidden rounded-2xl bg-night text-lg font-black text-white shadow-[var(--shadow-glow)]">
               <span className="uae-flag-strip absolute inset-0" />
@@ -44,12 +44,12 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 rounded-full border border-border bg-surface-muted/70 p-1 text-sm font-black text-muted xl:flex">
+          <nav className="hidden items-center gap-5 text-sm font-black text-primary lg:flex">
             {primaryNavigation.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-full px-4 py-2.5 transition hover:bg-white hover:text-primary hover:shadow-sm"
+                className="transition hover:text-secondary"
               >
                 {item.label}
               </Link>
@@ -58,7 +58,7 @@ export function SiteHeader() {
 
           <form
             action="/search"
-            className="order-3 grid w-full grid-cols-[1fr_auto] rounded-full border border-border bg-white p-1 shadow-inner lg:order-none lg:max-w-xs"
+            className="order-3 grid w-full grid-cols-[1fr_auto] rounded-full border border-border bg-white p-1 shadow-sm lg:order-none lg:max-w-xs"
           >
             <input
               aria-label="بحث سريع"
@@ -68,7 +68,7 @@ export function SiteHeader() {
               type="search"
             />
             <button
-              className="rounded-full bg-uae-black px-4 text-sm font-black text-white transition hover:bg-secondary hover:text-primary"
+              className="rounded-full bg-secondary px-4 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
               type="submit"
             >
               بحث
@@ -80,12 +80,12 @@ export function SiteHeader() {
               <>
                 <Link
                   href="/profile"
-                  className="hidden rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary md:inline-flex"
+                  className="hidden rounded-full border border-border px-4 py-2.5 text-sm font-black text-primary transition hover:border-secondary md:inline-flex"
                 >
                   حسابي
                 </Link>
                 <button
-                  className="rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary"
+                  className="rounded-full border border-border px-4 py-2.5 text-sm font-black text-primary transition hover:border-secondary"
                   onClick={clearSessionUser}
                   type="button"
                 >
@@ -95,20 +95,20 @@ export function SiteHeader() {
             ) : (
               <Link
                 href="/login"
-                className="rounded-full px-4 py-2.5 text-sm font-black text-muted transition hover:bg-primary-soft hover:text-primary"
+                className="rounded-full border border-border px-4 py-2.5 text-sm font-black text-primary transition hover:border-secondary"
               >
                 دخول
               </Link>
             )}
             <Link
               href="/listings/new"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-dark"
             >
               أضف إعلان
             </Link>
           </div>
         </div>
-        <nav className="mt-2 flex gap-2 overflow-x-auto rounded-[1.35rem] border border-white/80 bg-white/82 p-2 text-sm font-black text-muted shadow-[var(--shadow-soft)] backdrop-blur-2xl xl:hidden">
+        <nav className="flex gap-2 overflow-x-auto border-t border-border py-2 text-sm font-black text-muted lg:hidden">
           {primaryNavigation.map((item) => (
             <Link
               key={item.href}
