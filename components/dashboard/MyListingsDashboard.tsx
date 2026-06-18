@@ -36,6 +36,7 @@ export function MyListingsDashboard({
   listings,
 }: MyListingsDashboardProps) {
   const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const [actionMessage, setActionMessage] = useState("");
   const allListings = useMemo(
     () => [...localListings, ...listings],
     [listings, localListings],
@@ -89,6 +90,11 @@ export function MyListingsDashboard({
           </Link>
         </div>
       </Card>
+      {actionMessage ? (
+        <Card className="border-secondary/30 bg-secondary-soft p-4 text-sm font-black text-primary">
+          {actionMessage}
+        </Card>
+      ) : null}
 
       {statusOrder.map((status) => {
         const statusListings = allListings.filter(
@@ -171,6 +177,11 @@ export function MyListingsDashboard({
                         {listing.status === "expired" ? (
                           <button
                             className="rounded-full bg-accent-soft px-4 py-2 text-sm font-black text-amber-800"
+                            onClick={() =>
+                              setActionMessage(
+                                "تم تجهيز طلب إعادة النشر في تجربة الديمو. سيتم ربطه بالـ API لاحقاً.",
+                              )
+                            }
                             type="button"
                           >
                             إعادة نشر

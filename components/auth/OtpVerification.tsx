@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 type OtpVerificationProps = {
   identifier: string;
   onBack: () => void;
@@ -11,6 +13,10 @@ export function OtpVerification({
   onBack,
   onVerified,
 }: OtpVerificationProps) {
+  const [statusMessage, setStatusMessage] = useState(
+    "استخدم أي رمز من 6 أرقام للمتابعة في الديمو.",
+  );
+
   return (
     <div className="grid gap-5">
       <div>
@@ -38,14 +44,22 @@ export function OtpVerification({
 
       <button
         className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-black text-white transition hover:bg-primary-dark"
-        onClick={onVerified}
+        onClick={() => {
+          setStatusMessage("تم التحقق بنجاح.");
+          onVerified?.();
+        }}
         type="button"
       >
         تأكيد الرمز
       </button>
+      <p className="text-sm font-bold text-muted">{statusMessage}</p>
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm font-bold text-muted">
-        <button className="text-primary" type="button">
+        <button
+          className="text-primary"
+          onClick={() => setStatusMessage("تم إرسال رمز جديد في تجربة الديمو.")}
+          type="button"
+        >
           إعادة إرسال الرمز
         </button>
         <button

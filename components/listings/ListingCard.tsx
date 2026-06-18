@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
+import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
@@ -62,13 +63,10 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
             </div>
           </div>
         </Link>
-        <button
-          aria-label="إضافة إلى المفضلة"
+        <FavoriteButton
           className="absolute bottom-4 left-4 grid size-12 place-items-center rounded-full bg-white text-xl shadow-[var(--shadow-soft)] transition hover:scale-105 hover:text-primary"
-          type="button"
-        >
-          ♡
-        </button>
+          label=""
+        />
       </div>
       <div className="p-5">
         <Link href={listingHref}>

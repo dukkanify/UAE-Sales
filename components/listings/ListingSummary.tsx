@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Category, Listing } from "@/types";
+import { FavoriteButton } from "@/components/common/FavoriteButton";
+import { ShareButton } from "@/components/common/ShareButton";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 
@@ -67,18 +69,13 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         </Link>
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <button
+        <FavoriteButton
           className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
-          type="button"
-        >
-          ♡ إضافة للمفضلة
-        </button>
-        <button
+        />
+        <ShareButton
           className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
-          type="button"
-        >
-          مشاركة الإعلان
-        </button>
+          title={listing.title}
+        />
       </div>
     </Card>
   );
