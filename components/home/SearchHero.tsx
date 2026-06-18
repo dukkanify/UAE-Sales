@@ -114,9 +114,9 @@ export function SearchHero({ categories }: SearchHeroProps) {
                 }))}
               />
               <Select
-                aria-label="المدينة"
+                aria-label="الإمارة / المدينة"
                 className="border-border bg-white text-ink"
-                label="المدينة"
+                label="الإمارة / المدينة"
                 name="city"
                 options={[
                   { label: "كل المدن", value: "" },

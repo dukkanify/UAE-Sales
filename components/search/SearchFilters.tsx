@@ -57,7 +57,7 @@ export function SearchFilters({
       />
       <Select
         defaultValue={selectedFilters.city}
-        label="المدينة"
+        label="الإمارة / المدينة"
         name="city"
         options={[
           { label: "كل المدن", value: "" },

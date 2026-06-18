@@ -60,7 +60,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             />
             <Select
               defaultValue={cities.find((city) => city.name === displayUser.city)?.id}
-              label="المدينة"
+              label="الإمارة / المدينة"
               name="city"
               options={cities.map((city) => ({
                 label: city.name,

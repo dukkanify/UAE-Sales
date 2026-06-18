@@ -15,7 +15,7 @@ UAE Sales should feel like a premium UAE marketplace: trustworthy, polished, inv
 | Surface | Ivory White | `#FFFFFF` | Cards, forms, panels |
 | Muted Surface | Warm Sand | `#EFEAE1` | Secondary panels, input backgrounds |
 | Text Muted | Warm Grey | `#6B665C` | Descriptions, helper text |
-| Border | Soft Stone | `#E4DDD1` | Card borders, input borders, dividers |
+| Border | Soft Stone | `#E5E7EB` | Card borders, input borders, dividers |
 
 Green is intentionally removed from the UI identity. UAE influence is expressed through premium charcoal, gold, and a restrained red accent.
 

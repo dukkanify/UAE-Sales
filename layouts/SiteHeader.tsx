@@ -102,12 +102,29 @@ export function SiteHeader() {
             )}
             <Link
               href="/listings/new"
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-[var(--shadow-soft)] transition hover:-translate-y-0.5 hover:bg-primary-dark"
             >
               أضف إعلان
             </Link>
           </div>
         </div>
+        <nav className="mt-2 flex gap-2 overflow-x-auto rounded-[1.35rem] border border-white/80 bg-white/82 p-2 text-sm font-black text-muted shadow-[var(--shadow-soft)] backdrop-blur-2xl xl:hidden">
+          {primaryNavigation.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="shrink-0 rounded-full border border-border bg-white px-4 py-2 transition hover:border-secondary hover:bg-secondary-soft hover:text-primary"
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link
+            href="/search"
+            className="shrink-0 rounded-full border border-border bg-white px-4 py-2 transition hover:border-secondary hover:bg-secondary-soft hover:text-primary"
+          >
+            البحث
+          </Link>
+        </nav>
       </div>
     </header>
   );
