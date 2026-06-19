@@ -102,7 +102,7 @@ export function SiteHeader() {
             )}
             <Link
               href="/listings/new"
-              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-dark"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-secondary px-5 py-2.5 text-sm font-black text-primary shadow-sm transition hover:-translate-y-0.5 hover:bg-primary hover:text-white"
             >
               أضف إعلان
             </Link>

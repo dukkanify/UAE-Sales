@@ -26,7 +26,7 @@ export function ComingSoonPage({
         </h1>
         <p className="mt-4 max-w-2xl leading-9 text-muted">{description}</p>
         <Link
-          className="mt-8 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-black text-white"
+          className="mt-8 inline-flex rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
           href={actionHref}
         >
           {actionLabel}

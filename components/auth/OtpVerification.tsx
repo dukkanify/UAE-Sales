@@ -43,7 +43,7 @@ export function OtpVerification({
       </div>
 
       <button
-        className="inline-flex min-h-12 items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-black text-white transition hover:bg-primary-dark"
+        className="inline-flex min-h-12 items-center justify-center rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
         onClick={() => {
           setStatusMessage("تم التحقق بنجاح.");
           onVerified?.();

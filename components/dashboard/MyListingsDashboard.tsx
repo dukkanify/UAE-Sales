@@ -84,7 +84,7 @@ export function MyListingsDashboard({
           </div>
           <Link
             href="/listings/new"
-            className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white transition hover:bg-primary-dark"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-secondary px-5 py-2.5 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
           >
             إضافة إعلان جديد
           </Link>
@@ -161,7 +161,7 @@ export function MyListingsDashboard({
                               ? `/listings/local/${listing.id}/edit`
                               : `/listings/${listing.slug}/edit`
                           }
-                          className="rounded-full bg-primary-soft px-4 py-2 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
+                          className="rounded-full bg-secondary-soft px-4 py-2 text-sm font-black text-primary transition hover:bg-secondary"
                         >
                           تعديل
                         </Link>
