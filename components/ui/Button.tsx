@@ -21,12 +21,14 @@ export function Button({
   variant = "primary",
   ...props
 }: ButtonProps) {
+  const content = children ?? "إجراء";
+
   return (
     <button
       className={`focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-sm font-black transition duration-200 ${variantClasses[variant]} ${className}`}
       {...props}
     >
-      {children}
+      {content}
     </button>
   );
 }
