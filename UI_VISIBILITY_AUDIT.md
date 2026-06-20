@@ -9,8 +9,8 @@ This audit reviewed visible labels, button contrast, navigation links, CTA butto
 ### Listing Card Favorite Button
 
 - **Issue:** Listing cards used an icon-only favorite button with `label=""`.
-- **Risk:** The visible button could look like an empty circular button in some states and had insufficient explicit accessible labeling.
-- **Fix:** Added a required fallback `aria-label` and `title` to `FavoriteButton`, and passed listing-specific text from `ListingCard`.
+- **Risk:** The visible button could look like an empty circular button in some states and did not satisfy the requirement that every button show visible text.
+- **Fix:** Added a required fallback `aria-label` and `title` to `FavoriteButton`, passed listing-specific accessible text from `ListingCard`, and changed the card button to render the visible label `مفضلة`.
 
 ### Generic Button Component
 
@@ -58,7 +58,7 @@ Validated visible labels include:
 
 ## Remaining Issues
 
-- Some icon-only controls intentionally remain icon-only visually, but now include accessible labels.
+- No known button, tab, badge, navigation item, or CTA remains without visible text in the audited UI.
 - Full automated accessibility testing is not yet configured.
 - Visual regression testing is not yet configured.
 
