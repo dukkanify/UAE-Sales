@@ -70,8 +70,9 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
           </div>
         </Link>
         <FavoriteButton
-          className="absolute left-3 top-3 grid size-9 place-items-center rounded-full bg-white text-lg shadow-sm transition hover:scale-105 hover:text-uae-red"
-          label=""
+          ariaLabel={`إضافة ${listing.title} إلى المفضلة`}
+          className="absolute left-3 top-3 inline-flex min-h-9 items-center justify-center rounded-full bg-white px-3 text-xs font-black text-primary shadow-sm transition hover:scale-105 hover:text-uae-red"
+          label="مفضلة"
         />
       </div>
       <div className="p-4">

@@ -9,13 +9,13 @@ export default function LoginPage() {
       <SiteHeader />
       <main>
         <AuthShell
-          description="واجهة تسجيل دخول عربية جاهزة لربط OTP وUAE PASS، وتناسب رحلة المشتري والبائع داخل السوق."
+          description="منصة إماراتية موثوقة لبيع وشراء المنتجات والخدمات مع نظام ضمان مالي يحمي حقوق المشتري والبائع."
           footerAction={{
             href: "/register",
             label: "أنشئ حساباً جديداً",
             prompt: "ليس لديك حساب؟",
           }}
-          title="مرحباً بعودتك إلى سوق الإمارات."
+          title="مرحباً بك في UAE Sales"
         >
           <LoginForm />
         </AuthShell>

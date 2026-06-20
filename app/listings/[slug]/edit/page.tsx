@@ -26,7 +26,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
               : "الإعلان غير موجود في البيانات الحالية."}
           </p>
           <Link
-            className="mt-6 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-black text-white"
+            className="mt-6 inline-flex rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
             href="/dashboard/listings"
           >
             العودة إلى إعلاناتي

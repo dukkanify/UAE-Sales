@@ -82,13 +82,12 @@ export function LoginForm() {
   return (
     <form className="grid gap-5" noValidate onSubmit={handleSubmit}>
       <div>
-        <p className="text-sm font-bold text-primary">تسجيل الدخول</p>
+        <p className="text-sm font-bold text-primary">تسجيل الدخول الآمن</p>
         <h2 className="mt-2 text-2xl font-black text-ink">
           ادخل إلى حسابك
         </h2>
         <p className="mt-3 leading-8 text-muted">
-          استخدم رقم الهاتف أو البريد الإلكتروني مع كلمة المرور، ثم انتقل
-          لواجهة OTP الجاهزة للربط.
+          تابع إعلاناتك، محادثاتك، وطلبات الشراء المحمية داخل الإمارات من لوحة واحدة.
         </p>
       </div>
 
@@ -137,7 +136,7 @@ export function LoginForm() {
       <Button type="submit">تسجيل الدخول</Button>
 
       <button
-        className="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-border bg-white px-5 py-3 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+        className="focus-ring inline-flex min-h-12 items-center justify-center rounded-full border border-border bg-white px-5 py-3 text-sm font-black text-muted transition hover:border-secondary hover:text-primary disabled:cursor-not-allowed disabled:opacity-75"
         disabled
         type="button"
       >

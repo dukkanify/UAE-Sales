@@ -120,7 +120,7 @@ export function SearchResultsList({
         </p>
         <a
           href="/search"
-          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-black text-white transition hover:bg-primary-dark"
+          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-secondary px-5 py-2.5 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
         >
           عرض كل الإعلانات
         </a>

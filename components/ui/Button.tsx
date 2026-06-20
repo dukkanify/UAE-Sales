@@ -9,7 +9,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary-dark",
+    "bg-secondary text-primary shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary hover:text-white",
   secondary:
     "border border-secondary/45 bg-white/90 text-primary shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-secondary hover:text-primary",
   ghost: "text-muted hover:bg-secondary-soft hover:text-primary",
@@ -21,12 +21,17 @@ export function Button({
   variant = "primary",
   ...props
 }: ButtonProps) {
+  const content =
+    typeof children === "string" && children.trim().length === 0
+      ? "إجراء"
+      : (children ?? "إجراء");
+
   return (
     <button
       className={`focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-sm font-black transition duration-200 ${variantClasses[variant]} ${className}`}
       {...props}
     >
-      {children}
+      {content}
     </button>
   );
 }

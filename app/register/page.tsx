@@ -9,13 +9,13 @@ export default function RegisterPage() {
       <SiteHeader />
       <main>
         <AuthShell
-          description="ابدأ حسابك في UAE Sales لإضافة الإعلانات، متابعة المحادثات، وإدارة الطلبات والمدفوعات لاحقاً."
+          description="انضم إلى منصة إماراتية موثوقة تتيح لك بيع وشراء المنتجات والخدمات مع ضمان مالي وتجربة آمنة داخل الإمارات."
           footerAction={{
             href: "/login",
             label: "سجّل الدخول",
             prompt: "لديك حساب بالفعل؟",
           }}
-          title="أنشئ حسابك وابدأ البيع والشراء."
+          title="أنشئ حسابك في UAE Sales"
         >
           <RegisterForm />
         </AuthShell>
