@@ -72,16 +72,24 @@ export function AuthShell({
         </div>
       </div>
 
-      <Card className="p-6 md:p-8">
-        {children}
-        <div className="mt-8 border-t border-border pt-5 text-center text-sm font-bold text-muted">
-          {footerAction.prompt}{" "}
-          <Link
-            href={footerAction.href}
-            className="text-primary transition hover:text-primary-dark"
-          >
-            {footerAction.label}
-          </Link>
+      <Card className="overflow-hidden p-0">
+        <div className="uae-flag-strip h-2 w-full" />
+        <div className="p-6 md:p-8">
+          {children}
+          <div className="mt-6 grid gap-2 rounded-3xl bg-surface-muted p-4 text-xs font-black text-muted sm:grid-cols-3">
+            <span>ضمان مالي</span>
+            <span>حساب موثق</span>
+            <span>سوق إماراتي</span>
+          </div>
+          <div className="mt-8 border-t border-border pt-5 text-center text-sm font-bold text-muted">
+            {footerAction.prompt}{" "}
+            <Link
+              href={footerAction.href}
+              className="text-primary transition hover:text-secondary"
+            >
+              {footerAction.label}
+            </Link>
+          </div>
         </div>
       </Card>
     </section>

@@ -127,13 +127,12 @@ export function RegisterForm() {
   return (
     <form className="grid gap-5" noValidate onSubmit={handleSubmit}>
       <div>
-        <p className="text-sm font-bold text-primary">إنشاء حساب</p>
+        <p className="text-sm font-bold text-primary">حساب جديد موثق</p>
         <h2 className="mt-2 text-2xl font-black text-ink">
           ابدأ البيع والشراء بأمان
         </h2>
         <p className="mt-3 leading-8 text-muted">
-          أنشئ حساباً أولياً لإدارة الإعلانات والمحادثات والطلبات والمحفظة
-          لاحقاً.
+          أنشئ حسابك لإضافة الإعلانات، إدارة المحادثات، ومتابعة الصفقات المحمية داخل الإمارات.
         </p>
       </div>
 

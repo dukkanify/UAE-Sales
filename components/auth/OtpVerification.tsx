@@ -14,7 +14,7 @@ export function OtpVerification({
   onVerified,
 }: OtpVerificationProps) {
   const [statusMessage, setStatusMessage] = useState(
-    "استخدم أي رمز من 6 أرقام للمتابعة في الديمو.",
+    "أدخل رمز التحقق للمتابعة. في نسخة الديمو يمكنك استخدام أي 6 أرقام.",
   );
 
   return (
@@ -23,7 +23,7 @@ export function OtpVerification({
         <p className="text-sm font-bold text-primary">التحقق بخطوتين</p>
         <h2 className="mt-2 text-2xl font-black text-ink">أدخل رمز OTP</h2>
         <p className="mt-3 leading-8 text-muted">
-          واجهة جاهزة للربط لاحقاً. سيتم إرسال الرمز إلى:
+          سيتم استخدام هذه الخطوة لحماية حسابك ومعاملاتك. أرسلنا الرمز إلى:
           <span className="mx-1 font-black text-ink">{identifier}</span>
         </p>
       </div>
