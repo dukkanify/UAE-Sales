@@ -21,7 +21,10 @@ export function Button({
   variant = "primary",
   ...props
 }: ButtonProps) {
-  const content = children ?? "إجراء";
+  const content =
+    typeof children === "string" && children.trim().length === 0
+      ? "إجراء"
+      : (children ?? "إجراء");
 
   return (
     <button

@@ -23,6 +23,12 @@ This audit reviewed visible labels, button contrast, navigation links, CTA butto
 - **Issue:** Some primary CTAs previously used charcoal backgrounds. While text existed, the UI feedback made them look visually heavy and potentially like unlabeled pills in screenshots.
 - **Fix:** Primary CTA styling now uses gold buttons with charcoal text and a high-contrast hover state.
 
+### Dark Button Contrast Guard
+
+- **Issue:** Some dark navy pills could still inherit an unsuitable text color from competing utility classes or browser/cascade order.
+- **Risk:** Text exists in the DOM but appears invisible because foreground/background contrast is invalid.
+- **Fix:** Added a global CSS guard for interactive elements using `bg-primary`, `bg-night`, or `bg-uae-black` so buttons/links and nested content always render white text on dark backgrounds.
+
 ### Dashboard Sidebar Logout
 
 - **Issue:** The dashboard sidebar included profile/listings/add listing/wallet links but did not include the requested visible `تسجيل الخروج` action.
@@ -60,7 +66,9 @@ Validated visible labels include:
 - `components/listings/ListingCard.tsx`
   - Added listing-specific accessible favorite labels.
 - `components/ui/Button.tsx`
-  - Added fallback button text.
+  - Added fallback button text, including empty-string children.
+- `app/globals.css`
+  - Added dark interactive contrast guard for dark buttons/links.
 - `components/dashboard/DashboardShell.tsx`
   - Added visible `تسجيل الخروج` sidebar action.
 

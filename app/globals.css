@@ -139,3 +139,25 @@ textarea {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 4px rgb(4 120 87 / 14%);
 }
+
+button.bg-primary,
+a.bg-primary,
+button.bg-night,
+a.bg-night,
+button.bg-uae-black,
+a.bg-uae-black {
+  color: #ffffff !important;
+}
+
+button.bg-primary *,
+a.bg-primary *,
+button.bg-night *,
+a.bg-night *,
+button.bg-uae-black *,
+a.bg-uae-black * {
+  color: inherit !important;
+}
+
+button:disabled {
+  opacity: 0.72;
+}
