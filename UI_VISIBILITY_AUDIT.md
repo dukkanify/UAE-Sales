@@ -23,6 +23,12 @@ This audit reviewed visible labels, button contrast, navigation links, CTA butto
 - **Issue:** Some primary CTAs previously used charcoal backgrounds. While text existed, the UI feedback made them look visually heavy and potentially like unlabeled pills in screenshots.
 - **Fix:** Primary CTA styling now uses gold buttons with charcoal text and a high-contrast hover state.
 
+### Dashboard Sidebar Logout
+
+- **Issue:** The dashboard sidebar included profile/listings/add listing/wallet links but did not include the requested visible `تسجيل الخروج` action.
+- **Risk:** Users could rely only on the header logout action, and the sidebar did not fully match the requested navigation labels.
+- **Fix:** Added a visible `تسجيل الخروج` button to the dashboard sidebar with outlined styling and clear Arabic text.
+
 ## Missing Labels
 
 No missing labels were found in navigation links or primary CTA buttons after fixes.
@@ -55,10 +61,19 @@ Validated visible labels include:
   - Added listing-specific accessible favorite labels.
 - `components/ui/Button.tsx`
   - Added fallback button text.
+- `components/dashboard/DashboardShell.tsx`
+  - Added visible `تسجيل الخروج` sidebar action.
+
+## Demo Listing Data Audit
+
+- Searched for obvious random/demo strings such as `jgy`, `asdf`, `lorem`, `dummy`, `random`, `xxxx`, and similar placeholder text.
+- No random listing titles or descriptions were found in runtime listing data.
+- Current demo listings include realistic Arabic titles, descriptions, prices, categories, cities, statuses, and image URLs.
 
 ## Remaining Issues
 
 - No known button, tab, badge, navigation item, or CTA remains without visible text in the audited UI.
+- No random demo listing text was found in current runtime listing data.
 - Full automated accessibility testing is not yet configured.
 - Visual regression testing is not yet configured.
 

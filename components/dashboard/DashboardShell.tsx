@@ -6,7 +6,10 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
 import { Card } from "@/components/ui/Card";
-import { getSessionUser } from "@/services/clientStorage";
+import {
+  clearSessionUser,
+  getSessionUser,
+} from "@/services/clientStorage";
 
 type DashboardShellProps = {
   activePath: "/profile" | "/dashboard/listings";
@@ -96,6 +99,16 @@ export function DashboardShell({
                 </Link>
               );
             })}
+            <button
+              className="rounded-2xl border border-border bg-white px-4 py-3 text-right text-sm font-black text-primary transition hover:border-secondary hover:bg-secondary-soft"
+              onClick={() => {
+                clearSessionUser();
+                router.replace("/login");
+              }}
+              type="button"
+            >
+              تسجيل الخروج
+            </button>
           </nav>
         </Card>
       </aside>
