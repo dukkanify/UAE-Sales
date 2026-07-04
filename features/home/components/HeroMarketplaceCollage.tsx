@@ -79,6 +79,17 @@ export function HeroMarketplaceCollage({ listings }: HeroMarketplaceCollageProps
       <div className="absolute -inset-6 rounded-[2rem] bg-[radial-gradient(ellipse_at_35%_20%,rgb(201_169_98/18%),transparent_58%)]" />
 
       <div className="relative rounded-[2rem] border border-border bg-white/72 p-3 shadow-[0_28px_90px_rgb(15_20_25/10)] backdrop-blur-xl sm:p-4">
+        <div className="mb-4 flex items-center justify-between gap-3 px-1">
+          <div>
+            <p className="text-sm font-black text-ink">معاينة من السوق</p>
+            <p className="mt-0.5 text-xs font-medium text-muted">
+              إعلانات حقيقية بتصنيفات متعددة
+            </p>
+          </div>
+          <span className="rounded-full border border-border bg-surface px-3 py-1 text-[0.68rem] font-bold text-primary">
+            مباشر
+          </span>
+        </div>
         <div className="grid gap-4 md:grid-cols-[1.08fr_0.92fr]">
           <MiniListingCard listing={realEstate} size="lg" />
 

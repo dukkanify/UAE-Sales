@@ -46,6 +46,22 @@ export async function SearchHero({ categories, trustPoints }: SearchHeroProps) {
               action="/search"
               className="mx-auto mt-8 rounded-[var(--radius-2xl)] border border-border bg-surface p-3 shadow-[0_24px_70px_rgb(15_20_25/10)] sm:p-4 lg:mx-0"
             >
+              <div className="mb-3 flex items-center justify-between gap-3 px-1">
+                <div className="flex items-center gap-2">
+                  <span className="grid size-8 place-items-center rounded-[var(--radius-lg)] bg-secondary-soft text-secondary">
+                    <Icon name="search" size={15} />
+                  </span>
+                  <div className="text-start">
+                    <p className="text-xs font-black text-ink">بحث ذكي في السوق</p>
+                    <p className="text-[0.68rem] font-medium text-muted">
+                      سيارات، عقارات، أجهزة، وخدمات في الإمارات
+                    </p>
+                  </div>
+                </div>
+                <span className="hidden rounded-full bg-surface-muted px-3 py-1 text-[0.68rem] font-bold text-muted sm:inline-flex">
+                  +24,000 إعلان
+                </span>
+              </div>
               <div className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.9fr)_minmax(0,0.9fr)_auto]">
                 <label className="flex min-h-[3.25rem] items-center gap-3 rounded-[var(--radius-xl)] border border-border bg-surface-muted/60 px-4">
                   <Icon className="shrink-0 text-secondary" name="search" size={18} />
