@@ -118,6 +118,49 @@ textarea {
     );
 }
 
+/* ── Emirati identity (subtle) ── */
+.uae-gold {
+  color: #b8955f;
+}
+
+.uae-gold-bg {
+  background-color: #b8955f;
+}
+
+.uae-gold-gradient {
+  background: linear-gradient(135deg, #d4b87a 0%, #b8955f 52%, #9a7d4a 100%);
+}
+
+.uae-header-sand {
+  background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%);
+}
+
+.uae-header-accent {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(184 149 95 / 35%) 20%,
+    rgb(184 149 95 / 55%) 50%,
+    rgb(184 149 95 / 35%) 80%,
+    transparent 100%
+  );
+}
+
+.uae-geometric-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23B8955F' stroke-width='0.35' opacity='0.45'%3E%3Cpath d='M30 5 L55 17.5 L55 42.5 L30 55 L5 42.5 L5 17.5 Z'/%3E%3Cpath d='M30 15 L45 22.5 L45 37.5 L30 45 L15 37.5 L15 22.5 Z'/%3E%3Cpath d='M30 25 L35 27.5 L35 32.5 L30 35 L25 32.5 L25 27.5 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 60px 60px;
+}
+
+.uae-hero-sand-wash {
+  background:
+    radial-gradient(ellipse 55% 45% at 85% 75%, rgb(184 149 95 / 14%), transparent 68%),
+    radial-gradient(ellipse 40% 35% at 15% 85%, rgb(196 30 58 / 5%), transparent 62%);
+}
+
+.uae-hex-mark {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
 /* ── Focus & interaction ── */
 .focus-ring {
   outline: none;

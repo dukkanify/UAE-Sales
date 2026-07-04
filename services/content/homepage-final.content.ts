@@ -9,6 +9,7 @@ export type FinalHeroListingCard = {
   imageUrl: string;
   price: number;
   showEscrow?: boolean;
+  showVerified?: boolean;
   title: string;
 };
 
@@ -22,19 +23,19 @@ export type FinalTestimonial = {
   rating: number;
 };
 
-const imageQuality = "auto=format&fit=crop&w=2000&q=90";
+const imageQuality = "auto=format&fit=crop&w=2000&q=92";
 
 export async function getFinalHeroBackground(): Promise<string> {
-  return `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?${imageQuality}`;
+  return `https://images.unsplash.com/photo-1518684079-3c830dcef090?${imageQuality}`;
 }
 
 export async function getFinalPopularSearches() {
   return [
     { href: "/search?q=للبيع", label: "للبيع" },
     { href: "/search?q=سيارات+مستعملة", label: "سيارات مستعملة" },
-    { href: "/categories/real-estate", label: "عقارات" },
+    { href: "/categories/real-estate", label: "عقارات دبي" },
     { href: "/categories/mobiles", label: "موبايلات" },
-    { href: "/search?city=دبي", label: "إعلانات دبي" },
+    { href: "/search?city=أبوظبي", label: "إعلانات أبوظبي" },
   ];
 }
 
@@ -57,32 +58,37 @@ export async function getFinalHeroCollage(): Promise<FinalHeroListingCard[]> {
       id: "real-estate",
       badge: "عقار مميز",
       category: "عقارات",
-      city: "نخلة جميرا، دبي",
+      city: "نخلة جميرا · دبي",
       href: "/search?q=فيلا+نخلة+جميرا",
-      imageUrl: `https://images.unsplash.com/photo-1600585154340-be6161a56a0c?${imageQuality}`,
+      imageUrl: `https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?${imageQuality}`,
       price: 18500000,
-      title: "Villa Palm Jumeirah",
+      showEscrow: true,
+      showVerified: true,
+      title: "فيلا فاخرة — نخلة جميرا",
     },
     {
       id: "cars",
       badge: "سيارة مميزة",
       category: "سيارات",
-      city: "دبي",
+      city: "دبي مارينا · دبي",
       href: "/search?q=مرسيدس+G63",
-      imageUrl: `https://images.unsplash.com/photo-1606664515524-9f513f17b1c5?${imageQuality}`,
+      imageUrl: `https://images.unsplash.com/photo-1563720360172-1f859e989174?${imageQuality}`,
       price: 895000,
-      title: "Mercedes-AMG G63 2024",
+      showEscrow: true,
+      showVerified: true,
+      title: "Mercedes-AMG G63 · 2024",
     },
     {
       id: "mobiles",
       badge: "إلكترونيات",
       category: "موبايلات",
-      city: "أبوظبي",
+      city: "الريم · أبوظبي",
       href: "/search?q=آيفون+16+برو",
       imageUrl: `https://images.unsplash.com/photo-1695048133142-1a20484d2569?${imageQuality}`,
       price: 4899,
       showEscrow: true,
-      title: "iPhone 16 Pro Max",
+      showVerified: true,
+      title: "iPhone 16 Pro Max · 256GB",
     },
   ];
 }
@@ -120,7 +126,7 @@ export async function getFinalEscrowSteps(): Promise<FinalEscrowStep[]> {
 export async function getFinalTestimonials(): Promise<FinalTestimonial[]> {
   return [
     {
-      avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?${imageQuality}&w=400`,
+      avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=90`,
       city: "دبي",
       name: "محمد الكعبي",
       quote:
@@ -128,7 +134,7 @@ export async function getFinalTestimonials(): Promise<FinalTestimonial[]> {
       rating: 5,
     },
     {
-      avatarUrl: `https://images.unsplash.com/photo-1494790108377-be9c29b29330?${imageQuality}&w=400`,
+      avatarUrl: `https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=90`,
       city: "أبوظبي",
       name: "فاطمة النعيمي",
       quote:
@@ -136,7 +142,7 @@ export async function getFinalTestimonials(): Promise<FinalTestimonial[]> {
       rating: 5,
     },
     {
-      avatarUrl: `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?${imageQuality}&w=400`,
+      avatarUrl: `https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=90`,
       city: "الشارقة",
       name: "خالد المرزوقي",
       quote:
@@ -159,13 +165,13 @@ export async function getFinalEmirateImages(): Promise<Record<string, string>> {
 
 export async function getFinalCategoryImages(): Promise<Record<string, string>> {
   return {
-    cars: `https://images.unsplash.com/photo-1503376780353-7e6692767b70?${imageQuality}`,
-    "real-estate": `https://images.unsplash.com/photo-1600585154340-be6161a56a0c?${imageQuality}`,
-    mobiles: `https://images.unsplash.com/photo-1695048133142-1a20484d2569?${imageQuality}`,
-    electronics: `https://images.unsplash.com/photo-1498049794561-7780e7231661?${imageQuality}`,
-    jobs: `https://images.unsplash.com/photo-1497366754035-f200968a6e72?${imageQuality}`,
-    services: `https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?${imageQuality}`,
-    furniture: `https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?${imageQuality}`,
-    fashion: `https://images.unsplash.com/photo-1445205170230-053b83016050?${imageQuality}`,
+    cars: `https://images.unsplash.com/photo-1544636331-e26879cd4d9b?${imageQuality}`,
+    "real-estate": `https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?${imageQuality}`,
+    mobiles: `https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?${imageQuality}`,
+    electronics: `https://images.unsplash.com/photo-1468495244123-6c6c332eeece?${imageQuality}`,
+    jobs: `https://images.unsplash.com/photo-1497366811353-6870744d04b2?${imageQuality}`,
+    services: `https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?${imageQuality}`,
+    furniture: `https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?${imageQuality}`,
+    fashion: `https://images.unsplash.com/photo-1441986300917-64674bd600d8?${imageQuality}`,
   };
 }

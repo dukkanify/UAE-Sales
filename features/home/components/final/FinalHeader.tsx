@@ -19,16 +19,15 @@ const homeNavigation = [
   { href: "/search", label: "الشركات" },
 ];
 
-function HexLogo() {
+function BrandMark() {
   return (
-    <span
-      className="grid size-11 place-items-center bg-[#B8955F] text-[0.65rem] font-bold text-white md:size-12"
-      style={{
-        clipPath:
-          "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-      }}
-    >
-      UAE
+    <span className="relative grid size-12 place-items-center md:size-[3.25rem]">
+      <span className="uae-hex-mark absolute inset-0 uae-gold-gradient shadow-[0_6px_20px_rgb(184_149_95/35%)]" />
+      <span className="uae-hex-mark absolute inset-[3px] bg-white/20" />
+      <span className="relative text-[0.7rem] font-black tracking-[0.08em] text-white md:text-xs">
+        UAE
+      </span>
+      <span className="absolute -start-px top-[22%] bottom-[22%] w-[3px] rounded-full bg-uae-red/90" />
     </span>
   );
 }
@@ -46,20 +45,26 @@ export function FinalHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-white/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 uae-header-sand shadow-[0_1px_0_rgb(15_20_25/5%)] backdrop-blur-md">
+      <div className="h-0.5 uae-header-accent" />
       <div className="app-container">
-        <div className="flex min-h-[4.5rem] items-center justify-between gap-4 md:min-h-[4.75rem]">
+        <div className="flex min-h-[4.75rem] items-center justify-between gap-4 md:min-h-[5rem]">
           <div className="flex shrink-0 items-center gap-3 md:gap-4">
             <Link className="flex items-center gap-3" href="/">
-              <HexLogo />
-              <span className="hidden text-base font-bold tracking-tight text-ink sm:block">
-                UAE Sales
+              <BrandMark />
+              <span className="hidden sm:block">
+                <span className="block text-base font-bold tracking-tight text-ink">
+                  UAE Sales
+                </span>
+                <span className="block text-[0.65rem] font-semibold text-[#B8955F]">
+                  سوق إماراتي فاخر
+                </span>
               </span>
             </Link>
 
-            <span className="hidden items-center gap-2 rounded-full border border-border bg-surface-muted/50 px-3 py-1.5 md:inline-flex">
+            <span className="hidden items-center gap-2 rounded-full border border-[#B8955F]/20 bg-white px-3 py-1.5 shadow-sm md:inline-flex">
               <span className="inline-block h-4 w-6 shrink-0 overflow-hidden rounded-sm uae-flag-strip" />
-              <span className="text-xs font-semibold text-ink">العربية</span>
+              <span className="text-xs font-bold text-ink">العربية</span>
             </span>
           </div>
 
@@ -67,10 +72,10 @@ export function FinalHeader() {
             {homeNavigation.map((item, index) => (
               <Link
                 key={item.href}
-                className={`rounded-lg px-3 py-2 text-sm transition hover:bg-surface-muted ${
+                className={`relative rounded-lg px-3.5 py-2.5 text-sm transition hover:bg-[#B8955F]/8 hover:text-ink ${
                   index === 0
-                    ? "font-bold text-ink"
-                    : "font-medium text-muted hover:text-ink"
+                    ? "font-bold text-ink after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-[#B8955F]/70"
+                    : "font-semibold text-muted"
                 }`}
                 href={item.href}
               >
@@ -82,7 +87,7 @@ export function FinalHeader() {
           <div className="flex items-center gap-2 md:gap-3">
             <Link
               aria-label="بحث"
-              className="grid size-10 place-items-center rounded-lg text-muted transition hover:bg-surface-muted hover:text-ink"
+              className="grid size-10 place-items-center rounded-lg text-muted transition hover:bg-[#B8955F]/10 hover:text-[#B8955F] md:size-11"
               href="/search"
             >
               <Icon name="search" size={20} />
@@ -90,14 +95,14 @@ export function FinalHeader() {
 
             {user ? (
               <Link
-                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
+                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
                 href="/profile"
               >
                 {user.fullName.split(" ")[0]}
               </Link>
             ) : (
               <Link
-                className="hidden rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
+                className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
                 href="/login"
               >
                 دخول
@@ -105,10 +110,10 @@ export function FinalHeader() {
             )}
 
             <Link
-              className="hidden min-h-10 items-center gap-1.5 rounded-full bg-primary px-5 text-sm font-bold text-white shadow-[0_4px_16px_rgb(15_20_25/15%)] transition hover:bg-primary-dark sm:inline-flex"
+              className="uae-gold-gradient hidden min-h-11 items-center gap-2 rounded-full px-6 text-sm font-bold text-white shadow-[0_8px_24px_rgb(184_149_95/32%)] transition hover:brightness-105 sm:inline-flex"
               href="/listings/new"
             >
-              <Icon name="plus" size={16} />
+              <Icon name="plus" size={17} />
               أضف إعلانك
             </Link>
 
@@ -130,7 +135,7 @@ export function FinalHeader() {
               {homeNavigation.map((item) => (
                 <Link
                   key={item.href}
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-ink transition hover:bg-surface-muted"
+                  className="rounded-lg px-4 py-3 text-sm font-semibold text-ink transition hover:bg-[#B8955F]/8"
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -141,7 +146,7 @@ export function FinalHeader() {
                 className="mt-2 w-full"
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
-                variant="primary"
+                variant="accent"
               >
                 <Icon name="plus" size={16} />
                 أضف إعلانك
