@@ -7,8 +7,10 @@ import { cities, countries } from "@/constants/locations";
 import type { Category, Listing, ListingCondition } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import { getSessionUser, saveLocalListing } from "@/services/clientStorage";
 
 type AddListingFormProps = {
@@ -167,7 +169,6 @@ export function AddListingForm({ categories }: AddListingFormProps) {
   if (!isAllowed) {
     return (
       <Card className="overflow-hidden p-8 text-center">
-        <div className="uae-flag-strip mx-auto mb-5 h-1.5 w-20 rounded-full" />
         <h1 className="text-2xl font-black text-ink">يلزم تسجيل الدخول</h1>
         <p className="mt-3 text-muted">
           سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد.
@@ -181,15 +182,14 @@ export function AddListingForm({ categories }: AddListingFormProps) {
       <input name="categoryId" type="hidden" value={selectedCategoryId} />
 
       <div className="grid gap-6">
-        <div className="overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)]">
-          <div className="uae-flag-strip mb-5 h-2 w-32 rounded-full" />
+        <div className="surface-gradient overflow-hidden rounded-[var(--radius-xl)] border border-border p-6 shadow-[var(--shadow-soft)]">
           <h2 className="text-3xl font-black text-primary">ابدأ إعلانك خلال دقائق</h2>
           <p className="mt-3 leading-8 text-muted">
             خطوات واضحة: القسم، التفاصيل، الصور، ثم النشر. الإعلان سيظهر مباشرة في حسابك ونتائج البحث.
           </p>
           <div className="mt-6 grid gap-3 sm:grid-cols-4">
             {["القسم", "التفاصيل", "الصور", "النشر"].map((step, index) => (
-              <div key={step} className="rounded-2xl border border-border bg-white/75 p-3">
+              <div key={step} className="rounded-[var(--radius-md)] border border-border bg-surface p-3">
                 <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-black text-white">
                   {index + 1}
                 </span>
@@ -199,8 +199,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           </div>
         </div>
 
-        <Card className="overflow-hidden p-6">
-          <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
+        <Card className="p-6">
           <h2 className="text-2xl font-black text-ink">1. اختر القسم</h2>
           <p className="mt-2 text-sm font-bold text-muted">
             اختر القسم الأنسب لإعلانك ليظهر أمام المشترين المناسبين.
@@ -229,7 +228,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
             })}
           </div>
           {errors.category ? (
-            <p className="mt-3 text-xs font-bold text-rose-700">{errors.category}</p>
+            <FormMessage variant="error">{errors.category}</FormMessage>
           ) : null}
 
           {(selectedCategory?.subcategories.length ?? 0) > 0 ? (
@@ -246,8 +245,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           ) : null}
         </Card>
 
-        <Card className="overflow-hidden p-6">
-          <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
+        <Card className="p-6">
           <h2 className="text-2xl font-black text-ink">2. تفاصيل الإعلان</h2>
           <div className="mt-5 grid gap-4">
             <div>
@@ -263,29 +261,24 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                 placeholder="مثال: آيفون 15 برو بحالة ممتازة"
               />
               {errors.title ? (
-                <p className="mt-2 text-xs font-bold text-rose-700">{errors.title}</p>
+                <FormMessage variant="error">{errors.title}</FormMessage>
               ) : null}
             </div>
 
-            <label className="grid gap-2 text-sm font-black text-ink">
-              <span>الوصف</span>
-              <textarea
-                className="focus-ring min-h-36 rounded-2xl border border-border bg-white/90 p-4 text-sm font-bold text-ink shadow-sm placeholder:text-muted"
-                name="description"
-                onChange={(event) =>
-                  setPreview((current) => ({
-                    ...current,
-                    description:
-                      event.target.value || "سيظهر وصف الإعلان هنا أثناء الكتابة.",
-                  }))
-                }
-                placeholder="اكتب تفاصيل المنتج، الحالة، سبب البيع، وأي معلومات مهمة..."
-              />
-            </label>
+            <Textarea
+              label="الوصف"
+              name="description"
+              onChange={(event) =>
+                setPreview((current) => ({
+                  ...current,
+                  description:
+                    event.target.value || "سيظهر وصف الإعلان هنا أثناء الكتابة.",
+                }))
+              }
+              placeholder="اكتب تفاصيل المنتج، الحالة، سبب البيع، وأي معلومات مهمة..."
+            />
             {errors.description ? (
-              <p className="-mt-2 text-xs font-bold text-rose-700">
-                {errors.description}
-              </p>
+              <FormMessage variant="error">{errors.description}</FormMessage>
             ) : null}
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -305,7 +298,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                   type="number"
                 />
                 {errors.price ? (
-                  <p className="mt-2 text-xs font-bold text-rose-700">{errors.price}</p>
+                  <FormMessage variant="error">{errors.price}</FormMessage>
                 ) : null}
               </div>
               <Select
@@ -343,8 +336,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           </div>
         </Card>
 
-        <Card className="overflow-hidden p-6">
-          <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
+        <Card className="p-6">
           <h2 className="text-2xl font-black text-ink">3. الصور والتواصل</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <div className="grid gap-3">
@@ -392,9 +384,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                   type="tel"
                 />
                 {errors.contact ? (
-                  <p className="mt-2 text-xs font-bold text-rose-700">
-                    {errors.contact}
-                  </p>
+                  <FormMessage variant="error">{errors.contact}</FormMessage>
                 ) : null}
               </div>
               <Select
@@ -421,10 +411,9 @@ export function AddListingForm({ categories }: AddListingFormProps) {
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <Card className="overflow-hidden p-5">
-          <div className="uae-flag-strip -mx-5 -mt-5 mb-5 h-2" />
+        <Card className="p-5">
           <p className="text-sm font-black text-muted">معاينة الإعلان</p>
-          <div className="mt-4 overflow-hidden rounded-[1.6rem] border border-border bg-[linear-gradient(135deg,#fff7ec,#f4efe6)]">
+          <div className="mt-4 overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface-muted">
             <div className="relative h-44">
               {imagePreviews[0] ? (
                 <div

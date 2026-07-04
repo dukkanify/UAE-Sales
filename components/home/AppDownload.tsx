@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 
@@ -42,9 +41,9 @@ export function AppDownload() {
           </div>
 
           <div className="mt-6">
-            <Link href="/register">
-              <Button variant="primary">سجّل للحصول على إشعار الإطلاق</Button>
-            </Link>
+            <Button href="/register" variant="primary">
+              سجّل للحصول على إشعار الإطلاق
+            </Button>
           </div>
         </div>
       </div>

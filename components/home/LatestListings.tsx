@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Listing } from "@/types";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/Button";
@@ -19,11 +18,9 @@ export function LatestListings({ categories, listings }: LatestListingsProps) {
       <div className="app-container">
         <SectionHeader
           action={
-            <Link href="/search">
-              <Button size="sm" variant="secondary">
-                عرض الكل
-              </Button>
-            </Link>
+            <Button href="/search" size="sm" variant="secondary">
+              عرض الكل
+            </Button>
           }
           description="أحدث الإعلانات المنشورة في السوق."
           eyebrow="جديد"

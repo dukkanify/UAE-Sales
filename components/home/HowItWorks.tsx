@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
 const steps = [
@@ -40,9 +39,9 @@ export function HowItWorks() {
           </div>
 
           <div className="mt-8 text-center">
-            <Link href="/register">
-              <Button variant="accent">ابدأ الآن</Button>
-            </Link>
+            <Button href="/register" variant="accent">
+              ابدأ الآن
+            </Button>
           </div>
         </div>
       </div>

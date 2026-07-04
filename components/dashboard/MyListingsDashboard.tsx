@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { listingStatusLabels } from "@/constants/listingStatuses";
@@ -99,11 +98,9 @@ export function MyListingsDashboard({
       <Card className="p-4" variant="flat">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-black text-ink">إعلاناتي</h2>
-          <Link href="/listings/new">
-            <Button size="sm" variant="primary">
-              إضافة
-            </Button>
-          </Link>
+          <Button href="/listings/new" size="sm" variant="primary">
+            إضافة
+          </Button>
         </div>
         <div className="mt-4">
           <Tabs activeId={activeStatus} onChange={setActiveStatus} tabs={tabs} />
@@ -139,20 +136,28 @@ export function MyListingsDashboard({
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Link href={
-                    listing.id.startsWith("local-")
-                      ? `/listings/local/${listing.id}`
-                      : `/listings/${listing.slug}`
-                  }>
-                    <Button size="sm" variant="secondary">عرض</Button>
-                  </Link>
-                  <Link href={
-                    listing.id.startsWith("local-")
-                      ? `/listings/local/${listing.id}/edit`
-                      : `/listings/${listing.slug}/edit`
-                  }>
-                    <Button size="sm" variant="ghost">تعديل</Button>
-                  </Link>
+                  <Button
+                    href={
+                      listing.id.startsWith("local-")
+                        ? `/listings/local/${listing.id}`
+                        : `/listings/${listing.slug}`
+                    }
+                    size="sm"
+                    variant="secondary"
+                  >
+                    عرض
+                  </Button>
+                  <Button
+                    href={
+                      listing.id.startsWith("local-")
+                        ? `/listings/local/${listing.id}/edit`
+                        : `/listings/${listing.slug}/edit`
+                    }
+                    size="sm"
+                    variant="ghost"
+                  >
+                    تعديل
+                  </Button>
                   {listing.id.startsWith("local-") ? (
                     <Button
                       onClick={() => {

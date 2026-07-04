@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -40,9 +39,9 @@ export function EmptyState({
       </p>
       {children}
       {actionHref && actionLabel ? (
-        <Link className="mt-6 inline-block" href={actionHref}>
-          <Button>{actionLabel}</Button>
-        </Link>
+        <Button className="mt-6" href={actionHref}>
+          {actionLabel}
+        </Button>
       ) : null}
     </Card>
   );

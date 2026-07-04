@@ -1,10 +1,13 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import Link from "next/link";
+import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   children: ReactNode;
   fullWidth?: boolean;
+  href?: string;
+  onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
   size?: "sm" | "md" | "lg";
   variant?: ButtonVariant;
 };
@@ -29,6 +32,8 @@ export function Button({
   children,
   className = "",
   fullWidth = false,
+  href,
+  onClick,
   size = "md",
   variant = "accent",
   ...props
@@ -38,11 +43,18 @@ export function Button({
       ? "إجراء"
       : (children ?? "إجراء");
 
+  const classes = `focus-ring interactive-lift inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-bold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${className}`;
+
+  if (href) {
+    return (
+      <Link className={classes} href={href} onClick={onClick}>
+        {content}
+      </Link>
+    );
+  }
+
   return (
-    <button
-      className={`focus-ring interactive-lift inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-bold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${className}`}
-      {...props}
-    >
+    <button className={classes} onClick={onClick} {...props}>
       {content}
     </button>
   );

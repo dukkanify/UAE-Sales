@@ -46,12 +46,7 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
 
-            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-              <FavoriteButton
-                ariaLabel={`إضافة ${listing.title} إلى المفضلة`}
-                className="grid size-8 place-items-center rounded-[var(--radius-sm)] bg-surface/90 text-ink shadow-[var(--shadow-xs)] backdrop-blur transition hover:text-accent"
-                label=""
-              />
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-end p-3">
               <div className="flex flex-col items-end gap-1">
                 {listing.isFeatured ? <Badge variant="gold">مميز</Badge> : null}
                 {categoryName ? (
@@ -60,7 +55,7 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
               </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 flex gap-1.5 p-3">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex gap-1.5 p-3">
               <Badge variant="success">ضمان مالي</Badge>
               {isVerifiedSeller ? (
                 <Badge variant="default">موثق</Badge>
@@ -68,6 +63,14 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
             </div>
           </div>
         </Link>
+
+        <div className="absolute start-3 top-3 z-10">
+          <FavoriteButton
+            ariaLabel={`إضافة ${listing.title} إلى المفضلة`}
+            className="min-h-8 bg-surface/90 px-2.5 text-xs shadow-[var(--shadow-xs)] backdrop-blur"
+            label="مفضلة"
+          />
+        </div>
       </div>
 
       <div className="p-4">

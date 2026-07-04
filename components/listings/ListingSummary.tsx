@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Category, Listing } from "@/types";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { ShareButton } from "@/components/common/ShareButton";
@@ -58,16 +57,12 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        <Link href={`/checkout?listing=${listing.slug}`}>
-          <Button className="w-full" variant="accent">
-            شراء الآن
-          </Button>
-        </Link>
-        <Link href={`/chat?listing=${listing.slug}`}>
-          <Button className="w-full" variant="secondary">
-            محادثة البائع
-          </Button>
-        </Link>
+        <Button fullWidth href={`/checkout?listing=${listing.slug}`} variant="accent">
+          شراء الآن
+        </Button>
+        <Button fullWidth href={`/chat?listing=${listing.slug}`} variant="secondary">
+          محادثة البائع
+        </Button>
       </div>
 
       <div className="mt-2 grid gap-2 sm:grid-cols-2">

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -37,9 +36,9 @@ export function ComingSoonPage({
           {description}
         </p>
         {children}
-        <Link className="mt-6 inline-block" href={actionHref}>
-          <Button variant="primary">{actionLabel}</Button>
-        </Link>
+        <Button className="mt-6" href={actionHref} variant="primary">
+          {actionLabel}
+        </Button>
       </Card>
     </section>
   );

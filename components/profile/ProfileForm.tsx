@@ -36,8 +36,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
       <Card className="overflow-hidden p-0">
-        <div className="bg-[linear-gradient(135deg,#111827,#1f2937)] p-6 text-white">
-          <div className="uae-flag-strip mb-5 h-1.5 w-24 rounded-full" />
+        <div className="luxury-gradient p-6 text-white">
           <div className="flex flex-wrap items-center gap-5">
             <div className="grid size-20 place-items-center rounded-3xl bg-secondary text-2xl font-black text-primary shadow-lg">
               {displayUser.fullName.slice(0, 2)}
@@ -124,8 +123,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </Card>
 
       <div className="grid gap-4">
-        <Card className="overflow-hidden p-6">
-          <div className="uae-flag-strip -mx-6 -mt-6 mb-5 h-1.5" />
+        <Card className="p-6">
           <h2 className="text-xl font-black text-ink">حالة الحساب</h2>
           <div className="mt-5 grid gap-3 text-sm font-bold">
             <div className="flex justify-between rounded-2xl bg-surface-muted p-4">

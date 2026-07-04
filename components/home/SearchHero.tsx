@@ -3,7 +3,6 @@ import type { Category } from "@/types";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import Link from "next/link";
 
 type SearchHeroProps = {
   categories: Category[];
@@ -100,12 +99,12 @@ export function SearchHero({ categories }: SearchHeroProps) {
           </div>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/listings/new">
-              <Button variant="accent">أضف إعلانك</Button>
-            </Link>
-            <Link href="/categories">
-              <Button variant="secondary">التصنيفات</Button>
-            </Link>
+            <Button href="/listings/new" variant="accent">
+              أضف إعلانك
+            </Button>
+            <Button href="/categories" variant="secondary">
+              التصنيفات
+            </Button>
           </div>
         </div>
       </div>

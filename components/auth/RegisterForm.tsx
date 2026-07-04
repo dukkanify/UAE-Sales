@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { cities, countries } from "@/constants/locations";
 import { OtpVerification } from "@/components/auth/OtpVerification";
 import { Button } from "@/components/ui/Button";
+import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { setSessionUser } from "@/services/clientStorage";
@@ -147,9 +148,7 @@ export function RegisterForm() {
             type="text"
           />
           {errors.fullName ? (
-            <p className="mt-2 text-xs font-bold text-rose-700">
-              {errors.fullName}
-            </p>
+            <FormMessage variant="error">{errors.fullName}</FormMessage>
           ) : null}
         </div>
         <div>
@@ -162,9 +161,7 @@ export function RegisterForm() {
             type="email"
           />
           {errors.email ? (
-            <p className="mt-2 text-xs font-bold text-rose-700">
-              {errors.email}
-            </p>
+            <FormMessage variant="error">{errors.email}</FormMessage>
           ) : null}
         </div>
       </div>
@@ -199,9 +196,7 @@ export function RegisterForm() {
             type="tel"
           />
           {errors.phone ? (
-            <p className="mt-2 text-xs font-bold text-rose-700">
-              {errors.phone}
-            </p>
+            <FormMessage variant="error">{errors.phone}</FormMessage>
           ) : null}
         </div>
         <Select
@@ -225,9 +220,7 @@ export function RegisterForm() {
             type="password"
           />
           {errors.password ? (
-            <p className="mt-2 text-xs font-bold text-rose-700">
-              {errors.password}
-            </p>
+            <FormMessage variant="error">{errors.password}</FormMessage>
           ) : null}
         </div>
         <div>
@@ -240,9 +233,7 @@ export function RegisterForm() {
             type="password"
           />
           {errors.confirmPassword ? (
-            <p className="mt-2 text-xs font-bold text-rose-700">
-              {errors.confirmPassword}
-            </p>
+            <FormMessage variant="error">{errors.confirmPassword}</FormMessage>
           ) : null}
         </div>
       </div>
@@ -261,7 +252,7 @@ export function RegisterForm() {
           </span>
         </label>
         {errors.terms ? (
-          <p className="mt-2 text-xs font-bold text-rose-700">{errors.terms}</p>
+          <FormMessage variant="error">{errors.terms}</FormMessage>
         ) : null}
       </div>
 

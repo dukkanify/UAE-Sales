@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Listing } from "@/types";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { Button } from "@/components/ui/Button";
@@ -22,11 +21,9 @@ export function FeaturedListings({
       <div className="app-container">
         <SectionHeader
           action={
-            <Link href="/featured">
-              <Button size="sm" variant="primary">
-                عرض المميز
-              </Button>
-            </Link>
+            <Button href="/featured" size="sm" variant="primary">
+              عرض المميز
+            </Button>
           }
           description="إعلانات مختارة من بائعين موثوقين."
           eyebrow="مميز"

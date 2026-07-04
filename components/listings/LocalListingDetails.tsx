@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Category, Listing } from "@/types";
 import { EscrowProtectionCard } from "@/components/listings/EscrowProtectionCard";
@@ -57,11 +56,14 @@ export function LocalListingDetails({
         <p className="mt-3 text-sm font-medium leading-8 text-muted">
           {listing.description}
         </p>
-        <Link className="mt-4 inline-block" href={`/listings/local/${listingId}/edit`}>
-          <Button size="sm" variant="secondary">
-            تعديل الإعلان
-          </Button>
-        </Link>
+        <Button
+          className="mt-4"
+          href={`/listings/local/${listingId}/edit`}
+          size="sm"
+          variant="secondary"
+        >
+          تعديل الإعلان
+        </Button>
       </Card>
     </div>
   );

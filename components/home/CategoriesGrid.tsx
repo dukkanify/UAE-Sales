@@ -16,11 +16,9 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
       <div className="app-container">
         <SectionHeader
           action={
-            <Link href="/categories">
-              <Button size="sm" variant="secondary">
-                عرض الكل
-              </Button>
-            </Link>
+            <Button href="/categories" size="sm" variant="secondary">
+              عرض الكل
+            </Button>
           }
           description="اكتشف آلاف الإعلانات في أهم التصنيفات."
           eyebrow="التصنيفات"

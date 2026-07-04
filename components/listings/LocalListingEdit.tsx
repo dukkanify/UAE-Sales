@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
@@ -9,8 +8,10 @@ import type { Listing, ListingCondition } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
+import { Textarea } from "@/components/ui/Textarea";
 import {
   getLocalListingById,
   saveLocalListing,
@@ -80,8 +81,7 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
 
   return (
     <Card className="overflow-hidden p-0">
-      <div className="bg-[linear-gradient(135deg,#fff8ed,#fffdf8)] p-6">
-        <div className="uae-flag-strip mb-4 h-1.5 w-24 rounded-full" />
+      <div className="surface-gradient p-6">
         <h1 className="text-3xl font-black text-ink">تعديل الإعلان</h1>
         <p className="mt-3 leading-8 text-muted">
           عدّل بيانات إعلانك المحفوظ محلياً. التغييرات ستظهر فوراً في إعلاناتي ونتائج البحث.
@@ -91,14 +91,11 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
       <form className="grid gap-5 p-6" onSubmit={handleSubmit}>
         <Input defaultValue={currentListing.title} label="عنوان الإعلان" name="title" />
 
-        <label className="grid gap-2 text-sm font-black text-ink">
-          <span>الوصف</span>
-          <textarea
-            className="focus-ring min-h-36 rounded-2xl border border-border bg-white/90 p-4 text-sm font-bold text-ink shadow-sm"
-            defaultValue={currentListing.description}
-            name="description"
-          />
-        </label>
+        <Textarea
+          defaultValue={currentListing.description}
+          label="الوصف"
+          name="description"
+        />
 
         <div className="grid gap-4 md:grid-cols-3">
           <Input
@@ -131,19 +128,19 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         </div>
 
         {saveMessage ? (
-          <div className="rounded-2xl border border-secondary/30 bg-secondary-soft p-4 text-sm font-black text-primary">
+          <FormMessage variant={saveMessage.includes("نجاح") ? "success" : "error"}>
             {saveMessage}
-          </div>
+          </FormMessage>
         ) : null}
 
         <div className="flex flex-wrap gap-3">
           <Button type="submit">حفظ التعديلات</Button>
-          <Link
-            className="inline-flex min-h-12 items-center justify-center rounded-full border border-border px-6 py-3 text-sm font-black text-ink transition hover:border-primary hover:text-primary"
+          <Button
             href={`/listings/local/${currentListing.id}`}
+            variant="secondary"
           >
             إلغاء
-          </Link>
+          </Button>
         </div>
       </form>
     </Card>

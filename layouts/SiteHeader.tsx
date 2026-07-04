@@ -84,11 +84,9 @@ export function SiteHeader() {
                 دخول
               </Link>
             )}
-            <Link className="hidden sm:block" href="/listings/new">
-              <Button size="sm" variant="primary">
-                أضف إعلان
-              </Button>
-            </Link>
+            <Button className="hidden sm:block" href="/listings/new" size="sm" variant="primary">
+              أضف إعلان
+            </Button>
             <button
               aria-expanded={menuOpen}
               aria-label="القائمة"
@@ -117,15 +115,14 @@ export function SiteHeader() {
               <form action="/search" className="mt-2 px-1">
                 <InputShell />
               </form>
-              <Link
-                className="mt-2 block px-1"
+              <Button
+                className="mt-2 w-full"
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
+                variant="primary"
               >
-                <Button className="w-full" variant="primary">
-                  أضف إعلان
-                </Button>
-              </Link>
+                أضف إعلان
+              </Button>
               {user ? (
                 <>
                   <Link
