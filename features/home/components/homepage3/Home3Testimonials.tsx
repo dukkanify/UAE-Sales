@@ -11,8 +11,8 @@ export async function Home3Testimonials() {
       <div className="app-container">
         <Home3SectionHeader
           description="ثقة حقيقية من مستخدمين يبيعون ويشترون في الإمارات كل يوم."
-          eyebrow="Testimonials"
-          title="قصص تجعل السوق أكثر إنسانية"
+          eyebrow="Success Stories"
+          title="قصص نجاح من السوق"
         />
 
         <div className="grid gap-6 lg:grid-cols-3">
