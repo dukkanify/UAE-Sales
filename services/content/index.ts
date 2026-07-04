@@ -1,4 +1,12 @@
 export {
+  getMarketEmirateImages,
+  getMarketHeroBackground,
+  getMarketHeroPreviews,
+  getMarketQuickSearches,
+  getMarketTrustStats,
+} from "./homepage-marketplace.content";
+
+export {
   getFinalCategoryImages,
   getFinalCategoryLabels,
   getFinalEmirateImages,

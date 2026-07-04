@@ -1,19 +1,22 @@
-import { FinalApp } from "@/features/home/components/final/FinalApp";
-import { FinalCategories } from "@/features/home/components/final/FinalCategories";
-import { FinalEmirates } from "@/features/home/components/final/FinalEmirates";
-import { FinalEscrow } from "@/features/home/components/final/FinalEscrow";
-import { FinalFeaturedListings } from "@/features/home/components/final/FinalFeaturedListings";
-import { FinalFooter } from "@/features/home/components/final/FinalFooter";
-import { FinalHeader } from "@/features/home/components/final/FinalHeader";
-import { FinalHero } from "@/features/home/components/final/FinalHero";
-import { FinalTestimonials } from "@/features/home/components/final/FinalTestimonials";
+import { MarketCategorySection } from "@/features/home/components/marketplace/MarketCategorySection";
+import { MarketEmirates } from "@/features/home/components/marketplace/MarketEmirates";
+import { MarketEscrow } from "@/features/home/components/marketplace/MarketEscrow";
+import { MarketFeatured } from "@/features/home/components/marketplace/MarketFeatured";
+import { MarketFooter } from "@/features/home/components/marketplace/MarketFooter";
+import { MarketHeader } from "@/features/home/components/marketplace/MarketHeader";
+import { MarketHero } from "@/features/home/components/marketplace/MarketHero";
+import { MarketPreviewStrip } from "@/features/home/components/marketplace/MarketPreviewStrip";
 import { getCategories } from "@/services/categories";
-import { getFeaturedListings } from "@/services/listings";
+import {
+  getFeaturedListings,
+  getListings,
+} from "@/services/listings";
 
 export default async function Home() {
-  const [categories, featuredListings] = await Promise.all([
+  const [categories, featuredListings, allListings] = await Promise.all([
     getCategories(),
     getFeaturedListings(),
+    getListings(),
   ]);
 
   const categoryMeta = categories.map((category) => ({
@@ -21,22 +24,47 @@ export default async function Home() {
     name: category.name,
   }));
 
+  const categoryById = (id: string) =>
+    categories.find((c) => c.id === id)?.slug ?? id;
+
   return (
     <>
-      <FinalHeader />
+      <MarketHeader />
       <main>
-        <FinalHero categories={categories} />
-        <FinalCategories categories={categories} />
-        <FinalFeaturedListings
-          categories={categoryMeta}
-          listings={featuredListings}
+        <MarketHero categories={categories} />
+        <MarketPreviewStrip />
+        <MarketFeatured categories={categoryMeta} listings={featuredListings} />
+        <MarketCategorySection
+          categoryId="cars"
+          categorySlug={categoryById("cars")}
+          description="سيارات فاخرة ومستعملة من معارض موثوقة في دبي وأبوظبي."
+          eyebrow="Cars"
+          listings={allListings}
+          title="سيارات في الإمارات"
+          variant="sand"
         />
-        <FinalEscrow />
-        <FinalEmirates />
-        <FinalTestimonials />
-        <FinalApp />
+        <MarketCategorySection
+          categoryId="real-estate"
+          categorySlug={categoryById("real-estate")}
+          description="شقق، فلل، ومكاتب للبيع والإيجار في أرقى مناطق الإمارات."
+          eyebrow="Real Estate"
+          listings={allListings}
+          title="عقارات مميزة"
+          variant="white"
+        />
+        <MarketCategorySection
+          categoryId="electronics"
+          categorySlug={categoryById("electronics")}
+          description="إلكترونيات حديثة مع ضمان مالي وتوثيق للبائعين."
+          eyebrow="Electronics"
+          listings={allListings}
+          title="إلكترونيات موثوقة"
+          variant="sand"
+        />
+        <MarketEscrow />
+        <MarketEmirates />
       </main>
-      <FinalFooter />
+      <MarketFooter />
     </>
   );
 }
