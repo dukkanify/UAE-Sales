@@ -7,7 +7,8 @@ export async function HowItWorks() {
   const steps = await getHomeHowItWorksSteps();
 
   return (
-    <section className="section-padding bg-surface">
+    <section className="relative overflow-hidden section-padding bg-surface">
+      <div className="pointer-events-none absolute inset-x-12 top-1/2 hidden h-px bg-gradient-to-l from-transparent via-secondary/25 to-transparent lg:block" />
       <div className="app-container">
         <SectionHeader
           align="center"
@@ -16,14 +17,16 @@ export async function HowItWorks() {
           title="ابدأ في دقائق"
         />
 
-        <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="relative mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, index) => (
-            <Card key={step.title} className="p-5 text-center" variant="flat">
-              <span className="mx-auto grid size-10 place-items-center rounded-full bg-primary text-sm font-bold text-white">
+            <Card key={step.title} className="p-6 text-center" interactive variant="elevated">
+              <span className="mx-auto grid size-11 place-items-center rounded-full bg-primary text-sm font-black text-white shadow-[var(--shadow-xs)]">
                 {index + 1}
               </span>
-              <h3 className="mt-4 text-sm font-semibold text-ink">{step.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted">{step.description}</p>
+              <h3 className="mt-4 text-sm font-black text-ink">{step.title}</h3>
+              <p className="mt-2 text-sm font-medium leading-7 text-muted">
+                {step.description}
+              </p>
             </Card>
           ))}
         </div>

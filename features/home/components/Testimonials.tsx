@@ -12,7 +12,8 @@ export async function Testimonials(props: TestimonialsProps = {}) {
   const items = props.testimonials ?? (await getHomeTestimonials());
 
   return (
-    <section className="section-padding bg-surface">
+    <section className="relative overflow-hidden section-padding bg-surface">
+      <div className="pointer-events-none absolute start-8 top-12 h-52 w-52 rounded-full bg-accent/5 blur-3xl" />
       <div className="app-container">
         <SectionHeader
           align="center"
@@ -21,19 +22,19 @@ export async function Testimonials(props: TestimonialsProps = {}) {
           title="يثقون بنا"
         />
 
-        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
+        <div className="relative mx-auto grid max-w-5xl gap-6 md:grid-cols-3">
           {items.map((item) => (
-            <Card key={item.name} className="p-6" variant="flat">
+            <Card key={item.name} className="p-6" interactive variant="elevated">
               <div className="flex gap-0.5 text-secondary">
                 {Array.from({ length: 5 }).map((_, index) => (
                   <Icon key={index} name="star" size={12} />
                 ))}
               </div>
-              <p className="mt-4 text-sm leading-7 text-muted">
+              <p className="mt-4 text-sm font-medium leading-8 text-muted">
                 &ldquo;{item.quote}&rdquo;
               </p>
               <div className="mt-6 border-t border-border pt-4">
-                <p className="text-sm font-semibold text-ink">{item.name}</p>
+                <p className="text-sm font-black text-ink">{item.name}</p>
                 <p className="mt-1 text-xs text-muted">
                   {item.role} — {item.city}
                 </p>
