@@ -1,15 +1,13 @@
-import { AppDownload } from "@/features/home/components/AppDownload";
-import { CategoriesGrid } from "@/features/home/components/CategoriesGrid";
-import { EscrowSection } from "@/features/home/components/EscrowSection";
-import { FeaturedListings } from "@/features/home/components/FeaturedListings";
-import { HowItWorks } from "@/features/home/components/HowItWorks";
-import { LatestListings } from "@/features/home/components/LatestListings";
-import { PopularCities } from "@/features/home/components/PopularCities";
-import { SearchHero } from "@/features/home/components/SearchHero";
-import { StatsSection } from "@/features/home/components/StatsSection";
-import { Testimonials } from "@/features/home/components/Testimonials";
-import { WhyUaeSales } from "@/features/home/components/WhyUaeSales";
-import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { Home3Categories } from "@/features/home/components/homepage3/Home3Categories";
+import { Home3Emirates } from "@/features/home/components/homepage3/Home3Emirates";
+import { Home3Escrow } from "@/features/home/components/homepage3/Home3Escrow";
+import { Home3FeaturedListings } from "@/features/home/components/homepage3/Home3FeaturedListings";
+import { Home3Footer } from "@/features/home/components/homepage3/Home3Footer";
+import { Home3Hero } from "@/features/home/components/homepage3/Home3Hero";
+import { Home3LatestPulse } from "@/features/home/components/homepage3/Home3LatestPulse";
+import { Home3MobileApp } from "@/features/home/components/homepage3/Home3MobileApp";
+import { Home3Testimonials } from "@/features/home/components/homepage3/Home3Testimonials";
+import { Home3Why } from "@/features/home/components/homepage3/Home3Why";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import {
@@ -33,19 +31,17 @@ export default async function Home() {
     <>
       <SiteHeader />
       <main>
-        <SearchHero categories={categories} />
-        <StatsSection />
-        <CategoriesGrid categories={categories} />
-        <FeaturedListings categories={categoryMeta} listings={featuredListings} />
-        <LatestListings categories={categoryMeta} listings={latestListings} />
-        <EscrowSection />
-        <WhyUaeSales />
-        <HowItWorks />
-        <PopularCities />
-        <Testimonials />
-        <AppDownload />
+        <Home3Hero categories={categories} listings={featuredListings} />
+        <Home3Categories categories={categories} />
+        <Home3FeaturedListings categories={categoryMeta} listings={featuredListings} />
+        <Home3Why />
+        <Home3Escrow />
+        <Home3LatestPulse categories={categoryMeta} listings={latestListings} />
+        <Home3Emirates />
+        <Home3Testimonials />
+        <Home3MobileApp />
       </main>
-      <SiteFooter />
+      <Home3Footer />
     </>
   );
 }

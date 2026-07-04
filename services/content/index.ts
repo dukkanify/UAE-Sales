@@ -1,4 +1,12 @@
 export {
+  getHomepage3CategoryVisuals,
+  getHomepage3Emirates,
+  getHomepage3HeroImages,
+  getHomepage3StoryBlocks,
+  getHomepage3Testimonials,
+} from "./homepage3.content";
+
+export {
   getAuthTrustPoints,
   getEscrowProtectionSteps,
   getHomeCityHighlights,
