@@ -17,16 +17,17 @@ export function ComingSoonPage({
   title,
 }: ComingSoonPageProps) {
   return (
-    <section className="app-container py-12">
-      <Card className="overflow-hidden p-8">
-        <div className="uae-flag-strip mb-8 h-2 w-32 rounded-full" />
-        <p className="text-sm font-black text-primary">{eyebrow}</p>
-        <h1 className="mt-3 text-3xl font-black text-ink md:text-5xl">
+    <section className="app-container section-padding">
+      <Card className="mx-auto max-w-2xl p-10 text-center" variant="elevated">
+        <p className="text-sm font-bold text-secondary">{eyebrow}</p>
+        <h1 className="mt-3 text-3xl font-black text-ink md:text-4xl">
           {title}
         </h1>
-        <p className="mt-4 max-w-2xl leading-9 text-muted">{description}</p>
+        <p className="mx-auto mt-4 max-w-lg leading-8 text-muted">
+          {description}
+        </p>
         <Link
-          className="mt-8 inline-flex rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
+          className="mt-8 inline-flex min-h-11 items-center justify-center rounded-xl bg-primary px-6 text-sm font-bold text-white transition hover:-translate-y-px"
           href={actionHref}
         >
           {actionLabel}
