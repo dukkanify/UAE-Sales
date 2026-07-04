@@ -1,4 +1,5 @@
 export {
+  getFinalCategoryImages,
   getFinalEmirateImages,
   getFinalEscrowSteps,
   getFinalHeroCollage,

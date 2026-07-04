@@ -24,29 +24,33 @@ export function FinalHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-white">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-white shadow-[0_1px_0_rgb(15_20_25/4%)]">
       <div className="app-container">
-        <div className="flex min-h-[4.25rem] items-center justify-between gap-4">
-          <Link className="flex shrink-0 items-center gap-2.5" href="/">
-            <span className="relative grid size-9 place-items-center overflow-hidden rounded-[var(--radius-lg)] bg-primary text-[0.65rem] font-semibold text-white">
+        <div className="flex min-h-[4.75rem] items-center justify-between gap-6 md:min-h-[5rem]">
+          <Link className="flex shrink-0 items-center gap-3" href="/">
+            <span className="relative grid size-11 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-primary text-xs font-bold text-white md:size-12">
               <span className="uae-flag-strip absolute inset-0 opacity-30" />
               <span className="relative">UAE</span>
             </span>
             <span className="hidden sm:block">
-              <span className="block text-sm font-semibold tracking-tight text-ink">
+              <span className="block text-base font-bold tracking-tight text-ink">
                 UAE Sales
               </span>
-              <span className="block text-[0.65rem] font-medium text-muted">
+              <span className="block text-xs font-medium text-muted">
                 سوق إماراتي موثوق
               </span>
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-0.5 lg:flex">
-            {primaryNavigation.map((item) => (
+          <nav className="hidden items-center gap-1 lg:flex">
+            {primaryNavigation.map((item, index) => (
               <Link
                 key={item.href}
-                className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+                className={`rounded-[var(--radius-md)] px-4 py-2.5 transition hover:bg-surface-muted ${
+                  index === 0
+                    ? "text-sm font-bold text-ink"
+                    : "text-sm font-medium text-muted hover:text-ink"
+                }`}
                 href={item.href}
               >
                 {item.label}
@@ -54,18 +58,18 @@ export function FinalHeader() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
             <Link
               aria-label="بحث"
-              className="grid size-10 place-items-center rounded-[var(--radius-md)] text-muted transition hover:bg-surface-muted hover:text-ink"
+              className="grid size-10 place-items-center rounded-[var(--radius-md)] text-muted transition hover:bg-surface-muted hover:text-ink md:size-11"
               href="/search"
             >
-              <Icon name="search" size={20} />
+              <Icon name="search" size={21} />
             </Link>
 
             {user ? (
               <Link
-                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
+                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
                 href="/profile"
               >
                 {user.fullName.split(" ")[0]}
@@ -79,7 +83,13 @@ export function FinalHeader() {
               </Link>
             )}
 
-            <Button className="hidden sm:inline-flex" href="/listings/new" size="sm" variant="primary">
+            <Button
+              className="hidden px-5 shadow-[0_4px_16px_rgb(15_20_25/12%)] sm:inline-flex"
+              href="/listings/new"
+              size="md"
+              variant="primary"
+            >
+              <Icon name="plus" size={16} />
               أضف إعلان
             </Button>
 
@@ -119,8 +129,10 @@ export function FinalHeader() {
                 className="mt-2 w-full"
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
+                size="md"
                 variant="primary"
               >
+                <Icon name="plus" size={16} />
                 أضف إعلان
               </Button>
               {user ? (

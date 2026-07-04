@@ -13,26 +13,26 @@ export function FinalHeroSearch({ categories }: FinalHeroSearchProps) {
   return (
     <form
       action="/search"
-      className="rounded-[var(--radius-2xl)] border border-border bg-white p-4 shadow-[var(--shadow-card)] md:p-5"
+      className="rounded-[var(--radius-2xl)] border border-border/80 bg-white p-5 shadow-[0_8px_40px_rgb(15_20_25/10%)] md:p-6"
     >
-      <div className="grid gap-4 md:grid-cols-[1.4fr_1fr_1fr_auto] md:items-end">
-        <label className="grid gap-2">
-          <span className="text-xs font-semibold text-muted">ماذا تبحث عنه؟</span>
-          <div className="flex min-h-12 items-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 px-4">
-            <Icon className="shrink-0 text-muted" name="search" size={18} />
+      <div className="grid gap-4 md:grid-cols-[1.5fr_1fr_1fr_auto] md:items-end md:gap-5">
+        <label className="grid gap-2.5">
+          <span className="text-sm font-semibold text-ink">ماذا تبحث عنه؟</span>
+          <div className="flex min-h-14 items-center gap-3 rounded-[var(--radius-xl)] border border-border bg-surface-muted/50 px-4">
+            <Icon className="shrink-0 text-muted" name="search" size={20} />
             <input
-              className="w-full bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted/60"
+              className="w-full bg-transparent text-base font-medium text-ink outline-none placeholder:text-muted/55"
               name="q"
-              placeholder="سيارة، شقة، آيفون..."
+              placeholder="سيارة، فيلا، آيفون، وظيفة..."
               type="search"
             />
           </div>
         </label>
 
-        <label className="grid gap-2">
-          <span className="text-xs font-semibold text-muted">التصنيف</span>
+        <label className="grid gap-2.5">
+          <span className="text-sm font-semibold text-ink">التصنيف</span>
           <select
-            className="min-h-12 w-full rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 px-4 text-sm font-medium text-ink outline-none"
+            className="min-h-14 w-full rounded-[var(--radius-xl)] border border-border bg-surface-muted/50 px-4 text-base font-medium text-ink outline-none"
             defaultValue=""
             name="category"
           >
@@ -45,10 +45,10 @@ export function FinalHeroSearch({ categories }: FinalHeroSearchProps) {
           </select>
         </label>
 
-        <label className="grid gap-2">
-          <span className="text-xs font-semibold text-muted">الإمارة</span>
+        <label className="grid gap-2.5">
+          <span className="text-sm font-semibold text-ink">الإمارة</span>
           <select
-            className="min-h-12 w-full rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 px-4 text-sm font-medium text-ink outline-none"
+            className="min-h-14 w-full rounded-[var(--radius-xl)] border border-border bg-surface-muted/50 px-4 text-base font-medium text-ink outline-none"
             defaultValue=""
             name="city"
           >
@@ -61,8 +61,13 @@ export function FinalHeroSearch({ categories }: FinalHeroSearchProps) {
           </select>
         </label>
 
-        <Button className="min-h-12 w-full md:w-auto" size="lg" type="submit" variant="primary">
-          <Icon name="search" size={18} />
+        <Button
+          className="min-h-14 w-full px-7 text-base md:w-auto"
+          size="lg"
+          type="submit"
+          variant="primary"
+        >
+          <Icon name="search" size={20} />
           بحث
         </Button>
       </div>

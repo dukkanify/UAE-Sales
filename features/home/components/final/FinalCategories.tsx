@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Button } from "@/shared/ui/Button";
-import { getHomepage3CategoryVisuals } from "@/services/content/homepage3.content";
+import { getFinalCategoryImages } from "@/services/content/homepage-final.content";
 import { FinalSectionHeader } from "./FinalSectionHeader";
 
 const featuredCategoryIds = [
@@ -21,8 +21,7 @@ type FinalCategoriesProps = {
 };
 
 export async function FinalCategories({ categories }: FinalCategoriesProps) {
-  const visuals = await getHomepage3CategoryVisuals();
-  const visualMap = new Map(visuals.map((visual) => [visual.categoryId, visual]));
+  const images = await getFinalCategoryImages();
   const selected = categories
     .filter((category) => featuredCategoryIds.includes(category.id))
     .sort(
@@ -45,12 +44,12 @@ export async function FinalCategories({ categories }: FinalCategoriesProps) {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {selected.map((category) => {
-            const visual = visualMap.get(category.id);
+            const imageUrl = images[category.id];
 
             return (
               <Link
                 key={category.id}
-                className="group relative min-h-56 overflow-hidden rounded-[var(--radius-2xl)] bg-surface shadow-[var(--shadow-soft)] transition duration-300 hover:shadow-[var(--shadow-card)]"
+                className="group relative min-h-56 overflow-hidden rounded-[var(--radius-2xl)] border border-white/60 bg-surface shadow-[0_8px_32px_rgb(15_20_25/8%)] transition duration-300 hover:shadow-[0_12px_40px_rgb(15_20_25/12%)]"
                 href={`/categories/${category.slug}`}
               >
                 <AppImage
@@ -58,7 +57,7 @@ export async function FinalCategories({ categories }: FinalCategoriesProps) {
                   className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   fill
                   sizes="(max-width: 768px) 100vw, 25vw"
-                  src={visual?.imageUrl}
+                  src={imageUrl}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-black/5 transition duration-300 group-hover:from-black/72" />
                 <div className="absolute inset-x-0 bottom-0 p-4">
