@@ -3,9 +3,7 @@ import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { Badge } from "@/shared/ui/Badge";
-import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
-import { FinalSectionHeader } from "./FinalSectionHeader";
 
 type FinalFeaturedListingsProps = {
   categories: { id: string; name: string }[];
@@ -151,15 +149,17 @@ export function FinalFeaturedListings({
   return (
     <section className="bg-white py-16 md:py-20">
       <div className="app-container">
-        <FinalSectionHeader
-          action={
-            <Button href="/featured" size="sm" variant="secondary">
-              عرض الكل
-            </Button>
-          }
-          description="إعلانات مختارة بعناية — صور حقيقية، أسعار واضحة، وضمان مالي على كل معاملة."
-          title="إعلانات مميزة"
-        />
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <h2 className="text-2xl font-bold tracking-tight text-ink md:text-3xl">
+            إعلانات مميزة
+          </h2>
+          <Link
+            className="text-sm font-bold text-[#B8955F] transition hover:text-[#a6844f]"
+            href="/featured"
+          >
+            عرض جميع الإعلانات
+          </Link>
+        </div>
 
         <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
           <LargeListingCard

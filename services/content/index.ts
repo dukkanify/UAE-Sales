@@ -1,8 +1,11 @@
 export {
   getFinalCategoryImages,
+  getFinalCategoryLabels,
   getFinalEmirateImages,
   getFinalEscrowSteps,
+  getFinalHeroBackground,
   getFinalHeroCollage,
+  getFinalPopularSearches,
   getFinalTestimonials,
 } from "./homepage-final.content";
 

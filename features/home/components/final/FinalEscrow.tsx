@@ -1,4 +1,4 @@
-import { Button } from "@/shared/ui/Button";
+import Link from "next/link";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
 import { getFinalEscrowSteps } from "@/services/content/homepage-final.content";
@@ -11,8 +11,8 @@ export async function FinalEscrow() {
     <section className="bg-surface-muted/50 py-16 md:py-20">
       <div className="app-container">
         <FinalSectionHeader
-          description="نظام ضمان مالي يحمي الطرفين — من الدفع حتى التسليم. واضح، آمن، ومبني على معايير fintech."
-          title="كيف يعمل الضمان المالي؟"
+          description="نظام ضمان مالي يحمي الطرفين — من الدفع حتى التسليم."
+          title="الضمان المالي"
         />
 
         <div className="rounded-[var(--radius-2xl)] border border-border bg-white p-6 shadow-[var(--shadow-card)] md:p-10">
@@ -25,11 +25,11 @@ export async function FinalEscrow() {
               <ol className="grid grid-cols-5 gap-4">
                 {steps.map((step, index) => (
                   <li key={step.title} className="relative text-center">
-                    <span className="relative z-10 mx-auto grid size-14 place-items-center rounded-full border-2 border-secondary/30 bg-secondary-soft text-sm font-bold text-ink">
+                    <span className="relative z-10 mx-auto grid size-14 place-items-center rounded-full border-2 border-[#B8955F]/35 bg-[#B8955F]/10 text-sm font-bold text-ink">
                       {index + 1}
                     </span>
                     <div className="mt-4">
-                      <span className="mx-auto mb-2 grid size-9 place-items-center rounded-[var(--radius-md)] bg-surface-muted text-secondary">
+                      <span className="mx-auto mb-2 grid size-9 place-items-center rounded-[var(--radius-md)] bg-surface-muted text-[#B8955F]">
                         <Icon name={step.icon as IconName} size={18} />
                       </span>
                       <h3 className="text-sm font-bold text-ink">{step.title}</h3>
@@ -81,9 +81,12 @@ export async function FinalEscrow() {
                 </p>
               </div>
             </div>
-            <Button href="/escrow" variant="primary">
+            <Link
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#B8955F] px-6 text-sm font-bold text-white transition hover:bg-[#a6844f]"
+              href="/escrow"
+            >
               تعرّف على الضمان
-            </Button>
+            </Link>
           </div>
         </div>
       </div>

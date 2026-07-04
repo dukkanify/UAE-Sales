@@ -1,6 +1,7 @@
 import type { HomeEscrowStep } from "@/types/domain/content";
 
 export type FinalHeroListingCard = {
+  badge: string;
   category: string;
   city: string;
   href: string;
@@ -21,21 +22,40 @@ export type FinalTestimonial = {
   rating: number;
 };
 
-const imageQuality = "auto=format&fit=crop&w=1600&q=90";
+const imageQuality = "auto=format&fit=crop&w=2000&q=90";
+
+export async function getFinalHeroBackground(): Promise<string> {
+  return `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?${imageQuality}`;
+}
+
+export async function getFinalPopularSearches() {
+  return [
+    { href: "/search?q=للبيع", label: "للبيع" },
+    { href: "/search?q=سيارات+مستعملة", label: "سيارات مستعملة" },
+    { href: "/categories/real-estate", label: "عقارات" },
+    { href: "/categories/mobiles", label: "موبايلات" },
+    { href: "/search?city=دبي", label: "إعلانات دبي" },
+  ];
+}
+
+export async function getFinalCategoryLabels(): Promise<Record<string, string>> {
+  return {
+    cars: "سيارات",
+    "real-estate": "عقارات",
+    mobiles: "موبايلات",
+    electronics: "إلكترونيات",
+    jobs: "وظائف",
+    services: "خدمات",
+    furniture: "أثاث ومفروشات",
+    fashion: "الأزياء والموضة",
+  };
+}
 
 export async function getFinalHeroCollage(): Promise<FinalHeroListingCard[]> {
   return [
     {
-      id: "cars",
-      category: "سيارات",
-      city: "دبي",
-      href: "/search?q=مرسيدس+G63",
-      imageUrl: `https://images.unsplash.com/photo-1606664515524-9f513f17b1c5?${imageQuality}`,
-      price: 895000,
-      title: "Mercedes-AMG G63",
-    },
-    {
       id: "real-estate",
+      badge: "عقار مميز",
       category: "عقارات",
       city: "نخلة جميرا، دبي",
       href: "/search?q=فيلا+نخلة+جميرا",
@@ -44,14 +64,25 @@ export async function getFinalHeroCollage(): Promise<FinalHeroListingCard[]> {
       title: "Villa Palm Jumeirah",
     },
     {
+      id: "cars",
+      badge: "سيارة مميزة",
+      category: "سيارات",
+      city: "دبي",
+      href: "/search?q=مرسيدس+G63",
+      imageUrl: `https://images.unsplash.com/photo-1606664515524-9f513f17b1c5?${imageQuality}`,
+      price: 895000,
+      title: "Mercedes-AMG G63 2024",
+    },
+    {
       id: "mobiles",
+      badge: "إلكترونيات",
       category: "موبايلات",
       city: "أبوظبي",
       href: "/search?q=آيفون+16+برو",
       imageUrl: `https://images.unsplash.com/photo-1695048133142-1a20484d2569?${imageQuality}`,
       price: 4899,
       showEscrow: true,
-      title: "iPhone 16 Pro",
+      title: "iPhone 16 Pro Max",
     },
   ];
 }
