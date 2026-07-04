@@ -1,5 +1,6 @@
 import type { Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { SectionBackdrop } from "@/shared/components/SectionBackdrop";
 import { Button } from "@/shared/ui/Button";
 import { SectionHeader } from "@/shared/ui/SectionHeader";
 
@@ -17,19 +18,22 @@ export function FeaturedListings({
   );
 
   return (
-    <section className="section-padding">
-      <div className="app-container">
+    <section className="relative overflow-hidden">
+      <SectionBackdrop variant="gold" />
+
+      <div className="app-container relative section-padding">
         <SectionHeader
           action={
-            <Button href="/featured" size="sm" variant="primary">
-              عرض المميز
+            <Button href="/featured" size="sm" variant="accent">
+              عرض المميز ←
             </Button>
           }
-          description="إعلانات مختارة من بائعين موثوقين."
+          description="إعلانات مختارة من بائعين موثوقين — جودة عالية وضمان مالي."
           eyebrow="مميز"
           title="أفضل العروض"
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.slice(0, 8).map((listing) => (
             <ListingCard
               key={listing.id}

@@ -4,6 +4,7 @@ export {
   getHomeCityHighlights,
   getHomeEscrowSteps,
   getHomeHowItWorksSteps,
+  getHomeQuickSearchTags,
   getHomeReasons,
   getHomeStats,
   getHomeTestimonials,

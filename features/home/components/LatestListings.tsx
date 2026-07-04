@@ -1,5 +1,6 @@
 import type { Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { SectionBackdrop } from "@/shared/components/SectionBackdrop";
 import { Button } from "@/shared/ui/Button";
 import { SectionHeader } from "@/shared/ui/SectionHeader";
 
@@ -14,19 +15,21 @@ export function LatestListings({ categories, listings }: LatestListingsProps) {
   );
 
   return (
-    <section className="section-padding bg-surface-muted/50">
-      <div className="app-container">
+    <section className="relative overflow-hidden">
+      <SectionBackdrop variant="warm" />
+
+      <div className="app-container relative section-padding">
         <SectionHeader
           action={
-            <Button href="/search" size="sm" variant="secondary">
+            <Button href="/search" size="sm" variant="primary">
               عرض الكل
             </Button>
           }
-          description="أحدث الإعلانات المنشورة في السوق."
+          description="أحدث الإعلانات المنشورة في السوق — فرص جديدة كل يوم."
           eyebrow="جديد"
           title="أحدث الإعلانات"
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.slice(0, 8).map((listing) => (
             <ListingCard
               key={listing.id}

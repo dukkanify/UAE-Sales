@@ -2,6 +2,8 @@ import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { HeroDeviceMockup } from "./HeroDeviceMockup";
+import { HeroEscrowBadge } from "./HeroEscrowBadge";
 
 type HeroPreviewStackProps = {
   listings: Listing[];
@@ -19,7 +21,7 @@ type PreviewCardProps = {
 
 function PreviewCard({ badge, listing, priority = false }: PreviewCardProps) {
   return (
-    <article className="overflow-hidden rounded-[var(--radius-2xl)] border border-white/20 bg-white/95 shadow-[var(--shadow-xl)] backdrop-blur-md">
+    <article className="premium-float-card overflow-hidden rounded-[var(--radius-2xl)] border border-white/25 bg-white/96 shadow-[var(--shadow-xl)] backdrop-blur-md">
       <div className="relative aspect-[4/3] overflow-hidden bg-surface-muted">
         <AppImage
           alt={listing.title}
@@ -29,7 +31,7 @@ function PreviewCard({ badge, listing, priority = false }: PreviewCardProps) {
           sizes="(max-width: 768px) 60vw, 250px"
           src={listing.imageUrl}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         {badge ? (
           <div className="absolute start-3 top-3">
             <Badge variant="verified">{badge}</Badge>
@@ -77,7 +79,7 @@ function FloatingCard({
   priority,
 }: FloatingCardProps) {
   return (
-    <div className={`absolute w-[min(100%,15.5rem)] ${className}`}>
+    <div className={`absolute w-[min(100%,14.5rem)] sm:w-[min(100%,15.5rem)] ${className}`}>
       <div className={`${animationClass} transition-transform duration-300 hover:scale-[1.02]`}>
         <PreviewCard badge={badge} listing={listing} priority={priority} />
       </div>
@@ -95,15 +97,19 @@ export function HeroPreviewStack({ listings }: HeroPreviewStackProps) {
   return (
     <div
       aria-label="معاينة إعلانات المنصة"
-      className="relative mx-auto h-[19rem] w-full max-w-sm sm:h-[22rem] sm:max-w-md lg:mx-0 lg:h-[30rem] lg:max-w-none"
+      className="relative mx-auto h-[22rem] w-full max-w-md sm:h-[26rem] lg:mx-0 lg:h-[32rem] lg:max-w-none"
       role="group"
     >
       <div className="hero-preview-glow absolute inset-0 rounded-[var(--radius-2xl)]" />
 
+      <div className="absolute end-0 top-0 z-40 hidden lg:block">
+        <HeroDeviceMockup />
+      </div>
+
       {tertiary ? (
         <FloatingCard
           animationClass="hero-float-delayed"
-          className="end-0 top-2 z-10 sm:end-2 sm:top-4"
+          className="end-2 top-6 z-10 sm:end-6 sm:top-8 lg:end-16"
           listing={tertiary}
         />
       ) : null}
@@ -112,21 +118,30 @@ export function HeroPreviewStack({ listings }: HeroPreviewStackProps) {
         <FloatingCard
           animationClass="hero-float-slow"
           badge="ضمان مالي"
-          className="start-0 top-10 z-20 sm:start-4 sm:top-12"
+          className="start-0 top-16 z-20 sm:start-2 sm:top-20 lg:start-0"
           listing={secondary}
         />
       ) : null}
 
       <FloatingCard
         animationClass="hero-float"
-        className="bottom-0 start-1/2 z-30 w-[min(100%,17rem)] -translate-x-1/2 sm:w-[min(100%,18rem)] lg:-translate-x-[42%]"
+        className="bottom-8 start-1/2 z-30 w-[min(100%,16rem)] -translate-x-1/2 sm:bottom-10 sm:w-[min(100%,17rem)] lg:bottom-12 lg:start-[38%] lg:-translate-x-1/2"
         listing={primary}
         priority
       />
 
-      <div className="absolute bottom-2 start-1/2 z-40 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/25 bg-white/90 px-4 py-2 text-xs font-semibold text-ink shadow-[var(--shadow-md)] backdrop-blur-md">
-        <span className="grid size-2 rounded-full bg-success" aria-hidden />
+      <HeroEscrowBadge />
+
+      <div className="absolute bottom-0 start-1/2 z-40 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-white/92 px-4 py-2.5 text-xs font-bold text-ink shadow-[var(--shadow-lg)] backdrop-blur-md">
+        <span className="relative flex size-2" aria-hidden>
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60" />
+          <span className="relative inline-flex size-2 rounded-full bg-success" />
+        </span>
         +24,000 إعلان نشط الآن
+      </div>
+
+      <div className="absolute end-0 top-1/2 z-30 -translate-y-1/2 lg:hidden">
+        <HeroDeviceMockup />
       </div>
     </div>
   );

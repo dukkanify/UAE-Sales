@@ -8,12 +8,21 @@ import type {
   HomeTrustPoint,
 } from "@/types";
 
+export async function getHomeQuickSearchTags() {
+  return [
+    { href: "/search?q=سيارات", label: "سيارات مستعملة" },
+    { href: "/search?q=شقق", label: "شقق للإيجار" },
+    { href: "/categories/mobiles", label: "موبايلات" },
+    { href: "/search?city=دبي", label: "إعلانات دبي" },
+  ];
+}
+
 export async function getHomeStats(): Promise<HomeStat[]> {
   return [
-    { label: "إعلان نشط", value: "24,000+" },
-    { label: "مستخدم موثق", value: "18,500+" },
-    { label: "معاملة آمنة", value: "12,000+" },
-    { label: "تقييم المستخدمين", value: "4.9" },
+    { icon: "chart", label: "إعلان نشط", value: "24,000+" },
+    { icon: "check", label: "مستخدم موثق", value: "18,500+" },
+    { icon: "shield", label: "معاملة آمنة", value: "12,000+" },
+    { icon: "star", label: "تقييم المستخدمين", value: "4.9" },
   ];
 }
 

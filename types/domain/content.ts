@@ -9,6 +9,7 @@ export type ContentIconName =
   | "home";
 
 export type HomeStat = {
+  icon?: ContentIconName;
   label: string;
   value: string;
 };
