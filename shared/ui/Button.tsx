@@ -49,7 +49,7 @@ export function Button({
 
   const isDisabled = disabled || loading;
 
-  const classes = `focus-ring interactive-lift inline-flex items-center justify-center gap-2 rounded-[var(--radius-xl)] font-semibold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${isDisabled ? "pointer-events-none opacity-60" : ""} ${className}`;
+  const classes = `focus-ring interactive-lift inline-flex items-center justify-center gap-2 overflow-hidden rounded-[var(--radius-xl)] font-semibold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${isDisabled ? "pointer-events-none opacity-60" : ""} ${className}`;
 
   const inner = (
     <>

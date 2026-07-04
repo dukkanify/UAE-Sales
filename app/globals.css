@@ -215,17 +215,26 @@ button:disabled {
 }
 
 .hero-float {
-  animation: hero-float 5.5s ease-in-out infinite;
+  animation: hero-float 6s ease-in-out infinite;
 }
 
 .hero-float-slow {
-  animation: hero-float 6.5s ease-in-out infinite;
+  animation: hero-float 7s ease-in-out infinite;
   animation-delay: 0.8s;
 }
 
 .hero-float-delayed {
-  animation: hero-float 7s ease-in-out infinite;
+  animation: hero-float 7.5s ease-in-out infinite;
   animation-delay: 1.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-float,
+  .hero-float-slow,
+  .hero-float-delayed,
+  .animate-fade-up {
+    animation: none !important;
+  }
 }
 
 .hero-preview-glow {

@@ -12,7 +12,7 @@ export async function StatsSection(props: StatsSectionProps = {}) {
   const items = props.stats ?? (await getHomeStats());
 
   return (
-    <section className="relative overflow-hidden pt-8 sm:pt-10">
+    <section className="relative overflow-hidden pt-14 sm:pt-16 lg:pt-20">
       <SectionBackdrop variant="warm" />
 
       <div className="app-container relative section-padding">

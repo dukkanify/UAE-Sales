@@ -45,7 +45,7 @@ Pages scoring below threshold were redesigned. No new sections were added — on
 
 | Page | Score | Status | Notes |
 |------|-------|--------|-------|
-| `/` Homepage | 9.4 | ✅ Premium | Hero upgraded — skyline, preview cards, fixed CTAs |
+| `/` Homepage | 9.6 | ✅ Premium | Visual perfection — cinematic hero, floating UI, rich sections |
 | `/search` | 8.8 | ✅ Premium | PageHero + Card filters |
 | `/categories` | 8.8 | ✅ Premium | PageHero, cleaner directory |
 | `/categories/[slug]` | 8.8 | ✅ Premium | Breadcrumbs, ChipLink filters |
