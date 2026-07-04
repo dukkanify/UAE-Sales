@@ -1,4 +1,11 @@
 export {
+  getFinalEmirateImages,
+  getFinalEscrowSteps,
+  getFinalHeroCollage,
+  getFinalTestimonials,
+} from "./homepage-final.content";
+
+export {
   getHomepage3CategoryVisuals,
   getHomepage3Emirates,
   getHomepage3HeroImages,
