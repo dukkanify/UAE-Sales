@@ -8,6 +8,10 @@ import type {
   HomeTrustPoint,
 } from "@/types";
 
+export async function getHeroShowcaseImage(): Promise<string> {
+  return "https://images.unsplash.com/photo-1600607687644-c7171b42498f?auto=format&fit=crop&w=1200&q=80";
+}
+
 export async function getHomeQuickSearchTags() {
   return [
     { href: "/search?q=سيارات", label: "سيارات مستعملة" },

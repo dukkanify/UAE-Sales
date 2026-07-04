@@ -1,13 +1,13 @@
+import Link from "next/link";
+import { cities, countries } from "@/shared/constants/locations";
 import type { Category, HomeTrustPoint } from "@/types";
-import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
-import { getHomeTrustPoints } from "@/services/content";
+import { getHomeQuickSearchTags, getHomeTrustPoints } from "@/services/content";
 import { getFeaturedListings } from "@/services/listings";
 import { HeroBackground } from "./HeroBackground";
-import { HeroFloatingSearch } from "./HeroFloatingSearch";
-import { HeroPreviewStack } from "./HeroPreviewStack";
+import { HeroShowcase } from "./HeroShowcase";
 
 type SearchHeroProps = {
   categories: Category[];
@@ -15,81 +15,120 @@ type SearchHeroProps = {
 };
 
 export async function SearchHero({ categories, trustPoints }: SearchHeroProps) {
-  const [points, featuredListings] = await Promise.all([
+  const [points, quickTags, featuredListings] = await Promise.all([
     trustPoints ?? getHomeTrustPoints(),
+    getHomeQuickSearchTags(),
     getFeaturedListings(),
   ]);
 
-  const previewListings = featuredListings.slice(0, 3);
-
   return (
-    <section className="relative isolate overflow-hidden pb-4 sm:pb-6">
+    <section className="relative border-b border-border bg-[var(--color-background)]">
       <HeroBackground />
 
-      <div className="app-container relative z-10 section-padding pb-6 pt-10 sm:pb-8 sm:pt-12 lg:pb-10 lg:pt-14">
-        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10 xl:gap-14">
-          <div className="animate-fade-up min-w-0 text-center lg:text-start">
-            <Badge className="mb-5 border-white/20 bg-white/10 text-white backdrop-blur-sm" variant="premium">
-              السوق الإماراتي الفاخر 2026
-            </Badge>
+      <div className="app-container relative section-padding pb-20 pt-12 sm:pt-16 lg:pb-24 lg:pt-20">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold text-secondary">UAE Sales</p>
 
-            <h1 className="text-[2.1rem] font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[3.35rem] xl:text-[3.65rem]">
-              بيع وشراء بثقة
-              <span className="mt-1 block text-secondary sm:bg-gradient-to-l sm:from-secondary sm:via-[#e8d5a8] sm:to-secondary sm:bg-clip-text sm:text-transparent">
-                في الإمارات
-              </span>
-            </h1>
+          <h1 className="mt-3 text-4xl font-black tracking-tight text-ink sm:text-5xl lg:text-[3.25rem] lg:leading-[1.12]">
+            بيع وشراء بثقة في الإمارات
+          </h1>
 
-            <p className="mx-auto mt-5 max-w-xl text-base font-medium leading-8 text-white/90 sm:text-lg lg:mx-0">
-              منصة إماراتية فاخرة للإعلانات المبوبة، تجمع بين سهولة البيع والشراء
-              ونظام ضمان مالي يحمي حقوق المشتري والبائع.
-            </p>
+          <p className="mx-auto mt-4 max-w-2xl text-base font-medium leading-8 text-muted sm:text-lg">
+            منصة إماراتية للإعلانات المبوبة مع ضمان مالي يحمي المشتري والبائع.
+            ابحث، قارن، وتواصل بأمان.
+          </p>
 
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-              <Button
-                className="h-12 min-h-12 w-full justify-center gap-2 whitespace-nowrap px-5 sm:w-auto sm:px-7"
-                href="/listings/new"
-                size="lg"
-                variant="accent"
-              >
-                <Icon className="shrink-0" name="plus" size={18} />
-                <span>أضف إعلانك الآن</span>
-              </Button>
-              <Button
-                className="h-12 min-h-12 w-full justify-center gap-2 border border-white/30 bg-white/10 px-5 text-white hover:bg-white/20 hover:text-white sm:w-auto sm:px-7"
-                href="/search"
-                size="lg"
-                variant="ghost"
-              >
-                <Icon className="shrink-0" name="search" size={18} />
-                <span>تصفح الإعلانات</span>
-              </Button>
-            </div>
+          <form
+            action="/search"
+            className="mx-auto mt-10 rounded-[var(--radius-2xl)] border border-border bg-surface p-3 shadow-[var(--shadow-soft)] sm:p-4"
+          >
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)_auto]">
+              <label className="flex min-h-12 items-center gap-3 rounded-[var(--radius-xl)] border border-border bg-surface-muted/60 px-4 sm:col-span-2 lg:col-span-1">
+                <Icon className="shrink-0 text-muted" name="search" size={18} />
+                <input
+                  aria-label="كلمة البحث"
+                  className="min-w-0 flex-1 bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted"
+                  name="q"
+                  placeholder="ابحث عن سيارات، عقارات، إلكترونيات..."
+                  type="search"
+                />
+              </label>
 
-            <div className="mt-8 grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-3">
-              {points.map((point) => (
-                <div
-                  key={point.label}
-                  className="flex min-w-0 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-white/15 bg-white/8 px-2.5 py-2.5 backdrop-blur-md sm:gap-2.5 sm:px-3 lg:justify-start"
+              <label className="flex min-h-12 items-center rounded-[var(--radius-xl)] border border-border bg-surface-muted/60 px-4">
+                <select
+                  aria-label="التصنيف"
+                  className="w-full bg-transparent text-sm font-medium text-ink outline-none"
+                  name="category"
                 >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-[var(--radius-lg)] bg-secondary/20 text-secondary sm:size-8">
-                    <Icon name={point.icon as IconName} size={14} />
-                  </span>
-                  <span className="truncate text-[0.7rem] font-bold text-white/90 sm:text-xs">
-                    {point.label}
-                  </span>
-                </div>
-              ))}
+                  <option value="">كل التصنيفات</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="flex min-h-12 items-center rounded-[var(--radius-xl)] border border-border bg-surface-muted/60 px-4">
+                <select
+                  aria-label="الإمارة"
+                  className="w-full bg-transparent text-sm font-medium text-ink outline-none"
+                  name="city"
+                >
+                  <option value="">كل الإمارات</option>
+                  {cities.map((city) => (
+                    <option key={city.id} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <Button
+                className="h-12 min-h-12 w-full shrink-0 whitespace-nowrap px-8 lg:w-auto"
+                size="lg"
+                type="submit"
+                variant="primary"
+              >
+                بحث
+              </Button>
             </div>
+            <input name="country" type="hidden" value={countries[0].name} />
+          </form>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {quickTags.map((tag) => (
+              <Link
+                key={tag.label}
+                className="rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted transition hover:border-secondary/40 hover:text-ink"
+                href={tag.href}
+              >
+                {tag.label}
+              </Link>
+            ))}
           </div>
 
-          <div className="animate-fade-up min-w-0 [animation-delay:120ms]">
-            <HeroPreviewStack listings={previewListings} />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted">
+            {points.map((point) => (
+              <span key={point.label} className="inline-flex items-center gap-2">
+                <Icon className="text-secondary" name={point.icon as IconName} size={15} />
+                {point.label}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button className="h-12 whitespace-nowrap px-8" href="/listings/new" size="lg" variant="accent">
+              أضف إعلانك الآن
+            </Button>
+            <Button className="h-12 whitespace-nowrap px-8" href="/search" size="lg" variant="secondary">
+              تصفح الإعلانات
+            </Button>
           </div>
         </div>
-      </div>
 
-      <HeroFloatingSearch categories={categories} />
+        <HeroShowcase listings={featuredListings.slice(0, 2)} />
+      </div>
     </section>
   );
 }
