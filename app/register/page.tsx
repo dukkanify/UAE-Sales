@@ -1,7 +1,7 @@
-import { AuthShell } from "@/components/auth/AuthShell";
-import { RegisterForm } from "@/components/auth/RegisterForm";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 export default function RegisterPage() {
   return (

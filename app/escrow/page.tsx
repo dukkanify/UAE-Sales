@@ -1,6 +1,6 @@
-import { ComingSoonPage } from "@/components/common/ComingSoonPage";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { ComingSoonPage } from "@/shared/components/ComingSoonPage";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 export default function EscrowPage() {
   return (

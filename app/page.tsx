@@ -1,21 +1,21 @@
-import { AppDownload } from "@/components/home/AppDownload";
-import { CategoriesGrid } from "@/components/home/CategoriesGrid";
-import { EscrowSection } from "@/components/home/EscrowSection";
-import { FeaturedListings } from "@/components/home/FeaturedListings";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { LatestListings } from "@/components/home/LatestListings";
-import { PopularCities } from "@/components/home/PopularCities";
-import { SearchHero } from "@/components/home/SearchHero";
-import { StatsSection } from "@/components/home/StatsSection";
-import { Testimonials } from "@/components/home/Testimonials";
-import { WhyUaeSales } from "@/components/home/WhyUaeSales";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { AppDownload } from "@/features/home/components/AppDownload";
+import { CategoriesGrid } from "@/features/home/components/CategoriesGrid";
+import { EscrowSection } from "@/features/home/components/EscrowSection";
+import { FeaturedListings } from "@/features/home/components/FeaturedListings";
+import { HowItWorks } from "@/features/home/components/HowItWorks";
+import { LatestListings } from "@/features/home/components/LatestListings";
+import { PopularCities } from "@/features/home/components/PopularCities";
+import { SearchHero } from "@/features/home/components/SearchHero";
+import { StatsSection } from "@/features/home/components/StatsSection";
+import { Testimonials } from "@/features/home/components/Testimonials";
+import { WhyUaeSales } from "@/features/home/components/WhyUaeSales";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 import {
   getFeaturedListings,
   getLatestListings,
-} from "@/services/listingsService";
+} from "@/services/listings";
 
 export default async function Home() {
   const [categories, featuredListings, latestListings] = await Promise.all([

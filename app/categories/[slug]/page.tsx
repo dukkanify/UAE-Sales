@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { cities, countries } from "@/constants/locations";
-import { SearchFilters } from "@/components/search/SearchFilters";
-import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { Badge } from "@/components/ui/Badge";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { ChipLink } from "@/components/ui/ChipLink";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { cities, countries } from "@/shared/constants/locations";
+import { SearchFilters } from "@/features/search/components/SearchFilters";
+import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { Badge } from "@/shared/ui/Badge";
+import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
+import { ChipLink } from "@/shared/ui/ChipLink";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import {
   getCategories,
   getCategoryBySlug,
-} from "@/services/categoriesService";
-import { searchListings } from "@/services/listingsService";
+} from "@/services/categories";
+import { searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Tajawal } from "next/font/google";
+import { OfflineBanner } from "@/shared/components/OfflineBanner";
 import "./globals.css";
 
 const tajawal = Tajawal({
@@ -22,7 +23,10 @@ export default function RootLayout({
 }>) {
   return (
     <html className={tajawal.variable} lang="ar" dir="rtl">
-      <body className={tajawal.className}>{children}</body>
+      <body className={tajawal.className}>
+        <OfflineBanner />
+        {children}
+      </body>
     </html>
   );
 }

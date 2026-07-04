@@ -1,7 +1,7 @@
-import { AuthShell } from "@/components/auth/AuthShell";
-import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 export default function ForgotPasswordPage() {
   return (

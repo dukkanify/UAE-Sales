@@ -1,9 +1,9 @@
-import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
-import { getFeaturedListings } from "@/services/listingsService";
+import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
+import { getFeaturedListings } from "@/services/listings";
 
 export default async function FeaturedPage() {
   const [categories, listings] = await Promise.all([

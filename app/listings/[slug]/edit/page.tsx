@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getListingBySlug } from "@/services/listingsService";
+import { Button } from "@/shared/ui/Button";
+import { Card } from "@/shared/ui/Card";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getListingBySlug } from "@/services/listings";
 
 type EditListingPageProps = {
   params: Promise<{

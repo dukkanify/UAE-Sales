@@ -1,8 +1,8 @@
-import { CategoryDirectory } from "@/components/categories/CategoryDirectory";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { CategoryDirectory } from "@/features/categories/components/CategoryDirectory";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 
 export default async function CategoriesPage() {
   const categories = await getCategories();

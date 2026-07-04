@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { EscrowProtectionCard } from "@/components/listings/EscrowProtectionCard";
-import { ListingCard } from "@/components/listings/ListingCard";
-import { ListingGallery } from "@/components/listings/ListingGallery";
-import { ListingSummary } from "@/components/listings/ListingSummary";
-import { SellerPanel } from "@/components/listings/SellerPanel";
-import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Card } from "@/components/ui/Card";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
+import { ListingCard } from "@/features/listings/components/ListingCard";
+import { ListingGallery } from "@/features/listings/components/ListingGallery";
+import { ListingSummary } from "@/features/listings/components/ListingSummary";
+import { SellerPanel } from "@/features/listings/components/SellerPanel";
+import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
+import { Card } from "@/shared/ui/Card";
+import { SectionHeader } from "@/shared/ui/SectionHeader";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 import {
   getListingBySlug,
   getListings,
   getRelatedListings,
-} from "@/services/listingsService";
+} from "@/services/listings";
 
 type ListingPageProps = {
   params: Promise<{ slug: string }>;

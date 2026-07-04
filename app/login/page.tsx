@@ -1,7 +1,7 @@
-import { AuthShell } from "@/components/auth/AuthShell";
-import { LoginForm } from "@/components/auth/LoginForm";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { AuthShell } from "@/features/auth/components/AuthShell";
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 export default function LoginPage() {
   return (

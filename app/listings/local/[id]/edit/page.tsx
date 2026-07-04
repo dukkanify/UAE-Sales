@@ -1,7 +1,7 @@
-import { LocalListingEdit } from "@/components/listings/LocalListingEdit";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { LocalListingEdit } from "@/features/listings/components/LocalListingEdit";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 type LocalListingEditPageProps = {
   params: Promise<{

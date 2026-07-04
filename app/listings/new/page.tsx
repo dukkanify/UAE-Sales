@@ -1,8 +1,8 @@
-import { AddListingForm } from "@/components/listings/AddListingForm";
-import { PageHero } from "@/components/ui/PageHero";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { AddListingForm } from "@/features/listings/components/AddListingForm.lazy";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 
 export default async function NewListingPage() {
   const categories = await getCategories();
