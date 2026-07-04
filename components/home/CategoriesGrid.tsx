@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Category } from "@/types";
 import { Button } from "@/components/ui/Button";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
@@ -29,14 +30,14 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
           {popular.map((category) => (
             <Link
               key={category.id}
-              className="interactive-lift flex items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-4"
+              className="interactive-lift flex items-center gap-3 rounded-[var(--radius-2xl)] border border-border bg-surface p-4"
               href={`/categories/${category.slug}`}
             >
-              <span className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-md)] bg-secondary-soft text-xl">
-                {category.icon}
+              <span className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-xl)] bg-secondary-soft text-secondary">
+                <CategoryIcon category={category} size={20} />
               </span>
               <div className="min-w-0">
-                <h3 className="truncate text-sm font-bold text-ink">
+                <h3 className="truncate text-sm font-semibold text-ink">
                   {category.name}
                 </h3>
                 <p className="mt-0.5 text-xs font-medium text-muted">

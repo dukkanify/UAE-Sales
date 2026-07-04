@@ -18,7 +18,7 @@ export default async function LocalListingPage({
     <>
       <SiteHeader />
       <main>
-        <section className="app-container py-8 lg:py-12">
+        <section className="app-container page-padding">
           <LocalListingDetails categories={categories} listingId={id} />
         </section>
       </main>

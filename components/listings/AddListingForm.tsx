@@ -7,6 +7,8 @@ import { cities, countries } from "@/constants/locations";
 import type { Category, Listing, ListingCondition } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { Icon } from "@/components/ui/Icon";
 import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -182,26 +184,22 @@ export function AddListingForm({ categories }: AddListingFormProps) {
       <input name="categoryId" type="hidden" value={selectedCategoryId} />
 
       <div className="grid gap-6">
-        <div className="surface-gradient overflow-hidden rounded-[var(--radius-xl)] border border-border p-6 shadow-[var(--shadow-soft)]">
-          <h2 className="text-3xl font-black text-primary">ابدأ إعلانك خلال دقائق</h2>
-          <p className="mt-3 leading-8 text-muted">
-            خطوات واضحة: القسم، التفاصيل، الصور، ثم النشر. الإعلان سيظهر مباشرة في حسابك ونتائج البحث.
-          </p>
-          <div className="mt-6 grid gap-3 sm:grid-cols-4">
+        <Card className="p-5" variant="flat">
+          <div className="grid gap-3 sm:grid-cols-4">
             {["القسم", "التفاصيل", "الصور", "النشر"].map((step, index) => (
-              <div key={step} className="rounded-[var(--radius-md)] border border-border bg-surface p-3">
-                <span className="grid size-8 place-items-center rounded-full bg-primary text-xs font-black text-white">
+              <div key={step} className="rounded-[var(--radius-xl)] border border-border bg-surface-muted p-3">
+                <span className="grid size-8 place-items-center rounded-[var(--radius-sm)] bg-primary text-xs font-semibold text-white">
                   {index + 1}
                 </span>
-                <p className="mt-3 text-sm font-black text-primary">{step}</p>
+                <p className="mt-3 text-sm font-semibold text-ink">{step}</p>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
 
         <Card className="p-6">
           <h2 className="text-2xl font-black text-ink">1. اختر القسم</h2>
-          <p className="mt-2 text-sm font-bold text-muted">
+          <p className="mt-2 text-sm font-medium text-muted">
             اختر القسم الأنسب لإعلانك ليظهر أمام المشترين المناسبين.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -211,18 +209,18 @@ export function AddListingForm({ categories }: AddListingFormProps) {
               return (
                 <button
                   key={category.id}
-                  className={`rounded-2xl border p-4 text-center transition ${
+                  className={`rounded-[var(--radius-xl)] border p-4 text-center transition ${
                     isSelected
-                      ? "border-secondary bg-secondary-soft shadow-sm"
-                      : "border-border bg-white hover:border-secondary/40"
+                      ? "border-secondary bg-secondary-soft shadow-[var(--shadow-xs)]"
+                      : "border-border bg-surface hover:border-secondary/40"
                   }`}
                   onClick={() => setSelectedCategoryId(category.id)}
                   type="button"
                 >
-                  <span className="text-2xl" aria-hidden>
-                    {category.icon}
+                  <span className="mx-auto grid size-10 place-items-center text-secondary" aria-hidden>
+                    <CategoryIcon category={category} size={22} />
                   </span>
-                  <p className="mt-2 text-sm font-black text-ink">{category.name}</p>
+                  <p className="mt-2 text-sm font-semibold text-ink">{category.name}</p>
                 </button>
               );
             })}
@@ -340,7 +338,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           <h2 className="text-2xl font-black text-ink">3. الصور والتواصل</h2>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <div className="grid gap-3">
-              <label className="grid min-h-40 cursor-pointer place-items-center rounded-3xl border border-dashed border-secondary bg-secondary-soft p-6 text-center text-sm font-black text-primary transition hover:bg-secondary/20">
+              <label className="grid min-h-40 cursor-pointer place-items-center rounded-[var(--radius-2xl)] border border-dashed border-secondary bg-secondary-soft p-6 text-center text-sm font-semibold text-primary transition hover:bg-secondary/20">
                 <input
                   accept="image/*"
                   className="sr-only"
@@ -350,7 +348,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                 />
                 <span>
                   رفع صور الإعلان
-                  <span className="mt-2 block text-xs font-bold text-muted">
+                  <span className="mt-2 block text-xs font-medium text-muted">
                     {imagePreviews.length > 0
                       ? `تم اختيار ${imagePreviews.length} صورة`
                       : "اختر حتى 6 صور — ستظهر في المعاينة"}
@@ -362,7 +360,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                   {imagePreviews.map((url, index) => (
                     <div
                       key={url}
-                      className="relative h-20 overflow-hidden rounded-xl border border-border bg-white"
+                      className="relative h-20 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
                     >
                       <div
                         aria-label={`معاينة صورة ${index + 1}`}
@@ -400,20 +398,20 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           </div>
         </Card>
 
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-[var(--radius-xl)] bg-primary p-5 text-white">
-          <p className="font-bold">
+        <Card className="flex flex-wrap items-center justify-between gap-4 bg-primary p-5 text-white">
+          <p className="font-medium">
             بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
           </p>
           <Button className="shrink-0" type="submit">
             نشر الإعلان
           </Button>
-        </div>
+        </Card>
       </div>
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <Card className="p-5">
-          <p className="text-sm font-black text-muted">معاينة الإعلان</p>
-          <div className="mt-4 overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface-muted">
+          <p className="text-sm font-semibold text-muted">معاينة الإعلان</p>
+          <div className="mt-4 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted">
             <div className="relative h-44">
               {imagePreviews[0] ? (
                 <div
@@ -423,28 +421,32 @@ export function AddListingForm({ categories }: AddListingFormProps) {
                   style={{ backgroundImage: `url(${imagePreviews[0]})` }}
                 />
               ) : (
-                <div className="grid h-full place-items-center">
-                  <span className="text-4xl">{selectedCategory?.icon ?? "📦"}</span>
+                <div className="grid h-full place-items-center text-secondary">
+                  {selectedCategory ? (
+                    <CategoryIcon category={selectedCategory} size={36} />
+                  ) : (
+                    <Icon name="package" size={36} />
+                  )}
                 </div>
               )}
-              <span className="absolute right-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-black text-primary">
+              <span className="absolute start-4 top-4 rounded-[var(--radius-lg)] bg-surface/90 px-3 py-1 text-xs font-semibold text-primary">
                 {selectedCategory?.name ?? "قسم"}
               </span>
             </div>
-            <div className="bg-white p-5">
-              <h3 className="line-clamp-2 text-xl font-black leading-8 text-primary">
+            <div className="bg-surface p-5">
+              <h3 className="line-clamp-2 text-lg font-semibold leading-8 text-ink">
                 {preview.title}
               </h3>
-              <p className="mt-3 line-clamp-2 text-sm leading-7 text-muted">
+              <p className="mt-3 line-clamp-2 text-sm font-medium leading-7 text-muted">
                 {preview.description}
               </p>
-              <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface-muted px-4 py-3">
-                <span className="text-xl font-black text-primary">
+              <div className="mt-4 flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
+                <span className="text-lg font-semibold text-accent">
                   {Number(preview.price || 0).toLocaleString("ar-AE")} د.إ
                 </span>
-                <span className="text-sm font-black text-muted">{preview.city}</span>
+                <span className="text-sm font-medium text-muted">{preview.city}</span>
               </div>
-              <div className="mt-4 flex items-center justify-between text-xs font-black text-muted">
+              <div className="mt-4 flex items-center justify-between text-xs font-medium text-muted">
                 <span>{conditionLabels[preview.condition]}</span>
                 <span>{imagePreviews.length} صور</span>
               </div>

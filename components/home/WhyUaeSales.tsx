@@ -28,7 +28,7 @@ export function WhyUaeSales() {
               <span className="grid size-9 place-items-center rounded-[var(--radius-md)] bg-primary text-white">
                 <Icon name={reason.icon} size={16} />
               </span>
-              <h3 className="mt-3 text-sm font-black text-ink">{reason.title}</h3>
+              <h3 className="mt-3 text-sm font-semibold text-ink">{reason.title}</h3>
               <p className="mt-1.5 text-xs font-medium leading-6 text-muted">
                 {reason.description}
               </p>

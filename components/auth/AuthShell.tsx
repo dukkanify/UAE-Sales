@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 
 type AuthShellProps = {
   children: ReactNode;
@@ -26,21 +27,20 @@ export function AuthShell({
   title,
 }: AuthShellProps) {
   return (
-    <section className="app-container grid min-h-[calc(100vh-8rem)] gap-8 py-10 lg:grid-cols-2 lg:items-center lg:py-16">
-      <div className="luxury-gradient relative overflow-hidden rounded-3xl p-8 text-white md:p-10">
-        <div className="uae-pattern absolute inset-0 opacity-20" />
+    <section className="app-container page-padding grid min-h-[calc(100vh-8rem)] gap-8 lg:grid-cols-2 lg:items-center">
+      <div className="luxury-gradient relative overflow-hidden rounded-[var(--radius-2xl)] p-8 text-white md:p-10">
         <div className="relative">
           <Link className="inline-flex items-center gap-3" href="/">
-            <span className="grid size-11 place-items-center rounded-xl bg-white/10 text-xs font-black backdrop-blur">
+            <span className="grid size-11 place-items-center rounded-[var(--radius-xl)] bg-white/10 text-xs font-semibold backdrop-blur">
               UAE
             </span>
-            <span className="text-lg font-black">UAE Sales</span>
+            <span className="text-lg font-semibold">UAE Sales</span>
           </Link>
 
           <h1 className="mt-10 text-3xl font-black leading-tight md:text-4xl">
             {title}
           </h1>
-          <p className="mt-4 max-w-md text-base leading-8 text-white/80">
+          <p className="mt-4 max-w-md text-base font-medium leading-8 text-white/80">
             {description}
           </p>
 
@@ -48,9 +48,9 @@ export function AuthShell({
             {trustPoints.map((point) => (
               <div
                 key={point}
-                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-bold backdrop-blur"
+                className="flex items-center gap-3 rounded-[var(--radius-xl)] border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium backdrop-blur"
               >
-                <span className="text-secondary">✓</span>
+                <Icon className="text-secondary" name="check" size={16} />
                 {point}
               </div>
             ))}
@@ -63,7 +63,7 @@ export function AuthShell({
         <div className="mt-8 border-t border-border pt-6 text-center text-sm font-medium text-muted">
           {footerAction.prompt}{" "}
           <Link
-            className="font-bold text-primary transition hover:text-secondary"
+            className="font-semibold text-primary transition hover:text-secondary"
             href={footerAction.href}
           >
             {footerAction.label}

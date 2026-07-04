@@ -14,10 +14,10 @@ export function PageHero({
   title,
 }: PageHeroProps) {
   return (
-    <div className="surface-gradient mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-border p-6 shadow-[var(--shadow-soft)] md:mb-10 md:p-8">
+    <div className="surface-gradient mb-8 overflow-hidden rounded-[var(--radius-2xl)] border border-border p-6 shadow-[var(--shadow-md)] md:mb-10 md:p-8">
       {children}
       {eyebrow ? (
-        <p className="text-xs font-bold tracking-wide text-secondary uppercase">
+        <p className="text-xs font-medium tracking-wide text-secondary uppercase">
           {eyebrow}
         </p>
       ) : null}

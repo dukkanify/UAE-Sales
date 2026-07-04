@@ -27,6 +27,7 @@
   --color-night-soft: var(--color-night-soft);
   --color-glow: var(--color-glow);
   --shadow-soft: var(--shadow-soft);
+  --shadow-xl: var(--shadow-xl);
   --font-sans: var(--font-arabic);
 }
 

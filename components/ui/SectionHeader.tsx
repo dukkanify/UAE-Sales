@@ -27,7 +27,7 @@ export function SectionHeader({
     >
       <div className={isCenter ? "max-w-2xl" : "max-w-xl"}>
         {eyebrow ? (
-          <p className="mb-2 text-xs font-bold tracking-wide text-secondary uppercase">
+          <p className="mb-2 text-xs font-medium tracking-wide text-secondary uppercase">
             {eyebrow}
           </p>
         ) : null}

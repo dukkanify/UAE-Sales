@@ -33,7 +33,7 @@ export function AppDownload() {
             <div className="flex justify-center">
               <div className="relative h-52 w-36 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-primary shadow-[var(--shadow-lg)]">
                 <div className="grid h-full place-items-center text-white">
-                  <span className="text-lg font-black">UAE</span>
+                  <span className="text-lg font-semibold">UAE</span>
                   <span className="text-xs font-medium text-white/70">Sales</span>
                 </div>
               </div>

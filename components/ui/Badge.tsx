@@ -1,12 +1,15 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
 type BadgeVariant =
-  | "default"
-  | "gold"
-  | "success"
-  | "accent"
-  | "muted"
-  | "warning";
+  | "verified"
+  | "premium"
+  | "escrow"
+  | "featured"
+  | "new"
+  | "sold"
+  | "pending"
+  | "rejected"
+  | "muted";
 
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
   children: ReactNode;
@@ -14,23 +17,26 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const variantClasses: Record<BadgeVariant, string> = {
-  default: "border-border bg-surface-muted text-ink",
-  gold: "border-secondary/20 bg-secondary-soft text-primary",
-  success: "border-success/15 bg-success-soft text-success",
-  accent: "border-accent/15 bg-accent-soft text-accent",
+  verified: "border-primary/15 bg-primary-soft text-primary",
+  premium: "border-secondary/25 bg-secondary-soft text-primary",
+  escrow: "border-success/15 bg-success-soft text-success",
+  featured: "border-secondary/20 bg-secondary-soft text-primary",
+  new: "border-accent/15 bg-accent-soft text-accent",
+  sold: "border-border bg-surface-muted text-muted",
+  pending: "border-secondary/25 bg-primary-soft text-primary",
+  rejected: "border-accent/20 bg-accent-soft text-accent",
   muted: "border-border bg-surface text-muted",
-  warning: "border-secondary/25 bg-primary-soft text-primary",
 };
 
 export function Badge({
   children,
   className = "",
-  variant = "gold",
+  variant = "featured",
   ...props
 }: BadgeProps) {
   return (
     <span
-      className={`inline-flex items-center rounded-[var(--radius-sm)] border px-2 py-0.5 text-xs font-bold ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center rounded-[var(--radius-lg)] border px-2.5 py-0.5 text-xs font-semibold ${variantClasses[variant]} ${className}`}
       {...props}
     >
       {children}

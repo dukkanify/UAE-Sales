@@ -27,10 +27,10 @@ export function HowItWorks() {
                 key={step.title}
                 className="rounded-[var(--radius-lg)] border border-white/10 bg-white/5 p-5 backdrop-blur"
               >
-                <span className="grid size-8 place-items-center rounded-[var(--radius-sm)] bg-secondary text-xs font-black text-primary">
+                <span className="grid size-8 place-items-center rounded-[var(--radius-sm)] bg-secondary text-xs font-semibold text-primary">
                   {index + 1}
                 </span>
-                <h3 className="mt-3 text-sm font-black text-white">{step.title}</h3>
+                <h3 className="mt-3 text-sm font-semibold text-white">{step.title}</h3>
                 <p className="mt-1.5 text-xs font-medium leading-6 text-white/70">
                   {step.description}
                 </p>

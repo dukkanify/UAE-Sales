@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
+import { PageHero } from "@/components/ui/PageHero";
 import {
   clearSessionUser,
   getSessionUser,
@@ -68,7 +70,7 @@ export function DashboardShell({
         {dashboardLinks.map((link) => (
           <Link
             key={link.href}
-            className={`inline-flex shrink-0 items-center gap-2 rounded-[var(--radius-md)] px-3.5 py-2 text-sm font-medium transition ${
+            className={`inline-flex shrink-0 items-center gap-2 rounded-[var(--radius-xl)] px-3.5 py-2 text-sm font-medium transition ${
               link.href === activePath
                 ? "bg-primary text-white"
                 : "border border-border bg-surface text-muted"
@@ -81,15 +83,15 @@ export function DashboardShell({
         ))}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[16rem_1fr]">
-        <aside className="hidden lg:grid lg:gap-3 lg:self-start">
-          <Card className="p-4" variant="flat">
+      <div className="grid gap-6 lg:grid-cols-[17rem_1fr]">
+        <aside className="hidden lg:grid lg:gap-4 lg:self-start">
+          <Card className="p-5" variant="flat">
             <div className="flex items-center gap-3">
-              <span className="grid size-11 place-items-center rounded-[var(--radius-md)] bg-primary text-xs font-black text-white">
+              <span className="grid size-11 place-items-center rounded-[var(--radius-xl)] bg-primary text-xs font-semibold text-white">
                 {displayUser.fullName.slice(0, 2)}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-ink">
+                <p className="truncate text-sm font-semibold text-ink">
                   {displayUser.fullName}
                 </p>
                 <p className="text-xs font-medium text-muted">
@@ -97,11 +99,11 @@ export function DashboardShell({
                 </p>
               </div>
             </div>
-            <nav className="mt-4 grid gap-0.5">
+            <nav className="mt-5 grid gap-1">
               {dashboardLinks.map((link) => (
                 <Link
                   key={link.href}
-                  className={`flex items-center gap-2.5 rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-medium transition ${
+                  className={`flex items-center gap-2.5 rounded-[var(--radius-xl)] px-3 py-2.5 text-sm font-medium transition ${
                     link.href === activePath
                       ? "bg-primary text-white"
                       : "text-muted hover:bg-surface-muted hover:text-ink"
@@ -113,7 +115,7 @@ export function DashboardShell({
                 </Link>
               ))}
               <button
-                className="mt-2 rounded-[var(--radius-md)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
+                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
                 onClick={() => {
                   clearSessionUser();
                   router.replace("/login");
@@ -125,30 +127,19 @@ export function DashboardShell({
             </nav>
           </Card>
 
-          <Card className="p-4" variant="flat">
+          <Card className="p-5" variant="flat">
             <p className="text-xs font-medium text-muted">رصيد المحفظة</p>
-            <p className="mt-1 text-xl font-black text-ink">
+            <p className="mt-1 text-xl font-semibold text-ink">
               2,450 <span className="text-xs font-medium text-muted">د.إ</span>
             </p>
-            <Link
-              className="mt-3 block rounded-[var(--radius-md)] bg-secondary-soft py-2 text-center text-xs font-bold text-primary transition hover:bg-secondary"
-              href="/wallet"
-            >
+            <Button className="mt-4 w-full" href="/wallet" size="sm" variant="secondary">
               إدارة المحفظة
-            </Link>
+            </Button>
           </Card>
         </aside>
 
         <div>
-          <div className="mb-6">
-            <p className="text-xs font-bold tracking-wide text-secondary uppercase">
-              لوحة التحكم
-            </p>
-            <h1 className="mt-1 text-2xl font-black text-ink md:text-3xl">
-              {title}
-            </h1>
-            <p className="mt-1.5 text-sm font-medium text-muted">{description}</p>
-          </div>
+          <PageHero description={description} eyebrow="لوحة التحكم" title={title} />
           {children}
         </div>
       </div>

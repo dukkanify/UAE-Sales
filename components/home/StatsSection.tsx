@@ -8,11 +8,11 @@ const stats = [
 export function StatsSection() {
   return (
     <section className="border-y border-border bg-surface">
-      <div className="app-container py-10">
+      <div className="app-container section-padding">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-2xl font-black text-ink md:text-3xl">
+              <p className="text-2xl font-semibold text-ink md:text-3xl">
                 {stat.value}
               </p>
               <p className="mt-1 text-xs font-medium tracking-wide text-muted uppercase">

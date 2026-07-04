@@ -9,7 +9,7 @@ type ShareButtonProps = {
 };
 
 const baseClass =
-  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-4 text-sm font-bold text-ink transition";
+  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
 export function ShareButton({ className = "", title }: ShareButtonProps) {
   const [message, setMessage] = useState("مشاركة");

@@ -88,7 +88,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
         </section>
 
         {relatedListings.length > 0 ? (
-          <section className="app-container pb-12">
+          <section className="app-container page-padding">
             <SectionHeader
               description="إعلانات من نفس التصنيف قد تعجبك."
               eyebrow="مشابه"

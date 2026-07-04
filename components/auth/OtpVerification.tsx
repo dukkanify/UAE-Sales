@@ -20,7 +20,7 @@ export function OtpVerification({
   return (
     <div className="grid gap-4">
       <div>
-        <p className="text-xs font-bold tracking-wide text-secondary uppercase">
+        <p className="text-xs font-medium tracking-wide text-secondary uppercase">
           التحقق
         </p>
         <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز OTP</h2>
@@ -35,7 +35,7 @@ export function OtpVerification({
           <input
             key={index}
             aria-label={`رقم ${index + 1}`}
-            className="focus-ring h-12 rounded-[var(--radius-md)] border border-border bg-surface text-center text-lg font-black text-ink shadow-[var(--shadow-xs)]"
+            className="focus-ring h-12 rounded-[var(--radius-xl)] border border-border bg-surface text-center text-lg font-semibold text-ink shadow-[var(--shadow-xs)]"
             inputMode="numeric"
             maxLength={1}
             pattern="[0-9]*"

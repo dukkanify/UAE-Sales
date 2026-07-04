@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { cities } from "@/constants/locations";
 import type { UserProfile } from "@/types";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { getSessionUser } from "@/services/clientStorage";
@@ -38,16 +40,18 @@ export function ProfileForm({ user }: ProfileFormProps) {
       <Card className="overflow-hidden p-0">
         <div className="luxury-gradient p-6 text-white">
           <div className="flex flex-wrap items-center gap-5">
-            <div className="grid size-20 place-items-center rounded-3xl bg-secondary text-2xl font-black text-primary shadow-lg">
+            <div className="grid size-20 place-items-center rounded-[var(--radius-2xl)] bg-secondary text-2xl font-semibold text-primary shadow-[var(--shadow-md)]">
               {displayUser.fullName.slice(0, 2)}
             </div>
             <div>
               <h2 className="text-2xl font-black">{displayUser.fullName}</h2>
-              <p className="mt-2 text-sm font-bold text-white/75">
+              <p className="mt-2 text-sm font-medium text-white/75">
                 {displayUser.email}
               </p>
-              <p className="mt-1 text-xs font-bold text-secondary">
-                {displayUser.isVerified ? "حساب موثق ✓" : "بانتظار توثيق UAE PASS"}
+              <p className="mt-2">
+                <Badge variant={displayUser.isVerified ? "verified" : "pending"}>
+                  {displayUser.isVerified ? "حساب موثق" : "بانتظار توثيق UAE PASS"}
+                </Badge>
               </p>
             </div>
           </div>
@@ -108,13 +112,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
           />
 
           {saveMessage ? (
-            <div className="rounded-2xl border border-secondary/30 bg-secondary-soft p-4 text-sm font-black text-primary">
-              {saveMessage}
-            </div>
+            <FormMessage variant="success">{saveMessage}</FormMessage>
           ) : null}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-surface-muted p-4">
-            <p className="text-sm font-bold text-muted">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-2xl)] bg-surface-muted p-4">
+            <p className="text-sm font-medium text-muted">
               بياناتك محفوظة محلياً في هذا المتصفح.
             </p>
             <Button type="submit">حفظ التغييرات</Button>
@@ -125,33 +127,29 @@ export function ProfileForm({ user }: ProfileFormProps) {
       <div className="grid gap-4">
         <Card className="p-6">
           <h2 className="text-xl font-black text-ink">حالة الحساب</h2>
-          <div className="mt-5 grid gap-3 text-sm font-bold">
-            <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
+          <div className="mt-5 grid gap-3 text-sm font-medium">
+            <div className="flex justify-between rounded-[var(--radius-xl)] bg-surface-muted p-4">
               <span className="text-muted">نوع الحساب</span>
-              <span className="text-ink">
+              <span className="font-semibold text-ink">
                 {accountTypeLabels[displayUser.accountType]}
               </span>
             </div>
-            <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
+            <div className="flex justify-between rounded-[var(--radius-xl)] bg-surface-muted p-4">
               <span className="text-muted">التوثيق</span>
-              <span
-                className={
-                  displayUser.isVerified ? "text-primary" : "text-amber-700"
-                }
-              >
+              <Badge variant={displayUser.isVerified ? "verified" : "pending"}>
                 {displayUser.isVerified ? "موثق" : "بانتظار UAE PASS"}
-              </span>
+              </Badge>
             </div>
-            <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
+            <div className="flex justify-between rounded-[var(--radius-xl)] bg-surface-muted p-4">
               <span className="text-muted">تاريخ الانضمام</span>
-              <span className="text-ink">{displayUser.joinedAt}</span>
+              <span className="font-semibold text-ink">{displayUser.joinedAt}</span>
             </div>
           </div>
         </Card>
 
         <Card className="border-primary-soft bg-primary-soft p-6">
           <h2 className="text-lg font-black text-primary">خطوة التوثيق القادمة</h2>
-          <p className="mt-3 text-sm font-bold leading-7 text-primary">
+          <p className="mt-3 text-sm font-medium leading-7 text-primary">
             عند تفعيل UAE PASS سيتمكن المستخدم من توثيق الهوية ورفع حدود البيع
             والسحب من المحفظة.
           </p>

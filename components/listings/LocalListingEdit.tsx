@@ -80,15 +80,8 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
   }
 
   return (
-    <Card className="overflow-hidden p-0">
-      <div className="surface-gradient p-6">
-        <h1 className="text-3xl font-black text-ink">تعديل الإعلان</h1>
-        <p className="mt-3 leading-8 text-muted">
-          عدّل بيانات إعلانك المحفوظ محلياً. التغييرات ستظهر فوراً في إعلاناتي ونتائج البحث.
-        </p>
-      </div>
-
-      <form className="grid gap-5 p-6" onSubmit={handleSubmit}>
+    <Card className="p-6">
+      <form className="grid gap-5" onSubmit={handleSubmit}>
         <Input defaultValue={currentListing.title} label="عنوان الإعلان" name="title" />
 
         <Textarea

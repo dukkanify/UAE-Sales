@@ -9,10 +9,10 @@ export function Input({ className = "", hint, label, ...props }: InputProps) {
   return (
     <label className="grid gap-1.5">
       {label ? (
-        <span className="text-sm font-bold text-ink">{label}</span>
+        <span className="text-sm font-medium text-ink">{label}</span>
       ) : null}
       <input
-        className={`focus-ring min-h-11 rounded-[var(--radius-md)] border border-border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 ${className}`}
+        className={`focus-ring min-h-11 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 ${className}`}
         {...props}
       />
       {hint ? (

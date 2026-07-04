@@ -239,7 +239,7 @@ export function RegisterForm() {
       </div>
 
       <div>
-        <label className="flex gap-3 rounded-3xl bg-surface-muted p-4 text-sm font-bold leading-7 text-muted">
+        <label className="flex gap-3 rounded-[var(--radius-2xl)] bg-surface-muted p-4 text-sm font-medium leading-7 text-muted">
           <input
             className="mt-1 size-4 accent-primary"
             name="terms"

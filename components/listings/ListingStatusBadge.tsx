@@ -8,13 +8,13 @@ type ListingStatusBadgeProps = {
 
 const statusVariants: Record<
   ListingStatus,
-  "success" | "muted" | "warning" | "accent" | "default"
+  "new" | "muted" | "pending" | "sold" | "rejected"
 > = {
-  active: "success",
+  active: "new",
   draft: "muted",
-  expired: "warning",
-  pending_review: "default",
-  rejected: "accent",
+  expired: "sold",
+  pending_review: "pending",
+  rejected: "rejected",
 };
 
 export function ListingStatusBadge({ status }: ListingStatusBadgeProps) {

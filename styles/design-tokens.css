@@ -50,16 +50,17 @@
   --shadow-sm: 0 4px 16px rgb(15 20 25 / 6%);
   --shadow-md: 0 8px 32px rgb(15 20 25 / 8%);
   --shadow-lg: 0 16px 48px rgb(15 20 25 / 10%);
+  --shadow-xl: 0 24px 64px rgb(15 20 25 / 12%);
   --shadow-card: 0 8px 32px rgb(15 20 25 / 7%);
   --shadow-soft: 0 4px 20px rgb(15 20 25 / 5%);
   --shadow-glow: 0 8px 40px rgb(201 169 98 / 18%);
 
-  /* Radii — strict scale */
-  --radius-sm: 0.5rem;   /* 8px  — badges, chips */
-  --radius-md: 0.75rem;  /* 12px — buttons, inputs */
-  --radius-lg: 1rem;     /* 16px — cards */
-  --radius-xl: 1.5rem;   /* 24px — hero panels */
-  --radius-2xl: 2rem;    /* 32px — feature blocks */
+  /* Radii — semantic roles */
+  --radius-sm: 0.5rem;   /* 8px  — chips, step numbers */
+  --radius-md: 0.75rem;  /* 12px — nested surfaces */
+  --radius-lg: 1rem;     /* 16px — badges */
+  --radius-xl: 1.5rem;   /* 24px — buttons, inputs */
+  --radius-2xl: 2rem;    /* 32px — cards, heroes, dialogs */
 
   /* Motion */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);

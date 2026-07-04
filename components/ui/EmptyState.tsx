@@ -8,7 +8,8 @@ type EmptyStateProps = {
   actionLabel?: string;
   children?: ReactNode;
   description: string;
-  icon?: "search" | "package" | "message" | "wallet" | "photo";
+  eyebrow?: string;
+  icon?: "search" | "package" | "message" | "wallet" | "photo" | "shield";
   title: string;
 };
 
@@ -17,6 +18,7 @@ const iconMap = {
   package: "package",
   photo: "photo",
   search: "search",
+  shield: "shield",
   wallet: "wallet",
 } as const;
 
@@ -25,15 +27,23 @@ export function EmptyState({
   actionLabel,
   children,
   description,
+  eyebrow,
   icon = "package",
   title,
 }: EmptyStateProps) {
   return (
     <Card className="p-10 text-center" variant="flat">
-      <span className="mx-auto grid size-14 place-items-center rounded-[var(--radius-lg)] bg-surface-muted text-secondary">
+      <span className="mx-auto grid size-14 place-items-center rounded-[var(--radius-2xl)] bg-surface-muted text-secondary">
         <Icon name={iconMap[icon]} size={24} />
       </span>
-      <h3 className="mt-5 text-xl font-black text-ink">{title}</h3>
+      {eyebrow ? (
+        <p className="mt-5 text-xs font-medium tracking-wide text-secondary uppercase">
+          {eyebrow}
+        </p>
+      ) : null}
+      <h2 className={`${eyebrow ? "mt-2" : "mt-5"} text-xl font-black text-ink`}>
+        {title}
+      </h2>
       <p className="mx-auto mt-2 max-w-md text-sm font-medium leading-7 text-muted">
         {description}
       </p>

@@ -43,7 +43,7 @@ export function Button({
       ? "إجراء"
       : (children ?? "إجراء");
 
-  const classes = `focus-ring interactive-lift inline-flex items-center justify-center gap-2 rounded-[var(--radius-md)] font-bold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${className}`;
+  const classes = `focus-ring interactive-lift inline-flex items-center justify-center gap-2 rounded-[var(--radius-xl)] font-semibold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? "w-full" : ""} ${className}`;
 
   if (href) {
     return (

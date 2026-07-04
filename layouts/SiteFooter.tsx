@@ -9,11 +9,11 @@ export function SiteFooter() {
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
           <div>
             <div className="mb-5 flex items-center gap-2.5">
-              <span className="grid size-10 place-items-center rounded-[var(--radius-md)] bg-primary text-[0.65rem] font-black text-white">
+              <span className="grid size-10 place-items-center rounded-[var(--radius-xl)] bg-primary text-[0.65rem] font-semibold text-white">
                 UAE
               </span>
               <div>
-                <p className="text-base font-black text-ink">UAE Sales</p>
+                <p className="text-base font-semibold text-ink">UAE Sales</p>
                 <p className="text-xs font-medium text-muted">
                   السوق الإماراتي الفاخر
                 </p>
@@ -28,7 +28,7 @@ export function SiteFooter() {
           <div className="grid gap-8 sm:grid-cols-3">
             {footerLinks.map((group) => (
               <div key={group.title}>
-                <h3 className="mb-3 text-xs font-black tracking-wide text-ink uppercase">
+                <h3 className="mb-3 text-xs font-semibold tracking-wide text-ink uppercase">
                   {group.title}
                 </h3>
                 <ul className="grid gap-2">

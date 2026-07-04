@@ -28,12 +28,12 @@ export function SiteHeader() {
       <div className="app-container">
         <div className="flex min-h-[4rem] items-center justify-between gap-4">
           <Link className="flex shrink-0 items-center gap-2.5" href="/">
-            <span className="relative grid size-9 place-items-center overflow-hidden rounded-[var(--radius-md)] bg-primary text-[0.65rem] font-black text-white">
+            <span className="relative grid size-9 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-primary text-[0.65rem] font-semibold text-white">
               <span className="uae-flag-strip absolute inset-0 opacity-30" />
               <span className="relative">UAE</span>
             </span>
             <span className="hidden sm:block">
-              <span className="block text-sm font-black tracking-tight text-ink">
+              <span className="block text-sm font-semibold tracking-tight text-ink">
                 UAE Sales
               </span>
               <span className="block text-[0.65rem] font-medium text-secondary">

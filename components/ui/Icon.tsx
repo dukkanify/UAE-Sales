@@ -22,7 +22,21 @@ type IconName =
   | "arrow-left"
   | "package"
   | "bell"
-  | "chart";
+  | "chart"
+  | "car"
+  | "laptop"
+  | "phone"
+  | "sofa"
+  | "briefcase"
+  | "watch"
+  | "paw"
+  | "wrench"
+  | "baby"
+  | "book"
+  | "sport"
+  | "food";
+
+export type { IconName };
 
 type IconProps = {
   className?: string;
@@ -70,6 +84,30 @@ const paths: Record<IconName, string> = {
     "M15 17H9l-1 2h8l-1-2Zm-3 3a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2ZM18 14a6 6 0 1 0-12 0v4h12v-4Z",
   chart:
     "M5 19V9M10 19V5M15 19v-7M20 19V11",
+  car:
+    "M5 17h14M6 17v2M18 17v2M4 12h16l-1.5-5a2 2 0 0 0-2-1.5H7.5a2 2 0 0 0-2 1.5L4 12Zm3-3h10",
+  laptop:
+    "M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V7Zm-1 10h18",
+  phone:
+    "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
+  sofa:
+    "M5 12V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M4 12h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4Z",
+  briefcase:
+    "M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9Z",
+  watch:
+    "M9 3h6l1 4H8l1-4Zm-1 14h8l1 4H8l1-4ZM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Z",
+  paw:
+    "M8.5 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM6 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm12 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM12 20c2.8 0 5-2 5-4.5S14.8 11 12 11s-5 1.5-5 4.5S9.2 20 12 20Z",
+  wrench:
+    "M14.7 6.3a4 4 0 0 0-5.4 5.4L4 17l3 3 5.3-5.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2.8-2.8 2.1-2.1Z",
+  baby:
+    "M12 3a3 3 0 1 0 3 3 3 3 0 0 0-3-3Zm-5 9a5 5 0 0 0 10 0v1H7v-1Z",
+  book:
+    "M5 4h9a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Zm11 2h3v14h-3",
+  sport:
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-16a7 7 0 0 1 0 14",
+  food:
+    "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
 };
 
 export function Icon({ className = "", name, size = 20 }: IconProps) {

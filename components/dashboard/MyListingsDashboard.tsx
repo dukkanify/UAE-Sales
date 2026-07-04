@@ -77,7 +77,7 @@ export function MyListingsDashboard({
   }, []);
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-5">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { icon: "check" as const, label: "نشطة", value: counts.active },
@@ -85,19 +85,21 @@ export function MyListingsDashboard({
           { icon: "edit" as const, label: "مسودات", value: counts.draft },
           { icon: "eye" as const, label: "مشاهدات", value: "3,240" },
         ].map((stat) => (
-          <Card key={stat.label} className="p-4" variant="flat">
+          <Card key={stat.label} className="p-5" variant="flat">
             <div className="flex items-center justify-between">
-              <Icon className="text-secondary" name={stat.icon} size={18} />
-              <p className="text-xl font-black text-ink">{stat.value}</p>
+              <span className="grid size-10 place-items-center rounded-[var(--radius-xl)] bg-secondary-soft text-secondary">
+                <Icon name={stat.icon} size={18} />
+              </span>
+              <p className="text-xl font-semibold text-ink">{stat.value}</p>
             </div>
-            <p className="mt-1 text-xs font-medium text-muted">{stat.label}</p>
+            <p className="mt-2 text-xs font-medium text-muted">{stat.label}</p>
           </Card>
         ))}
       </div>
 
-      <Card className="p-4" variant="flat">
+      <Card className="p-5" variant="flat">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-black text-ink">إعلاناتي</h2>
+          <h2 className="text-sm font-semibold text-ink">إعلاناتي</h2>
           <Button href="/listings/new" size="sm" variant="primary">
             إضافة
           </Button>
@@ -120,16 +122,16 @@ export function MyListingsDashboard({
           title="لا توجد إعلانات"
         />
       ) : (
-        <div className="grid gap-2">
+        <div className="grid gap-3">
           {filteredListings.map((listing) => (
-            <Card key={listing.id} className="p-4" variant="flat">
-              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+            <Card key={listing.id} className="p-5" variant="flat">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="text-sm font-bold text-ink">{listing.title}</h4>
+                    <h4 className="text-sm font-semibold text-ink">{listing.title}</h4>
                     <ListingStatusBadge status={listing.status} />
                   </div>
-                  <p className="mt-1 flex flex-wrap gap-3 text-xs font-medium text-muted">
+                  <p className="mt-1.5 flex flex-wrap gap-3 text-xs font-medium text-muted">
                     <span>{categoryNames.get(listing.categoryId)}</span>
                     <span>{listing.city}</span>
                     <span>{priceFormatter.format(listing.price)} د.إ</span>

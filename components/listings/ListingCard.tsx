@@ -44,22 +44,10 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
                 <Icon name="photo" size={32} />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
 
             <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-end p-3">
-              <div className="flex flex-col items-end gap-1">
-                {listing.isFeatured ? <Badge variant="gold">مميز</Badge> : null}
-                {categoryName ? (
-                  <Badge variant="muted">{categoryName}</Badge>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 flex gap-1.5 p-3">
-              <Badge variant="success">ضمان مالي</Badge>
-              {isVerifiedSeller ? (
-                <Badge variant="default">موثق</Badge>
-              ) : null}
+              {listing.isFeatured ? <Badge variant="featured">مميز</Badge> : null}
             </div>
           </div>
         </Link>
@@ -75,13 +63,13 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
 
       <div className="p-4">
         <Link href={listingHref}>
-          <h3 className="line-clamp-2 min-h-10 text-sm font-bold leading-6 text-ink transition group-hover:text-primary">
+          <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-6 text-ink transition group-hover:text-primary">
             {listing.title}
           </h3>
         </Link>
 
         <div className="mt-3 flex items-center justify-between gap-2">
-          <p className="text-lg font-black text-accent">
+          <p className="text-lg font-semibold text-accent">
             {priceFormatter.format(listing.price)}{" "}
             <span className="text-xs font-medium text-muted">د.إ</span>
           </p>
@@ -92,10 +80,16 @@ export function ListingCard({ categoryName, listing }: ListingCardProps) {
         </div>
 
         <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-xs font-medium text-muted">
-          <span>{conditionLabels[listing.condition]}</span>
-          <span className="inline-flex items-center gap-1">
-            <Icon name="eye" size={12} />
-            {listing.views.toLocaleString("ar-AE")}
+          <span>
+            {categoryName ? `${categoryName} · ` : ""}
+            {conditionLabels[listing.condition]}
+          </span>
+          <span className="inline-flex items-center gap-2">
+            {isVerifiedSeller ? <Badge variant="verified">موثق</Badge> : null}
+            <span className="inline-flex items-center gap-1">
+              <Icon name="eye" size={12} />
+              {listing.views.toLocaleString("ar-AE")}
+            </span>
           </span>
         </div>
       </div>

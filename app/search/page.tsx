@@ -82,7 +82,7 @@ export default async function SearchPage({
             <p className="text-sm font-medium text-muted">
               {listings.length.toLocaleString("ar-AE")} نتيجة
             </p>
-            <Badge variant="success">ضمان مالي متاح</Badge>
+            <Badge variant="escrow">ضمان مالي متاح</Badge>
           </div>
           <div className="mt-5">
             <SearchResultsList

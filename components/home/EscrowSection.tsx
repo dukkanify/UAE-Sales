@@ -30,7 +30,7 @@ export function EscrowSection() {
               <p className="mt-3 text-xs font-bold text-secondary">
                 {index + 1}
               </p>
-              <h3 className="mt-1 text-sm font-black text-ink">{step.title}</h3>
+              <h3 className="mt-1 text-sm font-semibold text-ink">{step.title}</h3>
               <p className="mt-2 text-xs font-medium leading-6 text-muted">
                 {step.description}
               </p>

@@ -22,7 +22,7 @@ export function SearchHero({ categories }: SearchHeroProps) {
 
       <div className="app-container relative section-padding pb-16">
         <div className="mx-auto max-w-3xl text-center">
-          <Badge className="mb-5" variant="gold">
+          <Badge className="mb-5" variant="premium">
             السوق الإماراتي الفاخر
           </Badge>
 

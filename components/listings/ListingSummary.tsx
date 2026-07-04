@@ -11,6 +11,12 @@ type ListingSummaryProps = {
   listing: Listing;
 };
 
+const conditionVariants: Record<Listing["condition"], "new" | "muted" | "premium"> = {
+  excellent: "premium",
+  new: "new",
+  used: "muted",
+};
+
 const conditionLabels: Record<Listing["condition"], string> = {
   excellent: "ممتاز",
   new: "جديد",
@@ -25,39 +31,40 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
   return (
     <Card className="p-6">
       <div className="flex flex-wrap items-center gap-2">
-        {category ? <Badge variant="gold">{category.name}</Badge> : null}
-        <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
-        <Badge variant="success">ضمان مالي</Badge>
+        {category ? <Badge variant="muted">{category.name}</Badge> : null}
+        <Badge variant={conditionVariants[listing.condition]}>
+          {conditionLabels[listing.condition]}
+        </Badge>
       </div>
 
       <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
         {listing.title}
       </h1>
 
-      <p className="mt-4 text-3xl font-black text-accent">
+      <p className="mt-4 text-3xl font-semibold text-accent">
         {priceFormatter.format(listing.price)}{" "}
         <span className="text-sm font-medium text-muted">د.إ</span>
       </p>
 
-      <div className="mt-5 grid gap-2 rounded-[var(--radius-md)] border border-border bg-surface-muted p-4 text-sm">
-        <div className="flex items-center justify-between">
+      <div className="mt-6 grid gap-3 text-sm">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <span className="font-medium text-muted">الموقع</span>
-          <span className="inline-flex items-center gap-1 font-bold text-ink">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
             {listing.city}
           </span>
         </div>
         <div className="flex items-center justify-between">
           <span className="font-medium text-muted">المشاهدات</span>
-          <span className="inline-flex items-center gap-1 font-bold text-ink">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="eye" size={14} />
             {listing.views.toLocaleString("ar-AE")}
           </span>
         </div>
       </div>
 
-      <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        <Button fullWidth href={`/checkout?listing=${listing.slug}`} variant="accent">
+      <div className="mt-6 grid gap-2">
+        <Button fullWidth href={`/checkout?listing=${listing.slug}`} size="lg" variant="accent">
           شراء الآن
         </Button>
         <Button fullWidth href={`/chat?listing=${listing.slug}`} variant="secondary">

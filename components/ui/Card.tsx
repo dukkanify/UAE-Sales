@@ -10,11 +10,11 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 
 const variantClasses: Record<CardVariant, string> = {
   default:
-    "rounded-[var(--radius-lg)] border border-border bg-surface shadow-[var(--shadow-card)]",
+    "rounded-[var(--radius-2xl)] border border-border bg-surface shadow-[var(--shadow-card)]",
   elevated:
-    "rounded-[var(--radius-lg)] border border-border bg-surface-elevated shadow-[var(--shadow-lg)]",
-  glass: "glass-panel rounded-[var(--radius-lg)]",
-  flat: "rounded-[var(--radius-lg)] border border-border bg-surface",
+    "rounded-[var(--radius-2xl)] border border-border bg-surface-elevated shadow-[var(--shadow-lg)]",
+  glass: "glass-panel rounded-[var(--radius-2xl)]",
+  flat: "rounded-[var(--radius-2xl)] border border-border bg-surface",
 };
 
 export function Card({

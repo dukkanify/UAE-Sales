@@ -46,7 +46,7 @@ export function Testimonials() {
                 &ldquo;{item.quote}&rdquo;
               </p>
               <div className="mt-5 flex items-center gap-3 border-t border-border pt-4">
-                <span className="grid size-9 place-items-center rounded-[var(--radius-md)] bg-primary text-xs font-black text-white">
+                <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-primary text-xs font-semibold text-white">
                   {item.name.slice(0, 2)}
                 </span>
                 <div>
