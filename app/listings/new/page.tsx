@@ -15,7 +15,7 @@ export default async function NewListingPage() {
           <SectionHeader
             eyebrow="إضافة إعلان"
             title="انشر إعلانك في سوق الإمارات"
-            description="تدفق إضافة إعلان كامل يعمل بالبيانات الوهمية وlocalStorage حتى يكون جاهزاً للربط مع Backend لاحقاً."
+            description="أضف إعلانك في خطوات بسيطة: اختر القسم، اكتب التفاصيل، أرفق الصور، ثم انشر مباشرة."
           />
           <AddListingForm categories={categories} />
         </section>

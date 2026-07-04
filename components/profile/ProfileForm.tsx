@@ -23,6 +23,7 @@ const accountTypeLabels: Record<UserProfile["accountType"], string> = {
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const [displayUser, setDisplayUser] = useState(user);
+  const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -34,8 +35,33 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
-      <Card className="p-6">
-        <form key={displayUser.id} className="grid gap-5">
+      <Card className="overflow-hidden p-0">
+        <div className="bg-[linear-gradient(135deg,#111827,#1f2937)] p-6 text-white">
+          <div className="uae-flag-strip mb-5 h-1.5 w-24 rounded-full" />
+          <div className="flex flex-wrap items-center gap-5">
+            <div className="grid size-20 place-items-center rounded-3xl bg-secondary text-2xl font-black text-primary shadow-lg">
+              {displayUser.fullName.slice(0, 2)}
+            </div>
+            <div>
+              <h2 className="text-2xl font-black">{displayUser.fullName}</h2>
+              <p className="mt-2 text-sm font-bold text-white/75">
+                {displayUser.email}
+              </p>
+              <p className="mt-1 text-xs font-bold text-secondary">
+                {displayUser.isVerified ? "حساب موثق ✓" : "بانتظار توثيق UAE PASS"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form
+          key={displayUser.id}
+          className="grid gap-5 p-6"
+          onSubmit={(event) => {
+            event.preventDefault();
+            setSaveMessage("تم حفظ التغييرات محلياً. سيتم ربط الحفظ بالخادم لاحقاً.");
+          }}
+        >
           <div className="grid gap-4 md:grid-cols-2">
             <Input
               defaultValue={displayUser.fullName}
@@ -82,9 +108,15 @@ export function ProfileForm({ user }: ProfileFormProps) {
             ]}
           />
 
+          {saveMessage ? (
+            <div className="rounded-2xl border border-secondary/30 bg-secondary-soft p-4 text-sm font-black text-primary">
+              {saveMessage}
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-3xl bg-surface-muted p-4">
             <p className="text-sm font-bold text-muted">
-              سيتم ربط الحفظ بخدمة المستخدم عند توفر Backend.
+              بياناتك محفوظة محلياً في هذا المتصفح.
             </p>
             <Button type="submit">حفظ التغييرات</Button>
           </div>
@@ -92,7 +124,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </Card>
 
       <div className="grid gap-4">
-        <Card className="p-6">
+        <Card className="overflow-hidden p-6">
+          <div className="uae-flag-strip -mx-6 -mt-6 mb-5 h-1.5" />
           <h2 className="text-xl font-black text-ink">حالة الحساب</h2>
           <div className="mt-5 grid gap-3 text-sm font-bold">
             <div className="flex justify-between rounded-2xl bg-surface-muted p-4">
