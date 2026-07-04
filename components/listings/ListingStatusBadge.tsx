@@ -1,24 +1,26 @@
 import type { ListingStatus } from "@/types";
 import { listingStatusLabels } from "@/constants/listingStatuses";
+import { Badge } from "@/components/ui/Badge";
 
 type ListingStatusBadgeProps = {
   status: ListingStatus;
 };
 
-const statusClasses: Record<ListingStatus, string> = {
-  active: "bg-secondary-soft text-primary",
-  draft: "bg-slate-100 text-slate-700",
-  expired: "bg-amber-100 text-amber-800",
-  pending_review: "bg-sky-100 text-sky-800",
-  rejected: "bg-rose-100 text-rose-800",
+const statusVariants: Record<
+  ListingStatus,
+  "success" | "muted" | "warning" | "accent" | "default"
+> = {
+  active: "success",
+  draft: "muted",
+  expired: "warning",
+  pending_review: "default",
+  rejected: "accent",
 };
 
 export function ListingStatusBadge({ status }: ListingStatusBadgeProps) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black ${statusClasses[status]}`}
-    >
+    <Badge variant={statusVariants[status]}>
       {listingStatusLabels[status]}
-    </span>
+    </Badge>
   );
 }

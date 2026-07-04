@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 
 type ShareButtonProps = {
   className?: string;
   title: string;
 };
 
+const baseClass =
+  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-4 text-sm font-bold text-ink transition";
+
 export function ShareButton({ className = "", title }: ShareButtonProps) {
-  const [message, setMessage] = useState("مشاركة الإعلان");
+  const [message, setMessage] = useState("مشاركة");
 
   async function handleShare() {
     const url = window.location.href;
@@ -21,14 +25,15 @@ export function ShareButton({ className = "", title }: ShareButtonProps) {
       }
 
       await navigator.clipboard.writeText(url);
-      setMessage("تم نسخ الرابط");
+      setMessage("تم النسخ");
     } catch {
-      setMessage("الرابط جاهز للمشاركة");
+      setMessage("مشاركة");
     }
   }
 
   return (
-    <button className={className} onClick={handleShare} type="button">
+    <button className={`${baseClass} ${className}`} onClick={handleShare} type="button">
+      <Icon name="send" size={16} />
       {message}
     </button>
   );

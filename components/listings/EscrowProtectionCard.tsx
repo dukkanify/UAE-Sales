@@ -1,30 +1,34 @@
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 
 const protectionSteps = [
-  "يدفع المشتري قيمة المنتج عبر صفحة الدفع.",
-  "يتم حجز المبلغ في الضمان المالي حتى تأكيد الاستلام.",
-  "يتم تحرير المبلغ للبائع عند تأكيد مطابقة المنتج.",
+  "يدفع المشتري عبر صفحة الدفع الآمنة.",
+  "يُحجز المبلغ في الضمان المالي.",
+  "يُحرَّر المبلغ للبائع بعد تأكيد الاستلام.",
 ];
 
 export function EscrowProtectionCard() {
   return (
-    <Card className="overflow-hidden p-6">
-      <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
-      <h2 className="text-xl font-black text-ink">حماية الدفع</h2>
-      <p className="mt-3 leading-8 text-muted">
-        هذه الواجهة جاهزة لربط رحلة الشراء مع نظام الضمان المالي والمحفظة في
-        المراحل القادمة.
+    <Card className="p-6">
+      <div className="flex items-center gap-2">
+        <span className="grid size-9 place-items-center rounded-[var(--radius-md)] bg-success-soft text-success">
+          <Icon name="shield" size={18} />
+        </span>
+        <h2 className="text-base font-black text-ink">حماية الدفع</h2>
+      </div>
+      <p className="mt-3 text-sm font-medium leading-7 text-muted">
+        كل معاملة محمية بنظام الضمان المالي لحماية حقوق الطرفين.
       </p>
-      <ol className="mt-5 grid gap-3">
+      <ol className="mt-4 grid gap-2">
         {protectionSteps.map((step, index) => (
           <li
             key={step}
-            className="flex gap-3 rounded-2xl border border-secondary/30 bg-secondary-soft p-4 text-sm font-bold text-primary"
+            className="flex gap-3 rounded-[var(--radius-md)] border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-ink"
           >
-            <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-xs text-white">
+            <span className="grid size-6 shrink-0 place-items-center rounded-[var(--radius-sm)] bg-primary text-xs font-bold text-white">
               {index + 1}
             </span>
-            <span>{step}</span>
+            {step}
           </li>
         ))}
       </ol>

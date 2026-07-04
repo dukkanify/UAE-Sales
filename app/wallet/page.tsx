@@ -8,8 +8,9 @@ export default function WalletPage() {
       <SiteHeader />
       <main>
         <ComingSoonPage
-          description="واجهة المحفظة ستعرض الرصيد المتاح، الرصيد المعلق، وسجل العمليات عند ربط خدمات الدفع."
+          description="عرض الرصيد المتاح، الرصيد المعلق، وسجل العمليات."
           eyebrow="المحفظة"
+          icon="wallet"
           title="محفظة المستخدم"
         />
       </main>

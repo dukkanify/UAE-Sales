@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { primaryNavigation } from "@/constants/navigation";
+import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import {
   clearSessionUser,
   getSessionUser,
@@ -15,38 +17,36 @@ export function SiteHeader() {
 
   useEffect(() => {
     const syncSession = () => setUser(getSessionUser());
-
     syncSession();
     window.addEventListener("uae-sales-session-change", syncSession);
-
     return () =>
       window.removeEventListener("uae-sales-session-change", syncSession);
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-surface/80 backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
       <div className="app-container">
-        <div className="flex min-h-[4.25rem] items-center justify-between gap-4">
-          <Link className="flex shrink-0 items-center gap-3" href="/">
-            <span className="relative grid size-10 place-items-center overflow-hidden rounded-xl bg-primary text-xs font-black text-white shadow-[var(--shadow-sm)]">
-              <span className="uae-flag-strip absolute inset-0 opacity-40" />
+        <div className="flex min-h-[4rem] items-center justify-between gap-4">
+          <Link className="flex shrink-0 items-center gap-2.5" href="/">
+            <span className="relative grid size-9 place-items-center overflow-hidden rounded-[var(--radius-md)] bg-primary text-[0.65rem] font-black text-white">
+              <span className="uae-flag-strip absolute inset-0 opacity-30" />
               <span className="relative">UAE</span>
             </span>
             <span className="hidden sm:block">
-              <span className="block text-base font-black tracking-tight text-ink">
+              <span className="block text-sm font-black tracking-tight text-ink">
                 UAE Sales
               </span>
-              <span className="block text-[0.7rem] font-bold text-secondary">
+              <span className="block text-[0.65rem] font-medium text-secondary">
                 سوق إماراتي فاخر
               </span>
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 lg:flex">
             {primaryNavigation.map((item) => (
               <Link
                 key={item.href}
-                className="rounded-lg px-3.5 py-2 text-sm font-bold text-muted transition hover:bg-surface-muted hover:text-ink"
+                className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
                 href={item.href}
               >
                 {item.label}
@@ -56,11 +56,9 @@ export function SiteHeader() {
 
           <form
             action="/search"
-            className="hidden max-w-xs flex-1 items-center gap-2 rounded-xl border border-border bg-surface-muted/60 px-3 md:flex"
+            className="hidden max-w-xs flex-1 items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface-muted/60 px-3 md:flex"
           >
-            <span aria-hidden className="text-muted">
-              ⌕
-            </span>
+            <Icon className="text-muted" name="search" size={16} />
             <input
               aria-label="بحث سريع"
               className="min-h-10 w-full bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted/60"
@@ -73,33 +71,32 @@ export function SiteHeader() {
           <div className="flex items-center gap-2">
             {user ? (
               <Link
-                className="hidden rounded-xl px-3.5 py-2 text-sm font-bold text-ink transition hover:bg-surface-muted sm:inline-flex"
+                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
                 href="/profile"
               >
                 {user.fullName.split(" ")[0]}
               </Link>
             ) : (
               <Link
-                className="hidden rounded-xl px-3.5 py-2 text-sm font-bold text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
+                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
                 href="/login"
               >
                 دخول
               </Link>
             )}
-            <Link
-              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-primary px-4 text-sm font-bold text-white shadow-[var(--shadow-sm)] transition hover:-translate-y-px hover:shadow-[var(--shadow-md)]"
-              href="/listings/new"
-            >
-              أضف إعلان
+            <Link className="hidden sm:block" href="/listings/new">
+              <Button size="sm" variant="primary">
+                أضف إعلان
+              </Button>
             </Link>
             <button
               aria-expanded={menuOpen}
               aria-label="القائمة"
-              className="inline-flex size-10 items-center justify-center rounded-xl border border-border text-ink lg:hidden"
+              className="grid size-10 place-items-center rounded-[var(--radius-md)] border border-border text-ink lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
-              {menuOpen ? "✕" : "☰"}
+              <Icon name={menuOpen ? "close" : "menu"} size={18} />
             </button>
           </div>
         </div>
@@ -110,7 +107,7 @@ export function SiteHeader() {
               {primaryNavigation.map((item) => (
                 <Link
                   key={item.href}
-                  className="rounded-xl px-4 py-3 text-sm font-bold text-ink transition hover:bg-surface-muted"
+                  className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink transition hover:bg-surface-muted"
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -118,25 +115,28 @@ export function SiteHeader() {
                 </Link>
               ))}
               <form action="/search" className="mt-2 px-1">
-                <input
-                  aria-label="بحث"
-                  className="focus-ring w-full rounded-xl border border-border bg-surface px-4 py-3 text-sm"
-                  name="q"
-                  placeholder="ابحث عن أي شيء..."
-                  type="search"
-                />
+                <InputShell />
               </form>
+              <Link
+                className="mt-2 block px-1"
+                href="/listings/new"
+                onClick={() => setMenuOpen(false)}
+              >
+                <Button className="w-full" variant="primary">
+                  أضف إعلان
+                </Button>
+              </Link>
               {user ? (
                 <>
                   <Link
-                    className="rounded-xl px-4 py-3 text-sm font-bold text-ink"
+                    className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
                   >
                     حسابي
                   </Link>
                   <button
-                    className="w-full rounded-xl px-4 py-3 text-right text-sm font-bold text-muted"
+                    className="w-full rounded-[var(--radius-md)] px-4 py-3 text-right text-sm font-medium text-muted"
                     onClick={() => {
                       clearSessionUser();
                       setMenuOpen(false);
@@ -148,7 +148,7 @@ export function SiteHeader() {
                 </>
               ) : (
                 <Link
-                  className="rounded-xl px-4 py-3 text-sm font-bold text-ink"
+                  className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
                   href="/login"
                   onClick={() => setMenuOpen(false)}
                 >
@@ -160,5 +160,20 @@ export function SiteHeader() {
         ) : null}
       </div>
     </header>
+  );
+}
+
+function InputShell() {
+  return (
+    <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-3">
+      <Icon className="text-muted" name="search" size={16} />
+      <input
+        aria-label="بحث"
+        className="min-h-11 w-full bg-transparent text-sm outline-none"
+        name="q"
+        placeholder="ابحث عن أي شيء..."
+        type="search"
+      />
+    </div>
   );
 }

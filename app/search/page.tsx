@@ -1,7 +1,8 @@
 import { cities, countries } from "@/constants/locations";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Badge } from "@/components/ui/Badge";
+import { PageHero } from "@/components/ui/PageHero";
 import { SiteFooter } from "@/layouts/SiteFooter";
 import { SiteHeader } from "@/layouts/SiteHeader";
 import { getCategories } from "@/services/categoriesService";
@@ -11,21 +12,12 @@ type SearchParams = Record<string, string | string[] | undefined>;
 
 function getParam(params: SearchParams, key: string) {
   const value = params[key];
-
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-
-  return value;
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function getNumberParam(params: SearchParams, key: string) {
   const value = getParam(params, key);
-
-  if (!value) {
-    return undefined;
-  }
-
+  if (!value) return undefined;
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : undefined;
 }
@@ -74,30 +66,25 @@ export default async function SearchPage({
     <>
       <SiteHeader />
       <main>
-        <section className="app-container py-12 lg:py-16">
-          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)] md:p-8">
-            <div className="uae-flag-strip mb-6 h-2 w-36 rounded-full" />
-            <SectionHeader
-              eyebrow="بحث متقدم"
-              title="اعثر على الإعلان المناسب بسرعة"
-              description="فلترة احترافية حسب المدينة، القسم، السعر، وحالة المنتج مع دعم الإعلانات المنشورة محلياً في التجربة."
-            />
-          </div>
+        <section className="app-container page-padding">
+          <PageHero
+            description="فلترة دقيقة حسب المدينة والقسم والسعر وحالة المنتج."
+            eyebrow="بحث متقدم"
+            title="اعثر على الإعلان المناسب"
+          />
           <SearchFilters
             categories={categories}
             cities={cities}
             countries={countries}
             selectedFilters={selectedFilters}
           />
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm font-bold text-muted">
-              {listings.length.toLocaleString("ar-AE")} نتيجة من البيانات الأساسية
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-muted">
+              {listings.length.toLocaleString("ar-AE")} نتيجة
             </p>
-            <p className="rounded-full bg-secondary-soft px-4 py-2 text-xs font-black text-primary">
-              الضمان المالي متاح عند الشراء
-            </p>
+            <Badge variant="success">ضمان مالي متاح</Badge>
           </div>
-          <div className="mt-6">
+          <div className="mt-5">
             <SearchResultsList
               categories={categories}
               listings={listings}

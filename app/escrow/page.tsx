@@ -8,9 +8,10 @@ export default function EscrowPage() {
       <SiteHeader />
       <main>
         <ComingSoonPage
-          description="شرح واجهة الضمان المالي جاهز: يتم حجز المبلغ حتى يؤكد المشتري استلام المنتج مطابقاً للمواصفات."
+          description="حجز المبلغ حتى يؤكد المشتري استلام المنتج."
           eyebrow="الضمان المالي"
-          title="حماية الدفع في UAE Sales"
+          icon="shield"
+          title="حماية الدفع"
         />
       </main>
       <SiteFooter />

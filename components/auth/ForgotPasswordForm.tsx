@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { FormMessage } from "@/components/ui/FormMessage";
 import { Input } from "@/components/ui/Input";
 
 export function ForgotPasswordForm() {
@@ -20,16 +21,14 @@ export function ForgotPasswordForm() {
       return;
     }
 
-    setMessage(
-      "تم إرسال رابط إعادة التعيين إلى بريدك. تحقق من صندوق الوارد.",
-    );
+    setMessage("تم إرسال رابط إعادة التعيين إلى بريدك.");
   }
 
   return (
-    <form className="grid gap-5" onSubmit={handleSubmit}>
+    <form className="grid gap-4" onSubmit={handleSubmit}>
       <div>
-        <h2 className="text-2xl font-black text-ink">نسيت كلمة المرور؟</h2>
-        <p className="mt-2 text-sm text-muted">
+        <h2 className="text-xl font-black text-ink">نسيت كلمة المرور؟</h2>
+        <p className="mt-1.5 text-sm font-medium text-muted">
           أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة التعيين.
         </p>
       </div>
@@ -43,21 +42,15 @@ export function ForgotPasswordForm() {
         value={email}
       />
 
-      {error ? (
-        <p className="text-sm font-bold text-accent">{error}</p>
-      ) : null}
-      {message ? (
-        <p className="rounded-xl bg-success-soft p-4 text-sm font-bold text-success">
-          {message}
-        </p>
-      ) : null}
+      {error ? <FormMessage variant="error">{error}</FormMessage> : null}
+      {message ? <FormMessage variant="success">{message}</FormMessage> : null}
 
-      <Button className="w-full" type="submit">
+      <Button fullWidth type="submit" variant="primary">
         إرسال رابط الاستعادة
       </Button>
 
       <Link
-        className="text-center text-sm font-bold text-muted transition hover:text-ink"
+        className="text-center text-sm font-medium text-muted transition hover:text-ink"
         href="/login"
       >
         العودة لتسجيل الدخول

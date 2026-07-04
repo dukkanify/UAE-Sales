@@ -22,9 +22,9 @@ export function Tabs({ activeId, onChange, tabs }: TabsProps) {
           <button
             key={tab.id}
             aria-selected={isActive}
-            className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold transition duration-200 ${
+            className={`inline-flex min-h-9 items-center gap-2 rounded-[var(--radius-md)] px-3.5 py-2 text-sm font-bold transition duration-200 ${
               isActive
-                ? "bg-primary text-white shadow-[var(--shadow-sm)]"
+                ? "bg-primary text-white shadow-[var(--shadow-xs)]"
                 : "bg-surface-muted text-muted hover:text-ink"
             }`}
             onClick={() => onChange(tab.id)}
@@ -34,7 +34,7 @@ export function Tabs({ activeId, onChange, tabs }: TabsProps) {
             {tab.label}
             {typeof tab.count === "number" ? (
               <span
-                className={`rounded-md px-1.5 py-0.5 text-xs ${
+                className={`rounded-[var(--radius-sm)] px-1.5 py-0.5 text-xs font-bold ${
                   isActive ? "bg-white/15" : "bg-surface"
                 }`}
               >

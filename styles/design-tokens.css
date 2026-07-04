@@ -15,6 +15,12 @@
   --color-surface: #ffffff;
   --color-surface-muted: #f3f0ea;
   --color-surface-elevated: #ffffff;
+  --gradient-surface: linear-gradient(
+    135deg,
+    var(--color-secondary-soft) 0%,
+    var(--color-surface) 55%,
+    var(--color-background) 100%
+  );
 
   /* Accent — Elegant UAE Red */
   --color-accent: #c41e3a;
@@ -26,6 +32,10 @@
   /* Success — Modern Emerald */
   --color-success: #10b981;
   --color-success-soft: #ecfdf5;
+
+  /* Error */
+  --color-error: #dc2626;
+  --color-error-soft: #fef2f2;
 
   /* Neutrals */
   --color-ink: #0f1419;
@@ -44,12 +54,12 @@
   --shadow-soft: 0 4px 20px rgb(15 20 25 / 5%);
   --shadow-glow: 0 8px 40px rgb(201 169 98 / 18%);
 
-  /* Radii */
-  --radius-sm: 0.625rem;
-  --radius-md: 0.875rem;
-  --radius-lg: 1.25rem;
-  --radius-xl: 1.75rem;
-  --radius-2xl: 2.25rem;
+  /* Radii — strict scale */
+  --radius-sm: 0.5rem;   /* 8px  — badges, chips */
+  --radius-md: 0.75rem;  /* 12px — buttons, inputs */
+  --radius-lg: 1rem;     /* 16px — cards */
+  --radius-xl: 1.5rem;   /* 24px — hero panels */
+  --radius-2xl: 2rem;    /* 32px — feature blocks */
 
   /* Motion */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
@@ -59,5 +69,6 @@
 
   /* Layout */
   --container-width: 1280px;
+  --section-gap: clamp(3.5rem, 7vw, 6rem);
   --font-arabic: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
 }

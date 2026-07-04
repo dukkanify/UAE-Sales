@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { ListingCard } from "@/components/listings/ListingCard";
+import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 type FeaturedListingsProps = {
@@ -21,19 +22,17 @@ export function FeaturedListings({
       <div className="app-container">
         <SectionHeader
           action={
-            <Link
-              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-primary px-5 text-sm font-bold text-white transition hover:-translate-y-px"
-              href="/featured"
-            >
-              عرض المميز
+            <Link href="/featured">
+              <Button size="sm" variant="primary">
+                عرض المميز
+              </Button>
             </Link>
           }
-          description="إعلانات مختارة بعناية من بائعين موثوقين مع ضمان مالي كامل."
-          eyebrow="إعلانات مميزة"
-          title="أفضل العروض الآن"
+          description="إعلانات مختارة من بائعين موثوقين."
+          eyebrow="مميز"
+          title="أفضل العروض"
         />
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.slice(0, 8).map((listing) => (
             <ListingCard
               key={listing.id}

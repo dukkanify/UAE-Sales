@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 
 type FavoriteButtonProps = {
   ariaLabel?: string;
@@ -8,24 +9,27 @@ type FavoriteButtonProps = {
   label?: string;
 };
 
+const baseClass =
+  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-4 text-sm font-bold text-ink transition";
+
 export function FavoriteButton({
   ariaLabel = "إضافة إلى المفضلة",
   className = "",
-  label = "إضافة للمفضلة",
+  label = "مفضلة",
 }: FavoriteButtonProps) {
   const [isFavorite, setIsFavorite] = useState(false);
-  const text = label ? (isFavorite ? "♥ تمت الإضافة" : `♡ ${label}`) : isFavorite ? "♥" : "♡";
 
   return (
     <button
       aria-label={ariaLabel}
       aria-pressed={isFavorite}
-      className={className}
+      className={`${baseClass} ${isFavorite ? "border-accent/30 bg-accent-soft text-accent" : ""} ${className}`}
       onClick={() => setIsFavorite((current) => !current)}
       title={ariaLabel}
       type="button"
     >
-      {text}
+      <Icon name="heart" size={16} />
+      {label ? (isFavorite ? "تمت الإضافة" : label) : null}
     </button>
   );
 }

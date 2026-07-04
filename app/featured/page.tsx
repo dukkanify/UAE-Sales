@@ -1,5 +1,5 @@
 import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { SectionHeader } from "@/components/ui/SectionHeader";
+import { PageHero } from "@/components/ui/PageHero";
 import { SiteFooter } from "@/layouts/SiteFooter";
 import { SiteHeader } from "@/layouts/SiteHeader";
 import { getCategories } from "@/services/categoriesService";
@@ -15,11 +15,11 @@ export default async function FeaturedPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="app-container py-12">
-          <SectionHeader
-            eyebrow="الإعلانات المميزة"
-            title="أفضل عروض UAE Sales"
-            description="إعلانات مختارة بتجربة عرض احترافية وهوية إماراتية واضحة."
+        <section className="app-container page-padding">
+          <PageHero
+            description="إعلانات مختارة بعناية من بائعين موثوقين مع ضمان مالي كامل."
+            eyebrow="إعلانات مميزة"
+            title="أفضل العروض"
           />
           <SearchResultsList categories={categories} listings={listings} />
         </section>

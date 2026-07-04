@@ -3,7 +3,9 @@ import type { Category, Listing } from "@/types";
 import { FavoriteButton } from "@/components/common/FavoriteButton";
 import { ShareButton } from "@/components/common/ShareButton";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 
 type ListingSummaryProps = {
   category?: Category;
@@ -22,60 +24,55 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
   return (
-    <Card className="overflow-hidden p-6">
-      <div className="uae-flag-strip -mx-6 -mt-6 mb-6 h-2" />
-      <div className="flex flex-wrap items-center gap-3">
-        {category ? <Badge>{category.name}</Badge> : null}
-        <span className="rounded-full bg-secondary-soft px-3 py-1 text-xs font-black text-primary">
-          الحالة: {conditionLabels[listing.condition]}
-        </span>
-        <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-black text-uae-red">
-          ضمان مالي 100%
-        </span>
+    <Card className="p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        {category ? <Badge variant="gold">{category.name}</Badge> : null}
+        <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
+        <Badge variant="success">ضمان مالي</Badge>
       </div>
 
-      <h1 className="mt-5 text-3xl font-black leading-tight text-ink md:text-4xl">
+      <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
         {listing.title}
       </h1>
-      <p className="mt-5 text-4xl font-black text-primary">
-        {priceFormatter.format(listing.price)} د.إ
+
+      <p className="mt-4 text-3xl font-black text-accent">
+        {priceFormatter.format(listing.price)}{" "}
+        <span className="text-sm font-medium text-muted">د.إ</span>
       </p>
 
-      <div className="mt-6 grid gap-3 rounded-3xl border border-border bg-surface-muted p-4 text-sm font-bold text-muted sm:grid-cols-2">
-        <div>
-          <span className="block text-xs text-muted">الموقع</span>
-          <span className="mt-1 block text-ink">
-            {listing.city}، {listing.country}
+      <div className="mt-5 grid gap-2 rounded-[var(--radius-md)] border border-border bg-surface-muted p-4 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-muted">الموقع</span>
+          <span className="inline-flex items-center gap-1 font-bold text-ink">
+            <Icon name="map" size={14} />
+            {listing.city}
           </span>
         </div>
-        <div>
-          <span className="block text-xs text-muted">حالة الإعلان</span>
-          <span className="mt-1 block text-ink">نشط + محمي بالضمان</span>
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-muted">المشاهدات</span>
+          <span className="inline-flex items-center gap-1 font-bold text-ink">
+            <Icon name="eye" size={14} />
+            {listing.views.toLocaleString("ar-AE")}
+          </span>
         </div>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <Link
-          href={`/checkout?listing=${listing.slug}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary shadow-[var(--shadow-soft)] transition hover:bg-primary hover:text-white"
-        >
-          شراء الآن
+      <div className="mt-5 grid gap-2 sm:grid-cols-2">
+        <Link href={`/checkout?listing=${listing.slug}`}>
+          <Button className="w-full" variant="accent">
+            شراء الآن
+          </Button>
         </Link>
-        <Link
-          href={`/chat?listing=${listing.slug}`}
-          className="inline-flex min-h-12 items-center justify-center rounded-full border border-secondary/50 bg-white px-5 py-3 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
-        >
-          محادثة البائع
+        <Link href={`/chat?listing=${listing.slug}`}>
+          <Button className="w-full" variant="secondary">
+            محادثة البائع
+          </Button>
         </Link>
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <FavoriteButton
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
-        />
-        <ShareButton
-          className="inline-flex min-h-11 items-center justify-center rounded-full border border-border bg-white px-5 py-2.5 text-sm font-black text-ink transition hover:border-secondary hover:bg-secondary-soft"
-          title={listing.title}
-        />
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <FavoriteButton className="w-full" />
+        <ShareButton className="w-full" title={listing.title} />
       </div>
     </Card>
   );

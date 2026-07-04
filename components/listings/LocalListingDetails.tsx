@@ -7,7 +7,9 @@ import { EscrowProtectionCard } from "@/components/listings/EscrowProtectionCard
 import { ListingGallery } from "@/components/listings/ListingGallery";
 import { ListingSummary } from "@/components/listings/ListingSummary";
 import { SellerPanel } from "@/components/listings/SellerPanel";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { getLocalListingById } from "@/services/clientStorage";
 
 type LocalListingDetailsProps = {
@@ -25,43 +27,41 @@ export function LocalListingDetails({
     const timeoutId = window.setTimeout(() => {
       setListing(getLocalListingById(listingId) ?? null);
     }, 0);
-
     return () => window.clearTimeout(timeoutId);
   }, [listingId]);
 
   if (!listing) {
     return (
-      <Card className="p-8 text-center">
-        <h1 className="text-2xl font-black text-ink">الإعلان غير موجود</h1>
-        <p className="mt-3 text-muted">
-          ربما تم حذف الإعلان من التخزين المحلي في هذا المتصفح.
-        </p>
-        <Link
-          className="mt-6 inline-flex rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
-          href="/dashboard/listings"
-        >
-          العودة إلى إعلاناتي
-        </Link>
-      </Card>
+      <EmptyState
+        actionHref="/dashboard/listings"
+        actionLabel="إعلاناتي"
+        description="الإعلان غير موجود في هذا المتصفح."
+        icon="package"
+        title="الإعلان غير موجود"
+      />
     );
   }
 
   const category = categories.find((item) => item.id === listing.categoryId);
 
   return (
-    <div className="grid gap-8">
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-        <ListingGallery listing={listing} />
-        <div className="grid gap-5">
-          <ListingSummary category={category} listing={listing} />
-          <SellerPanel listing={listing} />
-          <EscrowProtectionCard />
-        </div>
+    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+      <ListingGallery listing={listing} />
+      <div className="grid gap-4">
+        <ListingSummary category={category} listing={listing} />
+        <SellerPanel listing={listing} />
+        <EscrowProtectionCard />
       </div>
-
-      <Card className="p-6">
-        <h2 className="text-2xl font-black text-ink">وصف الإعلان</h2>
-        <p className="mt-3 leading-9 text-muted">{listing.description}</p>
+      <Card className="p-6 lg:col-span-2">
+        <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
+        <p className="mt-3 text-sm font-medium leading-8 text-muted">
+          {listing.description}
+        </p>
+        <Link className="mt-4 inline-block" href={`/listings/local/${listingId}/edit`}>
+          <Button size="sm" variant="secondary">
+            تعديل الإعلان
+          </Button>
+        </Link>
       </Card>
     </div>
   );

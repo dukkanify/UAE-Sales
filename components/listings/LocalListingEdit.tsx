@@ -39,7 +39,7 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         actionHref="/dashboard/listings"
         actionLabel="العودة إلى إعلاناتي"
         description="الإعلان غير موجود في هذا المتصفح. ربما تم حذفه أو لم يُحفظ بعد."
-        icon="🔍"
+        icon="search"
         title="الإعلان غير موجود"
       />
     );

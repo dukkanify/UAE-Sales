@@ -8,9 +8,10 @@ export default function ChatPage() {
       <SiteHeader />
       <main>
         <ComingSoonPage
-          description="واجهة المحادثة جاهزة للربط لاحقاً لتمكين التواصل بين البائع والمشتري قبل إتمام الطلب."
+          description="تواصل مع البائع قبل إتمام الطلب."
           eyebrow="المحادثات"
-          title="محادثة البائع"
+          icon="message"
+          title="المحادثات"
         />
       </main>
       <SiteFooter />

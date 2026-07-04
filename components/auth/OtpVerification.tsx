@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { FormMessage } from "@/components/ui/FormMessage";
 
 type OtpVerificationProps = {
   identifier: string;
@@ -13,18 +15,18 @@ export function OtpVerification({
   onBack,
   onVerified,
 }: OtpVerificationProps) {
-  const [statusMessage, setStatusMessage] = useState(
-    "أدخل رمز التحقق للمتابعة. في نسخة الديمو يمكنك استخدام أي 6 أرقام.",
-  );
+  const [statusMessage, setStatusMessage] = useState("");
 
   return (
-    <div className="grid gap-5">
+    <div className="grid gap-4">
       <div>
-        <p className="text-sm font-bold text-primary">التحقق بخطوتين</p>
-        <h2 className="mt-2 text-2xl font-black text-ink">أدخل رمز OTP</h2>
-        <p className="mt-3 leading-8 text-muted">
-          سيتم استخدام هذه الخطوة لحماية حسابك ومعاملاتك. أرسلنا الرمز إلى:
-          <span className="mx-1 font-black text-ink">{identifier}</span>
+        <p className="text-xs font-bold tracking-wide text-secondary uppercase">
+          التحقق
+        </p>
+        <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز OTP</h2>
+        <p className="mt-2 text-sm font-medium text-muted">
+          أرسلنا الرمز إلى{" "}
+          <span className="font-bold text-ink">{identifier}</span>
         </p>
       </div>
 
@@ -32,8 +34,8 @@ export function OtpVerification({
         {Array.from({ length: 6 }).map((_, index) => (
           <input
             key={index}
-            aria-label={`OTP digit ${index + 1}`}
-            className="focus-ring h-14 rounded-2xl border border-border bg-white text-center text-xl font-black text-ink"
+            aria-label={`رقم ${index + 1}`}
+            className="focus-ring h-12 rounded-[var(--radius-md)] border border-border bg-surface text-center text-lg font-black text-ink shadow-[var(--shadow-xs)]"
             inputMode="numeric"
             maxLength={1}
             pattern="[0-9]*"
@@ -42,28 +44,32 @@ export function OtpVerification({
         ))}
       </div>
 
-      <button
-        className="inline-flex min-h-12 items-center justify-center rounded-full bg-secondary px-5 py-3 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
+      <Button
+        fullWidth
         onClick={() => {
           setStatusMessage("تم التحقق بنجاح.");
           onVerified?.();
         }}
         type="button"
+        variant="primary"
       >
         تأكيد الرمز
-      </button>
-      <p className="text-sm font-bold text-muted">{statusMessage}</p>
+      </Button>
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-sm font-bold text-muted">
+      {statusMessage ? (
+        <FormMessage variant="success">{statusMessage}</FormMessage>
+      ) : null}
+
+      <div className="flex items-center justify-between text-sm font-medium">
         <button
           className="text-primary"
-          onClick={() => setStatusMessage("تم إرسال رمز جديد في تجربة الديمو.")}
+          onClick={() => setStatusMessage("تم إرسال رمز جديد.")}
           type="button"
         >
-          إعادة إرسال الرمز
+          إعادة الإرسال
         </button>
         <button
-          className="text-muted transition hover:text-primary"
+          className="text-muted transition hover:text-ink"
           onClick={onBack}
           type="button"
         >

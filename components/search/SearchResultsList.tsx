@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/components/listings/ListingCard";
-import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ListingCardSkeleton } from "@/components/ui/Skeleton";
 import { getLocalListings } from "@/services/clientStorage";
 
 type SearchResultsListProps = {
@@ -29,9 +30,11 @@ export function SearchResultsList({
   selectedFilters = {},
 }: SearchResultsListProps) {
   const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
   );
+
   const visibleListings = useMemo(() => {
     const normalizedQuery = selectedFilters.query?.trim().toLowerCase();
     const minPrice = selectedFilters.minPrice
@@ -71,60 +74,50 @@ export function SearchResultsList({
           : true,
       )
       .filter((listing) => {
-        if (!normalizedQuery) {
-          return true;
-        }
-
+        if (!normalizedQuery) return true;
         return [listing.title, listing.description, listing.city, listing.seller.name]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery);
       });
 
-    const combinedListings = [...matchingLocalListings, ...listings];
-
-    return combinedListings.sort((first, second) => {
-      if (selectedFilters.sort === "price_asc") {
-        return first.price - second.price;
-      }
-
-      if (selectedFilters.sort === "price_desc") {
-        return second.price - first.price;
-      }
-
-      return second.id.localeCompare(first.id);
+    return [...matchingLocalListings, ...listings].sort((a, b) => {
+      if (selectedFilters.sort === "price_asc") return a.price - b.price;
+      if (selectedFilters.sort === "price_desc") return b.price - a.price;
+      return b.id.localeCompare(a.id);
     });
   }, [categoryId, listings, localListings, selectedFilters]);
 
   useEffect(() => {
     const syncLocalListings = () => setLocalListings(getLocalListings());
-
     syncLocalListings();
+    const timeoutId = window.setTimeout(() => setIsLoading(false), 300);
     window.addEventListener("uae-sales-listings-change", syncLocalListings);
-
-    return () =>
+    return () => {
+      window.clearTimeout(timeoutId);
       window.removeEventListener("uae-sales-listings-change", syncLocalListings);
+    };
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <ListingCardSkeleton key={index} />
+        ))}
+      </div>
+    );
+  }
 
   if (visibleListings.length === 0) {
     return (
-      <Card className="p-8 text-center">
-        <div className="mx-auto grid size-16 place-items-center rounded-3xl bg-primary-soft text-3xl">
-          🔎
-        </div>
-        <h2 className="mt-5 text-2xl font-black text-ink">
-          لا توجد نتائج مطابقة
-        </h2>
-        <p className="mt-3 leading-8 text-muted">
-          جرّب تعديل المدينة أو التصنيف أو نطاق السعر لعرض إعلانات أكثر.
-        </p>
-        <a
-          href="/search"
-          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-secondary px-5 py-2.5 text-sm font-black text-primary transition hover:bg-primary hover:text-white"
-        >
-          عرض كل الإعلانات
-        </a>
-      </Card>
+      <EmptyState
+        actionHref="/search"
+        actionLabel="عرض كل الإعلانات"
+        description="جرّب تعديل الفلاتر أو البحث بكلمات مختلفة."
+        icon="search"
+        title="لا توجد نتائج"
+      />
     );
   }
 

@@ -12,7 +12,7 @@ export function Input({ className = "", hint, label, ...props }: InputProps) {
         <span className="text-sm font-bold text-ink">{label}</span>
       ) : null}
       <input
-        className={`focus-ring min-h-12 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/70 ${className}`}
+        className={`focus-ring min-h-11 rounded-[var(--radius-md)] border border-border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 ${className}`}
         {...props}
       />
       {hint ? (

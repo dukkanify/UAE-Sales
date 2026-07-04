@@ -1,67 +1,37 @@
 import { Card } from "@/components/ui/Card";
+import { Icon } from "@/components/ui/Icon";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const reasons = [
-  {
-    description:
-      "هوية بصرية فاخرة وتجربة استخدام سلسة مصممة خصيصاً للسوق الإماراتي.",
-    icon: "✦",
-    title: "تصميم عالمي المستوى",
-  },
-  {
-    description:
-      "كل معاملة محمية بنظام ضمان مالي يحجز المبلغ حتى تأكيد الاستلام.",
-    icon: "🛡",
-    title: "ضمان مالي حقيقي",
-  },
-  {
-    description:
-      "تحقق من الهوية عبر OTP وUAE PASS لبناء مجتمع بائعين ومشترين موثوقين.",
-    icon: "✓",
-    title: "بائعون موثقون",
-  },
-  {
-    description:
-      "فريق دعم متاح على مدار الساعة لحل أي استفسار أو نزاع بسرعة.",
-    icon: "💬",
-    title: "دعم احترافي 24/7",
-  },
-  {
-    description:
-      "محفظة رقمية آمنة لإدارة الأرصدة والسحوبات والمعاملات بسهولة.",
-    icon: "💳",
-    title: "محفظة رقمية",
-  },
-  {
-    description:
-      "واجهة عربية كاملة مع دعم RTL مثالي لجميع الأجهزة والشاشات.",
-    icon: "🌐",
-    title: "عربي بالكامل",
-  },
+  { description: "تجربة استخدام سلسة مصممة للسوق الإماراتي.", icon: "star" as const, title: "تصميم عالمي" },
+  { description: "كل معاملة محمية بنظام ضمان مالي.", icon: "shield" as const, title: "ضمان حقيقي" },
+  { description: "تحقق عبر OTP وUAE PASS.", icon: "check" as const, title: "بائعون موثقون" },
+  { description: "فريق دعم متاح على مدار الساعة.", icon: "message" as const, title: "دعم 24/7" },
+  { description: "محفظة رقمية آمنة لإدارة الأرصدة.", icon: "wallet" as const, title: "محفظة رقمية" },
+  { description: "واجهة عربية كاملة مع RTL مثالي.", icon: "home" as const, title: "عربي بالكامل" },
 ];
 
 export function WhyUaeSales() {
   return (
-    <section className="section-padding bg-surface-muted/40">
+    <section className="section-padding bg-surface-muted/50">
       <div className="app-container">
         <SectionHeader
           align="center"
-          description="لماذا يختار آلاف المستخدمين UAE Sales لبيع وشراء منتجاتهم؟"
-          eyebrow="لماذا UAE Sales"
-          title="سوق مختلف عن البقية"
+          description="لماذا يختار آلاف المستخدمين UAE Sales."
+          eyebrow="لماذا نحن"
+          title="سوق مختلف"
         />
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {reasons.map((reason) => (
-            <Card
-              key={reason.title}
-              className="p-6 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-md)]"
-            >
-              <span className="grid size-10 place-items-center rounded-xl bg-primary text-sm font-black text-white">
-                {reason.icon}
+            <Card key={reason.title} className="p-5" interactive>
+              <span className="grid size-9 place-items-center rounded-[var(--radius-md)] bg-primary text-white">
+                <Icon name={reason.icon} size={16} />
               </span>
-              <h3 className="mt-4 text-base font-black text-ink">{reason.title}</h3>
-              <p className="mt-2 text-sm leading-7 text-muted">{reason.description}</p>
+              <h3 className="mt-3 text-sm font-black text-ink">{reason.title}</h3>
+              <p className="mt-1.5 text-xs font-medium leading-6 text-muted">
+                {reason.description}
+              </p>
             </Card>
           ))}
         </div>

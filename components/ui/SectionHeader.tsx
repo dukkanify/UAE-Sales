@@ -19,7 +19,7 @@ export function SectionHeader({
 
   return (
     <div
-      className={`mb-10 flex flex-col gap-5 md:mb-12 ${
+      className={`mb-8 flex flex-col gap-4 md:mb-10 ${
         isCenter
           ? "items-center text-center"
           : "md:flex-row md:items-end md:justify-between"
@@ -27,15 +27,15 @@ export function SectionHeader({
     >
       <div className={isCenter ? "max-w-2xl" : "max-w-xl"}>
         {eyebrow ? (
-          <p className="mb-3 inline-flex items-center gap-2 rounded-lg border border-secondary/20 bg-secondary-soft px-3 py-1.5 text-xs font-bold text-primary">
+          <p className="mb-2 text-xs font-bold tracking-wide text-secondary uppercase">
             {eyebrow}
           </p>
         ) : null}
-        <h2 className="text-3xl font-black tracking-tight text-ink md:text-4xl lg:text-[2.75rem] lg:leading-tight">
+        <h2 className="text-2xl font-black tracking-tight text-ink md:text-3xl">
           {title}
         </h2>
         {description ? (
-          <p className="mt-3 text-base leading-8 text-muted md:text-lg">
+          <p className="mt-2 text-base font-medium leading-8 text-muted">
             {description}
           </p>
         ) : null}
