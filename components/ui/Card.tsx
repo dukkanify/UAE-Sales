@@ -1,15 +1,31 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
+type CardVariant = "default" | "elevated" | "glass" | "flat";
+
 type CardProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
+  variant?: CardVariant;
 };
 
-export function Card({ children, className = "", ...props }: CardProps) {
+const variantClasses: Record<CardVariant, string> = {
+  default:
+    "rounded-[var(--radius-lg)] border border-border bg-surface shadow-[var(--shadow-card)]",
+  elevated:
+    "rounded-[var(--radius-xl)] border border-border bg-surface-elevated shadow-[var(--shadow-lg)]",
+  glass:
+    "glass-panel rounded-[var(--radius-lg)]",
+  flat:
+    "rounded-[var(--radius-lg)] border border-border bg-surface",
+};
+
+export function Card({
+  children,
+  className = "",
+  variant = "default",
+  ...props
+}: CardProps) {
   return (
-    <div
-      className={`rounded-[var(--radius-lg)] border border-white/75 bg-white/90 shadow-[var(--shadow-card)] backdrop-blur-xl ${className}`}
-      {...props}
-    >
+    <div className={`${variantClasses[variant]} ${className}`} {...props}>
       {children}
     </div>
   );

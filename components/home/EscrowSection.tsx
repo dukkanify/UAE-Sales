@@ -1,51 +1,66 @@
+import Link from "next/link";
 import { Card } from "@/components/ui/Card";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 
 const escrowSteps = [
   {
+    description: "يتم حجز المبلغ في حساب الضمان حتى تأكيد الاستلام.",
+    icon: "🔒",
     title: "ادفع بأمان",
-    description: "المبلغ محجوز في الضمان المالي",
   },
   {
+    description: "تواصل مع البائع واستلم منتجك بكل راحة.",
+    icon: "📦",
     title: "استلم المنتج",
-    description: "تستلم المنتج وتتحقق منه",
   },
   {
+    description: "راجع المنتج وأكد أنه مطابق للوصف.",
+    icon: "✓",
     title: "أكد الاستلام",
-    description: "تأكد أن كل شيء مطابق",
   },
   {
-    title: "يتم تحويل المبلغ",
-    description: "تحويل المبلغ للبائع بأمان",
+    description: "يُحوَّل المبلغ للبائع بعد تأكيدك أو انتهاء المهلة.",
+    icon: "💰",
+    title: "تحرير المبلغ",
   },
 ];
 
 export function EscrowSection() {
   return (
-    <section className="app-container py-8">
-      <div className="overflow-hidden rounded-2xl border border-secondary/25 bg-[linear-gradient(135deg,#fff8ed,#fffdf8)] p-5 shadow-[var(--shadow-soft)] md:p-6">
-        <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h2 className="text-2xl font-black text-primary">
-              كيف يعمل الضمان المالي؟
-            </h2>
-            <p className="mt-1 text-sm font-bold text-muted">
-              حمايتك في كل خطوة من عملية الشراء
-            </p>
-          </div>
-          <span className="rounded-full bg-secondary-soft px-4 py-2 text-xs font-black text-primary">
-            ضمان مالي 100%
-          </span>
-        </div>
-        <div className="grid gap-4 md:grid-cols-4">
+    <section className="section-padding">
+      <div className="app-container">
+        <SectionHeader
+          align="center"
+          description="نظام ضمان مالي يحمي حقوق المشتري والبائع في كل معاملة."
+          eyebrow="الضمان المالي"
+          title="تسوّق بثقة تامة"
+        />
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {escrowSteps.map((step, index) => (
-            <Card key={step.title} className="border-white bg-white p-5 text-center shadow-sm">
-              <span className="mx-auto grid size-10 place-items-center rounded-full bg-secondary text-sm font-black text-primary">
-                {index + 1}
+            <Card
+              key={step.title}
+              className="group p-6 text-center transition hover:-translate-y-1 hover:shadow-[var(--shadow-md)]"
+            >
+              <span className="mx-auto grid size-12 place-items-center rounded-xl bg-secondary-soft text-xl transition group-hover:scale-105">
+                {step.icon}
               </span>
-              <h3 className="mt-4 text-base font-black text-primary">{step.title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted">{step.description}</p>
+              <span className="mt-4 block text-xs font-bold text-secondary">
+                الخطوة {index + 1}
+              </span>
+              <h3 className="mt-2 text-base font-black text-ink">{step.title}</h3>
+              <p className="mt-2 text-sm leading-7 text-muted">{step.description}</p>
             </Card>
           ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link
+            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-border px-6 text-sm font-bold text-ink transition hover:bg-surface-muted"
+            href="/escrow"
+          >
+            تعرّف على الضمان المالي
+          </Link>
         </div>
       </div>
     </section>

@@ -1,24 +1,35 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
+  size?: "sm" | "md" | "lg";
   variant?: ButtonVariant;
 };
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-secondary text-primary shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-primary hover:text-white",
+    "bg-primary text-white shadow-[var(--shadow-sm)] hover:-translate-y-px hover:shadow-[var(--shadow-md)] active:translate-y-0",
   secondary:
-    "border border-secondary/45 bg-white/90 text-primary shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-secondary hover:text-primary",
-  ghost: "text-muted hover:bg-secondary-soft hover:text-primary",
+    "border border-border bg-surface text-ink shadow-[var(--shadow-xs)] hover:-translate-y-px hover:border-secondary/50 hover:shadow-[var(--shadow-sm)]",
+  ghost:
+    "text-muted hover:bg-surface-muted hover:text-ink",
+  accent:
+    "bg-secondary text-primary shadow-[var(--shadow-glow)] hover:-translate-y-px hover:bg-primary hover:text-white",
+};
+
+const sizeClasses = {
+  sm: "min-h-9 px-4 py-2 text-xs",
+  md: "min-h-11 px-5 py-2.5 text-sm",
+  lg: "min-h-[3.25rem] px-7 py-3.5 text-base",
 };
 
 export function Button({
   children,
   className = "",
-  variant = "primary",
+  size = "md",
+  variant = "accent",
   ...props
 }: ButtonProps) {
   const content =
@@ -28,7 +39,7 @@ export function Button({
 
   return (
     <button
-      className={`focus-ring inline-flex min-h-12 items-center justify-center rounded-full px-6 py-3 text-sm font-black transition duration-200 ${variantClasses[variant]} ${className}`}
+      className={`focus-ring inline-flex items-center justify-center gap-2 rounded-xl font-bold transition duration-200 ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
       {...props}
     >
       {content}

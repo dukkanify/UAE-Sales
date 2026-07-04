@@ -1,17 +1,23 @@
 import type { InputHTMLAttributes } from "react";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+  hint?: string;
   label?: string;
 };
 
-export function Input({ className = "", label, ...props }: InputProps) {
+export function Input({ className = "", hint, label, ...props }: InputProps) {
   return (
-    <label className="grid gap-2 text-sm font-black text-ink">
-      {label ? <span>{label}</span> : null}
+    <label className="grid gap-1.5">
+      {label ? (
+        <span className="text-sm font-bold text-ink">{label}</span>
+      ) : null}
       <input
-        className={`focus-ring min-h-[3.25rem] rounded-2xl border border-border bg-white/90 px-4 text-sm font-bold text-ink shadow-sm placeholder:text-muted ${className}`}
+        className={`focus-ring min-h-12 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/70 ${className}`}
         {...props}
       />
+      {hint ? (
+        <span className="text-xs font-medium text-muted">{hint}</span>
+      ) : null}
     </label>
   );
 }

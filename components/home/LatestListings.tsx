@@ -3,34 +3,31 @@ import type { Listing } from "@/types";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
-type FeaturedListingsProps = {
+type LatestListingsProps = {
   categories: { id: string; name: string }[];
   listings: Listing[];
 };
 
-export function FeaturedListings({
-  categories,
-  listings,
-}: FeaturedListingsProps) {
+export function LatestListings({ categories, listings }: LatestListingsProps) {
   const categoryMap = new Map(
     categories.map((category) => [category.id, category.name]),
   );
 
   return (
-    <section className="section-padding">
+    <section className="section-padding bg-surface-muted/40">
       <div className="app-container">
         <SectionHeader
           action={
             <Link
-              className="inline-flex min-h-10 items-center justify-center rounded-xl bg-primary px-5 text-sm font-bold text-white transition hover:-translate-y-px"
-              href="/featured"
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border px-5 text-sm font-bold text-ink transition hover:bg-surface"
+              href="/search"
             >
-              عرض المميز
+              عرض الكل
             </Link>
           }
-          description="إعلانات مختارة بعناية من بائعين موثوقين مع ضمان مالي كامل."
-          eyebrow="إعلانات مميزة"
-          title="أفضل العروض الآن"
+          description="أحدث الإعلانات المنشورة في السوق — محدّثة باستمرار."
+          eyebrow="وصل للتو"
+          title="أحدث الإعلانات"
         />
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

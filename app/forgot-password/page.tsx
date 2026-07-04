@@ -1,4 +1,5 @@
-import { ComingSoonPage } from "@/components/common/ComingSoonPage";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { ForgotPasswordForm } from "@/components/auth/ForgotPasswordForm";
 import { SiteFooter } from "@/layouts/SiteFooter";
 import { SiteHeader } from "@/layouts/SiteHeader";
 
@@ -7,13 +8,17 @@ export default function ForgotPasswordPage() {
     <>
       <SiteHeader />
       <main>
-        <ComingSoonPage
-          actionHref="/login"
-          actionLabel="العودة لتسجيل الدخول"
-          description="استعادة كلمة المرور ستستخدم OTP على رقم الهاتف أو البريد عند ربط خدمة المصادقة."
-          eyebrow="استعادة الحساب"
-          title="نسيت كلمة المرور؟"
-        />
+        <AuthShell
+          description="استعد الوصول إلى حسابك بخطوات بسيطة وآمنة عبر البريد الإلكتروني."
+          footerAction={{
+            href: "/register",
+            label: "إنشاء حساب",
+            prompt: "ليس لديك حساب؟",
+          }}
+          title="استعادة الحساب"
+        >
+          <ForgotPasswordForm />
+        </AuthShell>
       </main>
       <SiteFooter />
     </>

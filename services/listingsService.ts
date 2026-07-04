@@ -29,6 +29,12 @@ export async function getFeaturedListings() {
   return mockListings.filter((listing) => listing.isFeatured);
 }
 
+export async function getLatestListings() {
+  return mockListings
+    .filter((listing) => listing.status === "active")
+    .slice(0, 12);
+}
+
 export async function getRelatedListings(categoryId: string, excludedId: string) {
   return mockListings
     .filter((listing) => listing.status === "active")

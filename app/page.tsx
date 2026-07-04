@@ -1,42 +1,49 @@
+import { AppDownload } from "@/components/home/AppDownload";
 import { CategoriesGrid } from "@/components/home/CategoriesGrid";
 import { EscrowSection } from "@/components/home/EscrowSection";
 import { FeaturedListings } from "@/components/home/FeaturedListings";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { LatestListings } from "@/components/home/LatestListings";
+import { PopularCities } from "@/components/home/PopularCities";
 import { SearchHero } from "@/components/home/SearchHero";
-import { TrustSafetySection } from "@/components/home/TrustSafetySection";
+import { StatsSection } from "@/components/home/StatsSection";
+import { Testimonials } from "@/components/home/Testimonials";
+import { WhyUaeSales } from "@/components/home/WhyUaeSales";
 import { SiteFooter } from "@/layouts/SiteFooter";
 import { SiteHeader } from "@/layouts/SiteHeader";
 import { getCategories } from "@/services/categoriesService";
-import { getFeaturedListings } from "@/services/listingsService";
+import {
+  getFeaturedListings,
+  getLatestListings,
+} from "@/services/listingsService";
 
 export default async function Home() {
-  const [categories, featuredListings] = await Promise.all([
+  const [categories, featuredListings, latestListings] = await Promise.all([
     getCategories(),
     getFeaturedListings(),
+    getLatestListings(),
   ]);
+
+  const categoryMeta = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+  }));
 
   return (
     <>
       <SiteHeader />
       <main>
         <SearchHero categories={categories} />
+        <StatsSection />
         <CategoriesGrid categories={categories} />
-        <FeaturedListings listings={featuredListings} />
+        <FeaturedListings categories={categoryMeta} listings={featuredListings} />
+        <LatestListings categories={categoryMeta} listings={latestListings} />
         <EscrowSection />
-        <TrustSafetySection />
-        <section className="app-container py-8">
-          <div className="luxury-gradient relative grid overflow-hidden rounded-[var(--radius-xl)] p-6 text-white shadow-[var(--shadow-glow)] md:grid-cols-3 md:p-8">
-            <div className="absolute -left-20 -top-20 size-72 rounded-full bg-primary/20 blur-3xl" />
-            <div>
-              <p className="text-sm font-bold text-secondary">جاهز للربط</p>
-              <h2 className="mt-2 text-2xl font-black">طبقة API منظمة</h2>
-            </div>
-            <p className="leading-8 text-white/75 md:col-span-2">
-              تم فصل واجهات العرض عن مصادر البيانات عبر services قابلة للتبديل
-              بين mock data وواجهات backend للإعلانات، التصنيفات، الطلبات،
-              المحفظة، والدردشة.
-            </p>
-          </div>
-        </section>
+        <WhyUaeSales />
+        <HowItWorks />
+        <PopularCities />
+        <Testimonials />
+        <AppDownload />
       </main>
       <SiteFooter />
     </>

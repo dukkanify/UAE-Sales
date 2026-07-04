@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
+import { Tajawal } from "next/font/google";
 import "./globals.css";
 
+const tajawal = Tajawal({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-tajawal",
+});
+
 export const metadata: Metadata = {
-  title: "UAE Sales | السوق الإماراتي الآمن",
+  title: "UAE Sales | السوق الإماراتي الفاخر",
   description:
-    "منصة إعلانات مبوبة بهوية إماراتية للبيع والشراء داخل الإمارات مع حماية الدفع، المحفظة، الدردشة، وإدارة الإعلانات.",
+    "منصة إعلانات مبوبة فاخرة بهوية إماراتية — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
 };
 
 export default function RootLayout({
@@ -13,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
-      <body>{children}</body>
+    <html className={tajawal.variable} lang="ar" dir="rtl">
+      <body className={tajawal.className}>{children}</body>
     </html>
   );
 }

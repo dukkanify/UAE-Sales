@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import { Card } from "@/components/ui/Card";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 type CategoriesGridProps = {
@@ -8,39 +7,46 @@ type CategoriesGridProps = {
 };
 
 export function CategoriesGrid({ categories }: CategoriesGridProps) {
-  return (
-    <section className="app-container py-8">
-      <SectionHeader
-        eyebrow="التصنيفات الرئيسية"
-        title="تصفح حسب القسم"
-        description="اختصر الطريق وابدأ من القسم المناسب."
-        action={
-          <Link
-            href="/categories"
-            className="text-sm font-black text-primary transition hover:text-primary-dark"
-          >
-            عرض كل التصنيفات
-          </Link>
-        }
-      />
+  const popular = categories.slice(0, 8);
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8">
-        {categories.map((category) => (
-          <Link key={category.id} href={`/categories/${category.slug}`}>
-            <Card className="group relative h-full overflow-hidden p-4 text-center transition duration-300 hover:-translate-y-1 hover:border-secondary hover:shadow-xl">
-              <div className="uae-flag-strip absolute inset-x-0 top-0 h-1" />
-              <div className="relative mx-auto mb-3 grid size-14 place-items-center rounded-2xl border border-secondary/25 bg-white text-3xl text-secondary shadow-sm transition group-hover:bg-secondary-soft">
+  return (
+    <section className="section-padding bg-surface-muted/40">
+      <div className="app-container">
+        <SectionHeader
+          action={
+            <Link
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border px-5 text-sm font-bold text-ink transition hover:bg-surface"
+              href="/categories"
+            >
+              عرض الكل
+            </Link>
+          }
+          description="اكتشف آلاف الإعلانات في أهم التصنيفات داخل الإمارات."
+          eyebrow="التصنيفات الشائعة"
+          title="ماذا تبحث عنه؟"
+        />
+
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+          {popular.map((category) => (
+            <Link
+              key={category.id}
+              className="group flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 transition duration-300 hover:-translate-y-0.5 hover:border-secondary/30 hover:shadow-[var(--shadow-md)]"
+              href={`/categories/${category.slug}`}
+            >
+              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-secondary-soft text-2xl transition group-hover:scale-105">
                 {category.icon}
+              </span>
+              <div className="min-w-0">
+                <h3 className="truncate text-sm font-black text-ink transition group-hover:text-primary">
+                  {category.name}
+                </h3>
+                <p className="mt-0.5 text-xs font-medium text-muted">
+                  {category.listingCount.toLocaleString("ar-AE")} إعلان
+                </p>
               </div>
-              <h3 className="relative text-sm font-black text-ink transition group-hover:text-primary">
-                {category.name}
-              </h3>
-              <p className="relative mt-1 text-xs font-bold text-muted">
-                {category.listingCount.toLocaleString("ar-AE")} إعلان
-              </p>
-            </Card>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
