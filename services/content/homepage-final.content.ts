@@ -1,16 +1,14 @@
 import type { HomeEscrowStep } from "@/types/domain/content";
 
 export type FinalHeroListingCard = {
-  badge: string;
   category: string;
   city: string;
   href: string;
   id: string;
   imageUrl: string;
   price: number;
-  showEscrow?: boolean;
-  showVerified?: boolean;
   title: string;
+  trustBadge: "escrow" | "verified";
 };
 
 export type FinalEscrowStep = HomeEscrowStep;
@@ -56,38 +54,32 @@ export async function getFinalHeroCollage(): Promise<FinalHeroListingCard[]> {
   return [
     {
       id: "real-estate",
-      badge: "عقار مميز",
       category: "عقارات",
-      city: "نخلة جميرا · دبي",
+      city: "نخلة جميرا، دبي",
       href: "/search?q=فيلا+نخلة+جميرا",
       imageUrl: `https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?${imageQuality}`,
       price: 18500000,
-      showEscrow: true,
-      showVerified: true,
+      trustBadge: "escrow",
       title: "فيلا فاخرة — نخلة جميرا",
     },
     {
       id: "cars",
-      badge: "سيارة مميزة",
       category: "سيارات",
-      city: "دبي مارينا · دبي",
+      city: "دبي مارينا، دبي",
       href: "/search?q=مرسيدس+G63",
       imageUrl: `https://images.unsplash.com/photo-1563720360172-1f859e989174?${imageQuality}`,
       price: 895000,
-      showEscrow: true,
-      showVerified: true,
+      trustBadge: "verified",
       title: "Mercedes-AMG G63 · 2024",
     },
     {
       id: "mobiles",
-      badge: "إلكترونيات",
       category: "موبايلات",
-      city: "الريم · أبوظبي",
+      city: "الريم، أبوظبي",
       href: "/search?q=آيفون+16+برو",
       imageUrl: `https://images.unsplash.com/photo-1695048133142-1a20484d2569?${imageQuality}`,
       price: 4899,
-      showEscrow: true,
-      showVerified: true,
+      trustBadge: "escrow",
       title: "iPhone 16 Pro Max · 256GB",
     },
   ];

@@ -21,7 +21,7 @@ const homeNavigation = [
 
 function BrandMark() {
   return (
-    <span className="relative grid size-12 place-items-center md:size-[3.25rem]">
+    <span className="relative grid size-11 place-items-center md:size-12">
       <span className="uae-hex-mark absolute inset-0 uae-gold-gradient shadow-[0_6px_20px_rgb(184_149_95/35%)]" />
       <span className="uae-hex-mark absolute inset-[3px] bg-white/20" />
       <span className="relative text-[0.7rem] font-black tracking-[0.08em] text-white md:text-xs">
@@ -48,8 +48,8 @@ export function FinalHeader() {
     <header className="sticky top-0 z-50 uae-header-sand shadow-[0_1px_0_rgb(15_20_25/5%)] backdrop-blur-md">
       <div className="h-0.5 uae-header-accent" />
       <div className="app-container">
-        <div className="flex min-h-[4.75rem] items-center justify-between gap-4 md:min-h-[5rem]">
-          <div className="flex shrink-0 items-center gap-3 md:gap-4">
+        <div className="flex min-h-[4.25rem] items-center justify-between gap-3 md:min-h-[4.5rem] md:gap-5">
+          <div className="flex shrink-0 items-center gap-2.5 md:gap-3.5">
             <Link className="flex items-center gap-3" href="/">
               <BrandMark />
               <span className="hidden sm:block">
@@ -68,11 +68,11 @@ export function FinalHeader() {
             </span>
           </div>
 
-          <nav className="hidden items-center gap-0.5 xl:flex">
+          <nav className="hidden items-center gap-1 xl:flex">
             {homeNavigation.map((item, index) => (
               <Link
                 key={item.href}
-                className={`relative rounded-lg px-3.5 py-2.5 text-sm transition hover:bg-[#B8955F]/8 hover:text-ink ${
+                className={`relative rounded-lg px-3 py-2 text-sm transition hover:bg-[#B8955F]/8 hover:text-ink ${
                   index === 0
                     ? "font-bold text-ink after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:rounded-full after:bg-[#B8955F]/70"
                     : "font-semibold text-muted"
@@ -84,7 +84,7 @@ export function FinalHeader() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2 md:gap-3">
+          <div className="flex items-center gap-1.5 md:gap-2.5">
             <Link
               aria-label="بحث"
               className="grid size-10 place-items-center rounded-lg text-muted transition hover:bg-[#B8955F]/10 hover:text-[#B8955F] md:size-11"
@@ -110,10 +110,10 @@ export function FinalHeader() {
             )}
 
             <Link
-              className="uae-gold-gradient hidden min-h-11 items-center gap-2 rounded-full px-6 text-sm font-bold text-white shadow-[0_8px_24px_rgb(184_149_95/32%)] transition hover:brightness-105 sm:inline-flex"
+              className="uae-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgb(184_149_95/28%)] transition hover:brightness-105 sm:inline-flex"
               href="/listings/new"
             >
-              <Icon name="plus" size={17} />
+              <Icon name="plus" size={16} />
               أضف إعلانك
             </Link>
 

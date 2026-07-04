@@ -53,7 +53,7 @@ export async function FinalCategories({ categories }: FinalCategoriesProps) {
     );
 
   return (
-    <section className="bg-[#fdfbf7] pb-16 pt-28 md:pb-20 md:pt-32">
+    <section className="bg-[#fdfbf7] pb-16 pt-[6.5rem] md:pb-20 md:pt-28">
       <div className="app-container">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
