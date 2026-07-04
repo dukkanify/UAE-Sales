@@ -202,3 +202,48 @@ button:disabled {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
+
+/* ── Hero premium ── */
+@keyframes hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.hero-float {
+  animation: hero-float 5.5s ease-in-out infinite;
+}
+
+.hero-float-slow {
+  animation: hero-float 6.5s ease-in-out infinite;
+  animation-delay: 0.8s;
+}
+
+.hero-float-delayed {
+  animation: hero-float 7s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
+.hero-preview-glow {
+  background: radial-gradient(
+    circle at 50% 55%,
+    rgb(201 169 98 / 22%),
+    transparent 68%
+  );
+}
+
+.hero-search-panel {
+  box-shadow:
+    var(--shadow-xl),
+    0 0 0 1px rgb(255 255 255 / 8%) inset;
+}
+
+.hero-preview-card {
+  transition:
+    transform var(--duration-normal) var(--ease-premium),
+    box-shadow var(--duration-normal) var(--ease-premium);
+}
