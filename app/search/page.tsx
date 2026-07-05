@@ -1,31 +1,21 @@
-import { cities, countries } from "@/constants/locations";
-import { SearchFilters } from "@/components/search/SearchFilters";
-import { SearchResultsList } from "@/components/search/SearchResultsList";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
-import { searchListings } from "@/services/listingsService";
+import { cities, countries } from "@/shared/constants/locations";
+import { SearchFilters } from "@/features/search/components/SearchFilters";
+import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
+import { searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function getParam(params: SearchParams, key: string) {
   const value = params[key];
-
-  if (Array.isArray(value)) {
-    return value[0];
-  }
-
-  return value;
+  return Array.isArray(value) ? value[0] : value;
 }
 
 function getNumberParam(params: SearchParams, key: string) {
   const value = getParam(params, key);
-
-  if (!value) {
-    return undefined;
-  }
-
+  if (!value) return undefined;
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : undefined;
 }
@@ -73,36 +63,39 @@ export default async function SearchPage({
   return (
     <>
       <SiteHeader />
-      <main>
-        <section className="app-container py-12 lg:py-16">
-          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)] md:p-8">
-            <div className="uae-flag-strip mb-6 h-2 w-36 rounded-full" />
-            <SectionHeader
-              eyebrow="بحث متقدم"
-              title="اعثر على الإعلان المناسب بسرعة"
-              description="فلترة احترافية حسب المدينة، القسم، السعر، وحالة المنتج مع دعم الإعلانات المنشورة محلياً في التجربة."
-            />
-          </div>
-          <SearchFilters
-            categories={categories}
-            cities={cities}
-            countries={countries}
-            selectedFilters={selectedFilters}
-          />
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm font-bold text-muted">
-              {listings.length.toLocaleString("ar-AE")} نتيجة من البيانات الأساسية
-            </p>
-            <p className="rounded-full bg-secondary-soft px-4 py-2 text-xs font-black text-primary">
-              الضمان المالي متاح عند الشراء
+      <main className="bg-[#fdfbf7]">
+        <section className="app-container page-padding">
+          <div className="mb-8">
+            <p className="text-xs font-bold text-[#B8955F]">بحث السوق</p>
+            <h1 className="mt-1 text-2xl font-bold text-ink md:text-3xl">
+              {selectedFilters.query
+                ? `نتائج: ${selectedFilters.query}`
+                : "اعثر على الإعلان المناسب"}
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-muted">
+              فلترة دقيقة حسب الإمارة والتصنيف والسعر — نفس جودة عرض الإعلانات في
+              الصفحة الرئيسية.
             </p>
           </div>
-          <div className="mt-6">
-            <SearchResultsList
-              categories={categories}
-              listings={listings}
-              selectedFilters={selectedFilters}
-            />
+
+          <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <SearchFilters
+                categories={categories}
+                cities={cities}
+                countries={countries}
+                layout="sidebar"
+                selectedFilters={selectedFilters}
+              />
+            </aside>
+
+            <div>
+              <SearchResultsList
+                categories={categories}
+                listings={listings}
+                selectedFilters={selectedFilters}
+              />
+            </div>
           </div>
         </section>
       </main>
