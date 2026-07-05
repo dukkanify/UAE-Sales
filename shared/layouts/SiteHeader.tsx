@@ -84,8 +84,14 @@ export function SiteHeader() {
                 دخول
               </Link>
             )}
-            <Button className="hidden sm:block" href="/listings/new" size="sm" variant="primary">
-              أضف إعلان
+            <Button
+              className="hidden !h-[42px] !min-h-[42px] !min-w-[120px] shrink-0 !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap sm:inline-flex"
+              href="/listings/new"
+              size="sm"
+              variant="primary"
+            >
+              <Icon name="plus" size={16} />
+              أضف إعلانك
             </Button>
             <button
               aria-expanded={menuOpen}
@@ -116,12 +122,13 @@ export function SiteHeader() {
                 <InputShell />
               </form>
               <Button
-                className="mt-2 w-full"
+                className="mt-2 !h-[42px] !min-h-[42px] w-full !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap"
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
                 variant="primary"
               >
-                أضف إعلان
+                <Icon name="plus" size={16} />
+                أضف إعلانك
               </Button>
               {user ? (
                 <>

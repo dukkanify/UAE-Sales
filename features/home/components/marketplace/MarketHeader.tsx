@@ -90,7 +90,7 @@ export function MarketHeader() {
             )}
 
             <Link
-              className="uae-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgb(184_149_95/30%)] sm:inline-flex"
+              className="uae-gold-gradient hidden h-[42px] min-h-[42px] min-w-[120px] shrink-0 items-center justify-center gap-2 overflow-visible rounded-full px-[18px] text-sm font-bold whitespace-nowrap text-white shadow-[0_6px_20px_rgb(184_149_95/30%)] sm:inline-flex"
               href="/listings/new"
             >
               <Icon name="plus" size={16} />
@@ -122,7 +122,13 @@ export function MarketHeader() {
                   {item.label}
                 </Link>
               ))}
-              <Button className="mt-2 w-full" href="/listings/new" variant="accent">
+              <Button
+                className="mt-2 !h-[42px] !min-h-[42px] w-full !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap"
+                href="/listings/new"
+                onClick={() => setMenuOpen(false)}
+                variant="accent"
+              >
+                <Icon name="plus" size={16} />
                 أضف إعلانك
               </Button>
             </div>
