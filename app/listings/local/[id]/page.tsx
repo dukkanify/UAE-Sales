@@ -1,7 +1,7 @@
-import { LocalListingDetails } from "@/components/listings/LocalListingDetails";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { LocalListingDetails } from "@/features/listings/components/LocalListingDetails";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 
 type LocalListingPageProps = {
   params: Promise<{
@@ -18,7 +18,7 @@ export default async function LocalListingPage({
     <>
       <SiteHeader />
       <main>
-        <section className="app-container py-8 lg:py-12">
+        <section className="app-container page-padding">
           <LocalListingDetails categories={categories} listingId={id} />
         </section>
       </main>
