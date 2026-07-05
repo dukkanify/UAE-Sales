@@ -1,6 +1,7 @@
-import { LocalListingEdit } from "@/components/listings/LocalListingEdit";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
+import { LocalListingEdit } from "@/features/listings/components/LocalListingEdit";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 type LocalListingEditPageProps = {
   params: Promise<{
@@ -16,7 +17,12 @@ export default async function LocalListingEditPage({
   return (
     <>
       <SiteHeader />
-      <main className="app-container py-12">
+      <main className="app-container page-padding">
+        <PageHero
+          description="عدّل بيانات إعلانك المحفوظ محلياً. التغييرات ستظهر فوراً في إعلاناتي ونتائج البحث."
+          eyebrow="إعلاناتي"
+          title="تعديل الإعلان"
+        />
         <LocalListingEdit listingId={id} />
       </main>
       <SiteFooter />
