@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -15,7 +15,13 @@ import {
 } from "@/services/storage";
 
 type DashboardShellProps = {
-  activePath: "/profile" | "/dashboard/listings";
+  activePath:
+    | "/profile"
+    | "/dashboard/listings"
+    | "/wallet"
+    | "/escrow"
+    | "/orders"
+    | "/checkout";
   children: ReactNode;
   description: string;
   title: string;
@@ -25,12 +31,30 @@ type DashboardShellProps = {
 const dashboardLinks = [
   { href: "/profile", icon: "user" as const, label: "الملف الشخصي" },
   { href: "/dashboard/listings", icon: "grid" as const, label: "إعلاناتي" },
+  { href: "/orders", icon: "chart" as const, label: "طلباتي" },
   { href: "/listings/new", icon: "plus" as const, label: "إضافة إعلان" },
   { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
+  { href: "/escrow", icon: "shield" as const, label: "الضمان" },
   { href: "/chat", icon: "message" as const, label: "الرسائل" },
 ] as const;
 
-export function DashboardShell({
+export function DashboardShell(props: DashboardShellProps) {
+  return (
+    <Suspense
+      fallback={
+        <section className="app-container page-padding">
+          <Card className="p-8 text-center" variant="flat">
+            <p className="text-sm font-medium text-muted">جاري التحميل...</p>
+          </Card>
+        </section>
+      }
+    >
+      <DashboardShellInner {...props} />
+    </Suspense>
+  );
+}
+
+function DashboardShellInner({
   activePath,
   children,
   description,
@@ -40,6 +64,8 @@ export function DashboardShell({
   const [isAllowed, setIsAllowed] = useState(false);
   const [displayUser, setDisplayUser] = useState(user);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -49,10 +75,13 @@ export function DashboardShell({
         setIsAllowed(true);
         return;
       }
-      router.replace(`/login?next=${activePath}`);
+
+      const query = searchParams.toString();
+      const returnPath = query ? `${pathname}?${query}` : pathname;
+      router.replace(`/login?next=${encodeURIComponent(returnPath)}`);
     }, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [activePath, router, user]);
+  }, [pathname, router, searchParams, user]);
 
   if (!isAllowed) {
     return (
@@ -63,6 +92,8 @@ export function DashboardShell({
       </section>
     );
   }
+
+  const walletBalance = displayUser.walletBalance ?? 0;
 
   return (
     <section className="app-container page-padding">
@@ -130,10 +161,8 @@ export function DashboardShell({
           <Card className="p-5" variant="flat">
             <p className="text-xs font-medium text-muted">رصيد المحفظة</p>
             <p className="mt-1 text-xl font-semibold text-ink">
-              2,450 <span className="text-xs font-medium text-muted">د.إ</span>
-            </p>
-            <p className="mt-1 text-xs font-medium text-muted">
-              850 د.إ قيد المعالجة
+              {walletBalance.toLocaleString("ar-AE")}{" "}
+              <span className="text-xs font-medium text-muted">د.إ</span>
             </p>
             <Button className="mt-4 w-full" href="/wallet" size="sm" variant="secondary">
               إدارة المحفظة

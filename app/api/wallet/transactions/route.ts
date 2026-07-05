@@ -1,3 +1,4 @@
+import { mapDbWalletTransaction } from "@/lib/mappers/transaction.mapper";
 import { requireAuth } from "@/lib/auth/guards";
 import { ApiHttpError, handleApiRoute, jsonSuccess } from "@/lib/api/response";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
@@ -12,10 +13,7 @@ export async function GET() {
     const wallet = await prisma.wallet.findUnique({
       where: { userId: user.id },
       include: {
-        transactions: {
-          orderBy: { createdAt: "desc" },
-          take: 50,
-        },
+        transactions: { orderBy: { createdAt: "desc" }, take: 50 },
       },
     });
 
@@ -23,6 +21,6 @@ export async function GET() {
       throw new ApiHttpError(404, "NOT_FOUND", "المحفظة غير موجودة.");
     }
 
-    return jsonSuccess(wallet.transactions);
+    return jsonSuccess(wallet.transactions.map(mapDbWalletTransaction));
   });
 }

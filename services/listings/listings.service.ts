@@ -50,6 +50,24 @@ export async function getListingBySlug(
   );
 }
 
+export async function getListingById(
+  id: string,
+): Promise<Listing | undefined> {
+  return withDataFallback(
+    async () => {
+      const { getListingByIdFromDb } = await import(
+        "@/lib/repositories/listings.repository"
+      );
+      return getListingByIdFromDb(id);
+    },
+    async () =>
+      [...mockListings, ...mockUserListings].find(
+        (listing) => listing.id === id,
+      ),
+    "listing-by-id",
+  );
+}
+
 export async function getFeaturedListings(): Promise<Listing[]> {
   return withDataFallback(
     getFeaturedListingsFromDb,

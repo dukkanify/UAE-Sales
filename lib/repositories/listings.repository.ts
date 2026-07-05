@@ -112,6 +112,14 @@ export async function getListingBySlugFromDb(slug: string) {
   return listing ? mapDbListing(listing) : undefined;
 }
 
+export async function getListingByIdFromDb(id: string) {
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    include: listingInclude,
+  });
+  return listing ? mapDbListing(listing) : undefined;
+}
+
 export async function searchListingsFromDb(filters: ListingSearchFilters = {}) {
   const listings = await prisma.listing.findMany({
     where: buildListingWhere(filters),

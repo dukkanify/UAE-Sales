@@ -3,6 +3,16 @@ import { ApiHttpError, handleApiRoute, jsonCreated, jsonSuccess } from "@/lib/ap
 import { createOrderSchema, parseJsonBody } from "@/lib/api/validation";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
+import { mapDbOrder } from "@/lib/mappers/transaction.mapper";
+
+const orderInclude = {
+  listing: { include: { images: true } },
+  buyer: true,
+  seller: true,
+  escrow: true,
+  disputes: true,
+} as const;
+
 export async function GET() {
   return handleApiRoute(async () => {
     if (!isDatabaseConfigured()) {
@@ -14,14 +24,11 @@ export async function GET() {
       where: {
         OR: [{ buyerId: user.id }, { sellerId: user.id }],
       },
-      include: {
-        listing: true,
-        escrow: true,
-      },
+      include: orderInclude,
       orderBy: { createdAt: "desc" },
     });
 
-    return jsonSuccess(orders);
+    return jsonSuccess(orders.map(mapDbOrder));
   });
 }
 
@@ -44,7 +51,8 @@ export async function POST(request: Request) {
     }
 
     const paymentFee = body.paymentFee ?? 0;
-    const totalAmount = body.amount + paymentFee;
+    const platformFee = body.platformFee ?? 0;
+    const totalAmount = body.amount + paymentFee + platformFee;
 
     const order = await prisma.order.create({
       data: {
@@ -55,10 +63,11 @@ export async function POST(request: Request) {
         paymentFee,
         totalAmount,
         status: "PENDING",
+        metadata: { platformFee },
       },
-      include: { listing: true, escrow: true },
+      include: orderInclude,
     });
 
-    return jsonCreated(order);
+    return jsonCreated(mapDbOrder(order));
   });
 }

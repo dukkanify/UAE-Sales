@@ -2,6 +2,7 @@ import type { Category, Listing } from "@/types";
 import { formatPostedTime } from "./listing-card.utils";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
+import { BuyNowButton } from "@/features/listings/components/BuyNowButton";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -75,9 +76,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <div className="mt-6 grid gap-2">
-        <Button fullWidth href={`/checkout?listing=${listing.slug}`} size="lg" variant="accent">
-          شراء الآن
-        </Button>
+        <BuyNowButton listing={listing} />
         <Button fullWidth href={`/chat?listing=${listing.slug}`} variant="secondary">
           محادثة البائع
         </Button>

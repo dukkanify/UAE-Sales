@@ -282,6 +282,7 @@ model Order {
   paymentFee  Float       @default(0)
   totalAmount Float
   status      OrderStatus @default(PENDING)
+  metadata    Json?
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
@@ -314,6 +315,8 @@ model Dispute {
   reason      String
   description String?
   status      DisputeStatus @default(OPEN)
+  preferredResolution String?
+  evidenceNote String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 

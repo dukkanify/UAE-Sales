@@ -69,6 +69,27 @@ export const createOrderSchema = z.object({
   listingId: z.string(),
   amount: z.number().positive(),
   paymentFee: z.number().nonnegative().optional(),
+  platformFee: z.number().nonnegative().optional(),
+});
+
+export const createDisputeSchema = z.object({
+  orderId: z.string(),
+  reason: z.enum([
+    "not_received",
+    "not_as_described",
+    "damaged",
+    "wrong_item",
+    "seller_unresponsive",
+    "other",
+  ]),
+  description: z.string().min(10),
+  preferredResolution: z.enum([
+    "full_refund",
+    "partial_refund",
+    "replacement",
+    "release_to_seller",
+  ]),
+  evidenceNote: z.string().optional(),
 });
 
 export const escrowActionSchema = z.object({

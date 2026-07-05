@@ -1,10 +1,12 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { Icon } from "@/shared/ui/Icon";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
-import { getEscrowSummary, getEscrowTransactions } from "@/services/escrowService";
+import { ESCROW_FAQ, getEscrowSummary, getEscrowTransactions } from "@/services/escrow";
 import { getCurrentUser } from "@/services/profile";
 
 const priceFormatter = new Intl.NumberFormat("ar-AE", {
@@ -14,7 +16,8 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 const statusLabels = {
   held: "محجوز",
   released: "مكتمل",
-  pending_delivery: "بانتظار التسليم",
+  refunded: "مسترد",
+  disputed: "نزاع",
 } as const;
 
 export default async function EscrowPage() {
@@ -30,20 +33,34 @@ export default async function EscrowPage() {
       <SiteHeader />
       <main>
         <DashboardShell
-          activePath="/profile"
-          description="متابعة المبالغ المحجوزة والمعاملات المحمية بين المشتري والبائع."
+          activePath="/escrow"
+          description="نظام الضمان المالي يحمي المشتري والبائع في كل معاملة."
           title="الضمان المالي"
           user={user}
         >
           <div className="grid gap-5">
+            <Card className="marketplace-panel p-6" variant="flat">
+              <div className="flex items-start gap-3">
+                <span className="grid size-12 place-items-center rounded-[var(--radius-xl)] bg-success-soft text-success">
+                  <Icon name="shield" size={22} />
+                </span>
+                <div>
+                  <h2 className="text-lg font-black text-ink">ما هو الضمان المالي؟</h2>
+                  <p className="mt-2 text-sm leading-7 text-muted">
+                    عند الشراء عبر UAE Sales، يُحجز المبلغ بأمان لدى المنصة حتى
+                    يؤكد المشتري استلام المنتج. هذا يحمي المشتري من الاحتيال
+                    ويضمن للبائع استلام المبلغ بعد التسليم.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
             <div className="grid gap-4 sm:grid-cols-2">
-              <Card className="p-6" variant="flat">
+              <Card className="marketplace-stat-card p-6" variant="flat">
                 <p className="text-sm font-medium text-muted">حجوزات نشطة</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {summary.activeHolds}
-                </p>
+                <p className="mt-2 text-3xl font-bold text-ink">{summary.activeHolds}</p>
               </Card>
-              <Card className="p-6" variant="flat">
+              <Card className="marketplace-stat-card p-6" variant="flat">
                 <p className="text-sm font-medium text-muted">إجمالي المحمي</p>
                 <p className="mt-2 text-3xl font-bold text-ink">
                   {priceFormatter.format(summary.totalProtected)} د.إ
@@ -51,8 +68,27 @@ export default async function EscrowPage() {
               </Card>
             </div>
 
-            <Card className="p-6" variant="flat">
-              <h2 className="text-sm font-semibold text-ink">معاملاتك</h2>
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card className="marketplace-panel p-6" variant="flat">
+                <h3 className="text-sm font-semibold text-ink">حماية المشتري</h3>
+                <ul className="mt-3 grid gap-2 text-sm text-muted">
+                  <li>· المبلغ محجوز حتى تأكيد الاستلام</li>
+                  <li>· إمكانية فتح نزاع خلال 7 أيام</li>
+                  <li>· استرداد كامل عند عدم التسليم</li>
+                </ul>
+              </Card>
+              <Card className="marketplace-panel p-6" variant="flat">
+                <h3 className="text-sm font-semibold text-ink">حماية البائع</h3>
+                <ul className="mt-3 grid gap-2 text-sm text-muted">
+                  <li>· ضمان استلام المبلغ بعد التسليم</li>
+                  <li>· حماية من الدفع الوهمي</li>
+                  <li>· دعم في حالات النزاع</li>
+                </ul>
+              </Card>
+            </div>
+
+            <Card className="marketplace-panel p-6" variant="flat">
+              <h2 className="text-sm font-semibold text-ink">معاملات الضمان</h2>
               <ul className="mt-4 grid gap-3">
                 {transactions.map((txn) => (
                   <li
@@ -60,12 +96,9 @@ export default async function EscrowPage() {
                     className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border px-4 py-3"
                   >
                     <div>
-                      <p className="text-sm font-semibold text-ink">
-                        {txn.listingTitle}
-                      </p>
+                      <p className="text-sm font-semibold text-ink">{txn.listingTitle}</p>
                       <p className="mt-0.5 text-xs text-muted">
-                        مع {txn.buyer} ·{" "}
-                        {new Date(txn.createdAt).toLocaleDateString("ar-AE")}
+                        {txn.buyerName} · {txn.sellerName}
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -79,8 +112,8 @@ export default async function EscrowPage() {
               </ul>
             </Card>
 
-            <Card className="p-6" variant="flat">
-              <h2 className="text-sm font-semibold text-ink">كيف يعمل الضمان</h2>
+            <Card className="marketplace-panel p-6" variant="flat">
+              <h2 className="text-sm font-semibold text-ink">مسار الضمان</h2>
               <ol className="mt-4 grid gap-2">
                 {steps.map((step, index) => (
                   <li
@@ -95,6 +128,27 @@ export default async function EscrowPage() {
                   </li>
                 ))}
               </ol>
+            </Card>
+
+            <Card className="marketplace-panel p-6" variant="flat">
+              <h2 className="text-sm font-semibold text-ink">الأسئلة الشائعة</h2>
+              <dl className="mt-4 grid gap-4">
+                {ESCROW_FAQ.map((item) => (
+                  <div key={item.question}>
+                    <dt className="text-sm font-bold text-ink">{item.question}</dt>
+                    <dd className="mt-1 text-sm text-muted">{item.answer}</dd>
+                  </div>
+                ))}
+              </dl>
+            </Card>
+
+            <Card className="marketplace-panel p-6 text-center" variant="flat">
+              <p className="text-sm text-muted">
+                تصفح الإعلانات المحمية بالضمان المالي
+              </p>
+              <Button className="mt-4" href="/featured" variant="accent">
+                إعلانات مميزة محمية
+              </Button>
             </Card>
           </div>
         </DashboardShell>
