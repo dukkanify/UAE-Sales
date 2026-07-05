@@ -15,10 +15,11 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
         <Card key={category.id} className="overflow-hidden p-0" interactive>
           <div className="flex gap-0">
             {category.imageUrl ? (
-              <div className="relative hidden w-28 shrink-0 sm:block">
+              <div className="relative hidden min-h-full w-28 shrink-0 sm:block">
                 <AppImage
                   alt={category.name}
                   className="object-cover"
+                  fallbackCategory={category.id}
                   fill
                   sizes="112px"
                   src={category.imageUrl}

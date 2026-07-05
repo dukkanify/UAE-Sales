@@ -22,21 +22,16 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
 
   return (
     <div className="grid gap-3">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-[#e8e4de] shadow-[var(--shadow-lg)] lg:min-h-[28rem]">
-        {activeImage ? (
-          <AppImage
-            alt={listing.title}
-            className="object-cover transition duration-500"
-            fill
-            priority
-            sizes="(max-width: 1024px) 100vw, 60vw"
-            src={activeImage}
-          />
-        ) : (
-          <div className="grid h-full min-h-[20rem] place-items-center text-muted">
-            <Badge variant="muted">لا توجد صورة</Badge>
-          </div>
-        )}
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border shadow-[var(--shadow-lg)] lg:min-h-[28rem]">
+        <AppImage
+          alt={listing.title}
+          className="object-cover"
+          fallbackCategory={listing.categoryId}
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 60vw"
+          src={activeImage}
+        />
         <div className="absolute start-4 top-4 z-10 flex flex-wrap gap-2">
           {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
           {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
@@ -62,10 +57,11 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               type="button"
             >
               <AppImage
-                alt={`صورة ${index + 1}`}
+                alt={`صورة ${index + 1} — ${listing.title}`}
                 className="object-cover"
+                fallbackCategory={listing.categoryId}
                 fill
-                loading={index === 0 ? undefined : "lazy"}
+                loading="lazy"
                 sizes="96px"
                 src={url}
               />

@@ -50,14 +50,15 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
   const imageArea = (
     <div
-      className={`marketplace-card-media relative overflow-hidden bg-[#e8e4de] ${layout === "row" ? "h-full min-h-full w-full" : "aspect-[4/3]"}`}
+      className={`marketplace-card-media relative overflow-hidden ${layout === "row" ? "h-full min-h-full w-full" : "aspect-[4/3]"}`}
     >
       {imageUrl ? (
         <Link className="absolute inset-0" href={href}>
           <span className="sr-only">{listing.title}</span>
           <AppImage
             alt={listing.title}
-            className="marketplace-card-image object-cover"
+            className="marketplace-card-image"
+            fallbackCategory={listing.categoryId}
             fill
             loading={priority ? undefined : "lazy"}
             priority={priority}
@@ -125,6 +126,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
             <AppImage
               alt={listing.seller.name}
               className="object-cover"
+              fallback="avatar"
               fill
               sizes="28px"
               src={listing.seller.avatarUrl}

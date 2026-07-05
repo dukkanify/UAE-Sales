@@ -23,8 +23,9 @@ export async function MarketHero({ categories }: MarketHeroProps) {
     <section className="relative overflow-hidden">
       <div className="absolute inset-0">
         <AppImage
-          alt="أفق دبي"
+          alt="أفق دبي — برج خليفة وأفق المدينة"
           className="object-cover object-center"
+          fallback="emirates"
           fill
           priority
           sizes="100vw"

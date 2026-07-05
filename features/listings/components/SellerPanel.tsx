@@ -29,6 +29,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
             <AppImage
               alt={listing.seller.name}
               className="object-cover"
+              fallback="avatar"
               fill
               sizes="48px"
               src={listing.seller.avatarUrl}

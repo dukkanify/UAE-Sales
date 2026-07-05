@@ -30,12 +30,13 @@ export async function MarketEmirates() {
           return (
             <Link
               key={city.id}
-              className="group relative min-h-56 overflow-hidden rounded-2xl bg-[#e8e4de] shadow-[0_8px_28px_rgb(15_20_25/8%)] transition hover:shadow-[0_14px_40px_rgb(15_20_25/12%)]"
+              className="group relative min-h-56 overflow-hidden rounded-2xl shadow-[0_8px_28px_rgb(15_20_25/8%)] transition hover:shadow-[0_14px_40px_rgb(15_20_25/12%)]"
               href={`/search?city=${encodeURIComponent(city.name)}`}
             >
               <AppImage
                 alt={city.name}
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                fallback="emirates"
                 fill
                 sizes="33vw"
                 src={images[city.id]}

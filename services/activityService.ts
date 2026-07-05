@@ -1,3 +1,5 @@
+import { getCategoryFallbackUrl, unsplashUrl } from "@/shared/constants/image-fallbacks";
+
 export async function getNotifications() {
   return [
     {
@@ -37,29 +39,25 @@ export async function getSavedListings() {
       slug: "mercedes-amg-g63-2024",
       title: "مرسيدس-AMG G63 موديل 2024",
       price: 895000,
-      imageUrl:
-        "https://images.unsplash.com/photo-1563720360172-1f859e989174?auto=format&fit=crop&w=600&q=85",
+      imageUrl: unsplashUrl("photo-1618843479313-40f8afb4b4d8", 600),
     },
     {
       slug: "villa-palm-jumeirah",
       title: "فيلا فاخرة على نخلة جميرا",
       price: 18500000,
-      imageUrl:
-        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=85",
+      imageUrl: getCategoryFallbackUrl("real-estate", 600),
     },
     {
       slug: "iphone-16-pro-max-256gb",
       title: "آيفون 16 برو ماكس 256 جيجابايت",
       price: 4899,
-      imageUrl:
-        "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=600&q=85",
+      imageUrl: getCategoryFallbackUrl("mobiles", 600),
     },
     {
       slug: "sony-playstation-5",
       title: "سوني بلايستيشن 5",
       price: 1899,
-      imageUrl:
-        "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=600&q=85",
+      imageUrl: getCategoryFallbackUrl("electronics", 600),
     },
   ];
 }

@@ -38,6 +38,7 @@ export default async function ChatPage() {
                     <AppImage
                       alt={thread.participantName}
                       className="object-cover"
+                      fallback="avatar"
                       fill
                       sizes="48px"
                       src={thread.avatarUrl}

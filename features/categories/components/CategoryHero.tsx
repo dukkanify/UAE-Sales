@@ -18,16 +18,15 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
     <div className="mb-8 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-white shadow-[var(--shadow-card)]">
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
         <div className="relative min-h-[12rem] lg:min-h-[16rem]">
-          {category.imageUrl ? (
-            <AppImage
-              alt={category.name}
-              className="object-cover"
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              src={category.imageUrl}
-            />
-          ) : null}
+          <AppImage
+            alt={category.name}
+            className="object-cover"
+            fallbackCategory={category.id}
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 60vw"
+            src={category.imageUrl}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
             <Badge variant="featured">{category.name}</Badge>

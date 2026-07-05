@@ -17,8 +17,10 @@ export function getListingLocation(listing: Listing): string {
   return listing.emirate ?? listing.city;
 }
 
+import { getCategoryFallbackUrl } from "@/shared/constants/image-fallbacks";
+
 export function getListingImageUrl(listing: Listing): string {
-  return listing.images?.[0] ?? listing.imageUrl ?? "";
+  return listing.images?.[0] ?? listing.imageUrl ?? getCategoryFallbackUrl(listing.categoryId);
 }
 
 export const conditionLabels: Record<Listing["condition"], string> = {
