@@ -73,6 +73,17 @@ enum DisputeStatus {
   CLOSED
 }
 
+enum NotificationType {
+  NEW_MESSAGE
+  LISTING_APPROVED
+  LISTING_REJECTED
+  ORDER_CREATED
+  PAYMENT_HELD
+  PAYMENT_RELEASED
+  DISPUTE_OPENED
+  WALLET_UPDATED
+}
+
 model User {
   id             String      @id @default(cuid())
   fullName       String
@@ -102,6 +113,7 @@ model User {
   sessions       Session[]
   otpVerifications OtpVerification[]
   openedDisputes Dispute[]   @relation("OpenedDisputes")
+  notifications  Notification[]
 }
 
 model Session {
@@ -236,6 +248,7 @@ model Message {
   receiverId String
   listingId  String?
   message    String
+  imageUrl   String?
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
 
@@ -245,6 +258,24 @@ model Message {
 
   @@index([senderId])
   @@index([receiverId])
+  @@index([listingId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  read      Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
 }
 
 model Wallet {

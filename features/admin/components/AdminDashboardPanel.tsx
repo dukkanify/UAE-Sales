@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { AdminSummary } from "@/types/domain/admin";
 import { AdminLoading } from "@/features/admin/components/AdminLoading";
 import { formatAdminCurrency } from "@/mock/admin.mock";
+import { getMockUnreadNotificationsCount } from "@/mock/notifications.mock";
 import { fetchAdminSummary } from "@/services/admin";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -39,6 +40,7 @@ export function AdminDashboardPanel() {
     { label: "نزاعات مفتوحة", value: summary.openDisputes.toLocaleString("ar-AE") },
     { label: "إجمالي المعاملات", value: summary.totalTransactions.toLocaleString("ar-AE") },
     { label: "إيرادات (تجريبي)", value: formatAdminCurrency(summary.revenueDemo) },
+    { label: "إشعارات المنصة", value: getMockUnreadNotificationsCount().toLocaleString("ar-AE") },
   ];
 
   const quickActions = [

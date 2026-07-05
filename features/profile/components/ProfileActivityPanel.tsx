@@ -1,43 +1,19 @@
 import Link from "next/link";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
-import { getNotifications, getSavedListings } from "@/services/activityService";
+import { DashboardActivityWidget } from "@/features/dashboard/components/DashboardActivityWidget";
+import { getSavedListings } from "@/services/activityService";
 
 const priceFormatter = new Intl.NumberFormat("ar-AE", {
   maximumFractionDigits: 0,
 });
 
 export async function ProfileActivityPanel() {
-  const [notifications, saved] = await Promise.all([
-    getNotifications(),
-    getSavedListings(),
-  ]);
-
-  const unread = notifications.filter((n) => !n.read).length;
+  const saved = await getSavedListings();
 
   return (
     <div className="mt-6 grid gap-5">
-      <Card className="p-5" variant="flat">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-ink">الإشعارات</h2>
-          {unread > 0 ? (
-            <span className="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent">
-              {unread} جديد
-            </span>
-          ) : null}
-        </div>
-        <ul className="mt-4 grid gap-2">
-          {notifications.slice(0, 4).map((item) => (
-            <li
-              key={item.id}
-              className={`rounded-[var(--radius-xl)] px-4 py-3 text-sm ${item.read ? "bg-surface-muted text-muted" : "border border-primary/15 bg-primary-soft"}`}
-            >
-              <p className="font-semibold text-ink">{item.title}</p>
-              <p className="mt-0.5 text-xs">{item.body}</p>
-            </li>
-          ))}
-        </ul>
-      </Card>
+      <DashboardActivityWidget />
 
       <Card className="p-5" variant="flat">
         <h2 className="text-sm font-semibold text-ink">المحفوظات</h2>
@@ -64,7 +40,7 @@ export async function ProfileActivityPanel() {
         {[
           { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
           { href: "/escrow", icon: "shield" as const, label: "الضمان المالي" },
-          { href: "/chat", icon: "message" as const, label: "الرسائل" },
+          { href: "/notifications", icon: "message" as const, label: "الإشعارات" },
         ].map((link) => (
           <Link
             key={link.href}

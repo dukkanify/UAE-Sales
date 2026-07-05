@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AdminDisputeRecord } from "@/types/domain/admin";
 import { AdminLoading } from "@/features/admin/components/AdminLoading";
 import { AdminStatusBadge } from "@/features/admin/components/AdminStatusBadge";
+import { AdminDisputeMessagesPanel } from "@/features/admin/components/AdminDisputeMessagesPanel";
 import { fetchAdminDisputes, patchAdminDisputeClient } from "@/services/admin";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -51,7 +52,8 @@ export function AdminDisputesPanel() {
   }
 
   return (
-    <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
+    <div className="grid gap-5">
+      <div className="grid gap-5 lg:grid-cols-[1fr_20rem]">
       <Card className="marketplace-panel p-6" variant="flat">
         <select
           className="rounded-[var(--radius-xl)] border border-border bg-surface px-3 py-2.5 text-sm"
@@ -151,6 +153,8 @@ export function AdminDisputesPanel() {
           <p className="mt-4 text-sm text-muted">اختر نزاعاً لعرض التفاصيل.</p>
         )}
       </Card>
+
+      <AdminDisputeMessagesPanel />
     </div>
   );
 }

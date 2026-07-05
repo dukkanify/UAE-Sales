@@ -49,6 +49,19 @@ export type {
 export type { AccountType, UserProfile, UserRole } from "./domain/user";
 
 export type {
+  ChatConversation,
+  ChatConversationDetail,
+  ChatMessage,
+  SendChatMessageInput,
+} from "./domain/chat";
+
+export type {
+  NotificationRecord,
+  NotificationSummary,
+  NotificationType,
+} from "./domain/notification";
+
+export type {
   AdminActivityItem,
   AdminCategoryRecord,
   AdminDisputePatch,

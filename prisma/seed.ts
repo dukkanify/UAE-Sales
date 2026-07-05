@@ -45,6 +45,7 @@ async function clearDatabase() {
   await prisma.walletTransaction.deleteMany();
   await prisma.wallet.deleteMany();
   await prisma.message.deleteMany();
+  await prisma.notification.deleteMany();
   await prisma.favorite.deleteMany();
   await prisma.listingImage.deleteMany();
   await prisma.listing.deleteMany();
