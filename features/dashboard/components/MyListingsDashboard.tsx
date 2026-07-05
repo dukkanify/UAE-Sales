@@ -59,6 +59,8 @@ export function MyListingsDashboard({
       ? allListings
       : allListings.filter((listing) => listing.status === activeStatus);
 
+  const totalViews = allListings.reduce((sum, listing) => sum + listing.views, 0);
+
   const tabs = [
     { count: allListings.length, id: "all", label: "الكل" },
     ...statusOrder.map((status) => ({
@@ -83,7 +85,7 @@ export function MyListingsDashboard({
           { icon: "check" as const, label: "نشطة", value: counts.active },
           { icon: "clock" as const, label: "قيد المراجعة", value: counts.pending_review },
           { icon: "edit" as const, label: "مسودات", value: counts.draft },
-          { icon: "eye" as const, label: "مشاهدات", value: "3,240" },
+          { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("ar-AE") },
         ].map((stat) => (
           <Card key={stat.label} className="p-5" variant="flat">
             <div className="flex items-center justify-between">

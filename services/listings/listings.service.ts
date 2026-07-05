@@ -22,8 +22,9 @@ export async function getFeaturedListings(): Promise<Listing[]> {
 }
 
 export async function getLatestListings(): Promise<Listing[]> {
-  return mockListings
+  return [...mockListings]
     .filter((listing) => listing.status === "active")
+    .sort((a, b) => (b.postedAt ?? "").localeCompare(a.postedAt ?? ""))
     .slice(0, 12);
 }
 
@@ -38,27 +39,47 @@ export async function getRelatedListings(
     .slice(0, 3);
 }
 
+function matchesQuery(listing: Listing, query: string): boolean {
+  const haystack = [
+    listing.title,
+    listing.titleEnglish,
+    listing.description,
+    listing.descriptionEnglish,
+    listing.city,
+    listing.emirate,
+    listing.area,
+    listing.subcategory,
+    listing.seller.name,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(query);
+}
+
 export async function searchListings(
   filters: ListingSearchFilters = {},
 ): Promise<Listing[]> {
   const normalizedQuery = filters.query?.trim().toLowerCase();
+  const emirateFilter = filters.emirate ?? filters.city;
 
   const results = mockListings
     .filter((listing) => listing.status === "active")
-    .filter((listing) => {
-      if (!normalizedQuery) {
-        return true;
-      }
-
-      return [listing.title, listing.description, listing.city, listing.seller.name]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery);
-    })
+    .filter((listing) =>
+      normalizedQuery ? matchesQuery(listing, normalizedQuery) : true,
+    )
     .filter((listing) =>
       filters.categoryId ? listing.categoryId === filters.categoryId : true,
     )
-    .filter((listing) => (filters.city ? listing.city === filters.city : true))
+    .filter((listing) =>
+      emirateFilter
+        ? listing.emirate === emirateFilter || listing.city === emirateFilter
+        : true,
+    )
+    .filter((listing) =>
+      filters.area ? listing.area === filters.area : true,
+    )
     .filter((listing) =>
       filters.condition ? listing.condition === filters.condition : true,
     )
@@ -74,6 +95,12 @@ export async function searchListings(
       typeof filters.maxPrice === "number"
         ? listing.price <= filters.maxPrice
         : true,
+    )
+    .filter((listing) =>
+      filters.featured ? listing.isFeatured === true : true,
+    )
+    .filter((listing) =>
+      filters.premium ? listing.isPremium === true : true,
     );
 
   return [...results].sort((first, second) => {
@@ -85,6 +112,8 @@ export async function searchListings(
       return second.price - first.price;
     }
 
-    return second.id.localeCompare(first.id);
+    const firstDate = first.postedAt ?? first.id;
+    const secondDate = second.postedAt ?? second.id;
+    return secondDate.localeCompare(firstDate);
   });
 }

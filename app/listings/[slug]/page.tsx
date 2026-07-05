@@ -13,7 +13,6 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import {
   getListingBySlug,
-  getListings,
   getRelatedListings,
 } from "@/services/listings";
 
@@ -22,8 +21,12 @@ type ListingPageProps = {
 };
 
 export async function generateStaticParams() {
-  const listings = await getListings();
-  return listings.map((listing) => ({ slug: listing.slug }));
+  const { getListings, getMyListings } = await import("@/services/listings");
+  const [listings, userListings] = await Promise.all([
+    getListings(),
+    getMyListings(),
+  ]);
+  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
 }
 
 export async function generateMetadata({

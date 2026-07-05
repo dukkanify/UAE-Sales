@@ -132,6 +132,9 @@ export function DashboardShell({
             <p className="mt-1 text-xl font-semibold text-ink">
               2,450 <span className="text-xs font-medium text-muted">د.إ</span>
             </p>
+            <p className="mt-1 text-xs font-medium text-muted">
+              850 د.إ قيد المعالجة
+            </p>
             <Button className="mt-4 w-full" href="/wallet" size="sm" variant="secondary">
               إدارة المحفظة
             </Button>

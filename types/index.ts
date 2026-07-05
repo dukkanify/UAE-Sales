@@ -16,12 +16,15 @@ export type {
 } from "./domain/content";
 
 export type {
+  ContactMethod,
+  DeliveryOption,
   Listing,
   ListingCondition,
   ListingImageTone,
   ListingSearchFilters,
   ListingSeller,
   ListingStatus,
+  SellerType,
 } from "./domain/listing";
 
 export type { City, Country } from "./domain/location";

@@ -35,6 +35,9 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         <Badge variant={conditionVariants[listing.condition]}>
           {conditionLabels[listing.condition]}
         </Badge>
+        {listing.escrowAvailable ? (
+          <Badge variant="escrow">ضمان مالي</Badge>
+        ) : null}
       </div>
 
       <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
@@ -51,7 +54,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
           <span className="font-medium text-muted">الموقع</span>
           <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
-            {listing.city}
+            {listing.area ? `${listing.area}، ${listing.emirate ?? listing.city}` : listing.city}
           </span>
         </div>
         <div className="flex items-center justify-between">
