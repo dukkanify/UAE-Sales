@@ -1,0 +1,68 @@
+import { randomBytes } from "crypto";
+import { cookies } from "next/headers";
+import type { User } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
+
+export const SESSION_COOKIE = "uae-sales-session-token";
+export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+export function createSessionToken(): string {
+  return randomBytes(32).toString("hex");
+}
+
+export async function createSession(userId: string) {
+  const token = createSessionToken();
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+
+  await prisma.session.create({
+    data: {
+      userId,
+      token,
+      expiresAt,
+    },
+  });
+
+  return { token, expiresAt };
+}
+
+export async function getUserFromSessionToken(
+  token: string | undefined,
+): Promise<User | null> {
+  if (!token) {
+    return null;
+  }
+
+  const session = await prisma.session.findUnique({
+    where: { token },
+    include: { user: true },
+  });
+
+  if (!session || session.expiresAt < new Date()) {
+    if (session) {
+      await prisma.session.delete({ where: { id: session.id } });
+    }
+    return null;
+  }
+
+  return session.user;
+}
+
+export async function getCurrentSessionUser(): Promise<User | null> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(SESSION_COOKIE)?.value;
+  return getUserFromSessionToken(token);
+}
+
+export function sessionCookieOptions(expiresAt: Date) {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    expires: expiresAt,
+  };
+}
+
+export async function deleteSession(token: string) {
+  await prisma.session.deleteMany({ where: { token } });
+}

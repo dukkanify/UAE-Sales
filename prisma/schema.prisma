@@ -1,0 +1,327 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  BUSINESS
+  ADMIN
+}
+
+enum AccountType {
+  INDIVIDUAL
+  BUSINESS
+  BUYER
+  SELLER
+  COMPANY
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  PENDING_REVIEW
+  EXPIRED
+  REJECTED
+}
+
+enum ListingCondition {
+  NEW
+  USED
+  EXCELLENT
+}
+
+enum WalletTransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  ESCROW_HOLD
+  ESCROW_RELEASE
+  ESCROW_REFUND
+  PAYMENT
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum EscrowStatus {
+  HELD
+  RELEASED
+  REFUNDED
+  DISPUTED
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id             String      @id @default(cuid())
+  fullName       String
+  email          String      @unique
+  phone          String      @unique
+  passwordHash   String
+  role           UserRole    @default(USER)
+  accountType    AccountType
+  emirate        String?
+  city           String?
+  verified       Boolean     @default(false)
+  subscription   String?
+  employeesCount Int?
+  listingsCount  Int?
+  favoritesCount Int?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  seller         Seller?
+  favorites      Favorite[]
+  sentMessages   Message[]   @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
+  wallet         Wallet?
+  buyerOrders    Order[]     @relation("BuyerOrders")
+  sellerOrders   Order[]     @relation("SellerOrders")
+  sessions       Session[]
+  otpVerifications OtpVerification[]
+  openedDisputes Dispute[]   @relation("OpenedDisputes")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OtpVerification {
+  id         String   @id @default(cuid())
+  userId     String?
+  identifier String
+  code       String
+  expiresAt  DateTime
+  verified   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([identifier])
+}
+
+model Seller {
+  id                    String    @id @default(cuid())
+  userId                String?   @unique
+  sellerKey             String?   @unique
+  sellerName            String
+  sellerType            String
+  rating                Float     @default(0)
+  reviewsCount          Int       @default(0)
+  verified              Boolean   @default(false)
+  responseTime          String?
+  completedTransactions Int       @default(0)
+  avatarUrl             String?
+  nameEnglish           String?
+  joinedAt              DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user     User?     @relation(fields: [userId], references: [id])
+  listings Listing[]
+}
+
+model Category {
+  id                  String   @id
+  nameArabic          String
+  nameEnglish         String?
+  slug                String   @unique
+  icon                String
+  image               String?
+  listingCount        Int      @default(0)
+  subcategories       Json     @default("[]")
+  featuredListingSlug String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  listings Listing[]
+}
+
+model Listing {
+  id                 String           @id @default(cuid())
+  sellerId           String
+  categoryId         String
+  ownerUserId        String?
+  titleArabic        String
+  titleEnglish       String?
+  slug               String           @unique
+  descriptionArabic  String
+  descriptionEnglish String?
+  price              Float
+  currency           String           @default("AED")
+  emirate            String?
+  city               String?
+  area               String?
+  condition          ListingCondition
+  status             ListingStatus    @default(ACTIVE)
+  featured           Boolean          @default(false)
+  premium            Boolean          @default(false)
+  escrowAvailable    Boolean          @default(false)
+  views              Int              @default(0)
+  metadata           Json?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  seller   Seller         @relation(fields: [sellerId], references: [id])
+  category Category       @relation(fields: [categoryId], references: [id])
+  images   ListingImage[]
+  favorites Favorite[]
+  messages Message[]
+  orders   Order[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([featured])
+  @@index([ownerUserId])
+}
+
+model ListingImage {
+  id        String @id @default(cuid())
+  listingId String
+  url       String
+  alt       String?
+  sortOrder Int    @default(0)
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  listingId  String?
+  message    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  listing  Listing? @relation(fields: [listingId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model Wallet {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  availableBalance Float    @default(0)
+  pendingBalance   Float    @default(0)
+  currency         String   @default("AED")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+}
+
+model WalletTransaction {
+  id          String                @id @default(cuid())
+  walletId    String
+  type        WalletTransactionType
+  amount      Float
+  status      TransactionStatus     @default(PENDING)
+  description String?
+  createdAt   DateTime              @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  buyerId     String
+  sellerId    String
+  listingId   String
+  amount      Float
+  paymentFee  Float       @default(0)
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  buyer  User              @relation("BuyerOrders", fields: [buyerId], references: [id])
+  seller User              @relation("SellerOrders", fields: [sellerId], references: [id])
+  listing Listing          @relation(fields: [listingId], references: [id])
+  escrow EscrowTransaction?
+  disputes Dispute[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+}
+
+model EscrowTransaction {
+  id         String       @id @default(cuid())
+  orderId    String       @unique
+  amount     Float
+  status     EscrowStatus @default(HELD)
+  heldAt     DateTime     @default(now())
+  releasedAt DateTime?
+  refundedAt DateTime?
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  orderId     String
+  openedById  String
+  reason      String
+  description String?
+  status      DisputeStatus @default(OPEN)
+  preferredResolution String?
+  evidenceNote String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  openedBy User  @relation("OpenedDisputes", fields: [openedById], references: [id])
+
+  @@index([orderId])
+}
