@@ -7,6 +7,9 @@ export async function requireAuth(): Promise<User> {
   if (!user) {
     throw new ApiHttpError(401, "UNAUTHORIZED", "يجب تسجيل الدخول أولاً.");
   }
+  if (user.suspended) {
+    throw new ApiHttpError(403, "FORBIDDEN", "تم إيقاف هذا الحساب.");
+  }
   return user;
 }
 

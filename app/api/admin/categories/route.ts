@@ -1,5 +1,7 @@
 import { requireAdmin } from "@/lib/auth/guards";
-import { ApiHttpError, handleApiRoute, jsonCreated, jsonSuccess } from "@/lib/api/response";
+import { handleApiRoute, jsonCreated, jsonSuccess } from "@/lib/api/response";
+import { enforceAdminRateLimit } from "@/lib/api/admin-rate-limit";
+import { adminCategoryCreateSchema, parseJsonBody } from "@/lib/api/validation";
 import { withDataFallback } from "@/lib/data/fallback";
 import { getAdminCategoriesFromDb } from "@/lib/repositories/admin.repository";
 import {
@@ -21,12 +23,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   return handleApiRoute(async () => {
-    await requireAdmin();
-    const body = (await request.json()) as { name?: string };
-
-    if (!body.name?.trim()) {
-      throw new ApiHttpError(400, "VALIDATION_ERROR", "اسم التصنيف مطلوب.");
-    }
+    const admin = await requireAdmin();
+    await enforceAdminRateLimit(request, "categories-create", admin.id);
+    const body = await parseJsonBody(request, adminCategoryCreateSchema);
 
     const category = await withDataFallback(
       async () => {
@@ -34,8 +33,8 @@ export async function POST(request: Request) {
         const created = await prisma.category.create({
           data: {
             id: `cat-${Date.now()}`,
-            nameArabic: body.name!.trim(),
-            slug: body.name!.trim().replace(/\s+/g, "-").toLowerCase(),
+            nameArabic: body.name,
+            slug: body.name.replace(/\s+/g, "-").toLowerCase(),
             icon: "package",
             listingCount: 0,
           },
@@ -49,7 +48,7 @@ export async function POST(request: Request) {
           icon: created.icon,
         };
       },
-      () => addMockAdminCategory(body.name!.trim()),
+      () => addMockAdminCategory(body.name),
       "admin-category-create",
     );
 

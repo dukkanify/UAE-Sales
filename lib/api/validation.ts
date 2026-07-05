@@ -96,6 +96,48 @@ export const escrowActionSchema = z.object({
   orderId: z.string(),
 });
 
+export const sendChatMessageSchema = z.object({
+  text: z.string().trim().max(4000).optional(),
+  imageUrl: z.string().url().optional(),
+}).refine((value) => Boolean(value.text?.length) || Boolean(value.imageUrl), {
+  message: "نص الرسالة أو صورة مرفقة مطلوبة.",
+});
+
+export const favoriteSchema = z.object({
+  listingId: z.string().min(1),
+});
+
+export const adminUserPatchSchema = z.object({
+  verified: z.boolean().optional(),
+  suspended: z.boolean().optional(),
+});
+
+export const adminListingPatchSchema = z.object({
+  status: z
+    .enum(["draft", "active", "pending_review", "expired", "rejected"])
+    .optional(),
+  featured: z.boolean().optional(),
+  premium: z.boolean().optional(),
+});
+
+export const adminDisputePatchSchema = z.object({
+  status: z.enum(["open", "under_review", "resolved", "closed"]).optional(),
+  decision: z.enum(["refund_buyer", "release_seller", "partial_refund"]).optional(),
+});
+
+export const adminEscrowActionSchema = z.object({
+  action: z.enum(["release", "refund"]),
+});
+
+export const adminCategoryCreateSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+});
+
+export const adminCategoryPatchSchema = z.object({
+  name: z.string().trim().min(2).max(120).optional(),
+  disabled: z.boolean().optional(),
+});
+
 export async function parseJsonBody<T>(
   request: Request,
   schema: z.ZodSchema<T>,

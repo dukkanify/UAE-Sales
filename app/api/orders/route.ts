@@ -1,5 +1,6 @@
 import { requireAuth } from "@/lib/auth/guards";
 import { ApiHttpError, handleApiRoute, jsonCreated, jsonSuccess } from "@/lib/api/response";
+import { enforceApiRateLimit } from "@/lib/api/rate-limit";
 import { createOrderSchema, parseJsonBody } from "@/lib/api/validation";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
@@ -39,6 +40,12 @@ export async function POST(request: Request) {
     }
 
     const user = await requireAuth();
+    await enforceApiRateLimit(request, {
+      scope: "orders-create",
+      limit: 10,
+      windowMs: 60_000,
+      identifier: user.id,
+    });
     const body = await parseJsonBody(request, createOrderSchema);
 
     const listing = await prisma.listing.findUnique({

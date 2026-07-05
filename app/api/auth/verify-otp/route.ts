@@ -8,6 +8,10 @@ import {
   sessionCookieOptions,
   SESSION_COOKIE,
 } from "@/lib/auth/session";
+import {
+  SESSION_META_COOKIE,
+  signSessionMeta,
+} from "@/lib/auth/session-meta";
 import { mapDbUser } from "@/lib/mappers";
 import { checkRateLimit, getClientIp } from "@/lib/auth/rate-limit";
 import { ApiHttpError, handleApiRoute } from "@/lib/api/response";
@@ -25,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     const ip = getClientIp(request);
-    const rate = checkRateLimit({
+    const rate = await checkRateLimit({
       key: `auth-otp:${ip}`,
       limit: 10,
       windowMs: 60_000,
@@ -34,7 +38,7 @@ export async function POST(request: Request) {
     if (!rate.allowed) {
       throw new ApiHttpError(
         429,
-        "UNKNOWN",
+        "RATE_LIMITED",
         "محاولات كثيرة. انتظر قليلاً ثم حاول مرة أخرى.",
       );
     }
@@ -58,6 +62,17 @@ export async function POST(request: Request) {
     response.cookies.set(
       SESSION_COOKIE,
       token,
+      sessionCookieOptions(expiresAt),
+    );
+
+    const metaToken = await signSessionMeta({
+      userId: user.id,
+      role: user.role,
+      exp: expiresAt.getTime(),
+    });
+    response.cookies.set(
+      SESSION_META_COOKIE,
+      metaToken,
       sessionCookieOptions(expiresAt),
     );
 

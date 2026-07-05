@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { buildCategoryMetadata } from "@/lib/seo/metadata";
+import { buildCategoryJsonLd } from "@/lib/seo/structured-data";
+import { JsonLd } from "@/shared/components/JsonLd";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
@@ -39,16 +41,11 @@ export async function generateStaticParams() {
   return categories.map((category) => ({ slug: category.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: CategoryPageProps) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return { title: "القسم غير موجود | UAE Sales" };
-  return {
-    title: `${category.name} | UAE Sales`,
-    description: `تصفح إعلانات ${category.name} في سوق الإمارات.`,
-  };
+  if (!category) return { title: "القسم غير موجود" };
+  return buildCategoryMetadata(category);
 }
 
 export default async function CategoryPage({
@@ -92,8 +89,11 @@ export default async function CategoryPage({
     }),
   ]);
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
   return (
     <>
+      <JsonLd data={buildCategoryJsonLd(category, appUrl)} />
       <SiteHeader />
       <main>
         <section className="app-container page-padding">

@@ -5,7 +5,8 @@ export type ApiErrorCode =
   | "UNKNOWN"
   | "UNAUTHORIZED"
   | "FORBIDDEN"
-  | "VALIDATION_ERROR";
+  | "VALIDATION_ERROR"
+  | "RATE_LIMITED";
 
 export type ApiErrorPayload = {
   code: ApiErrorCode;

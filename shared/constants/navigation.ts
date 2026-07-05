@@ -28,6 +28,12 @@ export const footerLinks = [
       { label: "كيف يعمل الضمان", href: "/escrow" },
       { label: "فتح نزاع", href: "/disputes/new" },
       { label: "تواصل معنا", href: "/support" },
+      { label: "الشروط والأحكام", href: "/terms" },
+      { label: "سياسة الخصوصية", href: "/privacy" },
+      { label: "سياسة الضمان", href: "/escrow-policy" },
+      { label: "سياسة الاسترداد", href: "/refund-policy" },
+      { label: "نصائح الأمان", href: "/safety" },
+      { label: "اتصل بنا", href: "/contact" },
     ],
   },
 ];

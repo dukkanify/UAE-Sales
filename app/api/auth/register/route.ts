@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     }
 
     const ip = getClientIp(request);
-    const rate = checkRateLimit({
+    const rate = await checkRateLimit({
       key: `auth-register:${ip}`,
       limit: 5,
       windowMs: 60_000,
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     if (!rate.allowed) {
       throw new ApiHttpError(
         429,
-        "UNKNOWN",
+        "RATE_LIMITED",
         "محاولات كثيرة. انتظر قليلاً ثم حاول مرة أخرى.",
       );
     }

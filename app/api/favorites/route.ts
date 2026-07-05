@@ -1,6 +1,7 @@
 import { mapDbListing } from "@/lib/mappers";
 import { requireAuth } from "@/lib/auth/guards";
 import { handleApiRoute, jsonSuccess } from "@/lib/api/response";
+import { parseJsonBody, favoriteSchema } from "@/lib/api/validation";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import { ApiHttpError } from "@/lib/api/response";
 
@@ -32,11 +33,7 @@ export async function POST(request: Request) {
     }
 
     const user = await requireAuth();
-    const body = (await request.json()) as { listingId?: string };
-
-    if (!body.listingId) {
-      throw new ApiHttpError(400, "VALIDATION_ERROR", "معرّف الإعلان مطلوب.");
-    }
+    const body = await parseJsonBody(request, favoriteSchema);
 
     const favorite = await prisma.favorite.upsert({
       where: {

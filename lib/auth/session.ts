@@ -2,8 +2,10 @@ import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
 import type { User } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { SESSION_META_COOKIE } from "@/lib/auth/session-meta";
+import { SESSION_COOKIE } from "@/lib/auth/session-constants";
 
-export const SESSION_COOKIE = "uae-sales-session-token";
+export { SESSION_COOKIE };
 export const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 export function createSessionToken(): string {
@@ -44,6 +46,11 @@ export async function getUserFromSessionToken(
     return null;
   }
 
+  if (session.user.suspended) {
+    await prisma.session.delete({ where: { id: session.id } });
+    return null;
+  }
+
   return session.user;
 }
 
@@ -54,14 +61,29 @@ export async function getCurrentSessionUser(): Promise<User | null> {
 }
 
 export function sessionCookieOptions(expiresAt: Date) {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "lax" as const,
+    path: "/",
+    expires: expiresAt,
+    ...(isProduction ? { priority: "high" as const } : {}),
+  };
+}
+
+export function clearSessionCookieOptions() {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax" as const,
     path: "/",
-    expires: expiresAt,
+    expires: new Date(0),
   };
 }
+
+export const SESSION_COOKIES_TO_CLEAR = [SESSION_COOKIE, SESSION_META_COOKIE];
 
 export async function deleteSession(token: string) {
   await prisma.session.deleteMany({ where: { token } });

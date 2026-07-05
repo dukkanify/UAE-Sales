@@ -1,5 +1,7 @@
-import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { buildListingMetadata } from "@/lib/seo/metadata";
+import { buildListingJsonLd } from "@/lib/seo/structured-data";
+import { JsonLd } from "@/shared/components/JsonLd";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
@@ -37,16 +39,11 @@ export async function generateStaticParams() {
   return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: ListingPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ListingPageProps) {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
-  if (!listing) return { title: "الإعلان غير موجود | UAE Sales" };
-  return {
-    title: `${listing.title} | UAE Sales`,
-    description: listing.description,
-  };
+  if (!listing) return { title: "الإعلان غير موجود" };
+  return buildListingMetadata(listing);
 }
 
 export default async function ListingDetailsPage({ params }: ListingPageProps) {
@@ -61,8 +58,11 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   ]);
   const category = categories.find((item) => item.id === listing.categoryId);
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
   return (
     <>
+      <JsonLd data={buildListingJsonLd(listing, appUrl)} />
       <SiteHeader />
       <RecentlyViewedTracker listing={listing} />
       <main>

@@ -153,6 +153,7 @@ export function AdminDisputesPanel() {
           <p className="mt-4 text-sm text-muted">اختر نزاعاً لعرض التفاصيل.</p>
         )}
       </Card>
+      </div>
 
       <AdminDisputeMessagesPanel />
     </div>

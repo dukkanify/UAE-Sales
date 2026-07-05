@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { deleteSession, SESSION_COOKIE } from "@/lib/auth/session";
+import { deleteSession, SESSION_COOKIE, clearSessionCookieOptions, SESSION_COOKIES_TO_CLEAR } from "@/lib/auth/session";
 import { handleApiRoute } from "@/lib/api/response";
 
 export async function POST() {
@@ -13,11 +13,9 @@ export async function POST() {
     }
 
     const response = NextResponse.json({ loggedOut: true });
-    response.cookies.set(SESSION_COOKIE, "", {
-      httpOnly: true,
-      path: "/",
-      expires: new Date(0),
-    });
+    for (const cookieName of SESSION_COOKIES_TO_CLEAR) {
+      response.cookies.set(cookieName, "", clearSessionCookieOptions());
+    }
 
     return response;
   });

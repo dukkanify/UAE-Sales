@@ -1,9 +1,11 @@
 import { requireAuth } from "@/lib/auth/guards";
 import { ApiHttpError, handleApiRoute, jsonCreated } from "@/lib/api/response";
+import { enforceApiRateLimit } from "@/lib/api/rate-limit";
+import { parseJsonBody, sendChatMessageSchema } from "@/lib/api/validation";
 import { withDataFallback } from "@/lib/data/fallback";
+import type { SendChatMessageInput } from "@/types";
 import { sendChatMessageInDb } from "@/lib/repositories/chat.repository";
 import { addMockChatMessage } from "@/mock/chat.mock";
-import type { SendChatMessageInput } from "@/types/domain/chat";
 
 export async function POST(
   request: Request,
@@ -11,19 +13,26 @@ export async function POST(
 ) {
   return handleApiRoute(async () => {
     const user = await requireAuth();
-    const { id } = await context.params;
-    const body = (await request.json()) as SendChatMessageInput;
+    await enforceApiRateLimit(request, {
+      scope: "chat-message",
+      limit: 30,
+      windowMs: 60_000,
+      identifier: user.id,
+    });
 
-    if (!body.text?.trim() && !body.imageUrl) {
-      throw new ApiHttpError(400, "VALIDATION_ERROR", "نص الرسالة مطلوب.");
-    }
+    const { id } = await context.params;
+    const body = await parseJsonBody(request, sendChatMessageSchema);
+    const payload: SendChatMessageInput = {
+      text: body.text ?? "",
+      ...(body.imageUrl ? { imageUrl: body.imageUrl } : {}),
+    };
 
     const message = await withDataFallback(
-      () => sendChatMessageInDb(id, user.id, body),
+      () => sendChatMessageInDb(id, user.id, payload),
       () =>
         addMockChatMessage(
           id,
-          body,
+          payload,
           user.id,
           user.fullName,
         ),

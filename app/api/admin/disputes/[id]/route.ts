@@ -1,18 +1,20 @@
 import { requireAdmin } from "@/lib/auth/guards";
 import { ApiHttpError, handleApiRoute, jsonSuccess } from "@/lib/api/response";
+import { enforceAdminRateLimit } from "@/lib/api/admin-rate-limit";
+import { adminDisputePatchSchema, parseJsonBody } from "@/lib/api/validation";
 import { withDataFallback } from "@/lib/data/fallback";
 import { patchAdminDisputeInDb } from "@/lib/repositories/admin.repository";
 import { patchMockAdminDispute } from "@/mock/admin.mock";
-import type { AdminDisputePatch } from "@/types/domain/admin";
 
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   return handleApiRoute(async () => {
-    await requireAdmin();
+    const admin = await requireAdmin();
+    await enforceAdminRateLimit(request, "disputes-patch", admin.id);
     const { id } = await context.params;
-    const patch = (await request.json()) as AdminDisputePatch;
+    const patch = await parseJsonBody(request, adminDisputePatchSchema);
 
     const dispute = await withDataFallback(
       () => patchAdminDisputeInDb(id, patch),
