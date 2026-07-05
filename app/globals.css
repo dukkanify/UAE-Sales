@@ -207,6 +207,17 @@ textarea {
   box-shadow: var(--shadow-card);
 }
 
+.admin-sidebar {
+  border: 1px solid color-mix(in srgb, var(--color-primary) 12%, var(--color-border));
+  border-radius: var(--radius-2xl);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-secondary-soft) 65%, var(--color-surface)) 0%,
+    var(--color-surface) 100%
+  );
+  box-shadow: var(--shadow-card);
+}
+
 .uae-hex-mark {
   clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
 }

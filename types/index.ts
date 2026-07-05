@@ -49,6 +49,21 @@ export type {
 export type { AccountType, UserProfile, UserRole } from "./domain/user";
 
 export type {
+  AdminActivityItem,
+  AdminCategoryRecord,
+  AdminDisputePatch,
+  AdminDisputeRecord,
+  AdminEscrowRecord,
+  AdminListingPatch,
+  AdminListingRecord,
+  AdminOrderRecord,
+  AdminReportsData,
+  AdminSummary,
+  AdminUserPatch,
+  AdminUserRecord,
+} from "./domain/admin";
+
+export type {
   WalletSummary,
   WalletTransaction,
   WalletTransactionStatus,

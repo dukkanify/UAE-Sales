@@ -65,7 +65,7 @@ export const demoAccounts: DemoAccount[] = [
     label: "مدير النظام",
     password: "Admin@123",
     phone: "0521234567",
-    postLoginPath: "/dashboard/listings",
+    postLoginPath: "/admin",
     role: "admin",
     profile: {
       id: "demo-admin-001",

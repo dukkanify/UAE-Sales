@@ -84,6 +84,7 @@ model User {
   emirate        String?
   city           String?
   verified       Boolean     @default(false)
+  suspended      Boolean     @default(false)
   subscription   String?
   employeesCount Int?
   listingsCount  Int?

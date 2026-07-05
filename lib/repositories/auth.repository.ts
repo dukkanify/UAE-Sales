@@ -101,6 +101,9 @@ export async function getUserProfile(userId: string) {
 }
 
 export function getPostLoginPathForRole(role: UserRole): string {
+  if (role === "ADMIN") {
+    return "/admin";
+  }
   if (role === "USER") {
     return "/profile";
   }
