@@ -1,5 +1,5 @@
 import type { UserProfile } from "@/types";
-import { mockCurrentUser } from "@/services/data";
+import { mockCurrentUser } from "@/mock";
 
 export async function getCurrentUser(): Promise<UserProfile> {
   return mockCurrentUser;

@@ -6,7 +6,6 @@ export {
   getMarketEmirateImages,
   getMarketEscrowSteps,
   getMarketHeroBackground,
-  getMarketHeroPreviews,
   getMarketQuickSearches,
   getMarketTrustStats,
 } from "./homepage-marketplace.content";

@@ -1,19 +1,11 @@
-export type { ApiErrorCode, ApiErrorPayload, PaginatedResult, ServiceResult } from "./api";
+export type { ApiErrorCode, ApiErrorPayload } from "./api";
+
+export type { HomeCityHighlight } from "./domain/content";
 
 export type {
   Category,
   CategoryIconName,
 } from "./domain/category";
-
-export type {
-  HomeCityHighlight,
-  HomeEscrowStep,
-  HomeReason,
-  HomeStat,
-  HomeStep,
-  HomeTestimonial,
-  HomeTrustPoint,
-} from "./domain/content";
 
 export type {
   CarSpecs,

@@ -223,3 +223,36 @@ export function galleryFromPool(
 }
 
 export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?${q}`;
+
+/** Verified seller portrait URLs */
+export const sellerAvatarUrls = {
+  alNoorMotors: unsplashUrl("photo-1560179707-f14e90ef3623", 200),
+  dubaiElite: unsplashUrl("photo-1560518883-ce09059eeffa", 200),
+  gulfElectronics: unsplashUrl("photo-1560472354-b33ff0c44a43", 200),
+  emiratesHome: unsplashUrl("photo-1581578731548-c64695cc6952", 200),
+  goldenKey: unsplashUrl("photo-1573496359142-b8d87734a5a2", 200),
+  khalidAlMansoori: unsplashUrl("photo-1507003211169-0a1dd7228f2d", 200),
+  fatimaAlZaabi: unsplashUrl("photo-1494790108377-be9c29b29330", 200),
+  omarHassan: unsplashUrl("photo-1472099645785-5658abf4ff4e", 200),
+  priyaSharma: unsplashUrl("photo-1438761681033-6461ffad8d80", 200),
+  ahmedAlMansoori: unsplashUrl("photo-1500648767791-00dcc994a43e", 200),
+} as const;
+
+export function getAllCategoryImageUrls(): Record<string, string> {
+  const keys: ImageFallbackCategory[] = [
+    "cars",
+    "real-estate",
+    "electronics",
+    "mobiles",
+    "furniture",
+    "jobs",
+    "fashion",
+    "services",
+    "pets",
+    "kids",
+    "books",
+    "sports",
+    "food",
+  ];
+  return Object.fromEntries(keys.map((key) => [key, getCategoryFallbackUrl(key)]));
+}

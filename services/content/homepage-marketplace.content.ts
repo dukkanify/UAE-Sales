@@ -1,12 +1,6 @@
-export type MarketHeroPreview = {
-  category: string;
-  city: string;
-  href: string;
-  id: string;
-  imageUrl: string;
-  price: number;
-  title: string;
-};
+import { mockEmirateHighlights } from "@/mock";
+import type { HomeCityHighlight } from "@/types";
+import { getEmirateImageUrl, heroBackgroundUrl } from "@/shared/constants/image-fallbacks";
 
 export type MarketTrustStat = {
   label: string;
@@ -18,12 +12,6 @@ export type MarketEscrowStep = {
   icon: string;
   title: string;
 };
-
-import {
-  getEmirateImageUrl,
-  heroBackgroundUrl,
-  unsplashUrl,
-} from "@/shared/constants/image-fallbacks";
 
 export async function getMarketHeroBackground(): Promise<string> {
   return heroBackgroundUrl;
@@ -102,47 +90,6 @@ export async function getListingSafetyTips(): Promise<string[]> {
   ];
 }
 
-export async function getMarketHeroPreviews(): Promise<MarketHeroPreview[]> {
-  return [
-    {
-      id: "cars",
-      category: "سيارات",
-      city: "دبي مارينا، دبي",
-      href: "/listings/mercedes-amg-g63-2024",
-      imageUrl: unsplashUrl("photo-1618843479313-40f8afb4b4d8", 2000),
-      price: 895000,
-      title: "Mercedes-AMG G63 · 2024",
-    },
-    {
-      id: "real-estate",
-      category: "عقارات",
-      city: "نخلة جميرا، دبي",
-      href: "/listings/villa-palm-jumeirah",
-      imageUrl: unsplashUrl("photo-1600607687939-ce8a6c25118c", 2000),
-      price: 18500000,
-      title: "Villa Palm Jumeirah",
-    },
-    {
-      id: "mobiles",
-      category: "موبايلات",
-      city: "الريم، أبوظبي",
-      href: "/listings/iphone-16-pro-max-256gb",
-      imageUrl: unsplashUrl("photo-1695048133142-1a20484d2569", 2000),
-      price: 4899,
-      title: "iPhone 16 Pro Max · 256GB",
-    },
-    {
-      id: "real-estate-office",
-      category: "عقارات",
-      city: "الخليج التجاري، دبي",
-      href: "/listings/office-business-bay",
-      imageUrl: unsplashUrl("photo-1486406146926-c627a92ad1ab", 2000),
-      price: 1850000,
-      title: "مكتب تجاري — Business Bay",
-    },
-  ];
-}
-
 export async function getMarketEmirateImages(): Promise<Record<string, string>> {
   return {
     dubai: getEmirateImageUrl("dubai"),
@@ -154,15 +101,8 @@ export async function getMarketEmirateImages(): Promise<Record<string, string>> 
   };
 }
 
-export async function getHomeCityHighlights() {
-  return [
-    { cityId: "dubai", listingCount: 9840 },
-    { cityId: "abu-dhabi", listingCount: 5620 },
-    { cityId: "sharjah", listingCount: 3180 },
-    { cityId: "ajman", listingCount: 1240 },
-    { cityId: "rak", listingCount: 890 },
-    { cityId: "fujairah", listingCount: 620 },
-  ];
+export async function getHomeCityHighlights(): Promise<HomeCityHighlight[]> {
+  return mockEmirateHighlights;
 }
 
 export async function getAuthTrustPoints() {

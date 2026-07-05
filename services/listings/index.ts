@@ -1,6 +1,5 @@
 export {
   getFeaturedListings,
-  getLatestListings,
   getListingBySlug,
   getListings,
   getMyListings,

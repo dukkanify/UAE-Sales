@@ -1,5 +1,1 @@
-export {
-  getCategories,
-  getCategoryById,
-  getCategoryBySlug,
-} from "./categories.service";
+export { getCategories, getCategoryBySlug } from "./categories.service";

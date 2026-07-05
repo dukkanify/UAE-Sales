@@ -6,9 +6,9 @@ import type {
   ListingImageTone,
   ListingStatus,
 } from "@/types";
-import { imagesForSlug } from "./images";
-import { resolveSeller } from "./sellers";
-import { extrasForSlug } from "./specs";
+import { imagesForSlug } from "./listing-images.mock";
+import { resolveSeller } from "./sellers.mock";
+import { extrasForSlug } from "./listing-specs.mock";
 
 type ListingSeed = {
   id: string;

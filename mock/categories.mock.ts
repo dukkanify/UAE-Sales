@@ -1,6 +1,7 @@
-import type { Category, UserProfile } from "@/types";
-import { marketplaceListings, marketplaceUserListings } from "./marketplace-data";
-import { categoryImages } from "./marketplace-data/images";
+import type { Category } from "@/types";
+import { getAllCategoryImageUrls } from "@/shared/constants/image-fallbacks";
+
+const categoryImages = getAllCategoryImageUrls();
 
 export const mockCategories: Category[] = [
   {
@@ -129,18 +130,3 @@ export const mockCategories: Category[] = [
     subcategories: ["أكلات منزلية", "تمور", "حلويات", "ضيافة"],
   },
 ];
-
-export const mockCurrentUser: UserProfile = {
-  id: "user-current",
-  fullName: "أحمد المنصوري",
-  email: "ahmed.almansoori@email.com",
-  phone: "0501234567",
-  city: "دبي",
-  accountType: "seller",
-  isVerified: true,
-  joinedAt: "2026-01-15",
-};
-
-export const mockListings = marketplaceListings;
-
-export const mockUserListings = marketplaceUserListings;

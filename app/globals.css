@@ -119,20 +119,8 @@ textarea {
 }
 
 /* ── Emirati identity (subtle) ── */
-.uae-gold {
-  color: #b8955f;
-}
-
-.uae-gold-bg {
-  background-color: #b8955f;
-}
-
 .uae-gold-gradient {
   background: linear-gradient(135deg, #d4b87a 0%, #b8955f 52%, #9a7d4a 100%);
-}
-
-.uae-header-sand {
-  background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%);
 }
 
 .uae-header-accent {
@@ -280,8 +268,13 @@ button:disabled {
   }
 }
 
-.animate-fade-up {
-  animation: fade-up var(--duration-slow) var(--ease-premium) both;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .skeleton {
@@ -308,111 +301,6 @@ button:disabled {
   box-shadow: var(--shadow-md);
 }
 
-/* ── Hero premium ── */
-@keyframes hero-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-.hero-float {
-  animation: hero-float 6s ease-in-out infinite;
-}
-
-.hero-float-slow {
-  animation: hero-float 7s ease-in-out infinite;
-  animation-delay: 0.8s;
-}
-
-.hero-float-delayed {
-  animation: hero-float 7.5s ease-in-out infinite;
-  animation-delay: 1.4s;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in var(--duration-normal) var(--ease-premium) both;
-}
-
-.page-enter {
-  animation: fade-up var(--duration-slow) var(--ease-premium) both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-float,
-  .hero-float-slow,
-  .hero-float-delayed,
-  .animate-fade-up,
-  .animate-fade-in,
-  .page-enter,
-  .marketplace-card,
-  .marketplace-card-image,
-  .interactive-lift {
-    animation: none !important;
-    transition: none !important;
-  }
-
-  .marketplace-card:hover,
-  .marketplace-card:hover .marketplace-card-image {
-    transform: none !important;
-  }
-}
-
-.hero-preview-glow {
-  background: radial-gradient(
-    circle at 50% 55%,
-    rgb(201 169 98 / 22%),
-    transparent 68%
-  );
-}
-
-.hero-search-panel {
-  box-shadow:
-    var(--shadow-xl),
-    0 0 0 1px rgb(255 255 255 / 8%) inset;
-}
-
-.hero-preview-card {
-  transition:
-    transform var(--duration-normal) var(--ease-premium),
-    box-shadow var(--duration-normal) var(--ease-premium);
-}
-
-/* ── Visual perfection utilities ── */
-.hero-cinematic-grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
-}
-
-.hero-floating-search {
-  box-shadow:
-    0 24px 64px rgb(15 20 25 / 14%),
-    0 8px 24px rgb(201 169 98 / 12%),
-    0 0 0 1px rgb(255 255 255 / 50%) inset;
-}
-
-.hero-device-mockup {
-  filter: drop-shadow(0 24px 48px rgb(15 20 25 / 28%));
-}
-
-.premium-float-card {
-  box-shadow:
-    0 20px 50px rgb(15 20 25 / 16%),
-    0 0 0 1px rgb(255 255 255 / 30%) inset;
-}
-
 .premium-chip {
   display: inline-flex;
   align-items: center;
@@ -434,119 +322,26 @@ button:disabled {
   color: var(--color-ink);
 }
 
-.premium-listing-card {
-  box-shadow:
-    var(--shadow-card),
-    0 0 0 1px rgb(255 255 255 / 60%) inset;
-  transition:
-    transform 0.35s var(--ease-premium),
-    box-shadow 0.35s var(--ease-premium);
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-premium) both;
 }
 
-.premium-listing-card:hover {
-  transform: translateY(-6px);
-  box-shadow:
-    var(--shadow-lg),
-    0 0 0 1px rgb(201 169 98 / 15%) inset;
+.page-enter {
+  animation: fade-up var(--duration-slow) var(--ease-premium) both;
 }
 
-.section-backdrop-warm {
-  background:
-    radial-gradient(ellipse at 85% 10%, rgb(201 169 98 / 10%), transparent 45%),
-    radial-gradient(ellipse at 10% 90%, rgb(196 30 58 / 5%), transparent 40%),
-    var(--color-background);
-}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in,
+  .page-enter,
+  .marketplace-card,
+  .marketplace-card-image,
+  .interactive-lift {
+    animation: none !important;
+    transition: none !important;
+  }
 
-.section-backdrop-gold {
-  background:
-    radial-gradient(ellipse at 70% 0%, rgb(201 169 98 / 14%), transparent 50%),
-    linear-gradient(180deg, var(--color-secondary-soft) 0%, var(--color-background) 100%);
-}
-
-.section-backdrop-mesh {
-  background:
-    linear-gradient(rgb(250 249 247 / 92%), rgb(250 249 247 / 92%)),
-    linear-gradient(90deg, rgb(232 228 222 / 40%) 1px, transparent 1px),
-    linear-gradient(rgb(232 228 222 / 40%) 1px, transparent 1px);
-  background-size:
-    auto,
-    2.5rem 2.5rem,
-    2.5rem 2.5rem;
-}
-
-.section-backdrop-night {
-  background:
-    radial-gradient(ellipse at 30% 20%, rgb(201 169 98 / 12%), transparent 50%),
-    linear-gradient(160deg, var(--color-night) 0%, var(--color-night-soft) 100%);
-}
-
-.section-backdrop-orb {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(60px);
-  opacity: 0.55;
-}
-
-.section-backdrop-orb-a {
-  width: 18rem;
-  height: 18rem;
-  background: rgb(201 169 98 / 18%);
-  inset-inline-start: -4rem;
-  top: 10%;
-}
-
-.section-backdrop-orb-b {
-  width: 22rem;
-  height: 22rem;
-  background: rgb(196 30 58 / 8%);
-  inset-inline-end: -6rem;
-  bottom: 5%;
-}
-
-.glass-stat-card {
-  border: 1px solid rgb(255 255 255 / 70%);
-  background: linear-gradient(145deg, rgb(255 255 255 / 92%), rgb(255 255 255 / 78%));
-  box-shadow: var(--shadow-sm);
-  backdrop-filter: blur(12px);
-}
-
-.category-tile {
-  box-shadow: var(--shadow-xs);
-  transition:
-    transform 0.3s var(--ease-premium),
-    box-shadow 0.3s var(--ease-premium),
-    border-color 0.3s var(--ease-premium);
-}
-
-.category-tile:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: rgb(201 169 98 / 35%);
-}
-
-.city-card-premium {
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  transition:
-    transform 0.35s var(--ease-premium),
-    box-shadow 0.35s var(--ease-premium);
-}
-
-.city-card-premium:hover {
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: var(--shadow-lg);
-}
-
-.testimonial-card-premium {
-  border: 1px solid rgb(255 255 255 / 80%);
-  background: linear-gradient(160deg, rgb(255 255 255 / 96%), rgb(247 244 238 / 90%));
-  box-shadow: var(--shadow-card);
-}
-
-.cta-panel-premium {
-  background:
-    radial-gradient(ellipse at 80% 20%, rgb(201 169 98 / 22%), transparent 55%),
-    radial-gradient(ellipse at 10% 80%, rgb(196 30 58 / 10%), transparent 45%),
-    linear-gradient(135deg, var(--color-night) 0%, var(--color-night-soft) 100%);
-  box-shadow: var(--shadow-xl);
+  .marketplace-card:hover,
+  .marketplace-card:hover .marketplace-card-image {
+    transform: none !important;
+  }
 }

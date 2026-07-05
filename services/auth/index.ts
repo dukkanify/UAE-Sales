@@ -1,5 +1,1 @@
-export {
-  completeLogin,
-  registerUserDraft,
-  requestLoginOtp,
-} from "./auth.service";
+export { completeLogin, requestLoginOtp } from "./auth.service";

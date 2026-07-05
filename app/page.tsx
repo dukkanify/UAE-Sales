@@ -1,16 +1,16 @@
-import { MarketCategorySection } from "@/features/home/components/marketplace/MarketCategorySection";
-import { MarketEmirates } from "@/features/home/components/marketplace/MarketEmirates";
-import { MarketEscrow } from "@/features/home/components/marketplace/MarketEscrow";
-import { MarketFeatured } from "@/features/home/components/marketplace/MarketFeatured";
-import { MarketFooter } from "@/features/home/components/marketplace/MarketFooter";
-import { MarketHeader } from "@/features/home/components/marketplace/MarketHeader";
-import { MarketHero } from "@/features/home/components/marketplace/MarketHero";
-import { MarketPreviewStrip } from "@/features/home/components/marketplace/MarketPreviewStrip";
-import { getCategories } from "@/services/categories";
 import {
-  getFeaturedListings,
-  getListings,
-} from "@/services/listings";
+  MarketCategorySection,
+  MarketEmirates,
+  MarketEscrow,
+  MarketFeatured,
+  MarketHeader,
+  MarketHero,
+  MarketPreviewStrip,
+  MarketSiteFooter,
+} from "@/features/home";
+import { mockHomeCategorySections } from "@/mock";
+import { getCategories } from "@/services/categories";
+import { getFeaturedListings, getListings } from "@/services/listings";
 
 export default async function Home() {
   const [categories, featuredListings, allListings] = await Promise.all([
@@ -34,37 +34,22 @@ export default async function Home() {
         <MarketHero categories={categories} />
         <MarketPreviewStrip />
         <MarketFeatured categories={categoryMeta} listings={featuredListings} />
-        <MarketCategorySection
-          categoryId="cars"
-          categorySlug={categoryById("cars")}
-          description="سيارات فاخرة ومستعملة من معارض موثوقة في دبي وأبوظبي."
-          eyebrow="Cars"
-          listings={allListings}
-          title="سيارات في الإمارات"
-          variant="sand"
-        />
-        <MarketCategorySection
-          categoryId="real-estate"
-          categorySlug={categoryById("real-estate")}
-          description="شقق، فلل، ومكاتب للبيع والإيجار في أرقى مناطق الإمارات."
-          eyebrow="Real Estate"
-          listings={allListings}
-          title="عقارات مميزة"
-          variant="white"
-        />
-        <MarketCategorySection
-          categoryId="electronics"
-          categorySlug={categoryById("electronics")}
-          description="إلكترونيات حديثة مع ضمان مالي وتوثيق للبائعين."
-          eyebrow="Electronics"
-          listings={allListings}
-          title="إلكترونيات موثوقة"
-          variant="sand"
-        />
+        {mockHomeCategorySections.map((section) => (
+          <MarketCategorySection
+            key={section.categoryId}
+            categoryId={section.categoryId}
+            categorySlug={categoryById(section.categoryId)}
+            description={section.description}
+            eyebrow={section.eyebrow}
+            listings={allListings}
+            title={section.title}
+            variant={section.variant}
+          />
+        ))}
         <MarketEscrow />
         <MarketEmirates />
       </main>
-      <MarketFooter />
+      <MarketSiteFooter />
     </>
   );
 }

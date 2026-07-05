@@ -1,5 +1,5 @@
 import type { Listing, ListingSearchFilters } from "@/types";
-import { mockListings, mockUserListings } from "@/services/data";
+import { mockListings, mockUserListings } from "@/mock";
 
 export type { ListingSearchFilters };
 
@@ -19,13 +19,6 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
 
 export async function getFeaturedListings(): Promise<Listing[]> {
   return mockListings.filter((listing) => listing.isFeatured);
-}
-
-export async function getLatestListings(): Promise<Listing[]> {
-  return [...mockListings]
-    .filter((listing) => listing.status === "active")
-    .sort((a, b) => (b.postedAt ?? "").localeCompare(a.postedAt ?? ""))
-    .slice(0, 12);
 }
 
 export async function getRelatedListings(
