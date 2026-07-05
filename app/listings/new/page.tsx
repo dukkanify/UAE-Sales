@@ -1,8 +1,8 @@
-import { AddListingForm } from "@/components/listings/AddListingForm";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { AddListingForm } from "@/features/listings/components/AddListingForm.lazy";
+import { PageHero } from "@/shared/ui/PageHero";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 
 export default async function NewListingPage() {
   const categories = await getCategories();
@@ -11,11 +11,11 @@ export default async function NewListingPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="app-container py-10 lg:py-14">
-          <SectionHeader
+        <section className="app-container page-padding">
+          <PageHero
+            description="أضف إعلانك في خطوات بسيطة: اختر القسم، اكتب التفاصيل، أرفق الصور، ثم انشر مباشرة."
             eyebrow="إضافة إعلان"
             title="انشر إعلانك في سوق الإمارات"
-            description="تدفق إضافة إعلان كامل يعمل بالبيانات الوهمية وlocalStorage حتى يكون جاهزاً للربط مع Backend لاحقاً."
           />
           <AddListingForm categories={categories} />
         </section>
