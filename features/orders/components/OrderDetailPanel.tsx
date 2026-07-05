@@ -176,7 +176,7 @@ export function OrderDetailPanel({ order }: OrderDetailPanelProps) {
         <h3 className="text-sm font-semibold text-ink">الإجراءات</h3>
         <div className="mt-4 flex flex-wrap gap-2">
           {isBuyer && order.status === "paid" && order.metadata?.sellerDelivered ? (
-            <Button loading={confirming} onClick={handleConfirm} variant="accent">
+            <Button loading={confirming} onClick={handleConfirm} variant="success">
               تأكيد الاستلام
             </Button>
           ) : null}

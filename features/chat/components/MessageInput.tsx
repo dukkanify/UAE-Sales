@@ -34,25 +34,24 @@ export function MessageInput({ disabled = false, onSend }: MessageInputProps) {
       {attachedImage ? (
         <div className="mb-3 flex items-center justify-between rounded-[var(--radius-xl)] border border-border px-3 py-2 text-xs text-muted">
           <span>صورة مرفقة (تجريبي)</span>
-          <button
-            className="font-medium text-accent"
-            onClick={() => setAttachedImage(undefined)}
-            type="button"
-          >
+          <Button onClick={() => setAttachedImage(undefined)} size="sm" type="button" variant="ghost">
             إزالة
-          </button>
+          </Button>
         </div>
       ) : null}
       <div className="flex items-end gap-2">
-        <button
+        <Button
           aria-label="إرفاق صورة"
-          className="grid size-11 shrink-0 place-items-center rounded-[var(--radius-xl)] border border-border text-muted transition hover:bg-surface-muted"
           disabled={disabled || sending}
+          iconOnly
           onClick={() => setAttachedImage(mockImageUrl)}
+          shape="rounded"
+          size="md"
           type="button"
+          variant="outline"
         >
-          <Icon name="photo" size={18} />
-        </button>
+          <Icon className="shrink-0" name="photo" size={18} />
+        </Button>
         <textarea
           className="min-h-11 flex-1 resize-none rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 px-4 py-3 text-sm outline-none focus:border-primary/40"
           disabled={disabled || sending}

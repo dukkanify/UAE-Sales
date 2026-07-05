@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
 type CardShareButtonProps = {
@@ -39,15 +40,19 @@ export function CardShareButton({
   }
 
   return (
-    <button
-      aria-label={ariaLabel}
-      className={`focus-ring grid size-8 place-items-center rounded-full bg-white/95 text-ink shadow-[var(--shadow-sm)] transition hover:bg-white ${className}`}
+    <Button
+      aria-label={shared ? "تمت المشاركة" : ariaLabel}
+      className={`bg-white/95 shadow-[var(--shadow-sm)] hover:bg-white ${className}`}
+      iconOnly
       onClick={handleClick}
+      shape="pill"
+      size="sm"
       title={ariaLabel}
       type="button"
+      variant="outline"
     >
-      <Icon name="send" size={14} />
+      <Icon className="shrink-0" name="send" size={14} />
       <span className="sr-only">{shared ? "تمت المشاركة" : ariaLabel}</span>
-    </button>
+    </Button>
   );
 }

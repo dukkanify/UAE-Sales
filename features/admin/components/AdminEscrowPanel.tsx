@@ -57,18 +57,15 @@ export function AdminEscrowPanel() {
             { value: "refunded", label: "مسترد" },
             { value: "disputed", label: "نزاع" },
           ].map((tab) => (
-            <button
+            <Button
               key={tab.value}
-              className={`rounded-[var(--radius-xl)] px-4 py-2 text-sm font-medium transition ${
-                status === tab.value
-                  ? "bg-primary text-white"
-                  : "border border-border bg-surface text-muted"
-              }`}
               onClick={() => setStatus(tab.value)}
+              size="sm"
               type="button"
+              variant={status === tab.value ? "primary" : "outline"}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -116,7 +113,7 @@ export function AdminEscrowPanel() {
                       disabled={actionLoading}
                       onClick={() => handleAction(item.id, "release")}
                       size="sm"
-                      variant="primary"
+                      variant="success"
                     >
                       إطلاق يدوي
                     </Button>
@@ -124,7 +121,7 @@ export function AdminEscrowPanel() {
                       disabled={actionLoading}
                       onClick={() => handleAction(item.id, "refund")}
                       size="sm"
-                      variant="secondary"
+                      variant="danger"
                     >
                       استرداد يدوي
                     </Button>

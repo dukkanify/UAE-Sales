@@ -85,23 +85,28 @@ export function SiteHeader() {
               </Link>
             )}
             <Button
-              className="hidden !h-[42px] !min-h-[42px] !min-w-[120px] shrink-0 !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap sm:inline-flex"
+              className="hidden sm:inline-flex"
               href="/listings/new"
-              size="sm"
-              variant="primary"
+              shape="pill"
+              size="md"
+              variant="gold"
             >
-              <Icon name="plus" size={16} />
+              <Icon className="shrink-0" name="plus" size={16} />
               أضف إعلانك
             </Button>
-            <button
-              aria-expanded={menuOpen}
+            <Button
               aria-label="القائمة"
-              className="grid size-10 place-items-center rounded-[var(--radius-md)] border border-border text-ink lg:hidden"
+              aria-expanded={menuOpen}
+              className="lg:hidden"
+              iconOnly
               onClick={() => setMenuOpen((open) => !open)}
+              shape="rounded"
+              size="md"
               type="button"
+              variant="outline"
             >
               <Icon name={menuOpen ? "close" : "menu"} size={18} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -122,12 +127,15 @@ export function SiteHeader() {
                 <InputShell />
               </form>
               <Button
-                className="mt-2 !h-[42px] !min-h-[42px] w-full !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap"
+                className="mt-2"
+                fullWidth
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
-                variant="primary"
+                shape="pill"
+                size="md"
+                variant="gold"
               >
-                <Icon name="plus" size={16} />
+                <Icon className="shrink-0" name="plus" size={16} />
                 أضف إعلانك
               </Button>
               {user ? (
@@ -139,16 +147,17 @@ export function SiteHeader() {
                   >
                     حسابي
                   </Link>
-                  <button
-                    className="w-full rounded-[var(--radius-md)] px-4 py-3 text-right text-sm font-medium text-muted"
+                  <Button
+                    className="w-full justify-start"
                     onClick={() => {
                       clearSessionUser();
                       setMenuOpen(false);
                     }}
                     type="button"
+                    variant="ghost"
                   >
                     تسجيل الخروج
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <Link

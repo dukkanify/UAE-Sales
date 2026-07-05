@@ -145,16 +145,17 @@ function DashboardShellInner({
                   {link.label}
                 </Link>
               ))}
-              <button
-                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
+              <Button
+                className="mt-2 w-full justify-start"
                 onClick={() => {
                   clearSessionUser();
                   router.replace("/login");
                 }}
                 type="button"
+                variant="ghost"
               >
                 تسجيل الخروج
-              </button>
+              </Button>
             </nav>
           </Card>
 

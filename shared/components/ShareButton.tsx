@@ -1,15 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
 type ShareButtonProps = {
   className?: string;
   title: string;
 };
-
-const baseClass =
-  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
 export function ShareButton({ className = "", title }: ShareButtonProps) {
   const [message, setMessage] = useState("مشاركة");
@@ -32,9 +30,9 @@ export function ShareButton({ className = "", title }: ShareButtonProps) {
   }
 
   return (
-    <button className={`${baseClass} ${className}`} onClick={handleShare} type="button">
-      <Icon name="send" size={16} />
+    <Button className={className} onClick={handleShare} size="md" type="button" variant="outline">
+      <Icon className="shrink-0" name="send" size={16} />
       {message}
-    </button>
+    </Button>
   );
 }

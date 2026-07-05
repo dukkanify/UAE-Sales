@@ -71,13 +71,17 @@ export function MarketHeader() {
               <span className="text-xs font-bold text-ink">العربية</span>
             </span>
 
-            <Link
+            <Button
               aria-label="بحث"
-              className="grid size-10 place-items-center rounded-lg text-muted hover:bg-[#B8955F]/10 hover:text-[#B8955F]"
+              className="text-muted hover:bg-[#B8955F]/10 hover:text-[#B8955F]"
               href="/search"
+              iconOnly
+              shape="rounded"
+              size="md"
+              variant="ghost"
             >
               <Icon name="search" size={20} />
-            </Link>
+            </Button>
 
             {user ? (
               <Link className="hidden px-3 py-2 text-sm font-semibold text-muted sm:inline-flex" href="/profile">
@@ -89,23 +93,30 @@ export function MarketHeader() {
               </Link>
             )}
 
-            <Link
-              className="uae-gold-gradient hidden h-[42px] min-h-[42px] min-w-[120px] shrink-0 items-center justify-center gap-2 overflow-visible rounded-full px-[18px] text-sm font-bold whitespace-nowrap text-white shadow-[0_6px_20px_rgb(184_149_95/30%)] sm:inline-flex"
+            <Button
+              className="hidden sm:inline-flex"
               href="/listings/new"
+              shape="pill"
+              size="md"
+              variant="gold"
             >
-              <Icon name="plus" size={16} />
+              <Icon className="shrink-0" name="plus" size={16} />
               أضف إعلانك
-            </Link>
+            </Button>
 
-            <button
-              aria-expanded={menuOpen}
+            <Button
               aria-label="القائمة"
-              className="grid size-10 place-items-center rounded-lg border border-border lg:hidden"
+              aria-expanded={menuOpen}
+              className="lg:hidden"
+              iconOnly
               onClick={() => setMenuOpen((o) => !o)}
+              shape="rounded"
+              size="md"
               type="button"
+              variant="outline"
             >
               <Icon name={menuOpen ? "close" : "menu"} size={18} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -123,12 +134,15 @@ export function MarketHeader() {
                 </Link>
               ))}
               <Button
-                className="mt-2 !h-[42px] !min-h-[42px] w-full !justify-center !overflow-visible !rounded-full !px-[18px] whitespace-nowrap"
+                className="mt-2"
+                fullWidth
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
-                variant="accent"
+                shape="pill"
+                size="md"
+                variant="gold"
               >
-                <Icon name="plus" size={16} />
+                <Icon className="shrink-0" name="plus" size={16} />
                 أضف إعلانك
               </Button>
             </div>

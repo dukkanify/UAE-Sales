@@ -92,14 +92,17 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
               >
                 {item.label}
               </Link>
-              <button
+              <Button
                 aria-label={`حذف ${item.label}`}
-                className="focus-ring grid size-7 shrink-0 place-items-center rounded-full text-muted transition hover:bg-surface hover:text-error"
+                iconOnly
                 onClick={() => handleRemove(item.id)}
+                shape="pill"
+                size="sm"
                 type="button"
+                variant="ghost"
               >
-                <Icon name="close" size={12} />
-              </button>
+                <Icon className="shrink-0" name="close" size={12} />
+              </Button>
             </li>
           ))}
         </ul>

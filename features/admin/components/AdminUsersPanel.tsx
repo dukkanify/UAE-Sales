@@ -106,14 +106,15 @@ export function AdminUsersPanel() {
                     className="border-b border-border/60 transition hover:bg-surface-muted/50"
                   >
                     <td className="px-3 py-3">
-                      <button
-                        className="text-right"
+                      <Button
+                        className="h-auto justify-start p-0 text-right"
                         onClick={() => setSelected(user)}
                         type="button"
+                        variant="ghost"
                       >
                         <p className="font-medium text-ink">{user.fullName}</p>
                         <p className="text-xs text-muted">{user.email}</p>
-                      </button>
+                      </Button>
                     </td>
                     <td className="px-3 py-3">
                       <Badge variant="muted">{user.role}</Badge>
@@ -150,7 +151,7 @@ export function AdminUsersPanel() {
                             handlePatch(user.id, { suspended: !user.suspended })
                           }
                           size="sm"
-                          variant="ghost"
+                          variant={user.suspended ? "secondary" : "danger"}
                         >
                           {user.suspended ? "تفعيل" : "إيقاف"}
                         </Button>

@@ -189,7 +189,7 @@ export function CheckoutForm({ listing, user }: CheckoutFormProps) {
             loading={isLoading}
             onClick={confirmPayment}
             size="lg"
-            variant="accent"
+            variant="gold"
           >
             تأكيد الدفع
           </Button>

@@ -128,7 +128,7 @@ export function DisputeForm() {
 
         {error ? <FormMessage variant="error">{error}</FormMessage> : null}
 
-        <Button fullWidth loading={isLoading} type="submit" variant="accent">
+        <Button fullWidth loading={isLoading} type="submit" variant="gold">
           إرسال النزاع
         </Button>
       </form>

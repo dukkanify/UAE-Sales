@@ -90,16 +90,17 @@ function ChatShellInner({
         <Button href="/profile" size="sm" variant="ghost">
           الملف الشخصي
         </Button>
-        <button
-          className="text-sm font-medium text-muted transition hover:text-ink"
+        <Button
           onClick={() => {
             clearSessionUser();
             router.replace("/login");
           }}
+          size="sm"
           type="button"
+          variant="ghost"
         >
           تسجيل الخروج
-        </button>
+        </Button>
       </div>
     </section>
   );

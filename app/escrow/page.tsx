@@ -146,7 +146,7 @@ export default async function EscrowPage() {
               <p className="text-sm text-muted">
                 تصفح الإعلانات المحمية بالضمان المالي
               </p>
-              <Button className="mt-4" href="/featured" variant="accent">
+              <Button className="mt-4" href="/featured" variant="gold">
                 إعلانات مميزة محمية
               </Button>
             </Card>

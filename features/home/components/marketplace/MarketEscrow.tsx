@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
@@ -72,12 +72,9 @@ export async function MarketEscrow() {
               <p className="text-sm text-muted">لا يُحرَّر المبلغ إلا بعد تأكيد المشتري</p>
             </div>
           </div>
-          <Link
-            className="uae-gold-gradient inline-flex min-h-11 items-center justify-center rounded-xl px-6 text-sm font-bold text-white"
-            href="/escrow"
-          >
+          <Button href="/escrow" size="md" variant="gold">
             كيف يعمل الضمان؟
-          </Link>
+          </Button>
         </div>
       </div>
     </MarketSectionShell>

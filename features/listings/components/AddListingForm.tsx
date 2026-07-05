@@ -71,7 +71,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           <p className="font-medium">
             بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
           </p>
-          <Button className="shrink-0" loading={isSubmitting} type="submit">
+          <Button className="shrink-0" loading={isSubmitting} type="submit" variant="primary">
             نشر الإعلان
           </Button>
         </Card>

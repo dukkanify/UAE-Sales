@@ -131,7 +131,7 @@ export function AdminListingsPanel() {
                   disabled={actionLoading}
                   onClick={() => handlePatch(listing.id, { status: "active" })}
                   size="sm"
-                  variant="primary"
+                  variant="success"
                 >
                   موافقة
                 </Button>
@@ -139,7 +139,7 @@ export function AdminListingsPanel() {
                   disabled={actionLoading}
                   onClick={() => handlePatch(listing.id, { status: "rejected" })}
                   size="sm"
-                  variant="secondary"
+                  variant="danger"
                 >
                   رفض
                 </Button>
@@ -157,7 +157,7 @@ export function AdminListingsPanel() {
                   disabled={actionLoading}
                   onClick={() => handlePatch(listing.id, { status: "rejected" })}
                   size="sm"
-                  variant="ghost"
+                  variant="danger"
                 >
                   إزالة
                 </Button>

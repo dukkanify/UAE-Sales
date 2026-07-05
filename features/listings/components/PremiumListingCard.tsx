@@ -83,7 +83,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
       <div className="absolute end-3 top-3 z-20 flex gap-1.5">
         <FavoriteButton
           ariaLabel={`حفظ ${listing.title}`}
-          className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--shadow-sm)]"
+          iconOnly
           label=""
         />
         <CardShareButton title={listing.title} url={shareUrl} />

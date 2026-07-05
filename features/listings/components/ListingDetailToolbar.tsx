@@ -24,13 +24,13 @@ export function ListingDetailToolbar({ listingTitle }: ListingDetailToolbarProps
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
-      <ShareButton className="!min-h-9" title={listingTitle} />
-      <Button className="!min-h-9" onClick={handlePrint} size="sm" variant="secondary">
-        <Icon name="photo" size={14} />
+      <ShareButton title={listingTitle} />
+      <Button onClick={handlePrint} size="sm" variant="outline">
+        <Icon className="shrink-0" name="photo" size={14} />
         طباعة
       </Button>
-      <Button className="!min-h-9" onClick={handleReport} size="sm" variant="ghost">
-        <Icon name="shield" size={14} />
+      <Button onClick={handleReport} size="sm" variant="ghost">
+        <Icon className="shrink-0" name="shield" size={14} />
         إبلاغ عن الإعلان
       </Button>
       {reportMessage ? (

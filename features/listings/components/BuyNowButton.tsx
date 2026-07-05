@@ -26,7 +26,7 @@ export function BuyNowButton({ listing }: BuyNowButtonProps) {
   }, [listing.id, router]);
 
   return (
-    <Button fullWidth onClick={handleBuyNow} size="lg" variant="accent">
+    <Button fullWidth onClick={handleBuyNow} size="lg" variant="gold">
       شراء الآن
     </Button>
   );

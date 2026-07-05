@@ -2,6 +2,7 @@
 
 import type { Category } from "@/types";
 import { cities } from "@/shared/constants/locations";
+import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
 type MarketHeroSearchProps = {
@@ -62,13 +63,15 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
             </select>
           </label>
 
-          <button
-            className="uae-gold-gradient flex min-h-14 w-full items-center justify-center gap-2.5 rounded-xl px-8 text-base font-bold text-white shadow-[0_10px_32px_rgb(184_149_95/35%)] transition hover:brightness-105 sm:col-span-2 lg:col-span-1 lg:w-auto"
+          <Button
+            className="w-full shadow-[0_10px_32px_rgb(184_149_95/35%)] sm:col-span-2 lg:col-span-1 lg:w-auto"
+            size="lg"
             type="submit"
+            variant="gold"
           >
-            <Icon name="search" size={20} />
+            <Icon className="shrink-0" name="search" size={20} />
             بحث
-          </button>
+          </Button>
         </div>
       </div>
     </form>

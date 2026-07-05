@@ -77,15 +77,16 @@ export function AdminDisputesPanel() {
         ) : (
           <div className="mt-5 grid gap-3">
             {disputes.map((dispute) => (
-              <button
+              <Button
                 key={dispute.id}
-                className={`w-full rounded-[var(--radius-xl)] border p-4 text-right transition ${
+                className={`h-auto w-full justify-start p-4 text-right ${
                   selected?.id === dispute.id
                     ? "border-primary bg-primary-soft/30"
                     : "border-border/70 hover:bg-surface-muted/50"
                 }`}
                 onClick={() => setSelected(dispute)}
                 type="button"
+                variant="ghost"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -94,7 +95,7 @@ export function AdminDisputesPanel() {
                   </div>
                   <AdminStatusBadge status={dispute.status} />
                 </div>
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -126,7 +127,7 @@ export function AdminDisputesPanel() {
                   disabled={actionLoading}
                   onClick={() => handleDecision(selected.id, "refund_buyer")}
                   size="sm"
-                  variant="primary"
+                  variant="success"
                 >
                   استرداد للمشتري
                 </Button>

@@ -1,5 +1,6 @@
 import type { NotificationRecord, NotificationType } from "@/types/domain/notification";
 import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
 const typeLabels: Record<NotificationType, string> = {
@@ -85,13 +86,9 @@ export function NotificationCard({
               </a>
             ) : null}
             {!notification.read && onMarkRead ? (
-              <button
-                className="font-semibold text-ink"
-                onClick={() => onMarkRead(notification.id)}
-                type="button"
-              >
+              <Button onClick={() => onMarkRead(notification.id)} size="sm" type="button" variant="ghost">
                 تعليم كمقروء
-              </button>
+              </Button>
             ) : null}
           </div>
         </div>

@@ -108,21 +108,17 @@ export function OtpVerification({
       ) : null}
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
 
-      <div className="flex items-center justify-between text-sm font-medium">
-        <button
-          className="text-primary"
+      <div className="flex items-center justify-between gap-2 text-sm font-medium">
+        <Button
           onClick={() => setStatusMessage("تم إرسال رمز جديد.")}
           type="button"
+          variant="ghost"
         >
           إعادة الإرسال
-        </button>
-        <button
-          className="text-muted transition hover:text-ink"
-          onClick={onBack}
-          type="button"
-        >
+        </Button>
+        <Button onClick={onBack} type="button" variant="ghost">
           تعديل البيانات
-        </button>
+        </Button>
       </div>
     </div>
   );
