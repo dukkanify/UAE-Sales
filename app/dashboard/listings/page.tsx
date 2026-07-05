@@ -1,10 +1,10 @@
-import { DashboardShell } from "@/components/dashboard/DashboardShell";
-import { MyListingsDashboard } from "@/components/dashboard/MyListingsDashboard";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
-import { getMyListings } from "@/services/listingsService";
-import { getCurrentUser } from "@/services/userService";
+import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
+import { MyListingsDashboard } from "@/features/dashboard/components/MyListingsDashboard";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
+import { getMyListings } from "@/services/listings";
+import { getCurrentUser } from "@/services/profile";
 
 export default async function DashboardListingsPage() {
   const [categories, listings, user] = await Promise.all([

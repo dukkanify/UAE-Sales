@@ -1,44 +1,55 @@
-import { CategoriesGrid } from "@/components/home/CategoriesGrid";
-import { EscrowSection } from "@/components/home/EscrowSection";
-import { FeaturedListings } from "@/components/home/FeaturedListings";
-import { SearchHero } from "@/components/home/SearchHero";
-import { TrustSafetySection } from "@/components/home/TrustSafetySection";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
-import { getFeaturedListings } from "@/services/listingsService";
+import {
+  MarketCategorySection,
+  MarketEmirates,
+  MarketEscrow,
+  MarketFeatured,
+  MarketHeader,
+  MarketHero,
+  MarketPreviewStrip,
+  MarketSiteFooter,
+} from "@/features/home";
+import { mockHomeCategorySections } from "@/mock";
+import { getCategories } from "@/services/categories";
+import { getFeaturedListings, getListings } from "@/services/listings";
 
 export default async function Home() {
-  const [categories, featuredListings] = await Promise.all([
+  const [categories, featuredListings, allListings] = await Promise.all([
     getCategories(),
     getFeaturedListings(),
+    getListings(),
   ]);
+
+  const categoryMeta = categories.map((category) => ({
+    id: category.id,
+    name: category.name,
+  }));
+
+  const categoryById = (id: string) =>
+    categories.find((c) => c.id === id)?.slug ?? id;
 
   return (
     <>
-      <SiteHeader />
+      <MarketHeader />
       <main>
-        <SearchHero categories={categories} />
-        <CategoriesGrid categories={categories} />
-        <FeaturedListings listings={featuredListings} />
-        <EscrowSection />
-        <TrustSafetySection />
-        <section className="app-container py-8">
-          <div className="luxury-gradient relative grid overflow-hidden rounded-[var(--radius-xl)] p-6 text-white shadow-[var(--shadow-glow)] md:grid-cols-3 md:p-8">
-            <div className="absolute -left-20 -top-20 size-72 rounded-full bg-primary/20 blur-3xl" />
-            <div>
-              <p className="text-sm font-bold text-secondary">جاهز للربط</p>
-              <h2 className="mt-2 text-2xl font-black">طبقة API منظمة</h2>
-            </div>
-            <p className="leading-8 text-white/75 md:col-span-2">
-              تم فصل واجهات العرض عن مصادر البيانات عبر services قابلة للتبديل
-              بين mock data وواجهات backend للإعلانات، التصنيفات، الطلبات،
-              المحفظة، والدردشة.
-            </p>
-          </div>
-        </section>
+        <MarketHero categories={categories} />
+        <MarketPreviewStrip />
+        <MarketFeatured categories={categoryMeta} listings={featuredListings} />
+        {mockHomeCategorySections.map((section) => (
+          <MarketCategorySection
+            key={section.categoryId}
+            categoryId={section.categoryId}
+            categorySlug={categoryById(section.categoryId)}
+            description={section.description}
+            eyebrow={section.eyebrow}
+            listings={allListings}
+            title={section.title}
+            variant={section.variant}
+          />
+        ))}
+        <MarketEscrow />
+        <MarketEmirates />
       </main>
-      <SiteFooter />
+      <MarketSiteFooter />
     </>
   );
 }

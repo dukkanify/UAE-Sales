@@ -5,9 +5,15 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "prisma db seed",
+    "db:studio": "prisma studio",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
@@ -27,21 +33,30 @@
   },
   "homepage": "https://github.com/dukkanify/UAE-Sales#readme",
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
     "next": "^16.2.9",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.9",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4.3.0",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   },
   "overrides": {
     "postcss": "^8.5.10"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }

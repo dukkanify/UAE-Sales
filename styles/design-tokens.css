@@ -1,30 +1,75 @@
 :root {
-  --color-primary: #111827;
-  --color-primary-dark: #030712;
-  --color-primary-soft: #ede8dd;
-  --color-secondary: #c8a45d;
-  --color-secondary-soft: #f3ead8;
-  --color-uae-red: #b91c1c;
-  --color-uae-black: #111827;
-  --color-uae-white: #ffffff;
-  --color-accent: #b91c1c;
-  --color-accent-soft: #fee2e2;
-  --color-ink: #111827;
-  --color-muted: #6b665c;
-  --color-border: #e5e7eb;
+  /* Primary — Luxury Charcoal */
+  --color-primary: #0f1419;
+  --color-primary-dark: #06080c;
+  --color-primary-soft: #f0ede8;
+
+  /* Secondary — Warm Gold */
+  --color-secondary: #c9a962;
+  --color-secondary-soft: #f7f0e4;
+
+  /* Background — Warm White */
+  --color-background: #faf9f7;
+
+  /* Surface — Soft Ivory */
   --color-surface: #ffffff;
-  --color-surface-muted: #efeae1;
-  --color-background: #f8f7f4;
-  --color-night: #111827;
-  --color-night-soft: #1f2937;
-  --color-glow: #c8a45d;
-  --shadow-card: 0 24px 70px rgb(17 24 39 / 10%);
-  --shadow-soft: 0 16px 42px rgb(17 24 39 / 8%);
-  --shadow-glow: 0 24px 80px rgb(200 164 93 / 22%);
-  --radius-sm: 0.9rem;
-  --radius-md: 1.15rem;
-  --radius-lg: 1.75rem;
-  --radius-xl: 2.4rem;
-  --container-width: 1240px;
-  --font-arabic: "Tajawal", "IBM Plex Sans Arabic", Tahoma, Arial, sans-serif;
+  --color-surface-muted: #f3f0ea;
+  --color-surface-elevated: #ffffff;
+  --gradient-surface: linear-gradient(
+    135deg,
+    var(--color-secondary-soft) 0%,
+    var(--color-surface) 55%,
+    var(--color-background) 100%
+  );
+
+  /* Accent — Elegant UAE Red */
+  --color-accent: #c41e3a;
+  --color-accent-soft: #fdf2f4;
+  --color-uae-red: #c41e3a;
+  --color-uae-black: #0f1419;
+  --color-uae-white: #ffffff;
+
+  /* Success — Modern Emerald */
+  --color-success: #10b981;
+  --color-success-soft: #ecfdf5;
+
+  /* Error */
+  --color-error: #dc2626;
+  --color-error-soft: #fef2f2;
+
+  /* Neutrals */
+  --color-ink: #0f1419;
+  --color-muted: #6b6560;
+  --color-border: #e8e4de;
+  --color-night: #0f1419;
+  --color-night-soft: #1a2028;
+  --color-glow: #c9a962;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgb(15 20 25 / 4%);
+  --shadow-sm: 0 4px 16px rgb(15 20 25 / 6%);
+  --shadow-md: 0 8px 32px rgb(15 20 25 / 8%);
+  --shadow-lg: 0 16px 48px rgb(15 20 25 / 10%);
+  --shadow-xl: 0 24px 64px rgb(15 20 25 / 12%);
+  --shadow-card: 0 8px 32px rgb(15 20 25 / 7%);
+  --shadow-soft: 0 4px 20px rgb(15 20 25 / 5%);
+  --shadow-glow: 0 8px 40px rgb(201 169 98 / 18%);
+
+  /* Radii — semantic roles */
+  --radius-sm: 0.5rem;   /* 8px  — chips, step numbers */
+  --radius-md: 0.75rem;  /* 12px — nested surfaces */
+  --radius-lg: 1rem;     /* 16px — badges */
+  --radius-xl: 1.5rem;   /* 24px — buttons, inputs */
+  --radius-2xl: 2rem;    /* 32px — cards, heroes, dialogs */
+
+  /* Motion */
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* Layout */
+  --container-width: 1280px;
+  --section-gap: clamp(3.5rem, 7vw, 6rem);
+  --font-arabic: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
 }
