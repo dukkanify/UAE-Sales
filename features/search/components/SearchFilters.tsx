@@ -1,6 +1,5 @@
 import type { Category, City } from "@/types";
 import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 
@@ -12,6 +11,7 @@ type SearchFiltersProps = {
     id: string;
     name: string;
   }[];
+  layout?: "bar" | "sidebar";
   selectedFilters: {
     category?: string;
     city?: string;
@@ -30,14 +30,24 @@ export function SearchFilters({
   categories,
   cities,
   countries,
+  layout = "bar",
   selectedFilters,
   showCategory = true,
 }: SearchFiltersProps) {
+  const isSidebar = layout === "sidebar";
+
   return (
-    <Card className="p-5" variant="elevated">
+    <div className={isSidebar ? "marketplace-panel p-5" : "marketplace-panel p-5 md:p-6"}>
+      {isSidebar ? (
+        <h2 className="mb-4 text-sm font-bold text-ink">تصفية النتائج</h2>
+      ) : null}
       <form
         action={action}
-        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
+        className={
+          isSidebar
+            ? "grid gap-4"
+            : "grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
+        }
       >
         <Input
           defaultValue={selectedFilters.query}
@@ -109,7 +119,7 @@ export function SearchFilters({
           placeholder="50000"
           type="number"
         />
-        <div className="grid gap-2">
+        <div className={isSidebar ? "grid gap-2" : "grid gap-2"}>
           <Select
             defaultValue={selectedFilters.sort}
             label="الترتيب"
@@ -121,10 +131,10 @@ export function SearchFilters({
             ]}
           />
           <Button className="mt-auto w-full" type="submit" variant="primary">
-            تطبيق
+            تطبيق الفلاتر
           </Button>
         </div>
       </form>
-    </Card>
+    </div>
   );
 }

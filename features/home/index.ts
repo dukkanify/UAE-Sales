@@ -6,5 +6,4 @@ export { MarketFooter } from "./components/marketplace/MarketFooter";
 export { MarketHeader } from "./components/marketplace/MarketHeader";
 export { MarketHero } from "./components/marketplace/MarketHero";
 export { MarketHeroSearch } from "./components/marketplace/MarketHeroSearch";
-export { MarketListingCard } from "./components/marketplace/MarketListingCard";
 export { MarketPreviewStrip } from "./components/marketplace/MarketPreviewStrip";

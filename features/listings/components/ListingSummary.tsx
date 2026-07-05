@@ -29,7 +29,7 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
   return (
-    <Card className="p-6">
+    <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
         <Badge variant={conditionVariants[listing.condition]}>

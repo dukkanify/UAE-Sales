@@ -87,7 +87,7 @@ export function ListingFeatures({ listing }: ListingFeaturesProps) {
   }
 
   return (
-    <Card className="mt-8 p-6">
+    <Card className="mt-8 marketplace-panel p-6">
       <h2 className="text-lg font-black text-ink">المواصفات والميزات</h2>
 
       {specEntries.length > 0 ? (

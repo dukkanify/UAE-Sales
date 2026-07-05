@@ -101,7 +101,7 @@ export function SearchResultsList({
 
   if (isLoading) {
     return (
-      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <ListingCardSkeleton key={index} />
         ))}
@@ -122,7 +122,7 @@ export function SearchResultsList({
   }
 
   return (
-    <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {visibleListings.map((listing) => (
         <ListingCard
           key={listing.id}

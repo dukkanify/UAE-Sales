@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { getMarketHeroPreviews } from "@/services/content/homepage-marketplace.content";
-import { MarketListingCard } from "./MarketListingCard";
+import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
+import { getCategories } from "@/services/categories";
+import { getFeaturedListings } from "@/services/listings";
 
 export async function MarketPreviewStrip() {
-  const previews = await getMarketHeroPreviews();
+  const [categories, listings] = await Promise.all([
+    getCategories(),
+    getFeaturedListings(),
+  ]);
+  const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
+  const previews = listings.slice(0, 4);
 
   return (
     <section className="relative z-10 border-t border-[#B8955F]/10 bg-[#fdfbf7] py-10 md:py-14">
@@ -24,17 +30,11 @@ export async function MarketPreviewStrip() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {previews.map((preview, index) => (
-            <MarketListingCard
-              key={preview.id}
-              listing={{
-                category: preview.category,
-                city: preview.city,
-                href: preview.href,
-                imageUrl: preview.imageUrl,
-                price: preview.price,
-                title: preview.title,
-              }}
+          {previews.map((listing, index) => (
+            <PremiumListingCard
+              key={listing.id}
+              categoryName={categoryMap.get(listing.categoryId)}
+              listing={listing}
               priority={index === 0}
             />
           ))}

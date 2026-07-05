@@ -23,14 +23,18 @@ export function Skeleton({
 
 export function ListingCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface">
-      <Skeleton className="!rounded-none" height="12rem" />
-      <div className="space-y-3 p-4">
-        <Skeleton height="0.875rem" width="80%" />
-        <Skeleton height="0.875rem" width="55%" />
+    <div className="marketplace-card flex h-full flex-col overflow-hidden">
+      <div className="aspect-[4/3]">
+        <Skeleton className="h-full w-full !rounded-none" />
+      </div>
+      <div className="min-h-[9.5rem] space-y-3 p-4">
+        <Skeleton height="0.65rem" width="35%" />
+        <Skeleton height="0.875rem" width="90%" />
+        <Skeleton height="0.875rem" width="75%" />
+        <Skeleton height="0.75rem" width="50%" />
         <div className="flex justify-between pt-2">
-          <Skeleton height="1.25rem" width="5rem" />
-          <Skeleton height="0.75rem" width="3rem" />
+          <Skeleton height="1.25rem" width="5.5rem" />
+          <Skeleton height="0.75rem" width="4rem" />
         </div>
       </div>
     </div>

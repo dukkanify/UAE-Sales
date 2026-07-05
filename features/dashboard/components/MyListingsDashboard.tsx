@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
+import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { ListingStatusBadge } from "@/features/listings/components/ListingStatusBadge";
 import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
@@ -27,10 +27,6 @@ const statusOrder: ListingStatus[] = [
   "expired",
   "rejected",
 ];
-
-const priceFormatter = new Intl.NumberFormat("ar-AE", {
-  maximumFractionDigits: 0,
-});
 
 export function MyListingsDashboard({
   categories,
@@ -87,7 +83,7 @@ export function MyListingsDashboard({
           { icon: "edit" as const, label: "مسودات", value: counts.draft },
           { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("ar-AE") },
         ].map((stat) => (
-          <Card key={stat.label} className="p-5" variant="flat">
+          <div key={stat.label} className="marketplace-stat-card p-5">
             <div className="flex items-center justify-between">
               <span className="grid size-10 place-items-center rounded-[var(--radius-xl)] bg-secondary-soft text-secondary">
                 <Icon name={stat.icon} size={18} />
@@ -95,21 +91,21 @@ export function MyListingsDashboard({
               <p className="text-xl font-semibold text-ink">{stat.value}</p>
             </div>
             <p className="mt-2 text-xs font-medium text-muted">{stat.label}</p>
-          </Card>
+          </div>
         ))}
       </div>
 
-      <Card className="p-5" variant="flat">
+      <div className="marketplace-panel p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-semibold text-ink">إعلاناتي</h2>
           <Button href="/listings/new" size="sm" variant="primary">
-            إضافة
+            إضافة إعلان
           </Button>
         </div>
         <div className="mt-4">
           <Tabs activeId={activeStatus} onChange={setActiveStatus} tabs={tabs} />
         </div>
-      </Card>
+      </div>
 
       {actionMessage ? (
         <FormMessage variant="success">{actionMessage}</FormMessage>
@@ -124,59 +120,54 @@ export function MyListingsDashboard({
           title="لا توجد إعلانات"
         />
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {filteredListings.map((listing) => (
-            <Card key={listing.id} className="p-5" variant="flat">
-              <div className="flex flex-col gap-4 md:flex-row md:items-center">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="text-sm font-semibold text-ink">{listing.title}</h4>
-                    <ListingStatusBadge status={listing.status} />
-                  </div>
-                  <p className="mt-1.5 flex flex-wrap gap-3 text-xs font-medium text-muted">
-                    <span>{categoryNames.get(listing.categoryId)}</span>
-                    <span>{listing.city}</span>
-                    <span>{priceFormatter.format(listing.price)} د.إ</span>
-                  </p>
-                </div>
+            <div key={listing.id} className="grid gap-2">
+              <PremiumListingCard
+                categoryName={categoryNames.get(listing.categoryId)}
+                layout="row"
+                listing={listing}
+              />
+              <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+                <ListingStatusBadge status={listing.status} />
                 <div className="flex flex-wrap gap-2">
+                <Button
+                  href={
+                    listing.id.startsWith("local-")
+                      ? `/listings/local/${listing.id}`
+                      : `/listings/${listing.slug}`
+                  }
+                  size="sm"
+                  variant="secondary"
+                >
+                  عرض
+                </Button>
+                <Button
+                  href={
+                    listing.id.startsWith("local-")
+                      ? `/listings/local/${listing.id}/edit`
+                      : `/listings/${listing.slug}/edit`
+                  }
+                  size="sm"
+                  variant="ghost"
+                >
+                  تعديل
+                </Button>
+                {listing.id.startsWith("local-") ? (
                   <Button
-                    href={
-                      listing.id.startsWith("local-")
-                        ? `/listings/local/${listing.id}`
-                        : `/listings/${listing.slug}`
-                    }
+                    onClick={() => {
+                      deleteLocalListing(listing.id);
+                      setActionMessage("تم حذف الإعلان.");
+                    }}
                     size="sm"
                     variant="secondary"
                   >
-                    عرض
+                    حذف
                   </Button>
-                  <Button
-                    href={
-                      listing.id.startsWith("local-")
-                        ? `/listings/local/${listing.id}/edit`
-                        : `/listings/${listing.slug}/edit`
-                    }
-                    size="sm"
-                    variant="ghost"
-                  >
-                    تعديل
-                  </Button>
-                  {listing.id.startsWith("local-") ? (
-                    <Button
-                      onClick={() => {
-                        deleteLocalListing(listing.id);
-                        setActionMessage("تم حذف الإعلان.");
-                      }}
-                      size="sm"
-                      variant="secondary"
-                    >
-                      حذف
-                    </Button>
-                  ) : null}
+                ) : null}
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}

@@ -1,5 +1,5 @@
 import type { Listing } from "@/types";
-import { MarketListingCard } from "./MarketListingCard";
+import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
 type MarketCategorySectionProps = {
@@ -11,12 +11,6 @@ type MarketCategorySectionProps = {
   title: string;
   variant?: "sand" | "white";
 };
-
-function listingHref(listing: Listing) {
-  return listing.id.startsWith("local-")
-    ? `/listings/local/${listing.id}`
-    : `/listings/${listing.slug}`;
-}
 
 export function MarketCategorySection({
   categoryId,
@@ -44,18 +38,7 @@ export function MarketCategorySection({
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((listing) => (
-          <MarketListingCard
-            key={listing.id}
-            listing={{
-              city: listing.area
-                ? `${listing.area}، ${listing.emirate ?? listing.city}`
-                : listing.city,
-              href: listingHref(listing),
-              imageUrl: listing.imageUrl ?? "",
-              price: listing.price,
-              title: listing.title,
-            }}
-          />
+          <PremiumListingCard key={listing.id} listing={listing} />
         ))}
       </div>
     </MarketSectionShell>

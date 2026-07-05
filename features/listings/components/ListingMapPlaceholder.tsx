@@ -12,7 +12,7 @@ export function ListingMapPlaceholder({ listing }: ListingMapPlaceholderProps) {
     : listing.city;
 
   return (
-    <Card className="mt-8 overflow-hidden p-0">
+    <Card className="mt-8 overflow-hidden p-0 marketplace-panel">
       <div className="flex items-center justify-between border-b border-border px-6 py-4">
         <h2 className="text-lg font-black text-ink">الموقع على الخريطة</h2>
         <span className="inline-flex items-center gap-1.5 text-sm font-medium text-muted">

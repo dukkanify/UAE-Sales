@@ -7,7 +7,7 @@ export async function EscrowProtectionCard() {
   const protectionSteps = await getEscrowProtectionSteps();
 
   return (
-    <Card className="p-6">
+    <Card className="marketplace-panel p-6">
       <div className="flex items-center gap-2">
         <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-success-soft text-success">
           <Icon name="shield" size={18} />

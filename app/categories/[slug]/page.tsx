@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
+import { CategoryHero } from "@/features/categories/components/CategoryHero";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { ChipLink } from "@/shared/ui/ChipLink";
-import { PageHero } from "@/shared/ui/PageHero";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import {
@@ -104,11 +104,8 @@ export default async function CategoryPage({
               { label: category.name },
             ]}
           />
-          <PageHero
-            description={`${category.listingCount.toLocaleString("ar-AE")} إعلان في هذا القسم`}
-            eyebrow="صفحة القسم"
-            title={category.name}
-          />
+
+          <CategoryHero category={category} />
 
           <div className="mb-6 flex flex-wrap gap-2">
             {category.subcategories.map((subcategory) => (
@@ -120,29 +117,36 @@ export default async function CategoryPage({
             ))}
           </div>
 
-          <SearchFilters
-            action={`/categories/${category.slug}`}
-            categories={categories}
-            cities={cities}
-            countries={countries}
-            selectedFilters={selectedFilters}
-            showCategory={false}
-          />
+          <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
+            <aside className="lg:sticky lg:top-24 lg:self-start">
+              <SearchFilters
+                action={`/categories/${category.slug}`}
+                categories={categories}
+                cities={cities}
+                countries={countries}
+                layout="sidebar"
+                selectedFilters={selectedFilters}
+                showCategory={false}
+              />
+            </aside>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm font-medium text-muted">
-              {listings.length.toLocaleString("ar-AE")} نتيجة
-            </p>
-            <Badge variant="escrow">ضمان مالي متاح</Badge>
-          </div>
+            <div>
+              <div className="mt-0 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-ink">
+                  {listings.length.toLocaleString("ar-AE")} نتيجة
+                </p>
+                <Badge variant="escrow">ضمان مالي متاح</Badge>
+              </div>
 
-          <div className="mt-5">
-            <SearchResultsList
-              categoryId={category.id}
-              categories={categories}
-              listings={listings}
-              selectedFilters={selectedFilters}
-            />
+              <div className="mt-5">
+                <SearchResultsList
+                  categoryId={category.id}
+                  categories={categories}
+                  listings={listings}
+                  selectedFilters={selectedFilters}
+                />
+              </div>
+            </div>
           </div>
         </section>
       </main>

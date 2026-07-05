@@ -6,7 +6,7 @@ export async function ListingSafetyTips() {
   const tips = await getListingSafetyTips();
 
   return (
-    <Card className="mt-8 p-6">
+    <Card className="mt-8 marketplace-panel p-6">
       <div className="flex items-center gap-2">
         <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-accent-soft text-accent">
           <Icon name="shield" size={18} />

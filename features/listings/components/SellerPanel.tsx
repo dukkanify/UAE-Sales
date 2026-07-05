@@ -21,7 +21,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
     listing.seller.sellerType === "business" ? "شركة" : "بائع فردي";
 
   return (
-    <Card className="p-6">
+    <Card className="marketplace-panel p-6">
       <h2 className="text-base font-black text-ink">البائع</h2>
       <div className="mt-4 flex items-center gap-3">
         {listing.seller.avatarUrl ? (
