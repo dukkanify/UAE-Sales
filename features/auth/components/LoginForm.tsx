@@ -89,27 +89,23 @@ export function LoginForm() {
 
       <Input
         autoComplete="username"
+        error={errors.identifier}
         label="رقم الهاتف أو البريد"
         name="identifier"
         placeholder="example@email.com"
         required
         type="text"
       />
-      {errors.identifier ? (
-        <FormMessage variant="error">{errors.identifier}</FormMessage>
-      ) : null}
 
       <Input
         autoComplete="current-password"
+        error={errors.password}
         label="كلمة المرور"
         name="password"
         placeholder="••••••••"
         required
         type="password"
       />
-      {errors.password ? (
-        <FormMessage variant="error">{errors.password}</FormMessage>
-      ) : null}
 
       {submitError ? (
         <FormMessage variant="error">{submitError}</FormMessage>

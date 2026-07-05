@@ -11,7 +11,7 @@ export const sellerAvatars = {
   dubaiElite: unsplash("photo-1560518883-ce09059eeffa", 200),
   gulfElectronics: unsplash("photo-1560472354-b33ff0c44a43", 200),
   emiratesHome: unsplash("photo-1581578731548-c64695cc6952", 200),
-  goldenKey: unsplash("photo-1560518883-ce09059eeffa", 200),
+  goldenKey: unsplash("photo-1573496359142-b8d87734a5a2", 200),
   khalidAlMansoori: unsplash("photo-1507003211169-0a1dd7228f2d", 200),
   fatimaAlZaabi: unsplash("photo-1494790108377-be9c29b29330", 200),
   omarHassan: unsplash("photo-1472099645785-5658abf4ff4e", 200),
@@ -266,7 +266,7 @@ export const listingImages: Record<string, string[]> = {
     "photo-1521737711867-e3b97375f902",
     "photo-1600880292089-90a7e086ee0c",
     "photo-1560472354-b33ff0c44a43",
-    "photo-1521737711867-e3b97375f902",
+    "photo-1573497019940-88c2f6e0e0b0",
     "photo-1556761175-5973dc0f32e7",
   ),
   "real-estate-agent-abu-dhabi": gallery(

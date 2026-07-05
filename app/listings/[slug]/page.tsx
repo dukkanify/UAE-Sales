@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
 import { ListingFeatures } from "@/features/listings/components/ListingFeatures";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
 import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
@@ -13,7 +14,6 @@ import {
 } from "@/features/listings/components/RecentlyViewedSection";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
-import { Card } from "@/shared/ui/Card";
 import { SectionHeader } from "@/shared/ui/SectionHeader";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -86,6 +86,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
               <ListingGallery listing={listing} />
+              <ListingDetailToolbar listingTitle={listing.title} />
               <ListingMapPlaceholder listing={listing} />
             </div>
             <div className="grid gap-4">
@@ -95,7 +96,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             </div>
           </div>
 
-          <Card className="mt-8 p-6">
+          <div className="marketplace-panel mt-8 p-6">
             <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
             <p className="mt-4 text-sm font-medium leading-8 text-muted">
               {listing.description}
@@ -105,7 +106,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
                 {listing.descriptionEnglish}
               </p>
             ) : null}
-          </Card>
+          </div>
 
           <ListingFeatures listing={listing} />
           <ListingSafetyTips />

@@ -9,6 +9,7 @@ type AppImageProps = {
   className?: string;
   fill?: boolean;
   height?: number;
+  loading?: "eager" | "lazy";
   priority?: boolean;
   sizes?: string;
   src?: string;
@@ -20,6 +21,7 @@ export function AppImage({
   className = "",
   fill = false,
   height = 600,
+  loading,
   priority = false,
   sizes = "(max-width: 768px) 100vw, 50vw",
   src,
@@ -45,6 +47,7 @@ export function AppImage({
       className={className}
       fill={fill}
       height={fill ? undefined : height}
+      loading={priority ? undefined : loading}
       onError={() => setHasError(true)}
       priority={priority}
       sizes={sizes}

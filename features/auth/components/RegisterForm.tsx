@@ -138,32 +138,24 @@ export function RegisterForm() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Input
-            autoComplete="name"
-            label="الاسم الكامل"
-            name="fullName"
-            placeholder="اكتب اسمك"
-            required
-            type="text"
-          />
-          {errors.fullName ? (
-            <FormMessage variant="error">{errors.fullName}</FormMessage>
-          ) : null}
-        </div>
-        <div>
-          <Input
-            autoComplete="email"
-            label="البريد الإلكتروني"
-            name="email"
-            placeholder="example@email.com"
-            required
-            type="email"
-          />
-          {errors.email ? (
-            <FormMessage variant="error">{errors.email}</FormMessage>
-          ) : null}
-        </div>
+        <Input
+          autoComplete="name"
+          error={errors.fullName}
+          label="الاسم الكامل"
+          name="fullName"
+          placeholder="اكتب اسمك"
+          required
+          type="text"
+        />
+        <Input
+          autoComplete="email"
+          error={errors.email}
+          label="البريد الإلكتروني"
+          name="email"
+          placeholder="example@email.com"
+          required
+          type="email"
+        />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -186,19 +178,15 @@ export function RegisterForm() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Input
-            autoComplete="tel"
-            label="رقم الهاتف"
-            name="phone"
-            placeholder="05xxxxxxxx"
-            required
-            type="tel"
-          />
-          {errors.phone ? (
-            <FormMessage variant="error">{errors.phone}</FormMessage>
-          ) : null}
-        </div>
+        <Input
+          autoComplete="tel"
+          error={errors.phone}
+          label="رقم الهاتف"
+          name="phone"
+          placeholder="05xxxxxxxx"
+          required
+          type="tel"
+        />
         <Select
           label="نوع الحساب"
           name="accountType"
@@ -210,32 +198,25 @@ export function RegisterForm() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <Input
-            autoComplete="new-password"
-            label="كلمة المرور"
-            name="password"
-            placeholder="••••••••"
-            required
-            type="password"
-          />
-          {errors.password ? (
-            <FormMessage variant="error">{errors.password}</FormMessage>
-          ) : null}
-        </div>
-        <div>
-          <Input
-            autoComplete="new-password"
-            label="تأكيد كلمة المرور"
-            name="confirmPassword"
-            placeholder="••••••••"
-            required
-            type="password"
-          />
-          {errors.confirmPassword ? (
-            <FormMessage variant="error">{errors.confirmPassword}</FormMessage>
-          ) : null}
-        </div>
+        <Input
+          autoComplete="new-password"
+          error={errors.password}
+          hint="8 أحرف على الأقل مع حرف كبير وصغير ورقم"
+          label="كلمة المرور"
+          name="password"
+          placeholder="••••••••"
+          required
+          type="password"
+        />
+        <Input
+          autoComplete="new-password"
+          error={errors.confirmPassword}
+          label="تأكيد كلمة المرور"
+          name="confirmPassword"
+          placeholder="••••••••"
+          required
+          type="password"
+        />
       </div>
 
       <div>

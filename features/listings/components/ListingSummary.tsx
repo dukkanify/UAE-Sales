@@ -1,4 +1,5 @@
 import type { Category, Listing } from "@/types";
+import { formatPostedTime } from "./listing-card.utils";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { Badge } from "@/shared/ui/Badge";
@@ -55,6 +56,13 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
           <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
             {listing.area ? `${listing.area}، ${listing.emirate ?? listing.city}` : listing.city}
+          </span>
+        </div>
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <span className="font-medium text-muted">تاريخ النشر</span>
+          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+            <Icon name="clock" size={14} />
+            {formatPostedTime(listing.postedAt)}
           </span>
         </div>
         <div className="flex items-center justify-between">

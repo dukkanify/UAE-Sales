@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { ListingCardSkeleton } from "@/shared/ui/Skeleton";
 import { getLocalListings } from "@/services/storage";
@@ -111,18 +112,32 @@ export function SearchResultsList({
 
   if (visibleListings.length === 0) {
     return (
-      <EmptyState
-        actionHref="/search"
-        actionLabel="عرض كل الإعلانات"
-        description="جرّب تعديل الفلاتر أو البحث بكلمات مختلفة."
-        icon="search"
-        title="لا توجد نتائج"
-      />
+      <>
+        <SearchResultsToolbar
+          categories={categories}
+          resultCount={0}
+          selectedFilters={selectedFilters}
+        />
+        <EmptyState
+          actionHref="/search"
+          actionLabel="عرض كل الإعلانات"
+          description="جرّب تعديل الفلاتر أو البحث بكلمات مختلفة. يمكنك أيضاً حفظ البحث للمرة القادمة."
+          eyebrow="لا نتائج"
+          icon="search"
+          title="لم نجد إعلانات مطابقة"
+        />
+      </>
     );
   }
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    <>
+      <SearchResultsToolbar
+        categories={categories}
+        resultCount={visibleListings.length}
+        selectedFilters={selectedFilters}
+      />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 page-enter">
       {visibleListings.map((listing) => (
         <ListingCard
           key={listing.id}
@@ -130,6 +145,7 @@ export function SearchResultsList({
           listing={listing}
         />
       ))}
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { Button } from "@/shared/ui/Button";
-import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 
 type EmptyStateProps = {
@@ -32,27 +31,31 @@ export function EmptyState({
   title,
 }: EmptyStateProps) {
   return (
-    <Card className="p-10 text-center" variant="flat">
-      <span className="mx-auto grid size-14 place-items-center rounded-[var(--radius-2xl)] bg-surface-muted text-secondary">
-        <Icon name={iconMap[icon]} size={24} />
+    <div className="marketplace-panel animate-fade-in p-10 text-center sm:p-12">
+      <span className="relative mx-auto grid size-16 place-items-center rounded-[var(--radius-2xl)] bg-gradient-to-br from-secondary-soft to-surface-muted text-secondary shadow-[var(--shadow-sm)]">
+        <Icon name={iconMap[icon]} size={28} />
+        <span
+          aria-hidden
+          className="absolute -inset-1 -z-10 rounded-[var(--radius-2xl)] bg-secondary/10 blur-md"
+        />
       </span>
       {eyebrow ? (
-        <p className="mt-5 text-xs font-medium tracking-wide text-secondary uppercase">
+        <p className="mt-6 text-xs font-bold tracking-wide text-[#B8955F] uppercase">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className={`${eyebrow ? "mt-2" : "mt-5"} text-xl font-black text-ink`}>
+      <h2 className={`${eyebrow ? "mt-2" : "mt-6"} text-xl font-black text-ink sm:text-2xl`}>
         {title}
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm font-medium leading-7 text-muted">
+      <p className="mx-auto mt-3 max-w-md text-sm font-medium leading-7 text-muted">
         {description}
       </p>
       {children}
       {actionHref && actionLabel ? (
-        <Button className="mt-6" href={actionHref}>
+        <Button className="mt-7" href={actionHref} variant="primary">
           {actionLabel}
         </Button>
       ) : null}
-    </Card>
+    </div>
   );
 }

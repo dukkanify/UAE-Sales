@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
+import { DashboardOverviewPanel } from "@/features/dashboard/components/DashboardOverviewPanel";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { ListingStatusBadge } from "@/features/listings/components/ListingStatusBadge";
 import { Button } from "@/shared/ui/Button";
@@ -76,6 +77,8 @@ export function MyListingsDashboard({
 
   return (
     <div className="grid gap-5">
+      <DashboardOverviewPanel />
+
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { icon: "check" as const, label: "نشطة", value: counts.active },

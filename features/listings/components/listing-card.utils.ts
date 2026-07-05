@@ -26,3 +26,46 @@ export const conditionLabels: Record<Listing["condition"], string> = {
   new: "جديد",
   used: "مستعمل",
 };
+
+export const conditionBadgeVariant: Record<
+  Listing["condition"],
+  "new" | "muted" | "premium"
+> = {
+  excellent: "premium",
+  new: "new",
+  used: "muted",
+};
+
+export function formatPostedTime(postedAt?: string): string {
+  if (!postedAt) {
+    return "منذ ساعة";
+  }
+
+  const posted = new Date(postedAt);
+  const now = new Date();
+  const diffMs = now.getTime() - posted.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffHours < 1) {
+    return "الآن";
+  }
+  if (diffHours < 24) {
+    return `منذ ${diffHours} ساعة`;
+  }
+  if (diffDays === 1) {
+    return "أمس";
+  }
+  if (diffDays < 7) {
+    return `منذ ${diffDays} أيام`;
+  }
+
+  return posted.toLocaleDateString("ar-AE", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+export function formatViews(views: number): string {
+  return views.toLocaleString("ar-AE");
+}

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
@@ -14,22 +17,23 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         ? [listing.imageUrl]
         : [];
 
-  const [primaryImage, ...thumbnailImages] = galleryImages;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImage = galleryImages[activeIndex] ?? galleryImages[0];
 
   return (
-    <div className="grid gap-4">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted shadow-[var(--shadow-lg)] lg:aspect-auto lg:min-h-[32rem]">
-        {primaryImage ? (
+    <div className="grid gap-3">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-[#e8e4de] shadow-[var(--shadow-lg)] lg:min-h-[28rem]">
+        {activeImage ? (
           <AppImage
             alt={listing.title}
-            className="object-cover"
+            className="object-cover transition duration-500"
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 60vw"
-            src={primaryImage}
+            src={activeImage}
           />
         ) : (
-          <div className="grid h-full min-h-[24rem] place-items-center bg-surface-muted text-muted">
+          <div className="grid h-full min-h-[20rem] place-items-center text-muted">
             <Badge variant="muted">لا توجد صورة</Badge>
           </div>
         )}
@@ -37,24 +41,35 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
           {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
           {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+          {listing.escrowAvailable ? <Badge variant="escrow">ضمان مالي</Badge> : null}
         </div>
+        {galleryImages.length > 1 ? (
+          <p className="absolute bottom-4 end-4 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white">
+            {activeIndex + 1} / {galleryImages.length}
+          </p>
+        ) : null}
       </div>
 
-      {thumbnailImages.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {thumbnailImages.slice(0, 7).map((url, index) => (
-            <div
+      {galleryImages.length > 1 ? (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {galleryImages.map((url, index) => (
+            <button
               key={`${url}-${index}`}
-              className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] border border-border"
+              aria-label={`عرض صورة ${index + 1}`}
+              aria-pressed={activeIndex === index}
+              className={`relative aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-[var(--radius-xl)] border-2 transition ${activeIndex === index ? "border-secondary ring-2 ring-secondary/25" : "border-border opacity-80 hover:opacity-100"}`}
+              onClick={() => setActiveIndex(index)}
+              type="button"
             >
               <AppImage
-                alt={`صورة ${index + 2} — ${listing.title}`}
+                alt={`صورة ${index + 1}`}
                 className="object-cover"
                 fill
-                sizes="(max-width: 1024px) 25vw, 15vw"
+                loading={index === 0 ? undefined : "lazy"}
+                sizes="96px"
                 src={url}
               />
-            </div>
+            </button>
           ))}
         </div>
       ) : null}

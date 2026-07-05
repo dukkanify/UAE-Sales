@@ -1,7 +1,6 @@
 import { cities, countries } from "@/shared/constants/locations";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
-import { Badge } from "@/shared/ui/Badge";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
@@ -91,12 +90,6 @@ export default async function SearchPage({
             </aside>
 
             <div>
-              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-ink">
-                  {listings.length.toLocaleString("ar-AE")} إعلان
-                </p>
-                <Badge variant="escrow">ضمان مالي متاح</Badge>
-              </div>
               <SearchResultsList
                 categories={categories}
                 listings={listings}
