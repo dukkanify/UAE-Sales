@@ -1,140 +1,139 @@
-# UAE Sales Web App - Project Status Report
+# UAE Sales Web App — Project Status Report
 
-## 1. Fixed Issues
+**Last updated:** July 5, 2026  
+**Branch:** `cursor/web-foundation-homepage-37ba`  
+**Phase:** Production freeze — demo accounts + architecture cleanup complete
 
-- Reworked the visual identity to a premium UAE marketplace style using:
-  - Charcoal `#111827`
-  - Gold `#C8A45D`
-  - Red accent `#B91C1C`
-  - Warm background `#F8F7F4`
-  - Soft borders `#E5E7EB`
-- Removed green/emerald/teal styling from runtime UI code.
-- Improved Arabic RTL layout and labels across core forms and search filters.
-- Added mobile-friendly navigation in the header.
-- Improved the homepage hero, search area, category cards, featured listings, escrow, and trust/safety sections.
-- Improved category, search, listing details, and add-listing pages with premium cards, spacing, shadows, and typography.
-- Added working placeholder routes to avoid broken navigation:
-  - `/escrow`
-  - `/wallet`
-  - `/checkout`
-  - `/chat`
-  - `/support`
-  - `/disputes/new`
-  - `/featured`
-  - `/forgot-password`
-- Improved mock authentication:
-  - Register form validation.
-  - Login form validation.
-  - OTP screen with feedback.
-  - Mock localStorage session.
-  - Logout action from the header.
-- Improved Add Listing flow:
-  - Category and subcategory selection.
-  - Title, description, price, condition, city, contact, mock upload, and package fields.
-  - Form validation in Arabic.
-  - Live listing preview.
-  - Saved listings are stored in localStorage.
-  - Created listings appear in My Listings, category results, search results, and local details pages.
-- Fixed inactive UI actions:
-  - Favorite buttons now toggle state.
-  - Share button copies/shares the current listing URL.
-  - OTP resend button shows feedback.
-  - Re-publish action in My Listings shows feedback.
-- Added placeholder edit pages for seeded and local listings to avoid broken edit links.
+---
 
-## 2. Remaining Issues
+## Current Ready Features
 
-- Authentication is still mock/localStorage only.
-- Add Listing persists only in browser localStorage and is not shared across devices or sessions if storage is cleared.
-- Image upload is a mock upload only; files are not uploaded or previewed from a backend/CDN.
-- Checkout, wallet, chat, disputes, support, and escrow are UI placeholder pages, not full business workflows.
-- Favorite state is UI-only and is not persisted.
-- Share uses browser APIs when available and falls back to UI feedback.
-- Protected pages use client-side mock session checks; production needs server-side/session-aware protection.
+### Core Marketplace UI
+| Area | Routes | Status |
+|------|--------|--------|
+| Homepage | `/` | ✅ Final marketplace design (single version) |
+| Categories | `/categories`, `/categories/[slug]` | ✅ Directory + hero + listings |
+| Search | `/search` | ✅ Sticky filters, chips, saved searches |
+| Featured | `/featured` | ✅ Premium listing grid |
+| Listing detail | `/listings/[slug]` | ✅ Gallery, sticky price, seller, escrow, safety |
+| Local listings | `/listings/local/[id]`, `.../edit` | ✅ localStorage CRUD |
+| Add listing | `/listings/new` | ✅ 3-step form + preview |
 
-## 3. Missing Features
+### Auth & Accounts
+| Feature | Status |
+|---------|--------|
+| Demo User login | ✅ `user@uaesales.demo` / `User@123` |
+| Demo Business login | ✅ `company@uaesales.demo` / `Company@123` |
+| Demo Admin login | ✅ `admin@uaesales.demo` / `Admin@123` |
+| OTP verification | ✅ `123456` for all demo accounts |
+| Demo credentials panel on login | ✅ |
+| Register + OTP | ✅ |
+| Session (localStorage) | ✅ |
 
-- Real backend API integration.
-- Real user registration/login/logout with secure sessions.
-- OTP provider integration.
-- UAE PASS integration.
-- Persistent listing CRUD.
-- Real image upload, validation, storage, and gallery management.
-- Payment gateway integration.
-- Escrow ledger and order state machine.
-- Wallet balance and withdrawal workflows.
-- Chat messaging backend.
-- Notifications center.
-- Admin moderation/review dashboard.
-- SEO metadata per category/listing from real data.
-- Analytics and event tracking.
+### Dashboard & Profile
+| Route | Status |
+|-------|--------|
+| `/profile` | ✅ Profile form + activity panel |
+| `/dashboard/listings` | ✅ Analytics, tabs, listing management |
+| `/wallet` | ✅ Demo wallet UI |
+| `/escrow` | ✅ Demo escrow UI |
+| `/chat` | ✅ Demo messaging UI |
 
-## 4. Broken or Incomplete Flows
+### Design System
+- Single `PremiumListingCard` across all listing grids
+- Unified tokens: `styles/design-tokens.css`, `app/globals.css`
+- Shared UI primitives in `shared/ui/`
+- Image fallback system in `shared/constants/image-fallbacks.ts`
 
-- No known broken routes were found in the checked core paths.
-- The main user journey works as a browser mock flow:
-  1. Homepage.
-  2. Register or login.
-  3. Add listing.
-  4. Publish listing.
-  5. View local listing details.
-  6. See listing in My Listings.
-  7. Find listing in search/category results.
-  8. Logout.
-- Incomplete production flows:
-  - Checkout and payment are placeholder screens.
-  - Chat is a placeholder screen.
-  - Dispute creation is a placeholder screen.
-  - Wallet is a placeholder screen.
+### Data Architecture
+- All mock data in `mock/` directory
+- Services layer ready for backend swap (`services/*.service.ts`)
+- API client scaffold (`services/api/client.ts`)
 
-## 5. Recommended Next Tasks
+### Technical Health
+| Check | Status |
+|-------|--------|
+| `npm run lint` | ✅ Pass |
+| `npm run build` | ✅ 71 routes |
+| TypeScript | ✅ No errors |
+| RTL Arabic | ✅ |
+| Responsive | ✅ |
+| Automated tests | ❌ Not configured |
 
-1. Add a backend API contract for auth, listings, categories, images, orders, wallet, chat, and disputes.
-2. Replace localStorage listing persistence with API-backed listing CRUD.
-3. Add real image upload and preview management.
-4. Implement checkout and escrow order flow.
-5. Implement wallet transaction history and withdrawal request UI.
-6. Implement chat list and chat room UI backed by API.
-7. Add automated E2E tests for the main journey.
-8. Add responsive visual QA on mobile, tablet, laptop, and desktop breakpoints.
-9. Add accessibility QA for forms, labels, keyboard focus, and contrast.
-10. Add production deployment configuration and environment documentation.
+---
 
-## 6. Priority List to Complete the Project Successfully
+## Missing Features
 
-### Priority 1 - Production Foundations
+| Item | Notes |
+|------|-------|
+| `/admin` route | Admin demo account redirects to `/dashboard/listings` |
+| Real backend API | All data is mock/in-memory |
+| UAE PASS integration | Button disabled (coming soon) |
+| Real payment/checkout | `/checkout` is placeholder |
+| Real OTP/SMS | Demo OTP `123456` only |
+| Automated test suite | Not configured |
+| Production CDN for images | External Unsplash URLs |
 
-- Backend API contract.
-- Real authentication and secure session handling.
-- API-backed listing CRUD.
-- Real image upload.
+---
 
-### Priority 2 - Marketplace Transaction Flow
+## Architecture Status
 
-- Checkout.
-- Escrow order lifecycle.
-- Confirm delivery.
-- Disputes.
-- Wallet balances and transactions.
+| Item | Status |
+|------|--------|
+| One homepage | ✅ `features/home/components/marketplace/` |
+| One listing card | ✅ `PremiumListingCard` |
+| One mock layer | ✅ `mock/` |
+| One image registry | ✅ `image-fallbacks.ts` |
+| Dead code removed | ✅ Verified |
+| Duplicate homepage experiments | ✅ None remain |
 
-### Priority 3 - User Engagement
+**Note:** Homepage uses `MarketHeader` / `MarketSiteFooter` (gold marketplace styling). Other pages use `SiteHeader` / `SiteFooter`. This is intentional to preserve the approved homepage design.
 
-- Chat.
-- Notifications.
-- Favorites persistence.
-- Seller profiles and trust badges.
+---
 
-### Priority 4 - Quality and Scale
+## Next Recommended Phase
 
-- Automated tests.
-- Accessibility improvements.
-- Performance optimization.
-- SEO improvements.
-- Admin/moderation tools.
+### Phase 1 — Backend Foundation
+1. Wire `services/api/client.ts` to real API
+2. Replace `mock/` imports in services with API calls
+3. Real JWT/session auth replacing localStorage
+4. Real OTP provider
 
-## Verification Completed
+### Phase 2 — Payments & Trust
+1. Wallet backend + transactions
+2. Escrow workflow API
+3. Checkout payment integration
 
-- `npm run lint`
-- `npm run build`
-- Core route checks returned `200 OK` for the tested main flow routes.
-- Runtime code search found no `green`, `emerald`, or `teal` styling references.
+### Phase 3 — Messaging & Admin
+1. Real-time chat
+2. `/admin` panel for admin role
+3. Listing moderation API
+
+### Phase 4 — Quality
+1. Add Playwright/Cypress E2E tests using `TESTING_GUIDE.md` demo accounts
+2. Performance monitoring
+3. Production image CDN
+
+---
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| `TESTING_GUIDE.md` | Demo accounts + QA flows |
+| `PROJECT_CLEANUP_REPORT.md` | Cleanup audit |
+| `ARCHITECTURE_CLEANUP_REPORT.md` | Architecture freeze details |
+| `IMAGE_AUDIT_REPORT.md` | Image fix audit |
+| `PRODUCTION_POLISH_REPORT.md` | UI polish pass |
+
+---
+
+## Demo Quick Reference
+
+```
+User:     user@uaesales.demo     / User@123     / OTP: 123456
+Business: company@uaesales.demo  / Company@123  / OTP: 123456
+Admin:    admin@uaesales.demo    / Admin@123    / OTP: 123456
+```
+
+See `TESTING_GUIDE.md` for full testing instructions.
