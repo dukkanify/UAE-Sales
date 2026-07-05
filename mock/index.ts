@@ -1,3 +1,4 @@
+export { demoAccounts, DEMO_OTP } from "./demo-accounts.mock";
 export { mockCategories } from "./categories.mock";
 export {
   mockDashboardNotifications,

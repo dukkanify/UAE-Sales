@@ -1,158 +1,139 @@
 # UAE Sales Web App — Project Status Report
 
-**Last updated:** July 4, 2026 (post QA review)  
+**Last updated:** July 5, 2026  
 **Branch:** `cursor/web-foundation-homepage-37ba`  
-**Phase:** Premium 2026 UI/UX Redesign — QA complete, ready for Wallet/Escrow/Checkout
+**Phase:** Production freeze — demo accounts + architecture cleanup complete
 
 ---
 
-## QA Gate Status
+## Current Ready Features
 
-| Gate | Result |
-|------|--------|
-| Full UI QA review | ✅ Complete — see `UI_QA_REPORT.md` |
-| Responsive review | ✅ Complete — see `RESPONSIVE_REPORT.md` |
-| Lint + build | ✅ Pass (41 routes) |
-| All routes HTTP 200 | ✅ Verified |
-| Wallet / Escrow / Checkout started | ❌ Blocked until QA — **now unblocked** |
-
----
-
-## What Is Ready
-
-### Design System & Foundation
-- Luxury Charcoal + Warm Gold + UAE Red + Emerald palette
-- CSS design tokens (`styles/design-tokens.css`, `app/globals.css`)
-- Tajawal typography via `next/font`
-- Shared UI primitives: Button, Card, Input, Select, Textarea, Badge, Tabs, FormMessage, PageHero, Breadcrumbs, Icon (24 SVGs), Skeleton, EmptyState
-- Documentation: `DESIGN_SYSTEM.md`, `UI_STYLE_GUIDE.md`, `UI_AUDIT_REPORT.md`, `DESIGN_DECISIONS.md`, `DESIGN_IMPROVEMENTS.md`, `VISUAL_CHANGELOG.md`, `DESIGN_SCORE.md` (8.7/10)
-
-### Pages & Flows (Fully Implemented UI)
+### Core Marketplace UI
 | Area | Routes | Status |
 |------|--------|--------|
-| Homepage | `/` | ✅ 11 sections, premium design |
-| Categories | `/categories`, `/categories/[slug]` | ✅ Grid + listings |
-| Search | `/search` | ✅ Filters, skeleton, results |
-| Featured | `/featured` | ✅ Featured grid |
-| Listing detail | `/listings/[slug]` | ✅ Gallery, summary, seller, escrow card |
-| Local listings | `/listings/local/[id]`, `.../edit` | ✅ Full CRUD in localStorage |
-| Add listing | `/listings/new` | ✅ 3-step form + live preview |
-| Auth | `/login`, `/register`, `/forgot-password` | ✅ Forms + OTP mock |
-| Profile | `/profile` | ✅ Edit form + account status |
-| Dashboard | `/dashboard/listings` | ✅ Stats, tabs, listing management |
+| Homepage | `/` | ✅ Final marketplace design (single version) |
+| Categories | `/categories`, `/categories/[slug]` | ✅ Directory + hero + listings |
+| Search | `/search` | ✅ Sticky filters, chips, saved searches |
+| Featured | `/featured` | ✅ Premium listing grid |
+| Listing detail | `/listings/[slug]` | ✅ Gallery, sticky price, seller, escrow, safety |
+| Local listings | `/listings/local/[id]`, `.../edit` | ✅ localStorage CRUD |
+| Add listing | `/listings/new` | ✅ 3-step form + preview |
 
-### User Journeys (Mock E2E)
-- Register → OTP (any 6 digits) → Profile ✅
-- Login → Dashboard ✅
-- Add listing → Publish → View in search/categories/dashboard ✅
-- Edit / delete local listings ✅
-- Logout ✅
+### Auth & Accounts
+| Feature | Status |
+|---------|--------|
+| Demo User login | ✅ `user@uaesales.demo` / `User@123` |
+| Demo Business login | ✅ `company@uaesales.demo` / `Company@123` |
+| Demo Admin login | ✅ `admin@uaesales.demo` / `Admin@123` |
+| OTP verification | ✅ `123456` for all demo accounts |
+| Demo credentials panel on login | ✅ |
+| Register + OTP | ✅ |
+| Session (localStorage) | ✅ |
+
+### Dashboard & Profile
+| Route | Status |
+|-------|--------|
+| `/profile` | ✅ Profile form + activity panel |
+| `/dashboard/listings` | ✅ Analytics, tabs, listing management |
+| `/wallet` | ✅ Demo wallet UI |
+| `/escrow` | ✅ Demo escrow UI |
+| `/chat` | ✅ Demo messaging UI |
+
+### Design System
+- Single `PremiumListingCard` across all listing grids
+- Unified tokens: `styles/design-tokens.css`, `app/globals.css`
+- Shared UI primitives in `shared/ui/`
+- Image fallback system in `shared/constants/image-fallbacks.ts`
+
+### Data Architecture
+- All mock data in `mock/` directory
+- Services layer ready for backend swap (`services/*.service.ts`)
+- API client scaffold (`services/api/client.ts`)
 
 ### Technical Health
 | Check | Status |
 |-------|--------|
-| `npm run lint` | ✅ |
-| `npm run build` | ✅ 41 routes |
+| `npm run lint` | ✅ Pass |
+| `npm run build` | ✅ 71 routes |
 | TypeScript | ✅ No errors |
-| RTL (`lang="ar" dir="rtl"`) | ✅ |
-| Responsive (mobile/tablet/desktop) | ✅ |
-| Valid HTML (no nested interactives) | ✅ Fixed in QA pass |
+| RTL Arabic | ✅ |
+| Responsive | ✅ |
 | Automated tests | ❌ Not configured |
 
 ---
 
-## What Is Missing
+## Missing Features
 
-### Placeholder Pages (UI shell only — `ComingSoonPage`)
-| Route | Planned feature |
-|-------|-----------------|
-| `/wallet` | Balance, transactions, withdrawal |
-| `/escrow` | Escrow dashboard, active deals |
-| `/checkout` | Payment flow, order confirmation |
-| `/chat` | Messaging between buyer/seller |
-| `/support` | Help center, contact |
-| `/disputes/new` | Dispute filing form |
+| Item | Notes |
+|------|-------|
+| `/admin` route | Admin demo account redirects to `/dashboard/listings` |
+| Real backend API | All data is mock/in-memory |
+| UAE PASS integration | Button disabled (coming soon) |
+| Real payment/checkout | `/checkout` is placeholder |
+| Real OTP/SMS | Demo OTP `123456` only |
+| Automated test suite | Not configured |
+| Production CDN for images | External Unsplash URLs |
 
-These routes return 200 and render branded coming-soon cards. **No functional workflows yet.**
+---
 
-### Partial / Stub Implementations
+## Architecture Status
+
 | Item | Status |
 |------|--------|
-| Seeded listing edit (`/listings/[slug]/edit`) | UI shell — awaits API |
-| Profile save | Local message only — no persistence |
-| Favorites | Toggle state only — not persisted |
-| Share | Web Share API / clipboard — no tracking |
-| Dashboard wallet summary | Mock display data |
-| Dashboard notifications | Static mock items |
-| Image upload on add listing | Browser preview only — no CDN |
-| UAE PASS verification | Copy placeholder |
-| `TrustSafetySection` component | Exists but not used on homepage |
+| One homepage | ✅ `features/home/components/marketplace/` |
+| One listing card | ✅ `PremiumListingCard` |
+| One mock layer | ✅ `mock/` |
+| One image registry | ✅ `image-fallbacks.ts` |
+| Dead code removed | ✅ Verified |
+| Duplicate homepage experiments | ✅ None remain |
 
-### Backend & Infrastructure (Not in repo)
-| Feature | Status |
-|---------|--------|
-| Real authentication (JWT/sessions) | Not started |
-| OTP provider | Not started |
-| Listing CRUD API | Not started |
-| Payment gateway | Not started |
-| Escrow ledger | Not started |
-| Wallet transactions | Not started |
-| Chat backend | Not started |
-| Admin moderation | Not started |
-| `next/image` optimization | Not started |
-| E2E tests (Playwright) | Not started |
-| Production deployment | Not started |
+**Note:** Homepage uses `MarketHeader` / `MarketSiteFooter` (gold marketplace styling). Other pages use `SiteHeader` / `SiteFooter`. This is intentional to preserve the approved homepage design.
 
 ---
 
-## QA Fixes Applied (July 4, 2026)
+## Next Recommended Phase
 
-1. `Button href` prop — eliminates invalid `<Link><Button>` nesting (15 files)
-2. `ListingSummary` — restored proper `ShareButton` import
-3. `RegisterForm` — `FormMessage` for all validation errors
-4. `AddListingForm` — design tokens, `Textarea`, `FormMessage`
-5. `ProfileForm` — `luxury-gradient` header (token-based)
-6. `LocalListingEdit` — `Button href`, `Textarea`, `FormMessage`
-7. Seeded edit page — `PageHero` + `Button href`
-8. `ListingCard` — favorite button outside link, visible "مفضلة" label
+### Phase 1 — Backend Foundation
+1. Wire `services/api/client.ts` to real API
+2. Replace `mock/` imports in services with API calls
+3. Real JWT/session auth replacing localStorage
+4. Real OTP provider
+
+### Phase 2 — Payments & Trust
+1. Wallet backend + transactions
+2. Escrow workflow API
+3. Checkout payment integration
+
+### Phase 3 — Messaging & Admin
+1. Real-time chat
+2. `/admin` panel for admin role
+3. Listing moderation API
+
+### Phase 4 — Quality
+1. Add Playwright/Cypress E2E tests using `TESTING_GUIDE.md` demo accounts
+2. Performance monitoring
+3. Production image CDN
 
 ---
 
-## Recommended Next Steps (In Priority Order)
+## Documentation
 
-1. **Wallet UI** — balance card, transaction history, withdrawal request
-2. **Escrow UI** — deal status, milestones, release/refund actions
-3. **Checkout UI** — order summary, payment method selection, confirmation
-4. **Chat UI** — conversation list, message thread
-5. Backend API contract (OpenAPI)
-6. `next/image` with remote patterns
-7. Playwright E2E for register → add listing → search
-8. Production deployment (Vercel)
+| Document | Purpose |
+|----------|---------|
+| `TESTING_GUIDE.md` | Demo accounts + QA flows |
+| `PROJECT_CLEANUP_REPORT.md` | Cleanup audit |
+| `ARCHITECTURE_CLEANUP_REPORT.md` | Architecture freeze details |
+| `IMAGE_AUDIT_REPORT.md` | Image fix audit |
+| `PRODUCTION_POLISH_REPORT.md` | UI polish pass |
 
 ---
 
-## How to Run
+## Demo Quick Reference
 
-```bash
-npm install
-npm run dev    # http://localhost:3000
-npm run build  # Production build
-npm run lint   # ESLint
+```
+User:     user@uaesales.demo     / User@123     / OTP: 123456
+Business: company@uaesales.demo  / Company@123  / OTP: 123456
+Admin:    admin@uaesales.demo    / Admin@123    / OTP: 123456
 ```
 
-No environment variables required for current mock-data flow.
-
----
-
-## Success Criteria (Updated)
-
-| Criterion | Status |
-|-----------|--------|
-| Premium 2026 marketplace look | ✅ |
-| Unified design language | ✅ |
-| RTL correct | ✅ |
-| No invisible text | ✅ |
-| No broken routes | ✅ |
-| QA review complete | ✅ |
-| Wallet / Escrow / Checkout functional | ❌ Next phase |
-| Production-ready (full stack) | ❌ Frontend MVP only |
+See `TESTING_GUIDE.md` for full testing instructions.

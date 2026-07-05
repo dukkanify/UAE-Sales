@@ -24,4 +24,4 @@ export type {
 
 export type { City, Country } from "./domain/location";
 
-export type { AccountType, UserProfile } from "./domain/user";
+export type { AccountType, UserProfile, UserRole } from "./domain/user";

@@ -5,6 +5,8 @@ export type AccountType =
   | "individual"
   | "company";
 
+export type UserRole = "user" | "business" | "admin";
+
 export type UserProfile = {
   id: string;
   fullName: string;
@@ -14,4 +16,10 @@ export type UserProfile = {
   accountType: AccountType;
   isVerified: boolean;
   joinedAt: string;
+  employeesCount?: number;
+  favoritesCount?: number;
+  listingsCount?: number;
+  role?: UserRole;
+  subscription?: string;
+  walletBalance?: number;
 };
