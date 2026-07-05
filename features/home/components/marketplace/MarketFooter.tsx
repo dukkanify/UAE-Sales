@@ -1,5 +1,5 @@
-import { FinalFooter } from "@/features/home/components/final/FinalFooter";
+import { MarketSiteFooter } from "./MarketSiteFooter";
 
 export function MarketFooter() {
-  return <FinalFooter />;
+  return <MarketSiteFooter />;
 }

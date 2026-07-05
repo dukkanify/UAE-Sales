@@ -1,16 +1,19 @@
 import type { ListingSeller } from "@/types";
 import { sellerAvatars } from "./images";
 
-export type DemoSellerProfile = ListingSeller & {
+export type SellerProfile = ListingSeller & {
   nameEnglish?: string;
 };
 
-export const demoSellers: Record<string, DemoSellerProfile> = {
+export const marketplaceSellers: Record<string, SellerProfile> = {
   "al-noor-motors": {
     id: "seller-al-noor-motors",
     name: "معرض النور للسيارات",
     nameEnglish: "Al Noor Motors",
     rating: 4.9,
+    reviewCount: 412,
+    responseTime: "خلال 15 دقيقة",
+    completedTransactions: 186,
     avatarUrl: sellerAvatars.alNoorMotors,
     isVerified: true,
     sellerType: "business",
@@ -21,6 +24,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "دبي إيليت للعقارات",
     nameEnglish: "Dubai Elite Properties",
     rating: 4.8,
+    reviewCount: 328,
+    responseTime: "خلال 20 دقيقة",
+    completedTransactions: 94,
     avatarUrl: sellerAvatars.dubaiElite,
     isVerified: true,
     sellerType: "business",
@@ -31,6 +37,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "إلكترونيات الخليج",
     nameEnglish: "Gulf Electronics",
     rating: 4.7,
+    reviewCount: 567,
+    responseTime: "خلال 10 دقائق",
+    completedTransactions: 1240,
     avatarUrl: sellerAvatars.gulfElectronics,
     isVerified: true,
     sellerType: "business",
@@ -41,6 +50,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "خدمات الإمارات المنزلية",
     nameEnglish: "Emirates Home Services",
     rating: 4.9,
+    reviewCount: 891,
+    responseTime: "خلال 30 دقيقة",
+    completedTransactions: 2340,
     avatarUrl: sellerAvatars.emiratesHome,
     isVerified: true,
     sellerType: "business",
@@ -51,6 +63,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "المفتاح الذهبي للعقارات",
     nameEnglish: "Golden Key Real Estate",
     rating: 4.8,
+    reviewCount: 256,
+    responseTime: "خلال 25 دقيقة",
+    completedTransactions: 78,
     avatarUrl: sellerAvatars.goldenKey,
     isVerified: true,
     sellerType: "business",
@@ -61,6 +76,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "خالد المنصوري",
     nameEnglish: "Khalid Al Mansoori",
     rating: 4.8,
+    reviewCount: 47,
+    responseTime: "خلال ساعة",
+    completedTransactions: 12,
     avatarUrl: sellerAvatars.khalidAlMansoori,
     isVerified: true,
     sellerType: "individual",
@@ -71,6 +89,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "فاطمة الزعابي",
     nameEnglish: "Fatima Al Zaabi",
     rating: 4.9,
+    reviewCount: 63,
+    responseTime: "خلال 20 دقيقة",
+    completedTransactions: 18,
     avatarUrl: sellerAvatars.fatimaAlZaabi,
     isVerified: true,
     sellerType: "individual",
@@ -81,6 +102,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "عمر حسن",
     nameEnglish: "Omar Hassan",
     rating: 4.6,
+    reviewCount: 22,
+    responseTime: "خلال ساعتين",
+    completedTransactions: 8,
     avatarUrl: sellerAvatars.omarHassan,
     isVerified: false,
     sellerType: "individual",
@@ -91,6 +115,9 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     name: "بريا شارما",
     nameEnglish: "Priya Sharma",
     rating: 4.7,
+    reviewCount: 38,
+    responseTime: "خلال 45 دقيقة",
+    completedTransactions: 15,
     avatarUrl: sellerAvatars.priyaSharma,
     isVerified: true,
     sellerType: "individual",
@@ -100,23 +127,29 @@ export const demoSellers: Record<string, DemoSellerProfile> = {
     id: "user-current",
     name: "أحمد المنصوري",
     nameEnglish: "Ahmed Al Mansoori",
-    rating: 4.8,
+    rating: 4.9,
+    reviewCount: 28,
+    responseTime: "خلال 10 دقائق",
+    completedTransactions: 6,
     avatarUrl: sellerAvatars.ahmedAlMansoori,
     isVerified: true,
     sellerType: "individual",
-    joinedAt: "2026-01-15",
+    joinedAt: "2021-06-10",
   },
 };
 
 export function resolveSeller(sellerKey: string): ListingSeller {
-  const seller = demoSellers[sellerKey];
+  const seller = marketplaceSellers[sellerKey];
   if (!seller) {
-    throw new Error(`Unknown demo seller: ${sellerKey}`);
+    throw new Error(`Unknown seller: ${sellerKey}`);
   }
   return {
     id: seller.id,
     name: seller.name,
     rating: seller.rating,
+    reviewCount: seller.reviewCount,
+    responseTime: seller.responseTime,
+    completedTransactions: seller.completedTransactions,
     avatarUrl: seller.avatarUrl,
     isVerified: seller.isVerified,
     sellerType: seller.sellerType,

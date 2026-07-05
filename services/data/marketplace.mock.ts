@@ -1,5 +1,6 @@
 import type { Category, UserProfile } from "@/types";
-import { demoListings, demoUserListings } from "./demo";
+import { marketplaceListings, marketplaceUserListings } from "./marketplace-data";
+import { categoryImages } from "./marketplace-data/images";
 
 export const mockCategories: Category[] = [
   {
@@ -8,6 +9,8 @@ export const mockCategories: Category[] = [
     slug: "cars",
     icon: "car",
     listingCount: 8420,
+    imageUrl: categoryImages.cars,
+    featuredListingSlug: "mercedes-amg-g63-2024",
     subcategories: ["سيارات مستعملة", "سيارات فاخرة", "سيارات كهربائية", "قطع غيار"],
   },
   {
@@ -16,6 +19,8 @@ export const mockCategories: Category[] = [
     slug: "real-estate",
     icon: "home",
     listingCount: 6950,
+    imageUrl: categoryImages["real-estate"],
+    featuredListingSlug: "villa-palm-jumeirah",
     subcategories: ["شقق للبيع", "شقق للإيجار", "فلل", "مكاتب"],
   },
   {
@@ -24,6 +29,8 @@ export const mockCategories: Category[] = [
     slug: "electronics",
     icon: "laptop",
     listingCount: 3760,
+    imageUrl: categoryImages.electronics,
+    featuredListingSlug: "sony-playstation-5",
     subcategories: ["لابتوبات", "ألعاب", "كاميرات", "سماعات"],
   },
   {
@@ -32,6 +39,8 @@ export const mockCategories: Category[] = [
     slug: "mobiles",
     icon: "phone",
     listingCount: 4820,
+    imageUrl: categoryImages.mobiles,
+    featuredListingSlug: "iphone-16-pro-max-256gb",
     subcategories: ["آيفون", "سامسونج", "أجهزة لوحية", "إكسسوارات"],
   },
   {
@@ -40,6 +49,8 @@ export const mockCategories: Category[] = [
     slug: "furniture",
     icon: "sofa",
     listingCount: 1950,
+    imageUrl: categoryImages.furniture,
+    featuredListingSlug: "luxury-italian-sofa-set",
     subcategories: ["غرف نوم", "كنب", "طاولات طعام", "أثاث خارجي"],
   },
   {
@@ -48,6 +59,8 @@ export const mockCategories: Category[] = [
     slug: "jobs",
     icon: "briefcase",
     listingCount: 2340,
+    imageUrl: categoryImages.jobs,
+    featuredListingSlug: "sales-executive-dubai",
     subcategories: ["مبيعات", "عقارات", "توصيل", "محاسبة", "تصميم"],
   },
   {
@@ -56,6 +69,8 @@ export const mockCategories: Category[] = [
     slug: "fashion",
     icon: "watch",
     listingCount: 1420,
+    imageUrl: categoryImages.fashion,
+    featuredListingSlug: "apple-watch-ultra-2",
     subcategories: ["ساعات", "حقائب", "ملابس", "عطور"],
   },
   {
@@ -64,6 +79,8 @@ export const mockCategories: Category[] = [
     slug: "services",
     icon: "wrench",
     listingCount: 3180,
+    imageUrl: categoryImages.services,
+    featuredListingSlug: "home-cleaning-service-dubai",
     subcategories: ["تنظيف", "صيانة", "نقل", "تكييف"],
   },
   {
@@ -72,6 +89,7 @@ export const mockCategories: Category[] = [
     slug: "pets",
     icon: "paw",
     listingCount: 680,
+    imageUrl: categoryImages.pets,
     subcategories: ["قطط", "كلاب", "طيور", "مستلزمات"],
   },
   {
@@ -80,6 +98,7 @@ export const mockCategories: Category[] = [
     slug: "kids",
     icon: "baby",
     listingCount: 920,
+    imageUrl: categoryImages.kids,
     subcategories: ["عربات أطفال", "ألعاب", "ملابس أطفال", "مستلزمات"],
   },
   {
@@ -88,6 +107,7 @@ export const mockCategories: Category[] = [
     slug: "books",
     icon: "book",
     listingCount: 540,
+    imageUrl: categoryImages.books,
     subcategories: ["كتب عربية", "كتب جامعية", "روايات", "مناهج"],
   },
   {
@@ -96,6 +116,7 @@ export const mockCategories: Category[] = [
     slug: "sports",
     icon: "sport",
     listingCount: 1180,
+    imageUrl: categoryImages.sports,
     subcategories: ["معدات رياضية", "دراجات", "لياقة", "تخييم"],
   },
   {
@@ -104,6 +125,7 @@ export const mockCategories: Category[] = [
     slug: "food",
     icon: "food",
     listingCount: 430,
+    imageUrl: categoryImages.food,
     subcategories: ["أكلات منزلية", "تمور", "حلويات", "ضيافة"],
   },
 ];
@@ -119,6 +141,6 @@ export const mockCurrentUser: UserProfile = {
   joinedAt: "2026-01-15",
 };
 
-export const mockListings = demoListings;
+export const mockListings = marketplaceListings;
 
-export const mockUserListings = demoUserListings;
+export const mockUserListings = marketplaceUserListings;

@@ -16,14 +16,17 @@ export type {
 } from "./domain/content";
 
 export type {
+  CarSpecs,
   ContactMethod,
   DeliveryOption,
+  ElectronicsSpecs,
   Listing,
   ListingCondition,
   ListingImageTone,
   ListingSearchFilters,
   ListingSeller,
   ListingStatus,
+  RealEstateSpecs,
   SellerType,
 } from "./domain/listing";
 

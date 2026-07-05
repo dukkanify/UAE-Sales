@@ -41,12 +41,17 @@ export function SellerPanel({ listing }: SellerPanelProps) {
         )}
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-ink">{listing.seller.name}</p>
-          <p className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-muted">
+          <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
             <Icon className="text-secondary" name="star" size={14} />
             {listing.seller.rating}
-            <span className="text-border">·</span>
-            {sellerTypeLabel}
+            {listing.seller.reviewCount ? (
+              <>
+                <span className="text-border">·</span>
+                {listing.seller.reviewCount.toLocaleString("ar-AE")} تقييم
+              </>
+            ) : null}
           </p>
+          <p className="mt-0.5 text-xs font-medium text-muted">{sellerTypeLabel}</p>
         </div>
         {isVerified ? <Badge variant="verified">موثق</Badge> : null}
       </div>
@@ -54,7 +59,9 @@ export function SellerPanel({ listing }: SellerPanelProps) {
       <div className="mt-5 grid gap-2 text-sm">
         <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
           <span className="font-medium text-muted">الرد</span>
-          <span className="font-semibold text-ink">خلال ساعة</span>
+          <span className="font-semibold text-ink">
+            {listing.seller.responseTime ?? "خلال ساعة"}
+          </span>
         </div>
         <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
           <span className="font-medium text-muted">عضو منذ</span>
@@ -62,6 +69,14 @@ export function SellerPanel({ listing }: SellerPanelProps) {
             {formatJoinedDate(listing.seller.joinedAt)}
           </span>
         </div>
+        {typeof listing.seller.completedTransactions === "number" ? (
+          <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
+            <span className="font-medium text-muted">معاملات مكتملة</span>
+            <span className="font-semibold text-ink">
+              {listing.seller.completedTransactions.toLocaleString("ar-AE")}
+            </span>
+          </div>
+        ) : null}
       </div>
     </Card>
   );

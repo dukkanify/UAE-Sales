@@ -2,8 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { ListingFeatures } from "@/features/listings/components/ListingFeatures";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
+import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
+import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
 import { ListingSummary } from "@/features/listings/components/ListingSummary";
+import {
+  RecentlyViewedSection,
+  RecentlyViewedTracker,
+} from "@/features/listings/components/RecentlyViewedSection";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { Card } from "@/shared/ui/Card";
@@ -13,6 +20,7 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import {
   getListingBySlug,
+  getListings,
   getRelatedListings,
 } from "@/services/listings";
 
@@ -46,15 +54,17 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const listing = await getListingBySlug(slug);
   if (!listing) notFound();
 
-  const [categories, relatedListings] = await Promise.all([
+  const [categories, relatedListings, allListings] = await Promise.all([
     getCategories(),
     getRelatedListings(listing.categoryId, listing.id),
+    getListings(),
   ]);
   const category = categories.find((item) => item.id === listing.categoryId);
 
   return (
     <>
       <SiteHeader />
+      <RecentlyViewedTracker listing={listing} />
       <main>
         <section className="app-container page-padding">
           <Breadcrumbs
@@ -74,7 +84,10 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
           />
 
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-            <ListingGallery listing={listing} />
+            <div>
+              <ListingGallery listing={listing} />
+              <ListingMapPlaceholder listing={listing} />
+            </div>
             <div className="grid gap-4">
               <ListingSummary category={category} listing={listing} />
               <SellerPanel listing={listing} />
@@ -87,7 +100,15 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             <p className="mt-4 text-sm font-medium leading-8 text-muted">
               {listing.description}
             </p>
+            {listing.descriptionEnglish ? (
+              <p className="mt-4 border-t border-border pt-4 text-sm leading-7 text-muted/80">
+                {listing.descriptionEnglish}
+              </p>
+            ) : null}
           </Card>
+
+          <ListingFeatures listing={listing} />
+          <ListingSafetyTips />
         </section>
 
         {relatedListings.length > 0 ? (
@@ -108,6 +129,12 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             </div>
           </section>
         ) : null}
+
+        <RecentlyViewedSection
+          categories={categories}
+          currentSlug={listing.slug}
+          listings={allListings}
+        />
       </main>
       <SiteFooter />
     </>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Category } from "@/types";
+import { AppImage } from "@/shared/components/AppImage";
 import { Card } from "@/shared/ui/Card";
-import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { Icon } from "@/shared/ui/Icon";
 
 type CategoryDirectoryProps = {
@@ -12,12 +12,20 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {categories.map((category) => (
-        <Card key={category.id} className="p-5" interactive>
-          <div className="flex gap-4">
-            <span className="grid size-14 shrink-0 place-items-center rounded-[var(--radius-xl)] bg-secondary-soft text-secondary">
-              <CategoryIcon category={category} size={24} />
-            </span>
-            <div className="min-w-0 flex-1">
+        <Card key={category.id} className="overflow-hidden p-0" interactive>
+          <div className="flex gap-0">
+            {category.imageUrl ? (
+              <div className="relative hidden w-28 shrink-0 sm:block">
+                <AppImage
+                  alt={category.name}
+                  className="object-cover"
+                  fill
+                  sizes="112px"
+                  src={category.imageUrl}
+                />
+              </div>
+            ) : null}
+            <div className="min-w-0 flex-1 p-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link
                   className="text-lg font-semibold text-ink transition hover:text-primary"
@@ -29,6 +37,14 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
                   {category.listingCount.toLocaleString("ar-AE")} إعلان
                 </span>
               </div>
+              {category.featuredListingSlug ? (
+                <Link
+                  className="mt-2 inline-block text-xs font-semibold text-primary"
+                  href={`/listings/${category.featuredListingSlug}`}
+                >
+                  إعلان مميز في هذا القسم ←
+                </Link>
+              ) : null}
               <div className="mt-4 flex flex-wrap gap-2">
                 {category.subcategories.slice(0, 4).map((subcategory) => (
                   <Link

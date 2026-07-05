@@ -25,6 +25,39 @@ export type ListingSeller = {
   isVerified?: boolean;
   sellerType?: SellerType;
   joinedAt?: string;
+  reviewCount?: number;
+  responseTime?: string;
+  completedTransactions?: number;
+};
+
+export type CarSpecs = {
+  mileage: string;
+  transmission: string;
+  fuel: string;
+  warranty: string;
+  accidentHistory: string;
+  regionalSpecs: string;
+  serviceHistory: string;
+  vinAvailable: boolean;
+};
+
+export type RealEstateSpecs = {
+  bedrooms: number;
+  bathrooms: number;
+  parking: number;
+  areaSqft: number;
+  furnished: string;
+  developer: string;
+  community: string;
+  amenities: string[];
+};
+
+export type ElectronicsSpecs = {
+  storage: string;
+  color: string;
+  warranty: string;
+  accessories: string;
+  purchaseDate: string;
 };
 
 export type ListingImageTone = "gold" | "amber" | "sky" | "rose" | "slate";
@@ -58,6 +91,12 @@ export type Listing = {
   postedAt?: string;
   contactMethod?: ContactMethod;
   deliveryOption?: DeliveryOption;
+  features?: string[];
+  negotiable?: boolean;
+  reasonForSelling?: string;
+  carSpecs?: CarSpecs;
+  realEstateSpecs?: RealEstateSpecs;
+  electronicsSpecs?: ElectronicsSpecs;
 };
 
 export type ListingSearchFilters = {

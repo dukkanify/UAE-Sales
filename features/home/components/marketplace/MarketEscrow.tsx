@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
-import { getFinalEscrowSteps } from "@/services/content/homepage-final.content";
+import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
 export async function MarketEscrow() {
-  const steps = await getFinalEscrowSteps();
+  const steps = await getMarketEscrowSteps();
 
   return (
     <MarketSectionShell variant="white">

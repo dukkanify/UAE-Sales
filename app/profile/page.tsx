@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
+import { ProfileActivityPanel } from "@/features/profile/components/ProfileActivityPanel";
 import { ProfileForm } from "@/features/profile/components/ProfileForm";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -18,6 +19,7 @@ export default async function ProfilePage() {
           user={user}
         >
           <ProfileForm user={user} />
+          <ProfileActivityPanel />
         </DashboardShell>
       </main>
       <SiteFooter />

@@ -6,8 +6,9 @@ import type {
   ListingImageTone,
   ListingStatus,
 } from "@/types";
-import { demoImageSets } from "./images";
+import { imagesForSlug } from "./images";
 import { resolveSeller } from "./sellers";
+import { extrasForSlug } from "./specs";
 
 type ListingSeed = {
   id: string;
@@ -23,7 +24,6 @@ type ListingSeed = {
   condition: ListingCondition;
   descriptionArabic: string;
   descriptionEnglish: string;
-  images: readonly string[];
   sellerKey: string;
   verifiedSeller: boolean;
   escrowAvailable: boolean;
@@ -39,6 +39,8 @@ type ListingSeed = {
 
 function buildListing(seed: ListingSeed): Listing {
   const seller = resolveSeller(seed.sellerKey);
+  const images = [...imagesForSlug(seed.slug)];
+  const extras = extrasForSlug(seed.slug);
 
   return {
     id: seed.id,
@@ -60,8 +62,8 @@ function buildListing(seed: ListingSeed): Listing {
     isFeatured: seed.featured,
     isPremium: seed.premium,
     views: seed.views,
-    images: [...seed.images],
-    imageUrl: seed.images[0],
+    images,
+    imageUrl: images[0],
     seller,
     verifiedSeller: seed.verifiedSeller,
     escrowAvailable: seed.escrowAvailable,
@@ -69,6 +71,12 @@ function buildListing(seed: ListingSeed): Listing {
     contactMethod: seed.contactMethod,
     deliveryOption: seed.deliveryOption,
     imageTone: seed.imageTone,
+    features: extras?.features,
+    negotiable: extras?.negotiable,
+    reasonForSelling: extras?.reasonForSelling,
+    carSpecs: extras?.carSpecs,
+    realEstateSpecs: extras?.realEstateSpecs,
+    electronicsSpecs: extras?.electronicsSpecs,
   };
 }
 
@@ -90,7 +98,6 @@ const listingSeeds: ListingSeed[] = [
       "مرسيدس G63 AMG موديل 2024، وارد وكالة، لون أسود مع تفاصيل كروم. المحرك V8 Biturbo بقوة 577 حصان، دفع رباعي، مقاعد جلد Nappa، نظام MBUX، كاميرات 360، وفتحة سقف بانورامية. السيارة بحالة ممتازة مع ضمان الوكالة حتى 2027. الفحص والتحويل متاحان في دبي.",
     descriptionEnglish:
       "2024 Mercedes-AMG G63, agency import, black with chrome accents. V8 Biturbo 577 HP, 4MATIC, Nappa leather, MBUX, 360 cameras, panoramic roof. Excellent condition with agency warranty until 2027.",
-    images: demoImageSets.cars.g63,
     sellerKey: "al-noor-motors",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -119,7 +126,6 @@ const listingSeeds: ListingSeed[] = [
       "لاند كروزر GXR 2023 خليجي، عداد 28,000 كم فقط. صيانة وكالة كاملة، لون أبيض لؤلؤي، مقاعد جلد 7 ركاب، شاشة لمس 12.3 بوصة، حساسات أمامية وخلفية، وكاميرا خلفية. السيارة جاهزة للفحص والتحويل الفوري في معرض البرشاء.",
     descriptionEnglish:
       "2023 Toyota Land Cruiser GXR GCC spec, 28,000 km only. Full agency service history, pearl white, 7-seat leather, 12.3-inch display, front/rear sensors. Ready for inspection and transfer.",
-    images: demoImageSets.cars.landCruiser,
     sellerKey: "al-noor-motors",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -148,7 +154,6 @@ const listingSeeds: ListingSeed[] = [
       "نيسان باترول بلاتينيوم 2022 فل أوبشن، محرك V8 5.6 لتر، مقاعد جلد مبردة ومُدفأة، نظام صوت BOSE، شاشة مزدوجة، ونظام قيادة ذكي ProPILOT. السيارة خليجية بحالة ممتازة مع سجل صيانة كامل في أبوظبي.",
     descriptionEnglish:
       "2022 Nissan Patrol Platinum full option, V8 5.6L, ventilated/heated leather, BOSE audio, dual screens, ProPILOT assist. GCC spec with full service history in Abu Dhabi.",
-    images: demoImageSets.cars.patrol,
     sellerKey: "khalid-al-mansoori",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -177,7 +182,6 @@ const listingSeeds: ListingSeed[] = [
       "بي إم دبليو X7 موديل 2023، وارد وكالة، لون رمادي معدني. مقاعد 7 ركاب، بانوراما سقف، شاشة Curved Display، نظام صوت Harman Kardon، ومساعدة قيادة متقدمة. عداد 19,500 كم، حالة ممتازة.",
     descriptionEnglish:
       "2023 BMW X7 xDrive40i agency import, metallic grey. 7 seats, panoramic roof, Curved Display, Harman Kardon, advanced driver assist. 19,500 km, excellent condition.",
-    images: demoImageSets.cars.bmwX7,
     sellerKey: "al-noor-motors",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -206,7 +210,6 @@ const listingSeeds: ListingSeed[] = [
       "تسلا موديل Y لونج رينج 2024، مدى يصل إلى 533 كم، لون أبيض مع مقصورة سوداء. شحن منزلي متضمن، Autopilot، شاشة 15 بوصة، وتحديثات OTA. السيارة بحالة ممتازة مع ضمان باقي من الوكالة.",
     descriptionEnglish:
       "2024 Tesla Model Y Long Range, up to 533 km range, white exterior, black interior. Home charger included, Autopilot, 15-inch display, OTA updates. Excellent with remaining agency warranty.",
-    images: demoImageSets.cars.teslaModelY,
     sellerKey: "fatima-al-zaabi",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -237,7 +240,6 @@ const listingSeeds: ListingSeed[] = [
       "فيلا مستقلة على نخلة جميرا بإطلالة بحرية مباشرة. 5 غرف نوم مع غرفة خادمة، صالة مزدوجة الارتفاع، مطبخ إيطالي مجهز، مسبح خاص، وحديقة منسقة. مساحة الأرض 8,500 قدم مربع، مساحة البناء 12,000 قدم. قريبة من نادي النخلة وشاطئ المارينا.",
     descriptionEnglish:
       "Standalone villa on Palm Jumeirah with direct sea views. 5 bedrooms plus maid's room, double-height living, Italian kitchen, private pool, landscaped garden. 8,500 sqft plot, 12,000 sqft built-up.",
-    images: demoImageSets.realEstate.villaPalm,
     sellerKey: "dubai-elite-properties",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -266,7 +268,6 @@ const listingSeeds: ListingSeed[] = [
       "شقة 2 غرف وصالة في برج راقي بداون تاون دبي، الطابق 42 مع إطلالة مباشرة على برج خليفة ونافورة دبي. تشطيبات فندقية، مطبخ مفتوح، حمامين، موقفين، ووصول لمرافق المسبح والجيم.",
     descriptionEnglish:
       "2-bedroom apartment in premium Downtown tower, floor 42 with Burj Khalifa and fountain views. Hotel-style finishes, open kitchen, 2 bathrooms, 2 parking, pool and gym access.",
-    images: demoImageSets.realEstate.downtownApt,
     sellerKey: "golden-key-real-estate",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -295,7 +296,6 @@ const listingSeeds: ListingSeed[] = [
       "تاون هاوس Type 2E في المرابع العربية 2. 4 غرف نوم مع غرفة خادمة، صالة واسعة، مطبخ مجهز، حديقة خلفية، وموقفين. مجتمع هادئ مع مدارس ومرافق ترفيهية. مثالي للعائلات.",
     descriptionEnglish:
       "Type 2E townhouse in Arabian Ranches 2. 4 bedrooms plus maid's, spacious living, fitted kitchen, backyard, 2 parking. Quiet family community with schools and amenities.",
-    images: demoImageSets.realEstate.arabianRanches,
     sellerKey: "dubai-elite-properties",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -324,7 +324,6 @@ const listingSeeds: ListingSeed[] = [
       "مكتب جاهز للتشغيل في برج A+ بالخليج التجاري. مساحة 1,200 قدم مربع، تشطيبات عصرية، 3 غرف اجتماعات، استقبال، مطبخ صغير، وموقفين. مناسب لشركات الاستشارات والتقنية. إطلالة على قناة دبي.",
     descriptionEnglish:
       "Ready office in A+ Business Bay tower. 1,200 sqft, modern fit-out, 3 meeting rooms, reception, pantry, 2 parking. Ideal for consulting and tech firms with canal views.",
-    images: demoImageSets.realEstate.officeBay,
     sellerKey: "golden-key-real-estate",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -353,7 +352,6 @@ const listingSeeds: ListingSeed[] = [
       "استوديو مفروش بالكامل في JVC، مساحة 450 قدم مربع. مطبخ مجهز، حمام حديث، شرفة، موقف مجاني. مثالي للمستثمرين أو السكن قصير المدى. إيجار سنوي يشمل الصيانة.",
     descriptionEnglish:
       "Fully furnished studio in JVC, 450 sqft. Fitted kitchen, modern bathroom, balcony, free parking. Ideal for investors or short-term living. Annual rent includes maintenance.",
-    images: demoImageSets.realEstate.studioJvc,
     sellerKey: "omar-hassan",
     verifiedSeller: false,
     escrowAvailable: true,
@@ -384,7 +382,6 @@ const listingSeeds: ListingSeed[] = [
       "آيفون 16 برو ماكس 256 جيجابايت، لون تيتانيوم طبيعي، جديد بالكرتونة مع ضمان Apple لمدة سنة. غير مفعل، يشمل الشاحن والكابل الأصلي. متوفر للتسليم الفوري من متجر الخليج التجاري.",
     descriptionEnglish:
       "iPhone 16 Pro Max 256GB Natural Titanium, brand new sealed with 1-year Apple warranty. Unactivated, includes original charger and cable. Immediate delivery from Al Reem Island.",
-    images: demoImageSets.mobiles.iphone16ProMax,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -413,7 +410,6 @@ const listingSeeds: ListingSeed[] = [
       "سامسونج جالاكسي S25 Ultra بسعة 512 جيجابايت، لون تيتانيوم أسود. شاشة Dynamic AMOLED 2X، قلم S Pen مدمج، كاميرا 200 ميجابكسل، وضمان سامسونج الإمارات لمدة سنتين.",
     descriptionEnglish:
       "Samsung Galaxy S25 Ultra 512GB Titanium Black. Dynamic AMOLED 2X display, built-in S Pen, 200MP camera, 2-year Samsung UAE warranty.",
-    images: demoImageSets.mobiles.galaxyS25Ultra,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -442,7 +438,6 @@ const listingSeeds: ListingSeed[] = [
       "آيفون 15 برو 128 جيجابايت، لون أزرق تيتانيوم. استخدام 8 أشهر بحالة ممتازة، بطارية 94%، بدون خدوش. يشمل العلبة الأصلية والكابل. الفحص متاح قبل الشراء.",
     descriptionEnglish:
       "iPhone 15 Pro 128GB Blue Titanium. 8 months use, excellent condition, 94% battery, scratch-free. Includes original box and cable. Inspection available.",
-    images: demoImageSets.mobiles.iphone15Pro,
     sellerKey: "priya-sharma",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -471,7 +466,6 @@ const listingSeeds: ListingSeed[] = [
       "آيباد برو M4 بشاشة 13 بوصة ومساحة 256 جيجابايت، لون فضي. شاشة Ultra Retina XDR، شريحة M4، دعم Apple Pencil Pro. جديد بضمان Apple، مثالي للمصممين والطلاب.",
     descriptionEnglish:
       "iPad Pro M4 13-inch 256GB Silver. Ultra Retina XDR display, M4 chip, Apple Pencil Pro support. Brand new with Apple warranty.",
-    images: demoImageSets.mobiles.ipadProM4,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -500,7 +494,6 @@ const listingSeeds: ListingSeed[] = [
       "ماك بوك برو 14 بوصة بمعالج M3، ذاكرة 18 جيجابايت وتخزين 512 جيجابايت. لون Space Black، استخدام 4 أشهر بحالة ممتازة. يشمل الشاحن الأصلي والعلبة. ضمان Apple حتى 2027.",
     descriptionEnglish:
       "MacBook Pro 14-inch M3, 18GB RAM, 512GB SSD. Space Black, 4 months use, excellent. Includes original charger and box. Apple warranty until 2027.",
-    images: demoImageSets.mobiles.macbookProM3,
     sellerKey: "fatima-al-zaabi",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -531,7 +524,6 @@ const listingSeeds: ListingSeed[] = [
       "بلايستيشن 5 إصدار الإمارات مع قرصين (FC 25 و Spider-Man 2). جهاز بحالة ممتازة مع يدتين DualSense أصليتين، كابل HDMI، وقاعدة تبريد. ضمان متبقي 6 أشهر.",
     descriptionEnglish:
       "UAE PS5 with 2 discs (FC 25 and Spider-Man 2). Excellent condition with 2 original DualSense controllers, HDMI cable, cooling stand. 6 months warranty remaining.",
-    images: demoImageSets.electronics.ps5,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -560,7 +552,6 @@ const listingSeeds: ListingSeed[] = [
       "تلفزيون LG OLED evo C4 بمقاس 65 بوصة، دقة 4K مع Dolby Vision و HDR10. معدل تحديث 120Hz، webOS 24، HDMI 2.1. جديد بالكرتونة مع ضمان LG لمدة سنتين وتركيب مجاني.",
     descriptionEnglish:
       "LG OLED evo C4 65-inch 4K with Dolby Vision and HDR10. 120Hz refresh, webOS 24, HDMI 2.1. Brand new with 2-year LG warranty and free installation.",
-    images: demoImageSets.electronics.lgOled,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -589,7 +580,6 @@ const listingSeeds: ListingSeed[] = [
       "كاميرا كانون EOS R6 Mark II مع عدسة RF 24-105mm f/4L. عدد الشُتر 12,000 فقط، بحالة ممتازة. يشمل بطاريتين، شاحن، حقيبة Lowepro، وبطاقتي SD. مثالية للتصوير الاحترافي والفيديو 4K.",
     descriptionEnglish:
       "Canon EOS R6 Mark II with RF 24-105mm f/4L lens. 12,000 shutter count, excellent. Includes 2 batteries, charger, Lowepro bag, 2 SD cards. Ideal for pro photo and 4K video.",
-    images: demoImageSets.electronics.canonR6,
     sellerKey: "priya-sharma",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -618,7 +608,6 @@ const listingSeeds: ListingSeed[] = [
       "Bose Smart Soundbar 900 مع Dolby Atmos و Alexa مدمج. صوت محيطي 3D، اتصال Wi-Fi و Bluetooth، وتحكم عبر تطبيق Bose Music. استخدام 6 أشهر بحالة ممتازة مع العلبة الأصلية.",
     descriptionEnglish:
       "Bose Smart Soundbar 900 with Dolby Atmos and built-in Alexa. 3D surround, Wi-Fi and Bluetooth, Bose Music app control. 6 months use, excellent with original box.",
-    images: demoImageSets.electronics.boseSoundbar,
     sellerKey: "omar-hassan",
     verifiedSeller: false,
     escrowAvailable: true,
@@ -647,7 +636,6 @@ const listingSeeds: ListingSeed[] = [
       "Apple Watch Ultra 2 بحجم 49mm، إطار تيتانيوم طبيعي مع سوار Ocean Band أزرق. GPS + Cellular، بطارية تدوم يومين. استخدام 3 أشهر بحالة ممتازة، ضمان Apple حتى 2027.",
     descriptionEnglish:
       "Apple Watch Ultra 2 49mm Natural Titanium with Blue Ocean Band. GPS + Cellular, 2-day battery. 3 months use, excellent, Apple warranty until 2027.",
-    images: demoImageSets.electronics.appleWatchUltra,
     sellerKey: "gulf-electronics",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -678,7 +666,6 @@ const listingSeeds: ListingSeed[] = [
       "طقم كنب إيطالي فاخر 3+2+1 من الجلد الطبيعي باللون الكريمي. تصميم Minotti مستوحى، حشوات memory foam، إطار خشب زان. استخدام خفيف لمدة سنة، حالة ممتازة. التوصيل والتركيب متاحان في دبي.",
     descriptionEnglish:
       "Luxury Italian 3+2+1 natural leather sofa set in cream. Minotti-inspired design, memory foam cushions, beech frame. Light 1-year use, excellent. Delivery and installation in Dubai.",
-    images: demoImageSets.furniture.italianSofa,
     sellerKey: "fatima-al-zaabi",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -707,7 +694,6 @@ const listingSeeds: ListingSeed[] = [
       "طاولة طعام عصرية لـ 8 كراسي، سطح رخام كالاكاتا مع قاعدة خشبية. الكراسي مخمل رمادي مع إطار ذهبي. حالة ممتازة، مناسبة للمجالس والصالات الواسعة.",
     descriptionEnglish:
       "Modern 8-seater dining table, Calacatta marble top with wooden base. Grey velvet chairs with gold frame. Excellent condition for spacious dining rooms.",
-    images: demoImageSets.furniture.diningTable,
     sellerKey: "khalid-al-mansoori",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -736,7 +722,6 @@ const listingSeeds: ListingSeed[] = [
       "طقم غرفة نوم ماستر كامل: سرير كينج مع مرتبة، دولابين ملابس، تسريحة مع مرآة، وكومودينو. خشب MDF فاخر بلون أبيض وذهبي. حالة ممتازة، استخدام سنتين.",
     descriptionEnglish:
       "Complete master bedroom set: king bed with mattress, 2 wardrobes, dressing table with mirror, nightstands. Premium white and gold MDF. Excellent, 2 years use.",
-    images: demoImageSets.furniture.bedroomSet,
     sellerKey: "omar-hassan",
     verifiedSeller: false,
     escrowAvailable: true,
@@ -765,7 +750,6 @@ const listingSeeds: ListingSeed[] = [
       "مكتب تنفيذي L-shaped بخشب الجوز مع درجين وخزانة ملفات. يشمل كرسي جلد دوار ergonomic ومصباح مكتب LED. مثالي للعمل من المنزل أو المكتب الصغير.",
     descriptionEnglish:
       "L-shaped executive walnut desk with 2 drawers and filing cabinet. Includes ergonomic leather swivel chair and LED desk lamp. Ideal for home office.",
-    images: demoImageSets.furniture.officeDesk,
     sellerKey: "priya-sharma",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -794,7 +778,6 @@ const listingSeeds: ListingSeed[] = [
       "طقم جلسة خارجية مقاوم للطقس: 6 كراسي بوسائد + طاولة قهوة + مظلة. مادة rattan اصطناعي بلون بني، مناسب للفلل والحدائق. حالة ممتازة مع غطاء حماية.",
     descriptionEnglish:
       "Weather-resistant outdoor set: 6 cushioned chairs, coffee table, umbrella. Brown synthetic rattan, ideal for villas and gardens. Excellent with protective cover.",
-    images: demoImageSets.furniture.gardenSet,
     sellerKey: "khalid-al-mansoori",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -825,7 +808,6 @@ const listingSeeds: ListingSeed[] = [
       "خدمة تنظيف منازل احترافية من فريق مدرب ومؤمن. باقة التنظيف العميق تشمل 3 غرف، 2 حمام، مطبخ، وصالة. مواد تنظيف صديقة للبيئة. متاح يومياً من 8 صباحاً حتى 8 مساءً في جميع مناطق دبي.",
     descriptionEnglish:
       "Professional home cleaning by trained, insured team. Deep clean package covers 3 bedrooms, 2 bathrooms, kitchen, living room. Eco-friendly products. Daily 8am–8pm across Dubai.",
-    images: demoImageSets.services.homeCleaning,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -854,7 +836,6 @@ const listingSeeds: ListingSeed[] = [
       "عقد صيانة فلل شهري يشمل فحص كهرباء، سباكة، تكييف، وحدائق. فريق فني مرخص متاح 24/7 للطوارئ. يشمل 4 زيارات مجدولة شهرياً مع تقرير حالة مفصل.",
     descriptionEnglish:
       "Monthly villa maintenance contract covering electrical, plumbing, AC, and gardens. Licensed team available 24/7 for emergencies. 4 scheduled visits with detailed status report.",
-    images: demoImageSets.services.villaMaintenance,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -883,7 +864,6 @@ const listingSeeds: ListingSeed[] = [
       "خدمة تلميع سيارات فاخرة تشمل غسيل بخار، تلميع خارجي، تنظيف داخلي عميق، معالجة الجلد، وتطبيق شمع حماية. خدمة متنقلة إلى موقعك في دبي. مدة الخدمة 3-4 ساعات.",
     descriptionEnglish:
       "Premium car detailing: steam wash, exterior polish, deep interior clean, leather treatment, protective wax. Mobile service to your location in Dubai. 3–4 hours.",
-    images: demoImageSets.services.carDetailing,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -912,7 +892,6 @@ const listingSeeds: ListingSeed[] = [
       "خدمة نقل أثاث محترفة داخل الإمارات. تشمل فك وتركيب الأثاث، تغليف احترافي، شاحنات مكيفة، وتأمين على المنقولات. فريق من 4 عمال مع مشرف. متاح من الشارقة إلى جميع الإمارات.",
     descriptionEnglish:
       "Professional furniture moving within UAE. Includes disassembly/assembly, professional packing, AC trucks, goods insurance. 4-person team with supervisor.",
-    images: demoImageSets.services.movingService,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: true,
@@ -941,7 +920,6 @@ const listingSeeds: ListingSeed[] = [
       "خدمة إصلاح وصيانة مكيفات مركزية وسبليت. فحص مجاني، تعبئة غاز، تنظيف فلاتر، وإصلاح أعطال كهربائية. فريق فني مرخص متاح 24/7 في عجمان والشارقة ودبي.",
     descriptionEnglish:
       "AC repair and maintenance for central and split units. Free inspection, gas refill, filter cleaning, electrical repairs. Licensed 24/7 team in Ajman, Sharjah, and Dubai.",
-    images: demoImageSets.services.acRepair,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -972,7 +950,6 @@ const listingSeeds: ListingSeed[] = [
       "شركة تقنية ناشئة في الخليج التجاري تبحث عن مندوب مبيعات. الراتب 8,000–12,000 د.إ + عمولات. خبرة 2+ سنوات في B2B مبيعات، إجادة الإنجليزية والعربية، رخصة قيادة إماراتية. تأمين صحي وتأشيرة كفالة.",
     descriptionEnglish:
       "Tech startup in Business Bay hiring Sales Executive. Salary AED 8,000–12,000 + commissions. 2+ years B2B sales, fluent Arabic/English, UAE driving license. Health insurance and visa sponsorship.",
-    images: demoImageSets.jobs.salesExecutive,
     sellerKey: "dubai-elite-properties",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -1001,7 +978,6 @@ const listingSeeds: ListingSeed[] = [
       "مكتب عقاري مرخص في جزيرة الريم يبحث عن وكيل عقارات. راتب أساسي + عمولة 40%. شهادة RERA إلزامية، خبرة 3+ سنوات في سوق أبوظبي. سيارة شركة وبدل اتصالات.",
     descriptionEnglish:
       "Licensed real estate office on Al Reem Island hiring agent. Base salary + 40% commission. RERA certificate required, 3+ years Abu Dhabi market experience. Company car and phone allowance.",
-    images: demoImageSets.jobs.realEstateAgent,
     sellerKey: "golden-key-real-estate",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -1030,7 +1006,6 @@ const listingSeeds: ListingSeed[] = [
       "شركة لوجستية في الشارقة توظف سائقي توصيل. راتب 3,500–4,500 د.إ + بدل وقود. رخصة قيادة إماراتية فئة 3، معرفة بمناطق الشارقة ودبي. دوام مرن، تأمين صحي.",
     descriptionEnglish:
       "Logistics company in Sharjah hiring delivery drivers. Salary AED 3,500–4,500 + fuel allowance. UAE Category 3 license, knowledge of Sharjah and Dubai areas. Flexible shifts, health insurance.",
-    images: demoImageSets.jobs.deliveryDriver,
     sellerKey: "emirates-home-services",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -1059,7 +1034,6 @@ const listingSeeds: ListingSeed[] = [
       "مجموعة تجارية في الفجيرة تبحث عن محاسب. راتب 7,000–9,000 د.إ. بكالوريوس محاسبة، خبرة 3+ سنوات، إجادة Excel وبرامج ERP. معالجة ضريبة القيمة المضافة وإعداد التقارير المالية.",
     descriptionEnglish:
       "Trading group in Fujairah hiring Accountant. Salary AED 7,000–9,000. Accounting degree, 3+ years experience, Excel and ERP proficiency. VAT processing and financial reporting.",
-    images: demoImageSets.jobs.accountant,
     sellerKey: "dubai-elite-properties",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -1088,7 +1062,6 @@ const listingSeeds: ListingSeed[] = [
       "وكالة إبداعية في دبي مارينا توظف مصمم جرافيك. راتب 8,000–11,000 د.إ. إتقان Adobe Creative Suite، خبرة 2+ سنوات في الهوية البصرية والسوشيال ميديا. بيئة عمل حديثة وفرص نمو.",
     descriptionEnglish:
       "Creative agency in Dubai Marina hiring Graphic Designer. Salary AED 8,000–11,000. Adobe Creative Suite proficiency, 2+ years brand identity and social media experience.",
-    images: demoImageSets.jobs.graphicDesigner,
     sellerKey: "priya-sharma",
     verifiedSeller: true,
     escrowAvailable: false,
@@ -1103,11 +1076,11 @@ const listingSeeds: ListingSeed[] = [
   },
 ];
 
-export const demoListings: Listing[] = listingSeeds.map(buildListing);
+export const marketplaceListings: Listing[] = listingSeeds.map(buildListing);
 
-export const demoUserListings: Listing[] = [
+export const marketplaceUserListings: Listing[] = [
   {
-    ...demoListings.find((l) => l.slug === "nissan-patrol-platinum-2022")!,
+    ...marketplaceListings.find((l) => l.slug === "nissan-patrol-platinum-2022")!,
     id: "user-listing-001",
     slug: "my-nissan-patrol-platinum-2022",
     title: "نيسان باترول بلاتينيوم 2022 — للبيع من المالك",
@@ -1121,7 +1094,7 @@ export const demoUserListings: Listing[] = [
     postedAt: "2026-05-10T10:00:00+04:00",
   },
   {
-    ...demoListings.find((l) => l.slug === "iphone-15-pro-128gb")!,
+    ...marketplaceListings.find((l) => l.slug === "iphone-15-pro-128gb")!,
     id: "user-listing-002",
     slug: "my-iphone-15-pro-sale",
     title: "آيفون 15 برو 128 جيجابايت — للبيع",
@@ -1135,7 +1108,7 @@ export const demoUserListings: Listing[] = [
     postedAt: "2026-06-30T14:00:00+04:00",
   },
   {
-    ...demoListings.find((l) => l.slug === "modern-dining-table-8-seater")!,
+    ...marketplaceListings.find((l) => l.slug === "modern-dining-table-8-seater")!,
     id: "user-listing-003",
     slug: "my-dining-table-draft",
     title: "طاولة طعام عصرية 8 كراسي — مسودة",
@@ -1149,7 +1122,7 @@ export const demoUserListings: Listing[] = [
     postedAt: "2026-06-29T09:00:00+04:00",
   },
   {
-    ...demoListings.find((l) => l.slug === "studio-jvc")!,
+    ...marketplaceListings.find((l) => l.slug === "studio-jvc")!,
     id: "user-listing-004",
     slug: "my-studio-jvc-rent",
     title: "استوديو JVC للإيجار السنوي — منتهي",
@@ -1163,7 +1136,7 @@ export const demoUserListings: Listing[] = [
     postedAt: "2026-03-15T10:00:00+04:00",
   },
   {
-    ...demoListings.find((l) => l.slug === "apple-watch-ultra-2")!,
+    ...marketplaceListings.find((l) => l.slug === "apple-watch-ultra-2")!,
     id: "user-listing-005",
     slug: "my-apple-watch-rejected",
     title: "ساعة Apple Watch Ultra — مرفوض",

@@ -36,12 +36,13 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         <div className="absolute start-4 top-4 z-10 flex flex-wrap gap-2">
           {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
           {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
+          {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
         </div>
       </div>
 
       {thumbnailImages.length > 0 ? (
-        <div className="grid grid-cols-3 gap-3">
-          {thumbnailImages.slice(0, 3).map((url, index) => (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {thumbnailImages.slice(0, 7).map((url, index) => (
             <div
               key={`${url}-${index}`}
               className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] border border-border"
@@ -50,7 +51,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                 alt={`صورة ${index + 2} — ${listing.title}`}
                 className="object-cover"
                 fill
-                sizes="(max-width: 1024px) 33vw, 20vw"
+                sizes="(max-width: 1024px) 25vw, 15vw"
                 src={url}
               />
             </div>

@@ -31,38 +31,36 @@ const groups = [
   },
 ];
 
-export function Home3Footer() {
+export function MarketSiteFooter() {
   return (
-    <footer className="bg-primary text-white">
-      <div className="app-container py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.1fr_1.5fr]">
+    <footer className="border-t border-border bg-primary text-white">
+      <div className="app-container py-14 md:py-16">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <div className="flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-[1rem] bg-secondary text-sm font-black text-primary">
+              <span className="grid size-11 place-items-center rounded-[var(--radius-lg)] bg-secondary text-sm font-bold text-primary">
                 UAE
               </span>
               <div>
-                <p className="text-xl font-black">UAE Sales</p>
-                <p className="text-sm font-medium text-white/60">
-                  مستقبل الإعلانات المبوبة في الإمارات
-                </p>
+                <p className="text-lg font-bold">UAE Sales</p>
+                <p className="text-sm text-white/55">سوق إماراتي موثوق</p>
               </div>
             </div>
-            <p className="mt-6 max-w-md text-sm font-medium leading-8 text-white/62">
-              منصة ذكية للبيع والشراء بثقة، تجمع بين البحث السريع، العرض
+            <p className="mt-5 max-w-sm text-sm leading-7 text-white/60">
+              منصة ذكية للبيع والشراء بثقة — تجمع بين البحث السريع، العرض
               الاحترافي، والضمان المالي في تجربة واحدة.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-6 flex flex-wrap gap-2">
               {[
                 ["shield", "ضمان مالي"],
                 ["check", "توثيق"],
-                ["message", "دعم"],
+                ["wallet", "دفع آمن"],
               ].map(([icon, label]) => (
                 <span
                   key={label}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-bold text-white/78"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/70"
                 >
-                  <Icon name={icon as "shield" | "check" | "message"} size={14} />
+                  <Icon name={icon as "shield" | "check" | "wallet"} size={13} />
                   {label}
                 </span>
               ))}
@@ -72,14 +70,12 @@ export function Home3Footer() {
           <div className="grid gap-8 sm:grid-cols-3">
             {groups.map((group) => (
               <div key={group.title}>
-                <h3 className="text-xs font-black tracking-[0.2em] text-secondary uppercase">
-                  {group.title}
-                </h3>
-                <ul className="mt-5 grid gap-3">
+                <h3 className="text-xs font-bold text-secondary">{group.title}</h3>
+                <ul className="mt-4 grid gap-2.5">
                   {group.links.map((link) => (
                     <li key={link.href}>
                       <Link
-                        className="text-sm font-medium text-white/62 transition hover:text-white"
+                        className="text-sm text-white/55 transition hover:text-white"
                         href={link.href}
                       >
                         {link.label}
@@ -92,13 +88,9 @@ export function Home3Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6">
-          <p className="text-xs font-medium text-white/48">
-            © 2026 UAE Sales. جميع الحقوق محفوظة.
-          </p>
-          <p className="text-xs font-medium text-white/48">
-            صُمم في الإمارات لسوق الإمارات.
-          </p>
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/45">
+          <p>© 2026 UAE Sales. جميع الحقوق محفوظة.</p>
+          <p>صُمم في الإمارات لسوق الإمارات.</p>
         </div>
       </div>
     </footer>

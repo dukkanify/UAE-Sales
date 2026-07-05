@@ -47,7 +47,9 @@ export function MarketCategorySection({
           <MarketListingCard
             key={listing.id}
             listing={{
-              city: listing.city,
+              city: listing.area
+                ? `${listing.area}، ${listing.emirate ?? listing.city}`
+                : listing.city,
               href: listingHref(listing),
               imageUrl: listing.imageUrl ?? "",
               price: listing.price,

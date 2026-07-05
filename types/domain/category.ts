@@ -20,4 +20,6 @@ export type Category = {
   icon: CategoryIconName;
   listingCount: number;
   subcategories: string[];
+  imageUrl?: string;
+  featuredListingSlug?: string;
 };
