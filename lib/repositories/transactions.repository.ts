@@ -105,14 +105,14 @@ export async function holdEscrowInDb(orderId: string, userId: string) {
   return updated ? mapDbOrder(updated) : undefined;
 }
 
-export async function markOrderDeliveredInDb(orderId: string, sellerId: string) {
+export async function markOrderDeliveredInDb(orderId: string, sellerUserId: string) {
   const order = await prisma.order.findFirst({
-    where: { id: orderId, sellerId },
+    where: { id: orderId, sellerId: sellerUserId },
     include: orderInclude,
   });
 
   if (!order) {
-    throw new Error("Order not found");
+    return undefined;
   }
 
   const metadata = {

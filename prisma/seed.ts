@@ -91,17 +91,22 @@ async function seedUsers() {
   return users;
 }
 
-async function seedSellers(demoUserId: string) {
+async function seedSellers(demoUserId: string, businessUserId: string) {
   const sellerIdByKey = new Map<string, string>();
 
   for (const [sellerKey, seller] of Object.entries(marketplaceSellers)) {
     const isDemoUserSeller = sellerKey === "ahmed-al-mansoori";
+    const isBusinessSeller = sellerKey === "al-noor-motors";
 
     const record = await prisma.seller.create({
       data: {
         id: seller.id,
         sellerKey,
-        userId: isDemoUserSeller ? demoUserId : undefined,
+        userId: isDemoUserSeller
+          ? demoUserId
+          : isBusinessSeller
+            ? businessUserId
+            : undefined,
         sellerName: seller.name,
         sellerType: seller.sellerType ?? "individual",
         rating: seller.rating,
@@ -245,8 +250,16 @@ async function main() {
     throw new Error("Demo user not found after seed.");
   }
 
+  const businessUser = await prisma.user.findUnique({
+    where: { email: "company@uaesales.demo" },
+  });
+
+  if (!businessUser) {
+    throw new Error("Demo business user not found after seed.");
+  }
+
   console.log("Seeding sellers...");
-  await seedSellers(demoUser.id);
+  await seedSellers(demoUser.id, businessUser.id);
 
   console.log("Seeding categories...");
   await seedCategories();

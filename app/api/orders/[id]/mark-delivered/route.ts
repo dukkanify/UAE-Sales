@@ -18,7 +18,7 @@ export async function POST(_request: Request, context: RouteContext) {
 
     const order = await markOrderDeliveredInDb(id, user.id);
     if (!order) {
-      throw new ApiHttpError(404, "NOT_FOUND", "الطلب غير موجود.");
+      throw new ApiHttpError(404, "NOT_FOUND", "الطلب غير موجود أو ليس لديك صلاحية.");
     }
 
     return jsonSuccess(order);

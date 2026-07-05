@@ -28,7 +28,13 @@ export async function POST(
     };
 
     const message = await withDataFallback(
-      () => sendChatMessageInDb(id, user.id, payload),
+      async () => {
+        const result = await sendChatMessageInDb(id, user.id, payload);
+        if (!result) {
+          throw new Error("Conversation not found in database");
+        }
+        return result;
+      },
       () =>
         addMockChatMessage(
           id,
