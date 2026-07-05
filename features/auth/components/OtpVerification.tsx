@@ -9,7 +9,7 @@ import { isValidDemoOtp } from "@/services/auth";
 type OtpVerificationProps = {
   identifier: string;
   onBack: () => void;
-  onVerified?: () => void | Promise<void>;
+  onVerified?: (code: string) => void | Promise<void>;
 };
 
 export function OtpVerification({
@@ -33,7 +33,7 @@ export function OtpVerification({
       setOtpError("");
       await new Promise((resolve) => window.setTimeout(resolve, 400));
       setStatusMessage("تم التحقق بنجاح.");
-      await onVerified?.();
+      await onVerified?.(code);
     }, [digits, onVerified]),
   );
 

@@ -4,6 +4,8 @@ import {
   findDemoAccountByIdentifier,
 } from "@/mock/demo-accounts.mock";
 import type { UserProfile } from "@/types";
+import { apiClient, isApiConfigured } from "@/services/api";
+import { setAuthToken } from "@/services/storage";
 
 const AUTH_DELAY_MS = 350;
 
@@ -13,10 +15,32 @@ function delay(ms = AUTH_DELAY_MS) {
 
 export { DEMO_OTP };
 
+type VerifyOtpResponse = {
+  token: string;
+  user: UserProfile;
+  postLoginPath: string;
+};
+
 export async function validateLoginCredentials(
   identifier: string,
   password: string,
 ) {
+  if (isApiConfigured()) {
+    try {
+      await apiClient("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ identifier, password }),
+      });
+      const account = findDemoAccountByIdentifier(identifier);
+      if (account) {
+        return account;
+      }
+      return { identifier, password } as never;
+    } catch {
+      // Fall through to mock validation.
+    }
+  }
+
   await delay();
 
   const account = findDemoAccount(identifier, password);
@@ -30,6 +54,10 @@ export async function validateLoginCredentials(
 }
 
 export async function requestLoginOtp(identifier: string) {
+  if (isApiConfigured()) {
+    return { identifier, otpRequested: true };
+  }
+
   await delay();
 
   const account = findDemoAccountByIdentifier(identifier);
@@ -43,7 +71,23 @@ export async function requestLoginOtp(identifier: string) {
   };
 }
 
-export async function completeLogin(identifier: string): Promise<UserProfile> {
+export async function completeLogin(
+  identifier: string,
+  code = DEMO_OTP,
+): Promise<UserProfile> {
+  if (isApiConfigured()) {
+    try {
+      const result = await apiClient<VerifyOtpResponse>("/api/auth/verify-otp", {
+        method: "POST",
+        body: JSON.stringify({ identifier, code }),
+      });
+      setAuthToken(result.token);
+      return result.user;
+    } catch {
+      // Fall through to mock login.
+    }
+  }
+
   await delay();
 
   const account = findDemoAccountByIdentifier(identifier);

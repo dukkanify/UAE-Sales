@@ -60,14 +60,17 @@ export function LoginForm() {
     }, []),
   );
 
-  const handleVerified = useCallback(async () => {
-    const user = await completeLogin(identifier);
-    setSessionUser(user);
-    const nextPath =
-      new URLSearchParams(window.location.search).get("next") ??
-      getPostLoginPath(identifier);
-    router.push(nextPath);
-  }, [identifier, router]);
+  const handleVerified = useCallback(
+    async (code: string) => {
+      const user = await completeLogin(identifier, code);
+      setSessionUser(user);
+      const nextPath =
+        new URLSearchParams(window.location.search).get("next") ??
+        getPostLoginPath(identifier);
+      router.push(nextPath);
+    },
+    [identifier, router],
+  );
 
   if (showOtp) {
     return (

@@ -1,10 +1,25 @@
 import type { Category } from "@/types";
 import { mockCategories } from "@/mock";
+import { withDataFallback } from "@/lib/data/fallback";
+import {
+  getAllCategoriesFromDb,
+  getCategoryBySlugFromDb,
+} from "@/lib/repositories/listings.repository";
 
 export async function getCategories(): Promise<Category[]> {
-  return mockCategories;
+  return withDataFallback(
+    getAllCategoriesFromDb,
+    async () => mockCategories,
+    "categories",
+  );
 }
 
-export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
-  return mockCategories.find((category) => category.slug === slug);
+export async function getCategoryBySlug(
+  slug: string,
+): Promise<Category | undefined> {
+  return withDataFallback(
+    () => getCategoryBySlugFromDb(slug),
+    async () => mockCategories.find((category) => category.slug === slug),
+    "category-by-slug",
+  );
 }

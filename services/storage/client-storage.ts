@@ -1,6 +1,7 @@
 import type { Listing, UserProfile } from "@/types";
 
 const SESSION_KEY = "uae-sales-session";
+const AUTH_TOKEN_KEY = "uae-sales-auth-token";
 const LOCAL_LISTINGS_KEY = "uae-sales-local-listings";
 
 function canUseStorage() {
@@ -31,7 +32,32 @@ export function clearSessionUser() {
   }
 
   window.localStorage.removeItem(SESSION_KEY);
+  window.localStorage.removeItem(AUTH_TOKEN_KEY);
   window.dispatchEvent(new Event("uae-sales-session-change"));
+}
+
+export function setAuthToken(token: string) {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  window.localStorage.setItem(AUTH_TOKEN_KEY, token);
+}
+
+export function getAuthToken(): string | null {
+  if (!canUseStorage()) {
+    return null;
+  }
+
+  return window.localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function clearAuthToken() {
+  if (!canUseStorage()) {
+    return;
+  }
+
+  window.localStorage.removeItem(AUTH_TOKEN_KEY);
 }
 
 export function getLocalListings(): Listing[] {

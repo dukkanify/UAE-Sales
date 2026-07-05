@@ -1,24 +1,38 @@
 import { ApiError } from "./errors";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 
 export function isApiConfigured() {
-  return Boolean(API_BASE_URL);
+  return (
+    process.env.NEXT_PUBLIC_USE_API === "true" ||
+    Boolean(process.env.NEXT_PUBLIC_API_BASE_URL)
+  );
+}
+
+function getAuthHeader(): Record<string, string> {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const token = window.localStorage.getItem("uae-sales-auth-token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export async function apiClient<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!API_BASE_URL) {
+  if (!isApiConfigured()) {
     throw new ApiError({
       code: "NETWORK_ERROR",
-      message: "NEXT_PUBLIC_API_BASE_URL is not configured.",
+      message: "API mode is not enabled.",
     });
   }
 
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeader(),
         ...init?.headers,
       },
     });

@@ -2,7 +2,10 @@ export type ApiErrorCode =
   | "NETWORK_ERROR"
   | "NOT_FOUND"
   | "SERVER_ERROR"
-  | "UNKNOWN";
+  | "UNKNOWN"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "VALIDATION_ERROR";
 
 export type ApiErrorPayload = {
   code: ApiErrorCode;
