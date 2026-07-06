@@ -9,6 +9,7 @@ import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
 import { getLocalListingById } from "@/services/storage";
 
 type LocalListingDetailsProps = {
@@ -20,7 +21,7 @@ export function LocalListingDetails({
   categories,
   listingId,
 }: LocalListingDetailsProps) {
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [listing, setListing] = useState<Listing | null | undefined>(undefined);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -29,13 +30,19 @@ export function LocalListingDetails({
     return () => window.clearTimeout(timeoutId);
   }, [listingId]);
 
-  if (!listing) {
+  if (listing === undefined) {
+    return <ListingDetailSkeleton />;
+  }
+
+  if (listing === null) {
     return (
       <EmptyState
         actionHref="/dashboard/listings"
         actionLabel="إعلاناتي"
         description="الإعلان غير موجود في هذا المتصفح."
         icon="package"
+        secondaryActionHref="/listings/new"
+        secondaryActionLabel="إضافة إعلان"
         title="الإعلان غير موجود"
       />
     );
@@ -51,11 +58,9 @@ export function LocalListingDetails({
         <SellerPanel listing={listing} />
         <EscrowProtectionCard />
       </div>
-      <Card className="p-6 lg:col-span-2">
-        <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
-        <p className="mt-3 text-sm font-medium leading-8 text-muted">
-          {listing.description}
-        </p>
+      <Card className="p-6 lg:col-span-2" variant="panel">
+        <h2 className="text-h2">وصف الإعلان</h2>
+        <p className="text-body mt-3">{listing.description}</p>
         <Button
           className="mt-4"
           href={`/listings/local/${listingId}/edit`}

@@ -7,6 +7,7 @@ import { AdminStatusBadge } from "@/features/admin/components/AdminStatusBadge";
 import { fetchAdminOrders } from "@/services/admin";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { DataTable } from "@/shared/ui/DataTable";
 import { EmptyState } from "@/shared/ui/EmptyState";
 
 const priceFormatter = new Intl.NumberFormat("ar-AE", {
@@ -62,21 +63,21 @@ export function AdminOrdersPanel() {
             />
           </div>
         ) : (
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[44rem] text-sm">
+          <div className="mt-5">
+            <DataTable minWidth="44rem">
               <thead>
-                <tr className="border-b border-border text-right text-xs text-muted">
-                  <th className="px-3 py-2 font-medium">الطلب</th>
-                  <th className="px-3 py-2 font-medium">المشتري / البائع</th>
-                  <th className="px-3 py-2 font-medium">المبلغ</th>
-                  <th className="px-3 py-2 font-medium">الحالة</th>
+                <tr>
+                  <th>الطلب</th>
+                  <th>المشتري / البائع</th>
+                  <th>المبلغ</th>
+                  <th>الحالة</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
                   <tr
                     key={order.id}
-                    className="cursor-pointer border-b border-border/60 transition hover:bg-surface-muted/50"
+                    className="cursor-pointer"
                     onClick={() => setSelected(order)}
                   >
                     <td className="px-3 py-3">
@@ -96,7 +97,7 @@ export function AdminOrdersPanel() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </DataTable>
           </div>
         )}
       </Card>

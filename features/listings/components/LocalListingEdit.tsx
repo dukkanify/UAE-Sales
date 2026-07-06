@@ -11,6 +11,7 @@ import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
+import { FormSkeleton } from "@/shared/ui/Skeleton";
 import { Textarea } from "@/shared/ui/Textarea";
 import {
   getLocalListingById,
@@ -22,7 +23,7 @@ type LocalListingEditProps = {
 };
 
 export function LocalListingEdit({ listingId }: LocalListingEditProps) {
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [listing, setListing] = useState<Listing | null | undefined>(undefined);
   const [saveMessage, setSaveMessage] = useState("");
   const router = useRouter();
 
@@ -34,13 +35,19 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
     return () => window.clearTimeout(timeoutId);
   }, [listingId]);
 
-  if (!listing) {
+  if (listing === undefined) {
+    return <FormSkeleton />;
+  }
+
+  if (listing === null) {
     return (
       <EmptyState
         actionHref="/dashboard/listings"
         actionLabel="العودة إلى إعلاناتي"
         description="الإعلان غير موجود في هذا المتصفح. ربما تم حذفه أو لم يُحفظ بعد."
         icon="search"
+        secondaryActionHref="/listings/new"
+        secondaryActionLabel="إضافة إعلان جديد"
         title="الإعلان غير موجود"
       />
     );
@@ -80,7 +87,7 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-6" variant="panel">
       <form className="grid gap-5" onSubmit={handleSubmit}>
         <Input defaultValue={currentListing.title} label="عنوان الإعلان" name="title" />
 

@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { Suspense, useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
+import { AdminLoading } from "@/features/admin/components/AdminLoading";
 import { AdminUnauthorized } from "@/features/admin/components/AdminUnauthorized";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -47,15 +48,7 @@ const adminLinks: { href: AdminPath; icon: "chart" | "user" | "grid" | "package"
 
 export function AdminShell(props: AdminShellProps) {
   return (
-    <Suspense
-      fallback={
-        <section className="app-container page-padding">
-          <Card className="p-8 text-center" variant="flat">
-            <p className="text-sm font-medium text-muted">جاري التحميل...</p>
-          </Card>
-        </section>
-      }
-    >
+    <Suspense fallback={<AdminLoading />}>
       <AdminShellInner {...props} />
     </Suspense>
   );
@@ -94,9 +87,7 @@ function AdminShellInner({
   if (authState === "loading" || authState === "guest") {
     return (
       <section className="app-container page-padding">
-        <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm font-medium text-muted">جاري التحقق من الصلاحيات...</p>
-        </Card>
+        <AdminLoading />
       </section>
     );
   }
@@ -175,7 +166,7 @@ function AdminShellInner({
           </Card>
         </aside>
 
-        <div>
+        <div className="overflow-safe min-w-0">
           <PageHero description={description} eyebrow="لوحة الإدارة" title={title} />
           {children}
         </div>

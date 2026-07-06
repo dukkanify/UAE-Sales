@@ -1,6 +1,7 @@
 import type { NotificationRecord, NotificationType } from "@/types/domain/notification";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
+import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 
 const typeLabels: Record<NotificationType, string> = {
@@ -49,12 +50,13 @@ export function NotificationCard({
   onMarkRead,
 }: NotificationCardProps) {
   return (
-    <article
-      className={`rounded-[var(--radius-xl)] border px-4 py-4 transition ${
+    <Card
+      className={`px-4 py-4 transition ${
         notification.read
           ? "border-border/70 bg-surface"
           : "border-primary/20 bg-primary-soft/35"
       }`}
+      variant="flat"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-10 shrink-0 place-items-center rounded-[var(--radius-xl)] bg-surface-muted text-primary">
@@ -93,6 +95,6 @@ export function NotificationCard({
           </div>
         </div>
       </div>
-    </article>
+    </Card>
   );
 }

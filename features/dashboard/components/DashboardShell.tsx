@@ -9,6 +9,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { PageHero } from "@/shared/ui/PageHero";
+import { DashboardShellSkeleton } from "@/shared/ui/Skeleton";
 import {
   clearSessionUser,
   getSessionUser,
@@ -40,15 +41,7 @@ const dashboardLinks = [
 
 export function DashboardShell(props: DashboardShellProps) {
   return (
-    <Suspense
-      fallback={
-        <section className="app-container page-padding">
-          <Card className="p-8 text-center" variant="flat">
-            <p className="text-sm font-medium text-muted">جاري التحميل...</p>
-          </Card>
-        </section>
-      }
-    >
+    <Suspense fallback={<DashboardShellSkeleton />}>
       <DashboardShellInner {...props} />
     </Suspense>
   );
@@ -84,13 +77,7 @@ function DashboardShellInner({
   }, [pathname, router, searchParams, user]);
 
   if (!isAllowed) {
-    return (
-      <section className="app-container page-padding">
-        <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm font-medium text-muted">جاري التحقق من الجلسة...</p>
-        </Card>
-      </section>
-    );
+    return <DashboardShellSkeleton />;
   }
 
   const walletBalance = displayUser.walletBalance ?? 0;
@@ -171,7 +158,7 @@ function DashboardShellInner({
           </Card>
         </aside>
 
-        <div>
+        <div className="overflow-safe min-w-0">
           <PageHero description={description} eyebrow="لوحة التحكم" title={title} />
           {children}
         </div>

@@ -73,12 +73,14 @@ function AppImageInner({
       ) : null}
       <Image
         alt={alt}
+        blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwJyBoZWlnaHQ9JzEwMCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nMTAwJScgaGVpZ2h0PScxMDAlJyBmaWxsPSIjZjNmMGVhIi8+PC9zdmc+"
         className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
         fill={fill}
         height={fill ? undefined : height}
         loading={priority ? undefined : loading ?? "lazy"}
         onError={handleError}
         onLoad={() => setIsLoaded(true)}
+        placeholder="blur"
         priority={priority}
         sizes={sizes}
         src={activeSrc}

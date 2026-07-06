@@ -25,9 +25,12 @@ export function OrdersList({ orders }: OrdersListProps) {
   if (orders.length === 0) {
     return (
       <EmptyState
-        actionHref="/"
+        actionHref="/search"
         actionLabel="تصفح الإعلانات"
         description="عند إتمام عملية شراء، ستظهر طلباتك هنا."
+        icon="cart"
+        secondaryActionHref="/wallet"
+        secondaryActionLabel="المحفظة"
         title="لا توجد طلبات بعد"
       />
     );
@@ -39,8 +42,9 @@ export function OrdersList({ orders }: OrdersListProps) {
         <li key={order.id}>
           <Link href={`/orders/${order.id}`}>
             <Card
-              className="marketplace-panel flex flex-wrap items-center justify-between gap-4 p-5 transition hover:border-primary/30"
-              variant="flat"
+              className="flex flex-wrap items-center justify-between gap-4 p-5 transition hover:border-primary/30"
+              interactive
+              variant="panel"
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium text-muted">
@@ -52,8 +56,9 @@ export function OrdersList({ orders }: OrdersListProps) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-sm font-bold text-ink">
-                  {priceFormatter.format(order.totalAmount)} د.إ
+                <p className="text-price">
+                  {priceFormatter.format(order.totalAmount)}{" "}
+                  <span className="text-xs font-semibold text-muted">د.إ</span>
                 </p>
                 <Badge variant="escrow">{statusLabels[order.status]}</Badge>
                 <Icon className="text-muted" name="arrow-left" size={16} />

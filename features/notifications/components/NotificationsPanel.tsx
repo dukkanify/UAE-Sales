@@ -79,8 +79,10 @@ export function NotificationsPanel() {
       {notifications.length === 0 ? (
         <div className="mt-6">
           <EmptyState
+            actionHref="/search"
+            actionLabel="تصفح الإعلانات"
             description="ستظهر هنا إشعارات الرسائل والطلبات والضمان والمحفظة."
-            icon="message"
+            icon="bell"
             title="لا توجد إشعارات"
           />
         </div>

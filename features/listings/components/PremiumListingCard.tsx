@@ -115,7 +115,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </h3>
       </Link>
 
-      <p className="mt-2 text-lg font-bold text-ink sm:text-xl">
+      <p className="text-price mt-2">
         {listingPriceFormatter.format(listing.price)}{" "}
         <span className="text-xs font-semibold text-muted">د.إ</span>
       </p>

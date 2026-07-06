@@ -8,6 +8,7 @@ import { fetchAdminUsers, patchAdminUserClient } from "@/services/admin";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { DataTable } from "@/shared/ui/DataTable";
 import { EmptyState } from "@/shared/ui/EmptyState";
 
 export function AdminUsersPanel() {
@@ -89,22 +90,19 @@ export function AdminUsersPanel() {
             />
           </div>
         ) : (
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[42rem] text-sm">
+          <div className="mt-5">
+            <DataTable>
               <thead>
-                <tr className="border-b border-border text-right text-xs text-muted">
-                  <th className="px-3 py-2 font-medium">المستخدم</th>
-                  <th className="px-3 py-2 font-medium">الدور</th>
-                  <th className="px-3 py-2 font-medium">الحالة</th>
-                  <th className="px-3 py-2 font-medium">الإجراءات</th>
+                <tr>
+                  <th>المستخدم</th>
+                  <th>الدور</th>
+                  <th>الحالة</th>
+                  <th>الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-border/60 transition hover:bg-surface-muted/50"
-                  >
+                  <tr key={user.id}>
                     <td className="px-3 py-3">
                       <Button
                         className="h-auto justify-start p-0 text-right"
@@ -160,7 +158,7 @@ export function AdminUsersPanel() {
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </DataTable>
           </div>
         )}
       </Card>

@@ -8,11 +8,27 @@ type EmptyStateProps = {
   children?: ReactNode;
   description: string;
   eyebrow?: string;
-  icon?: "search" | "package" | "message" | "wallet" | "photo" | "shield";
+  icon?:
+    | "search"
+    | "package"
+    | "message"
+    | "wallet"
+    | "photo"
+    | "shield"
+    | "heart"
+    | "bell"
+    | "cart"
+    | "grid";
+  secondaryActionHref?: string;
+  secondaryActionLabel?: string;
   title: string;
 };
 
 const iconMap = {
+  bell: "bell",
+  cart: "package",
+  grid: "grid",
+  heart: "heart",
   message: "message",
   package: "package",
   photo: "photo",
@@ -28,6 +44,8 @@ export function EmptyState({
   description,
   eyebrow,
   icon = "package",
+  secondaryActionHref,
+  secondaryActionLabel,
   title,
 }: EmptyStateProps) {
   return (
@@ -51,11 +69,18 @@ export function EmptyState({
         {description}
       </p>
       {children}
-      {actionHref && actionLabel ? (
-        <Button className="mt-7" href={actionHref} variant="primary">
-          {actionLabel}
-        </Button>
-      ) : null}
+      <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+        {actionHref && actionLabel ? (
+          <Button href={actionHref} variant="primary">
+            {actionLabel}
+          </Button>
+        ) : null}
+        {secondaryActionHref && secondaryActionLabel ? (
+          <Button href={secondaryActionHref} variant="secondary">
+            {secondaryActionLabel}
+          </Button>
+        ) : null}
+      </div>
     </div>
   );
 }
