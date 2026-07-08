@@ -29,6 +29,7 @@ export const STORAGE_EVENTS = {
   sessionChange: "sooqna-session-change",
   listingsChange: "sooqna-listings-change",
   recentlyViewedChange: "sooqna-recently-viewed-change",
+  chatChange: "sooqna-chat-change",
 } as const;
 
 export const STORAGE_KEYS = {
@@ -36,6 +37,7 @@ export const STORAGE_KEYS = {
   localListings: "sooqna-local-listings",
   recentlyViewed: "sooqna-recently-viewed",
   savedSearches: "sooqna-saved-searches",
+  chatConversations: "sooqna-chat-conversations",
 } as const;
 
 /** Legacy keys migrated on read */

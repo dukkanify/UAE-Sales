@@ -20,7 +20,7 @@ export type DeliveryOption =
 export type ListingSeller = {
   id: string;
   name: string;
-  rating: number;
+  rating?: number;
   avatarUrl?: string;
   isVerified?: boolean;
   sellerType?: SellerType;
@@ -62,6 +62,8 @@ export type ElectronicsSpecs = {
 
 export type ListingImageTone = "gold" | "amber" | "sky" | "rose" | "slate";
 
+import type { CategorySpecs } from "./category-fields";
+
 export type Listing = {
   id: string;
   title: string;
@@ -97,6 +99,9 @@ export type Listing = {
   carSpecs?: CarSpecs;
   realEstateSpecs?: RealEstateSpecs;
   electronicsSpecs?: ElectronicsSpecs;
+  /** User-entered dynamic fields (local / new listings) */
+  categorySpecs?: CategorySpecs;
+  contactPhone?: string;
 };
 
 export type ListingSearchFilters = {

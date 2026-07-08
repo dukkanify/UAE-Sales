@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { listingMatchesQuery } from "@/shared/listings/listing-specs";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
@@ -79,10 +80,7 @@ export function SearchResultsList({
       )
       .filter((listing) => {
         if (!normalizedQuery) return true;
-        return [listing.title, listing.description, listing.city, listing.seller.name]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedQuery);
+        return listingMatchesQuery(listing, normalizedQuery);
       });
 
     return [...matchingLocalListings, ...listings].sort((a, b) => {

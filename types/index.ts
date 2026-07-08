@@ -8,6 +8,14 @@ export type {
 } from "./domain/category";
 
 export type {
+  CategoryFieldDefinition,
+  CategoryFieldOption,
+  CategoryFieldType,
+  CategorySpecValue,
+  CategorySpecs,
+} from "./domain/category-fields";
+
+export type {
   CarSpecs,
   ContactMethod,
   DeliveryOption,

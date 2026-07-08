@@ -1,5 +1,8 @@
+"use client";
+
 import type { Category, Listing } from "@/types";
-import { formatPostedTime } from "./listing-card.utils";
+import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
+import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { Badge } from "@/shared/ui/Badge";
@@ -29,6 +32,12 @@ const priceFormatter = new Intl.NumberFormat("ar-AE", {
 });
 
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
+  const locationLabel = listing.area
+    ? `${listing.area}، ${listing.emirate ?? listing.city}`
+    : listing.emirate
+      ? `${listing.city}، ${listing.emirate}`
+      : listing.city;
+
   return (
     <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
@@ -55,32 +64,34 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
           <span className="font-medium text-muted">الموقع</span>
           <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
-            {listing.area ? `${listing.area}، ${listing.emirate ?? listing.city}` : listing.city}
+            {locationLabel}
           </span>
         </div>
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <span className="font-medium text-muted">تاريخ النشر</span>
-          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
-            <Icon name="clock" size={14} />
-            {formatPostedTime(listing.postedAt)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="font-medium text-muted">المشاهدات</span>
-          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
-            <Icon name="eye" size={14} />
-            {listing.views.toLocaleString("ar-AE")}
-          </span>
-        </div>
+        {listing.postedAt ? (
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <span className="font-medium text-muted">تاريخ النشر</span>
+            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+              <Icon name="clock" size={14} />
+              {formatPostedTime(listing.postedAt)}
+            </span>
+          </div>
+        ) : null}
+        {listing.views > 0 ? (
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-muted">المشاهدات</span>
+            <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+              <Icon name="eye" size={14} />
+              {listing.views.toLocaleString("ar-AE")}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-6 grid gap-2">
         <Button fullWidth href={`/checkout?listing=${listing.slug}`} size="lg" variant="accent">
           شراء الآن
         </Button>
-        <Button fullWidth href={`/chat?listing=${listing.slug}`} variant="secondary">
-          محادثة البائع
-        </Button>
+        <StartChatButton fullWidth listing={listing} size="lg" />
       </div>
 
       <div className="mt-2 grid gap-2 sm:grid-cols-2">

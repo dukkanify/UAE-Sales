@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
-import { ListingFeatures } from "@/features/listings/components/ListingFeatures";
+import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
 import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
 import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
@@ -106,7 +106,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             ) : null}
           </div>
 
-          <ListingFeatures listing={listing} />
+          <ListingSpecifications listing={listing} />
           <ListingSafetyTips />
         </section>
 

@@ -15,7 +15,7 @@ import {
 } from "@/services/storage";
 
 type DashboardShellProps = {
-  activePath: "/profile" | "/dashboard/listings";
+  activePath: "/profile" | "/dashboard/listings" | "/chat";
   children: ReactNode;
   description: string;
   title: string;

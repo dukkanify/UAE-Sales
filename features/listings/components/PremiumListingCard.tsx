@@ -45,7 +45,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
   }, [href]);
 
   const isVerified =
-    listing.verifiedSeller ?? listing.seller.isVerified ?? listing.seller.rating >= 4.8;
+    listing.verifiedSeller ?? listing.seller.isVerified ?? (listing.seller.rating ?? 0) >= 4.8;
   const showEscrow = listing.escrowAvailable === true;
 
   const imageArea = (
