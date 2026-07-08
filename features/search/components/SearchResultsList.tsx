@@ -6,8 +6,10 @@ import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
 import { EmptyState } from "@/shared/ui/EmptyState";
-import { ListingCardSkeleton } from "@/shared/ui/Skeleton";
-import { getLocalListings } from "@/services/storage";
+import {
+  getLocalListingsForSeller,
+  getSessionUser,
+} from "@/services/storage";
 
 type SearchResultsListProps = {
   categoryId?: string;
@@ -32,7 +34,7 @@ export function SearchResultsList({
   selectedFilters = {},
 }: SearchResultsListProps) {
   const [localListings, setLocalListings] = useState<Listing[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
   );
@@ -91,25 +93,21 @@ export function SearchResultsList({
   }, [categoryId, listings, localListings, selectedFilters]);
 
   useEffect(() => {
-    const syncLocalListings = () => setLocalListings(getLocalListings());
+    const syncLocalListings = () => {
+      const user = getSessionUser();
+      setLocalListings(
+        user ? getLocalListingsForSeller(user.id) : [],
+      );
+    };
+
     syncLocalListings();
-    const timeoutId = window.setTimeout(() => setIsLoading(false), 300);
     window.addEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
+    window.addEventListener(STORAGE_EVENTS.sessionChange, syncLocalListings);
     return () => {
-      window.clearTimeout(timeoutId);
       window.removeEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
+      window.removeEventListener(STORAGE_EVENTS.sessionChange, syncLocalListings);
     };
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <ListingCardSkeleton key={index} />
-        ))}
-      </div>
-    );
-  }
 
   if (visibleListings.length === 0) {
     return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { demoAccounts } from "@/mock/demo-accounts.mock";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
@@ -14,7 +15,8 @@ import { Icon } from "@/shared/ui/Icon";
 import { Tabs } from "@/shared/ui/Tabs";
 import {
   deleteLocalListing,
-  getLocalListings,
+  getLocalListingsForSeller,
+  getSessionUser,
 } from "@/services/storage";
 
 type MyListingsDashboardProps = {
@@ -30,6 +32,12 @@ const statusOrder: ListingStatus[] = [
   "rejected",
 ];
 
+function isDemoSessionUser(email?: string, id?: string) {
+  return demoAccounts.some(
+    (account) => account.profile.email === email || account.profile.id === id,
+  );
+}
+
 export function MyListingsDashboard({
   categories,
   listings,
@@ -37,10 +45,13 @@ export function MyListingsDashboard({
   const [activeStatus, setActiveStatus] = useState("all");
   const [localListings, setLocalListings] = useState<Listing[]>([]);
   const [actionMessage, setActionMessage] = useState("");
-  const allListings = useMemo(
-    () => [...localListings, ...listings],
-    [listings, localListings],
-  );
+  const [showDemoListings, setShowDemoListings] = useState(false);
+
+  const allListings = useMemo(() => {
+    const demoListings = showDemoListings ? listings : [];
+    return [...localListings, ...demoListings];
+  }, [listings, localListings, showDemoListings]);
+
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
   );
@@ -69,11 +80,21 @@ export function MyListingsDashboard({
   ];
 
   useEffect(() => {
-    const syncLocalListings = () => setLocalListings(getLocalListings());
+    const syncLocalListings = () => {
+      const user = getSessionUser();
+      setLocalListings(
+        user ? getLocalListingsForSeller(user.id) : [],
+      );
+      setShowDemoListings(isDemoSessionUser(user?.email, user?.id));
+    };
+
     syncLocalListings();
     window.addEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
-    return () =>
+    window.addEventListener(STORAGE_EVENTS.sessionChange, syncLocalListings);
+    return () => {
       window.removeEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
+      window.removeEventListener(STORAGE_EVENTS.sessionChange, syncLocalListings);
+    };
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import type { UserProfile } from "@/types";
 import { Badge } from "@/shared/ui/Badge";
@@ -24,16 +24,10 @@ const accountTypeLabels: Record<UserProfile["accountType"], string> = {
 };
 
 export function ProfileForm({ user }: ProfileFormProps) {
-  const [displayUser, setDisplayUser] = useState(user);
+  const [displayUser] = useState(() =>
+    typeof window !== "undefined" ? (getSessionUser() ?? user) : user,
+  );
   const [saveMessage, setSaveMessage] = useState("");
-
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setDisplayUser(getSessionUser() ?? user);
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [user]);
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">

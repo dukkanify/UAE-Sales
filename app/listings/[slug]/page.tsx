@@ -20,7 +20,6 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import {
   getListingBySlug,
-  getListings,
   getRelatedListings,
 } from "@/services/listings";
 
@@ -54,10 +53,9 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const listing = await getListingBySlug(slug);
   if (!listing) notFound();
 
-  const [categories, relatedListings, allListings] = await Promise.all([
+  const [categories, relatedListings] = await Promise.all([
     getCategories(),
     getRelatedListings(listing.categoryId, listing.id),
-    getListings(),
   ]);
   const category = categories.find((item) => item.id === listing.categoryId);
 
@@ -134,7 +132,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
         <RecentlyViewedSection
           categories={categories}
           currentSlug={listing.slug}
-          listings={allListings}
+          listings={[listing, ...relatedListings]}
         />
       </main>
       <SiteFooter />

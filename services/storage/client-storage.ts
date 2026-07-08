@@ -23,6 +23,8 @@ function migrateKey(newKey: string, legacyKey: string) {
 function ensureMigrated() {
   migrateKey(STORAGE_KEYS.session, LEGACY_STORAGE_KEYS.session);
   migrateKey(STORAGE_KEYS.localListings, LEGACY_STORAGE_KEYS.localListings);
+  migrateKey(STORAGE_KEYS.recentlyViewed, LEGACY_STORAGE_KEYS.recentlyViewed);
+  migrateKey(STORAGE_KEYS.savedSearches, LEGACY_STORAGE_KEYS.savedSearches);
 }
 
 export function getSessionUser(): UserProfile | null {
@@ -92,4 +94,8 @@ export function deleteLocalListing(listingId: string) {
 
 export function getLocalListingById(listingId: string) {
   return getLocalListings().find((listing) => listing.id === listingId);
+}
+
+export function getLocalListingsForSeller(sellerId: string): Listing[] {
+  return getLocalListings().filter((listing) => listing.seller.id === sellerId);
 }

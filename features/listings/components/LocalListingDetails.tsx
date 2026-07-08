@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { Category, Listing } from "@/types";
+import type { Category } from "@/types";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
 import { ListingSummary } from "@/features/listings/components/ListingSummary";
@@ -9,6 +8,7 @@ import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
 import { getLocalListingById } from "@/services/storage";
 
 type LocalListingDetailsProps = {
@@ -20,14 +20,11 @@ export function LocalListingDetails({
   categories,
   listingId,
 }: LocalListingDetailsProps) {
-  const [listing, setListing] = useState<Listing | null>(null);
+  if (typeof window === "undefined") {
+    return <ListingDetailSkeleton />;
+  }
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setListing(getLocalListingById(listingId) ?? null);
-    }, 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [listingId]);
+  const listing = getLocalListingById(listingId) ?? null;
 
   if (!listing) {
     return (

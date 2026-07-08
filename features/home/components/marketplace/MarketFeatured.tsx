@@ -9,7 +9,7 @@ type MarketFeaturedProps = {
 
 export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
-  const featured = listings.filter((l) => l.isFeatured).slice(0, 6);
+  const featured = listings.slice(0, 6);
 
   if (featured.length === 0) {
     return null;

@@ -27,6 +27,13 @@ export default async function Home() {
   const categoryById = (id: string) =>
     categories.find((c) => c.id === id)?.slug ?? id;
 
+  const sectionListings = mockHomeCategorySections.map((section) => ({
+    ...section,
+    items: allListings
+      .filter((listing) => listing.categoryId === section.categoryId)
+      .slice(0, 4),
+  }));
+
   return (
     <>
       <MarketHeader />
@@ -34,14 +41,14 @@ export default async function Home() {
         <MarketHero categories={categories} />
         <MarketPreviewStrip />
         <MarketFeatured categories={categoryMeta} listings={featuredListings} />
-        {mockHomeCategorySections.map((section) => (
+        {sectionListings.map((section) => (
           <MarketCategorySection
             key={section.categoryId}
             categoryId={section.categoryId}
             categorySlug={categoryById(section.categoryId)}
             description={section.description}
             eyebrow={section.eyebrow}
-            listings={allListings}
+            listings={section.items}
             title={section.title}
             variant={section.variant}
           />

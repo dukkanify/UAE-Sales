@@ -22,6 +22,10 @@ type AppImageProps = {
   width?: number;
 };
 
+function isInlineImageSrc(src?: string) {
+  return Boolean(src?.startsWith("data:") || src?.startsWith("blob:"));
+}
+
 function AppImageInner({
   alt,
   className = "",
@@ -49,8 +53,9 @@ function AppImageInner({
   }, [fallback, fallbackCategory, fill, width]);
 
   const [activeSrc, setActiveSrc] = useState(src || fallbackUrl);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(isInlineImageSrc(src));
   const usingFallback = activeSrc === fallbackUrl;
+  const useNativeImage = isInlineImageSrc(activeSrc);
 
   function handleError() {
     if (activeSrc !== fallbackUrl) {
@@ -60,30 +65,43 @@ function AppImageInner({
   }
 
   const imageClassName = `object-cover ${className}`.trim();
+  const wrapperClassName = `overflow-hidden ${fill ? "absolute inset-0" : "relative block"}`;
 
   return (
-    <span
-      className={`overflow-hidden ${fill ? "absolute inset-0" : "relative block"}`}
-    >
+    <span className={wrapperClassName}>
       {!isLoaded ? (
         <span
           aria-hidden
           className={`absolute inset-0 skeleton ${fill ? "" : "min-h-[inherit]"}`}
         />
       ) : null}
-      <Image
-        alt={alt}
-        className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
-        fill={fill}
-        height={fill ? undefined : height}
-        loading={priority ? undefined : loading ?? "lazy"}
-        onError={handleError}
-        onLoad={() => setIsLoaded(true)}
-        priority={priority}
-        sizes={sizes}
-        src={activeSrc}
-        width={fill ? undefined : width}
-      />
+      {useNativeImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          alt={alt}
+          className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"} ${fill ? "absolute inset-0 h-full w-full" : ""}`}
+          height={fill ? undefined : height}
+          loading={priority ? "eager" : loading ?? "lazy"}
+          onError={handleError}
+          onLoad={() => setIsLoaded(true)}
+          src={activeSrc}
+          width={fill ? undefined : width}
+        />
+      ) : (
+        <Image
+          alt={alt}
+          className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+          fill={fill}
+          height={fill ? undefined : height}
+          loading={priority ? undefined : loading ?? "lazy"}
+          onError={handleError}
+          onLoad={() => setIsLoaded(true)}
+          priority={priority}
+          sizes={sizes}
+          src={activeSrc}
+          width={fill ? undefined : width}
+        />
+      )}
       {usingFallback ? (
         <span className="sr-only">صورة بديلة لـ {alt}</span>
       ) : null}

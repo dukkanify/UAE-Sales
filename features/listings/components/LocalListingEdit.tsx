@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import type { Listing, ListingCondition } from "@/types";
 import { Button } from "@/shared/ui/Button";
@@ -12,6 +12,8 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
+import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import {
   getLocalListingById,
   saveLocalListing,
@@ -22,17 +24,54 @@ type LocalListingEditProps = {
 };
 
 export function LocalListingEdit({ listingId }: LocalListingEditProps) {
-  const [listing, setListing] = useState<Listing | null>(null);
   const [saveMessage, setSaveMessage] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      setListing(getLocalListingById(listingId) ?? null);
-    }, 0);
+  const saveChanges = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const currentListing = getLocalListingById(listingId);
+      if (!currentListing) {
+        return;
+      }
 
-    return () => window.clearTimeout(timeoutId);
-  }, [listingId]);
+      const formData = new FormData(event.currentTarget);
+      const title = String(formData.get("title") ?? "").trim();
+      const description = String(formData.get("description") ?? "").trim();
+      const price = Number(formData.get("price") ?? 0);
+      const condition = String(
+        formData.get("condition") ?? currentListing.condition,
+      ) as ListingCondition;
+      const cityId = String(formData.get("city") ?? "dubai");
+
+      if (title.length < 8 || description.length < 20 || price <= 0) {
+        setSaveMessage("تأكد من صحة العنوان والوصف والسعر قبل الحفظ.");
+        return;
+      }
+
+      const updatedListing: Listing = {
+        ...currentListing,
+        title,
+        description,
+        price,
+        condition,
+        city: cities.find((city) => city.id === cityId)?.name ?? currentListing.city,
+      };
+
+      saveLocalListing(updatedListing);
+      setSaveMessage("تم حفظ التعديلات بنجاح.");
+      router.push(`/listings/local/${currentListing.id}`);
+    },
+    [listingId, router],
+  );
+
+  const { isLoading, run: handleSubmit } = useAsyncAction(saveChanges);
+
+  if (typeof window === "undefined") {
+    return <ListingDetailSkeleton />;
+  }
+
+  const listing = getLocalListingById(listingId) ?? null;
 
   if (!listing) {
     return (
@@ -47,37 +86,6 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
   }
 
   const currentListing = listing;
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const title = String(formData.get("title") ?? "").trim();
-    const description = String(formData.get("description") ?? "").trim();
-    const price = Number(formData.get("price") ?? 0);
-    const condition = String(
-      formData.get("condition") ?? currentListing.condition,
-    ) as ListingCondition;
-    const cityId = String(formData.get("city") ?? "dubai");
-
-    if (title.length < 8 || description.length < 20 || price <= 0) {
-      setSaveMessage("تأكد من صحة العنوان والوصف والسعر قبل الحفظ.");
-      return;
-    }
-
-    const updatedListing: Listing = {
-      ...currentListing,
-      title,
-      description,
-      price,
-      condition,
-      city: cities.find((city) => city.id === cityId)?.name ?? currentListing.city,
-    };
-
-    saveLocalListing(updatedListing);
-    setSaveMessage("تم حفظ التعديلات بنجاح.");
-    router.push(`/listings/local/${currentListing.id}`);
-  }
 
   return (
     <Card className="p-6">
@@ -127,7 +135,9 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         ) : null}
 
         <div className="flex flex-wrap gap-3">
-          <Button type="submit">حفظ التعديلات</Button>
+          <Button loading={isLoading} type="submit">
+            حفظ التعديلات
+          </Button>
           <Button
             href={`/listings/local/${currentListing.id}`}
             variant="secondary"

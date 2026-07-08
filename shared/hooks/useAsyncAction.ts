@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { getErrorMessage } from "@/services/api";
 
 export function useAsyncAction<TArgs extends unknown[]>(
@@ -8,9 +8,15 @@ export function useAsyncAction<TArgs extends unknown[]>(
 ) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isRunningRef = useRef(false);
 
   const run = useCallback(
     async (...args: TArgs) => {
+      if (isRunningRef.current) {
+        return;
+      }
+
+      isRunningRef.current = true;
       setIsLoading(true);
       setError(null);
 
@@ -19,6 +25,7 @@ export function useAsyncAction<TArgs extends unknown[]>(
       } catch (nextError) {
         setError(getErrorMessage(nextError));
       } finally {
+        isRunningRef.current = false;
         setIsLoading(false);
       }
     },

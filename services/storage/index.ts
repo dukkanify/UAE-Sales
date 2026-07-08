@@ -3,6 +3,7 @@ export {
   deleteLocalListing,
   getLocalListingById,
   getLocalListings,
+  getLocalListingsForSeller,
   getSessionUser,
   saveLocalListing,
   setSessionUser,
