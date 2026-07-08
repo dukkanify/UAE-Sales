@@ -1,6 +1,7 @@
 "use client";
 
 import type { Category, Listing } from "@/types";
+import { getCheckoutListingParam } from "@/shared/listings/listing-ownership";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
@@ -88,7 +89,12 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <div className="mt-6 grid gap-2">
-        <Button fullWidth href={`/checkout?listing=${listing.slug}`} size="lg" variant="accent">
+        <Button
+          fullWidth
+          href={`/checkout?listing=${getCheckoutListingParam(listing)}`}
+          size="lg"
+          variant="accent"
+        >
           شراء الآن
         </Button>
         <StartChatButton fullWidth listing={listing} size="lg" />

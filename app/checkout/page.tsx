@@ -1,19 +1,24 @@
-import { ComingSoonPage } from "@/shared/components/ComingSoonPage";
+import { CheckoutContent } from "@/features/checkout/components/CheckoutContent";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getListingBySlug } from "@/services/listings";
 
-export default function CheckoutPage() {
+type CheckoutPageProps = {
+  searchParams: Promise<{ listing?: string }>;
+};
+
+export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
+  const { listing: listingRef } = await searchParams;
+  const catalogListing =
+    listingRef && !listingRef.startsWith("local-")
+      ? await getListingBySlug(listingRef)
+      : undefined;
+
   return (
     <>
       <SiteHeader />
       <main>
-        <ComingSoonPage
-          actionHref="/escrow"
-          actionLabel="كيف يعمل الضمان؟"
-          description="واجهة الدفع جاهزة لتعرض سعر المنتج، رسوم الدفع الإلكتروني، والإجمالي مع توضيح حجز المبلغ في الضمان المالي."
-          eyebrow="الدفع"
-          title="إتمام الشراء بأمان"
-        />
+        <CheckoutContent catalogListing={catalogListing} listingRef={listingRef} />
       </main>
       <SiteFooter />
     </>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Listing } from "@/types";
 import { openListingConversation } from "@/services/chat";
+import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -41,7 +42,7 @@ export function StartChatButton({
         return;
       }
 
-      if (user.id === listing.seller.id) {
+      if (isOwnListing(listing, user)) {
         setError("لا يمكنك مراسلة نفسك بخصوص إعلانك.");
         return;
       }

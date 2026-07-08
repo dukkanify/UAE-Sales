@@ -9,7 +9,7 @@ import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
-import { getSessionUser } from "@/services/storage";
+import { getSessionUser, setSessionUser } from "@/services/storage";
 
 type ProfileFormProps = {
   user: UserProfile;
@@ -24,7 +24,7 @@ const accountTypeLabels: Record<UserProfile["accountType"], string> = {
 };
 
 export function ProfileForm({ user }: ProfileFormProps) {
-  const [displayUser] = useState(() =>
+  const [displayUser, setDisplayUser] = useState(() =>
     typeof window !== "undefined" ? (getSessionUser() ?? user) : user,
   );
   const [saveMessage, setSaveMessage] = useState("");
@@ -56,7 +56,27 @@ export function ProfileForm({ user }: ProfileFormProps) {
           className="grid gap-5 p-6"
           onSubmit={(event) => {
             event.preventDefault();
-            setSaveMessage("تم حفظ التغييرات محلياً. سيتم ربط الحفظ بالخادم لاحقاً.");
+            const form = event.currentTarget;
+            const formData = new FormData(form);
+            const cityId = String(formData.get("city") ?? "");
+            const cityName =
+              cities.find((city) => city.id === cityId)?.name ?? displayUser.city;
+            const accountType = String(
+              formData.get("accountType") ?? displayUser.accountType,
+            ) as UserProfile["accountType"];
+
+            const updatedUser: UserProfile = {
+              ...displayUser,
+              fullName: String(formData.get("fullName") ?? displayUser.fullName),
+              email: String(formData.get("email") ?? displayUser.email),
+              phone: String(formData.get("phone") ?? displayUser.phone),
+              city: cityName,
+              accountType,
+            };
+
+            setSessionUser(updatedUser);
+            setDisplayUser(updatedUser);
+            setSaveMessage("تم حفظ التغييرات محلياً.");
           }}
         >
           <div className="grid gap-4 md:grid-cols-2">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { listingMatchesEmirate } from "@/shared/listings/listing-ownership";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
@@ -56,7 +57,9 @@ export function SearchResultsList({
         filterCategory ? listing.categoryId === filterCategory : true,
       )
       .filter((listing) =>
-        selectedFilters.city ? listing.city === selectedFilters.city : true,
+        selectedFilters.city
+          ? listingMatchesEmirate(listing, selectedFilters.city)
+          : true,
       )
       .filter((listing) =>
         selectedFilters.country

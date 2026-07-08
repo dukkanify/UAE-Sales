@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { WalletBalances } from "@/features/wallet/components/WalletBalances";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
@@ -35,22 +36,10 @@ export default async function WalletPage() {
           user={user}
         >
           <div className="grid gap-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Card className="p-6" variant="flat">
-                <p className="text-sm font-medium text-muted">الرصيد المتاح</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {priceFormatter.format(wallet.availableBalance)}{" "}
-                  <span className="text-sm font-medium text-muted">د.إ</span>
-                </p>
-              </Card>
-              <Card className="p-6" variant="flat">
-                <p className="text-sm font-medium text-muted">قيد المعالجة</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {priceFormatter.format(wallet.pendingBalance)}{" "}
-                  <span className="text-sm font-medium text-muted">د.إ</span>
-                </p>
-              </Card>
-            </div>
+            <WalletBalances
+              defaultAvailable={wallet.availableBalance}
+              defaultPending={wallet.pendingBalance}
+            />
 
             <Card className="p-6" variant="flat">
               <h2 className="text-sm font-semibold text-ink">النشاط الأخير</h2>

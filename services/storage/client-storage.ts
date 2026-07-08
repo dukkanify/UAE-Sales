@@ -37,12 +37,23 @@ export function getSessionUser(): UserProfile | null {
   return rawValue ? (JSON.parse(rawValue) as UserProfile) : null;
 }
 
+function safeSetItem(key: string, value: string): boolean {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function setSessionUser(user: UserProfile) {
   if (!canUseStorage()) {
     return;
   }
 
-  window.localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(user));
+  if (!safeSetItem(STORAGE_KEYS.session, JSON.stringify(user))) {
+    return;
+  }
   window.dispatchEvent(new Event(STORAGE_EVENTS.sessionChange));
 }
 
@@ -76,7 +87,9 @@ export function saveLocalListing(listing: Listing) {
     ...listings.filter((item) => item.id !== listing.id),
   ];
 
-  window.localStorage.setItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings));
+  if (!safeSetItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings))) {
+    return;
+  }
   window.dispatchEvent(new Event(STORAGE_EVENTS.listingsChange));
 }
 
@@ -88,7 +101,9 @@ export function deleteLocalListing(listingId: string) {
   const nextListings = getLocalListings().filter(
     (listing) => listing.id !== listingId,
   );
-  window.localStorage.setItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings));
+  if (!safeSetItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings))) {
+    return;
+  }
   window.dispatchEvent(new Event(STORAGE_EVENTS.listingsChange));
 }
 
