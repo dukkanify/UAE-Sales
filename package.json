@@ -1,6 +1,6 @@
 {
   "name": "sooqna-web",
-  "version": "1.0.0",
+  "version": "0.1.0-beta",
   "description": "Arabic RTL web app for Sooqna (سوقنا) — premium UAE marketplace.",
   "private": true,
   "scripts": {
