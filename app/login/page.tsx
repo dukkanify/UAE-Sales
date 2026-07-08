@@ -15,7 +15,7 @@ export default function LoginPage() {
             label: "أنشئ حساباً جديداً",
             prompt: "ليس لديك حساب؟",
           }}
-          title="مرحباً بك في UAE Sales"
+          title="مرحباً بك في سوقنا"
         >
           <LoginForm />
         </AuthShell>

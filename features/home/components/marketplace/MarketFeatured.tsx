@@ -20,7 +20,7 @@ export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
       <MarketSectionHeader
         actionHref="/featured"
         actionLabel="عرض جميع الإعلانات"
-        description="إعلانات مختارة من السوق الإماراتي — صور حقيقية، أسعار واضحة، وضمان على كل معاملة."
+        description="إعلانات مختارة من سوقنا — صور حقيقية، أسعار واضحة، وضمان على كل معاملة."
         eyebrow="Featured"
         title="إعلانات مميزة"
       />

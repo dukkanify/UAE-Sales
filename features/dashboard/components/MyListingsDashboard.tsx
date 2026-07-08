@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { Category, Listing, ListingStatus } from "@/types";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
 import { DashboardOverviewPanel } from "@/features/dashboard/components/DashboardOverviewPanel";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
@@ -70,9 +71,9 @@ export function MyListingsDashboard({
   useEffect(() => {
     const syncLocalListings = () => setLocalListings(getLocalListings());
     syncLocalListings();
-    window.addEventListener("uae-sales-listings-change", syncLocalListings);
+    window.addEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
     return () =>
-      window.removeEventListener("uae-sales-listings-change", syncLocalListings);
+      window.removeEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
   }, []);
 
   return (

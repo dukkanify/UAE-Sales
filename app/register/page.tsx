@@ -15,7 +15,7 @@ export default function RegisterPage() {
             label: "سجّل الدخول",
             prompt: "لديك حساب بالفعل؟",
           }}
-          title="أنشئ حسابك في UAE Sales"
+          title="أنشئ حسابك في سوقنا"
         >
           <RegisterForm />
         </AuthShell>

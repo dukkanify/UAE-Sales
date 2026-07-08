@@ -1,10 +1,12 @@
 :root {
-  /* Primary — Luxury Charcoal */
-  --color-primary: #0f1419;
-  --color-primary-dark: #06080c;
-  --color-primary-soft: #f0ede8;
+  /* ── Sooqna Brand Colors ── */
 
-  /* Secondary — Warm Gold */
+  /* Primary — Deep Navy */
+  --color-primary: #0b1628;
+  --color-primary-dark: #060d18;
+  --color-primary-soft: #eef1f6;
+
+  /* Secondary — Premium Gold */
   --color-secondary: #c9a962;
   --color-secondary-soft: #f7f0e4;
 
@@ -22,45 +24,49 @@
     var(--color-background) 100%
   );
 
-  /* Accent — Elegant UAE Red */
-  --color-accent: #c41e3a;
-  --color-accent-soft: #fdf2f4;
+  /* Accent — Subtle UAE Green */
+  --color-accent: #2d6a4f;
+  --color-accent-soft: #e8f3ed;
+
+  /* Legacy aliases (deprecated) */
   --color-uae-red: #c41e3a;
-  --color-uae-black: #0f1419;
+  --color-uae-black: #0b1628;
   --color-uae-white: #ffffff;
 
-  /* Success — Modern Emerald */
+  /* Semantic */
   --color-success: #10b981;
   --color-success-soft: #ecfdf5;
-
-  /* Error */
+  --color-warning: #f59e0b;
+  --color-warning-soft: #fffbeb;
   --color-error: #dc2626;
   --color-error-soft: #fef2f2;
+  --color-info: #3b82f6;
+  --color-info-soft: #eff6ff;
 
   /* Neutrals */
-  --color-ink: #0f1419;
+  --color-ink: #0b1628;
   --color-muted: #6b6560;
   --color-border: #e8e4de;
-  --color-night: #0f1419;
-  --color-night-soft: #1a2028;
+  --color-night: #0b1628;
+  --color-night-soft: #152238;
   --color-glow: #c9a962;
 
   /* Shadows */
-  --shadow-xs: 0 1px 2px rgb(15 20 25 / 4%);
-  --shadow-sm: 0 4px 16px rgb(15 20 25 / 6%);
-  --shadow-md: 0 8px 32px rgb(15 20 25 / 8%);
-  --shadow-lg: 0 16px 48px rgb(15 20 25 / 10%);
-  --shadow-xl: 0 24px 64px rgb(15 20 25 / 12%);
-  --shadow-card: 0 8px 32px rgb(15 20 25 / 7%);
-  --shadow-soft: 0 4px 20px rgb(15 20 25 / 5%);
+  --shadow-xs: 0 1px 2px rgb(11 22 40 / 4%);
+  --shadow-sm: 0 4px 16px rgb(11 22 40 / 6%);
+  --shadow-md: 0 8px 32px rgb(11 22 40 / 8%);
+  --shadow-lg: 0 16px 48px rgb(11 22 40 / 10%);
+  --shadow-xl: 0 24px 64px rgb(11 22 40 / 12%);
+  --shadow-card: 0 8px 32px rgb(11 22 40 / 7%);
+  --shadow-soft: 0 4px 20px rgb(11 22 40 / 5%);
   --shadow-glow: 0 8px 40px rgb(201 169 98 / 18%);
 
-  /* Radii — semantic roles */
-  --radius-sm: 0.5rem;   /* 8px  — chips, step numbers */
-  --radius-md: 0.75rem;  /* 12px — nested surfaces */
-  --radius-lg: 1rem;     /* 16px — badges */
-  --radius-xl: 1.5rem;   /* 24px — buttons, inputs */
-  --radius-2xl: 2rem;    /* 32px — cards, heroes, dialogs */
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 
   /* Motion */
   --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
@@ -71,5 +77,6 @@
   /* Layout */
   --container-width: 1280px;
   --section-gap: clamp(3.5rem, 7vw, 6rem);
-  --font-arabic: "Tajawal", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-arabic: var(--font-ibm-plex-arabic), "IBM Plex Sans Arabic", system-ui, sans-serif;
+  --font-latin: var(--font-inter), "Inter", system-ui, sans-serif;
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BRAND } from "@/shared/constants/brand";
 import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
@@ -44,10 +45,10 @@ export async function generateMetadata({
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return { title: "القسم غير موجود | UAE Sales" };
+  if (!category) return { title: `القسم غير موجود | Sooqna` };
   return {
-    title: `${category.name} | UAE Sales`,
-    description: `تصفح إعلانات ${category.name} في سوق الإمارات.`,
+    title: `${category.name} | Sooqna`,
+    description: `تصفح إعلانات ${category.name} في ${BRAND.nameAr}.`,
   };
 }
 

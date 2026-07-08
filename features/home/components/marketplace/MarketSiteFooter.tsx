@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BrandLogo } from "@/shared/components/BrandLogo";
+import { BRAND } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
 
 const groups = [
@@ -37,18 +39,9 @@ export function MarketSiteFooter() {
       <div className="app-container py-14 md:py-16">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
-            <div className="flex items-center gap-3">
-              <span className="grid size-11 place-items-center rounded-[var(--radius-lg)] bg-secondary text-sm font-bold text-primary">
-                UAE
-              </span>
-              <div>
-                <p className="text-lg font-bold">UAE Sales</p>
-                <p className="text-sm text-white/55">سوق إماراتي موثوق</p>
-              </div>
-            </div>
+            <BrandLogo showTagline={false} size="md" theme="dark" />
             <p className="mt-5 max-w-sm text-sm leading-7 text-white/60">
-              منصة ذكية للبيع والشراء بثقة — تجمع بين البحث السريع، العرض
-              الاحترافي، والضمان المالي في تجربة واحدة.
+              {BRAND.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {[
@@ -89,8 +82,8 @@ export function MarketSiteFooter() {
         </div>
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/45">
-          <p>© 2026 UAE Sales. جميع الحقوق محفوظة.</p>
-          <p>صُمم في الإمارات لسوق الإمارات.</p>
+          <p>{BRAND.copyright}</p>
+          <p>صُمم في الإمارات لـ {BRAND.nameAr}.</p>
         </div>
       </div>
     </footer>

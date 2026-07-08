@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
@@ -93,10 +94,10 @@ export function SearchResultsList({
     const syncLocalListings = () => setLocalListings(getLocalListings());
     syncLocalListings();
     const timeoutId = window.setTimeout(() => setIsLoading(false), 300);
-    window.addEventListener("uae-sales-listings-change", syncLocalListings);
+    window.addEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
     return () => {
       window.clearTimeout(timeoutId);
-      window.removeEventListener("uae-sales-listings-change", syncLocalListings);
+      window.removeEventListener(STORAGE_EVENTS.listingsChange, syncLocalListings);
     };
   }, []);
 

@@ -1,10 +1,28 @@
 import type { Listing, UserProfile } from "@/types";
-
-const SESSION_KEY = "uae-sales-session";
-const LOCAL_LISTINGS_KEY = "uae-sales-local-listings";
+import {
+  LEGACY_STORAGE_KEYS,
+  STORAGE_EVENTS,
+  STORAGE_KEYS,
+} from "@/shared/constants/brand";
 
 function canUseStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
+}
+
+function migrateKey(newKey: string, legacyKey: string) {
+  if (!canUseStorage()) return;
+  const current = window.localStorage.getItem(newKey);
+  if (current) return;
+  const legacy = window.localStorage.getItem(legacyKey);
+  if (legacy) {
+    window.localStorage.setItem(newKey, legacy);
+    window.localStorage.removeItem(legacyKey);
+  }
+}
+
+function ensureMigrated() {
+  migrateKey(STORAGE_KEYS.session, LEGACY_STORAGE_KEYS.session);
+  migrateKey(STORAGE_KEYS.localListings, LEGACY_STORAGE_KEYS.localListings);
 }
 
 export function getSessionUser(): UserProfile | null {
@@ -12,7 +30,8 @@ export function getSessionUser(): UserProfile | null {
     return null;
   }
 
-  const rawValue = window.localStorage.getItem(SESSION_KEY);
+  ensureMigrated();
+  const rawValue = window.localStorage.getItem(STORAGE_KEYS.session);
   return rawValue ? (JSON.parse(rawValue) as UserProfile) : null;
 }
 
@@ -21,8 +40,8 @@ export function setSessionUser(user: UserProfile) {
     return;
   }
 
-  window.localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  window.dispatchEvent(new Event("uae-sales-session-change"));
+  window.localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(user));
+  window.dispatchEvent(new Event(STORAGE_EVENTS.sessionChange));
 }
 
 export function clearSessionUser() {
@@ -30,8 +49,8 @@ export function clearSessionUser() {
     return;
   }
 
-  window.localStorage.removeItem(SESSION_KEY);
-  window.dispatchEvent(new Event("uae-sales-session-change"));
+  window.localStorage.removeItem(STORAGE_KEYS.session);
+  window.dispatchEvent(new Event(STORAGE_EVENTS.sessionChange));
 }
 
 export function getLocalListings(): Listing[] {
@@ -39,7 +58,8 @@ export function getLocalListings(): Listing[] {
     return [];
   }
 
-  const rawValue = window.localStorage.getItem(LOCAL_LISTINGS_KEY);
+  ensureMigrated();
+  const rawValue = window.localStorage.getItem(STORAGE_KEYS.localListings);
   return rawValue ? (JSON.parse(rawValue) as Listing[]) : [];
 }
 
@@ -54,8 +74,8 @@ export function saveLocalListing(listing: Listing) {
     ...listings.filter((item) => item.id !== listing.id),
   ];
 
-  window.localStorage.setItem(LOCAL_LISTINGS_KEY, JSON.stringify(nextListings));
-  window.dispatchEvent(new Event("uae-sales-listings-change"));
+  window.localStorage.setItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings));
+  window.dispatchEvent(new Event(STORAGE_EVENTS.listingsChange));
 }
 
 export function deleteLocalListing(listingId: string) {
@@ -66,8 +86,8 @@ export function deleteLocalListing(listingId: string) {
   const nextListings = getLocalListings().filter(
     (listing) => listing.id !== listingId,
   );
-  window.localStorage.setItem(LOCAL_LISTINGS_KEY, JSON.stringify(nextListings));
-  window.dispatchEvent(new Event("uae-sales-listings-change"));
+  window.localStorage.setItem(STORAGE_KEYS.localListings, JSON.stringify(nextListings));
+  window.dispatchEvent(new Event(STORAGE_EVENTS.listingsChange));
 }
 
 export function getLocalListingById(listingId: string) {

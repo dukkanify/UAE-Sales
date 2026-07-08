@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { STORAGE_EVENTS, STORAGE_KEYS } from "@/shared/constants/brand";
 import { SectionHeader } from "@/shared/ui/SectionHeader";
 
-const STORAGE_KEY = "uae-sales-recently-viewed";
+const STORAGE_KEY = STORAGE_KEYS.recentlyViewed;
 
 type RecentlyViewedTrackerProps = {
   listing: Listing;
@@ -24,7 +25,7 @@ export function RecentlyViewedTracker({ listing }: RecentlyViewedTrackerProps) {
         ...filtered,
       ].slice(0, 8);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      window.dispatchEvent(new Event("uae-sales-recently-viewed-change"));
+      window.dispatchEvent(new Event(STORAGE_EVENTS.recentlyViewedChange));
     } catch {
       // ignore storage errors
     }
@@ -62,9 +63,9 @@ export function RecentlyViewedSection({
       }
     };
     sync();
-    window.addEventListener("uae-sales-recently-viewed-change", sync);
+    window.addEventListener(STORAGE_EVENTS.recentlyViewedChange, sync);
     return () =>
-      window.removeEventListener("uae-sales-recently-viewed-change", sync);
+      window.removeEventListener(STORAGE_EVENTS.recentlyViewedChange, sync);
   }, [currentSlug]);
 
   const recentListings = slugs

@@ -1,19 +1,51 @@
 import type { Metadata } from "next";
-import { Tajawal } from "next/font/google";
+import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { OfflineBanner } from "@/shared/components/OfflineBanner";
+import { BRAND } from "@/shared/constants/brand";
 import "./globals.css";
 
-const tajawal = Tajawal({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "500", "700", "800", "900"],
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
   display: "swap",
-  variable: "--font-tajawal",
+  variable: "--font-ibm-plex-arabic",
+  weight: ["400", "500", "600", "700"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "UAE Sales | السوق الإماراتي الفاخر",
-  description:
-    "منصة إعلانات مبوبة فاخرة بهوية إماراتية — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
+  description: BRAND.description,
+  metadataBase: new URL(`https://${BRAND.domain}`),
+  icons: {
+    apple: "/brand/app-icon.svg",
+    icon: [
+      { url: "/brand/logo-icon.svg", type: "image/svg+xml" },
+      { url: "/brand/logo-icon.svg", sizes: "32x32" },
+    ],
+  },
+  openGraph: {
+    description: BRAND.description,
+    images: [{ url: "/brand/og-image.svg", width: 1200, height: 630 }],
+    locale: "ar_AE",
+    siteName: BRAND.nameEn,
+    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
+    type: "website",
+  },
+  title: {
+    default: `${BRAND.nameEn} | ${BRAND.nameAr}`,
+    template: `%s | ${BRAND.nameEn}`,
+  },
+  twitter: {
+    card: "summary_large_image",
+    description: BRAND.description,
+    images: ["/brand/og-image.svg"],
+    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
+  },
 };
 
 export default function RootLayout({
@@ -22,8 +54,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className={tajawal.variable} lang="ar" dir="rtl">
-      <body className={tajawal.className}>
+    <html
+      className={`${ibmPlexArabic.variable} ${inter.variable}`}
+      dir="rtl"
+      lang="ar"
+    >
+      <body className={ibmPlexArabic.className}>
         <OfflineBanner />
         {children}
       </body>

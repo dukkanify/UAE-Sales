@@ -94,7 +94,7 @@ export function LoginForm() {
           error={errors.identifier}
           label="رقم الهاتف أو البريد"
           name="identifier"
-          placeholder="user@uaesales.demo"
+          placeholder="user@sooqna.demo"
           required
           type="text"
         />

@@ -42,9 +42,9 @@ export async function generateMetadata({
 }: ListingPageProps): Promise<Metadata> {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
-  if (!listing) return { title: "الإعلان غير موجود | UAE Sales" };
+  if (!listing) return { title: `الإعلان غير موجود | Sooqna` };
   return {
-    title: `${listing.title} | UAE Sales`,
+    title: `${listing.title} | Sooqna`,
     description: listing.description,
   };
 }

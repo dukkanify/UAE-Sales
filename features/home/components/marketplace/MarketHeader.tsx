@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/shared/components/BrandLogo";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
@@ -15,16 +17,6 @@ const nav = [
   { href: "/search", label: "الشركات" },
 ];
 
-function BrandMark() {
-  return (
-    <span className="relative grid size-11 place-items-center">
-      <span className="uae-hex-mark absolute inset-0 uae-gold-gradient shadow-[0_4px_16px_rgb(184_149_95/30%)]" />
-      <span className="relative text-[0.65rem] font-black tracking-wider text-white">UAE</span>
-      <span className="absolute -start-px top-[20%] bottom-[20%] w-[3px] rounded-full bg-uae-red/90" />
-    </span>
-  );
-}
-
 export function MarketHeader() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,8 +24,8 @@ export function MarketHeader() {
   useEffect(() => {
     const sync = () => setUser(getSessionUser());
     sync();
-    window.addEventListener("uae-sales-session-change", sync);
-    return () => window.removeEventListener("uae-sales-session-change", sync);
+    window.addEventListener(STORAGE_EVENTS.sessionChange, sync);
+    return () => window.removeEventListener(STORAGE_EVENTS.sessionChange, sync);
   }, []);
 
   return (
@@ -41,15 +33,7 @@ export function MarketHeader() {
       <div className="h-0.5 uae-header-accent" />
       <div className="app-container">
         <div className="flex min-h-[4.25rem] items-center justify-between gap-4 md:min-h-[4.5rem]">
-          <Link className="flex items-center gap-3" href="/">
-            <BrandMark />
-            <span className="hidden sm:block">
-              <span className="block text-base font-bold text-ink">UAE Sales</span>
-              <span className="block text-[0.65rem] font-semibold text-[#B8955F]">
-                سوق الإمارات الموثوق
-              </span>
-            </span>
-          </Link>
+          <BrandLogo showTagline={false} size="md" />
 
           <nav className="hidden items-center gap-1 lg:flex">
             {nav.map((item, i) => (
@@ -90,7 +74,7 @@ export function MarketHeader() {
             )}
 
             <Link
-              className="uae-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgb(184_149_95/30%)] sm:inline-flex"
+              className="sooqna-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgb(201_169_98/30%)] sm:inline-flex"
               href="/listings/new"
             >
               <Icon name="plus" size={16} />
