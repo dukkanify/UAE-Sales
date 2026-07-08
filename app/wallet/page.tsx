@@ -17,6 +17,10 @@ const activityLabels = {
   escrow_hold: "حجز ضمان",
   release: "تحويل",
   withdrawal: "سحب",
+  refund: "استرداد",
+  stripe_payment: "دفع Stripe",
+  platform_fee: "رسوم المنصة",
+  escrow_release: "تحويل ضمان",
 } as const;
 
 export default async function WalletPage() {
@@ -38,6 +42,7 @@ export default async function WalletPage() {
           <div className="grid gap-5">
             <WalletBalances
               defaultAvailable={wallet.availableBalance}
+              defaultHeldInEscrow={wallet.heldInEscrow}
               defaultPending={wallet.pendingBalance}
             />
 
