@@ -1,4 +1,4 @@
-# Image Audit Report — UAE Sales
+# Image Audit Report — Sooqna
 
 **Date:** July 5, 2026  
 **Branch:** `cursor/web-foundation-homepage-37ba`

@@ -1,8 +1,8 @@
-# UAE Sales — Frontend Architecture
+# Sooqna — Frontend Architecture
 
 ## Overview
 
-UAE Sales (`uae-sales-web`) is a production-oriented Next.js 16 App Router frontend for an Arabic RTL classifieds marketplace. The application is designed for backend integration: pages and components consume data exclusively through typed service modules, with no inline mock data in UI code.
+Sooqna (`sooqna-web`) is a production-oriented Next.js 16 App Router frontend for an Arabic RTL classifieds marketplace. The application is designed for backend integration: pages and components consume data exclusively through typed service modules, with no inline mock data in UI code.
 
 **Stack:** Next.js 16 · React 19 · TypeScript · Tailwind CSS 4 · Turbopack
 

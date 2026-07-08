@@ -1,4 +1,4 @@
-# UAE Sales Web App — Project Status Report
+# Sooqna Web App — Project Status Report
 
 **Last updated:** July 5, 2026  
 **Branch:** `cursor/web-foundation-homepage-37ba`  
@@ -22,9 +22,9 @@
 ### Auth & Accounts
 | Feature | Status |
 |---------|--------|
-| Demo User login | ✅ `user@uaesales.demo` / `User@123` |
-| Demo Business login | ✅ `company@uaesales.demo` / `Company@123` |
-| Demo Admin login | ✅ `admin@uaesales.demo` / `Admin@123` |
+| Demo User login | ✅ `user@sooqna.demo` / `User@123` |
+| Demo Business login | ✅ `company@sooqna.demo` / `Company@123` |
+| Demo Admin login | ✅ `admin@sooqna.demo` / `Admin@123` |
 | OTP verification | ✅ `123456` for all demo accounts |
 | Demo credentials panel on login | ✅ |
 | Register + OTP | ✅ |
@@ -131,9 +131,9 @@
 ## Demo Quick Reference
 
 ```
-User:     user@uaesales.demo     / User@123     / OTP: 123456
-Business: company@uaesales.demo  / Company@123  / OTP: 123456
-Admin:    admin@uaesales.demo    / Admin@123    / OTP: 123456
+User:     user@sooqna.demo     / User@123     / OTP: 123456
+Business: company@sooqna.demo  / Company@123  / OTP: 123456
+Admin:    admin@sooqna.demo    / Admin@123    / OTP: 123456
 ```
 
 See `TESTING_GUIDE.md` for full testing instructions.

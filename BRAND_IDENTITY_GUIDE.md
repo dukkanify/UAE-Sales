@@ -223,7 +223,7 @@ Confident, warm, clear, never salesy. Arabic-first. Short sentences.
 ### Don't
 - Say «موقع إعلانات رخيص»
 - Overuse flag imagery
-- Mix old «UAE Sales» naming
+- Mix old «Sooqna» naming
 - Use aggressive discount language
 
 ---

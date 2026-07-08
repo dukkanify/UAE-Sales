@@ -1,11 +1,11 @@
 # Frontend Structure
 
-This document describes the folder layout and import conventions for `uae-sales-web`.
+This document describes the folder layout and import conventions for `sooqna-web`.
 
 ## Top-Level Layout
 
 ```
-uae-sales-web/
+sooqna-web/
 ├── app/                    # Next.js App Router (routes only)
 ├── features/               # Domain feature modules
 ├── shared/                 # Cross-feature UI and utilities

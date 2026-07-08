@@ -25,7 +25,7 @@ The Premium 2026 redesign is **stable and ready for feature expansion** on all i
 | Featured listings | ✅ Pass | Premium cards, section header CTA |
 | Latest listings | ✅ Pass | Grid layout, muted background band |
 | Escrow section | ✅ Pass | 4-step explainer, on-brand colors |
-| Why UAE Sales | ✅ Pass | 6 value props with icons |
+| Why Sooqna | ✅ Pass | 6 value props with icons |
 | How it works | ✅ Pass | Dark luxury gradient panel |
 | Popular cities | ✅ Pass | City chips with links |
 | Testimonials | ✅ Pass | Card layout, readable quotes |

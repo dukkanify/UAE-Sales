@@ -90,7 +90,7 @@
 ### SectionHeader (`components/ui/SectionHeader.tsx`)
 
 ```
-Homepage: CategoriesGrid, FeaturedListings, LatestListings, EscrowSection, WhyUaeSales, Testimonials
+Homepage: CategoriesGrid, FeaturedListings, LatestListings, EscrowSection, WhySooqna, Testimonials
 /listings/[slug]: Related listings
 ```
 

@@ -1,4 +1,4 @@
-# UAE Sales — Design Improvements
+# Sooqna — Design Improvements
 
 Prioritized list of visual improvements completed and remaining.
 

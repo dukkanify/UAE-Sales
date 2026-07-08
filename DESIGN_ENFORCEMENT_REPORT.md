@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-A full design-system enforcement pass was completed across the UAE Sales frontend. The goal was to eliminate visual drift and enforce one premium identity — no new features, no Wallet/Escrow/Checkout/Chat work.
+A full design-system enforcement pass was completed across the Sooqna frontend. The goal was to eliminate visual drift and enforce one premium identity — no new features, no Wallet/Escrow/Checkout/Chat work.
 
 **Result:** ✅ Enforcement complete. Lint and build pass (41 routes).
 

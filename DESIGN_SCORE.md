@@ -1,4 +1,4 @@
-# UAE Sales — Design Score
+# Sooqna — Design Score
 
 **Assessment date:** July 2026  
 **Target:** 10 / 10  
@@ -74,7 +74,7 @@ The platform now presents a cohesive, premium, handcrafted visual identity. It w
 
 ## Comparison Benchmark
 
-| Platform | Design Quality | UAE Sales Position |
+| Platform | Design Quality | Sooqna Position |
 |----------|---------------|-------------------|
 | Dubizzle | 6.5/10 | ✅ Significantly better |
 | OpenSooq | 6.0/10 | ✅ Significantly better |

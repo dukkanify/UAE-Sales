@@ -1,8 +1,8 @@
-# UAE Sales — UI Style Guide
+# Sooqna — UI Style Guide
 
 ## Visual Identity
 
-UAE Sales is a **premium UAE marketplace** — not a generic classifieds template. The visual language combines:
+Sooqna is a **premium UAE marketplace** — not a generic classifieds template. The visual language combines:
 
 - **Luxury Charcoal** authority (like Stripe, Linear)
 - **Warm Gold** elegance (UAE heritage)
@@ -64,7 +64,7 @@ UAE Sales is a **premium UAE marketplace** — not a generic classifieds templat
 4. Featured listings
 5. Latest listings
 6. Escrow explainer
-7. Why UAE Sales
+7. Why Sooqna
 8. How it works (dark panel)
 9. Popular cities
 10. Testimonials

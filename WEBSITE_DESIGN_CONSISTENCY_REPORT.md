@@ -2,7 +2,7 @@
 
 ## Summary
 
-Unified the entire UAE Sales website around the **homepage marketplace design system**. The homepage layout was not changed; all other pages were upgraded to match its card quality, spacing, shadows, and typography.
+Unified the entire Sooqna website around the **homepage marketplace design system**. The homepage layout was not changed; all other pages were upgraded to match its card quality, spacing, shadows, and typography.
 
 ---
 

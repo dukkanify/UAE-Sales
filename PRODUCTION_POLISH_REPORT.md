@@ -1,6 +1,6 @@
 # Production Polish Report — Phase 2
 
-**Project:** UAE Sales (`uae-sales-web`)  
+**Project:** Sooqna (`sooqna-web`)  
 **Date:** July 5, 2026  
 **Branch:** `cursor/web-foundation-homepage-37ba`
 

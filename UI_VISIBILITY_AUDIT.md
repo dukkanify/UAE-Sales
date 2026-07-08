@@ -2,7 +2,7 @@
 
 ## Scope
 
-This audit reviewed visible labels, button contrast, navigation links, CTA buttons, mobile navigation, badges, and interactive controls across the UAE Sales Web App.
+This audit reviewed visible labels, button contrast, navigation links, CTA buttons, mobile navigation, badges, and interactive controls across the Sooqna Web App.
 
 ## Broken Components Found
 

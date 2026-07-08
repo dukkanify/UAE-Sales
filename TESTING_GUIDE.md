@@ -1,4 +1,4 @@
-# UAE Sales — Testing Guide
+# Sooqna — Testing Guide
 
 **Last updated:** July 5, 2026
 
@@ -15,7 +15,7 @@ All demo accounts use the same OTP code.
 
 | Field | Value |
 |-------|-------|
-| Email | `user@uaesales.demo` |
+| Email | `user@sooqna.demo` |
 | Password | `User@123` |
 | Phone | `0501234567` |
 | OTP | `123456` |
@@ -34,7 +34,7 @@ All demo accounts use the same OTP code.
 
 | Field | Value |
 |-------|-------|
-| Email | `company@uaesales.demo` |
+| Email | `company@sooqna.demo` |
 | Password | `Company@123` |
 | Phone | `0551234567` |
 | OTP | `123456` |
@@ -53,12 +53,12 @@ All demo accounts use the same OTP code.
 
 | Field | Value |
 |-------|-------|
-| Email | `admin@uaesales.demo` |
+| Email | `admin@sooqna.demo` |
 | Password | `Admin@123` |
 | Phone | `0521234567` |
 | OTP | `123456` |
 | Role | Admin |
-| Name | UAE Sales Admin |
+| Name | Sooqna Admin |
 | Verified | Yes |
 | After login | `/dashboard/listings` (no `/admin` route yet) |
 

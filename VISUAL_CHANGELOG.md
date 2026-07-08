@@ -1,4 +1,4 @@
-# UAE Sales — Visual Changelog
+# Sooqna — Visual Changelog
 
 All visual changes in the visual perfection pass.
 
@@ -87,7 +87,7 @@ All visual changes in the visual perfection pass.
 
 ### ListingGallery
 - Shows real `imageUrl` when available
-- Removed "UAE Sales" watermark placeholder
+- Removed "Sooqna" watermark placeholder
 - Thumbnails from actual image
 - Token shadows
 
@@ -145,7 +145,7 @@ All visual changes in the visual perfection pass.
 - Uppercase muted labels
 - Cleaner number display
 
-### EscrowSection / WhyUaeSales
+### EscrowSection / WhySooqna
 - SVG icons (not emoji)
 - Smaller, tighter cards
 - Consistent `gap-3`
