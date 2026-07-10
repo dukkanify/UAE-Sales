@@ -13,6 +13,7 @@ import {
   clearSessionUser,
   getSessionUser,
 } from "@/services/storage";
+import { removeSessionCookie } from "@/services/auth/session-sync";
 
 type DashboardShellProps = {
   activePath: "/profile" | "/dashboard/listings" | "/chat";
@@ -118,6 +119,7 @@ export function DashboardShell({
                 className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
                 onClick={() => {
                   clearSessionUser();
+                  void removeSessionCookie();
                   router.replace("/login");
                 }}
                 type="button"

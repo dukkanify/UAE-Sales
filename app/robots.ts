@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
-import { BRAND } from "@/shared/constants/brand";
+import { getAppUrl } from "@/shared/constants/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = `https://${BRAND.domain}`;
+  const base = getAppUrl();
   return {
     rules: {
       allow: "/",

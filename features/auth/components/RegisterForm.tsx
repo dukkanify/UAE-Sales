@@ -10,6 +10,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
+import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
 
 type RegisterErrors = {
@@ -112,12 +113,14 @@ export function RegisterForm() {
       return;
     }
 
-    setSessionUser({
+    const newUser = {
       id: `user-${Date.now()}`,
       ...pendingUser,
       isVerified: true,
       joinedAt: new Date().toISOString().slice(0, 10),
-    });
+    };
+    setSessionUser(newUser);
+    await persistSessionCookie(newUser);
     router.push("/profile");
   }, [pendingUser, router]);
 

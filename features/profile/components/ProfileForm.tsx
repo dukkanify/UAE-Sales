@@ -10,6 +10,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { getSessionUser, setSessionUser } from "@/services/storage";
+import { persistSessionCookie } from "@/services/auth/session-sync";
 
 type ProfileFormProps = {
   user: UserProfile;
@@ -75,6 +76,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             };
 
             setSessionUser(updatedUser);
+            void persistSessionCookie(updatedUser);
             setDisplayUser(updatedUser);
             setSaveMessage("تم حفظ التغييرات محلياً.");
           }}

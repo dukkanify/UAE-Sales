@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { OfflineBanner } from "@/shared/components/OfflineBanner";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
 import { BRAND } from "@/shared/constants/brand";
+import { getAppUrl } from "@/shared/constants/site";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -19,9 +20,14 @@ const inter = Inter({
   weight: ["400", "500", "600", "700"],
 });
 
+const siteUrl = getAppUrl();
+
 export const metadata: Metadata = {
   description: BRAND.description,
-  metadataBase: new URL(`https://${BRAND.domain}`),
+  metadataBase: new URL(siteUrl),
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     apple: "/brand/app-icon.svg",
     icon: [
@@ -36,6 +42,7 @@ export const metadata: Metadata = {
     siteName: BRAND.nameEn,
     title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
     type: "website",
+    url: siteUrl,
   },
   title: {
     default: `${BRAND.nameEn} | ${BRAND.nameAr}`,

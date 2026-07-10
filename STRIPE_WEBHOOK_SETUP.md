@@ -9,7 +9,7 @@ POST /api/webhooks/stripe
 Production URL example:
 
 ```
-https://your-domain.com/api/webhooks/stripe
+https://sooqna.site/api/webhooks/stripe
 ```
 
 ## Environment
@@ -100,7 +100,7 @@ STRIPE_SECRET_KEY=sk_live_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_CURRENCY=aed
-NEXT_PUBLIC_APP_URL=https://your-domain.com
+NEXT_PUBLIC_APP_URL=https://sooqna.site
 ```
 
 ### 3. Verify

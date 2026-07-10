@@ -1,27 +1,30 @@
 import { BRAND } from "@/shared/constants/brand";
+import { getAppUrl } from "@/shared/constants/site";
 
 export function BrandJsonLd() {
+  const siteUrl = getAppUrl();
+
   const schema = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Organization",
-        "@id": `https://${BRAND.domain}/#organization`,
+        "@id": `${siteUrl}/#organization`,
         alternateName: BRAND.nameAr,
         description: BRAND.description,
-        logo: `https://${BRAND.domain}/brand/logo-horizontal.svg`,
+        logo: `${siteUrl}/brand/logo-horizontal.svg`,
         name: BRAND.nameEn,
-        url: `https://${BRAND.domain}`,
+        url: siteUrl,
       },
       {
         "@type": "WebSite",
-        "@id": `https://${BRAND.domain}/#website`,
+        "@id": `${siteUrl}/#website`,
         alternateName: BRAND.nameAr,
         description: BRAND.description,
         inLanguage: "ar-AE",
         name: BRAND.nameEn,
-        publisher: { "@id": `https://${BRAND.domain}/#organization` },
-        url: `https://${BRAND.domain}`,
+        publisher: { "@id": `${siteUrl}/#organization` },
+        url: siteUrl,
       },
     ],
   };

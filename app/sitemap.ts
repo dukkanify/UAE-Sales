@@ -1,10 +1,10 @@
 import type { MetadataRoute } from "next";
-import { BRAND } from "@/shared/constants/brand";
+import { getAppUrl } from "@/shared/constants/site";
 import { getCategories } from "@/services/categories";
 import { getListings } from "@/services/listings";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = `https://${BRAND.domain}`;
+  const base = getAppUrl();
   const [categories, listings] = await Promise.all([
     getCategories(),
     getListings(),

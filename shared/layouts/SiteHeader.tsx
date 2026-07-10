@@ -11,6 +11,7 @@ import {
   clearSessionUser,
   getSessionUser,
 } from "@/services/storage";
+import { removeSessionCookie } from "@/services/auth/session-sync";
 import type { UserProfile } from "@/types";
 
 export function SiteHeader() {
@@ -137,6 +138,7 @@ export function SiteHeader() {
                     className="w-full justify-start"
                     onClick={() => {
                       clearSessionUser();
+                      void removeSessionCookie();
                       setMenuOpen(false);
                     }}
                     type="button"

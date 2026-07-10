@@ -16,6 +16,7 @@ import {
   requestLoginOtp,
   validateLoginCredentials,
 } from "@/services/auth";
+import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
 
 type LoginErrors = {
@@ -63,6 +64,7 @@ export function LoginForm() {
   const handleVerified = useCallback(async () => {
     const user = await completeLogin(identifier);
     setSessionUser(user);
+    await persistSessionCookie(user);
     const nextPath =
       new URLSearchParams(window.location.search).get("next") ??
       getPostLoginPath(identifier);
