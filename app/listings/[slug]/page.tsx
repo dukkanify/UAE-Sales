@@ -1,33 +1,40 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EscrowProtectionCard } from "@/components/listings/EscrowProtectionCard";
-import { ListingCard } from "@/components/listings/ListingCard";
-import { ListingGallery } from "@/components/listings/ListingGallery";
-import { ListingSummary } from "@/components/listings/ListingSummary";
-import { SellerPanel } from "@/components/listings/SellerPanel";
-import { SectionHeader } from "@/components/ui/SectionHeader";
-import { SiteFooter } from "@/layouts/SiteFooter";
-import { SiteHeader } from "@/layouts/SiteHeader";
-import { getCategories } from "@/services/categoriesService";
+import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
+import { ListingCard } from "@/features/listings/components/ListingCard";
+import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
+import { ListingFeatures } from "@/features/listings/components/ListingFeatures";
+import { ListingGallery } from "@/features/listings/components/ListingGallery";
+import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
+import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
+import { ListingSummary } from "@/features/listings/components/ListingSummary";
+import {
+  RecentlyViewedSection,
+  RecentlyViewedTracker,
+} from "@/features/listings/components/RecentlyViewedSection";
+import { SellerPanel } from "@/features/listings/components/SellerPanel";
+import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
+import { SectionHeader } from "@/shared/ui/SectionHeader";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getCategories } from "@/services/categories";
 import {
   getListingBySlug,
   getListings,
   getRelatedListings,
-} from "@/services/listingsService";
+} from "@/services/listings";
 
 type ListingPageProps = {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const listings = await getListings();
-
-  return listings.map((listing) => ({
-    slug: listing.slug,
-  }));
+  const { getListings, getMyListings } = await import("@/services/listings");
+  const [listings, userListings] = await Promise.all([
+    getListings(),
+    getMyListings(),
+  ]);
+  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
 }
 
 export async function generateMetadata({
@@ -35,13 +42,7 @@ export async function generateMetadata({
 }: ListingPageProps): Promise<Metadata> {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
-
-  if (!listing) {
-    return {
-      title: "الإعلان غير موجود | UAE Sales",
-    };
-  }
-
+  if (!listing) return { title: "الإعلان غير موجود | UAE Sales" };
   return {
     title: `${listing.title} | UAE Sales`,
     description: listing.description,
@@ -51,78 +52,72 @@ export async function generateMetadata({
 export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
+  if (!listing) notFound();
 
-  if (!listing) {
-    notFound();
-  }
-
-  const [categories, relatedListings] = await Promise.all([
+  const [categories, relatedListings, allListings] = await Promise.all([
     getCategories(),
     getRelatedListings(listing.categoryId, listing.id),
+    getListings(),
   ]);
   const category = categories.find((item) => item.id === listing.categoryId);
 
   return (
     <>
       <SiteHeader />
+      <RecentlyViewedTracker listing={listing} />
       <main>
-        <section className="app-container py-8 lg:py-12">
-          <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
-            <Link href="/" className="transition hover:text-primary">
-              الرئيسية
-            </Link>
-            <span>/</span>
-            <Link href="/search" className="transition hover:text-primary">
-              الإعلانات
-            </Link>
-            {category ? (
-              <>
-                <span>/</span>
-                <Link
-                  href={`/search?category=${category.id}`}
-                  className="transition hover:text-primary"
-                >
-                  {category.name}
-                </Link>
-              </>
-            ) : null}
-          </nav>
+        <section className="app-container page-padding">
+          <Breadcrumbs
+            items={[
+              { href: "/", label: "الرئيسية" },
+              { href: "/search", label: "الإعلانات" },
+              ...(category
+                ? [
+                    {
+                      href: `/categories/${category.slug}`,
+                      label: category.name,
+                    },
+                  ]
+                : []),
+              { label: listing.title },
+            ]}
+          />
 
-          <div className="mb-8 overflow-hidden rounded-[var(--radius-xl)] border border-white bg-[linear-gradient(135deg,#fff7ec,#f8f0e5_55%,#fffdf8)] p-6 shadow-[var(--shadow-soft)]">
-            <div className="uae-flag-strip mb-5 h-2 w-32 rounded-full" />
-            <p className="text-sm font-black text-muted">تفاصيل الإعلان</p>
-            <h1 className="mt-2 text-3xl font-black text-primary md:text-5xl">
-              {listing.title}
-            </h1>
-          </div>
-
-          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-            <ListingGallery listing={listing} />
-            <div className="grid gap-5">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+            <div>
+              <ListingGallery listing={listing} />
+              <ListingDetailToolbar listingTitle={listing.title} />
+              <ListingMapPlaceholder listing={listing} />
+            </div>
+            <div className="grid gap-4">
               <ListingSummary category={category} listing={listing} />
               <SellerPanel listing={listing} />
               <EscrowProtectionCard />
             </div>
           </div>
 
-          <div className="mt-10 grid gap-5 rounded-[var(--radius-xl)] border border-border bg-white p-6 shadow-[var(--shadow-card)] lg:grid-cols-[0.75fr_1.25fr]">
-            <div>
-              <h2 className="text-2xl font-black text-ink">وصف الإعلان</h2>
-              <p className="mt-3 text-sm font-bold text-muted">
-                تفاصيل قابلة للتوسعة لاحقاً لعرض المواصفات الفنية والأسئلة
-                الشائعة.
+          <div className="marketplace-panel mt-8 p-6">
+            <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
+            <p className="mt-4 text-sm font-medium leading-8 text-muted">
+              {listing.description}
+            </p>
+            {listing.descriptionEnglish ? (
+              <p className="mt-4 border-t border-border pt-4 text-sm leading-7 text-muted/80">
+                {listing.descriptionEnglish}
               </p>
-            </div>
-            <p className="leading-9 text-muted">{listing.description}</p>
+            ) : null}
           </div>
+
+          <ListingFeatures listing={listing} />
+          <ListingSafetyTips />
         </section>
 
         {relatedListings.length > 0 ? (
-          <section className="app-container py-10">
+          <section className="app-container page-padding">
             <SectionHeader
-              eyebrow="إعلانات مشابهة"
+              description="إعلانات من نفس التصنيف قد تعجبك."
+              eyebrow="مشابه"
               title="قد يعجبك أيضاً"
-              description="اقتراحات من نفس التصنيف لتسهيل التصفح والانتقال بين الإعلانات."
             />
             <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {relatedListings.map((relatedListing) => (
@@ -135,6 +130,12 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
             </div>
           </section>
         ) : null}
+
+        <RecentlyViewedSection
+          categories={categories}
+          currentSlug={listing.slug}
+          listings={allListings}
+        />
       </main>
       <SiteFooter />
     </>

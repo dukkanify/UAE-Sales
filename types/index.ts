@@ -1,8 +1,27 @@
+export type { ApiErrorCode, ApiErrorPayload } from "./api";
+
+export type { HomeCityHighlight } from "./domain/content";
+
 export type {
   Category,
-  City,
+  CategoryIconName,
+} from "./domain/category";
+
+export type {
+  CarSpecs,
+  ContactMethod,
+  DeliveryOption,
+  ElectronicsSpecs,
   Listing,
   ListingCondition,
+  ListingImageTone,
+  ListingSearchFilters,
+  ListingSeller,
   ListingStatus,
-  UserProfile,
-} from "./marketplace";
+  RealEstateSpecs,
+  SellerType,
+} from "./domain/listing";
+
+export type { City, Country } from "./domain/location";
+
+export type { AccountType, UserProfile, UserRole } from "./domain/user";
