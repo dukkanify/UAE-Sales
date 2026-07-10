@@ -83,7 +83,7 @@ Or complete a real test checkout with card `4242 4242 4242 4242`.
 
 1. Go to **Developers → Webhooks**
 2. Click **Add endpoint**
-3. URL: `https://your-domain.com/api/webhooks/stripe`
+3. URL: `https://sooqna.site/api/webhooks/stripe`
 4. Select events:
    - `checkout.session.completed`
    - `payment_intent.succeeded`
