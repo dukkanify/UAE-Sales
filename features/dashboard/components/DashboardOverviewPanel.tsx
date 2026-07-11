@@ -8,6 +8,7 @@ import {
   mockDashboardSummaryCards,
   mockDashboardViewsChart,
 } from "@/mock";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -28,7 +29,11 @@ export function DashboardOverviewPanel() {
               <span className="grid size-10 place-items-center rounded-[var(--radius-xl)] bg-secondary-soft text-secondary">
                 <Icon name={card.icon} size={18} />
               </span>
-              <p className="text-lg font-bold text-ink">{card.value}</p>
+              {"amount" in card && card.amount !== undefined ? (
+                <CurrencyAmount amount={card.amount} size="lg" />
+              ) : (
+                <p className="text-lg font-bold text-ink">{card.value}</p>
+              )}
             </div>
             <p className="mt-2 text-xs font-medium text-muted">{card.label}</p>
           </Link>
@@ -96,7 +101,14 @@ export function DashboardOverviewPanel() {
                 className={`rounded-[var(--radius-xl)] border px-3 py-2.5 ${item.read ? "border-border bg-surface" : "border-secondary/30 bg-secondary-soft/40"}`}
               >
                 <p className="text-xs font-bold text-ink">{item.title}</p>
-                <p className="mt-1 text-xs font-medium text-muted">{item.body}</p>
+                <p className="mt-1 text-xs font-medium text-muted">
+                  {item.body}
+                  {"amount" in item && item.amount ? (
+                    <span className="mt-1 block">
+                      <CurrencyAmount amount={item.amount} size="sm" />
+                    </span>
+                  ) : null}
+                </p>
               </li>
             ))}
           </ul>
@@ -110,7 +122,14 @@ export function DashboardOverviewPanel() {
                 key={item.id}
                 className="flex items-center justify-between gap-3 border-b border-border/80 pb-3 last:border-0 last:pb-0"
               >
-                <p className="text-xs font-semibold text-ink">{item.text}</p>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-ink">{item.text}</p>
+                  {"amount" in item && item.amount ? (
+                    <div className="mt-0.5">
+                      <CurrencyAmount amount={item.amount} size="sm" />
+                    </div>
+                  ) : null}
+                </div>
                 <span className="shrink-0 text-[0.65rem] font-medium text-muted">
                   {item.time}
                 </span>

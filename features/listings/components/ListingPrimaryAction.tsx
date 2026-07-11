@@ -2,6 +2,9 @@
 
 import type { Listing } from "@/types";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
+import { JobApplicationModal } from "@/features/listings/components/JobApplicationModal";
+import { QuoteRequestModal } from "@/features/listings/components/QuoteRequestModal";
+import { ViewingBookingModal } from "@/features/listings/components/ViewingBookingModal";
 import {
   ACTION_LABELS,
   getListingActionConfig,
@@ -22,6 +25,8 @@ import { getSessionUser } from "@/services/storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
+
 type ListingPrimaryActionProps = {
   action: ListingActionType;
   fullWidth?: boolean;
@@ -41,6 +46,7 @@ export function ListingPrimaryAction({
   const { showToast } = useToast();
   const config = getListingActionConfig(listing);
   const [phoneConfirm, setPhoneConfirm] = useState(false);
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
 
   if (action === "SEND_MESSAGE") {
     return <StartChatButton fullWidth={fullWidth} listing={listing} size={size} />;
@@ -68,6 +74,14 @@ export function ListingPrimaryAction({
     router.push(checkoutPath);
   }
 
+  function openModal(modal: ActiveModal) {
+    const listingPath = listing.id.startsWith("local-")
+      ? `/listings/local/${listing.id}`
+      : `/listings/${listing.slug}`;
+    if (!requireAuth(listingPath)) return;
+    setActiveModal(modal);
+  }
+
   function handleClick() {
     switch (action) {
       case "BUY_NOW":
@@ -84,17 +98,18 @@ export function ListingPrimaryAction({
         setPhoneConfirm(true);
         break;
       }
-      case "BOOK_VIEWING":
-      case "REQUEST_QUOTE":
       case "APPLY_JOB":
-      case "BOOK_SERVICE": {
-        const listingPath = listing.id.startsWith("local-")
-          ? `/listings/local/${listing.id}`
-          : `/listings/${listing.slug}`;
-        if (!requireAuth(listingPath)) return;
-        showToast("سيتم تفعيل هذا الإجراء في الإصدار القادم.");
+        openModal("job");
         break;
-      }
+      case "BOOK_VIEWING":
+        openModal("viewing");
+        break;
+      case "REQUEST_QUOTE":
+        openModal("quote");
+        break;
+      case "BOOK_SERVICE":
+        openModal("service");
+        break;
       default:
         break;
     }
@@ -127,6 +142,32 @@ export function ListingPrimaryAction({
           </div>
         </div>
       ) : null}
+
+      <JobApplicationModal
+        listing={listing}
+        onClose={() => setActiveModal(null)}
+        onSuccess={() => showToast("تم إرسال طلب التوظيف بنجاح")}
+        open={activeModal === "job"}
+      />
+      <ViewingBookingModal
+        listing={listing}
+        onClose={() => setActiveModal(null)}
+        onSuccess={() => showToast("تم تأكيد حجز المعاينة")}
+        open={activeModal === "viewing"}
+      />
+      <QuoteRequestModal
+        listing={listing}
+        onClose={() => setActiveModal(null)}
+        onSuccess={() => showToast("تم إرسال الطلب بنجاح")}
+        open={activeModal === "quote"}
+      />
+      <QuoteRequestModal
+        kind="service_booking"
+        listing={listing}
+        onClose={() => setActiveModal(null)}
+        onSuccess={() => showToast("تم إرسال طلب حجز الخدمة")}
+        open={activeModal === "service"}
+      />
     </>
   );
 }

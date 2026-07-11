@@ -9,6 +9,9 @@ const adminLinks = [
   { href: "/admin/orders", icon: "package" as const, label: "الطلبات والمدفوعات" },
   { href: "/admin/escrow", icon: "shield" as const, label: "الضمان المالي" },
   { href: "/admin/reports", icon: "wallet" as const, label: "تقارير الدفع" },
+  { href: "/admin/job-applications", icon: "briefcase" as const, label: "طلبات التوظيف" },
+  { href: "/admin/viewing-bookings", icon: "home" as const, label: "حجوزات المعاينة" },
+  { href: "/admin/quote-requests", icon: "wrench" as const, label: "طلبات عروض الأسعار" },
 ] as const;
 
 export default function AdminPage() {
@@ -22,7 +25,7 @@ export default function AdminPage() {
             eyebrow="الإدارة"
             title="لوحة الإدارة"
           />
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {adminLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <Card

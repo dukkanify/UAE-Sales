@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { persistSessionCookie } from "@/services/auth/session-sync";
+import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 
 type RegisterErrors = {
@@ -121,6 +122,7 @@ export function RegisterForm() {
     };
     setSessionUser(newUser);
     await persistSessionCookie(newUser);
+    await syncFavoritesAfterLogin(newUser.id);
     router.push("/profile");
   }, [pendingUser, router]);
 

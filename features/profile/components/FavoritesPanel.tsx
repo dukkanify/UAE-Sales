@@ -1,10 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useFavoritesList } from "@/shared/components/FavoriteButton";
+import { useFavoritesList, FavoriteButton } from "@/shared/components/FavoriteButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import type { Listing } from "@/types";
+
+function getFavoriteHref(item: { listingId: string; slug: string }) {
+  return item.listingId.startsWith("local-")
+    ? `/listings/local/${item.listingId}`
+    : `/listings/${item.slug}`;
+}
 
 export function FavoritesPanel() {
   const favorites = useFavoritesList();
@@ -25,17 +32,30 @@ export function FavoritesPanel() {
     <ul className="grid gap-3">
       {favorites.map((item) => (
         <li key={item.listingId}>
-          <Link href={`/listings/${item.slug}`}>
-            <Card className="flex items-center justify-between gap-3 p-4 transition hover:border-primary/30" variant="flat">
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-ink">{item.title}</p>
-                <p className="mt-0.5 text-xs text-muted">
-                  {new Date(item.savedAt).toLocaleDateString("ar-AE")}
-                </p>
-              </div>
+          <Card className="flex items-center justify-between gap-3 p-4" variant="flat">
+            <Link className="min-w-0 flex-1" href={getFavoriteHref(item)}>
+              <p className="truncate font-semibold text-ink">{item.title}</p>
+              <p className="mt-0.5 text-xs text-muted">
+                {new Date(item.savedAt).toLocaleDateString("ar-AE")}
+              </p>
+            </Link>
+            <div className="flex items-center gap-2">
               <CurrencyAmount amount={item.price} size="sm" />
-            </Card>
-          </Link>
+              <FavoriteButton
+                className="!min-h-9 !min-w-9 !px-2"
+                iconOnly
+                listing={
+                  {
+                    id: item.listingId,
+                    slug: item.slug,
+                    title: item.title,
+                    price: item.price,
+                    imageUrl: item.imageUrl,
+                  } as Listing
+                }
+              />
+            </div>
+          </Card>
         </li>
       ))}
     </ul>

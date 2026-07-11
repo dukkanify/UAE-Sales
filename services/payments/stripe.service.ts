@@ -64,7 +64,7 @@ export async function createCheckoutSession(
         escrow: "true",
         shippingMethod: input.order.shippingMethod ?? "",
       },
-      success_url: `${appUrl}/orders/${input.order.id}?payment=success`,
+      success_url: `${appUrl}/checkout/success?orderId=${input.order.id}`,
       cancel_url: `${appUrl}/checkout?listingId=${listingParam}&payment=cancelled`,
     },
     {

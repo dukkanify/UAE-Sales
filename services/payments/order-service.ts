@@ -27,6 +27,7 @@ import {
 } from "@/services/payments/stripe.service";
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
+import { formatCurrencyLabel } from "@/shared/utils/currency";
 
 type ListingCheckoutContext = {
   snapshot: ListingSnapshot;
@@ -214,7 +215,7 @@ async function markOrderPaid(
     orderId: order.id,
     type: "order_paid",
     title: "تم الدفع بنجاح",
-    body: `تم دفع مبلغ ${order.fees.total} د.إ لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
+    body: `تم دفع مبلغ ${formatCurrencyLabel(order.fees.total)} لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
   });
 
   await createNotification({
@@ -222,7 +223,7 @@ async function markOrderPaid(
     orderId: order.id,
     type: "escrow_held",
     title: "دفعة جديدة محجوزة",
-    body: `تم حجز ${sellerNet} د.إ في الضمان لطلب «${order.listingTitle}».`,
+    body: `تم حجز ${formatCurrencyLabel(sellerNet)} في الضمان لطلب «${order.listingTitle}».`,
   });
 
   await logPaymentEvent({
@@ -315,7 +316,7 @@ export async function confirmOrderReceived(
     orderId: order.id,
     type: "order_released",
     title: "تم تحويل المبلغ",
-    body: `تم تحويل ${sellerNet} د.إ إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
+    body: `تم تحويل ${formatCurrencyLabel(sellerNet)} إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
   });
 
   const released = await updateOrder(orderId, { status: "released" });

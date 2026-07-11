@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import type { Listing } from "@/types";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { useToast } from "@/shared/components/ToastProvider";
@@ -10,8 +10,11 @@ import {
   getFavorites,
   getSessionUser,
   isFavoriteListing,
-  toggleFavorite,
 } from "@/services/storage";
+import {
+  hydrateFavoritesFromServer,
+  toggleFavoriteWithApi,
+} from "@/services/favorites/favorites-sync";
 
 type FavoriteButtonProps = {
   className?: string;
@@ -41,7 +44,13 @@ export function FavoriteButton({
     () => false,
   );
 
-  const handleToggle = useCallback(() => {
+  useEffect(() => {
+    const user = getSessionUser();
+    if (!user) return;
+    hydrateFavoritesFromServer(user.id).catch(() => undefined);
+  }, []);
+
+  const handleToggle = useCallback(async () => {
     const user = getSessionUser();
     const listingPath = listing.id.startsWith("local-")
       ? `/listings/local/${listing.id}`
@@ -52,14 +61,16 @@ export function FavoriteButton({
       return;
     }
 
-    const added = toggleFavorite({
+    const entry = {
       listingId: listing.id,
       slug: listing.slug,
       title: listing.title,
       price: listing.price,
       imageUrl: listing.imageUrl ?? listing.images?.[0],
       savedAt: new Date().toISOString(),
-    });
+    };
+
+    const added = await toggleFavoriteWithApi(user.id, entry);
 
     showToast(
       added

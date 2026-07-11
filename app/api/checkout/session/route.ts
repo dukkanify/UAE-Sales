@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         mode: "mock",
         orderId: result.orderId,
-        redirectUrl: `/orders/${result.orderId}?payment=success`,
+        redirectUrl: `/checkout/success?orderId=${result.orderId}`,
       });
     }
 

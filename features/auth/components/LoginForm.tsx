@@ -17,6 +17,7 @@ import {
   validateLoginCredentials,
 } from "@/services/auth";
 import { persistSessionCookie } from "@/services/auth/session-sync";
+import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 
 type LoginErrors = {
@@ -65,6 +66,7 @@ export function LoginForm() {
     const user = await completeLogin(identifier);
     setSessionUser(user);
     await persistSessionCookie(user);
+    await syncFavoritesAfterLogin(user.id);
     const nextPath =
       new URLSearchParams(window.location.search).get("next") ??
       getPostLoginPath(identifier);

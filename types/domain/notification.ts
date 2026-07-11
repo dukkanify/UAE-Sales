@@ -3,7 +3,10 @@ export type NotificationType =
   | "order_confirmed"
   | "order_released"
   | "order_refunded"
-  | "escrow_held";
+  | "escrow_held"
+  | "job_application"
+  | "viewing_booking"
+  | "quote_request";
 
 export type AppNotification = {
   id: string;
