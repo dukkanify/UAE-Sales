@@ -46,7 +46,6 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const [categories, relatedListings] = await Promise.all([
     getCategories(),
     getRelatedListings(listing.categoryId, listing.id),
-    getListings(),
   ]);
   const category = categories.find((item) => item.id === listing.categoryId);
 
