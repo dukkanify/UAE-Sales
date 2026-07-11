@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createNotification } from "@/services/payments/notification-store";
 import {
+  assertNotOwnListing,
+  resolveServerListing,
+  validateFutureDate,
+} from "@/services/listings/listing-action-resolver";
+import {
   createViewingBooking,
   findViewingBooking,
   getAvailableSlotsForListing,
+  getAvailableViewingDates,
   getViewingBookingsForUser,
 } from "@/services/viewing-bookings/viewing-booking-store";
 
@@ -31,38 +37,66 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  const available = await getAvailableSlotsForListing(
-    parsed.data.listingId,
-    parsed.data.date,
+  const allowedDates = getAvailableViewingDates();
+  if (!allowedDates.includes(parsed.data.date) || !validateFutureDate(parsed.data.date)) {
+    return NextResponse.json({ error: "INVALID_DATE" }, { status: 400 });
+  }
+
+  const listing = resolveServerListing(parsed.data.listingId);
+  if (listing && listing.categoryId !== "real-estate") {
+    return NextResponse.json({ error: "INVALID_LISTING_TYPE" }, { status: 400 });
+  }
+
+  const ownError = assertNotOwnListing(
+    listing,
+    parsed.data.buyerId,
+    parsed.data.sellerId,
   );
-  if (!available.includes(parsed.data.time)) {
+  if (ownError) {
+    return NextResponse.json({ error: ownError }, { status: 403 });
+  }
+
+  const payload = { ...parsed.data };
+
+  if (listing) {
+    payload.sellerId = listing.seller.id;
+    payload.sellerName = listing.seller.name;
+    payload.listingTitle = listing.title;
+    payload.listingSlug = listing.slug;
+  }
+
+  const available = await getAvailableSlotsForListing(
+    payload.listingId,
+    payload.date,
+  );
+  if (!available.includes(payload.time)) {
     return NextResponse.json({ error: "SLOT_UNAVAILABLE" }, { status: 409 });
   }
 
   const existing = await findViewingBooking(
-    parsed.data.buyerId,
-    parsed.data.listingId,
-    parsed.data.date,
-    parsed.data.time,
+    payload.buyerId,
+    payload.listingId,
+    payload.date,
+    payload.time,
   );
   if (existing) {
     return NextResponse.json({ error: "DUPLICATE_BOOKING" }, { status: 409 });
   }
 
-  const booking = await createViewingBooking(parsed.data);
+  const booking = await createViewingBooking(payload);
 
   await Promise.all([
     createNotification({
-      userId: parsed.data.buyerId,
+      userId: payload.buyerId,
       type: "viewing_booking",
       title: "تم تأكيد حجز المعاينة",
-      body: `معاينة «${parsed.data.listingTitle}» بتاريخ ${parsed.data.date} الساعة ${parsed.data.time}.`,
+      body: `معاينة «${payload.listingTitle}» بتاريخ ${payload.date} الساعة ${payload.time}.`,
     }),
     createNotification({
-      userId: parsed.data.sellerId,
+      userId: payload.sellerId,
       type: "viewing_booking",
       title: "حجز معاينة جديد",
-      body: `${parsed.data.buyerName} حجز معاينة لـ «${parsed.data.listingTitle}».`,
+      body: `${payload.buyerName} حجز معاينة لـ «${payload.listingTitle}».`,
     }),
   ]);
 

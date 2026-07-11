@@ -6,6 +6,11 @@ import {
   getJobApplicationsForUser,
 } from "@/services/job-applications/job-application-store";
 import { createNotification } from "@/services/payments/notification-store";
+import {
+  assertNotOwnListing,
+  resolveServerListing,
+  validateCvFileName,
+} from "@/services/listings/listing-action-resolver";
 
 const schema = z.object({
   listingId: z.string().min(1),
@@ -31,28 +36,55 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  const existing = await findJobApplication(
+  if (!validateCvFileName(parsed.data.cvFileName)) {
+    return NextResponse.json({ error: "INVALID_CV_TYPE" }, { status: 400 });
+  }
+
+  const listing = resolveServerListing(parsed.data.listingId);
+  if (listing && listing.categoryId !== "jobs") {
+    return NextResponse.json({ error: "INVALID_LISTING_TYPE" }, { status: 400 });
+  }
+
+  const ownError = assertNotOwnListing(
+    listing,
     parsed.data.applicantId,
-    parsed.data.listingId,
+    parsed.data.employerId,
+  );
+  if (ownError) {
+    return NextResponse.json({ error: ownError }, { status: 403 });
+  }
+
+  const payload = { ...parsed.data };
+
+  if (listing) {
+    payload.employerId = listing.seller.id;
+    payload.employerName = listing.seller.name;
+    payload.listingTitle = listing.title;
+    payload.listingSlug = listing.slug;
+  }
+
+  const existing = await findJobApplication(
+    payload.applicantId,
+    payload.listingId,
   );
   if (existing) {
     return NextResponse.json({ error: "DUPLICATE_APPLICATION" }, { status: 409 });
   }
 
-  const application = await createJobApplication(parsed.data);
+  const application = await createJobApplication(payload);
 
   await Promise.all([
     createNotification({
-      userId: parsed.data.applicantId,
+      userId: payload.applicantId,
       type: "job_application",
       title: "تم إرسال طلب التوظيف",
-      body: `تم إرسال طلبك على وظيفة «${parsed.data.listingTitle}» بنجاح.`,
+      body: `تم إرسال طلبك على وظيفة «${payload.listingTitle}» بنجاح.`,
     }),
     createNotification({
-      userId: parsed.data.employerId,
+      userId: payload.employerId,
       type: "job_application",
       title: "طلب توظيف جديد",
-      body: `${parsed.data.applicantName} قدّم على وظيفة «${parsed.data.listingTitle}».`,
+      body: `${payload.applicantName} قدّم على وظيفة «${payload.listingTitle}».`,
     }),
   ]);
 

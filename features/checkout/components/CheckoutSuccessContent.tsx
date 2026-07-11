@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DeliveryAddress } from "@/types/domain/address";
 import type { Order } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
@@ -25,43 +25,64 @@ const statusLabels: Record<Order["status"], string> = {
   refunded: "مسترد",
 };
 
+const MAX_POLL_ATTEMPTS = 8;
+const POLL_INTERVAL_MS = 1500;
+
 export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [address, setAddress] = useState<DeliveryAddress | null>(null);
   const [error, setError] = useState("");
+  const [pollingDelayed, setPollingDelayed] = useState(false);
+  const attemptsRef = useRef(0);
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let attempts = 0;
-    const load = () => {
-      fetch(`/api/orders/${orderId}`)
-        .then((res) => res.json())
-        .then(async (data) => {
-          if (!data.order) {
-            setError("لم يتم العثور على الطلب.");
-            return;
-          }
-          setOrder(data.order);
-          if (data.order.deliveryAddressId && data.order.buyerId) {
-            const addressResponse = await fetch(
-              `/api/addresses?userId=${encodeURIComponent(data.order.buyerId)}`,
-            );
-            const addressData = await addressResponse.json();
-            const match = (addressData.addresses as DeliveryAddress[] | undefined)?.find(
-              (item) => item.id === data.order.deliveryAddressId,
-            );
-            if (match) setAddress(match);
-          }
-          if (
-            data.order.status === "pending_payment" &&
-            attempts < 8
-          ) {
-            attempts += 1;
-            window.setTimeout(load, 1500);
-          }
-        })
-        .catch(() => setError("تعذر تحميل تفاصيل الطلب."));
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        const data = await response.json();
+        if (cancelled) return;
+
+        if (!data.order) {
+          setError("لم يتم العثور على الطلب.");
+          return;
+        }
+
+        setOrder(data.order);
+
+        if (data.order.deliveryAddressId && data.order.buyerId) {
+          const addressResponse = await fetch(
+            `/api/addresses?userId=${encodeURIComponent(data.order.buyerId)}`,
+          );
+          const addressData = await addressResponse.json();
+          const match = (addressData.addresses as DeliveryAddress[] | undefined)?.find(
+            (item) => item.id === data.order.deliveryAddressId,
+          );
+          if (match) setAddress(match);
+        }
+
+        if (data.order.status === "pending_payment" && attemptsRef.current < MAX_POLL_ATTEMPTS) {
+          attemptsRef.current += 1;
+          timeoutRef.current = window.setTimeout(load, POLL_INTERVAL_MS);
+          return;
+        }
+
+        if (data.order.status === "pending_payment") {
+          setPollingDelayed(true);
+        }
+      } catch {
+        if (!cancelled) setError("تعذر تحميل تفاصيل الطلب.");
+      }
     };
+
     load();
+
+    return () => {
+      cancelled = true;
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    };
   }, [orderId]);
 
   if (error) {
@@ -98,9 +119,16 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
       />
 
       <div className="mx-auto mt-6 max-w-2xl grid gap-5">
-        <FormMessage variant="success">
-          تم الدفع بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.
-        </FormMessage>
+        {pollingDelayed ? (
+          <FormMessage variant="success">
+            تم إنشاء الطلب. قد يستغرق تأكيد الدفع دقيقة إضافية. يمكنك متابعة الحالة من
+            تفاصيل الطلب.
+          </FormMessage>
+        ) : (
+          <FormMessage variant="success">
+            تم الدفع بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.
+          </FormMessage>
+        )}
 
         <Card className="p-6" variant="flat">
           <div className="flex flex-wrap items-center gap-2">

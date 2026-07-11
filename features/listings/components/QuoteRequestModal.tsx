@@ -10,6 +10,7 @@ import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { cities } from "@/shared/constants/locations";
+import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { getSessionUser } from "@/services/storage";
 
 type QuoteRequestModalProps = {
@@ -76,7 +77,15 @@ export function QuoteRequestModal({
 
       const data = await response.json();
       if (response.status === 409) {
-        setError("لديك طلب مفتوح لهذا الإعلان.");
+        setError("لديك طلب مفتوح لهذا الإعلان خلال الأيام السبعة الماضية.");
+        return;
+      }
+      if (response.status === 403) {
+        setError(LISTING_ERRORS.ownListing);
+        return;
+      }
+      if (response.status === 400) {
+        setError("تحقق من الحقول المطلوبة وصيغة المرفق.");
         return;
       }
       if (!response.ok) {
@@ -94,6 +103,9 @@ export function QuoteRequestModal({
   }
 
   const user = typeof window !== "undefined" ? getSessionUser() : null;
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().slice(0, 10);
 
   return (
     <Modal
@@ -145,7 +157,7 @@ export function QuoteRequestModal({
           />
           <Input label="المنطقة" name="area" required />
           <div className="grid gap-3 sm:grid-cols-2">
-            <Input label="التاريخ المفضل" name="preferredDate" required type="date" />
+            <Input label="التاريخ المفضل" min={minDate} name="preferredDate" required type="date" />
             <Input label="الوقت المفضل" name="preferredTime" required type="time" />
           </div>
           {!isBooking ? (

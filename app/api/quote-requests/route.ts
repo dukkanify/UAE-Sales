@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createNotification } from "@/services/payments/notification-store";
 import {
+  assertNotOwnListing,
+  resolveServerListing,
+  validateAttachmentName,
+  validatePreferredDate,
+} from "@/services/listings/listing-action-resolver";
+import {
   createQuoteRequest,
   findRecentQuoteRequest,
   getQuoteRequestsForUser,
@@ -36,33 +42,64 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  const existing = await findRecentQuoteRequest(
+  if (!validatePreferredDate(parsed.data.preferredDate)) {
+    return NextResponse.json({ error: "INVALID_DATE" }, { status: 400 });
+  }
+
+  if (!validateAttachmentName(parsed.data.attachmentName)) {
+    return NextResponse.json({ error: "INVALID_ATTACHMENT_TYPE" }, { status: 400 });
+  }
+
+  const listing = resolveServerListing(parsed.data.listingId);
+  if (listing && listing.categoryId !== "services") {
+    return NextResponse.json({ error: "INVALID_LISTING_TYPE" }, { status: 400 });
+  }
+
+  const ownError = assertNotOwnListing(
+    listing,
     parsed.data.requesterId,
-    parsed.data.listingId,
+    parsed.data.providerId,
+  );
+  if (ownError) {
+    return NextResponse.json({ error: ownError }, { status: 403 });
+  }
+
+  const payload = { ...parsed.data };
+
+  if (listing) {
+    payload.providerId = listing.seller.id;
+    payload.providerName = listing.seller.name;
+    payload.listingTitle = listing.title;
+    payload.listingSlug = listing.slug;
+  }
+
+  const existing = await findRecentQuoteRequest(
+    payload.requesterId,
+    payload.listingId,
   );
   if (existing) {
     return NextResponse.json({ error: "DUPLICATE_REQUEST" }, { status: 409 });
   }
 
-  const quoteRequest = await createQuoteRequest(parsed.data);
+  const quoteRequest = await createQuoteRequest(payload);
 
   const title =
-    parsed.data.kind === "service_booking"
+    payload.kind === "service_booking"
       ? "تم إرسال طلب حجز الخدمة"
       : "تم إرسال طلب عرض السعر";
 
   await Promise.all([
     createNotification({
-      userId: parsed.data.requesterId,
+      userId: payload.requesterId,
       type: "quote_request",
       title,
-      body: `تم إرسال طلبك لـ «${parsed.data.listingTitle}». سيتواصل مزود الخدمة معك قريباً.`,
+      body: `تم إرسال طلبك لـ «${payload.listingTitle}». سيتواصل مزود الخدمة معك قريباً.`,
     }),
     createNotification({
-      userId: parsed.data.providerId,
+      userId: payload.providerId,
       type: "quote_request",
       title: "طلب خدمة جديد",
-      body: `${parsed.data.requesterName} طلب عرض سعر لـ «${parsed.data.listingTitle}».`,
+      body: `${payload.requesterName} طلب عرض سعر لـ «${payload.listingTitle}».`,
     }),
   ]);
 

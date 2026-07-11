@@ -8,6 +8,7 @@ import { Textarea } from "@/shared/ui/Textarea";
 import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { getSessionUser } from "@/services/storage";
 
 type ViewingBookingModalProps = {
@@ -79,7 +80,19 @@ export function ViewingBookingModal({
 
       const data = await response.json();
       if (response.status === 409) {
-        setError("هذا الموعد محجوز أو لديك حجز مماثل.");
+        setError(
+          data.error === "SLOT_UNAVAILABLE"
+            ? "هذا الموعد غير متاح. اختر وقتاً آخر."
+            : "هذا الموعد محجوز أو لديك حجز مماثل.",
+        );
+        return;
+      }
+      if (response.status === 403) {
+        setError(LISTING_ERRORS.ownListing);
+        return;
+      }
+      if (response.status === 400) {
+        setError("تحقق من التاريخ والبيانات المدخلة.");
         return;
       }
       if (!response.ok) {

@@ -79,6 +79,11 @@ export function ListingPrimaryAction({
       ? `/listings/local/${listing.id}`
       : `/listings/${listing.slug}`;
     if (!requireAuth(listingPath)) return;
+    const user = getSessionUser();
+    if (user && isOwnListing(listing, user)) {
+      showToast(LISTING_ERRORS.ownListing, "error");
+      return;
+    }
     setActiveModal(modal);
   }
 

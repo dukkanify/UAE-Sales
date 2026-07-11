@@ -7,6 +7,8 @@ import { Input } from "@/shared/ui/Input";
 import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 
 type JobApplicationModalProps = {
@@ -33,8 +35,19 @@ export function JobApplicationModal({
     const user = getSessionUser();
     if (!user) return;
 
+    if (isOwnListing(listing, user)) {
+      setError(LISTING_ERRORS.ownListing);
+      return;
+    }
+
     if (!cvFileName) {
       setError("يرجى إرفاق السيرة الذاتية.");
+      return;
+    }
+
+    const lowerCv = cvFileName.toLowerCase();
+    if (![".pdf", ".doc", ".docx"].some((ext) => lowerCv.endsWith(ext))) {
+      setError("يرجى إرفاق ملف بصيغة PDF أو Word.");
       return;
     }
 
@@ -73,6 +86,10 @@ export function JobApplicationModal({
       const data = await response.json();
       if (response.status === 409) {
         setError("لقد قدّمت على هذه الوظيفة مسبقاً.");
+        return;
+      }
+      if (response.status === 403) {
+        setError(LISTING_ERRORS.ownListing);
         return;
       }
       if (!response.ok) {

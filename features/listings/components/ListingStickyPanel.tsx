@@ -10,7 +10,6 @@ import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import {
   ACTION_LABELS,
   getListingActionConfig,
-  type ListingActionType,
 } from "@/shared/constants/listingActionConfig";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listing-url";
