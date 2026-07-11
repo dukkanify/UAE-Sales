@@ -100,7 +100,7 @@ export function getListingActionConfig(listing: Listing): ListingActionConfig {
         purchasable ? "RESERVE" : "CONTACT_SELLER",
       ],
       checkoutEnabled: purchasable,
-      shippingEnabled: false,
+      shippingEnabled: purchasable,
       showBuyNow: purchasable,
       showEscrowBadge: Boolean(listing.escrowAvailable),
     };
