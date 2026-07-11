@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Order } from "@/types";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -14,8 +15,6 @@ type OrderDetailContentProps = {
   orderId: string;
   paymentSuccess?: boolean;
 };
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 const statusLabels: Record<Order["status"], string> = {
   pending_payment: "بانتظار الدفع",
@@ -138,10 +137,20 @@ export function OrderDetailContent({
             </div>
             <div className="flex justify-between">
               <span className="text-muted">الإجمالي</span>
-              <span className="font-bold text-accent">
-                {formatter.format(order.fees.total)} د.إ
-              </span>
+              <CurrencyAmount amount={order.fees.total} size="md" />
             </div>
+            {order.fees.shippingFee > 0 ? (
+              <div className="flex justify-between">
+                <span className="text-muted">التوصيل</span>
+                <CurrencyAmount amount={order.fees.shippingFee} size="sm" />
+              </div>
+            ) : null}
+            {order.shippingMethod ? (
+              <div className="flex justify-between">
+                <span className="text-muted">طريقة التوصيل</span>
+                <span className="font-semibold">{order.shippingMethod}</span>
+              </div>
+            ) : null}
             {order.stripePaymentIntentId ? (
               <div className="flex justify-between">
                 <span className="text-muted">Stripe Payment</span>

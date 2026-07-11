@@ -1,20 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
-import { ListingCard } from "@/features/listings/components/ListingCard";
-import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
-import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
-import { ListingGallery } from "@/features/listings/components/ListingGallery";
-import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
-import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
-import { ListingSummary } from "@/features/listings/components/ListingSummary";
+import { ListingDetailsView } from "@/features/listings/components/ListingDetailsView";
 import {
   RecentlyViewedSection,
   RecentlyViewedTracker,
 } from "@/features/listings/components/RecentlyViewedSection";
-import { SellerPanel } from "@/features/listings/components/SellerPanel";
-import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
-import { SectionHeader } from "@/shared/ui/SectionHeader";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
@@ -64,71 +54,19 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
       <SiteHeader />
       <RecentlyViewedTracker listing={listing} />
       <main>
-        <section className="app-container page-padding">
-          <Breadcrumbs
-            items={[
-              { href: "/", label: "الرئيسية" },
-              { href: "/search", label: "الإعلانات" },
-              ...(category
-                ? [
-                    {
-                      href: `/categories/${category.slug}`,
-                      label: category.name,
-                    },
-                  ]
-                : []),
-              { label: listing.title },
-            ]}
-          />
-
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-            <div>
-              <ListingGallery listing={listing} />
-              <ListingDetailToolbar listingTitle={listing.title} />
-              <ListingMapPlaceholder listing={listing} />
-            </div>
-            <div className="grid gap-4">
-              <ListingSummary category={category} listing={listing} />
-              <SellerPanel listing={listing} />
-              <EscrowProtectionCard />
-            </div>
-          </div>
-
-          <div className="marketplace-panel mt-8 p-6">
-            <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
-            <p className="mt-4 text-sm font-medium leading-8 text-muted">
-              {listing.description}
-            </p>
-            {listing.descriptionEnglish ? (
-              <p className="mt-4 border-t border-border pt-4 text-sm leading-7 text-muted/80">
-                {listing.descriptionEnglish}
-              </p>
-            ) : null}
-          </div>
-
-          <ListingSpecifications listing={listing} />
-          <ListingSafetyTips />
-        </section>
-
-        {relatedListings.length > 0 ? (
-          <section className="app-container page-padding">
-            <SectionHeader
-              description="إعلانات من نفس التصنيف قد تعجبك."
-              eyebrow="مشابه"
-              title="قد يعجبك أيضاً"
-            />
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {relatedListings.map((relatedListing) => (
-                <ListingCard
-                  key={relatedListing.id}
-                  categoryName={category?.name}
-                  listing={relatedListing}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
+        <ListingDetailsView
+          breadcrumbs={[
+            { href: "/", label: "الرئيسية" },
+            { href: "/search", label: "الإعلانات" },
+            ...(category
+              ? [{ href: `/categories/${category.slug}`, label: category.name }]
+              : []),
+            { label: listing.title },
+          ]}
+          category={category}
+          listing={listing}
+          relatedListings={relatedListings}
+        />
         <RecentlyViewedSection
           categories={categories}
           currentSlug={listing.slug}

@@ -62,6 +62,7 @@ export async function createCheckoutSession(
         sellerId: input.order.sellerId,
         platform: "sooqna",
         escrow: "true",
+        shippingMethod: input.order.shippingMethod ?? "",
       },
       success_url: `${appUrl}/orders/${input.order.id}?payment=success`,
       cancel_url: `${appUrl}/checkout?listingId=${listingParam}&payment=cancelled`,

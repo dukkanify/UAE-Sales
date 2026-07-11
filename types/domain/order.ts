@@ -1,3 +1,5 @@
+import type { ShippingMethodId } from "@/types/domain/address";
+
 export type OrderStatus =
   | "pending_payment"
   | "paid_held_in_escrow"
@@ -22,6 +24,7 @@ export type PaymentStatus =
 
 export type OrderFeeBreakdown = {
   productPrice: number;
+  shippingFee: number;
   gatewayFee: number;
   platformFee: number;
   total: number;
@@ -50,6 +53,8 @@ export type Order = {
   escrowStatus: EscrowStatus;
   paymentStatus: PaymentStatus;
   fees: OrderFeeBreakdown;
+  shippingMethod?: ShippingMethodId;
+  deliveryAddressId?: string;
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
   stripeRefundId?: string;

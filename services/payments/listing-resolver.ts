@@ -6,6 +6,9 @@ export type ListingSnapshot = {
   slug?: string;
   title: string;
   price: number;
+  categoryId?: string;
+  emirate?: string;
+  city?: string;
   seller: {
     id: string;
     name: string;

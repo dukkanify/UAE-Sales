@@ -1,11 +1,7 @@
 "use client";
 
 import type { Category } from "@/types";
-import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
-import { ListingGallery } from "@/features/listings/components/ListingGallery";
-import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
-import { ListingSummary } from "@/features/listings/components/ListingSummary";
-import { SellerPanel } from "@/features/listings/components/SellerPanel";
+import { ListingDetailsView } from "@/features/listings/components/ListingDetailsView";
 import { Button } from "@/shared/ui/Button";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
@@ -41,32 +37,25 @@ export function LocalListingDetails({
   const category = categories.find((item) => item.id === listing.categoryId);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-      <div>
-        <ListingGallery listing={listing} />
+    <>
+      <ListingDetailsView
+        breadcrumbs={[
+          { href: "/", label: "الرئيسية" },
+          { href: "/dashboard/listings", label: "إعلاناتي" },
+          { label: listing.title },
+        ]}
+        category={category}
+        listing={listing}
+      />
+      <div className="app-container -mt-20 pb-28 lg:pb-8">
+        <Button
+          href={`/listings/local/${listingId}/edit`}
+          size="sm"
+          variant="secondary"
+        >
+          تعديل الإعلان
+        </Button>
       </div>
-      <div className="grid gap-4">
-        <ListingSummary category={category} listing={listing} />
-        <SellerPanel listing={listing} />
-        <EscrowProtectionCard />
-      </div>
-      <div className="lg:col-span-2">
-        <div className="marketplace-panel p-6">
-          <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
-          <p className="mt-4 text-sm font-medium leading-8 text-muted">
-            {listing.description}
-          </p>
-          <Button
-            className="mt-4"
-            href={`/listings/local/${listingId}/edit`}
-            size="sm"
-            variant="secondary"
-          >
-            تعديل الإعلان
-          </Button>
-        </div>
-        <ListingSpecifications listing={listing} />
-      </div>
-    </div>
+    </>
   );
 }

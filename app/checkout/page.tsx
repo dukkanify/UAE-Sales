@@ -1,4 +1,4 @@
-import { CheckoutContent } from "@/features/checkout/components/CheckoutContent";
+import { CheckoutWizard } from "@/features/checkout/components/CheckoutWizard";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getListingBySlug } from "@/services/listings";
@@ -23,7 +23,7 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     <>
       <SiteHeader />
       <main>
-        <CheckoutContent
+        <CheckoutWizard
           catalogListing={catalogListing}
           listingRef={listingRef}
           paymentCancelled={params.payment === "cancelled"}

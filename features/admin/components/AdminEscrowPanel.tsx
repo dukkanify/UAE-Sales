@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { Badge } from "@/shared/ui/Badge";
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 type EscrowItem = {
   id: string;
@@ -43,9 +42,9 @@ export function AdminEscrowPanel() {
         </Card>
         <Card className="p-6" variant="flat">
           <p className="text-sm text-muted">إجمالي المحمي</p>
-          <p className="mt-2 text-3xl font-bold text-ink">
-            {formatter.format(summary.totalProtected)} د.إ
-          </p>
+          <div className="mt-2">
+            <CurrencyAmount amount={summary.totalProtected} size="xl" />
+          </div>
         </Card>
       </div>
 
@@ -58,7 +57,7 @@ export function AdminEscrowPanel() {
                 <p className="text-xs text-muted">{item.buyer}</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-bold">{formatter.format(item.amount)} د.إ</span>
+                <CurrencyAmount amount={item.amount} size="sm" />
                 <Badge variant="escrow">{item.status}</Badge>
               </div>
             </Card>

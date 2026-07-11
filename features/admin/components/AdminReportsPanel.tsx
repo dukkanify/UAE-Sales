@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 type ReportSummary = {
   totalOrders: number;
@@ -49,27 +48,31 @@ export function AdminReportsPanel() {
   return (
     <div className="grid gap-5">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { label: "إجمالي الطلبات", value: summary.totalOrders },
-          { label: "طلبات مدفوعة", value: summary.paidOrders },
-          { label: "مستردة", value: summary.refundedOrders },
-          {
-            label: "حجم المدفوعات",
-            value: `${formatter.format(summary.totalVolume)} د.إ`,
-          },
-        ].map((item) => (
-          <Card key={item.label} className="p-5" variant="flat">
-            <p className="text-xs text-muted">{item.label}</p>
-            <p className="mt-2 text-2xl font-bold text-ink">{item.value}</p>
-          </Card>
-        ))}
+        <Card className="p-5" variant="flat">
+          <p className="text-xs text-muted">إجمالي الطلبات</p>
+          <p className="mt-2 text-2xl font-bold text-ink">{summary.totalOrders}</p>
+        </Card>
+        <Card className="p-5" variant="flat">
+          <p className="text-xs text-muted">طلبات مدفوعة</p>
+          <p className="mt-2 text-2xl font-bold text-ink">{summary.paidOrders}</p>
+        </Card>
+        <Card className="p-5" variant="flat">
+          <p className="text-xs text-muted">مستردة</p>
+          <p className="mt-2 text-2xl font-bold text-ink">{summary.refundedOrders}</p>
+        </Card>
+        <Card className="p-5" variant="flat">
+          <p className="text-xs text-muted">حجم المدفوعات</p>
+          <div className="mt-2">
+            <CurrencyAmount amount={summary.totalVolume} size="lg" />
+          </div>
+        </Card>
       </div>
 
       <Card className="p-6" variant="flat">
         <p className="text-sm text-muted">رسوم المنصة</p>
-        <p className="mt-2 text-2xl font-bold text-ink">
-          {formatter.format(summary.totalPlatformFees)} د.إ
-        </p>
+        <div className="mt-2">
+          <CurrencyAmount amount={summary.totalPlatformFees} size="lg" />
+        </div>
       </Card>
 
       <Card className="p-6" variant="flat">

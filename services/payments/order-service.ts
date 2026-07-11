@@ -1,13 +1,14 @@
 import type { Order } from "@/types/domain/order";
 import type { CheckoutSessionResult } from "@/types/domain/payment";
+import { getAddressesForUser } from "@/services/addresses/address-store";
 import { calculateOrderFees } from "@/services/payments/fee-calculator";
 import {
   getServerListingById,
   getServerListingBySlug,
   toListingSnapshot,
   validateLocalListingSnapshot,
-  type ListingSnapshot,
 } from "@/services/payments/listing-resolver";
+import { resolveCheckoutShipping } from "@/services/shipping/shipping.service";
 import { createNotification } from "@/services/payments/notification-store";
 import {
   createOrder,
@@ -25,20 +26,41 @@ import {
   refundStripePayment,
 } from "@/services/payments/stripe.service";
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
+import type { ListingSnapshot } from "@/services/payments/listing-resolver";
 
-function resolveListingSnapshot(input: CreateCheckoutInput): ListingSnapshot | null {
+type ListingCheckoutContext = {
+  snapshot: ListingSnapshot;
+  categoryId: string;
+  sellerEmirate?: string;
+};
+
+function resolveListingCheckoutContext(
+  input: CreateCheckoutInput,
+): ListingCheckoutContext | null {
   const catalog =
     getServerListingById(input.listingId) ??
     getServerListingBySlug(input.listingId);
 
   if (catalog) {
-    return toListingSnapshot(catalog);
+    return {
+      snapshot: toListingSnapshot(catalog),
+      categoryId: catalog.categoryId,
+      sellerEmirate: catalog.emirate ?? catalog.city,
+    };
   }
 
   if (input.localListing && validateLocalListingSnapshot(input.localListing)) {
-    if (input.localListing.id === input.listingId) {
-      return input.localListing;
+    if (input.localListing.id !== input.listingId) {
+      return null;
     }
+    if (!input.localListing.categoryId) {
+      return null;
+    }
+    return {
+      snapshot: input.localListing,
+      categoryId: input.localListing.categoryId,
+      sellerEmirate: input.localListing.emirate ?? input.localListing.city,
+    };
   }
 
   return null;
@@ -47,10 +69,12 @@ function resolveListingSnapshot(input: CreateCheckoutInput): ListingSnapshot | n
 export async function initiateCheckout(
   input: CreateCheckoutInput,
 ): Promise<CheckoutSessionResult> {
-  const listing = resolveListingSnapshot(input);
-  if (!listing) {
+  const context = resolveListingCheckoutContext(input);
+  if (!context) {
     throw new Error("LISTING_NOT_FOUND");
   }
+
+  const listing = context.snapshot;
 
   if (listing.seller.id === input.buyer.id) {
     throw new Error("CANNOT_BUY_OWN_LISTING");
@@ -64,7 +88,20 @@ export async function initiateCheckout(
     };
   }
 
-  const fees = calculateOrderFees(listing.price);
+  let buyerEmirate: string | undefined;
+  if (input.addressId) {
+    const addresses = await getAddressesForUser(input.buyer.id);
+    buyerEmirate = addresses.find((item) => item.id === input.addressId)?.emirate;
+  }
+
+  const shipping = resolveCheckoutShipping({
+    categoryId: context.categoryId,
+    sellerEmirate: context.sellerEmirate,
+    buyerEmirate,
+    shippingMethod: input.shippingMethod,
+  });
+
+  const fees = calculateOrderFees(listing.price, shipping.shippingFee);
   const orderId = generateOrderId();
 
   const order = await createOrder({
@@ -81,6 +118,8 @@ export async function initiateCheckout(
     escrowStatus: "pending",
     paymentStatus: "pending",
     fees,
+    shippingMethod: shipping.shippingMethod,
+    deliveryAddressId: input.addressId,
   });
 
   if (!isStripeConfigured()) {

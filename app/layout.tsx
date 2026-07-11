@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { OfflineBanner } from "@/shared/components/OfflineBanner";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
+import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
 import "./globals.css";
@@ -68,9 +69,11 @@ export default function RootLayout({
       lang="ar"
     >
       <body className={ibmPlexArabic.className}>
-        <BrandJsonLd />
-        <OfflineBanner />
-        {children}
+        <ToastProvider>
+          <BrandJsonLd />
+          <OfflineBanner />
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import type { Listing } from "@/types";
 import { getLocalListingById, getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -15,8 +16,6 @@ type CheckoutContentProps = {
   listingRef?: string;
   paymentCancelled?: boolean;
 };
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 const PLATFORM_FEE_RATE = 0.025;
 const GATEWAY_FEE_RATE = 0.029;
@@ -179,19 +178,19 @@ export function CheckoutContent({
             <div className="mt-4 grid gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted">سعر المنتج</span>
-                <span className="font-semibold">{formatter.format(fees.productPrice)} د.إ</span>
+                <CurrencyAmount amount={fees.productPrice} size="sm" />
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">رسوم بوابة الدفع</span>
-                <span className="font-semibold">{formatter.format(fees.gatewayFee)} د.إ</span>
+                <CurrencyAmount amount={fees.gatewayFee} size="sm" />
               </div>
               <div className="flex justify-between">
                 <span className="text-muted">رسوم المنصة</span>
-                <span className="font-semibold">{formatter.format(fees.platformFee)} د.إ</span>
+                <CurrencyAmount amount={fees.platformFee} size="sm" />
               </div>
               <div className="flex justify-between border-t border-border pt-3 text-base">
                 <span className="font-bold text-ink">الإجمالي</span>
-                <span className="font-bold text-accent">{formatter.format(fees.total)} د.إ</span>
+                <CurrencyAmount amount={fees.total} size="lg" />
               </div>
             </div>
           </Card>

@@ -12,6 +12,9 @@ export const listingSnapshotSchema = z.object({
   slug: z.string().optional(),
   title: z.string().min(1),
   price: z.number().positive(),
+  categoryId: z.string().optional(),
+  emirate: z.string().optional(),
+  city: z.string().optional(),
   seller: z.object({
     id: z.string().min(1),
     name: z.string().min(1),
@@ -22,6 +25,9 @@ export const createCheckoutSchema = z.object({
   listingId: z.string().min(1),
   buyer: buyerSessionSchema,
   localListing: listingSnapshotSchema.optional(),
+  shippingMethod: z.enum(["express", "standard", "pickup"]).optional(),
+  shippingFee: z.number().min(0).optional(),
+  addressId: z.string().optional(),
 });
 
 export const confirmOrderSchema = z.object({

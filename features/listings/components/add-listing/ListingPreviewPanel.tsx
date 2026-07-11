@@ -1,4 +1,5 @@
 import type { Category } from "@/types";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { Icon } from "@/shared/ui/Icon";
@@ -50,9 +51,7 @@ export function ListingPreviewPanel({
               {preview.description}
             </p>
             <div className="mt-4 flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
-              <span className="text-lg font-semibold text-accent">
-                {Number(preview.price || 0).toLocaleString("ar-AE")} د.إ
-              </span>
+              <CurrencyAmount amount={Number(preview.price || 0)} size="md" />
               <span className="text-sm font-medium text-muted">{preview.city}</span>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs font-medium text-muted">

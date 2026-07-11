@@ -1,0 +1,15 @@
+export const LISTING_ERRORS = {
+  listingUnavailable: "هذا الإعلان غير متاح حالياً.",
+  listingSold: "تم بيع هذا الإعلان.",
+  sellerUnavailable: "البائع غير متاح للتواصل حالياً.",
+  chatFailed: "تعذر فتح المحادثة. حاول مرة أخرى.",
+  whatsappUnavailable: "واتساب غير متاح لهذا الإعلان.",
+  phoneUnavailable: "الاتصال غير متاح لهذا الإعلان.",
+  paymentFailed: "تعذر إتمام الدفع. حاول مرة أخرى.",
+  shippingUnavailable: "التوصيل غير متاح لهذا الإعلان.",
+  invalidAddress: "يرجى إكمال عنوان التوصيل بشكل صحيح.",
+  imageFailed: "تعذر تحميل الصورة.",
+  sessionExpired: "انتهت الجلسة. سجّل الدخول للمتابعة.",
+  ownListing: "لا يمكنك تنفيذ هذا الإجراء على إعلانك.",
+  duplicateFavorite: "الإعلان موجود في المفضلة مسبقاً.",
+} as const;

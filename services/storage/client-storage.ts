@@ -114,3 +114,34 @@ export function getLocalListingById(listingId: string) {
 export function getLocalListingsForSeller(sellerId: string): Listing[] {
   return getLocalListings().filter((listing) => listing.seller.id === sellerId);
 }
+
+export type FavoriteRecord = {
+  listingId: string;
+  slug: string;
+  title: string;
+  price: number;
+  imageUrl?: string;
+  savedAt: string;
+};
+
+export function getFavorites(): FavoriteRecord[] {
+  if (!canUseStorage()) return [];
+  const raw = window.localStorage.getItem(STORAGE_KEYS.favorites);
+  return raw ? (JSON.parse(raw) as FavoriteRecord[]) : [];
+}
+
+export function isFavoriteListing(listingId: string): boolean {
+  return getFavorites().some((item) => item.listingId === listingId);
+}
+
+export function toggleFavorite(entry: FavoriteRecord): boolean {
+  if (!canUseStorage()) return false;
+  const favorites = getFavorites();
+  const exists = favorites.some((item) => item.listingId === entry.listingId);
+  const next = exists
+    ? favorites.filter((item) => item.listingId !== entry.listingId)
+    : [entry, ...favorites];
+  if (!safeSetItem(STORAGE_KEYS.favorites, JSON.stringify(next))) return exists;
+  window.dispatchEvent(new Event(STORAGE_EVENTS.favoritesChange));
+  return !exists;
+}

@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Order } from "@/types";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { Badge } from "@/shared/ui/Badge";
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 const statusLabels: Record<Order["status"], string> = {
   pending_payment: "بانتظار الدفع",
@@ -51,9 +50,7 @@ export function OrdersListContent() {
               </div>
               <div className="flex items-center gap-3">
                 <Badge variant="muted">{statusLabels[order.status]}</Badge>
-                <span className="text-sm font-bold text-ink">
-                  {formatter.format(order.fees.total)} د.إ
-                </span>
+                <CurrencyAmount amount={order.fees.total} size="sm" />
               </div>
             </Card>
           </Link>

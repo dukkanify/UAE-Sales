@@ -47,7 +47,9 @@ export async function POST(request: Request) {
         ? 404
         : message === "CANNOT_BUY_OWN_LISTING"
           ? 403
-          : 500;
+          : message === "SHIPPING_UNAVAILABLE"
+            ? 400
+            : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

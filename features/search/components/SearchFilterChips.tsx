@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Category } from "@/types";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Icon } from "@/shared/ui/Icon";
 
 type SearchFilterChipsProps = {
@@ -70,7 +71,10 @@ export function SearchFilterChips({
   selectedFilters,
 }: SearchFilterChipsProps) {
   const categoryName = categories.find((c) => c.id === selectedFilters.category)?.name;
-  const chips: { key: keyof SearchFilterChipsProps["selectedFilters"]; label: string }[] = [];
+  const chips: {
+    key: keyof SearchFilterChipsProps["selectedFilters"];
+    label: React.ReactNode;
+  }[] = [];
 
   if (selectedFilters.query) {
     chips.push({ key: "query", label: `"${selectedFilters.query}"` });
@@ -91,10 +95,24 @@ export function SearchFilterChips({
     });
   }
   if (selectedFilters.minPrice) {
-    chips.push({ key: "minPrice", label: `من ${selectedFilters.minPrice} د.إ` });
+    chips.push({
+      key: "minPrice",
+      label: (
+        <span className="inline-flex items-center gap-1">
+          من <CurrencyAmount amount={Number(selectedFilters.minPrice)} size="sm" />
+        </span>
+      ),
+    });
   }
   if (selectedFilters.maxPrice) {
-    chips.push({ key: "maxPrice", label: `حتى ${selectedFilters.maxPrice} د.إ` });
+    chips.push({
+      key: "maxPrice",
+      label: (
+        <span className="inline-flex items-center gap-1">
+          حتى <CurrencyAmount amount={Number(selectedFilters.maxPrice)} size="sm" />
+        </span>
+      ),
+    });
   }
   if (selectedFilters.sort && selectedFilters.sort !== "newest") {
     chips.push({

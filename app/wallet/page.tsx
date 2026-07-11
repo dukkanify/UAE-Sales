@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { WalletBalances } from "@/features/wallet/components/WalletBalances";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
@@ -7,10 +8,6 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCurrentUser } from "@/services/profile";
 import { getWalletSummary } from "@/services/walletService";
-
-const priceFormatter = new Intl.NumberFormat("ar-AE", {
-  maximumFractionDigits: 0,
-});
 
 const activityLabels = {
   deposit: "إيداع",
@@ -66,12 +63,15 @@ export default async function WalletPage() {
                         })}
                       </p>
                     </div>
-                    <p
+                    <div
                       className={`shrink-0 text-sm font-bold ${item.amount >= 0 ? "text-success" : "text-ink"}`}
                     >
-                      {item.amount >= 0 ? "+" : ""}
-                      {priceFormatter.format(item.amount)} د.إ
-                    </p>
+                      <CurrencyAmount
+                        amount={item.amount}
+                        showSign
+                        size="sm"
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>

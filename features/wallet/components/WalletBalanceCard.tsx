@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import type { UserProfile } from "@/types";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 type WalletBalanceCardProps = {
   fallbackAvailable?: number;
@@ -33,12 +32,12 @@ export function WalletBalanceCard({
   return (
     <Card className="p-5" variant="flat">
       <p className="text-xs font-medium text-muted">رصيد المحفظة</p>
-      <p className="mt-1 text-xl font-semibold text-ink">
-        {formatter.format(available)}{" "}
-        <span className="text-xs font-medium text-muted">د.إ</span>
-      </p>
-      <p className="mt-1 text-xs font-medium text-muted">
-        {formatter.format(pending)} د.إ قيد المعالجة
+      <div className="mt-1">
+        <CurrencyAmount amount={available} size="lg" />
+      </div>
+      <p className="mt-1 flex items-center gap-1 text-xs font-medium text-muted">
+        <CurrencyAmount amount={pending} size="sm" />
+        <span>قيد المعالجة</span>
       </p>
       <Button className="mt-4 w-full" href="/wallet" size="sm" variant="secondary">
         إدارة المحفظة

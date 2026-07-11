@@ -4,6 +4,7 @@ import type { Category, Listing } from "@/types";
 import { getCheckoutListingParam } from "@/shared/listings/listing-ownership";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { Badge } from "@/shared/ui/Badge";
@@ -28,10 +29,6 @@ const conditionLabels: Record<Listing["condition"], string> = {
   used: "مستعمل",
 };
 
-const priceFormatter = new Intl.NumberFormat("ar-AE", {
-  maximumFractionDigits: 0,
-});
-
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
   const locationLabel = listing.area
     ? `${listing.area}، ${listing.emirate ?? listing.city}`
@@ -55,10 +52,9 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         {listing.title}
       </h1>
 
-      <p className="mt-4 text-3xl font-semibold text-accent">
-        {priceFormatter.format(listing.price)}{" "}
-        <span className="text-sm font-medium text-muted">د.إ</span>
-      </p>
+      <div className="mt-4">
+        <CurrencyAmount amount={listing.price} size="xl" />
+      </div>
 
       <div className="mt-6 grid gap-3 text-sm">
         <div className="flex items-center justify-between border-b border-border pb-3">
@@ -101,8 +97,8 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
-        <FavoriteButton className="w-full" />
-        <ShareButton className="w-full" title={listing.title} />
+        <FavoriteButton className="w-full" listing={listing} />
+        <ShareButton className="w-full" listing={listing} />
       </div>
     </Card>
   );

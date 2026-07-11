@@ -4,11 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { Order } from "@/types";
 import { getSessionUser } from "@/services/storage";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
-
-const formatter = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
 
 export function AdminOrdersPanel() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -71,9 +70,7 @@ export function AdminOrdersPanel() {
                 </p>
               </div>
               <div className="text-left">
-                <p className="text-lg font-bold text-ink">
-                  {formatter.format(order.fees.total)} د.إ
-                </p>
+                <CurrencyAmount amount={order.fees.total} size="lg" />
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant="muted">{order.status}</Badge>
                   <Badge variant="escrow">{order.paymentStatus}</Badge>
