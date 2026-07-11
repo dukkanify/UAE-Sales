@@ -1,14 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DeliveryAddress, ShippingMethodId } from "@/types/domain/address";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { useToast } from "@/shared/components/ToastProvider";
-import { getListingActionConfig } from "@/shared/constants/listingActionConfig";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
-import { isOwnListing } from "@/shared/listings/listing-ownership";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import {
+  CHECKOUT_ERRORS,
+  validateCheckoutReviewStep,
+} from "@/features/checkout/utils/checkout-validation";
 import { getLocalListingById, getSessionUser } from "@/services/storage";
 import {
   calculateShippingFee,
@@ -57,6 +60,8 @@ export function CheckoutWizard({
 }: CheckoutWizardProps) {
   const router = useRouter();
   const { showToast } = useToast();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const transitionLockRef = useRef(false);
   const listing = useSyncExternalStore(
     () => () => undefined,
     () => {
@@ -73,27 +78,52 @@ export function CheckoutWizard({
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
   const [error, setError] = useState("");
 
-  const config = listing ? getListingActionConfig(listing) : null;
   const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
-  const user = typeof window !== "undefined" ? getSessionUser() : null;
+  const sessionUser = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") return () => undefined;
+      const handler = () => onStoreChange();
+      window.addEventListener("storage", handler);
+      window.addEventListener(STORAGE_EVENTS.sessionChange, handler);
+      return () => {
+        window.removeEventListener("storage", handler);
+        window.removeEventListener(STORAGE_EVENTS.sessionChange, handler);
+      };
+    },
+    () => getSessionUser(),
+    () => null,
+  );
 
   const shippingMethods = useMemo(() => {
     if (!listing || !shippable) return [];
     return getAvailableShippingMethods(
       listing.categoryId,
       listing.emirate ?? listing.city,
-      user?.city,
+      sessionUser?.city,
     );
-  }, [listing, shippable, user?.city]);
+  }, [listing, shippable, sessionUser?.city]);
 
   const shippingFee = shippable ? calculateShippingFee(shippingMethod) : 0;
   const totals = listing ? calculateTotals(listing.price, shippingFee) : null;
 
-  async function loadAddresses() {
-    if (!user) return;
-    const response = await fetch(`/api/addresses?userId=${encodeURIComponent(user.id)}`);
+  function scrollPanelToTop() {
+    panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function advanceStep(next: CheckoutStep) {
+    setStep(next);
+    setError("");
+    scrollPanelToTop();
+  }
+
+  async function loadAddresses(userId: string) {
+    const response = await fetch(`/api/addresses?userId=${encodeURIComponent(userId)}`);
+    if (!response.ok) {
+      throw new Error("ADDRESS_LOAD_FAILED");
+    }
     const data = await response.json();
     setAddresses(data.addresses ?? []);
     const defaultAddress = (data.addresses as DeliveryAddress[] | undefined)?.find(
@@ -103,39 +133,62 @@ export function CheckoutWizard({
   }
 
   async function handleContinueFromReview() {
-    if (!listing || !config?.checkoutEnabled) {
-      setError(LISTING_ERRORS.listingUnavailable);
+    if (transitionLockRef.current || isContinuing) return;
+
+    setError("");
+    const buyer = getSessionUser();
+    const validation = validateCheckoutReviewStep(listing, buyer);
+
+    if (!validation.ok) {
+      if (validation.redirectToLogin) {
+        router.push(
+          `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+        );
+        return;
+      }
+      setError(validation.message);
       return;
     }
-    const sessionUser = getSessionUser();
-    if (!sessionUser) {
-      router.push(
-        `/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`,
-      );
-      return;
-    }
-    if (isOwnListing(listing, sessionUser)) {
-      setError(LISTING_ERRORS.ownListing);
-      return;
-    }
-    if (shippable) {
-      await loadAddresses();
-      setStep("delivery");
-    } else {
-      setStep("payment");
+
+    transitionLockRef.current = true;
+    setIsContinuing(true);
+
+    try {
+      if (shippable && buyer) {
+        await loadAddresses(buyer.id);
+        advanceStep("delivery");
+      } else {
+        advanceStep("payment");
+      }
+    } catch {
+      setError(CHECKOUT_ERRORS.addressLoadFailed);
+    } finally {
+      setIsContinuing(false);
+      transitionLockRef.current = false;
     }
   }
 
   async function handleContinueFromDelivery() {
+    if (transitionLockRef.current || isContinuing) return;
+
+    setError("");
     if (!shippable) {
-      setStep("payment");
+      advanceStep("payment");
       return;
     }
     if (!selectedAddressId && addresses.length === 0) {
       setError(LISTING_ERRORS.invalidAddress);
       return;
     }
-    setStep("payment");
+
+    transitionLockRef.current = true;
+    setIsContinuing(true);
+    try {
+      advanceStep("payment");
+    } finally {
+      setIsContinuing(false);
+      transitionLockRef.current = false;
+    }
   }
 
   async function handlePay() {
@@ -222,7 +275,7 @@ export function CheckoutWizard({
         title="إتمام الشراء"
       />
 
-      <div className="mx-auto mt-6 max-w-3xl">
+      <div className="mx-auto mt-6 max-w-3xl" ref={panelRef}>
         <div className="mb-6 flex flex-wrap gap-2">
           {(["review", "delivery", "payment"] as CheckoutStep[])
             .filter((item) => item !== "delivery" || shippable)
@@ -270,10 +323,15 @@ export function CheckoutWizard({
               </div>
             </div>
             <div className="mt-6 flex gap-2">
-              <Button onClick={handleContinueFromReview} variant="accent">
+              <Button
+                loading={isContinuing}
+                onClick={handleContinueFromReview}
+                type="button"
+                variant="accent"
+              >
                 متابعة
               </Button>
-              <Button href={backHref} variant="secondary">
+              <Button href={backHref} type="button" variant="secondary">
                 إلغاء
               </Button>
             </div>
@@ -324,17 +382,24 @@ export function CheckoutWizard({
 
             <AddressQuickForm
               onCreated={async () => {
-                await loadAddresses();
+                if (sessionUser) {
+                  await loadAddresses(sessionUser.id);
+                }
                 showToast("تم حفظ العنوان");
               }}
-              userId={user?.id ?? ""}
+              userId={sessionUser?.id ?? ""}
             />
 
             <div className="flex gap-2">
-              <Button onClick={handleContinueFromDelivery} variant="accent">
+              <Button
+                loading={isContinuing}
+                onClick={handleContinueFromDelivery}
+                type="button"
+                variant="accent"
+              >
                 متابعة للدفع
               </Button>
-              <Button onClick={() => setStep("review")} variant="secondary">
+              <Button onClick={() => advanceStep("review")} type="button" variant="secondary">
                 رجوع
               </Button>
             </div>
@@ -369,11 +434,12 @@ export function CheckoutWizard({
               </div>
             </div>
             <div className="flex gap-2">
-              <Button loading={isLoading} onClick={handlePay} variant="accent">
+              <Button loading={isLoading} onClick={handlePay} type="button" variant="accent">
                 تأكيد الدفع عبر Stripe
               </Button>
               <Button
-                onClick={() => setStep(shippable ? "delivery" : "review")}
+                onClick={() => advanceStep(shippable ? "delivery" : "review")}
+                type="button"
                 variant="secondary"
               >
                 رجوع
