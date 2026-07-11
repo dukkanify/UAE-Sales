@@ -1,13 +1,19 @@
 import type { ShippingMethod, ShippingMethodId } from "@/types/domain/address";
 import {
+  CAR_SHIPPING_METHOD_OVERRIDES,
+  CHECKOUT_SHIPPING_CATEGORIES,
   SHIPPABLE_CATEGORIES,
   SHIPPING_METHOD_CONFIG,
 } from "@/services/shipping/shipping.config";
 
-export { SHIPPING_METHOD_CONFIG, SHIPPABLE_CATEGORIES };
+export { SHIPPING_METHOD_CONFIG, SHIPPABLE_CATEGORIES, CHECKOUT_SHIPPING_CATEGORIES };
 
 export function isCategoryShippable(categoryId: string): boolean {
   return SHIPPABLE_CATEGORIES.has(categoryId);
+}
+
+export function isCheckoutShippingCategory(categoryId: string): boolean {
+  return CHECKOUT_SHIPPING_CATEGORIES.has(categoryId);
 }
 
 export function getAvailableShippingMethods(
@@ -15,6 +21,13 @@ export function getAvailableShippingMethods(
   sellerEmirate?: string,
   buyerEmirate?: string,
 ): ShippingMethod[] {
+  if (categoryId === "cars") {
+    return [
+      { id: "pickup", ...CAR_SHIPPING_METHOD_OVERRIDES.pickup! },
+      { id: "standard", ...CAR_SHIPPING_METHOD_OVERRIDES.standard! },
+    ];
+  }
+
   if (!isCategoryShippable(categoryId)) {
     return [];
   }
@@ -72,11 +85,11 @@ export type CheckoutShippingInput = {
 export function resolveCheckoutShipping(
   input: CheckoutShippingInput,
 ): { shippingFee: number; shippingMethod?: ShippingMethodId } {
-  if (!isCategoryShippable(input.categoryId)) {
+  if (!isCheckoutShippingCategory(input.categoryId)) {
     return { shippingFee: 0 };
   }
 
-  const methodId = input.shippingMethod ?? "standard";
+  const methodId = input.shippingMethod ?? (input.categoryId === "cars" ? "pickup" : "standard");
   const available = getAvailableShippingMethods(
     input.categoryId,
     input.sellerEmirate,

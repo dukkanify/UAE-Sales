@@ -1,7 +1,10 @@
+import { redirect } from "next/navigation";
 import { CheckoutWizard } from "@/features/checkout/components/CheckoutWizard";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
+import { getListingActionConfig } from "@/shared/constants/listingActionConfig";
 import { getListingBySlug } from "@/services/listings";
+import { getListingPath } from "@/shared/listings/listing-url";
 
 type CheckoutPageProps = {
   searchParams: Promise<{
@@ -18,6 +21,10 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
     listingRef && !listingRef.startsWith("local-")
       ? await getListingBySlug(listingRef)
       : undefined;
+
+  if (catalogListing && !getListingActionConfig(catalogListing).checkoutEnabled) {
+    redirect(getListingPath(catalogListing));
+  }
 
   return (
     <>

@@ -11,6 +11,12 @@ export const SHIPPABLE_CATEGORIES = new Set([
   "food",
 ]);
 
+/** Categories that participate in checkout delivery / handover step (includes vehicles). */
+export const CHECKOUT_SHIPPING_CATEGORIES = new Set([
+  "cars",
+  ...SHIPPABLE_CATEGORIES,
+]);
+
 export const SHIPPING_METHOD_CONFIG: Record<
   ShippingMethodId,
   Omit<ShippingMethod, "id">
@@ -32,5 +38,22 @@ export const SHIPPING_METHOD_CONFIG: Record<
     description: "التنسيق المباشر مع البائع في مكان آمن",
     fee: 0,
     estimatedLabel: "حسب الاتفاق",
+  },
+};
+
+export const CAR_SHIPPING_METHOD_OVERRIDES: Partial<
+  Record<ShippingMethodId, Omit<ShippingMethod, "id">>
+> = {
+  pickup: {
+    label: "الاستلام من المعرض",
+    description: "استلام المركبة من موقع البائع أو المعرض",
+    fee: 0,
+    estimatedLabel: "حسب الاتفاق",
+  },
+  standard: {
+    label: "نقل المركبة",
+    description: "نقل المركبة إلى العنوان المحدد عبر شريك نقل معتمد",
+    fee: 350,
+    estimatedLabel: "3-7 أيام",
   },
 };

@@ -12,11 +12,11 @@ import {
   CHECKOUT_ERRORS,
   validateCheckoutReviewStep,
 } from "@/features/checkout/utils/checkout-validation";
+import { requiresCheckoutDeliveryStep } from "@/shared/constants/checkout-routing";
 import { getLocalListingById, getSessionUser } from "@/services/storage";
 import {
   calculateShippingFee,
   getAvailableShippingMethods,
-  isCategoryShippable,
   validateDeliveryAddress,
 } from "@/services/shipping/shipping.service";
 import { Badge } from "@/shared/ui/Badge";
@@ -81,7 +81,7 @@ export function CheckoutWizard({
   const [isContinuing, setIsContinuing] = useState(false);
   const [error, setError] = useState("");
 
-  const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
+  const requiresDeliveryStep = listing ? requiresCheckoutDeliveryStep(listing) : false;
   const sessionUser = useSyncExternalStore(
     (onStoreChange) => {
       if (typeof window === "undefined") return () => undefined;
@@ -98,15 +98,15 @@ export function CheckoutWizard({
   );
 
   const shippingMethods = useMemo(() => {
-    if (!listing || !shippable) return [];
+    if (!listing || !requiresDeliveryStep) return [];
     return getAvailableShippingMethods(
       listing.categoryId,
       listing.emirate ?? listing.city,
       sessionUser?.city,
     );
-  }, [listing, shippable, sessionUser?.city]);
+  }, [listing, requiresDeliveryStep, sessionUser?.city]);
 
-  const shippingFee = shippable ? calculateShippingFee(shippingMethod) : 0;
+  const shippingFee = requiresDeliveryStep ? calculateShippingFee(shippingMethod) : 0;
   const totals = listing ? calculateTotals(listing.price, shippingFee) : null;
 
   function scrollPanelToTop() {
@@ -114,6 +114,9 @@ export function CheckoutWizard({
   }
 
   function advanceStep(next: CheckoutStep) {
+    if (next === "delivery" && listing?.categoryId === "cars") {
+      setShippingMethod("pickup");
+    }
     setStep(next);
     setError("");
     scrollPanelToTop();
@@ -154,7 +157,7 @@ export function CheckoutWizard({
     setIsContinuing(true);
 
     try {
-      if (shippable && buyer) {
+      if (requiresDeliveryStep && buyer) {
         await loadAddresses(buyer.id);
         advanceStep("delivery");
       } else {
@@ -172,7 +175,7 @@ export function CheckoutWizard({
     if (transitionLockRef.current || isContinuing) return;
 
     setError("");
-    if (!shippable) {
+    if (!requiresDeliveryStep) {
       advanceStep("payment");
       return;
     }
@@ -225,9 +228,9 @@ export function CheckoutWizard({
                 seller: { id: listing.seller.id, name: listing.seller.name },
               }
             : undefined,
-          shippingMethod: shippable ? shippingMethod : undefined,
-          shippingFee: shippable ? shippingFee : 0,
-          addressId: shippable ? selectedAddressId : undefined,
+          shippingMethod: requiresDeliveryStep ? shippingMethod : undefined,
+          shippingFee: requiresDeliveryStep ? shippingFee : 0,
+          addressId: requiresDeliveryStep ? selectedAddressId : undefined,
         }),
       });
 
@@ -278,7 +281,7 @@ export function CheckoutWizard({
       <div className="mx-auto mt-6 max-w-3xl" ref={panelRef}>
         <div className="mb-6 flex flex-wrap gap-2">
           {(["review", "delivery", "payment"] as CheckoutStep[])
-            .filter((item) => item !== "delivery" || shippable)
+            .filter((item) => item !== "delivery" || requiresDeliveryStep)
             .map((item, index) => (
               <Badge key={item} variant={step === item ? "premium" : "muted"}>
                 {index + 1}.{" "}
@@ -338,7 +341,7 @@ export function CheckoutWizard({
           </Card>
         ) : null}
 
-        {step === "delivery" && shippable ? (
+        {step === "delivery" && requiresDeliveryStep ? (
           <Card className="grid gap-4 p-6" variant="flat">
             <h3 className="font-black text-ink">طريقة التوصيل</h3>
             <div className="grid gap-2">
@@ -414,7 +417,7 @@ export function CheckoutWizard({
                 <span className="text-muted">سعر المنتج</span>
                 <CurrencyAmount amount={totals.productPrice} size="sm" />
               </div>
-              {shippable ? (
+              {requiresDeliveryStep ? (
                 <div className="flex justify-between">
                   <span className="text-muted">التوصيل</span>
                   <CurrencyAmount amount={totals.shippingFee} size="sm" />
@@ -438,7 +441,7 @@ export function CheckoutWizard({
                 تأكيد الدفع عبر Stripe
               </Button>
               <Button
-                onClick={() => advanceStep(shippable ? "delivery" : "review")}
+                onClick={() => advanceStep(requiresDeliveryStep ? "delivery" : "review")}
                 type="button"
                 variant="secondary"
               >
