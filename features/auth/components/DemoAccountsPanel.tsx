@@ -1,12 +1,15 @@
-import { demoAccounts, DEMO_OTP } from "@/mock/demo-accounts.mock";
+"use client";
+
+import { demoAccounts } from "@/mock/demo-accounts.mock";
 
 export function DemoAccountsPanel() {
+  if (process.env.NODE_ENV === "production") {
+    return null;
+  }
+
   return (
     <div className="marketplace-panel mt-6 p-4 text-sm">
       <p className="text-xs font-bold text-[#B8955F]">حسابات العرض التجريبية</p>
-      <p className="mt-1 text-xs font-medium text-muted">
-        OTP لجميع الحسابات: <span className="font-bold text-ink">{DEMO_OTP}</span>
-      </p>
 
       <div className="mt-4 grid gap-3">
         {demoAccounts.map((account) => (
@@ -23,12 +26,6 @@ export function DemoAccountsPanel() {
               <div className="flex justify-between gap-3">
                 <dt>كلمة المرور</dt>
                 <dd className="font-semibold text-ink">{account.password}</dd>
-              </div>
-              <div className="flex justify-between gap-3">
-                <dt>الهاتف</dt>
-                <dd className="font-semibold text-ink" dir="ltr">
-                  {account.phone}
-                </dd>
               </div>
             </dl>
           </div>

@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { getSessionUser, setSessionUser } from "@/services/storage";
 import { persistSessionCookie } from "@/services/auth/session-sync";
+import { isUaePassEnabled } from "@/shared/constants/feature-flags";
 
 type ProfileFormProps = {
   user: UserProfile;
@@ -45,7 +46,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
               </p>
               <p className="mt-2">
                 <Badge variant={displayUser.isVerified ? "verified" : "pending"}>
-                  {displayUser.isVerified ? "حساب موثق" : "بانتظار توثيق UAE PASS"}
+                  {displayUser.isVerified ? "حساب موثق" : "بانتظار التوثيق"}
                 </Badge>
               </p>
             </div>
@@ -153,7 +154,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             <div className="flex justify-between rounded-[var(--radius-xl)] bg-surface-muted p-4">
               <span className="text-muted">التوثيق</span>
               <Badge variant={displayUser.isVerified ? "verified" : "pending"}>
-                {displayUser.isVerified ? "موثق" : "بانتظار UAE PASS"}
+                {displayUser.isVerified ? "موثق" : "غير موثق"}
               </Badge>
             </div>
             <div className="flex justify-between rounded-[var(--radius-xl)] bg-surface-muted p-4">
@@ -163,13 +164,14 @@ export function ProfileForm({ user }: ProfileFormProps) {
           </div>
         </Card>
 
-        <Card className="border-primary-soft bg-primary-soft p-6">
-          <h2 className="text-lg font-black text-primary">خطوة التوثيق القادمة</h2>
-          <p className="mt-3 text-sm font-medium leading-7 text-primary">
-            عند تفعيل UAE PASS سيتمكن المستخدم من توثيق الهوية ورفع حدود البيع
-            والسحب من المحفظة.
-          </p>
-        </Card>
+        {isUaePassEnabled() ? (
+          <Card className="border-primary-soft bg-primary-soft p-6">
+            <h2 className="text-lg font-black text-primary">توثيق الهوية</h2>
+            <p className="mt-3 text-sm font-medium leading-7 text-primary">
+              يمكنك توثيق هويتك لرفع حدود البيع والسحب من المحفظة عند تفعيل خدمة التوثيق.
+            </p>
+          </Card>
+        ) : null}
       </div>
     </div>
   );

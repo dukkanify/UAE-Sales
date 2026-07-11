@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
   clearSessionCookie,
+  getSessionFromCookie,
   setSessionCookie,
 } from "@/services/auth/session-cookie";
 
@@ -21,6 +22,14 @@ const userSchema = z.object({
 const sessionBodySchema = z.object({
   user: userSchema,
 });
+
+export async function GET() {
+  const user = await getSessionFromCookie();
+  if (!user) {
+    return NextResponse.json({ user: null }, { status: 401 });
+  }
+  return NextResponse.json({ user });
+}
 
 export async function POST(request: Request) {
   try {

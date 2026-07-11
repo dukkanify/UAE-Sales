@@ -1,17 +1,19 @@
 import { NextResponse } from "next/server";
+import {
+  isSessionUser,
+  requireSessionUser,
+} from "@/services/auth/require-session";
 import { removeFavorite } from "@/services/favorites/favorite-store";
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await context.params;
-  const userId = new URL(request.url).searchParams.get("userId");
-  if (!userId) {
-    return NextResponse.json({ error: "USER_ID_REQUIRED" }, { status: 400 });
-  }
+  const user = await requireSessionUser();
+  if (!isSessionUser(user)) return user;
 
-  const removed = await removeFavorite(userId, id);
+  const { id } = await context.params;
+  const removed = await removeFavorite(user.id, id);
   if (!removed) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }

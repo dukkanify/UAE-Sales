@@ -1,20 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useCallback } from "react";
 import type { Listing } from "@/types";
-import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import {
+  getFavoritesSnapshot,
+  subscribeFavorites,
+} from "@/services/storage/external-store";
+import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
+import { useSyncExternalStore } from "react";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Icon } from "@/shared/ui/Icon";
-import {
-  getFavorites,
-  getSessionUser,
-  isFavoriteListing,
-} from "@/services/storage";
-import {
-  hydrateFavoritesFromServer,
-  toggleFavoriteWithApi,
-} from "@/services/favorites/favorites-sync";
+import { toggleFavoriteWithApi } from "@/services/favorites/favorites-sync";
 
 type FavoriteButtonProps = {
   className?: string;
@@ -25,11 +22,6 @@ type FavoriteButtonProps = {
 const baseClass =
   "focus-ring interactive-lift inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
-function subscribe(callback: () => void) {
-  window.addEventListener(STORAGE_EVENTS.favoritesChange, callback);
-  return () => window.removeEventListener(STORAGE_EVENTS.favoritesChange, callback);
-}
-
 export function FavoriteButton({
   className = "",
   iconOnly = false,
@@ -39,24 +31,23 @@ export function FavoriteButton({
   const { showToast } = useToast();
 
   const isFavorite = useSyncExternalStore(
-    subscribe,
-    () => isFavoriteListing(listing.id),
+    subscribeFavorites,
+    () => getFavoritesSnapshot().some((item) => item.listingId === listing.id),
     () => false,
   );
 
-  useEffect(() => {
-    const user = getSessionUser();
-    if (!user) return;
-    hydrateFavoritesFromServer(user.id).catch(() => undefined);
-  }, []);
+  const isLoggedIn = useSyncExternalStore(
+    subscribeSession,
+    () => Boolean(getSessionSnapshot()),
+    () => false,
+  );
 
   const handleToggle = useCallback(async () => {
-    const user = getSessionUser();
     const listingPath = listing.id.startsWith("local-")
       ? `/listings/local/${listing.id}`
       : `/listings/${listing.slug}`;
 
-    if (!user) {
+    if (!isLoggedIn) {
       router.push(`/login?next=${encodeURIComponent(listingPath)}`);
       return;
     }
@@ -70,14 +61,17 @@ export function FavoriteButton({
       savedAt: new Date().toISOString(),
     };
 
-    const added = await toggleFavoriteWithApi(user.id, entry);
-
-    showToast(
-      added
-        ? "تمت إضافة الإعلان إلى المفضلة"
-        : "تمت إزالة الإعلان من المفضلة",
-    );
-  }, [listing, router, showToast]);
+    try {
+      const added = await toggleFavoriteWithApi(entry);
+      showToast(
+        added
+          ? "تمت إضافة الإعلان إلى المفضلة"
+          : "تمت إزالة الإعلان من المفضلة",
+      );
+    } catch {
+      showToast("تعذر تحديث المفضلة. حاول مرة أخرى.", "error");
+    }
+  }, [isLoggedIn, listing, router, showToast]);
 
   return (
     <button
@@ -87,12 +81,16 @@ export function FavoriteButton({
       onClick={handleToggle}
       type="button"
     >
-      <Icon name="heart" size={18} />
+      <Icon filled={isFavorite} name={isFavorite ? "heart-filled" : "heart"} size={18} />
       {!iconOnly ? (isFavorite ? "محفوظ" : "مفضلة") : null}
     </button>
   );
 }
 
 export function useFavoritesList() {
-  return useSyncExternalStore(subscribe, () => getFavorites(), () => []);
+  return useSyncExternalStore(
+    subscribeFavorites,
+    () => getFavoritesSnapshot(),
+    () => [],
+  );
 }

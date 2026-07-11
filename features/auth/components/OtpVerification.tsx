@@ -1,52 +1,126 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import type { OtpPurpose } from "@/types/domain/otp";
+import type { UserProfile } from "@/types";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
-import { isValidDemoOtp } from "@/services/auth";
+import { maskEmail } from "@/shared/utils/mask-email";
 
 type OtpVerificationProps = {
-  identifier: string;
+  email: string;
+  fullName?: string;
+  maskedEmail?: string;
   onBack: () => void;
-  onVerified?: () => void | Promise<void>;
+  onVerified?: (data?: {
+    metadata?: Record<string, string>;
+    ok?: boolean;
+    resetToken?: string;
+    user?: UserProfile;
+  }) => void | Promise<void>;
+  purpose: OtpPurpose;
 };
 
+const COOLDOWN_SECONDS = 60;
+
 export function OtpVerification({
-  identifier,
+  email,
+  fullName,
+  maskedEmail,
   onBack,
   onVerified,
+  purpose,
 }: OtpVerificationProps) {
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
-  const [statusMessage, setStatusMessage] = useState("");
   const [otpError, setOtpError] = useState("");
+  const [cooldown, setCooldown] = useState(COOLDOWN_SECONDS);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const displayEmail = maskedEmail ?? maskEmail(email);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setCooldown((value) => Math.max(0, value - 1));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
 
   const { error, isLoading, run: verifyOtp } = useAsyncAction(
     useCallback(async () => {
       const code = digits.join("");
-      if (!isValidDemoOtp(code)) {
-        setOtpError("رمز التحقق غير صحيح. استخدم 123456 للحسابات التجريبية.");
+      if (code.length !== 6) {
+        setOtpError("أدخل رمز التحقق المكوّن من 6 أرقام.");
+        return;
+      }
+
+      const response = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, code, purpose }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setOtpError(data.message ?? "رمز التحقق غير صحيح.");
         return;
       }
 
       setOtpError("");
-      await new Promise((resolve) => window.setTimeout(resolve, 400));
-      setStatusMessage("تم التحقق بنجاح.");
-      await onVerified?.();
-    }, [digits, onVerified]),
+      await onVerified?.(data);
+    }, [digits, email, onVerified, purpose]),
   );
+
+  const { isLoading: isResending, run: resendOtp } = useAsyncAction(
+    useCallback(async () => {
+      if (cooldown > 0) return;
+      const response = await fetch("/api/auth/otp/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "resend",
+          email,
+          purpose,
+          fullName,
+        }),
+      });
+      if (!response.ok) {
+        setOtpError("تعذر إعادة إرسال الرمز. حاول لاحقًا.");
+        return;
+      }
+      setCooldown(COOLDOWN_SECONDS);
+      setOtpError("");
+    }, [cooldown, email, fullName, purpose]),
+  );
+
+  function applyDigits(nextDigits: string[]) {
+    setDigits(nextDigits);
+    setOtpError("");
+  }
 
   function handleDigitChange(index: number, value: string) {
     const nextDigit = value.replace(/\D/g, "").slice(-1);
     const nextDigits = [...digits];
     nextDigits[index] = nextDigit;
-    setDigits(nextDigits);
-    setOtpError("");
+    applyDigits(nextDigits);
 
     if (nextDigit && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
+  }
+
+  function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
+    const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    if (!pasted) return;
+    event.preventDefault();
+    const nextDigits = [...digits];
+    for (let i = 0; i < 6; i += 1) {
+      nextDigits[i] = pasted[i] ?? "";
+    }
+    applyDigits(nextDigits);
+    const focusIndex = Math.min(pasted.length, 5);
+    inputRefs.current[focusIndex]?.focus();
   }
 
   function handleKeyDown(index: number, key: string) {
@@ -59,15 +133,14 @@ export function OtpVerification({
     <div className="grid gap-4">
       <div>
         <p className="text-xs font-medium tracking-wide text-secondary uppercase">
-          التحقق
+          التحقق بالبريد الإلكتروني
         </p>
-        <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز OTP</h2>
+        <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز التحقق</h2>
         <p className="mt-2 text-sm font-medium text-muted">
-          أرسلنا الرمز إلى{" "}
-          <span className="font-bold text-ink">{identifier}</span>
+          أرسلنا رمز تحقق مكوّنًا من 6 أرقام إلى بريدك الإلكتروني
         </p>
-        <p className="mt-1 text-xs font-medium text-muted">
-          للحسابات التجريبية استخدم: <span className="font-bold text-ink">123456</span>
+        <p className="mt-1 text-sm font-bold text-ink" dir="ltr">
+          {displayEmail}
         </p>
       </div>
 
@@ -84,6 +157,7 @@ export function OtpVerification({
             maxLength={1}
             onChange={(event) => handleDigitChange(index, event.target.value)}
             onKeyDown={(event) => handleKeyDown(index, event.key)}
+            onPaste={handlePaste}
             pattern="[0-9]*"
             type="text"
             value={digit}
@@ -103,25 +177,23 @@ export function OtpVerification({
         تأكيد الرمز
       </Button>
 
-      {statusMessage ? (
-        <FormMessage variant="success">{statusMessage}</FormMessage>
-      ) : null}
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
 
       <div className="flex items-center justify-between text-sm font-medium">
         <button
-          className="text-primary"
-          onClick={() => setStatusMessage("تم إرسال رمز جديد.")}
+          className="text-primary disabled:opacity-50"
+          disabled={cooldown > 0 || isResending}
+          onClick={resendOtp}
           type="button"
         >
-          إعادة الإرسال
+          {cooldown > 0 ? `إعادة الإرسال خلال ${cooldown}ث` : "إعادة إرسال الرمز"}
         </button>
         <button
           className="text-muted transition hover:text-ink"
           onClick={onBack}
           type="button"
         >
-          تعديل البيانات
+          تغيير البريد الإلكتروني
         </button>
       </div>
     </div>

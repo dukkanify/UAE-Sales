@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { ErrorState } from "@/shared/components/ErrorState";
+import { RouteErrorFallback } from "@/shared/components/RouteErrorFallback";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getErrorMessage } from "@/services/api";
 
 type CategoriesErrorProps = {
   error: Error & { digest?: string };
@@ -12,21 +10,12 @@ type CategoriesErrorProps = {
 };
 
 export default function CategoriesError({ error, reset }: CategoriesErrorProps) {
-  useEffect(() => {
-    console.error("[CategoriesError]", error);
-  }, [error]);
-
   return (
     <>
       <SiteHeader />
       <main>
         <section className="app-container page-padding">
-          <ErrorState
-            description={getErrorMessage(error)}
-            onRetry={reset}
-            title="تعذر تحميل الأقسام"
-            variant="server"
-          />
+          <RouteErrorFallback error={error} reset={reset} title="تعذر تحميل الأقسام" />
         </section>
       </main>
       <SiteFooter />

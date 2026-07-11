@@ -16,7 +16,7 @@ export default async function ProfilePage() {
       <main>
         <DashboardShell
           activePath="/profile"
-          description="عرض وتعديل بيانات المستخدم، مع مساحة واضحة لحالة التوثيق وربط UAE PASS لاحقاً."
+          description="عرض وتعديل بيانات المستخدم، مع مساحة واضحة لحالة التوثيق والمفضلة."
           title="الملف الشخصي"
           user={user}
         >

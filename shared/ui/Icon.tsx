@@ -2,6 +2,7 @@ type IconName =
   | "search"
   | "shield"
   | "heart"
+  | "heart-filled"
   | "user"
   | "home"
   | "grid"
@@ -20,6 +21,7 @@ type IconName =
   | "photo"
   | "send"
   | "share"
+  | "share-2"
   | "phone"
   | "chevron-left"
   | "chevron-right"
@@ -43,6 +45,7 @@ export type { IconName };
 
 type IconProps = {
   className?: string;
+  filled?: boolean;
   name: IconName;
   size?: number;
 };
@@ -53,6 +56,8 @@ const paths: Record<IconName, string> = {
   shield:
     "M12 3l7 3v6c0 4.4-2.9 8.5-7 10-4.1-1.5-7-5.6-7-10V6l7-3Z M9.5 12l1.8 1.8L15 10",
   heart:
+    "M12 20s-6.5-4.2-8.8-8.2C1.4 8.4 3.6 5.5 6.7 5.5c1.7 0 3.2.8 4.3 2.1 1.1-1.3 2.6-2.1 4.3-2.1 3.1 0 5.3 2.9 3.5 6.3C18.5 15.8 12 20 12 20Z",
+  "heart-filled":
     "M12 20s-6.5-4.2-8.8-8.2C1.4 8.4 3.6 5.5 6.7 5.5c1.7 0 3.2.8 4.3 2.1 1.1-1.3 2.6-2.1 4.3-2.1 3.1 0 5.3 2.9 3.5 6.3C18.5 15.8 12 20 12 20Z",
   user: "M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z",
   home:
@@ -82,6 +87,8 @@ const paths: Record<IconName, string> = {
   send: "M4 12 20 4 12 20v-6l8-2-8-2v-6Z",
   share:
     "M8.5 12.5 4 17v-3.5A2.5 2.5 0 0 1 6.5 11H8m7.5 1.5L20 17v-3.5A2.5 2.5 0 0 0 17.5 11H16M12 3v10M9 6l3-3 3 3",
+  "share-2":
+    "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13",
   phone:
     "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
   "chevron-left": "M15 6l-6 6 6 6",
@@ -117,12 +124,13 @@ const paths: Record<IconName, string> = {
     "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
 };
 
-export function Icon({ className = "", name, size = 20 }: IconProps) {
+export function Icon({ className = "", filled = false, name, size = 20 }: IconProps) {
+  const isFilledHeart = name === "heart-filled" || (name === "heart" && filled);
   return (
     <svg
       aria-hidden
       className={className}
-      fill="none"
+      fill={isFilledHeart ? "currentColor" : "none"}
       height={size}
       stroke="currentColor"
       strokeLinecap="round"
@@ -131,7 +139,7 @@ export function Icon({ className = "", name, size = 20 }: IconProps) {
       viewBox="0 0 24 24"
       width={size}
     >
-      <path d={paths[name]} />
+      <path d={paths[name === "heart-filled" ? "heart-filled" : name]} />
     </svg>
   );
 }
