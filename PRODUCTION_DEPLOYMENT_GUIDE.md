@@ -95,7 +95,7 @@ https://sooqna.site/api/webhooks/stripe
 
 | Flow | URL |
 |------|-----|
-| Success | `https://sooqna.site/orders/[id]?payment=success` |
+| Success | `https://sooqna.site/checkout/success?orderId=[id]` |
 | Cancel | `https://sooqna.site/checkout?listingId=...&payment=cancelled` |
 
 ---
