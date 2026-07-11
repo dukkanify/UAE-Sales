@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { ShareButton } from "@/shared/components/ShareButton";
+import type { Listing } from "@/types";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import { useState } from "react";
 
 type ListingDetailToolbarProps = {
-  listingTitle: string;
+  listing: Listing;
 };
 
-export function ListingDetailToolbar({ listingTitle }: ListingDetailToolbarProps) {
+export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
   const [reportMessage, setReportMessage] = useState("");
 
   function handlePrint() {
@@ -24,7 +25,7 @@ export function ListingDetailToolbar({ listingTitle }: ListingDetailToolbarProps
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
-      <ShareButton className="!min-h-9" title={listingTitle} />
+      <ShareButton className="!min-h-9" listing={listing} />
       <Button className="!min-h-9" onClick={handlePrint} size="sm" variant="secondary">
         <Icon name="photo" size={14} />
         طباعة

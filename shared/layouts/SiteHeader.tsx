@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import {
   clearSessionUser,
   getSessionUser,
 } from "@/services/storage";
+import { removeSessionCookie } from "@/services/auth/session-sync";
 import type { UserProfile } from "@/types";
 
 export function SiteHeader() {
@@ -18,29 +21,17 @@ export function SiteHeader() {
   useEffect(() => {
     const syncSession = () => setUser(getSessionUser());
     syncSession();
-    window.addEventListener("uae-sales-session-change", syncSession);
+    window.addEventListener(STORAGE_EVENTS.sessionChange, syncSession);
     return () =>
-      window.removeEventListener("uae-sales-session-change", syncSession);
+      window.removeEventListener(STORAGE_EVENTS.sessionChange, syncSession);
   }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
+      <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
         <div className="flex min-h-[4rem] items-center justify-between gap-4">
-          <Link className="flex shrink-0 items-center gap-2.5" href="/">
-            <span className="relative grid size-9 place-items-center overflow-hidden rounded-[var(--radius-xl)] bg-primary text-[0.65rem] font-semibold text-white">
-              <span className="uae-flag-strip absolute inset-0 opacity-30" />
-              <span className="relative">UAE</span>
-            </span>
-            <span className="hidden sm:block">
-              <span className="block text-sm font-semibold tracking-tight text-ink">
-                UAE Sales
-              </span>
-              <span className="block text-[0.65rem] font-medium text-secondary">
-                سوق إماراتي فاخر
-              </span>
-            </span>
-          </Link>
+          <BrandLogo showTagline={false} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
             {primaryNavigation.map((item) => (
@@ -84,18 +75,26 @@ export function SiteHeader() {
                 دخول
               </Link>
             )}
-            <Button className="hidden sm:block" href="/listings/new" size="sm" variant="primary">
-              أضف إعلان
+            <Button
+              className="sooqna-gold-gradient hidden rounded-full sm:inline-flex"
+              href="/listings/new"
+              size="md"
+              variant="accent"
+            >
+              <Icon className="shrink-0" name="plus" size={16} />
+              أضف إعلانك
             </Button>
-            <button
-              aria-expanded={menuOpen}
+            <Button
               aria-label="القائمة"
-              className="grid size-10 place-items-center rounded-[var(--radius-md)] border border-border text-ink lg:hidden"
+              aria-expanded={menuOpen}
+              className="size-11 min-w-11 p-0 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
+              size="md"
               type="button"
+              variant="secondary"
             >
               <Icon name={menuOpen ? "close" : "menu"} size={18} />
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -116,12 +115,15 @@ export function SiteHeader() {
                 <InputShell />
               </form>
               <Button
-                className="mt-2 w-full"
+                className="sooqna-gold-gradient mt-2 rounded-full"
+                fullWidth
                 href="/listings/new"
                 onClick={() => setMenuOpen(false)}
-                variant="primary"
+                size="md"
+                variant="accent"
               >
-                أضف إعلان
+                <Icon className="shrink-0" name="plus" size={16} />
+                أضف إعلانك
               </Button>
               {user ? (
                 <>
@@ -132,16 +134,18 @@ export function SiteHeader() {
                   >
                     حسابي
                   </Link>
-                  <button
-                    className="w-full rounded-[var(--radius-md)] px-4 py-3 text-right text-sm font-medium text-muted"
+                  <Button
+                    className="w-full justify-start"
                     onClick={() => {
                       clearSessionUser();
+                      void removeSessionCookie();
                       setMenuOpen(false);
                     }}
                     type="button"
+                    variant="ghost"
                   >
                     تسجيل الخروج
-                  </button>
+                  </Button>
                 </>
               ) : (
                 <Link

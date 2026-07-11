@@ -1,10 +1,10 @@
-# UAE Sales — Design Decisions
+# Sooqna — Design Decisions
 
 ## 1. Color Strategy
 
 **Decision:** Luxury Charcoal (`#0F1419`) as primary, Warm Gold (`#C9A962`) as secondary, UAE Red (`#C41E3A`) as accent only.
 
-**Rationale:** Dubizzle and OpenSooq rely heavily on orange/blue generic palettes. UAE Sales differentiates with a charcoal + gold luxury pairing that signals premium trust without feeling corporate. Red is reserved for prices and alerts — not overused.
+**Rationale:** Dubizzle and OpenSooq rely heavily on orange/blue generic palettes. Sooqna differentiates with a charcoal + gold luxury pairing that signals premium trust without feeling corporate. Red is reserved for prices and alerts — not overused.
 
 **Rejected:** Green primary (previous iteration), bright blue (too generic), full dark mode default (adds complexity).
 
@@ -14,7 +14,7 @@
 
 **Decision:** Tajawal as primary Arabic font via `next/font/google`.
 
-**Rationale:** Tajawal offers excellent Arabic readability at all weights, modern geometric feel compatible with 2026 premium aesthetics, and pairs well with Latin characters for brand name "UAE Sales".
+**Rationale:** Tajawal offers excellent Arabic readability at all weights, modern geometric feel compatible with 2026 premium aesthetics, and pairs well with Latin characters for brand name "Sooqna".
 
 **Rejected:** System fonts only (inconsistent across devices), decorative Arabic fonts (poor readability at small sizes).
 

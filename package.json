@@ -1,7 +1,7 @@
 {
-  "name": "uae-sales-web",
-  "version": "1.0.0",
-  "description": "Arabic RTL web app foundation for the UAE Sales classified marketplace.",
+  "name": "sooqna-web",
+  "version": "0.1.0-beta",
+  "description": "Arabic RTL web app for Sooqna (سوقنا) — premium UAE marketplace.",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,6 +14,7 @@
     "url": "git+https://github.com/dukkanify/UAE-Sales.git"
   },
   "keywords": [
+    "sooqna",
     "classifieds",
     "marketplace",
     "uae",
@@ -27,9 +28,12 @@
   },
   "homepage": "https://github.com/dukkanify/UAE-Sales#readme",
   "dependencies": {
+    "@stripe/stripe-js": "^9.9.0",
     "next": "^16.2.9",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "stripe": "^22.3.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.0",

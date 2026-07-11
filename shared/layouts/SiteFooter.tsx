@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BrandLogo } from "@/shared/components/BrandLogo";
+import { BRAND } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -8,20 +10,11 @@ export function SiteFooter() {
       <div className="app-container section-padding pb-8">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
           <div>
-            <div className="mb-5 flex items-center gap-2.5">
-              <span className="grid size-10 place-items-center rounded-[var(--radius-xl)] bg-primary text-[0.65rem] font-semibold text-white">
-                UAE
-              </span>
-              <div>
-                <p className="text-base font-semibold text-ink">UAE Sales</p>
-                <p className="text-xs font-medium text-muted">
-                  السوق الإماراتي الفاخر
-                </p>
-              </div>
+            <div className="mb-5">
+              <BrandLogo href="/" showTagline={false} size="md" />
             </div>
             <p className="max-w-xs text-sm font-medium leading-7 text-muted">
-              منصة إعلانات مبوبة فاخرة مع ضمان مالي ومحفظة آمنة ودعم على مدار
-              الساعة.
+              {BRAND.description}
             </p>
           </div>
 
@@ -49,9 +42,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
-          <p className="text-xs font-medium text-muted">
-            © 2026 UAE Sales. جميع الحقوق محفوظة.
-          </p>
+          <p className="text-xs font-medium text-muted">{BRAND.copyright}</p>
           <div className="flex items-center gap-4 text-xs font-medium text-muted">
             <Link className="inline-flex items-center gap-1 transition hover:text-ink" href="/support">
               <Icon name="message" size={14} />
@@ -59,7 +50,7 @@ export function SiteFooter() {
             </Link>
             <Link className="inline-flex items-center gap-1 transition hover:text-ink" href="/escrow">
               <Icon name="shield" size={14} />
-              الضمان
+              الضمان المالي
             </Link>
           </div>
         </div>

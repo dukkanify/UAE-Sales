@@ -5,18 +5,18 @@ import { memo, useMemo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { CardShareButton } from "@/shared/components/CardShareButton";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
 import {
-  conditionBadgeVariant,
-  conditionLabels,
-  formatPostedTime,
-  formatViews,
   getListingHref,
   getListingImageUrl,
   getListingLocation,
-  listingPriceFormatter,
+  formatPostedTime,
+  formatViews,
+  conditionBadgeVariant,
+  conditionLabels,
 } from "./listing-card.utils";
 
 export type PremiumListingCardProps = {
@@ -45,7 +45,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
   }, [href]);
 
   const isVerified =
-    listing.verifiedSeller ?? listing.seller.isVerified ?? listing.seller.rating >= 4.8;
+    listing.verifiedSeller ?? listing.seller.isVerified ?? (listing.seller.rating ?? 0) >= 4.8;
   const showEscrow = listing.escrowAvailable === true;
 
   const imageArea = (
@@ -82,9 +82,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="absolute end-3 top-3 z-20 flex gap-1.5">
         <FavoriteButton
-          ariaLabel={`حفظ ${listing.title}`}
           className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--shadow-sm)]"
-          label=""
+          iconOnly
+          listing={listing}
         />
         <CardShareButton title={listing.title} url={shareUrl} />
       </div>
@@ -115,10 +115,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </h3>
       </Link>
 
-      <p className="mt-2 text-lg font-bold text-ink sm:text-xl">
-        {listingPriceFormatter.format(listing.price)}{" "}
-        <span className="text-xs font-semibold text-muted">د.إ</span>
-      </p>
+      <div className="mt-2">
+        <CurrencyAmount amount={listing.price} size="md" />
+      </div>
 
       <div className="mt-2 flex items-center gap-2">
         {listing.seller.avatarUrl ? (

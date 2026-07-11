@@ -8,17 +8,34 @@ type SellerPanelProps = {
   listing: Listing;
 };
 
-function formatJoinedDate(joinedAt?: string): string {
-  if (!joinedAt) return "—";
+function formatJoinedDate(joinedAt: string): string {
   const year = new Date(joinedAt).getFullYear();
   return Number.isFinite(year) ? String(year) : joinedAt;
 }
 
+function isUserCreatedListing(listing: Listing): boolean {
+  return listing.id.startsWith("local-");
+}
+
 export function SellerPanel({ listing }: SellerPanelProps) {
-  const isVerified =
-    listing.verifiedSeller ?? listing.seller.isVerified ?? listing.seller.rating >= 4.8;
-  const sellerTypeLabel =
-    listing.seller.sellerType === "business" ? "شركة" : "بائع فردي";
+  const isUserListing = isUserCreatedListing(listing);
+  const isVerified = isUserListing
+    ? Boolean(listing.seller.isVerified || listing.verifiedSeller)
+    : Boolean(
+        listing.verifiedSeller ??
+          listing.seller.isVerified ??
+          listing.seller.rating,
+      );
+
+  const showCompany = listing.seller.sellerType === "business";
+  const showRating =
+    !isUserListing && typeof listing.seller.rating === "number";
+  const showReviews =
+    !isUserListing && typeof listing.seller.reviewCount === "number";
+  const showResponseTime = Boolean(listing.seller.responseTime?.trim());
+  const showJoinedAt = Boolean(listing.seller.joinedAt?.trim());
+  const showTransactions =
+    typeof listing.seller.completedTransactions === "number";
 
   return (
     <Card className="marketplace-panel p-6">
@@ -42,43 +59,53 @@ export function SellerPanel({ listing }: SellerPanelProps) {
         )}
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-ink">{listing.seller.name}</p>
-          <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
-            <Icon className="text-secondary" name="star" size={14} />
-            {listing.seller.rating}
-            {listing.seller.reviewCount ? (
-              <>
-                <span className="text-border">·</span>
-                {listing.seller.reviewCount.toLocaleString("ar-AE")} تقييم
-              </>
-            ) : null}
-          </p>
-          <p className="mt-0.5 text-xs font-medium text-muted">{sellerTypeLabel}</p>
+          {showRating ? (
+            <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
+              <Icon className="text-secondary" name="star" size={14} />
+              {listing.seller.rating}
+              {showReviews ? (
+                <>
+                  <span className="text-border">·</span>
+                  {listing.seller.reviewCount!.toLocaleString("ar-AE")} تقييم
+                </>
+              ) : null}
+            </p>
+          ) : null}
+          {showCompany ? (
+            <p className="mt-0.5 text-xs font-medium text-muted">شركة</p>
+          ) : null}
         </div>
         {isVerified ? <Badge variant="verified">موثق</Badge> : null}
       </div>
 
-      <div className="mt-5 grid gap-2 text-sm">
-        <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
-          <span className="font-medium text-muted">الرد</span>
-          <span className="font-semibold text-ink">
-            {listing.seller.responseTime ?? "خلال ساعة"}
-          </span>
+      {showResponseTime || showJoinedAt || showTransactions ? (
+        <div className="mt-5 grid gap-2 text-sm">
+          {showResponseTime ? (
+            <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
+              <span className="font-medium text-muted">الرد</span>
+              <span className="font-semibold text-ink">
+                {listing.seller.responseTime}
+              </span>
+            </div>
+          ) : null}
+          {showJoinedAt ? (
+            <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
+              <span className="font-medium text-muted">عضو منذ</span>
+              <span className="font-semibold text-ink">
+                {formatJoinedDate(listing.seller.joinedAt!)}
+              </span>
+            </div>
+          ) : null}
+          {showTransactions ? (
+            <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
+              <span className="font-medium text-muted">معاملات مكتملة</span>
+              <span className="font-semibold text-ink">
+                {listing.seller.completedTransactions!.toLocaleString("ar-AE")}
+              </span>
+            </div>
+          ) : null}
         </div>
-        <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
-          <span className="font-medium text-muted">عضو منذ</span>
-          <span className="font-semibold text-ink">
-            {formatJoinedDate(listing.seller.joinedAt)}
-          </span>
-        </div>
-        {typeof listing.seller.completedTransactions === "number" ? (
-          <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
-            <span className="font-medium text-muted">معاملات مكتملة</span>
-            <span className="font-semibold text-ink">
-              {listing.seller.completedTransactions.toLocaleString("ar-AE")}
-            </span>
-          </div>
-        ) : null}
-      </div>
+      ) : null}
     </Card>
   );
 }

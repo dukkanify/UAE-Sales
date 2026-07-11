@@ -1,8 +1,8 @@
-# UAE Sales — Design System 2026
+# Sooqna — Design System 2026
 
 ## Overview
 
-UAE Sales uses a premium 2026 design language built for Arabic RTL marketplaces. The system prioritizes luxury, trust, clarity, and consistency across every surface.
+Sooqna uses a premium 2026 design language built for Arabic RTL marketplaces. The system prioritizes luxury, trust, clarity, and consistency across every surface.
 
 ## Design Principles
 

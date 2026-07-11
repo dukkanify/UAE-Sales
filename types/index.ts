@@ -8,6 +8,14 @@ export type {
 } from "./domain/category";
 
 export type {
+  CategoryFieldDefinition,
+  CategoryFieldOption,
+  CategoryFieldType,
+  CategorySpecValue,
+  CategorySpecs,
+} from "./domain/category-fields";
+
+export type {
   CarSpecs,
   ContactMethod,
   DeliveryOption,
@@ -25,3 +33,29 @@ export type {
 export type { City, Country } from "./domain/location";
 
 export type { AccountType, UserProfile, UserRole } from "./domain/user";
+
+export type {
+  EscrowStatus,
+  Order,
+  OrderAuditEvent,
+  OrderFeeBreakdown,
+  OrderStatus,
+  PaymentStatus,
+} from "./domain/order";
+
+export type {
+  WalletAccount,
+  WalletTransaction,
+  WalletTransactionType,
+} from "./domain/wallet";
+
+export type {
+  AppNotification,
+  NotificationType,
+} from "./domain/notification";
+
+export type {
+  CheckoutSessionResult,
+  PaymentEventLog,
+  StripePaymentMode,
+} from "./domain/payment";

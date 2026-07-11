@@ -16,8 +16,8 @@ export const mockDashboardQuickActions = [
 ];
 
 export const mockDashboardSummaryCards = [
-  { href: "/wallet", icon: "wallet" as const, label: "رصيد المحفظة", value: "2,450 د.إ" },
-  { href: "/escrow", icon: "shield" as const, label: "ضمان نشط", value: "3,200 د.إ" },
+  { href: "/wallet", icon: "wallet" as const, label: "رصيد المحفظة", amount: 2450 },
+  { href: "/escrow", icon: "shield" as const, label: "ضمان نشط", amount: 3200 },
   { href: "/chat", icon: "message" as const, label: "رسائل غير مقروءة", value: "4" },
   { href: "/dashboard/listings", icon: "chart" as const, label: "مشاهدات الأسبوع", value: "495" },
 ];
@@ -25,7 +25,7 @@ export const mockDashboardSummaryCards = [
 export const mockDashboardRecentActivity = [
   { id: "a1", text: "مشاهدة جديدة — مرسيدس G63", time: "منذ ساعة" },
   { id: "a2", text: "رسالة من خالد المنصوري", time: "منذ 3 ساعات" },
-  { id: "a3", text: "إيداع 1,500 د.إ في المحفظة", time: "أمس" },
+  { id: "a3", text: "إيداع في المحفظة", amount: 1500, time: "أمس" },
 ];
 
 export const mockDashboardNotifications = [
@@ -36,7 +36,8 @@ export const mockDashboardNotifications = [
     title: "معاينة مجدولة",
   },
   {
-    body: "تم حجز 3,200 د.إ لصفقة آيفون 15 برو.",
+    body: "تم حجز مبلغ لصفقة آيفون 15 برو.",
+    amount: 3200,
     id: "notif-002",
     read: false,
     title: "تم حجز الضمان",

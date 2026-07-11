@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { OtpVerification } from "@/features/auth/components/OtpVerification";
@@ -9,6 +9,9 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
+import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
+import { persistSessionCookie } from "@/services/auth/session-sync";
+import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 
 type RegisterErrors = {
@@ -47,80 +50,88 @@ export function RegisterForm() {
   const [showOtp, setShowOtp] = useState(false);
   const router = useRouter();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  const { isLoading, run: handleSubmit } = useAsyncAction(
+    useCallback(async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    const fullName = String(formData.get("fullName") ?? "").trim();
-    const email = String(formData.get("email") ?? "").trim();
-    const phone = String(formData.get("phone") ?? "").trim();
-    const city = String(formData.get("city") ?? "dubai");
-    const accountType = String(formData.get("accountType") ?? "individual") as
-      | "individual"
-      | "company";
-    const password = String(formData.get("password") ?? "");
-    const confirmPassword = String(formData.get("confirmPassword") ?? "");
-    const termsAccepted = formData.get("terms") === "on";
-    const nextErrors: RegisterErrors = {};
+      const formData = new FormData(event.currentTarget);
+      const fullName = String(formData.get("fullName") ?? "").trim();
+      const email = String(formData.get("email") ?? "").trim();
+      const phone = String(formData.get("phone") ?? "").trim();
+      const city = String(formData.get("city") ?? "dubai");
+      const accountType = String(formData.get("accountType") ?? "individual") as
+        | "individual"
+        | "company";
+      const password = String(formData.get("password") ?? "");
+      const confirmPassword = String(formData.get("confirmPassword") ?? "");
+      const termsAccepted = formData.get("terms") === "on";
+      const nextErrors: RegisterErrors = {};
 
-    if (fullName.length < 3) {
-      nextErrors.fullName = "اكتب الاسم الكامل بشكل صحيح.";
+      if (fullName.length < 3) {
+        nextErrors.fullName = "اكتب الاسم الكامل بشكل صحيح.";
+      }
+
+      if (!isValidEmail(email)) {
+        nextErrors.email = "اكتب بريد إلكتروني صحيح.";
+      }
+
+      if (!isValidUaePhone(phone)) {
+        nextErrors.phone = "اكتب رقم هاتف إماراتي صحيح مثل 05xxxxxxxx.";
+      }
+
+      if (!isStrongPassword(password)) {
+        nextErrors.password =
+          "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على حرف كبير وصغير ورقم.";
+      }
+
+      if (password !== confirmPassword) {
+        nextErrors.confirmPassword = "كلمة المرور وتأكيدها غير متطابقين.";
+      }
+
+      if (!termsAccepted) {
+        nextErrors.terms = "يجب الموافقة على الشروط قبل إنشاء الحساب.";
+      }
+
+      setErrors(nextErrors);
+
+      if (Object.keys(nextErrors).length === 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+        setIdentifier(phone || email);
+        setPendingUser({
+          accountType,
+          city: cities.find((item) => item.id === city)?.name ?? "دبي",
+          email,
+          fullName,
+          phone,
+        });
+        setShowOtp(true);
+      }
+    }, []),
+  );
+
+  const handleVerified = useCallback(async () => {
+    if (!pendingUser) {
+      return;
     }
 
-    if (!isValidEmail(email)) {
-      nextErrors.email = "اكتب بريد إلكتروني صحيح.";
-    }
-
-    if (!isValidUaePhone(phone)) {
-      nextErrors.phone = "اكتب رقم هاتف إماراتي صحيح مثل 05xxxxxxxx.";
-    }
-
-    if (!isStrongPassword(password)) {
-      nextErrors.password =
-        "كلمة المرور يجب أن تكون 8 أحرف على الأقل وتحتوي على حرف كبير وصغير ورقم.";
-    }
-
-    if (password !== confirmPassword) {
-      nextErrors.confirmPassword = "كلمة المرور وتأكيدها غير متطابقين.";
-    }
-
-    if (!termsAccepted) {
-      nextErrors.terms = "يجب الموافقة على الشروط قبل إنشاء الحساب.";
-    }
-
-    setErrors(nextErrors);
-
-    if (Object.keys(nextErrors).length === 0) {
-      setIdentifier(phone || email);
-      setPendingUser({
-        accountType,
-        city: cities.find((item) => item.id === city)?.name ?? "دبي",
-        email,
-        fullName,
-        phone,
-      });
-      setShowOtp(true);
-    }
-  }
+    const newUser = {
+      id: `user-${Date.now()}`,
+      ...pendingUser,
+      isVerified: true,
+      joinedAt: new Date().toISOString().slice(0, 10),
+    };
+    setSessionUser(newUser);
+    await persistSessionCookie(newUser);
+    await syncFavoritesAfterLogin(newUser.id);
+    router.push("/profile");
+  }, [pendingUser, router]);
 
   if (showOtp) {
     return (
       <OtpVerification
         identifier={identifier}
         onBack={() => setShowOtp(false)}
-        onVerified={() => {
-          if (!pendingUser) {
-            return;
-          }
-
-          setSessionUser({
-            id: `user-${Date.now()}`,
-            ...pendingUser,
-            isVerified: true,
-            joinedAt: new Date().toISOString().slice(0, 10),
-          });
-          router.push("/profile");
-        }}
+        onVerified={handleVerified}
       />
     );
   }
@@ -237,7 +248,9 @@ export function RegisterForm() {
         ) : null}
       </div>
 
-      <Button type="submit">إنشاء الحساب</Button>
+      <Button loading={isLoading} type="submit">
+        إنشاء الحساب
+      </Button>
     </form>
   );
 }

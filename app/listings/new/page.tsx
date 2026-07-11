@@ -15,7 +15,7 @@ export default async function NewListingPage() {
           <PageHero
             description="أضف إعلانك في خطوات بسيطة: اختر القسم، اكتب التفاصيل، أرفق الصور، ثم انشر مباشرة."
             eyebrow="إضافة إعلان"
-            title="انشر إعلانك في سوق الإمارات"
+            title="انشر إعلانك في سوقنا"
           />
           <AddListingForm categories={categories} />
         </section>

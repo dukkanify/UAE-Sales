@@ -1,3 +1,4 @@
+import { BRAND } from "@/shared/constants/brand";
 import { CategoryDirectory } from "@/features/categories/components/CategoryDirectory";
 import { PageHero } from "@/shared/ui/PageHero";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -13,7 +14,7 @@ export default async function CategoriesPage() {
       <main>
         <section className="app-container page-padding">
           <PageHero
-            description="تصفح سوق الإمارات عبر أقسام واضحة تصلك مباشرة للإعلانات المناسبة."
+            description={`تصفح ${BRAND.nameAr} عبر أقسام واضحة تصلك مباشرة للإعلانات المناسبة.`}
             eyebrow="دليل السوق"
             title="الأقسام الرئيسية"
           />

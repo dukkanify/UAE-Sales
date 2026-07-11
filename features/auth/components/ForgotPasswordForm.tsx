@@ -1,28 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
+import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 
 export function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError("");
-    setMessage("");
+  const { isLoading, run: handleSubmit } = useAsyncAction(
+    useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setError("");
+      setMessage("");
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError("أدخل بريداً إلكترونياً صحيحاً.");
-      return;
-    }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setError("أدخل بريداً إلكترونياً صحيحاً.");
+        return;
+      }
 
-    setMessage("تم إرسال رابط إعادة التعيين إلى بريدك.");
-  }
+      await new Promise((resolve) => window.setTimeout(resolve, 300));
+      setMessage("تم إرسال رابط إعادة التعيين إلى بريدك.");
+    }, [email]),
+  );
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -45,7 +49,7 @@ export function ForgotPasswordForm() {
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
       {message ? <FormMessage variant="success">{message}</FormMessage> : null}
 
-      <Button fullWidth type="submit" variant="primary">
+      <Button fullWidth loading={isLoading} type="submit" variant="primary">
         إرسال رابط الاستعادة
       </Button>
 

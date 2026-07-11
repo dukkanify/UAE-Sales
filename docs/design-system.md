@@ -1,8 +1,8 @@
-# UAE Sales Premium Design System
+# Sooqna Premium Design System
 
 ## Brand Direction
 
-UAE Sales should feel like a premium UAE marketplace: trustworthy, polished, investor-ready, and built for high-value transactions. The visual language should be closer to modern real-estate, fintech, and hospitality products than a generic classifieds template.
+Sooqna should feel like a premium UAE marketplace: trustworthy, polished, investor-ready, and built for high-value transactions. The visual language should be closer to modern real-estate, fintech, and hospitality products than a generic classifieds template.
 
 ## Color Palette
 

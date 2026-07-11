@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { WalletBalances } from "@/features/wallet/components/WalletBalances";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
@@ -7,15 +9,15 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCurrentUser } from "@/services/profile";
 import { getWalletSummary } from "@/services/walletService";
 
-const priceFormatter = new Intl.NumberFormat("ar-AE", {
-  maximumFractionDigits: 0,
-});
-
 const activityLabels = {
   deposit: "إيداع",
   escrow_hold: "حجز ضمان",
   release: "تحويل",
   withdrawal: "سحب",
+  refund: "استرداد",
+  stripe_payment: "دفع Stripe",
+  platform_fee: "رسوم المنصة",
+  escrow_release: "تحويل ضمان",
 } as const;
 
 export default async function WalletPage() {
@@ -35,22 +37,11 @@ export default async function WalletPage() {
           user={user}
         >
           <div className="grid gap-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Card className="p-6" variant="flat">
-                <p className="text-sm font-medium text-muted">الرصيد المتاح</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {priceFormatter.format(wallet.availableBalance)}{" "}
-                  <span className="text-sm font-medium text-muted">د.إ</span>
-                </p>
-              </Card>
-              <Card className="p-6" variant="flat">
-                <p className="text-sm font-medium text-muted">قيد المعالجة</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {priceFormatter.format(wallet.pendingBalance)}{" "}
-                  <span className="text-sm font-medium text-muted">د.إ</span>
-                </p>
-              </Card>
-            </div>
+            <WalletBalances
+              defaultAvailable={wallet.availableBalance}
+              defaultHeldInEscrow={wallet.heldInEscrow}
+              defaultPending={wallet.pendingBalance}
+            />
 
             <Card className="p-6" variant="flat">
               <h2 className="text-sm font-semibold text-ink">النشاط الأخير</h2>
@@ -72,12 +63,15 @@ export default async function WalletPage() {
                         })}
                       </p>
                     </div>
-                    <p
+                    <div
                       className={`shrink-0 text-sm font-bold ${item.amount >= 0 ? "text-success" : "text-ink"}`}
                     >
-                      {item.amount >= 0 ? "+" : ""}
-                      {priceFormatter.format(item.amount)} د.إ
-                    </p>
+                      <CurrencyAmount
+                        amount={item.amount}
+                        showSign
+                        size="sm"
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
-import { Button } from "@/shared/ui/Button";
+import { WalletBalanceCard } from "@/features/wallet/components/WalletBalanceCard";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { PageHero } from "@/shared/ui/PageHero";
@@ -13,9 +13,10 @@ import {
   clearSessionUser,
   getSessionUser,
 } from "@/services/storage";
+import { removeSessionCookie } from "@/services/auth/session-sync";
 
 type DashboardShellProps = {
-  activePath: "/profile" | "/dashboard/listings";
+  activePath: "/profile" | "/dashboard/listings" | "/chat";
   children: ReactNode;
   description: string;
   title: string;
@@ -118,6 +119,7 @@ export function DashboardShell({
                 className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
                 onClick={() => {
                   clearSessionUser();
+                  void removeSessionCookie();
                   router.replace("/login");
                 }}
                 type="button"
@@ -127,18 +129,7 @@ export function DashboardShell({
             </nav>
           </Card>
 
-          <Card className="p-5" variant="flat">
-            <p className="text-xs font-medium text-muted">رصيد المحفظة</p>
-            <p className="mt-1 text-xl font-semibold text-ink">
-              2,450 <span className="text-xs font-medium text-muted">د.إ</span>
-            </p>
-            <p className="mt-1 text-xs font-medium text-muted">
-              850 د.إ قيد المعالجة
-            </p>
-            <Button className="mt-4 w-full" href="/wallet" size="sm" variant="secondary">
-              إدارة المحفظة
-            </Button>
-          </Card>
+          <WalletBalanceCard />
         </aside>
 
         <div>

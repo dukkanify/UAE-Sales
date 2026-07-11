@@ -1,4 +1,5 @@
 import type { Listing, ListingSearchFilters } from "@/types";
+import { listingMatchesQuery } from "@/shared/listings/listing-specs";
 import { mockListings, mockUserListings } from "@/mock";
 
 export type { ListingSearchFilters };
@@ -33,22 +34,7 @@ export async function getRelatedListings(
 }
 
 function matchesQuery(listing: Listing, query: string): boolean {
-  const haystack = [
-    listing.title,
-    listing.titleEnglish,
-    listing.description,
-    listing.descriptionEnglish,
-    listing.city,
-    listing.emirate,
-    listing.area,
-    listing.subcategory,
-    listing.seller.name,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return haystack.includes(query);
+  return listingMatchesQuery(listing, query);
 }
 
 export async function searchListings(

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BrandLogo } from "@/shared/components/BrandLogo";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { getAuthTrustPoints } from "@/services/content";
@@ -27,12 +28,7 @@ export async function AuthShell({
     <section className="app-container page-padding grid min-h-[calc(100vh-8rem)] gap-8 lg:grid-cols-2 lg:items-center">
       <div className="luxury-gradient relative overflow-hidden rounded-[var(--radius-2xl)] p-8 text-white md:p-10">
         <div className="relative">
-          <Link className="inline-flex items-center gap-3" href="/">
-            <span className="grid size-11 place-items-center rounded-[var(--radius-xl)] bg-white/10 text-xs font-semibold backdrop-blur">
-              UAE
-            </span>
-            <span className="text-lg font-semibold">UAE Sales</span>
-          </Link>
+          <BrandLogo showTagline={false} size="md" theme="dark" />
 
           <h1 className="mt-10 text-3xl font-black leading-tight md:text-4xl">
             {title}

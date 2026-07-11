@@ -19,13 +19,16 @@ type IconName =
   | "edit"
   | "photo"
   | "send"
+  | "share"
+  | "phone"
+  | "chevron-left"
+  | "chevron-right"
   | "arrow-left"
   | "package"
   | "bell"
   | "chart"
   | "car"
   | "laptop"
-  | "phone"
   | "sofa"
   | "briefcase"
   | "watch"
@@ -77,6 +80,12 @@ const paths: Record<IconName, string> = {
   photo:
     "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6Zm2 0h12v8l-3.5-3.5a1 1 0 0 0-1.4 0L8 16l-2-2V6Zm6 2.5A1.5 1.5 0 1 0 12 10a1.5 1.5 0 0 0 0-3Z",
   send: "M4 12 20 4 12 20v-6l8-2-8-2v-6Z",
+  share:
+    "M8.5 12.5 4 17v-3.5A2.5 2.5 0 0 1 6.5 11H8m7.5 1.5L20 17v-3.5A2.5 2.5 0 0 0 17.5 11H16M12 3v10M9 6l3-3 3 3",
+  phone:
+    "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
+  "chevron-left": "M15 6l-6 6 6 6",
+  "chevron-right": "M9 6l6 6-6 6",
   "arrow-left": "M19 12H5M11 6l-6 6 6 6",
   package:
     "M12 3 20 7v10l-8 4-8-4V7l8-4Zm0 8 8-4M12 11 4 7M12 11v10",
@@ -88,8 +97,6 @@ const paths: Record<IconName, string> = {
     "M5 17h14M6 17v2M18 17v2M4 12h16l-1.5-5a2 2 0 0 0-2-1.5H7.5a2 2 0 0 0-2 1.5L4 12Zm3-3h10",
   laptop:
     "M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V7Zm-1 10h18",
-  phone:
-    "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
   sofa:
     "M5 12V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M4 12h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4Z",
   briefcase:

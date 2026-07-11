@@ -1,6 +1,6 @@
 # API Integration Guide
 
-This guide explains how to connect the UAE Sales frontend to a real backend API, replacing the current mock service layer.
+This guide explains how to connect the Sooqna frontend to a real backend API, replacing the current mock service layer.
 
 ## Current State
 
@@ -14,7 +14,7 @@ This guide explains how to connect the UAE Sales frontend to a real backend API,
 Add to `.env.local`:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://api.uaesales.ae/v1
+NEXT_PUBLIC_API_BASE_URL=https://api.sooqna.ae/v1
 ```
 
 When unset, domain services continue using mock data. When set, services should call `apiClient` instead of mock imports.

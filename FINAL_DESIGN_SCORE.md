@@ -1,4 +1,4 @@
-# Final Design Score — UAE Sales Premium 2026
+# Final Design Score — Sooqna Premium 2026
 
 **Assessment date:** July 4, 2026  
 **Phase:** Design System Enforcement (Post-QA)  

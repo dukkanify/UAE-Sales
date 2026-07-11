@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { STORAGE_KEYS } from "@/shared/constants/brand";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
 
-const STORAGE_KEY = "uae-sales-saved-searches";
+const STORAGE_KEY = STORAGE_KEYS.savedSearches;
 
 type SavedSearch = {
   id: string;

@@ -1,9 +1,11 @@
 "use client";
 
 import type { Category } from "@/types";
+import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
+import { CategoryFieldsStep } from "./add-listing/CategoryFieldsStep";
 import { CategorySelectionStep } from "./add-listing/CategorySelectionStep";
 import { ListingDetailsStep } from "./add-listing/ListingDetailsStep";
 import { ListingPreviewPanel } from "./add-listing/ListingPreviewPanel";
@@ -40,6 +42,8 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     );
   }
 
+  const useDynamicFields = isDynamicCategory(selectedCategoryId);
+
   return (
     <form
       className="grid gap-6 lg:grid-cols-[1fr_22rem]"
@@ -59,7 +63,11 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           selectedCategoryId={selectedCategoryId}
         />
 
-        <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
+        {useDynamicFields ? (
+          <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
+        ) : (
+          <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
+        )}
 
         <MediaContactStep
           errors={errors}

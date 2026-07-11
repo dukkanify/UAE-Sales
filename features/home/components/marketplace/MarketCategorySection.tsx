@@ -13,7 +13,6 @@ type MarketCategorySectionProps = {
 };
 
 export function MarketCategorySection({
-  categoryId,
   categorySlug,
   description,
   eyebrow,
@@ -21,7 +20,7 @@ export function MarketCategorySection({
   title,
   variant = "sand",
 }: MarketCategorySectionProps) {
-  const items = listings.filter((l) => l.categoryId === categoryId).slice(0, 4);
+  const items = listings;
 
   if (items.length === 0) {
     return null;

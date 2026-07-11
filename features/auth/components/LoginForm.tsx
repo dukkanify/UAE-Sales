@@ -16,6 +16,8 @@ import {
   requestLoginOtp,
   validateLoginCredentials,
 } from "@/services/auth";
+import { persistSessionCookie } from "@/services/auth/session-sync";
+import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 
 type LoginErrors = {
@@ -63,6 +65,8 @@ export function LoginForm() {
   const handleVerified = useCallback(async () => {
     const user = await completeLogin(identifier);
     setSessionUser(user);
+    await persistSessionCookie(user);
+    await syncFavoritesAfterLogin(user.id);
     const nextPath =
       new URLSearchParams(window.location.search).get("next") ??
       getPostLoginPath(identifier);
@@ -94,7 +98,7 @@ export function LoginForm() {
           error={errors.identifier}
           label="رقم الهاتف أو البريد"
           name="identifier"
-          placeholder="user@uaesales.demo"
+          placeholder="user@sooqna.demo"
           required
           type="text"
         />

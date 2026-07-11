@@ -44,3 +44,19 @@ export function ListingCardSkeleton() {
     </div>
   );
 }
+
+export function ListingDetailSkeleton() {
+  return (
+    <div aria-busy="true" aria-label="جاري تحميل الإعلان" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="grid gap-3">
+        <Skeleton className="aspect-[4/3] w-full !rounded-[var(--radius-2xl)] lg:min-h-[28rem]" />
+      </div>
+      <div className="grid gap-4">
+        <Skeleton className="h-48 w-full !rounded-[var(--radius-2xl)]" />
+        <Skeleton className="h-36 w-full !rounded-[var(--radius-2xl)]" />
+        <Skeleton className="h-28 w-full !rounded-[var(--radius-2xl)]" />
+      </div>
+      <Skeleton className="h-40 w-full !rounded-[var(--radius-2xl)] lg:col-span-2" />
+    </div>
+  );
+}

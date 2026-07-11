@@ -1,3 +1,4 @@
+import { BRAND } from "@/shared/constants/brand";
 import { mockEmirateHighlights } from "@/mock";
 import type { HomeCityHighlight } from "@/types";
 import { getEmirateImageUrl, heroBackgroundUrl } from "@/shared/constants/image-fallbacks";
@@ -66,7 +67,7 @@ export async function getMarketEscrowSteps(): Promise<MarketEscrowStep[]> {
     {
       icon: "message",
       title: "دعم النزاعات",
-      description: "فريق UAE Sales يتدخل عند وجود اختلاف بين الطرفين.",
+      description: `فريق ${BRAND.nameAr} يتدخل عند وجود اختلاف بين الطرفين.`,
     },
   ];
 }

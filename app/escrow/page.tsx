@@ -1,4 +1,5 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
+import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -6,10 +7,6 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { getEscrowSummary, getEscrowTransactions } from "@/services/escrowService";
 import { getCurrentUser } from "@/services/profile";
-
-const priceFormatter = new Intl.NumberFormat("ar-AE", {
-  maximumFractionDigits: 0,
-});
 
 const statusLabels = {
   held: "محجوز",
@@ -45,9 +42,9 @@ export default async function EscrowPage() {
               </Card>
               <Card className="p-6" variant="flat">
                 <p className="text-sm font-medium text-muted">إجمالي المحمي</p>
-                <p className="mt-2 text-3xl font-bold text-ink">
-                  {priceFormatter.format(summary.totalProtected)} د.إ
-                </p>
+                <div className="mt-2">
+                  <CurrencyAmount amount={summary.totalProtected} size="xl" />
+                </div>
               </Card>
             </div>
 
@@ -69,9 +66,7 @@ export default async function EscrowPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-3">
-                      <p className="text-sm font-bold text-ink">
-                        {priceFormatter.format(txn.amount)} د.إ
-                      </p>
+                      <CurrencyAmount amount={txn.amount} size="sm" />
                       <Badge variant="escrow">{statusLabels[txn.status]}</Badge>
                     </div>
                   </li>

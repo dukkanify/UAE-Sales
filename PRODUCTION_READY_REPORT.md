@@ -2,7 +2,7 @@
 
 ## Summary
 
-UAE Sales has been polished from prototype to **production-quality marketplace presentation**. No homepage layout or UI redesign was performed — this pass focused on content realism, seller trust signals, listing depth, active dashboard pages, and codebase cleanup.
+Sooqna has been polished from prototype to **production-quality marketplace presentation**. No homepage layout or UI redesign was performed — this pass focused on content realism, seller trust signals, listing depth, active dashboard pages, and codebase cleanup.
 
 ---
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 60 60">
+  <defs>
+    <pattern id="sooqna-pattern" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M30 5 L55 17.5 L55 42.5 L30 55 L5 42.5 L5 17.5 Z" fill="none" stroke="#C9A962" stroke-width="0.35" opacity="0.35"/>
+      <path d="M30 15 L45 22.5 L45 37.5 L30 45 L15 37.5 L15 22.5 Z" fill="none" stroke="#C9A962" stroke-width="0.25" opacity="0.2"/>
+      <circle cx="30" cy="30" r="2" fill="#C9A962" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <rect width="60" height="60" fill="url(#sooqna-pattern)"/>
+</svg>
