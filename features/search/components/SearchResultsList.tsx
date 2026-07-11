@@ -110,16 +110,6 @@ export function SearchResultsList({
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <ListingCardSkeleton key={index} />
-        ))}
-      </div>
-    );
-  }
-
   if (visibleListings.length === 0) {
     return (
       <>
