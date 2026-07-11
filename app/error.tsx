@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { ErrorState } from "@/shared/components/ErrorState";
-import { getErrorMessage } from "@/services/api";
+import { RouteErrorFallback } from "@/shared/components/RouteErrorFallback";
 
 type ErrorPageProps = {
   error: Error & { digest?: string };
@@ -10,18 +8,9 @@ type ErrorPageProps = {
 };
 
 export default function ErrorPage({ error, reset }: ErrorPageProps) {
-  useEffect(() => {
-    console.error("[RouteError]", error);
-  }, [error]);
-
   return (
     <section className="app-container page-padding">
-      <ErrorState
-        description={getErrorMessage(error)}
-        onRetry={reset}
-        title="تعذر تحميل الصفحة"
-        variant="server"
-      />
+      <RouteErrorFallback error={error} reset={reset} />
     </section>
   );
 }

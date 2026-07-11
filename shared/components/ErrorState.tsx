@@ -5,6 +5,7 @@ import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 
 type ErrorStateProps = {
+  children?: React.ReactNode;
   description: string;
   onRetry?: () => void;
   retryLabel?: string;
@@ -20,6 +21,7 @@ const iconMap = {
 } as const;
 
 export function ErrorState({
+  children,
   description,
   onRetry,
   retryLabel = "إعادة المحاولة",
@@ -40,6 +42,7 @@ export function ErrorState({
           {retryLabel}
         </Button>
       ) : null}
+      {children}
     </Card>
   );
 }

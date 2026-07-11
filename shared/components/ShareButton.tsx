@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { useToast } from "@/shared/components/ToastProvider";
@@ -14,7 +14,7 @@ type ShareButtonProps = {
 };
 
 const baseClass =
-  "focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
+  "focus-ring interactive-lift inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
 export function ShareButton({
   className = "",
@@ -24,27 +24,36 @@ export function ShareButton({
   const { showToast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
 
-  const locationLabel = listing.area
-    ? `${listing.area}، ${listing.emirate ?? listing.city}`
-    : listing.emirate
-      ? `${listing.city}، ${listing.emirate}`
-      : listing.city;
+  const locationLabel = useMemo(
+    () =>
+      listing.area
+        ? `${listing.area}، ${listing.emirate ?? listing.city}`
+        : listing.emirate
+          ? `${listing.city}، ${listing.emirate}`
+          : listing.city,
+    [listing.area, listing.city, listing.emirate],
+  );
 
-  const sharePayload = {
-    title: listing.title,
-    text: `${listing.title} — ${locationLabel}`,
-    url: getListingCanonicalUrl(listing),
-  };
+  const shareUrl = useMemo(() => getListingCanonicalUrl(listing), [listing]);
+
+  const sharePayload = useMemo(
+    () => ({
+      title: listing.title,
+      text: `${listing.title} — ${locationLabel}`,
+      url: shareUrl,
+    }),
+    [listing.title, locationLabel, shareUrl],
+  );
 
   const copyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(sharePayload.url);
+      await navigator.clipboard.writeText(shareUrl);
       showToast("تم نسخ رابط الإعلان");
       setModalOpen(false);
     } catch {
       showToast("تعذر نسخ الرابط", "error");
     }
-  }, [sharePayload.url, showToast]);
+  }, [shareUrl, showToast]);
 
   const handleShare = useCallback(async () => {
     try {
@@ -66,7 +75,7 @@ export function ShareButton({
         onClick={handleShare}
         type="button"
       >
-        <Icon name="share" size={18} />
+        <Icon name="share-2" size={18} />
         {!iconOnly ? "مشاركة" : null}
       </button>
 
@@ -106,7 +115,7 @@ export function ShareButton({
               </button>
               <a
                 className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-center text-sm font-semibold leading-[2.75rem]"
-                href={`https://wa.me/?text=${encodeURIComponent(`${sharePayload.text}\n${sharePayload.url}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`${sharePayload.text}\n${shareUrl}`)}`}
                 rel="noopener noreferrer"
                 target="_blank"
               >
@@ -114,10 +123,19 @@ export function ShareButton({
               </a>
               <a
                 className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-center text-sm font-semibold leading-[2.75rem]"
-                href={`mailto:?subject=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(`${sharePayload.text}\n${sharePayload.url}`)}`}
+                href={`mailto:?subject=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(`${sharePayload.text}\n${shareUrl}`)}`}
               >
                 البريد الإلكتروني
               </a>
+              {typeof navigator !== "undefined" && "share" in navigator ? (
+                <button
+                  className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
+                  onClick={handleShare}
+                  type="button"
+                >
+                  مشاركة عبر النظام
+                </button>
+              ) : null}
             </div>
           </div>
         </div>

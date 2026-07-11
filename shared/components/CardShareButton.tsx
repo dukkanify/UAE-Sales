@@ -46,7 +46,7 @@ export function CardShareButton({
       title={ariaLabel}
       type="button"
     >
-      <Icon name="share" size={14} />
+      <Icon name="share-2" size={14} />
       <span className="sr-only">{shared ? "تمت المشاركة" : ariaLabel}</span>
     </button>
   );

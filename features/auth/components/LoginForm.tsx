@@ -10,31 +10,27 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
-import {
-  completeLogin,
-  getPostLoginPath,
-  requestLoginOtp,
-  validateLoginCredentials,
-} from "@/services/auth";
+import { getPostLoginPath } from "@/services/auth";
+import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
+import { getSafeNextPath } from "@/shared/utils/safe-next";
+import { isUaePassEnabled } from "@/shared/constants/feature-flags";
 
 type LoginErrors = {
-  identifier?: string;
+  email?: string;
   password?: string;
 };
 
-function isValidIdentifier(value: string) {
-  return (
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ||
-    /^(\+971|971|0)?5\d{8}$/.test(value)
-  );
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
 export function LoginForm() {
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
+  const [maskedEmail, setMaskedEmail] = useState("");
   const [showOtp, setShowOtp] = useState(false);
   const router = useRouter();
 
@@ -42,12 +38,15 @@ export function LoginForm() {
     useCallback(async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
-      const nextIdentifier = String(formData.get("identifier") ?? "").trim();
+      const nextEmail = String(formData.get("email") ?? "").trim().toLowerCase();
       const password = String(formData.get("password") ?? "");
       const nextErrors: LoginErrors = {};
 
-      if (!isValidIdentifier(nextIdentifier)) {
-        nextErrors.identifier = "اكتب بريد إلكتروني أو رقم هاتف إماراتي صحيح.";
+      if (!isValidEmail(nextEmail)) {
+        nextErrors.email = "اكتب بريدًا إلكترونيًا صحيحًا.";
+      }
+      if (!password) {
+        nextErrors.password = "أدخل كلمة المرور.";
       }
 
       setErrors(nextErrors);
@@ -55,30 +54,49 @@ export function LoginForm() {
         return;
       }
 
-      await validateLoginCredentials(nextIdentifier, password);
-      await requestLoginOtp(nextIdentifier);
-      setIdentifier(nextIdentifier);
+      const response = await fetch("/api/auth/otp/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: nextEmail, password }),
+      });
+
+      const data = await response.json();
+      if (!response.ok && response.status !== 429) {
+        throw new Error("تعذر إرسال رمز التحقق. حاول مرة أخرى.");
+      }
+
+      setEmail(data.email ?? nextEmail);
+      setMaskedEmail(data.maskedEmail ?? nextEmail);
       setShowOtp(true);
     }, []),
   );
 
-  const handleVerified = useCallback(async () => {
-    const user = await completeLogin(identifier);
-    setSessionUser(user);
-    await persistSessionCookie(user);
-    await syncFavoritesAfterLogin(user.id);
-    const nextPath =
-      new URLSearchParams(window.location.search).get("next") ??
-      getPostLoginPath(identifier);
-    router.push(nextPath);
-  }, [identifier, router]);
+  const handleVerified = useCallback(
+    async (data?: { user?: UserProfile }) => {
+      const user = data?.user;
+      if (!user) return;
+
+      setSessionUser(user);
+      await persistSessionCookie(user);
+      await syncFavoritesAfterLogin(user.id);
+
+      const nextPath = getSafeNextPath(
+        new URLSearchParams(window.location.search).get("next"),
+        getPostLoginPath(email),
+      );
+      router.push(nextPath);
+    },
+    [email, router],
+  );
 
   if (showOtp) {
     return (
       <OtpVerification
-        identifier={identifier}
+        email={email}
+        maskedEmail={maskedEmail}
         onBack={() => setShowOtp(false)}
         onVerified={handleVerified}
+        purpose="LOGIN"
       />
     );
   }
@@ -94,13 +112,13 @@ export function LoginForm() {
         </div>
 
         <Input
-          autoComplete="username"
-          error={errors.identifier}
-          label="رقم الهاتف أو البريد"
-          name="identifier"
+          autoComplete="email"
+          error={errors.email}
+          label="البريد الإلكتروني"
+          name="email"
           placeholder="user@sooqna.demo"
           required
-          type="text"
+          type="email"
         />
 
         <Input
@@ -128,12 +146,14 @@ export function LoginForm() {
         </div>
 
         <Button fullWidth loading={isLoading} type="submit" variant="primary">
-          تسجيل الدخول
+          متابعة بالبريد الإلكتروني
         </Button>
 
-        <Button disabled fullWidth type="button" variant="secondary">
-          UAE PASS — قريباً
-        </Button>
+        {isUaePassEnabled() ? (
+          <Button fullWidth type="button" variant="secondary">
+            UAE PASS
+          </Button>
+        ) : null}
       </form>
 
       <DemoAccountsPanel />

@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
+  isSessionUser,
+  requireSessionUser,
+} from "@/services/auth/require-session";
+import {
   addFavorite,
   getFavoritesForUser,
   syncFavoritesForUser,
 } from "@/services/favorites/favorite-store";
 
 const favoriteSchema = z.object({
-  userId: z.string().min(1),
   listingId: z.string().min(1),
   slug: z.string().min(1),
   title: z.string().min(1),
@@ -16,7 +19,6 @@ const favoriteSchema = z.object({
 });
 
 const syncSchema = z.object({
-  userId: z.string().min(1),
   favorites: z.array(
     z.object({
       listingId: z.string().min(1),
@@ -28,26 +30,25 @@ const syncSchema = z.object({
   ),
 });
 
-export async function GET(request: Request) {
-  const userId = new URL(request.url).searchParams.get("userId");
-  if (!userId) {
-    return NextResponse.json({ error: "USER_ID_REQUIRED" }, { status: 400 });
-  }
-  const favorites = await getFavoritesForUser(userId);
+export async function GET() {
+  const user = await requireSessionUser();
+  if (!isSessionUser(user)) return user;
+
+  const favorites = await getFavoritesForUser(user.id);
   return NextResponse.json({ favorites });
 }
 
 export async function POST(request: Request) {
+  const user = await requireSessionUser();
+  if (!isSessionUser(user)) return user;
+
   const body = await request.json();
   if (body.sync) {
     const parsed = syncSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
-    const favorites = await syncFavoritesForUser(
-      parsed.data.userId,
-      parsed.data.favorites,
-    );
+    const favorites = await syncFavoritesForUser(user.id, parsed.data.favorites);
     return NextResponse.json({ favorites });
   }
 
@@ -56,6 +57,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  const favorite = await addFavorite(parsed.data);
+  const favorite = await addFavorite({
+    ...parsed.data,
+    userId: user.id,
+  });
   return NextResponse.json({ favorite });
 }

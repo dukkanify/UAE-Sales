@@ -4,6 +4,10 @@ import {
   STORAGE_EVENTS,
   STORAGE_KEYS,
 } from "@/shared/constants/brand";
+import {
+  invalidateFavoritesSnapshot,
+  invalidateSessionSnapshot,
+} from "@/services/storage/external-store";
 
 function canUseStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
@@ -54,6 +58,7 @@ export function setSessionUser(user: UserProfile) {
   if (!safeSetItem(STORAGE_KEYS.session, JSON.stringify(user))) {
     return;
   }
+  invalidateSessionSnapshot();
   window.dispatchEvent(new Event(STORAGE_EVENTS.sessionChange));
 }
 
@@ -63,6 +68,7 @@ export function clearSessionUser() {
   }
 
   window.localStorage.removeItem(STORAGE_KEYS.session);
+  invalidateSessionSnapshot();
   window.dispatchEvent(new Event(STORAGE_EVENTS.sessionChange));
 }
 
@@ -142,6 +148,7 @@ export function toggleFavorite(entry: FavoriteRecord): boolean {
     ? favorites.filter((item) => item.listingId !== entry.listingId)
     : [entry, ...favorites];
   if (!safeSetItem(STORAGE_KEYS.favorites, JSON.stringify(next))) return exists;
+  invalidateFavoritesSnapshot();
   window.dispatchEvent(new Event(STORAGE_EVENTS.favoritesChange));
   return !exists;
 }

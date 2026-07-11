@@ -7,12 +7,12 @@ import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { useToast } from "@/shared/components/ToastProvider";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
-import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import {
   CHECKOUT_ERRORS,
   validateCheckoutReviewStep,
 } from "@/features/checkout/utils/checkout-validation";
-import { getLocalListingById, getSessionUser } from "@/services/storage";
+import { getLocalListingById } from "@/services/storage";
+import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import {
   calculateShippingFee,
   getAvailableShippingMethods,
@@ -83,17 +83,8 @@ export function CheckoutWizard({
 
   const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
   const sessionUser = useSyncExternalStore(
-    (onStoreChange) => {
-      if (typeof window === "undefined") return () => undefined;
-      const handler = () => onStoreChange();
-      window.addEventListener("storage", handler);
-      window.addEventListener(STORAGE_EVENTS.sessionChange, handler);
-      return () => {
-        window.removeEventListener("storage", handler);
-        window.removeEventListener(STORAGE_EVENTS.sessionChange, handler);
-      };
-    },
-    () => getSessionUser(),
+    subscribeSession,
+    () => getSessionSnapshot(),
     () => null,
   );
 
@@ -136,7 +127,7 @@ export function CheckoutWizard({
     if (transitionLockRef.current || isContinuing) return;
 
     setError("");
-    const buyer = getSessionUser();
+    const buyer = getSessionSnapshot();
     const validation = validateCheckoutReviewStep(listing, buyer);
 
     if (!validation.ok) {
@@ -196,7 +187,7 @@ export function CheckoutWizard({
     setError("");
     setIsLoading(true);
     try {
-      const sessionUser = getSessionUser();
+      const sessionUser = getSessionSnapshot();
       if (!sessionUser) {
         router.push(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
         return;
