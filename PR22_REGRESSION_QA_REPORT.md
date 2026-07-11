@@ -11,7 +11,7 @@
 
 | Command | Result |
 |---------|--------|
-| `npm run lint` | Pass (0 errors, 2 pre-existing warnings) |
+| `npm run lint` | Pass (0 errors, 1 pre-existing warning in `ShareButton.tsx`) |
 | `npm run build` | Pass |
 | Live API smoke tests | Pass (dev server `localhost:3000`) |
 
