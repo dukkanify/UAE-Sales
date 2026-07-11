@@ -58,7 +58,7 @@ export async function createCheckoutSession(
       metadata: {
         orderId: input.order.id,
         listingId: input.order.listingId,
-        buyerId: input.order.buyerId,
+        buyerId: input.order.buyerId ?? "",
         sellerId: input.order.sellerId,
         platform: "sooqna",
         escrow: "true",
@@ -97,7 +97,7 @@ export async function createPaymentIntent(order: Order) {
       metadata: {
         orderId: order.id,
         listingId: order.listingId,
-        buyerId: order.buyerId,
+        buyerId: order.buyerId ?? "",
         sellerId: order.sellerId,
         platform: "sooqna",
         escrow: "true",

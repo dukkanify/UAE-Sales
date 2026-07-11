@@ -9,6 +9,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
+import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
@@ -27,7 +28,8 @@ function isValidEmail(value: string) {
 
 export function LoginForm() {
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [usePassword, setUsePassword] = useState(false);
+  const emailOtpEnabled = isEmailOtpEnabled();
+  const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
   const router = useRouter();
 
   const { error: submitError, isLoading, run: handleSubmit } = useAsyncAction(
@@ -51,7 +53,7 @@ export function LoginForm() {
 
         const nextParam = new URLSearchParams(window.location.search).get("next");
 
-        if (usePassword) {
+        if (usePassword || !emailOtpEnabled) {
           const response = await fetch("/api/auth/login/password", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -90,7 +92,7 @@ export function LoginForm() {
         if (nextParam) params.set("next", nextParam);
         router.push(`/verify-email?${params.toString()}`);
       },
-      [router, usePassword],
+      [router, usePassword, emailOtpEnabled],
     ),
   );
 
@@ -103,7 +105,9 @@ export function LoginForm() {
           </p>
           <h2 className="mt-1 text-xl font-black text-ink">ادخل إلى حسابك</h2>
           <p className="mt-2 text-sm font-medium text-muted">
-            أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن
+            {emailOtpEnabled
+              ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
+              : "أدخل بريدك الإلكتروني وكلمة المرور"}
           </p>
         </div>
 
@@ -117,7 +121,7 @@ export function LoginForm() {
           type="email"
         />
 
-        {usePassword ? (
+        {usePassword || !emailOtpEnabled ? (
           <Input
             autoComplete="current-password"
             error={errors.password}
@@ -132,14 +136,24 @@ export function LoginForm() {
         {submitError ? <FormMessage variant="error">{submitError}</FormMessage> : null}
 
         <div className="flex items-center justify-between text-sm font-medium">
-          <button
-            className="text-primary"
-            onClick={() => setUsePassword((value) => !value)}
-            type="button"
-          >
-            {usePassword ? "الدخول برمز البريد" : "الدخول بكلمة المرور"}
-          </button>
-          {usePassword ? (
+          {emailOtpEnabled ? (
+            <button
+              className="text-primary"
+              onClick={() => setUsePassword((value) => !value)}
+              type="button"
+            >
+              {usePassword ? "الدخول برمز البريد" : "الدخول بكلمة المرور"}
+            </button>
+          ) : (
+            <p className="text-muted">
+              ليس لديك كلمة مرور؟{" "}
+              <Link className="text-primary" href="/register">
+                أنشئ حسابًا
+              </Link>{" "}
+              أو أكمل الشراء كضيف.
+            </p>
+          )}
+          {usePassword || !emailOtpEnabled ? (
             <Link className="text-primary" href="/forgot-password">
               نسيت كلمة المرور؟
             </Link>
@@ -147,7 +161,7 @@ export function LoginForm() {
         </div>
 
         <Button fullWidth loading={isLoading} type="submit" variant="primary">
-          {usePassword ? "تسجيل الدخول" : "إرسال رمز الدخول"}
+          {usePassword || !emailOtpEnabled ? "تسجيل الدخول" : "إرسال رمز الدخول"}
         </Button>
       </form>
 

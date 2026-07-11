@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import {
   createResetToken,
@@ -13,6 +14,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  const disabled = emailOtpDisabledResponse();
+  if (disabled) return disabled;
+
   const body = await request.json();
   const parsed = schema.safeParse(body);
   if (!parsed.success) {

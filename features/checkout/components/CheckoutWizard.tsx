@@ -5,11 +5,14 @@ import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DeliveryAddress, ShippingMethodId } from "@/types/domain/address";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
-import { useToast } from "@/shared/components/ToastProvider";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import {
   CHECKOUT_ERRORS,
+  normalizeGuestBuyer,
   validateCheckoutReviewStep,
+  validateGuestDeliveryStep,
+  type GuestDeliveryInfo,
 } from "@/features/checkout/utils/checkout-validation";
 import { getLocalListingById } from "@/services/storage";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
@@ -17,7 +20,6 @@ import {
   calculateShippingFee,
   getAvailableShippingMethods,
   isCategoryShippable,
-  validateDeliveryAddress,
 } from "@/services/shipping/shipping.service";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -53,15 +55,33 @@ function calculateTotals(productPrice: number, shippingFee: number) {
   };
 }
 
+const defaultGuestInfo: GuestDeliveryInfo = {
+  fullName: "",
+  email: "",
+  phone: "",
+  shippingMethod: "standard",
+  emirate: "",
+  city: "",
+  area: "",
+  street: "",
+  building: "",
+  unit: "",
+  landmark: "",
+  notes: "",
+  companyName: "",
+  saveAddress: false,
+};
+
 export function CheckoutWizard({
   catalogListing,
   listingRef,
   paymentCancelled,
 }: CheckoutWizardProps) {
   const router = useRouter();
-  const { showToast } = useToast();
   const panelRef = useRef<HTMLDivElement>(null);
   const transitionLockRef = useRef(false);
+  const guestCheckout = isGuestCheckoutEnabled();
+
   const listing = useSyncExternalStore(
     () => () => undefined,
     () => {
@@ -73,29 +93,34 @@ export function CheckoutWizard({
     () => catalogListing,
   );
 
-  const [step, setStep] = useState<CheckoutStep>("review");
-  const [shippingMethod, setShippingMethod] = useState<ShippingMethodId>("standard");
-  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
-  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isContinuing, setIsContinuing] = useState(false);
-  const [error, setError] = useState("");
-
-  const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
   const sessionUser = useSyncExternalStore(
     subscribeSession,
     () => getSessionSnapshot(),
     () => null,
   );
 
+  const [step, setStep] = useState<CheckoutStep>("review");
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethodId>("standard");
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [addresses, setAddresses] = useState<DeliveryAddress[]>([]);
+  const [guestInfo, setGuestInfo] = useState<GuestDeliveryInfo>(defaultGuestInfo);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
+  const [error, setError] = useState("");
+  const [existingAccountHint, setExistingAccountHint] = useState(false);
+
+  const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
+  const requiresAddress = shippable && shippingMethod !== "pickup";
+
   const shippingMethods = useMemo(() => {
     if (!listing || !shippable) return [];
+    const buyerEmirate = sessionUser?.city ?? guestInfo.emirate;
     return getAvailableShippingMethods(
       listing.categoryId,
       listing.emirate ?? listing.city,
-      sessionUser?.city,
+      buyerEmirate,
     );
-  }, [listing, shippable, sessionUser?.city]);
+  }, [listing, shippable, sessionUser?.city, guestInfo.emirate]);
 
   const shippingFee = shippable ? calculateShippingFee(shippingMethod) : 0;
   const totals = listing ? calculateTotals(listing.price, shippingFee) : null;
@@ -110,6 +135,16 @@ export function CheckoutWizard({
     scrollPanelToTop();
   }
 
+  function prefillGuestFromSession() {
+    if (!sessionUser) return;
+    setGuestInfo((prev) => ({
+      ...prev,
+      fullName: prev.fullName || sessionUser.fullName,
+      email: prev.email || sessionUser.email,
+      phone: prev.phone || sessionUser.phone,
+    }));
+  }
+
   async function loadAddresses(userId: string) {
     const response = await fetch(`/api/addresses?userId=${encodeURIComponent(userId)}`);
     if (!response.ok) {
@@ -120,7 +155,39 @@ export function CheckoutWizard({
     const defaultAddress = (data.addresses as DeliveryAddress[] | undefined)?.find(
       (item) => item.isDefault,
     );
-    if (defaultAddress) setSelectedAddressId(defaultAddress.id);
+    if (defaultAddress) {
+      setSelectedAddressId(defaultAddress.id);
+      setGuestInfo((prev) => ({
+        ...prev,
+        fullName: defaultAddress.fullName,
+        phone: defaultAddress.phone,
+        emirate: defaultAddress.emirate,
+        city: defaultAddress.city,
+        area: defaultAddress.area,
+        street: defaultAddress.street,
+        building: defaultAddress.building ?? "",
+        unit: defaultAddress.unit ?? "",
+        landmark: defaultAddress.landmark ?? "",
+        notes: defaultAddress.notes ?? "",
+      }));
+    }
+  }
+
+  async function checkEmailExists(email: string) {
+    if (!guestCheckout || sessionUser) return;
+    try {
+      const response = await fetch("/api/checkout/lookup-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setExistingAccountHint(Boolean(data.hasAccount));
+      }
+    } catch {
+      setExistingAccountHint(false);
+    }
   }
 
   async function handleContinueFromReview() {
@@ -145,11 +212,16 @@ export function CheckoutWizard({
     setIsContinuing(true);
 
     try {
-      if (shippable && buyer) {
-        await loadAddresses(buyer.id);
+      prefillGuestFromSession();
+      if (shippable) {
+        if (buyer) await loadAddresses(buyer.id);
         advanceStep("delivery");
       } else {
-        advanceStep("payment");
+        if (guestCheckout && !buyer) {
+          advanceStep("delivery");
+        } else {
+          advanceStep("payment");
+        }
       }
     } catch {
       setError(CHECKOUT_ERRORS.addressLoadFailed);
@@ -163,13 +235,30 @@ export function CheckoutWizard({
     if (transitionLockRef.current || isContinuing) return;
 
     setError("");
-    if (!shippable) {
-      advanceStep("payment");
-      return;
-    }
-    if (!selectedAddressId && addresses.length === 0) {
-      setError(LISTING_ERRORS.invalidAddress);
-      return;
+    const buyer = getSessionSnapshot();
+    const info = normalizeGuestBuyer(guestInfo);
+
+    if (guestCheckout && !buyer) {
+      const validationError = validateGuestDeliveryStep(
+        { ...info, shippingMethod },
+        requiresAddress,
+      );
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+      setGuestInfo((prev) => ({ ...prev, ...info, shippingMethod }));
+    } else if (shippable && requiresAddress) {
+      if (!selectedAddressId && addresses.length === 0) {
+        const validationError = validateGuestDeliveryStep(
+          { ...info, shippingMethod },
+          true,
+        );
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+      }
     }
 
     transitionLockRef.current = true;
@@ -188,21 +277,37 @@ export function CheckoutWizard({
     setIsLoading(true);
     try {
       const sessionUser = getSessionSnapshot();
-      if (!sessionUser) {
+      const normalized = normalizeGuestBuyer(guestInfo);
+      const isGuest = guestCheckout && !sessionUser;
+
+      if (isGuest) {
+        const validationError = validateGuestDeliveryStep(
+          { ...normalized, shippingMethod },
+          requiresAddress,
+        );
+        if (validationError) {
+          setError(validationError);
+          return;
+        }
+      } else if (!sessionUser) {
         router.push(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
         return;
       }
+
+      const selectedAddress = addresses.find((item) => item.id === selectedAddressId);
 
       const response = await fetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listingId: listing.id,
+          isGuest,
           buyer: {
-            id: sessionUser.id,
-            email: sessionUser.email,
-            fullName: sessionUser.fullName,
-            role: sessionUser.role,
+            id: sessionUser?.id,
+            email: sessionUser?.email ?? normalized.email,
+            fullName: sessionUser?.fullName ?? normalized.fullName,
+            phone: sessionUser?.phone ?? normalized.phone,
+            role: sessionUser?.role,
           },
           localListing: listing.id.startsWith("local-")
             ? {
@@ -218,7 +323,24 @@ export function CheckoutWizard({
             : undefined,
           shippingMethod: shippable ? shippingMethod : undefined,
           shippingFee: shippable ? shippingFee : 0,
-          addressId: shippable ? selectedAddressId : undefined,
+          addressId: sessionUser && selectedAddressId ? selectedAddressId : undefined,
+          deliveryAddress:
+            requiresAddress && (!sessionUser || !selectedAddress)
+              ? {
+                  fullName: normalized.fullName,
+                  phone: normalized.phone,
+                  emirate: guestInfo.emirate,
+                  city: guestInfo.city,
+                  area: guestInfo.area,
+                  street: guestInfo.street,
+                  building: guestInfo.building,
+                  unit: guestInfo.unit,
+                  landmark: guestInfo.landmark,
+                  notes: guestInfo.notes,
+                  companyName: guestInfo.companyName,
+                  saveAddress: guestInfo.saveAddress,
+                }
+              : undefined,
         }),
       });
 
@@ -258,6 +380,13 @@ export function CheckoutWizard({
     ? `/listings/local/${listing.id}`
     : `/listings/${listing.slug}`;
 
+  const showDeliveryStep =
+    shippable || (guestCheckout && !sessionUser);
+
+  const steps: CheckoutStep[] = ["review"];
+  if (showDeliveryStep) steps.push("delivery");
+  steps.push("payment");
+
   return (
     <section className="app-container page-padding">
       <PageHero
@@ -268,18 +397,16 @@ export function CheckoutWizard({
 
       <div className="mx-auto mt-6 max-w-3xl" ref={panelRef}>
         <div className="mb-6 flex flex-wrap gap-2">
-          {(["review", "delivery", "payment"] as CheckoutStep[])
-            .filter((item) => item !== "delivery" || shippable)
-            .map((item, index) => (
-              <Badge key={item} variant={step === item ? "premium" : "muted"}>
-                {index + 1}.{" "}
-                {item === "review"
-                  ? "مراجعة الطلب"
-                  : item === "delivery"
-                    ? "التوصيل"
-                    : "الدفع"}
-              </Badge>
-            ))}
+          {steps.map((item, index) => (
+            <Badge key={item} variant={step === item ? "premium" : "muted"}>
+              {index + 1}.{" "}
+              {item === "review"
+                ? "مراجعة الطلب"
+                : item === "delivery"
+                  ? "التوصيل والتواصل"
+                  : "الدفع"}
+            </Badge>
+          ))}
         </div>
 
         {paymentCancelled ? (
@@ -313,6 +440,11 @@ export function CheckoutWizard({
                 ) : null}
               </div>
             </div>
+            {guestCheckout && !sessionUser ? (
+              <p className="mt-4 text-sm text-muted">
+                يمكنك إتمام الشراء كضيف دون تسجيل الدخول.
+              </p>
+            ) : null}
             <div className="mt-6 flex gap-2">
               <Button
                 loading={isContinuing}
@@ -329,57 +461,184 @@ export function CheckoutWizard({
           </Card>
         ) : null}
 
-        {step === "delivery" && shippable ? (
+        {step === "delivery" && showDeliveryStep ? (
           <Card className="grid gap-4 p-6" variant="flat">
-            <h3 className="font-black text-ink">طريقة التوصيل</h3>
-            <div className="grid gap-2">
-              {shippingMethods.map((method) => (
-                <label
-                  key={method.id}
-                  className={`flex cursor-pointer items-center justify-between rounded-[var(--radius-xl)] border px-4 py-3 ${shippingMethod === method.id ? "border-secondary bg-secondary-soft" : "border-border"}`}
-                >
-                  <span>
-                    <span className="block text-sm font-semibold">{method.label}</span>
-                    <span className="text-xs text-muted">{method.description}</span>
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <CurrencyAmount amount={method.fee} size="sm" />
-                    <input
-                      checked={shippingMethod === method.id}
-                      name="shipping"
-                      onChange={() => setShippingMethod(method.id)}
-                      type="radio"
-                    />
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            <h3 className="font-black text-ink">عنوان التوصيل</h3>
-            {addresses.length > 0 ? (
-              <Select
-                label="عنوان محفوظ"
-                name="addressId"
-                onChange={(event) => setSelectedAddressId(event.target.value)}
-                options={addresses.map((item) => ({
-                  label: `${item.label} — ${item.area}`,
-                  value: item.id,
-                }))}
-                value={selectedAddressId}
-              />
-            ) : (
-              <p className="text-sm text-muted">لا توجد عناوين محفوظة. أضف عنواناً جديداً.</p>
-            )}
-
-            <AddressQuickForm
-              onCreated={async () => {
-                if (sessionUser) {
-                  await loadAddresses(sessionUser.id);
+            <h3 className="font-black text-ink">بيانات المشتري</h3>
+            <div className="grid gap-3 md:grid-cols-2">
+              <Input
+                label="الاسم الكامل"
+                name="fullName"
+                onChange={(event) =>
+                  setGuestInfo((prev) => ({ ...prev, fullName: event.target.value }))
                 }
-                showToast("تم حفظ العنوان");
-              }}
-              userId={sessionUser?.id ?? ""}
-            />
+                required
+                value={guestInfo.fullName}
+              />
+              <Input
+                label="البريد الإلكتروني"
+                name="email"
+                onBlur={() => checkEmailExists(guestInfo.email)}
+                onChange={(event) =>
+                  setGuestInfo((prev) => ({ ...prev, email: event.target.value }))
+                }
+                required
+                type="email"
+                value={guestInfo.email}
+              />
+              <Input
+                label="رقم الجوال"
+                name="phone"
+                onChange={(event) =>
+                  setGuestInfo((prev) => ({ ...prev, phone: event.target.value }))
+                }
+                required
+                type="tel"
+                value={guestInfo.phone}
+              />
+            </div>
+            {existingAccountHint ? (
+              <FormMessage variant="success">
+                يمكنك متابعة الشراء. إذا كان لديك حساب سابق، يمكنك تسجيل الدخول لاحقًا لمتابعة
+                جميع طلباتك.
+              </FormMessage>
+            ) : null}
+
+            {shippable ? (
+              <>
+                <h3 className="font-black text-ink">طريقة التوصيل</h3>
+                <div className="grid gap-2">
+                  {shippingMethods.map((method) => (
+                    <label
+                      key={method.id}
+                      className={`flex cursor-pointer items-center justify-between rounded-[var(--radius-xl)] border px-4 py-3 ${shippingMethod === method.id ? "border-secondary bg-secondary-soft" : "border-border"}`}
+                    >
+                      <span>
+                        <span className="block text-sm font-semibold">{method.label}</span>
+                        <span className="text-xs text-muted">{method.description}</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        <CurrencyAmount amount={method.fee} size="sm" />
+                        <input
+                          checked={shippingMethod === method.id}
+                          name="shipping"
+                          onChange={() => setShippingMethod(method.id)}
+                          type="radio"
+                        />
+                      </span>
+                    </label>
+                  ))}
+                </div>
+
+                {requiresAddress ? (
+                  <>
+                    <h3 className="font-black text-ink">عنوان التوصيل</h3>
+                    {sessionUser && addresses.length > 0 ? (
+                      <Select
+                        label="عنوان محفوظ"
+                        name="addressId"
+                        onChange={(event) => setSelectedAddressId(event.target.value)}
+                        options={addresses.map((item) => ({
+                          label: `${item.label} — ${item.area}`,
+                          value: item.id,
+                        }))}
+                        value={selectedAddressId}
+                      />
+                    ) : null}
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <Select
+                        label="الإمارة"
+                        name="emirate"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, emirate: event.target.value }))
+                        }
+                        options={cities.map((city) => ({ label: city.name, value: city.name }))}
+                        value={guestInfo.emirate}
+                      />
+                      <Input
+                        label="المدينة"
+                        name="city"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, city: event.target.value }))
+                        }
+                        required
+                        value={guestInfo.city}
+                      />
+                      <Input
+                        label="المنطقة"
+                        name="area"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, area: event.target.value }))
+                        }
+                        required
+                        value={guestInfo.area}
+                      />
+                      <Input
+                        label="الشارع / المبنى"
+                        name="street"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, street: event.target.value }))
+                        }
+                        required
+                        value={guestInfo.street}
+                      />
+                      <Input
+                        label="رقم الشقة / الفيلا"
+                        name="unit"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, unit: event.target.value }))
+                        }
+                        value={guestInfo.unit}
+                      />
+                      <Input
+                        label="اسم الشركة (اختياري)"
+                        name="companyName"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, companyName: event.target.value }))
+                        }
+                        value={guestInfo.companyName}
+                      />
+                      <Input
+                        className="md:col-span-2"
+                        label="علامة مميزة (اختياري)"
+                        name="landmark"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, landmark: event.target.value }))
+                        }
+                        value={guestInfo.landmark}
+                      />
+                      <Input
+                        className="md:col-span-2"
+                        label="ملاحظات التوصيل (اختياري)"
+                        name="notes"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, notes: event.target.value }))
+                        }
+                        value={guestInfo.notes}
+                      />
+                    </div>
+                    {sessionUser ? (
+                      <label className="flex items-center gap-2 text-sm text-muted">
+                        <input
+                          checked={guestInfo.saveAddress}
+                          onChange={(event) =>
+                            setGuestInfo((prev) => ({
+                              ...prev,
+                              saveAddress: event.target.checked,
+                            }))
+                          }
+                          type="checkbox"
+                        />
+                        حفظ العنوان
+                      </label>
+                    ) : null}
+                  </>
+                ) : (
+                  <p className="text-sm text-muted">
+                    الاستلام من البائع — لا يلزم إدخال عنوان توصيل كامل.
+                  </p>
+                )}
+              </>
+            ) : null}
 
             <div className="flex gap-2">
               <Button
@@ -429,7 +688,7 @@ export function CheckoutWizard({
                 تأكيد الدفع عبر Stripe
               </Button>
               <Button
-                onClick={() => advanceStep(shippable ? "delivery" : "review")}
+                onClick={() => advanceStep(showDeliveryStep ? "delivery" : "review")}
                 type="button"
                 variant="secondary"
               >
@@ -440,67 +699,5 @@ export function CheckoutWizard({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function AddressQuickForm({
-  onCreated,
-  userId,
-}: {
-  onCreated: () => void;
-  userId: string;
-}) {
-  const [isSaving, setIsSaving] = useState(false);
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!userId) return;
-    const form = new FormData(event.currentTarget);
-    const payload = {
-      userId,
-      label: String(form.get("label") ?? "المنزل"),
-      fullName: String(form.get("fullName") ?? ""),
-      phone: String(form.get("phone") ?? ""),
-      emirate: String(form.get("emirate") ?? ""),
-      city: String(form.get("city") ?? ""),
-      area: String(form.get("area") ?? ""),
-      street: String(form.get("street") ?? ""),
-      isDefault: true,
-    };
-    if (!validateDeliveryAddress(payload)) return;
-    setIsSaving(true);
-    try {
-      await fetch("/api/addresses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      onCreated();
-      event.currentTarget.reset();
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  return (
-    <form className="grid gap-3 rounded-[var(--radius-xl)] border border-border p-4" onSubmit={handleSubmit}>
-      <p className="text-sm font-semibold text-ink">إضافة عنوان جديد</p>
-      <div className="grid gap-3 md:grid-cols-2">
-        <Input label="التسمية" name="label" placeholder="المنزل" />
-        <Input label="الاسم الكامل" name="fullName" required />
-        <Input label="الهاتف" name="phone" required type="tel" />
-        <Select
-          label="الإمارة"
-          name="emirate"
-          options={cities.map((city) => ({ label: city.name, value: city.name }))}
-        />
-        <Input label="المدينة" name="city" required />
-        <Input label="المنطقة" name="area" required />
-        <Input className="md:col-span-2" label="الشارع / المبنى" name="street" required />
-      </div>
-      <Button loading={isSaving} size="sm" type="submit" variant="secondary">
-        حفظ العنوان
-      </Button>
-    </form>
   );
 }

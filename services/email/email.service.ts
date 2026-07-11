@@ -51,6 +51,19 @@ async function deliverEmail(input: SendEmailInput): Promise<void> {
   throw new Error("EMAIL_SEND_FAILED");
 }
 
+/** Delivers email without throwing when provider is unavailable. */
+export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean> {
+  try {
+    await deliverEmail(input);
+    return true;
+  } catch {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[Sooqna Email:queued]", input.to, input.subject);
+    }
+    return false;
+  }
+}
+
 function buildOtpEmailHtml(name: string, otp: string, intro: string): string {
   return `
     <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">

@@ -6,14 +6,17 @@ import type { OtpPurpose } from "@/types/domain/otp";
 import type { UserProfile } from "@/types";
 import { OtpVerification } from "@/features/auth/components/OtpVerification";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
+import Link from "next/link";
 
 export function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [sessionError, setSessionError] = useState("");
+  const emailOtpEnabled = isEmailOtpEnabled();
   const email = searchParams.get("email") ?? "";
   const purpose = (searchParams.get("purpose") ?? "LOGIN") as OtpPurpose;
   const maskedEmail = searchParams.get("masked") ?? undefined;
@@ -45,6 +48,21 @@ export function VerifyEmailContent() {
     },
     [email, nextPath, purpose, router],
   );
+
+  if (!emailOtpEnabled) {
+    return (
+      <div className="grid gap-3">
+        <FormMessage variant="error">التحقق بالرمز غير متاح حاليًا.</FormMessage>
+        <p className="text-sm text-muted">
+          يمكنك{" "}
+          <Link className="text-primary" href="/login">
+            تسجيل الدخول بكلمة المرور
+          </Link>{" "}
+          أو متابعة الشراء كضيف.
+        </p>
+      </div>
+    );
+  }
 
   if (!email) {
     return (

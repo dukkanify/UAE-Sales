@@ -1,4 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
+import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import type { UserProfile } from "@/types";
@@ -57,6 +58,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
+  const disabled = emailOtpDisabledResponse();
+  if (disabled) return disabled;
     try {
       const email = parsed.data.email.trim().toLowerCase();
       const { code } = await createOtpRequest({

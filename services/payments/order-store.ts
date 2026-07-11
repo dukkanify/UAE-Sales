@@ -29,20 +29,27 @@ export async function getOrderById(orderId: string): Promise<Order | undefined> 
 export async function getOrdersForUser(userId: string): Promise<Order[]> {
   const orders = await getAllOrders();
   return orders.filter(
-    (order) => order.buyerId === userId || order.sellerId === userId,
+    (order) =>
+      (order.buyerId != null && order.buyerId === userId) || order.sellerId === userId,
   );
 }
 
 export async function findPendingOrder(
-  buyerId: string,
+  buyerId: string | undefined,
   listingId: string,
+  guestEmail?: string,
 ): Promise<Order | undefined> {
   const orders = await getAllOrders();
+  const normalizedGuest = guestEmail?.trim().toLowerCase();
   return orders.find(
     (order) =>
-      order.buyerId === buyerId &&
       order.listingId === listingId &&
-      order.status === "pending_payment",
+      order.status === "pending_payment" &&
+      (buyerId
+        ? order.buyerId === buyerId
+        : normalizedGuest
+          ? (order.guestEmail ?? order.buyerEmail).toLowerCase() === normalizedGuest
+          : false),
   );
 }
 

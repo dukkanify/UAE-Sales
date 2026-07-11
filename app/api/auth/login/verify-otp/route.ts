@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
@@ -46,6 +47,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID" }, { status: 400 });
   }
 
+  const disabled = emailOtpDisabledResponse();
+  if (disabled) return disabled;
   try {
     await setSessionCookie(user);
   } catch {

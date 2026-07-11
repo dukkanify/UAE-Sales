@@ -3,7 +3,7 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 type CheckoutSuccessPageProps = {
-  searchParams: Promise<{ orderId?: string }>;
+  searchParams: Promise<{ orderId?: string; token?: string }>;
 };
 
 export default async function CheckoutSuccessPage({
@@ -29,7 +29,7 @@ export default async function CheckoutSuccessPage({
     <>
       <SiteHeader />
       <main>
-        <CheckoutSuccessContent orderId={params.orderId} />
+        <CheckoutSuccessContent guestToken={params.token} orderId={params.orderId} />
       </main>
       <SiteFooter />
     </>

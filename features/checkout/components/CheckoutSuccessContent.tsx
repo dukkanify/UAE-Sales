@@ -5,6 +5,7 @@ import type { DeliveryAddress } from "@/types/domain/address";
 import type { Order } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { SHIPPING_METHOD_CONFIG } from "@/services/shipping/shipping.config";
+import { getSessionSnapshot } from "@/services/storage/external-store";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -13,6 +14,7 @@ import { PageHero } from "@/shared/ui/PageHero";
 
 type CheckoutSuccessContentProps = {
   orderId: string;
+  guestToken?: string;
 };
 
 const statusLabels: Record<Order["status"], string> = {
@@ -28,20 +30,25 @@ const statusLabels: Record<Order["status"], string> = {
 const MAX_POLL_ATTEMPTS = 8;
 const POLL_INTERVAL_MS = 1500;
 
-export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps) {
+export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessContentProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [address, setAddress] = useState<DeliveryAddress | null>(null);
   const [error, setError] = useState("");
   const [pollingDelayed, setPollingDelayed] = useState(false);
+  const [hasExistingAccount, setHasExistingAccount] = useState(false);
   const attemptsRef = useRef(0);
   const timeoutRef = useRef<number | null>(null);
+  const sessionUser = getSessionSnapshot();
 
   useEffect(() => {
     let cancelled = false;
 
     const load = async () => {
       try {
-        const response = await fetch(`/api/orders/${orderId}`);
+        const url = guestToken
+          ? `/api/order-status?token=${encodeURIComponent(guestToken)}`
+          : `/api/orders/${orderId}`;
+        const response = await fetch(url);
         const data = await response.json();
         if (cancelled) return;
 
@@ -51,8 +58,28 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
         }
 
         setOrder(data.order);
+        setHasExistingAccount(Boolean(data.order.hasExistingAccount));
 
-        if (data.order.deliveryAddressId && data.order.buyerId) {
+        if (data.order.deliveryAddressSnapshot) {
+          setAddress({
+            id: "",
+            userId: "",
+            label: data.order.deliveryAddressSnapshot.label ?? "التوصيل",
+            fullName: data.order.deliveryAddressSnapshot.fullName,
+            phone: data.order.deliveryAddressSnapshot.phone,
+            emirate: data.order.deliveryAddressSnapshot.emirate,
+            city: data.order.deliveryAddressSnapshot.city,
+            area: data.order.deliveryAddressSnapshot.area,
+            street: data.order.deliveryAddressSnapshot.street,
+            building: data.order.deliveryAddressSnapshot.building,
+            unit: data.order.deliveryAddressSnapshot.unit,
+            landmark: data.order.deliveryAddressSnapshot.landmark,
+            notes: data.order.deliveryAddressSnapshot.notes,
+            isDefault: false,
+            createdAt: "",
+            updatedAt: "",
+          });
+        } else if (data.order.deliveryAddressId && data.order.buyerId) {
           const addressResponse = await fetch(
             `/api/addresses?userId=${encodeURIComponent(data.order.buyerId)}`,
           );
@@ -83,7 +110,7 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
       cancelled = true;
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [orderId]);
+  }, [orderId, guestToken]);
 
   if (error) {
     return (
@@ -109,11 +136,14 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
   const estimatedDelivery = order.shippingMethod
     ? SHIPPING_METHOD_CONFIG[order.shippingMethod]?.estimatedLabel
     : undefined;
+  const trackHref = guestToken
+    ? `/order-status?token=${encodeURIComponent(guestToken)}`
+    : `/orders/${order.id}`;
 
   return (
     <section className="app-container page-padding">
       <PageHero
-        description="شكراً لك. تم استلام دفعتك بنجاح."
+        description="شكراً لك. تم استلام طلبك بنجاح."
         eyebrow="تأكيد الطلب"
         title="تم إتمام الشراء"
       />
@@ -121,14 +151,19 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
       <div className="mx-auto mt-6 max-w-2xl grid gap-5">
         {pollingDelayed ? (
           <FormMessage variant="success">
-            تم إنشاء الطلب. قد يستغرق تأكيد الدفع دقيقة إضافية. يمكنك متابعة الحالة من
-            تفاصيل الطلب.
+            تم تأكيد طلبك. يمكنك متابعة الطلب من صفحة التأكيد.
           </FormMessage>
         ) : (
           <FormMessage variant="success">
             تم الدفع بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.
           </FormMessage>
         )}
+
+        {hasExistingAccount && !sessionUser ? (
+          <FormMessage variant="success">
+            لديك حساب سابق بهذا البريد. يمكنك تسجيل الدخول لمتابعة جميع طلباتك.
+          </FormMessage>
+        ) : null}
 
         <Card className="p-6" variant="flat">
           <div className="flex flex-wrap items-center gap-2">
@@ -137,6 +172,7 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
           </div>
           <p className="mt-3 text-sm text-muted">رقم الطلب</p>
           <p className="font-mono text-sm font-semibold text-ink">{order.id}</p>
+          <p className="mt-2 text-sm text-muted">البريد: {order.buyerEmail}</p>
 
           <div className="mt-4 grid gap-2 text-sm">
             <div className="flex justify-between">
@@ -189,14 +225,16 @@ export function CheckoutSuccessContent({ orderId }: CheckoutSuccessContentProps)
         </Card>
 
         <div className="flex flex-wrap gap-2">
-          <Button href={`/orders/${order.id}`} variant="accent">
-            تفاصيل الطلب
+          <Button href={trackHref} variant="accent">
+            متابعة الطلب
           </Button>
-          <Button href="/chat" variant="secondary">
-            الرسائل
-          </Button>
+          {!sessionUser ? (
+            <Button href="/complete-account" variant="secondary">
+              إنشاء كلمة مرور لحسابي
+            </Button>
+          ) : null}
           <Button href="/search" variant="ghost">
-            متابعة التصفح
+            متابعة التسوق
           </Button>
         </div>
       </div>

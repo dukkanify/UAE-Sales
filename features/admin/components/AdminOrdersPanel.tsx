@@ -9,6 +9,12 @@ import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
+const customerTypeLabels: Record<NonNullable<Order["customerType"]>, string> = {
+  registered: "مستخدم مسجّل",
+  guest: "ضيف",
+  guest_converted: "ضيف — تم تحويله لحساب",
+};
+
 export function AdminOrdersPanel() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [refundingId, setRefundingId] = useState<string | null>(null);
@@ -68,6 +74,31 @@ export function AdminOrdersPanel() {
                 <p className="mt-2 text-sm">
                   {order.buyerName} → {order.sellerName}
                 </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {order.customerType ? (
+                    <Badge variant="muted">{customerTypeLabels[order.customerType]}</Badge>
+                  ) : null}
+                  {order.emailDeliveryStatus ? (
+                    <Badge variant="muted">البريد: {order.emailDeliveryStatus}</Badge>
+                  ) : null}
+                  {order.accountSetupEmailSent ? (
+                    <Badge variant="muted">رابط إعداد الحساب: مرسل</Badge>
+                  ) : null}
+                </div>
+                {order.guestEmail ? (
+                  <p className="mt-2 text-xs text-muted">
+                    ضيف: {order.guestEmail}
+                    {order.guestPhone ? ` — ${order.guestPhone}` : ""}
+                  </p>
+                ) : null}
+                {order.buyerId ? (
+                  <Link
+                    className="mt-1 inline-block text-xs font-semibold text-primary"
+                    href={`/profile`}
+                  >
+                    حساب المشتري: {order.buyerId}
+                  </Link>
+                ) : null}
               </div>
               <div className="text-left">
                 <CurrencyAmount amount={order.fees.total} size="lg" />

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
@@ -50,6 +51,8 @@ export async function POST(request: Request) {
   }
 
   const user = await activateUser(userId);
+  const disabled = emailOtpDisabledResponse();
+  if (disabled) return disabled;
   try {
     await setSessionCookie(user);
   } catch {

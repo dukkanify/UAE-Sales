@@ -64,6 +64,48 @@ export async function saveUser(user: StoredUser): Promise<StoredUser> {
   return user;
 }
 
+export async function createStandardUser(input: {
+  email: string;
+  fullName: string;
+  passwordHash: string;
+  accountType: StoredUser["accountType"];
+  phone?: string;
+}): Promise<StoredUser> {
+  const email = input.email.trim().toLowerCase();
+  const existing = await findUserByEmail(email);
+
+  if (existing?.accountStatus === "active") {
+    throw new Error("EMAIL_ALREADY_REGISTERED");
+  }
+
+  const now = new Date().toISOString();
+  const user: StoredUser = {
+    id: existing?.id ?? `user-${Date.now()}`,
+    fullName: input.fullName.trim(),
+    email,
+    normalizedEmail: email,
+    phone: input.phone?.trim() ?? "",
+    city: existing?.city ?? "دبي",
+    accountType: input.accountType,
+    isVerified: true,
+    joinedAt: now.slice(0, 10),
+    accountStatus: "active",
+    emailVerifiedAt: now,
+    passwordHash: input.passwordHash,
+    registrationSource: "STANDARD",
+    isGuestConverted: false,
+    onboardingStatus:
+      input.accountType === "company" ? ("business_pending" as OnboardingStatus) : "none",
+    role:
+      input.accountType === "company" || input.accountType === "business"
+        ? "business"
+        : "user",
+    walletBalance: existing?.walletBalance ?? 0,
+  };
+
+  return saveUser(user);
+}
+
 export async function createPendingUser(input: {
   email: string;
   fullName: string;

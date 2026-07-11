@@ -39,14 +39,27 @@ export type OrderAuditEvent = {
   metadata?: Record<string, string>;
 };
 
+export type CustomerType = "registered" | "guest" | "guest_converted";
+
+export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
+
 export type Order = {
   id: string;
   listingId: string;
   listingTitle: string;
   listingSlug?: string;
-  buyerId: string;
+  buyerId?: string | null;
   buyerName: string;
   buyerEmail: string;
+  guestEmail?: string;
+  guestFullName?: string;
+  guestPhone?: string;
+  customerType?: CustomerType;
+  hasExistingAccount?: boolean;
+  guestAccessTokenHash?: string;
+  guestAccessExpiresAt?: string;
+  accountSetupEmailSent?: boolean;
+  emailDeliveryStatus?: EmailDeliveryStatus;
   sellerId: string;
   sellerName: string;
   status: OrderStatus;
@@ -55,6 +68,21 @@ export type Order = {
   fees: OrderFeeBreakdown;
   shippingMethod?: ShippingMethodId;
   deliveryAddressId?: string;
+  deliveryAddressSnapshot?: {
+    label?: string;
+    fullName: string;
+    phone: string;
+    emirate: string;
+    city: string;
+    area: string;
+    street: string;
+    building?: string;
+    unit?: string;
+    landmark?: string;
+    notes?: string;
+    companyName?: string;
+  };
+  saveAddress?: boolean;
   stripeCheckoutSessionId?: string;
   stripePaymentIntentId?: string;
   stripeRefundId?: string;

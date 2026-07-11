@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { hashPassword, isStrongPassword } from "@/services/auth/password.service";
@@ -16,6 +17,9 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  const disabled = emailOtpDisabledResponse();
+  if (disabled) return disabled;
+
   const sessionUser = await requireSessionUser();
   if (!isSessionUser(sessionUser)) return sessionUser;
 
