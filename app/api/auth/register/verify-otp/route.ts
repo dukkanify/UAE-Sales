@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
@@ -49,7 +50,15 @@ export async function POST(request: Request) {
   }
 
   const user = await activateUser(userId);
-  await setSessionCookie(user);
+  try {
+    await setSessionCookie(user);
+  } catch {
+    trackAuthEvent("registration_failed");
+    return NextResponse.json(
+      { error: "SESSION_FAILED", message: SESSION_FAILED_MESSAGE },
+      { status: 500 },
+    );
+  }
 
   void sendWelcomeEmail({ email: user.email, name: user.fullName }).catch(() => undefined);
   trackAuthEvent("registration_verified", { accountType: user.accountType });

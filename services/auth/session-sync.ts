@@ -2,16 +2,17 @@
 
 import type { UserProfile } from "@/types";
 
-export async function persistSessionCookie(user: UserProfile): Promise<void> {
+export async function persistSessionCookie(user: UserProfile): Promise<boolean> {
   try {
-    await fetch("/api/auth/session", {
+    const response = await fetch("/api/auth/session", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ user }),
       credentials: "same-origin",
     });
+    return response.ok;
   } catch {
-    // Cookie sync is best-effort; localStorage session remains primary for client UI.
+    return false;
   }
 }
 

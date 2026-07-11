@@ -10,3 +10,8 @@ export const OTP_VERIFY_MESSAGES = {
   MAX_ATTEMPTS: "تجاوزت الحد المسموح من المحاولات. اطلب رمزًا جديدًا.",
   NOT_FOUND: "لم يتم العثور على طلب تحقق نشط.",
 } as const;
+
+export const RESEND_COOLDOWN_MESSAGE = "يرجى الانتظار قبل إعادة إرسال الرمز.";
+
+export const SESSION_FAILED_MESSAGE =
+  "تعذر إنشاء الجلسة. يرجى المحاولة مرة أخرى.";

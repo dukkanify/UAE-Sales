@@ -78,6 +78,10 @@ export function OtpVerification({
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.error === "SESSION_FAILED") {
+          setOtpError(data.message ?? "تعذر إنشاء الجلسة. يرجى المحاولة مرة أخرى.");
+          return;
+        }
         const attempts =
           typeof data.attemptsRemaining === "number"
             ? ` (المحاولات المتبقية: ${data.attemptsRemaining})`
@@ -108,7 +112,18 @@ export function OtpVerification({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, purpose, fullName }),
       });
+      const data = await response.json();
       if (!response.ok) {
+        if (response.status === 429 && data.retryAfterSeconds) {
+          const waitMsg = data.message
+            ? String(data.message)
+            : "\u064a\u0631\u062c\u0649 \u0627\u0644\u0627\u0646\u062a\u0638\u0627\u0631 " +
+              String(data.retryAfterSeconds) +
+              " \u062b\u0627\u0646\u064a\u0629 \u0642\u0628\u0644 \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0625\u0631\u0633\u0627\u0644.";
+          setOtpError(waitMsg);
+          setCooldown(data.retryAfterSeconds);
+          return;
+        }
         setOtpError("تعذر إعادة إرسال الرمز. حاول لاحقًا.");
         return;
       }

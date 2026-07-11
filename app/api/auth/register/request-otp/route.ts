@@ -10,6 +10,7 @@ import {
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import {
   createPendingUser,
+  deletePendingUser,
   findUserByEmail,
 } from "@/services/auth/user-store";
 
@@ -45,17 +46,22 @@ export async function POST(request: Request) {
       accountType: parsed.data.accountType,
     });
 
-    await sendOtpForPurpose({
-      email,
-      fullName: parsed.data.fullName,
-      purpose: "REGISTER",
-      userId: pending.id,
-      metadata: {
+    try {
+      await sendOtpForPurpose({
+        email,
         fullName: parsed.data.fullName,
-        accountType: parsed.data.accountType,
+        purpose: "REGISTER",
         userId: pending.id,
-      },
-    });
+        metadata: {
+          fullName: parsed.data.fullName,
+          accountType: parsed.data.accountType,
+          userId: pending.id,
+        },
+      });
+    } catch (sendError) {
+      await deletePendingUser(pending.id);
+      throw sendError;
+    }
 
     trackAuthEvent("registration_otp_sent");
     return genericOtpResponse(email);

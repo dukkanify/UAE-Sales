@@ -142,6 +142,14 @@ export async function verifyOtpCode(input: {
   return { ok: true, record };
 }
 
+export async function invalidateOtpRecord(recordId: string): Promise<void> {
+  const all = await loadCollection<OtpRecord>(FILE);
+  await saveCollection(
+    FILE,
+    all.filter((item) => item.id !== recordId),
+  );
+}
+
 import { maskEmail } from "@/shared/utils/mask-email";
 
 export { maskEmail };

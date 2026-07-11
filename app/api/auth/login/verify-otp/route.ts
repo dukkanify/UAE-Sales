@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
+import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { getRedirectAfterAuth } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
@@ -45,7 +46,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID" }, { status: 400 });
   }
 
-  await setSessionCookie(user);
+  try {
+    await setSessionCookie(user);
+  } catch {
+    return NextResponse.json(
+      { error: "SESSION_FAILED", message: SESSION_FAILED_MESSAGE },
+      { status: 500 },
+    );
+  }
   trackAuthEvent("login_verified");
 
   const redirectTo = parsed.data.next

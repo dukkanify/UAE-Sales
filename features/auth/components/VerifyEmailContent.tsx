@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { OtpPurpose } from "@/types/domain/otp";
 import type { UserProfile } from "@/types";
 import { OtpVerification } from "@/features/auth/components/OtpVerification";
+import { FormMessage } from "@/shared/ui/FormMessage";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
@@ -12,6 +13,7 @@ import { setSessionUser } from "@/services/storage";
 export function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [sessionError, setSessionError] = useState("");
   const email = searchParams.get("email") ?? "";
   const purpose = (searchParams.get("purpose") ?? "LOGIN") as OtpPurpose;
   const maskedEmail = searchParams.get("masked") ?? undefined;
@@ -29,7 +31,11 @@ export function VerifyEmailContent() {
       const user = data?.user;
       if (user) {
         setSessionUser(user);
-        await persistSessionCookie(user);
+        const synced = await persistSessionCookie(user);
+        if (!synced) {
+          setSessionError("تعذر إنشاء الجلسة. يرجى المحاولة مرة أخرى.");
+          return;
+        }
         await syncFavoritesAfterLogin(user.id);
         router.push(data.redirectTo ?? "/profile");
         return;
@@ -52,7 +58,9 @@ export function VerifyEmailContent() {
   }
 
   return (
-    <OtpVerification
+    <>
+      {sessionError ? <FormMessage variant="error">{sessionError}</FormMessage> : null}
+      <OtpVerification
       email={email}
       maskedEmail={maskedEmail}
       nextPath={nextPath}
@@ -60,5 +68,6 @@ export function VerifyEmailContent() {
       onVerified={handleVerified}
       purpose={purpose}
     />
+    </>
   );
 }

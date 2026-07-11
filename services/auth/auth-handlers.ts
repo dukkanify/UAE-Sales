@@ -4,9 +4,10 @@ import {
   GENERIC_OTP_SENT_MESSAGE,
   OTP_SEND_FAILED_MESSAGE,
   OTP_VERIFY_MESSAGES,
+  RESEND_COOLDOWN_MESSAGE,
 } from "@/services/auth/auth-messages";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
-import { createOtpRequest, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
+import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
 export async function enforceRateLimit(request: Request, email: string): Promise<boolean> {
@@ -36,7 +37,11 @@ export function otpCooldownResponse(error: unknown) {
   if (error instanceof Error && error.message.startsWith("RESEND_COOLDOWN:")) {
     const seconds = Number(error.message.split(":")[1] ?? 60);
     return NextResponse.json(
-      { error: "RESEND_COOLDOWN", retryAfterSeconds: seconds },
+      {
+        error: "RESEND_COOLDOWN",
+        message: `${RESEND_COOLDOWN_MESSAGE} (${seconds} ثانية)`,
+        retryAfterSeconds: seconds,
+      },
       { status: 429 },
     );
   }
@@ -69,7 +74,7 @@ export async function sendOtpForPurpose(input: {
   userId?: string;
   metadata?: Record<string, string>;
 }) {
-  const { code } = await createOtpRequest({
+  const { record, code } = await createOtpRequest({
     email: input.email,
     purpose: input.purpose,
     userId: input.userId,
@@ -79,24 +84,29 @@ export async function sendOtpForPurpose(input: {
   const senders = await import("@/services/email/email.service");
   const payload = { email: input.email, name: input.fullName, otp: code };
 
-  switch (input.purpose) {
-    case "REGISTER":
-      await senders.sendRegistrationOtp(payload);
-      break;
-    case "LOGIN":
-      await senders.sendLoginOtp(payload);
-      break;
-    case "PASSWORD_RESET":
-      await senders.sendPasswordResetOtp(payload);
-      break;
-    case "SET_PASSWORD":
-      await senders.sendSetPasswordOtp(payload);
-      break;
-    case "EMAIL_CHANGE":
-      await senders.sendEmailChangeOtp(payload);
-      break;
-    default:
-      await senders.sendLoginOtp(payload);
+  try {
+    switch (input.purpose) {
+      case "REGISTER":
+        await senders.sendRegistrationOtp(payload);
+        break;
+      case "LOGIN":
+        await senders.sendLoginOtp(payload);
+        break;
+      case "PASSWORD_RESET":
+        await senders.sendPasswordResetOtp(payload);
+        break;
+      case "SET_PASSWORD":
+        await senders.sendSetPasswordOtp(payload);
+        break;
+      case "EMAIL_CHANGE":
+        await senders.sendEmailChangeOtp(payload);
+        break;
+      default:
+        await senders.sendLoginOtp(payload);
+    }
+  } catch (error) {
+    await invalidateOtpRecord(record.id);
+    throw error;
   }
 }
 

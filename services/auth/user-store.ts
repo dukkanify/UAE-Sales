@@ -98,6 +98,16 @@ export async function createPendingUser(input: {
   return saveUser(user);
 }
 
+export async function deletePendingUser(userId: string): Promise<void> {
+  const users = await getAllUsers();
+  const user = users.find((item) => item.id === userId);
+  if (!user || user.accountStatus !== "pending") return;
+  await saveCollection(
+    FILE,
+    users.filter((item) => item.id !== userId),
+  );
+}
+
 export async function activateUser(userId: string): Promise<UserProfile> {
   const user = await findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
