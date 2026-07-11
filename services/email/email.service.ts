@@ -37,60 +37,116 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
 
 async function deliverEmail(input: SendEmailInput): Promise<void> {
   const provider = process.env.EMAIL_PROVIDER?.trim() || "resend";
-  const sent =
-    provider === "resend" ? await sendWithResend(input) : await sendWithResend(input);
+  const sent = provider === "resend" ? await sendWithResend(input) : await sendWithResend(input);
 
   if (sent) {
     return;
   }
 
   if (process.env.NODE_ENV !== "production") {
-    console.info("[Sooqna Email:dev]", input.to, input.subject, input.text);
+    console.info("[Sooqna Email:dev]", input.to, input.subject);
     return;
   }
 
   throw new Error("EMAIL_SEND_FAILED");
 }
 
-function buildOtpEmailHtml(name: string, otp: string): string {
+function buildOtpEmailHtml(name: string, otp: string, intro: string): string {
   return `
     <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
       <div style="text-align:center;margin-bottom:24px;">
         <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
       </div>
       <p style="font-size:16px;line-height:1.8;">مرحبًا ${name}،</p>
-      <p style="font-size:16px;line-height:1.8;">رمز التحقق الخاص بك هو:</p>
+      <p style="font-size:16px;line-height:1.8;">${intro}</p>
       <p style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:24px 0;color:#0B1628;">${otp}</p>
-      <p style="font-size:14px;line-height:1.8;color:#555;">تنتهي صلاحية هذا الرمز خلال 10 دقائق.<br/>لا تشارك هذا الرمز مع أي شخص.</p>
+      <p style="font-size:14px;line-height:1.8;color:#555;">تنتهي صلاحية الرمز خلال 10 دقائق.<br/>إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.<br/>لا تشارك رمز التحقق مع أي شخص.</p>
       <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
     </div>
   `.trim();
 }
 
-function buildOtpEmailText(name: string, otp: string): string {
+function buildOtpEmailText(name: string, otp: string, intro: string): string {
   return [
     `مرحبًا ${name}،`,
     "",
-    "رمز التحقق الخاص بك هو:",
+    intro,
     otp,
     "",
-    "تنتهي صلاحية هذا الرمز خلال 10 دقائق.",
-    "لا تشارك هذا الرمز مع أي شخص.",
+    "تنتهي صلاحية الرمز خلال 10 دقائق.",
+    "إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.",
+    "لا تشارك رمز التحقق مع أي شخص.",
     "",
     "فريق سوقنا",
   ].join("\n");
 }
 
-export async function sendOtpEmail(input: {
+async function sendPurposeOtp(input: {
   email: string;
+  intro: string;
   name: string;
   otp: string;
 }): Promise<void> {
   await deliverEmail({
     to: input.email,
     subject: "رمز التحقق الخاص بك في سوقنا",
-    html: buildOtpEmailHtml(input.name, input.otp),
-    text: buildOtpEmailText(input.name, input.otp),
+    html: buildOtpEmailHtml(input.name, input.otp, input.intro),
+    text: buildOtpEmailText(input.name, input.otp, input.intro),
+  });
+}
+
+export async function sendRegistrationOtp(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendPurposeOtp({
+    ...input,
+    intro: "استخدم رمز التحقق التالي لإكمال التسجيل في سوقنا:",
+  });
+}
+
+export async function sendLoginOtp(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendPurposeOtp({
+    ...input,
+    intro: "استخدم رمز التحقق التالي لتسجيل الدخول إلى سوقنا:",
+  });
+}
+
+export async function sendSetPasswordOtp(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendPurposeOtp({
+    ...input,
+    intro: "استخدم رمز التحقق التالي لإضافة كلمة مرور لحسابك في سوقنا:",
+  });
+}
+
+export async function sendPasswordResetOtp(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendPurposeOtp({
+    ...input,
+    intro: "استخدم رمز التحقق التالي لإعادة تعيين كلمة المرور في سوقنا:",
+  });
+}
+
+export async function sendEmailChangeOtp(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendPurposeOtp({
+    ...input,
+    intro: "استخدم رمز التحقق التالي لتأكيد تغيير بريدك الإلكتروني في سوقنا:",
   });
 }
 
@@ -106,12 +162,21 @@ export async function sendWelcomeEmail(input: {
   });
 }
 
+/** @deprecated Use purpose-specific senders */
+export async function sendOtpEmail(input: {
+  email: string;
+  name: string;
+  otp: string;
+}): Promise<void> {
+  await sendRegistrationOtp(input);
+}
+
 export async function sendPasswordResetEmail(input: {
   email: string;
   name: string;
   otp: string;
 }): Promise<void> {
-  await sendOtpEmail({ email: input.email, name: input.name, otp: input.otp });
+  await sendPasswordResetOtp(input);
 }
 
 export async function sendLoginVerificationEmail(input: {
@@ -119,5 +184,5 @@ export async function sendLoginVerificationEmail(input: {
   name: string;
   otp: string;
 }): Promise<void> {
-  await sendOtpEmail({ email: input.email, name: input.name, otp: input.otp });
+  await sendLoginOtp(input);
 }

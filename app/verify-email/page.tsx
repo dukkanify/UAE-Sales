@@ -1,25 +1,25 @@
 import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
-import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
+import { VerifyEmailContent } from "@/features/auth/components/VerifyEmailContent";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
-export default function ForgotPasswordPage() {
+export default function VerifyEmailPage() {
   return (
     <>
       <SiteHeader />
       <main>
         <AuthShell
-          description="استعد الوصول إلى حسابك بخطوات بسيطة وآمنة عبر البريد الإلكتروني."
+          description="أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال العملية."
           footerAction={{
-            href: "/register",
-            label: "إنشاء حساب",
-            prompt: "ليس لديك حساب؟",
+            href: "/login",
+            label: "تسجيل الدخول",
+            prompt: "لديك حساب؟",
           }}
-          title="استعادة الحساب"
+          title="التحقق من البريد الإلكتروني"
         >
           <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
-            <ForgotPasswordForm />
+            <VerifyEmailContent />
           </Suspense>
         </AuthShell>
       </main>

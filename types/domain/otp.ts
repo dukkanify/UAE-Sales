@@ -1,11 +1,19 @@
-export type OtpPurpose = "REGISTER" | "LOGIN" | "PASSWORD_RESET" | "EMAIL_CHANGE";
+export type OtpPurpose =
+  | "REGISTER"
+  | "LOGIN"
+  | "PASSWORD_RESET"
+  | "SET_PASSWORD"
+  | "EMAIL_CHANGE"
+  | "SENSITIVE_ACTION";
 
 export type OtpRecord = {
   id: string;
   email: string;
+  userId?: string;
   purpose: OtpPurpose;
-  codeHash: string;
+  otpHash: string;
   attempts: number;
+  maxAttempts: number;
   expiresAt: string;
   createdAt: string;
   consumedAt?: string;

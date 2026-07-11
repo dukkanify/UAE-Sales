@@ -7,36 +7,51 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { maskEmail } from "@/shared/utils/mask-email";
+import { trackAuthEventClient } from "@/services/analytics/auth-events";
 
 type OtpVerificationProps = {
   email: string;
   fullName?: string;
   maskedEmail?: string;
+  nextPath?: string;
   onBack: () => void;
   onVerified?: (data?: {
     metadata?: Record<string, string>;
     ok?: boolean;
+    redirectTo?: string;
     resetToken?: string;
     user?: UserProfile;
   }) => void | Promise<void>;
   purpose: OtpPurpose;
+  verifyEndpoint?: string;
 };
 
 const COOLDOWN_SECONDS = 60;
+
+const DEFAULT_VERIFY_ENDPOINTS: Partial<Record<OtpPurpose, string>> = {
+  REGISTER: "/api/auth/register/verify-otp",
+  LOGIN: "/api/auth/login/verify-otp",
+  PASSWORD_RESET: "/api/auth/password/reset/verify-otp",
+  SET_PASSWORD: "/api/auth/password/set/verify-otp",
+};
 
 export function OtpVerification({
   email,
   fullName,
   maskedEmail,
+  nextPath,
   onBack,
   onVerified,
   purpose,
+  verifyEndpoint,
 }: OtpVerificationProps) {
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   const [cooldown, setCooldown] = useState(COOLDOWN_SECONDS);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const autoSubmittedRef = useRef("");
   const displayEmail = maskedEmail ?? maskEmail(email);
+  const endpoint = verifyEndpoint ?? DEFAULT_VERIFY_ENDPOINTS[purpose] ?? "/api/auth/otp/verify";
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -54,36 +69,44 @@ export function OtpVerification({
         return;
       }
 
-      const response = await fetch("/api/auth/otp/verify", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email, code, purpose }),
+        body: JSON.stringify({ email, code, purpose, next: nextPath }),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        setOtpError(data.message ?? "رمز التحقق غير صحيح.");
+        const attempts =
+          typeof data.attemptsRemaining === "number"
+            ? ` (المحاولات المتبقية: ${data.attemptsRemaining})`
+            : "";
+        setOtpError(`${data.message ?? "رمز التحقق غير صحيح."}${attempts}`);
         return;
       }
 
       setOtpError("");
       await onVerified?.(data);
-    }, [digits, email, onVerified, purpose]),
+    }, [digits, email, endpoint, nextPath, onVerified, purpose]),
   );
+
+  useEffect(() => {
+    if (purpose === "SET_PASSWORD") return;
+    const code = digits.join("");
+    if (code.length !== 6 || isLoading) return;
+    if (autoSubmittedRef.current === code) return;
+    autoSubmittedRef.current = code;
+    void verifyOtp();
+  }, [digits, isLoading, purpose, verifyOtp]);
 
   const { isLoading: isResending, run: resendOtp } = useAsyncAction(
     useCallback(async () => {
       if (cooldown > 0) return;
-      const response = await fetch("/api/auth/otp/verify", {
+      const response = await fetch("/api/auth/otp/resend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "resend",
-          email,
-          purpose,
-          fullName,
-        }),
+        body: JSON.stringify({ email, purpose, fullName }),
       });
       if (!response.ok) {
         setOtpError("تعذر إعادة إرسال الرمز. حاول لاحقًا.");
@@ -91,12 +114,14 @@ export function OtpVerification({
       }
       setCooldown(COOLDOWN_SECONDS);
       setOtpError("");
+      trackAuthEventClient("otp_resend", { purpose });
     }, [cooldown, email, fullName, purpose]),
   );
 
   function applyDigits(nextDigits: string[]) {
     setDigits(nextDigits);
     setOtpError("");
+    autoSubmittedRef.current = "";
   }
 
   function handleDigitChange(index: number, value: string) {
@@ -152,6 +177,7 @@ export function OtpVerification({
               inputRefs.current[index] = element;
             }}
             aria-label={`رقم ${index + 1}`}
+            autoComplete="one-time-code"
             className="focus-ring h-12 rounded-[var(--radius-xl)] border border-border bg-surface text-center text-lg font-semibold text-ink shadow-[var(--shadow-xs)]"
             inputMode="numeric"
             maxLength={1}
