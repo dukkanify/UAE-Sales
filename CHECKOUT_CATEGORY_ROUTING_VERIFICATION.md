@@ -46,8 +46,8 @@
 | Furniture | `luxury-italian-sofa-set` | عادي، استلام (+ express same emirate) |
 | Fashion | *(category configured; no mock listing)* | Same as product categories |
 | Real Estate | `villa-palm-jumeirah` | Redirected from `/checkout` |
-| Jobs | `sales-executive-business-bay` | Redirected from `/checkout` |
-| Services | `home-deep-cleaning-dubai` | Redirected from `/checkout` |
+| Jobs | `sales-executive-dubai` | Redirected from `/checkout` |
+| Services | `home-cleaning-service-dubai` | Redirected from `/checkout` |
 
 ---
 
