@@ -14,40 +14,56 @@ const schema = z.object({
   next: z.string().optional(),
 });
 
+function passwordMatches(storedHash: string, password: string): boolean {
+  try {
+    return verifyPassword(password, storedHash);
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
-  const body = await request.json();
-  const parsed = schema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
-  }
+  try {
+    const body = await request.json();
+    const parsed = schema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
+    }
 
-  const email = parsed.data.email.trim().toLowerCase();
-  const stored = await findUserByEmail(email);
+    const email = parsed.data.email.trim().toLowerCase();
+    const password = parsed.data.password;
 
-  if (stored?.passwordHash && verifyPassword(parsed.data.password, stored.passwordHash)) {
-    const user = toUserProfile(stored);
-    await setSessionCookie(user);
-    trackAuthEvent("login_verified");
-    const redirectTo = getSafeNextPath(
-      parsed.data.next,
-      getRedirectAfterAuth(user, parsed.data.next),
+    const demo = findDemoAccount(email, password);
+    if (demo) {
+      await setSessionCookie(demo.profile);
+      trackAuthEvent("login_verified");
+      const redirectTo = getSafeNextPath(
+        parsed.data.next,
+        getPostLoginPath(email, getRedirectAfterAuth(demo.profile)),
+      );
+      return NextResponse.json({ ok: true, user: demo.profile, redirectTo });
+    }
+
+    const stored = await findUserByEmail(email);
+    if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
+      const user = toUserProfile(stored);
+      await setSessionCookie(user);
+      trackAuthEvent("login_verified");
+      const redirectTo = getSafeNextPath(
+        parsed.data.next,
+        getRedirectAfterAuth(user, parsed.data.next),
+      );
+      return NextResponse.json({ ok: true, user, redirectTo });
+    }
+
+    return NextResponse.json(
+      { error: "INVALID_CREDENTIALS", message: "بيانات الدخول غير صحيحة." },
+      { status: 401 },
     );
-    return NextResponse.json({ ok: true, user, redirectTo });
-  }
-
-  const demo = findDemoAccount(email, parsed.data.password);
-  if (demo) {
-    await setSessionCookie(demo.profile);
-    trackAuthEvent("login_verified");
-    const redirectTo = getSafeNextPath(
-      parsed.data.next,
-      getPostLoginPath(email, getRedirectAfterAuth(demo.profile)),
+  } catch {
+    return NextResponse.json(
+      { error: "LOGIN_FAILED", message: "تعذر تسجيل الدخول حاليًا. حاول مرة أخرى." },
+      { status: 500 },
     );
-    return NextResponse.json({ ok: true, user: demo.profile, redirectTo });
   }
-
-  return NextResponse.json(
-    { error: "INVALID_CREDENTIALS", message: "بيانات الدخول غير صحيحة." },
-    { status: 401 },
-  );
 }
