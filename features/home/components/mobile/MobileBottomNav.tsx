@@ -17,7 +17,8 @@ export function MobileBottomNav() {
 
   return (
     <nav aria-label="التنقل السفلي" className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 lg:hidden">
-      <div className="mobile-bottom-nav__grid">
+      <div className="mobile-bottom-nav__inner">
+        <div className="mobile-bottom-nav__grid">
         {items.map((item) => {
           const isActive =
             item.href === "/"
@@ -57,6 +58,7 @@ export function MobileBottomNav() {
             </Link>
           );
         })}
+        </div>
       </div>
     </nav>
   );
