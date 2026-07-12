@@ -17,7 +17,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
   return (
     <section aria-label="التصنيفات الرئيسية" className="mobile-home-categories">
       <MobileSectionHeader actionHref="/categories" title="التصنيفات الرئيسية" />
-      <div className="mobile-home-categories__track mobile-home-scroll">
+      <div className="mobile-home-categories__grid">
         {items.map((category) => (
           <Link
             key={category.id}
@@ -25,7 +25,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
             href={`/categories/${category.slug}`}
           >
             <span className="mobile-home-categories__icon">
-              <CategoryIcon category={category} className="text-[var(--mh-gold)]" size={28} />
+              <CategoryIcon category={category} className="text-[var(--mh-gold)]" size={24} />
             </span>
             <span className="mobile-home-categories__label">
               {MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}

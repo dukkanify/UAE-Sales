@@ -16,7 +16,7 @@ export function MobileSectionHeader({
   title,
 }: MobileSectionHeaderProps) {
   return (
-    <div className="mobile-home-section-header mobile-home-section px-4">
+    <div className="mobile-home-section-header">
       <h2 className="mobile-home-section-header__title">
         {icon ? <Icon className="text-[var(--mh-gold)]" name={icon} size={16} /> : null}
         {title}

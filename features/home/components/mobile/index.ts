@@ -3,6 +3,7 @@ export { MobileCategoryGrid } from "./MobileCategoryGrid";
 export { MobileFeaturedCard } from "./MobileFeaturedCard";
 export { MobileFeaturedCardSkeleton } from "./MobileFeaturedCardSkeleton";
 export { MobileFeaturedRail } from "./MobileFeaturedRail";
+export { MobileHeroBlock } from "./MobileHeroBlock";
 export { MobileHeroSection } from "./MobileHeroSection";
 export { MobileHomeHeader } from "./MobileHomeHeader";
 export { MobileHomeShell } from "./MobileHomeShell";

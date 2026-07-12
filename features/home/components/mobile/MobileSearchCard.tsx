@@ -20,16 +20,16 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
             placeholder="ابحث عن أي شيء..."
             type="search"
           />
-          <Icon className="shrink-0 text-[var(--mh-gold)]" name="search" size={18} />
+          <Icon className="mobile-home-search-card__search-icon" name="search" size={18} />
         </label>
 
         <div className="mobile-home-search-card__filters">
           <label className="mobile-home-search-card__segment">
             <span className="mobile-home-search-card__segment-label">التصنيف</span>
-            <span className="mobile-home-search-card__segment-value">
-              <Icon className="text-[var(--mh-gold)]" name="grid" size={12} />
+            <span className="mobile-home-search-card__segment-control">
+              <Icon name="grid" size={11} />
               <select className="mobile-home-search-card__select" defaultValue="" name="category">
-                <option value="">كل التصنيفات</option>
+                <option value="">الكل</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.slug}>
                     {category.name}
@@ -41,12 +41,12 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
 
           <label className="mobile-home-search-card__segment">
             <span className="mobile-home-search-card__segment-label">المدينة</span>
-            <span className="mobile-home-search-card__segment-value">
-              <Icon className="text-[var(--mh-gold)]" name="map" size={12} />
+            <span className="mobile-home-search-card__segment-control">
+              <Icon name="map" size={11} />
               <select className="mobile-home-search-card__select" defaultValue="دبي" name="city">
-                {cities.map((city) => (
-                  <option key={city.id} value={city.name}>
-                    {city.name}
+                {cities.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
                   </option>
                 ))}
               </select>
@@ -55,20 +55,20 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
 
           <label className="mobile-home-search-card__segment">
             <span className="mobile-home-search-card__segment-label">السعر</span>
-            <span className="mobile-home-search-card__segment-value">
-              <Icon className="text-[var(--mh-gold)]" name="filter" size={12} />
+            <span className="mobile-home-search-card__segment-control">
+              <Icon name="filter" size={11} />
               <select className="mobile-home-search-card__select" defaultValue="" name="price">
                 <option value="">أي سعر</option>
-                <option value="0-50000">حتى 50,000</option>
-                <option value="50000-200000">50K – 200K</option>
+                <option value="0-50000">50K-</option>
+                <option value="50000-200000">50-200K</option>
                 <option value="200000+">200K+</option>
               </select>
             </span>
           </label>
 
           <button className="mobile-home-search-card__submit" type="submit">
-            <Icon name="search" size={14} />
-            بحث
+            <Icon name="search" size={15} />
+            <span>بحث</span>
           </button>
         </div>
       </form>

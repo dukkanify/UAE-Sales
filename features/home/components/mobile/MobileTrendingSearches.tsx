@@ -16,7 +16,7 @@ export function MobileTrendingSearches() {
   return (
     <section aria-label="الأكثر بحثاً" className="mobile-home-trending">
       <MobileSectionHeader icon="chart" title="الأكثر بحثاً" />
-      <div className="mobile-home-trending__track mobile-home-section px-4">
+      <div className="mobile-home-trending__track">
         <div ref={trackRef} className="mobile-home-trending__pills mobile-home-scroll">
           {MOBILE_TRENDING_SEARCHES.map((item) => (
             <Link

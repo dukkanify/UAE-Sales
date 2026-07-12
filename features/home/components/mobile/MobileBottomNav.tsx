@@ -30,14 +30,11 @@ export function MobileBottomNav() {
 
           if (item.fab) {
             return (
-              <div key={item.label} className="flex justify-center">
-                <Link
-                  aria-label={item.label}
-                  className="mobile-bottom-nav__fab"
-                  href={item.href}
-                >
-                  <Icon name={item.icon} size={24} />
+              <div key={item.label} className="mobile-bottom-nav__fab-slot">
+                <Link aria-label={item.label} className="mobile-bottom-nav__fab" href={item.href}>
+                  <Icon name={item.icon} size={22} />
                 </Link>
+                <span className="mobile-bottom-nav__fab-label">{item.label}</span>
               </div>
             );
           }
@@ -45,18 +42,18 @@ export function MobileBottomNav() {
           return (
             <Link
               key={item.label}
-              className={`mobile-bottom-nav__link relative ${
+              className={`mobile-bottom-nav__link ${
                 isActive ? "mobile-bottom-nav__link--active" : ""
               }`}
               href={item.href}
             >
-              <span className="relative">
+              <span className="mobile-bottom-nav__icon-wrap">
                 <Icon filled={item.icon === "heart" && isActive} name={item.icon} size={20} />
                 {item.badge ? (
                   <span className="mobile-bottom-nav__badge">{item.badge}</span>
                 ) : null}
               </span>
-              <span>{item.label}</span>
+              <span className="mobile-bottom-nav__label">{item.label}</span>
             </Link>
           );
         })}

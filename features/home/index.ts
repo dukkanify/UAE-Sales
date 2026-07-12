@@ -14,6 +14,7 @@ export {
   MobileFeaturedCard,
   MobileFeaturedCardSkeleton,
   MobileFeaturedRail,
+  MobileHeroBlock,
   MobileHeroSection,
   MobileHomeHeader,
   MobileHomeShell,

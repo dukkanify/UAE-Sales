@@ -9,11 +9,10 @@ import {
   MarketSiteFooter,
   MobileCategoryGrid,
   MobileFeaturedRail,
-  MobileHeroSection,
+  MobileHeroBlock,
   MobileHomeHeader,
   MobileHomeShell,
   MobilePromoBanner,
-  MobileSearchCard,
   MobileStatsRow,
   MobileTrendingSearches,
 } from "@/features/home";
@@ -49,8 +48,7 @@ export default async function Home() {
         <MobileHomeShell>
           <MobileHomeHeader />
           <main className="mobile-home-main">
-            <MobileHeroSection />
-            <MobileSearchCard categories={categories} />
+            <MobileHeroBlock categories={categories} />
             <MobileStatsRow />
             <MobileTrendingSearches />
             <MobileCategoryGrid categories={categories} />

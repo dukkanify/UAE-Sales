@@ -12,9 +12,9 @@ export function MobileHomeHeader() {
 
   return (
     <header className="mobile-home-header">
-      <div className="mobile-home-header__grid">
+      <div className="mobile-home-header__bar">
         <label className="mobile-home-header__location">
-          <Icon className="text-[var(--mh-gold)]" name="map" size={14} />
+          <Icon className="mobile-home-header__location-icon" name="map" size={14} />
           <select
             aria-label="الإمارة"
             className="mobile-home-header__location-select"
@@ -27,16 +27,18 @@ export function MobileHomeHeader() {
               </option>
             ))}
           </select>
-          <Icon className="text-[var(--mh-muted)]" name="chevron-left" size={12} />
+          <Icon className="mobile-home-header__chevron" name="chevron-left" size={12} />
         </label>
 
-        <Link aria-label={`${BRAND.nameAr} ${BRAND.nameEn}`} className="justify-self-center" href="/">
-          <span className="inline-flex items-center gap-2">
-            <BrandMark size={32} variant="gold" />
-            <span className="text-center">
-              <span className="mobile-home-header__logo-en">{BRAND.nameEn}</span>
-              <span className="mobile-home-header__logo-ar">{BRAND.nameAr}</span>
-            </span>
+        <Link
+          aria-label={`${BRAND.nameAr} ${BRAND.nameEn}`}
+          className="mobile-home-header__logo"
+          href="/"
+        >
+          <BrandMark size={30} variant="gold" />
+          <span className="mobile-home-header__logo-text">
+            <span className="mobile-home-header__logo-en">{BRAND.nameEn}</span>
+            <span className="mobile-home-header__logo-ar">{BRAND.nameAr}</span>
           </span>
         </Link>
 
@@ -46,14 +48,14 @@ export function MobileHomeHeader() {
             className="mobile-home-header__icon-btn"
             type="button"
           >
-            <Icon name="menu" size={22} />
+            <Icon name="menu" size={20} />
           </button>
           <Link
             aria-label="الإشعارات"
-            className="mobile-home-header__icon-btn relative"
+            className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge"
             href="/profile"
           >
-            <Icon name="bell" size={20} />
+            <Icon name="bell" size={18} />
             <span className="mobile-home-header__badge">3</span>
           </Link>
         </div>
