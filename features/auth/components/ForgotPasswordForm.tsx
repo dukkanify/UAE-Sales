@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
 import { OtpVerification } from "@/features/auth/components/OtpVerification";
+import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -17,6 +18,7 @@ function isStrongPassword(value: string) {
 
 export function ForgotPasswordForm() {
   const searchParams = useSearchParams();
+  const emailOtpEnabled = isEmailOtpEnabled();
   const initialStep = searchParams.get("step") === "password" ? "password" : "email";
   const initialEmail = searchParams.get("email") ?? "";
   const initialToken = searchParams.get("token") ?? "";
@@ -36,7 +38,19 @@ export function ForgotPasswordForm() {
       setError("");
 
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        setError("أدخل بريداً إلكترونياً صحيحاً.");
+        setError("أدخل بريدًا إلكترونيًا صحيحًا.");
+        return;
+      }
+
+      if (!emailOtpEnabled) {
+        const response = await fetch("/api/auth/password/reset/request-link", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        });
+        const data = await response.json();
+        setMessage(data.message ?? "إذا كان البريد مسجّلًا لدينا، ستصلك رسالة لإعادة تعيين كلمة المرور.");
+        setStep("done");
         return;
       }
 
@@ -53,7 +67,7 @@ export function ForgotPasswordForm() {
       const data = await response.json();
       setMaskedEmail(data.maskedEmail ?? email);
       setStep("otp");
-    }, [email]),
+    }, [email, emailOtpEnabled]),
   );
 
   const handleOtpVerified = useCallback((data?: { resetToken?: string }) => {
@@ -100,7 +114,7 @@ export function ForgotPasswordForm() {
     }, [confirmPassword, email, password, resetToken]),
   );
 
-  if (step === "otp") {
+  if (step === "otp" && emailOtpEnabled) {
     return (
       <OtpVerification
         email={email}
@@ -112,7 +126,7 @@ export function ForgotPasswordForm() {
     );
   }
 
-  if (step === "password") {
+  if (step === "password" && emailOtpEnabled) {
     return (
       <form className="grid gap-4" onSubmit={handleResetPassword}>
         <div>
@@ -159,7 +173,9 @@ export function ForgotPasswordForm() {
       <div>
         <h2 className="text-xl font-black text-ink">نسيت كلمة المرور؟</h2>
         <p className="mt-1.5 text-sm font-medium text-muted">
-          أدخل بريدك الإلكتروني وسنرسل لك رمز تحقق لإعادة تعيين كلمة المرور.
+          {emailOtpEnabled
+            ? "أدخل بريدك الإلكتروني وسنرسل لك رمز تحقق لإعادة تعيين كلمة المرور."
+            : "أدخل بريدك الإلكتروني وسنرسل لك رابطًا آمنًا لإعادة تعيين كلمة المرور."}
         </p>
       </div>
       <Input
@@ -171,7 +187,7 @@ export function ForgotPasswordForm() {
       />
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
       <Button fullWidth loading={isLoading} type="submit" variant="primary">
-        إرسال رمز التحقق
+        {emailOtpEnabled ? "إرسال رمز التحقق" : "إرسال رابط إعادة التعيين"}
       </Button>
       <Link className="text-center text-sm font-medium text-muted transition hover:text-ink" href="/login">
         العودة لتسجيل الدخول

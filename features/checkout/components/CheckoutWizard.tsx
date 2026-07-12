@@ -30,6 +30,7 @@ import { Select } from "@/shared/ui/Select";
 import { PageHero } from "@/shared/ui/PageHero";
 import { AppImage } from "@/shared/components/AppImage";
 import { cities } from "@/shared/constants/locations";
+import { formatListingConditionLabel } from "@/shared/listings/listing-condition";
 
 type CheckoutWizardProps = {
   catalogListing?: Listing;
@@ -438,6 +439,14 @@ export function CheckoutWizard({
                     ضمان مالي
                   </Badge>
                 ) : null}
+                {formatListingConditionLabel(listing.condition) ? (
+                  <p className="mt-2 text-sm text-muted">
+                    الحالة:{" "}
+                    <span className="font-semibold text-ink">
+                      {formatListingConditionLabel(listing.condition)}
+                    </span>
+                  </p>
+                ) : null}
               </div>
             </div>
             {guestCheckout && !sessionUser ? (
@@ -582,11 +591,21 @@ export function CheckoutWizard({
                         value={guestInfo.street}
                       />
                       <Input
-                        label="رقم الشقة / الفيلا"
+                        label="اسم المبنى / الفيلا"
+                        name="building"
+                        onChange={(event) =>
+                          setGuestInfo((prev) => ({ ...prev, building: event.target.value }))
+                        }
+                        required={requiresAddress}
+                        value={guestInfo.building}
+                      />
+                      <Input
+                        label="رقم الشقة / الوحدة"
                         name="unit"
                         onChange={(event) =>
                           setGuestInfo((prev) => ({ ...prev, unit: event.target.value }))
                         }
+                        required={requiresAddress}
                         value={guestInfo.unit}
                       />
                       <Input

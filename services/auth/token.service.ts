@@ -6,6 +6,18 @@ const SETUP_TOKEN_FILE = "account-setup-tokens.json";
 
 export const SETUP_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 export const GUEST_ORDER_ACCESS_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+export const PASSWORD_RESET_TOKEN_TTL_MS = 45 * 60 * 1000;
+
+const PASSWORD_RESET_TOKEN_FILE = "password-reset-link-tokens.json";
+
+export type PasswordResetTokenRecord = {
+  id: string;
+  email: string;
+  tokenHash: string;
+  expiresAt: string;
+  consumedAt?: string;
+  createdAt: string;
+};
 
 export type AccountSetupTokenRecord = {
   id: string;
@@ -71,6 +83,47 @@ export async function consumeAccountSetupToken(
   );
   await saveCollection(SETUP_TOKEN_FILE, updated);
   return { userId: match.userId, email: match.email };
+}
+
+export async function createPasswordResetToken(email: string): Promise<string> {
+  const rawToken = generateSecureToken();
+  const tokenHash = hashToken(rawToken);
+  const normalized = email.trim().toLowerCase();
+  const now = new Date().toISOString();
+
+  const tokens = await loadCollection<PasswordResetTokenRecord>(PASSWORD_RESET_TOKEN_FILE);
+  const withoutEmail = tokens.filter((item) => item.email !== normalized);
+  withoutEmail.unshift({
+    id: `reset-${Date.now()}`,
+    email: normalized,
+    tokenHash,
+    expiresAt: new Date(Date.now() + PASSWORD_RESET_TOKEN_TTL_MS).toISOString(),
+    createdAt: now,
+  });
+  await saveCollection(PASSWORD_RESET_TOKEN_FILE, withoutEmail);
+  return rawToken;
+}
+
+export async function consumePasswordResetToken(
+  rawToken: string,
+): Promise<{ email: string } | null> {
+  const tokenHash = hashToken(rawToken);
+  const tokens = await loadCollection<PasswordResetTokenRecord>(PASSWORD_RESET_TOKEN_FILE);
+  const match = tokens.find(
+    (item) =>
+      item.tokenHash === tokenHash &&
+      !item.consumedAt &&
+      new Date(item.expiresAt).getTime() > Date.now(),
+  );
+  if (!match) return null;
+
+  const updated = tokens.map((item) =>
+    item.id === match.id
+      ? { ...item, consumedAt: new Date().toISOString() }
+      : item,
+  );
+  await saveCollection(PASSWORD_RESET_TOKEN_FILE, updated);
+  return { email: match.email };
 }
 
 export function createGuestOrderAccessToken(): {

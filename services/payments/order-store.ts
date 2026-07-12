@@ -96,6 +96,26 @@ export async function updateOrder(
   return updated;
 }
 
+export async function markGuestOrdersConverted(buyerId: string): Promise<number> {
+  const orders = await getAllOrders();
+  let count = 0;
+  const updated = orders.map((order) => {
+    if (order.buyerId === buyerId && order.customerType === "guest") {
+      count += 1;
+      return {
+        ...order,
+        customerType: "guest_converted" as const,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+    return order;
+  });
+  if (count > 0) {
+    await saveCollection(ORDERS_FILE, updated);
+  }
+  return count;
+}
+
 export function generateOrderId(): string {
   return `ord-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
