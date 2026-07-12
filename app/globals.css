@@ -343,6 +343,94 @@ button:disabled {
   animation: fade-up var(--duration-slow) var(--ease-premium) both;
 }
 
+/* ── Mobile homepage (reference layout, Sooqna identity) ── */
+.mobile-home-surface {
+  background: var(--color-surface);
+  border: 1px solid rgb(232 228 222 / 80%);
+}
+
+.mobile-home-category-icon {
+  background: linear-gradient(145deg, var(--color-primary) 0%, var(--color-night-soft) 100%);
+  box-shadow: var(--shadow-xs);
+}
+
+.mobile-home-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.mobile-home-search__city {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-inline-end: 1px solid var(--color-border);
+  padding-inline-end: 0.5rem;
+  flex-shrink: 0;
+}
+
+.mobile-home-search__city-select {
+  border: 0;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  max-width: 4.5rem;
+  outline: none;
+}
+
+.mobile-home-search__input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  outline: none;
+}
+
+.mobile-home-search__input::placeholder {
+  color: var(--color-muted);
+}
+
+.mobile-home-search__submit {
+  display: grid;
+  place-items: center;
+  size: 2.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.mobile-home-promo {
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    #1b4332 55%,
+    var(--color-primary) 100%
+  );
+}
+
+.mobile-home-listing-card {
+  transition:
+    transform var(--duration-fast) var(--ease-premium),
+    box-shadow var(--duration-fast) var(--ease-premium);
+}
+
+.mobile-home-listing-card:active {
+  transform: scale(0.98);
+}
+
+.mobile-bottom-nav__fab {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, #b8955f 100%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .page-enter,
