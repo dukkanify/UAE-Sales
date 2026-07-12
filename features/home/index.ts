@@ -11,9 +11,11 @@ export { MarketSiteFooter } from "./components/marketplace/MarketSiteFooter";
 export {
   MobileBottomNav,
   MobileCategoryGrid,
-  MobileFeaturedGrid,
+  MobileFeaturedRail,
+  MobileHeroSection,
   MobileHomeHeader,
   MobileHomeListingCard,
   MobileHomeShell,
   MobilePromoBanner,
+  MobileTrendingSearches,
 } from "./components/mobile";

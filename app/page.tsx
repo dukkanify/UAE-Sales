@@ -8,10 +8,12 @@ import {
   MarketPreviewStrip,
   MarketSiteFooter,
   MobileCategoryGrid,
-  MobileFeaturedGrid,
+  MobileFeaturedRail,
+  MobileHeroSection,
   MobileHomeHeader,
   MobileHomeShell,
   MobilePromoBanner,
+  MobileTrendingSearches,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
 import { getCategories } from "@/services/categories";
@@ -45,9 +47,11 @@ export default async function Home() {
         <MobileHomeShell>
           <MobileHomeHeader />
           <main>
+            <MobileHeroSection categories={categories} />
+            <MobileTrendingSearches />
             <MobileCategoryGrid categories={categories} />
             <MobilePromoBanner />
-            <MobileFeaturedGrid listings={featuredListings} />
+            <MobileFeaturedRail categories={categoryMeta} listings={featuredListings} />
           </main>
         </MobileHomeShell>
       </div>

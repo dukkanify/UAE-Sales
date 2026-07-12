@@ -1,7 +1,10 @@
 export { MobileBottomNav } from "./MobileBottomNav";
 export { MobileCategoryGrid } from "./MobileCategoryGrid";
-export { MobileFeaturedGrid } from "./MobileFeaturedGrid";
+export { MobileFeaturedRail } from "./MobileFeaturedRail";
+export { MobileHeroSearch } from "./MobileHeroSearch";
+export { MobileHeroSection } from "./MobileHeroSection";
 export { MobileHomeHeader } from "./MobileHomeHeader";
 export { MobileHomeListingCard } from "./MobileHomeListingCard";
 export { MobileHomeShell } from "./MobileHomeShell";
 export { MobilePromoBanner } from "./MobilePromoBanner";
+export { MobileTrendingSearches } from "./MobileTrendingSearches";
