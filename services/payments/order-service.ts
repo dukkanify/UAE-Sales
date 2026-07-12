@@ -1,6 +1,8 @@
 import type { Order } from "@/types/domain/order";
 import type { CheckoutSessionResult } from "@/types/domain/payment";
 import { getAddressesForUser } from "@/services/addresses/address-store";
+import { normalizeEmail } from "@/services/auth/guest-account.service";
+import { finalizeGuestCheckoutAfterPayment } from "@/services/payments/guest-checkout.service";
 import { calculateOrderFees } from "@/services/payments/fee-calculator";
 import {
   getServerListingById,
@@ -28,6 +30,7 @@ import {
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
 import { formatCurrencyLabel } from "@/shared/utils/currency";
+import { normalizeUaePhone } from "@/shared/utils/phone";
 
 type ListingCheckoutContext = {
   snapshot: ListingSnapshot;
@@ -67,6 +70,10 @@ function resolveListingCheckoutContext(
   return null;
 }
 
+function isGuestCheckout(input: CreateCheckoutInput): boolean {
+  return Boolean(input.isGuest || !input.buyer.id);
+}
+
 export async function initiateCheckout(
   input: CreateCheckoutInput,
 ): Promise<CheckoutSessionResult> {
@@ -76,12 +83,20 @@ export async function initiateCheckout(
   }
 
   const listing = context.snapshot;
+  const guest = isGuestCheckout(input);
+  const buyerEmail = normalizeEmail(input.buyer.email);
+  const buyerName = input.buyer.fullName.trim();
+  const buyerPhone = normalizeUaePhone(input.buyer.phone ?? "");
 
-  if (listing.seller.id === input.buyer.id) {
+  if (!guest && listing.seller.id === input.buyer.id) {
     throw new Error("CANNOT_BUY_OWN_LISTING");
   }
 
-  const existingPending = await findPendingOrder(input.buyer.id, listing.id);
+  const existingPending = await findPendingOrder(
+    input.buyer.id,
+    listing.id,
+    guest ? buyerEmail : undefined,
+  );
   if (existingPending) {
     return {
       mode: isStripeConfigured() ? "checkout" : "mock",
@@ -90,9 +105,11 @@ export async function initiateCheckout(
   }
 
   let buyerEmirate: string | undefined;
-  if (input.addressId) {
+  if (input.addressId && input.buyer.id) {
     const addresses = await getAddressesForUser(input.buyer.id);
     buyerEmirate = addresses.find((item) => item.id === input.addressId)?.emirate;
+  } else if (input.deliveryAddress?.emirate) {
+    buyerEmirate = input.deliveryAddress.emirate;
   }
 
   const shipping = resolveCheckoutShipping({
@@ -110,9 +127,13 @@ export async function initiateCheckout(
     listingId: listing.id,
     listingTitle: listing.title,
     listingSlug: listing.slug,
-    buyerId: input.buyer.id,
-    buyerName: input.buyer.fullName,
-    buyerEmail: input.buyer.email,
+    buyerId: guest ? null : input.buyer.id,
+    buyerName,
+    buyerEmail,
+    guestEmail: guest ? buyerEmail : undefined,
+    guestFullName: guest ? buyerName : undefined,
+    guestPhone: guest ? buyerPhone : undefined,
+    customerType: guest ? "guest" : "registered",
     sellerId: listing.seller.id,
     sellerName: listing.seller.name,
     status: "pending_payment",
@@ -121,6 +142,23 @@ export async function initiateCheckout(
     fees,
     shippingMethod: shipping.shippingMethod,
     deliveryAddressId: input.addressId,
+    deliveryAddressSnapshot: input.deliveryAddress
+      ? {
+          label: input.deliveryAddress.label,
+          fullName: input.deliveryAddress.fullName ?? buyerName,
+          phone: input.deliveryAddress.phone ?? buyerPhone,
+          emirate: input.deliveryAddress.emirate,
+          city: input.deliveryAddress.city,
+          area: input.deliveryAddress.area,
+          street: input.deliveryAddress.street,
+          building: input.deliveryAddress.building,
+          unit: input.deliveryAddress.unit,
+          landmark: input.deliveryAddress.landmark,
+          notes: input.deliveryAddress.notes,
+          companyName: input.deliveryAddress.companyName,
+        }
+      : undefined,
+    saveAddress: input.deliveryAddress?.saveAddress,
   });
 
   if (!isStripeConfigured()) {
@@ -134,7 +172,7 @@ export async function initiateCheckout(
 
   const session = await createCheckoutSession({
     order,
-    buyerEmail: input.buyer.email,
+    buyerEmail,
     listingTitle: listing.title,
   });
 
@@ -154,22 +192,46 @@ export async function initiateCheckout(
   return session;
 }
 
-export async function completeMockPayment(orderId: string): Promise<Order | undefined> {
+export async function completeMockPayment(orderId: string): Promise<{
+  order?: Order;
+  guestAccessToken?: string;
+  hasExistingAccount?: boolean;
+}> {
   const order = await getOrderById(orderId);
   if (!order || order.status !== "pending_payment") {
-    return order;
+    return { order };
   }
 
   return markOrderPaid(order, undefined, "mock");
+}
+
+async function sendOrderNotifications(order: Order): Promise<void> {
+  if (!order.buyerId) return;
+
+  await createNotification({
+    userId: order.buyerId,
+    orderId: order.id,
+    type: "order_paid",
+    title: "تم الدفع بنجاح",
+    body: `تم دفع مبلغ ${formatCurrencyLabel(order.fees.total)} لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
+  });
+
+  await createNotification({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "escrow_held",
+    title: "دفعة جديدة محجوزة",
+    body: `تم حجز ${formatCurrencyLabel(order.fees.productPrice)} في الضمان لطلب «${order.listingTitle}».`,
+  });
 }
 
 async function markOrderPaid(
   order: Order,
   paymentIntentId?: string,
   source: "stripe" | "mock" = "stripe",
-): Promise<Order | undefined> {
+): Promise<{ order?: Order; guestAccessToken?: string; hasExistingAccount?: boolean }> {
   if (!isValidOrderTransition(order.status, "paid_held_in_escrow")) {
-    return order;
+    return { order };
   }
 
   const sellerNet = order.fees.productPrice;
@@ -192,7 +254,7 @@ async function markOrderPaid(
     },
   );
 
-  if (!updated) return undefined;
+  if (!updated) return {};
 
   await addWalletTransaction(order.sellerId, {
     orderId: order.id,
@@ -210,21 +272,31 @@ async function markOrderPaid(
     status: "completed",
   });
 
-  await createNotification({
-    userId: order.buyerId,
-    orderId: order.id,
-    type: "order_paid",
-    title: "تم الدفع بنجاح",
-    body: `تم دفع مبلغ ${formatCurrencyLabel(order.fees.total)} لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
-  });
+  let finalOrder = updated;
+  let guestAccessToken: string | undefined;
+  let hasExistingAccount = updated.hasExistingAccount;
 
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "escrow_held",
-    title: "دفعة جديدة محجوزة",
-    body: `تم حجز ${formatCurrencyLabel(sellerNet)} في الضمان لطلب «${order.listingTitle}».`,
-  });
+  if (updated.customerType === "guest" || updated.guestEmail || !updated.buyerId) {
+    const result = await finalizeGuestCheckoutAfterPayment(updated, {
+      saveAddress: updated.saveAddress,
+      deliveryAddress: updated.deliveryAddressSnapshot
+        ? {
+            ...updated.deliveryAddressSnapshot,
+            label: updated.deliveryAddressSnapshot.label ?? "المنزل",
+            userId: "",
+            id: "",
+            isDefault: true,
+            createdAt: "",
+            updatedAt: "",
+          }
+        : undefined,
+    });
+    finalOrder = result.order;
+    guestAccessToken = result.guestAccessToken;
+    hasExistingAccount = result.hasExistingAccount;
+  }
+
+  await sendOrderNotifications(finalOrder);
 
   await logPaymentEvent({
     orderId: order.id,
@@ -232,7 +304,7 @@ async function markOrderPaid(
     payload: { source, paymentIntentId },
   });
 
-  return updated;
+  return { order: finalOrder, guestAccessToken, hasExistingAccount };
 }
 
 export async function handleCheckoutSessionCompleted(
@@ -370,13 +442,15 @@ export async function refundOrder(
     });
   }
 
-  await createNotification({
-    userId: order.buyerId,
-    orderId: order.id,
-    type: "order_refunded",
-    title: "تم استرداد المبلغ",
-    body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
-  });
+  if (order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "order_refunded",
+      title: "تم استرداد المبلغ",
+      body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
+    });
+  }
 
   await createNotification({
     userId: order.sellerId,

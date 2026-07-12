@@ -19,11 +19,18 @@ export async function POST(request: Request) {
     const result = await initiateCheckout(parsed.data);
 
     if (result.mode === "mock") {
-      await completeMockPayment(result.orderId);
+      const paymentResult = await completeMockPayment(result.orderId);
+      const params = new URLSearchParams({ orderId: result.orderId });
+      if (paymentResult.guestAccessToken) {
+        params.set("token", paymentResult.guestAccessToken);
+      }
+
       return NextResponse.json({
         mode: "mock",
         orderId: result.orderId,
-        redirectUrl: `/checkout/success?orderId=${result.orderId}`,
+        redirectUrl: `/checkout/success?${params.toString()}`,
+        guestAccessToken: paymentResult.guestAccessToken,
+        hasExistingAccount: paymentResult.hasExistingAccount,
       });
     }
 

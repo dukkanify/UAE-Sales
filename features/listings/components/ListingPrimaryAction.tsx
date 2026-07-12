@@ -18,6 +18,7 @@ import {
   getWhatsAppHref,
 } from "@/shared/listings/listing-contact";
 import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listing-url";
+import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -70,7 +71,7 @@ export function ListingPrimaryAction({
       return;
     }
     const checkoutPath = getCheckoutPath(listing);
-    if (!requireAuth(checkoutPath)) return;
+    if (!isGuestCheckoutEnabled() && !requireAuth(checkoutPath)) return;
     router.push(checkoutPath);
   }
 

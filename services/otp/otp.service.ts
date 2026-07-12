@@ -25,12 +25,21 @@ function generateOtpCode(): string {
   return String(randomInt(0, 1_000_000)).padStart(6, "0");
 }
 
+async function cleanupExpired(all: OtpRecord[]): Promise<OtpRecord[]> {
+  const now = Date.now();
+  return all.filter(
+    (item) =>
+      !item.consumedAt && new Date(item.expiresAt).getTime() > now - 24 * 60 * 60 * 1000,
+  );
+}
+
 export async function createOtpRequest(input: {
   email: string;
   purpose: OtpPurpose;
+  userId?: string;
   metadata?: Record<string, string>;
 }): Promise<{ record: OtpRecord; code: string }> {
-  const all = await loadCollection<OtpRecord>(FILE);
+  const all = await cleanupExpired(await loadCollection<OtpRecord>(FILE));
   const email = input.email.trim().toLowerCase();
   const now = Date.now();
   const cooldownMs = OTP_RESEND_COOLDOWN_SECONDS * 1000;
@@ -61,9 +70,11 @@ export async function createOtpRequest(input: {
   const record: OtpRecord = {
     id: `otp-${Date.now()}`,
     email,
+    userId: input.userId,
     purpose: input.purpose,
-    codeHash: hashOtp(code, email, input.purpose),
+    otpHash: hashOtp(code, email, input.purpose),
     attempts: 0,
+    maxAttempts: OTP_MAX_ATTEMPTS,
     expiresAt,
     createdAt: new Date(now).toISOString(),
     resendAvailableAt,
@@ -78,7 +89,11 @@ export async function createOtpRequest(input: {
 
 export type OtpVerifyResult =
   | { ok: true; record: OtpRecord }
-  | { ok: false; reason: "INVALID" | "EXPIRED" | "MAX_ATTEMPTS" | "NOT_FOUND" };
+  | {
+      ok: false;
+      reason: "INVALID" | "EXPIRED" | "MAX_ATTEMPTS" | "NOT_FOUND";
+      attemptsRemaining?: number;
+    };
 
 export async function verifyOtpCode(input: {
   email: string;
@@ -99,18 +114,23 @@ export async function verifyOtpCode(input: {
     return { ok: false, reason: "EXPIRED" };
   }
 
-  if (record.attempts >= OTP_MAX_ATTEMPTS) {
+  const maxAttempts = record.maxAttempts ?? OTP_MAX_ATTEMPTS;
+  if (record.attempts >= maxAttempts) {
     return { ok: false, reason: "MAX_ATTEMPTS" };
   }
 
   const expectedHash = hashOtp(input.code, email, input.purpose);
-  if (expectedHash !== record.codeHash) {
+  if (expectedHash !== record.otpHash) {
     record.attempts += 1;
     await saveCollection(
       FILE,
       all.map((item) => (item.id === record.id ? record : item)),
     );
-    return { ok: false, reason: "INVALID" };
+    return {
+      ok: false,
+      reason: "INVALID",
+      attemptsRemaining: Math.max(0, maxAttempts - record.attempts),
+    };
   }
 
   record.consumedAt = new Date().toISOString();
@@ -120,6 +140,14 @@ export async function verifyOtpCode(input: {
   );
 
   return { ok: true, record };
+}
+
+export async function invalidateOtpRecord(recordId: string): Promise<void> {
+  const all = await loadCollection<OtpRecord>(FILE);
+  await saveCollection(
+    FILE,
+    all.filter((item) => item.id !== recordId),
+  );
 }
 
 import { maskEmail } from "@/shared/utils/mask-email";

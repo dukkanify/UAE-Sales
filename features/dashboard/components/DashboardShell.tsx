@@ -16,7 +16,7 @@ import {
 import { removeSessionCookie } from "@/services/auth/session-sync";
 
 type DashboardShellProps = {
-  activePath: "/profile" | "/dashboard/listings" | "/chat";
+  activePath: "/profile" | "/dashboard/listings" | "/dashboard/business-onboarding" | "/chat";
   children: ReactNode;
   description: string;
   title: string;

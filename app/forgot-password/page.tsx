@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -17,7 +18,9 @@ export default function ForgotPasswordPage() {
           }}
           title="استعادة الحساب"
         >
-          <ForgotPasswordForm />
+          <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
+            <ForgotPasswordForm />
+          </Suspense>
         </AuthShell>
       </main>
       <SiteFooter />
