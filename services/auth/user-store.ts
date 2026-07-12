@@ -1,5 +1,6 @@
 import { demoAccounts } from "@/mock/demo-accounts.mock";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { hashPassword } from "@/services/auth/password.service";
 import type { AccountStatus, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
@@ -22,8 +23,11 @@ function seedDemoUsers(users: StoredUser[]): StoredUser[] {
     if (emails.has(account.profile.email.toLowerCase())) continue;
     seeded.push({
       ...account.profile,
+      role: account.role,
+      passwordHash: hashPassword(account.password),
       accountStatus: "active",
       emailVerifiedAt: account.profile.joinedAt,
+      registrationSource: "DEMO",
       onboardingStatus:
         account.profile.accountType === "company" ||
         account.profile.accountType === "business"
@@ -35,6 +39,50 @@ function seedDemoUsers(users: StoredUser[]): StoredUser[] {
   return seeded;
 }
 
+function ensureDemoUsers(users: StoredUser[]): StoredUser[] {
+  const byEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
+  let changed = false;
+
+  for (const account of demoAccounts) {
+    const email = account.profile.email.toLowerCase();
+    const existing = byEmail.get(email);
+
+    if (!existing) {
+      byEmail.set(email, {
+        ...account.profile,
+        role: account.role,
+        passwordHash: hashPassword(account.password),
+        accountStatus: "active",
+        emailVerifiedAt: account.profile.joinedAt,
+        registrationSource: "DEMO",
+        onboardingStatus:
+          account.profile.accountType === "company" ||
+          account.profile.accountType === "business"
+            ? "business_complete"
+            : "none",
+      });
+      changed = true;
+      continue;
+    }
+
+    const needsPassword = !existing.passwordHash;
+    const needsRole = existing.role !== account.role;
+
+    if (needsPassword || needsRole) {
+      byEmail.set(email, {
+        ...existing,
+        role: account.role,
+        ...(needsPassword ? { passwordHash: hashPassword(account.password) } : {}),
+        accountStatus: existing.accountStatus ?? "active",
+        registrationSource: existing.registrationSource ?? "DEMO",
+      });
+      changed = true;
+    }
+  }
+
+  return changed ? Array.from(byEmail.values()) : users;
+}
+
 export async function getAllUsers(): Promise<StoredUser[]> {
   const users = await loadCollection<StoredUser>(FILE);
   if (users.length === 0) {
@@ -42,6 +90,13 @@ export async function getAllUsers(): Promise<StoredUser[]> {
     await saveCollection(FILE, seeded);
     return seeded;
   }
+
+  const ensured = ensureDemoUsers(users);
+  if (ensured !== users) {
+    await saveCollection(FILE, ensured);
+    return ensured;
+  }
+
   return users;
 }
 
@@ -207,6 +262,10 @@ export async function resolveLoginUser(email: string): Promise<UserProfile | nul
 }
 
 export function getRedirectAfterAuth(user: UserProfile, next?: string | null): string {
+  if (user.role === "admin") {
+    return getSafeNextPath(next, "/admin");
+  }
+
   const fallback =
     user.accountType === "company" || user.accountType === "business"
       ? user.onboardingStatus === "business_pending"

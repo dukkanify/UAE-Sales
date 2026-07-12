@@ -28,23 +28,32 @@ function isValidEmail(value: string) {
 
 export function LoginForm() {
   const [errors, setErrors] = useState<LoginErrors>({});
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const emailOtpEnabled = isEmailOtpEnabled();
   const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
   const router = useRouter();
+
+  function fillDemoAccount(nextEmail: string, nextPassword: string) {
+    setEmail(nextEmail);
+    setPassword(nextPassword);
+    setUsePassword(true);
+    setErrors({});
+  }
 
   const { error: submitError, isLoading, run: handleSubmit } = useAsyncAction(
     useCallback(
       async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
-        const nextEmail = String(formData.get("email") ?? "").trim().toLowerCase();
-        const password = String(formData.get("password") ?? "");
+        const nextEmail = String(formData.get("email") ?? email).trim().toLowerCase();
+        const nextPassword = String(formData.get("password") ?? password);
         const nextErrors: LoginErrors = {};
 
         if (!isValidEmail(nextEmail)) {
           nextErrors.email = "اكتب بريدًا إلكترونيًا صحيحًا.";
         }
-        if (usePassword && !password) {
+        if (usePassword && !nextPassword) {
           nextErrors.password = "أدخل كلمة المرور.";
         }
 
@@ -58,7 +67,7 @@ export function LoginForm() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ email: nextEmail, password, next: nextParam }),
+            body: JSON.stringify({ email: nextEmail, password: nextPassword, next: nextParam }),
           });
           const data = await response.json();
           if (!response.ok) {
@@ -92,7 +101,7 @@ export function LoginForm() {
         if (nextParam) params.set("next", nextParam);
         router.push(`/verify-email?${params.toString()}`);
       },
-      [router, usePassword, emailOtpEnabled],
+      [email, password, router, usePassword, emailOtpEnabled],
     ),
   );
 
@@ -116,9 +125,11 @@ export function LoginForm() {
           error={errors.email}
           label="البريد الإلكتروني"
           name="email"
-          placeholder="user@sooqna.demo"
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="admin@sooqna.demo"
           required
           type="email"
+          value={email}
         />
 
         {usePassword || !emailOtpEnabled ? (
@@ -127,9 +138,11 @@ export function LoginForm() {
             error={errors.password}
             label="كلمة المرور"
             name="password"
+            onChange={(event) => setPassword(event.target.value)}
             placeholder="••••••••"
             required
             type="password"
+            value={password}
           />
         ) : null}
 
@@ -165,7 +178,7 @@ export function LoginForm() {
         </Button>
       </form>
 
-      <DemoAccountsPanel />
+      <DemoAccountsPanel onFillAccount={fillDemoAccount} />
     </>
   );
 }
