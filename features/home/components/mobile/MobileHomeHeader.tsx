@@ -48,7 +48,7 @@ export function MobileHomeHeader() {
             className="mobile-home-header__icon-btn"
             type="button"
           >
-            <Icon name="menu" size={20} />
+            <Icon className="shrink-0 text-[var(--mh-primary)]" name="menu" size={22} />
           </button>
           <Link
             aria-label="الإشعارات"
