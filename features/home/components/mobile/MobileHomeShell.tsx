@@ -7,7 +7,7 @@ type MobileHomeShellProps = {
 
 export function MobileHomeShell({ children }: MobileHomeShellProps) {
   return (
-    <div className="mobile-home-shell min-h-screen bg-background lg:hidden">
+    <div className="mobile-home-shell min-h-screen lg:hidden">
       {children}
       <MobileBottomNav />
     </div>

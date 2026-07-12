@@ -13,6 +13,8 @@ import {
   MobileHomeHeader,
   MobileHomeShell,
   MobilePromoBanner,
+  MobileSearchCard,
+  MobileStatsRow,
   MobileTrendingSearches,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
@@ -46,12 +48,14 @@ export default async function Home() {
       <div className="lg:hidden">
         <MobileHomeShell>
           <MobileHomeHeader />
-          <main>
-            <MobileHeroSection categories={categories} />
+          <main className="mobile-home-main">
+            <MobileHeroSection />
+            <MobileSearchCard categories={categories} />
+            <MobileStatsRow />
             <MobileTrendingSearches />
             <MobileCategoryGrid categories={categories} />
             <MobilePromoBanner />
-            <MobileFeaturedRail categories={categoryMeta} listings={featuredListings} />
+            <MobileFeaturedRail listings={featuredListings} />
           </main>
         </MobileHomeShell>
       </div>

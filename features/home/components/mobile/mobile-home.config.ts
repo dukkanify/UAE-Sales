@@ -17,18 +17,18 @@ export const MOBILE_MAIN_CATEGORY_LABELS: Record<string, string> = {
 };
 
 export const MOBILE_TRENDING_SEARCHES = [
-  { href: "/search?q=ساعات", label: "ساعات", icon: "watch" as const },
-  { href: "/search?q=شقة", label: "شقق", icon: "home" as const },
-  { href: "/search?q=iPhone", label: "iPhone", icon: "phone" as const },
-  { href: "/search?q=فيلا", label: "فلل", icon: "home" as const },
-  { href: "/search?q=Land+Cruiser", label: "لاند كروزر", icon: "car" as const },
+  { emoji: "⌚", href: "/search?q=ساعات", label: "ساعات" },
+  { emoji: "🏢", href: "/search?q=شقة", label: "شقق" },
+  { emoji: "📱", href: "/search?q=iPhone", label: "iPhone" },
+  { emoji: "🏡", href: "/search?q=فيلا", label: "فلل" },
+  { emoji: "🚗", href: "/search?q=Land+Cruiser", label: "Land Cruiser" },
 ] as const;
 
 export const MOBILE_TRUST_STATS = [
-  { icon: "grid" as const, label: "إعلان نشط", value: "24K+" },
-  { icon: "shield" as const, label: "مستخدم موثق", value: "18K+" },
-  { icon: "star" as const, label: "تقييم المنصة", value: "4.8/5" },
-  { icon: "wallet" as const, label: "معاملة آمنة", value: "12K+" },
+  { icon: "grid" as const, label: "إعلان نشط", tone: "gold" as const, value: "24K+" },
+  { icon: "user" as const, label: "مستخدم موثق", tone: "muted" as const, value: "18K+" },
+  { icon: "star" as const, label: "تقييم المنصة", tone: "gold" as const, value: "4.8/5" },
+  { icon: "shield" as const, label: "معاملة آمنة", tone: "primary" as const, value: "12K+" },
 ] as const;
 
 export function getMobileMainCategories(categories: Category[]): Category[] {
