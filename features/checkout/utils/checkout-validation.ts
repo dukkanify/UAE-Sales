@@ -15,6 +15,8 @@ export const CHECKOUT_ERRORS = {
   invalidPhone: "اكتب رقم هاتف إماراتي صحيحًا.",
   nameRequired: "الاسم الكامل مطلوب.",
   addressRequired: "أكمل بيانات العنوان للتوصيل.",
+  buildingRequired: "اسم المبنى أو الفيلا مطلوب.",
+  unitRequired: "رقم الشقة أو الوحدة مطلوب.",
 } as const;
 
 export type CheckoutReviewValidation =
@@ -115,8 +117,12 @@ export function validateGuestDeliveryStep(
     !input.emirate?.trim() ||
     !input.city?.trim() ||
     !input.area?.trim() ||
-    !input.street?.trim()
+    !input.street?.trim() ||
+    !input.building?.trim() ||
+    !input.unit?.trim()
   ) {
+    if (!input.building?.trim()) return CHECKOUT_ERRORS.buildingRequired;
+    if (!input.unit?.trim()) return CHECKOUT_ERRORS.unitRequired;
     return CHECKOUT_ERRORS.addressRequired;
   }
 

@@ -116,6 +116,13 @@ export function OrderStatusContent({ token }: OrderStatusContentProps) {
               {order.deliveryAddressSnapshot.emirate}
             </p>
             <p className="mt-1 text-sm text-muted">{order.deliveryAddressSnapshot.street}</p>
+            {order.deliveryAddressSnapshot.building || order.deliveryAddressSnapshot.unit ? (
+              <p className="mt-1 text-sm text-muted">
+                {[order.deliveryAddressSnapshot.building, order.deliveryAddressSnapshot.unit]
+                  .filter(Boolean)
+                  .join(" — ")}
+              </p>
+            ) : null}
           </Card>
         ) : null}
 

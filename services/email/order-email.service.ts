@@ -1,13 +1,18 @@
 import type { Order } from "@/types/domain/order";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { deliverEmailSafely } from "@/services/email/email.service";
 
 const PENDING_EMAILS_FILE = "pending-emails.json";
 
 export type PendingEmailEvent = {
   id: string;
-  type: "order_confirmation" | "seller_order_notification";
+  type:
+    | "order_confirmation"
+    | "seller_order_notification"
+    | "password_reset"
+    | "account_setup";
   to: string;
-  orderId: string;
+  orderId?: string;
   payload: Record<string, string>;
   createdAt: string;
   status: "pending" | "sent" | "failed";
@@ -99,8 +104,6 @@ async function queuePendingEmail(event: Omit<PendingEmailEvent, "id" | "createdA
   await saveCollection(PENDING_EMAILS_FILE, events);
 }
 
-import { deliverEmailSafely } from "@/services/email/email.service";
-
 export async function queueOrderConfirmationEmail(input: {
   order: Order;
   guestAccessToken: string;
@@ -175,4 +178,44 @@ async function queueSellerOrderNotification(order: Order): Promise<void> {
       payload: { listingTitle: order.listingTitle },
     });
   }
+}
+
+export async function sendPasswordResetLinkEmail(input: {
+  email: string;
+  name: string;
+  resetLink: string;
+}): Promise<boolean> {
+  const emailPayload = {
+    to: input.email,
+    subject: "إعادة تعيين كلمة المرور — سوقنا",
+    html: `
+      <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
+        <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.name}،</p>
+        <p style="font-size:16px;line-height:1.8;">تلقينا طلبًا لإعادة تعيين كلمة المرور.</p>
+        <p style="text-align:center;margin:20px 0;"><a href="${input.resetLink}" style="background:#0B1628;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">إعادة تعيين كلمة المرور</a></p>
+        <p style="font-size:14px;line-height:1.8;color:#555;">ينتهي الرابط خلال 45 دقيقة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.</p>
+        <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
+      </div>
+    `.trim(),
+    text: [
+      `مرحبًا ${input.name}،`,
+      "",
+      "تلقينا طلبًا لإعادة تعيين كلمة المرور.",
+      input.resetLink,
+      "",
+      "ينتهي الرابط خلال 45 دقيقة.",
+      "",
+      "فريق سوقنا",
+    ].join("\n"),
+  };
+
+  const sent = await deliverEmailSafely(emailPayload);
+  if (!sent) {
+    await queuePendingEmail({
+      type: "password_reset",
+      to: input.email,
+      payload: { resetLink: input.resetLink },
+    });
+  }
+  return sent;
 }

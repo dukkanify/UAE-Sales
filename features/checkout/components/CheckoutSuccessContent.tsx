@@ -42,13 +42,23 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
 
   useEffect(() => {
     let cancelled = false;
+    const sessionUser = getSessionSnapshot();
 
     const load = async () => {
       try {
+        if (!guestToken && !sessionUser) {
+          if (!cancelled) {
+            setError("للمتابعة استخدم رابط الطلب الآمن من بريدك الإلكتروني.");
+          }
+          return;
+        }
+
         const url = guestToken
           ? `/api/order-status?token=${encodeURIComponent(guestToken)}`
           : `/api/orders/${orderId}`;
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          credentials: guestToken ? "same-origin" : "include",
+        });
         const data = await response.json();
         if (cancelled) return;
 
@@ -211,7 +221,11 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
             <p className="mt-1 text-sm text-muted">
               {address.area}، {address.city}، {address.emirate}
             </p>
-            <p className="mt-1 text-sm text-muted">{address.street}</p>
+            <p className="mt-1 text-sm text-muted">
+              {address.street}
+              {address.building ? ` — ${address.building}` : ""}
+              {address.unit ? ` — ${address.unit}` : ""}
+            </p>
           </Card>
         ) : null}
 

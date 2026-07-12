@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Order } from "@/types";
-import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -37,16 +36,31 @@ export function OrderDetailContent({
   const [confirmMessage, setConfirmMessage] = useState("");
 
   useEffect(() => {
-    fetch(`/api/orders/${orderId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.order) setOrder(data.order);
-        else setError("لم يتم العثور على الطلب.");
+    fetch(`/api/orders/${orderId}`, { credentials: "include" })
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.status === 401) {
+          router.push(`/login?next=/orders/${orderId}`);
+          return null;
+        }
+        if (res.status === 403) {
+          setError("ليس لديك صلاحية لعرض هذا الطلب.");
+          return null;
+        }
+        if (!data.order) {
+          setError("لم يتم العثور على الطلب.");
+          return null;
+        }
+        return data.order as Order;
+      })
+      .then((loaded) => {
+        if (loaded) setOrder(loaded);
       })
       .catch(() => setError("تعذر تحميل الطلب."));
-  }, [orderId]);
+  }, [orderId, router]);
 
   async function handleConfirmReceived() {
+    const { getSessionUser } = await import("@/services/storage");
     const user = getSessionUser();
     if (!user) {
       router.push(`/login?next=/orders/${orderId}`);
