@@ -12,3 +12,21 @@ export function isEmailOtpEnabled(): boolean {
 export function isGuestCheckoutEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_GUEST_CHECKOUT !== "false";
 }
+
+/** Mock checkout button (skip Stripe) — enabled on preview/dev by default. */
+export function isMockCheckoutEnabled(): boolean {
+  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === "false") {
+    return false;
+  }
+  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT === "true") {
+    return true;
+  }
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname.endsWith(".vercel.app") ||
+      window.location.hostname.includes("-dukkanify-"))
+  ) {
+    return true;
+  }
+  return process.env.NODE_ENV !== "production";
+}

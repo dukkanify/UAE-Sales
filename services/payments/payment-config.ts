@@ -20,5 +20,12 @@ export function getStripePublishableKey(): string | undefined {
   return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
 }
 
+/** Server-side guard for forced mock checkout (preview / non-production). */
+export function isMockCheckoutAllowed(): boolean {
+  if (process.env.ALLOW_MOCK_CHECKOUT === "true") return true;
+  if (process.env.VERCEL_ENV === "preview") return true;
+  return process.env.NODE_ENV !== "production";
+}
+
 /** Re-export for payment redirects (Stripe success/cancel URLs). */
 export { getAppUrl };

@@ -6,7 +6,7 @@ import type { DeliveryAddress, ShippingMethodId } from "@/types/domain/address";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
-import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
+import { isGuestCheckoutEnabled, isMockCheckoutEnabled } from "@/shared/constants/feature-flags";
 import {
   CHECKOUT_ERRORS,
   buildDeliveryAddressInput,
@@ -45,6 +45,21 @@ type CheckoutStep = "review" | "delivery" | "payment";
 const PLATFORM_FEE_RATE = 0.025;
 const GATEWAY_FEE_RATE = 0.029;
 const GATEWAY_FEE_FIXED = 1;
+
+const CHECKOUT_API_ERRORS: Record<string, string> = {
+  INVALID_INPUT: "بيانات الطلب غير مكتملة. راجع خطوة التوصيل.",
+  LISTING_NOT_FOUND: "الإعلان غير موجود.",
+  CANNOT_BUY_OWN_LISTING: "لا يمكنك شراء إعلانك الخاص.",
+  SHIPPING_UNAVAILABLE: "التوصيل غير متاح لهذا الطلب.",
+};
+
+function formatCheckoutApiError(data: unknown): string {
+  if (!data || typeof data !== "object" || !("error" in data)) {
+    return LISTING_ERRORS.paymentFailed;
+  }
+  const code = String((data as { error: unknown }).error);
+  return CHECKOUT_API_ERRORS[code] ?? `${LISTING_ERRORS.paymentFailed} (${code})`;
+}
 
 function calculateTotals(productPrice: number, shippingFee: number) {
   const platformFee = Math.round(productPrice * PLATFORM_FEE_RATE);
@@ -260,7 +275,7 @@ export function CheckoutWizard({
     }
   }
 
-  async function handlePay() {
+  async function handlePay(options?: { forceMock?: boolean }) {
     if (!listing || !totals) return;
     setError("");
     setIsLoading(true);
@@ -293,6 +308,7 @@ export function CheckoutWizard({
         body: JSON.stringify({
           listingId: listing.id,
           isGuest,
+          forceMock: options?.forceMock === true,
           buyer: {
             id: sessionUser?.id,
             email: sessionUser?.email ?? normalized.email,
@@ -324,7 +340,7 @@ export function CheckoutWizard({
 
       const data = await response.json();
       if (!response.ok) {
-        setError(LISTING_ERRORS.paymentFailed);
+        setError(formatCheckoutApiError(data));
         return;
       }
 
@@ -364,6 +380,8 @@ export function CheckoutWizard({
   const steps: CheckoutStep[] = ["review"];
   if (showDeliveryStep) steps.push("delivery");
   steps.push("payment");
+
+  const mockCheckoutEnabled = isMockCheckoutEnabled();
 
   return (
     <section className="app-container page-padding">
@@ -616,10 +634,25 @@ export function CheckoutWizard({
                 <CurrencyAmount amount={totals.total} size="lg" />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button loading={isLoading} onClick={handlePay} type="button" variant="accent">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                loading={isLoading}
+                onClick={() => handlePay()}
+                type="button"
+                variant="accent"
+              >
                 تأكيد الدفع عبر Stripe
               </Button>
+              {mockCheckoutEnabled ? (
+                <Button
+                  loading={isLoading}
+                  onClick={() => handlePay({ forceMock: true })}
+                  type="button"
+                  variant="secondary"
+                >
+                  إتمام تجريبي (بدون Stripe)
+                </Button>
+              ) : null}
               <Button
                 onClick={() => advanceStep(showDeliveryStep ? "delivery" : "review")}
                 type="button"

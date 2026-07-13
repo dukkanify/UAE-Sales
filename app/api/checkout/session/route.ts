@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isMockCheckoutAllowed } from "@/services/payments/payment-config";
 import { createCheckoutSchema } from "@/services/payments/payment-schemas";
 import {
   completeMockPayment,
@@ -14,6 +15,10 @@ export async function POST(request: Request) {
         { error: "INVALID_INPUT", details: parsed.error.flatten() },
         { status: 400 },
       );
+    }
+
+    if (parsed.data.forceMock && !isMockCheckoutAllowed()) {
+      return NextResponse.json({ error: "MOCK_CHECKOUT_NOT_ALLOWED" }, { status: 403 });
     }
 
     const result = await initiateCheckout(parsed.data);
