@@ -30,7 +30,7 @@ export function MobileHomeHeader() {
           className="mobile-home-header__logo"
           href="/"
         >
-          <BrandMark size={30} variant="gold" />
+          <BrandMark size={32} variant="default" />
           <span className="mobile-home-header__logo-text">
             <span className="mobile-home-header__logo-en">{BRAND.nameEn}</span>
             <span className="mobile-home-header__logo-ar">{BRAND.nameAr}</span>

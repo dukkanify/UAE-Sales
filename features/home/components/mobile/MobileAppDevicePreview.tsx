@@ -23,7 +23,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
             </span>
 
             <div className="mobile-home-header__logo">
-              <BrandMark size={30} variant="gold" />
+              <BrandMark size={32} variant="default" />
               <span className="mobile-home-header__logo-text">
                 <span className="mobile-home-header__logo-en">{BRAND.nameEn}</span>
                 <span className="mobile-home-header__logo-ar">{BRAND.nameAr}</span>
