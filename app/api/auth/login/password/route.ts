@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     const email = parsed.data.email.trim().toLowerCase();
-    const password = parsed.data.password;
+    const password = parsed.data.password.trim();
 
     const demo = findDemoAccount(email, password);
     if (demo) {

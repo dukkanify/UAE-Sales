@@ -26,6 +26,17 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
+function getLoginErrorMessage(data: { message?: string; error?: string }, email: string) {
+  if (data.error === "INVALID_CREDENTIALS") {
+    if (email.includes("sooqna.demo") || email.includes("uaesales.demo")) {
+      return "بيانات الدخول غير صحيحة. تأكد من البريد وكلمة المرور كما هي: Admin@123 (حرف A كبير).";
+    }
+    return data.message ?? "بيانات الدخول غير صحيحة.";
+  }
+
+  return data.message ?? "بيانات الدخول غير صحيحة.";
+}
+
 export function LoginForm() {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [email, setEmail] = useState("");
@@ -33,6 +44,36 @@ export function LoginForm() {
   const emailOtpEnabled = isEmailOtpEnabled();
   const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
   const router = useRouter();
+
+  const completePasswordLogin = useCallback(
+    async (nextEmail: string, nextPassword: string) => {
+      const normalizedEmail = nextEmail.trim().toLowerCase();
+      const normalizedPassword = nextPassword.trim();
+      const nextParam = new URLSearchParams(window.location.search).get("next");
+
+      const response = await fetch("/api/auth/login/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          email: normalizedEmail,
+          password: normalizedPassword,
+          next: nextParam,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(getLoginErrorMessage(data, normalizedEmail));
+      }
+
+      setSessionUser(data.user as UserProfile);
+      await persistSessionCookie(data.user);
+      await syncFavoritesAfterLogin(data.user.id);
+      trackAuthEventClient("login_verified");
+      router.push(getSafeNextPath(data.redirectTo ?? nextParam, "/profile"));
+    },
+    [router],
+  );
 
   function fillDemoAccount(nextEmail: string, nextPassword: string) {
     setEmail(nextEmail);
@@ -47,37 +88,21 @@ export function LoginForm() {
         event.preventDefault();
         const formData = new FormData(event.currentTarget);
         const nextEmail = String(formData.get("email") ?? email).trim().toLowerCase();
-        const nextPassword = String(formData.get("password") ?? password);
+        const nextPassword = String(formData.get("password") ?? password).trim();
         const nextErrors: LoginErrors = {};
 
         if (!isValidEmail(nextEmail)) {
           nextErrors.email = "اكتب بريدًا إلكترونيًا صحيحًا.";
         }
-        if (usePassword && !nextPassword) {
+        if ((usePassword || !emailOtpEnabled) && !nextPassword) {
           nextErrors.password = "أدخل كلمة المرور.";
         }
 
         setErrors(nextErrors);
         if (Object.keys(nextErrors).length > 0) return;
 
-        const nextParam = new URLSearchParams(window.location.search).get("next");
-
         if (usePassword || !emailOtpEnabled) {
-          const response = await fetch("/api/auth/login/password", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
-            body: JSON.stringify({ email: nextEmail, password: nextPassword, next: nextParam }),
-          });
-          const data = await response.json();
-          if (!response.ok) {
-            throw new Error(data.message ?? "بيانات الدخول غير صحيحة.");
-          }
-          setSessionUser(data.user as UserProfile);
-          await persistSessionCookie(data.user);
-          await syncFavoritesAfterLogin(data.user.id);
-          trackAuthEventClient("login_verified");
-          router.push(getSafeNextPath(data.redirectTo ?? nextParam, "/profile"));
+          await completePasswordLogin(nextEmail, nextPassword);
           return;
         }
 
@@ -93,6 +118,7 @@ export function LoginForm() {
         }
 
         trackAuthEventClient("login_otp_sent");
+        const nextParam = new URLSearchParams(window.location.search).get("next");
         const params = new URLSearchParams({
           email: data.email ?? nextEmail,
           purpose: "LOGIN",
@@ -101,9 +127,26 @@ export function LoginForm() {
         if (nextParam) params.set("next", nextParam);
         router.push(`/verify-email?${params.toString()}`);
       },
-      [email, password, router, usePassword, emailOtpEnabled],
+      [completePasswordLogin, email, emailOtpEnabled, password, router, usePassword],
     ),
   );
+
+  const {
+    error: demoLoginError,
+    isLoading: isDemoLoginLoading,
+    run: loginDemoAccount,
+  } = useAsyncAction(
+    useCallback(
+      async (nextEmail: string, nextPassword: string) => {
+        fillDemoAccount(nextEmail, nextPassword);
+        await completePasswordLogin(nextEmail, nextPassword);
+      },
+      [completePasswordLogin],
+    ),
+  );
+
+  const isBusy = isLoading || isDemoLoginLoading;
+  const authError = submitError ?? demoLoginError;
 
   return (
     <>
@@ -139,14 +182,14 @@ export function LoginForm() {
             label="كلمة المرور"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="••••••••"
+            placeholder="Admin@123"
             required
             type="password"
             value={password}
           />
         ) : null}
 
-        {submitError ? <FormMessage variant="error">{submitError}</FormMessage> : null}
+        {authError ? <FormMessage variant="error">{authError}</FormMessage> : null}
 
         <div className="flex items-center justify-between text-sm font-medium">
           {emailOtpEnabled ? (
@@ -173,12 +216,16 @@ export function LoginForm() {
           ) : null}
         </div>
 
-        <Button fullWidth loading={isLoading} type="submit" variant="primary">
+        <Button fullWidth loading={isBusy} type="submit" variant="primary">
           {usePassword || !emailOtpEnabled ? "تسجيل الدخول" : "إرسال رمز الدخول"}
         </Button>
       </form>
 
-      <DemoAccountsPanel onFillAccount={fillDemoAccount} />
+      <DemoAccountsPanel
+        isLoading={isBusy}
+        onFillAccount={fillDemoAccount}
+        onLoginAccount={loginDemoAccount}
+      />
     </>
   );
 }
