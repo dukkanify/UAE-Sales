@@ -526,7 +526,7 @@
 
 .mobile-home-trending__pill {
   display: inline-flex;
-  shrink: 0;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.25rem;
   border: 1px solid var(--mh-border);
@@ -541,7 +541,7 @@
 
 .mobile-home-trending__scroll-btn {
   display: grid;
-  shrink: 0;
+  flex-shrink: 0;
   place-items: center;
   width: 1.875rem;
   height: 1.875rem;
@@ -692,6 +692,7 @@
 /* ── Featured ── */
 .mobile-home-featured__track {
   display: flex;
+  flex-wrap: nowrap;
   gap: 0.75rem;
   overflow-x: auto;
   padding-inline: var(--mh-page-x);
@@ -700,8 +701,8 @@
 }
 
 .mobile-home-featured-card {
-  width: var(--mh-card-width);
-  shrink: 0;
+  flex: 0 0 var(--mh-card-width);
+  min-width: var(--mh-card-width);
   overflow: hidden;
   border: 1px solid var(--mh-border);
   border-radius: var(--mh-radius-2xl);
@@ -971,7 +972,9 @@
   }
 
   .mobile-home-featured-card {
+    flex: unset;
     width: 100%;
+    min-width: 0;
     scroll-snap-align: unset;
   }
 
