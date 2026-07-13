@@ -1,8 +1,17 @@
 import Link from "next/link";
+import { AppImage } from "@/shared/components/AppImage";
 import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND } from "@/shared/constants/brand";
+import { heroBackgroundUrl, unsplashUrl } from "@/shared/constants/image-fallbacks";
 import { Icon } from "@/shared/ui/Icon";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
+
+const APP_PREVIEW_IMAGES = {
+  hero: heroBackgroundUrl,
+  featured: unsplashUrl("photo-1618843479313-40f8afb4b4d8", 640),
+  listingA: unsplashUrl("photo-1600607687939-ce8a6c25118c", 320),
+  listingB: unsplashUrl("photo-1592899677977-9c10ca588bbd", 320),
+};
 
 function AppStoreBadgeIcon() {
   return (
@@ -96,17 +105,65 @@ export function MobileAppDownload() {
             <div className="mobile-home-app__device">
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
-                <div className="mobile-home-app__device-header">
-                  <BrandMark size={22} variant="gold" />
-                  <span className="mobile-home-app__device-brand">{BRAND.nameAr}</span>
+                <AppImage
+                  alt=""
+                  className="object-cover"
+                  fallback="emirates"
+                  fill
+                  priority
+                  sizes="160px"
+                  src={APP_PREVIEW_IMAGES.hero}
+                />
+                <div className="mobile-home-app__device-overlay">
+                  <div className="mobile-home-app__device-header">
+                    <BrandMark size={18} variant="gold" />
+                    <span className="mobile-home-app__device-brand">{BRAND.nameAr}</span>
+                  </div>
+
+                  <div className="mobile-home-app__device-search">
+                    <Icon className="text-[var(--mh-gold)]" name="search" size={8} />
+                    <span>ابحث في سوقنا...</span>
+                  </div>
+
+                  <div className="mobile-home-app__device-featured">
+                    <AppImage
+                      alt=""
+                      className="object-cover"
+                      fallbackCategory="cars"
+                      fill
+                      priority
+                      sizes="140px"
+                      src={APP_PREVIEW_IMAGES.featured}
+                    />
+                    <span className="mobile-home-app__device-featured-badge">مميز</span>
+                    <span className="mobile-home-app__device-featured-price">895,000 د.إ</span>
+                  </div>
+
+                  <div className="mobile-home-app__device-thumbs">
+                    <div className="mobile-home-app__device-thumb">
+                      <AppImage
+                        alt=""
+                        className="object-cover"
+                        fallbackCategory="real-estate"
+                        fill
+                        sizes="64px"
+                        src={APP_PREVIEW_IMAGES.listingA}
+                      />
+                    </div>
+                    <div className="mobile-home-app__device-thumb">
+                      <AppImage
+                        alt=""
+                        className="object-cover"
+                        fallbackCategory="electronics"
+                        fill
+                        sizes="64px"
+                        src={APP_PREVIEW_IMAGES.listingB}
+                      />
+                    </div>
+                  </div>
+
+                  <span className="mobile-home-app__device-tag">تسوّق بثقة</span>
                 </div>
-                <div className="mobile-home-app__device-search" />
-                <div className="mobile-home-app__device-cards">
-                  <span className="mobile-home-app__device-card mobile-home-app__device-card--wide" />
-                  <span className="mobile-home-app__device-card" />
-                  <span className="mobile-home-app__device-card" />
-                </div>
-                <span className="mobile-home-app__device-tag">تسوّق بثقة</span>
               </div>
             </div>
           </div>
