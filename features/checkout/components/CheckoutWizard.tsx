@@ -21,6 +21,7 @@ import {
   getAvailableShippingMethods,
   isCategoryShippable,
 } from "@/services/shipping/shipping.service";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -433,9 +434,9 @@ export function CheckoutWizard({
                 <div className="mt-2">
                   <CurrencyAmount amount={listing.price} size="lg" />
                 </div>
-                {listing.escrowAvailable ? (
+                {showsEscrowProtection(listing) ? (
                   <Badge className="mt-2" variant="escrow">
-                    ضمان مالي
+                    ضمان مالي — دفع عبر المنصة
                   </Badge>
                 ) : null}
               </div>

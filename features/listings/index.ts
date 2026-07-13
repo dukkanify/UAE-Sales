@@ -1,5 +1,6 @@
 export { AddListingForm } from "./components/AddListingForm";
 export { EscrowProtectionCard } from "./components/EscrowProtectionCard";
+export { ListingPlatformNotice } from "./components/ListingPlatformNotice";
 export { ListingCard } from "./components/ListingCard";
 export { ListingGallery } from "./components/ListingGallery";
 export { ListingStatusBadge } from "./components/ListingStatusBadge";

@@ -2,6 +2,7 @@
 
 import type { Category, Listing } from "@/types";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
+import { ListingPlatformNotice } from "@/features/listings/components/ListingPlatformNotice";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
 import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
@@ -14,7 +15,7 @@ import {
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
-import { getListingActionConfig } from "@/shared/constants/listingActionConfig";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
@@ -40,7 +41,7 @@ export function ListingDetailsView({
   listing,
   relatedListings = [],
 }: ListingDetailsViewProps) {
-  const config = getListingActionConfig(listing);
+  const escrowProtected = showsEscrowProtection(listing);
   const locationLabel = listing.area
     ? `${listing.area}، ${listing.emirate ?? listing.city}`
     : listing.emirate
@@ -60,8 +61,8 @@ export function ListingDetailsView({
               <div className="flex flex-wrap items-center gap-2">
                 {category ? <Badge variant="muted">{category.name}</Badge> : null}
                 <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
-                {config.showEscrowBadge && listing.escrowAvailable ? (
-                  <Badge variant="escrow">ضمان مالي</Badge>
+                {escrowProtected ? (
+                  <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
                 ) : null}
               </div>
               <h1 className="mt-3 text-2xl font-black leading-tight text-ink">
@@ -104,12 +105,16 @@ export function ListingDetailsView({
               <SellerPanel listing={listing} />
             </div>
             <ListingSafetyTips />
+            <div className="mt-6 lg:hidden">
+              <ListingPlatformNotice listing={listing} />
+            </div>
           </div>
 
           <div className="hidden lg:grid lg:gap-4">
             <ListingStickyPanel category={category} listing={listing} />
             <SellerPanel listing={listing} />
-            <EscrowProtectionCard />
+            <EscrowProtectionCard listing={listing} />
+            <ListingPlatformNotice listing={listing} />
           </div>
         </div>
       </section>

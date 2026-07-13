@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import type { Listing } from "@/types";
 import { getLocalListingById, getSessionUser } from "@/services/storage";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -149,9 +150,13 @@ export function CheckoutContent({
   return (
     <section className="app-container page-padding">
       <PageHero
-        description="راجع التفاصيل وأكّد الدفع عبر Stripe. المبلغ يُحجز في الضمان حتى تأكيد الاستلام."
+        description={
+          showsEscrowProtection(listing)
+            ? "راجع التفاصيل وأكّد الدفع عبر Stripe. المبلغ يُحجز في الضمان حتى تأكيد الاستلام."
+            : "راجع التفاصيل وأكّد الدفع عبر نظام الدفع المدمج في المنصة."
+        }
         eyebrow="الدفع"
-        title="إتمام الشراء بأمان"
+        title="إتمام الشراء"
       />
 
       <div className="mx-auto mt-6 max-w-2xl grid gap-5">
@@ -160,12 +165,12 @@ export function CheckoutContent({
         ) : null}
 
         <Card className="p-6" variant="flat">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="escrow">ضمان مالي</Badge>
-            {listing.escrowAvailable ? (
+          {showsEscrowProtection(listing) ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
               <Badge variant="verified">محمي بالضمان</Badge>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
           <h2 className="mt-4 text-xl font-black text-ink">{listing.title}</h2>
           <p className="mt-2 text-sm text-muted">
             البائع: {listing.seller.name}

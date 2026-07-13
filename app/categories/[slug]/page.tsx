@@ -16,6 +16,18 @@ import {
 } from "@/services/categories";
 import { searchListings } from "@/services/listings";
 
+const ESCROW_CHECKOUT_CATEGORIES = new Set([
+  "mobiles",
+  "electronics",
+  "furniture",
+  "fashion",
+  "kids",
+  "sports",
+  "books",
+  "food",
+  "cars",
+]);
+
 type SearchParams = Record<string, string | string[] | undefined>;
 
 type CategoryPageProps = {
@@ -136,7 +148,9 @@ export default async function CategoryPage({
                 <p className="text-sm font-semibold text-ink">
                   {listings.length.toLocaleString("ar-AE")} نتيجة
                 </p>
-                <Badge variant="escrow">ضمان مالي متاح</Badge>
+                {ESCROW_CHECKOUT_CATEGORIES.has(category.id) ? (
+                  <Badge variant="escrow">ضمان مالي على الإعلانات المؤهلة</Badge>
+                ) : null}
               </div>
 
               <div className="mt-5">

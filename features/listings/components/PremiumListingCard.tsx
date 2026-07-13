@@ -7,6 +7,7 @@ import { AppImage } from "@/shared/components/AppImage";
 import { CardShareButton } from "@/shared/components/CardShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -46,7 +47,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
   const isVerified =
     listing.verifiedSeller ?? listing.seller.isVerified ?? (listing.seller.rating ?? 0) >= 4.8;
-  const showEscrow = listing.escrowAvailable === true;
+  const showEscrow = showsEscrowProtection(listing);
 
   const imageArea = (
     <div
