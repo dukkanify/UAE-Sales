@@ -2,6 +2,7 @@
 
 import type { Category, Listing } from "@/types";
 import { getCheckoutListingParam } from "@/shared/listings/listing-ownership";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
@@ -43,8 +44,8 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         <Badge variant={conditionVariants[listing.condition]}>
           {conditionLabels[listing.condition]}
         </Badge>
-        {listing.escrowAvailable ? (
-          <Badge variant="escrow">ضمان مالي</Badge>
+        {showsEscrowProtection(listing) ? (
+          <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}
       </div>
 

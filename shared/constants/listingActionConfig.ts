@@ -73,7 +73,7 @@ export function getListingActionConfig(listing: Listing): ListingActionConfig {
       checkoutEnabled: false,
       shippingEnabled: false,
       showBuyNow: false,
-      showEscrowBadge: Boolean(listing.escrowAvailable),
+      showEscrowBadge: false,
     };
   }
 
@@ -102,7 +102,7 @@ export function getListingActionConfig(listing: Listing): ListingActionConfig {
       checkoutEnabled: purchasable,
       shippingEnabled: false,
       showBuyNow: purchasable,
-      showEscrowBadge: Boolean(listing.escrowAvailable),
+      showEscrowBadge: purchasable,
     };
   }
 
@@ -114,7 +114,7 @@ export function getListingActionConfig(listing: Listing): ListingActionConfig {
       checkoutEnabled: true,
       shippingEnabled: true,
       showBuyNow: true,
-      showEscrowBadge: Boolean(listing.escrowAvailable),
+      showEscrowBadge: true,
     };
   }
 
@@ -125,7 +125,7 @@ export function getListingActionConfig(listing: Listing): ListingActionConfig {
     checkoutEnabled: false,
     shippingEnabled: false,
     showBuyNow: false,
-    showEscrowBadge: Boolean(listing.escrowAvailable),
+    showEscrowBadge: false,
   };
 }
 

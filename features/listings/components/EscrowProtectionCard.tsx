@@ -1,9 +1,19 @@
+import type { Listing } from "@/types";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { getEscrowProtectionSteps } from "@/services/content";
 
-export async function EscrowProtectionCard() {
+type EscrowProtectionCardProps = {
+  listing: Listing;
+};
+
+export async function EscrowProtectionCard({ listing }: EscrowProtectionCardProps) {
+  if (!showsEscrowProtection(listing)) {
+    return null;
+  }
+
   const protectionSteps = await getEscrowProtectionSteps();
 
   return (
@@ -15,12 +25,13 @@ export async function EscrowProtectionCard() {
         <div>
           <h2 className="text-base font-black text-ink">حماية الدفع</h2>
           <Badge className="mt-1" variant="escrow">
-            ضمان مالي
+            ضمان مالي — دفع عبر المنصة
           </Badge>
         </div>
       </div>
       <p className="mt-4 text-sm font-medium leading-7 text-muted">
-        كل معاملة محمية بنظام الضمان المالي لحماية حقوق الطرفين.
+        يُفعَّل الضمان المالي فقط عند شراء هذا الإعلان والدفع بالكامل عبر نظام الدفع
+        المدمج في المنصة. يُحجز المبلغ بأمان حتى تأكيد الاستلام.
       </p>
       <ol className="mt-4 grid gap-2">
         {protectionSteps.map((step, index) => (

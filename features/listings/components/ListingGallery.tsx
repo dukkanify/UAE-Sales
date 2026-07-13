@@ -5,6 +5,7 @@ import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -86,7 +87,9 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
             {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
             {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
-            {listing.escrowAvailable ? <Badge variant="escrow">ضمان مالي</Badge> : null}
+            {showsEscrowProtection(listing) ? (
+              <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+            ) : null}
           </div>
 
           <div className="absolute end-3 top-3 z-10 flex gap-2 lg:hidden">

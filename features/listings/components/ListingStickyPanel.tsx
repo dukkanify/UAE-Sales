@@ -11,6 +11,7 @@ import {
   ACTION_LABELS,
   getListingActionConfig,
 } from "@/shared/constants/listingActionConfig";
+import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listing-url";
 import {
@@ -59,8 +60,8 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         <Badge variant={conditionVariants[listing.condition]}>
           {conditionLabels[listing.condition]}
         </Badge>
-        {config.showEscrowBadge && listing.escrowAvailable ? (
-          <Badge variant="escrow">ضمان مالي</Badge>
+        {showsEscrowProtection(listing) ? (
+          <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}
       </div>
 
