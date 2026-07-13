@@ -40,7 +40,7 @@ export async function MobileEmiratesSection() {
             >
               <AppImage
                 alt={`${city.name} — ${landmark}`}
-                className="object-cover transition duration-500 group-active:scale-[1.02]"
+                className="mobile-home-emirates__image transition duration-500 group-active:scale-[1.02]"
                 fallback="emirates"
                 fill
                 sizes="(max-width: 768px) 50vw, 33vw"

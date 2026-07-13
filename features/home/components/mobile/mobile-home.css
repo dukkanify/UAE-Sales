@@ -15,7 +15,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--mh-section-gap);
-  padding-bottom: calc(clamp(6rem, 18vw, 7.5rem) + env(safe-area-inset-bottom, 0));
+  padding-bottom: var(--mh-bottom-nav-clearance);
 }
 
 .mobile-home-scroll {
@@ -1439,11 +1439,16 @@
 .mobile-home-emirates__card {
   position: relative;
   display: block;
-  min-height: clamp(8.5rem, 38vw, 10.5rem);
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border: 1px solid var(--mh-border);
   border-radius: var(--mh-radius-xl);
   box-shadow: var(--mh-shadow-card);
+}
+
+.mobile-home-emirates__image {
+  object-fit: cover;
+  object-position: center;
 }
 
 .mobile-home-emirates__overlay {
@@ -1503,10 +1508,6 @@
   .mobile-home-emirates__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
-  }
-
-  .mobile-home-emirates__card {
-    min-height: 11.5rem;
   }
 }
 
