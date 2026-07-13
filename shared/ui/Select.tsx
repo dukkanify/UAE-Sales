@@ -23,7 +23,7 @@ export function Select({
   const hasError = Boolean(error);
 
   return (
-    <label className={`grid ${compact ? "gap-1" : "gap-1.5"}`}>
+    <label className={`grid min-w-0 ${compact ? "gap-1" : "gap-1.5"}`}>
       <span
         className={
           compact ? "text-xs font-semibold text-muted" : "text-sm font-medium text-ink"
@@ -33,7 +33,7 @@ export function Select({
       </span>
       <select
         aria-invalid={hasError || undefined}
-        className={`focus-ring rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
+        className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
         {...props}
       >
         {options.map((option) => (

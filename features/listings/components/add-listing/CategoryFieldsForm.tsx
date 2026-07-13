@@ -180,7 +180,7 @@ export function CategoryFieldsForm({
 
           if (field.key === "condition" && conditionDefault) {
             return (
-              <div key={field.key} className={spansFullWidth ? "col-span-2" : ""}>
+              <div key={field.key} className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}>
                 <Select
                   compact
                   defaultValue={String(conditionDefault)}
@@ -199,7 +199,7 @@ export function CategoryFieldsForm({
           return (
             <div
               key={field.key}
-              className={spansFullWidth ? "col-span-2" : ""}
+              className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
             >
               {renderField(field, defaults, selectedFeatures)}
               {errors[field.key] ? (

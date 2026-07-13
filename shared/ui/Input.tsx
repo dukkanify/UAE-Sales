@@ -51,7 +51,7 @@ export function Input({
 
   return (
     <label
-      className={`grid ${compact ? "gap-1" : "gap-1.5"} ${isPickerType ? "cursor-pointer" : ""}`}
+      className={`grid min-w-0 ${compact ? "gap-1" : "gap-1.5"} ${isPickerType ? "cursor-pointer" : ""}`}
       onClick={handleLabelClick}
     >
       {label ? (
@@ -68,7 +68,7 @@ export function Input({
       <input
         ref={inputRef}
         aria-invalid={hasError || undefined}
-        className={`focus-ring rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${isPickerType ? "cursor-pointer" : ""} ${className}`}
+        className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${isPickerType ? "cursor-pointer" : ""} ${className}`}
         onClick={handleInputClick}
         type={type}
         {...props}

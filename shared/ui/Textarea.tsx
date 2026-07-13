@@ -18,7 +18,7 @@ export function Textarea({
   const hasError = Boolean(error);
 
   return (
-    <label className={`grid ${compact ? "gap-1" : "gap-1.5"}`}>
+    <label className={`grid min-w-0 ${compact ? "gap-1" : "gap-1.5"}`}>
       {label ? (
         <span
           className={
@@ -30,7 +30,7 @@ export function Textarea({
       ) : null}
       <textarea
         aria-invalid={hasError || undefined}
-        className={`focus-ring rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/70 transition ${compact ? "min-h-24 rounded-lg px-3 py-2 text-xs font-medium" : "min-h-32 px-4 py-3 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
+        className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/70 transition ${compact ? "min-h-24 rounded-lg px-3 py-2 text-xs font-medium" : "min-h-32 px-4 py-3 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
         {...props}
       />
       {error ? (
