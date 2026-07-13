@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { CategoryFieldDefinition, CategorySpecs, Listing, ListingCondition } from "@/types";
 import { getCategoryFields, isDynamicCategory } from "@/shared/constants/category-fields";
 import { Card } from "@/shared/ui/Card";
@@ -26,6 +27,7 @@ type CategoryFieldsFormProps = {
   listing?: Listing;
   showContact?: boolean;
   stepLabel?: string;
+  subcategoryField?: ReactNode;
 };
 
 function getSpecValue(
@@ -128,6 +130,7 @@ export function CategoryFieldsForm({
   heading = "تفاصيل الإعلان",
   showContact = false,
   stepLabel,
+  subcategoryField,
 }: CategoryFieldsFormProps) {
   if (!isDynamicCategory(categoryId)) {
     return null;
@@ -158,6 +161,8 @@ export function CategoryFieldsForm({
       <p className="mt-2 text-sm font-medium text-muted">
         الحقول تتغير تلقائياً حسب القسم — يُعرض فقط ما تدخله.
       </p>
+
+      {subcategoryField ? <div className="mt-5">{subcategoryField}</div> : null}
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         {fields.map((field) => {

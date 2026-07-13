@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import { AppImage } from "@/shared/components/AppImage";
+import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -14,19 +14,10 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
       {categories.map((category) => (
         <Card key={category.id} className="overflow-hidden p-0" interactive>
           <div className="flex gap-0">
-            {category.imageUrl ? (
-              <div className="relative hidden min-h-full w-28 shrink-0 sm:block">
-                <AppImage
-                  alt={category.name}
-                  className="object-cover"
-                  fallbackCategory={category.id}
-                  fill
-                  sizes="112px"
-                  src={category.imageUrl}
-                />
-              </div>
-            ) : null}
-            <div className="min-w-0 flex-1 p-5">
+            <div className="flex shrink-0 items-start p-4 sm:p-5">
+              <CategoryThumbnail category={category} size="lg" />
+            </div>
+            <div className="min-w-0 flex-1 py-5 pe-5 ps-0">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Link
                   className="text-lg font-semibold text-ink transition hover:text-primary"
