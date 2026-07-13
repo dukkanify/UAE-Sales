@@ -6,6 +6,9 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import {
+  addListingCheckboxGridClass,
+  addListingCheckboxGroupClass,
+  addListingCheckboxLabelClass,
   addListingDynamicFieldsGridClass,
   addListingStepCardClass,
   addListingStepDescClass,
@@ -84,27 +87,21 @@ function renderField(
 
   if (field.type === "checkbox-group") {
     return (
-      <fieldset
-        key={field.key}
-        className="grid gap-1.5 rounded-[var(--radius-lg)] border border-border p-3 sm:rounded-[var(--radius-xl)] sm:p-4"
-      >
-        <legend className="px-1 text-xs font-semibold text-ink sm:text-sm">
+      <fieldset key={field.key} className={addListingCheckboxGroupClass}>
+        <legend className="mb-1 px-0.5 text-xs font-semibold text-ink">
           {field.label}
         </legend>
-        <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-2">
+        <div className={addListingCheckboxGridClass}>
           {(field.options ?? []).map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center gap-2 text-xs font-medium text-muted sm:text-sm"
-            >
+            <label key={option.value} className={addListingCheckboxLabelClass}>
               <input
-                className="size-4 accent-primary"
+                className="size-3.5 shrink-0 accent-primary sm:size-4"
                 defaultChecked={selectedFeatures.includes(option.value)}
                 name={name}
                 type="checkbox"
                 value={option.value}
               />
-              {option.label}
+              <span className="min-w-0 truncate">{option.label}</span>
             </label>
           ))}
         </div>
@@ -208,13 +205,13 @@ export function CategoryFieldsForm({
             </div>
           );
         })}
-      </div>
 
-      {featureField ? (
-        <div className="mt-3 sm:mt-4">
-          {renderField(featureField, defaults, selectedFeatures)}
-        </div>
-      ) : null}
+        {featureField ? (
+          <div className="col-span-2 min-w-0">
+            {renderField(featureField, defaults, selectedFeatures)}
+          </div>
+        ) : null}
+      </div>
 
       <div className={addListingStepFooterClass}>
         <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-2">
