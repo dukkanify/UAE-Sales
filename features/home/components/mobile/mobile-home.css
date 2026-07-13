@@ -1281,24 +1281,22 @@
   border-radius: 1rem;
   isolation: isolate;
   background: #fff;
-  --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview {
   position: absolute;
   inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
   overflow: hidden;
   border-radius: inherit;
   background: #fff;
+  /* cqw must be read from a child of the query container, not on device-screen itself */
+  --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview-frame {
   width: calc(390px * var(--preview-scale));
   height: 100%;
-  flex-shrink: 0;
+  margin-inline: auto;
   overflow: hidden;
 }
 
@@ -1380,7 +1378,7 @@
 }
 
 @supports not (width: 1cqw) {
-  .mobile-home-app__device-screen {
+  .mobile-home-app__device-preview {
     --preview-scale: 0.36;
   }
 }
