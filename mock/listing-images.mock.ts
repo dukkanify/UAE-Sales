@@ -74,27 +74,23 @@ const slugCategories: Record<string, ImageFallbackCategory> = {
 /** Product-specific Unsplash photos for accurate marketplace previews */
 const curatedPhotoIds: Record<string, readonly string[]> = {
   "mercedes-amg-g63-2024": [
-    "photo-1617531653332-bd46c24f2068",
-    "photo-1617788138017-80ad40651399",
-    "photo-1533473359331-0135ef1b58bf",
+    "photo-1609184166822-bd1f1b991a06",
+    "photo-1749454006837-d2e73bb8a677",
   ],
   "toyota-land-cruiser-2023": [
-    "photo-1549317661-bd32c8ce0db2",
-    "photo-1536700503339-1e4b06520771",
-    "photo-1617788138017-80ad40651399",
+    "photo-1709620435533-56483034bdd4",
+    "photo-1690917448793-cf9a81b31940",
   ],
   "nissan-patrol-platinum-2022": [
-    "photo-1618843479313-40f8afb4b4d8",
-    "photo-1536700503339-1e4b06520771",
-    "photo-1502877338535-766e1452684a",
+    "photo-1742230285052-8c3b445c01fc",
   ],
   "bmw-x7-2023": [
-    "photo-1555215695-3004980ad54e",
-    "photo-1617788138017-80ad40651399",
+    "photo-1701985470695-e430a8fdc8d6",
+    "photo-1740815514959-07d12c339e8f",
   ],
   "tesla-model-y-2024": [
-    "photo-1560958089-b8a1929cea89",
-    "photo-1619767886558-efdc259cde1a",
+    "photo-1670332361054-7ddef413097e",
+    "photo-1676754568744-7852efc67c40",
   ],
   "villa-palm-jumeirah": [
     "photo-1600585154340-be6161a56a0c",
@@ -302,8 +298,7 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1488477181941-6428a0291777",
   ],
   "my-nissan-patrol-platinum-2022": [
-    "photo-1618843479313-40f8afb4b4d8",
-    "photo-1536700503339-1e4b06520771",
+    "photo-1742230285052-8c3b445c01fc",
   ],
   "my-iphone-15-pro-sale": [
     "photo-1695048133142-1a20484d2569",

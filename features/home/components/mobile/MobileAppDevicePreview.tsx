@@ -27,7 +27,7 @@ function MockListingCard({ listing }: { listing: Listing }) {
           fallbackCategory={listing.categoryId}
           fill
           priority
-          sizes="180px"
+          sizes="240px"
           src={listingImage}
         />
         {listing.isFeatured ? (
@@ -35,10 +35,13 @@ function MockListingCard({ listing }: { listing: Listing }) {
         ) : null}
       </div>
       <div className="mobile-home-app__mock-card-body">
-        <p className="mobile-home-app__mock-card-title">{listing.title}</p>
-        <p className="mobile-home-app__mock-card-meta">{location}</p>
         <p className="mobile-home-app__mock-card-price" dir="ltr">
           {formatCurrencyDisplay(listing.price, "ar-AE")}
+        </p>
+        <p className="mobile-home-app__mock-card-title">{listing.title}</p>
+        <p className="mobile-home-app__mock-card-meta">
+          <Icon name="map" size={8} />
+          {location}
         </p>
       </div>
     </article>
