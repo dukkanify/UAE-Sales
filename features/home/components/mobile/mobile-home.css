@@ -2,7 +2,9 @@
 
 /* ── Page container ── */
 .mobile-home-shell {
+  width: 100%;
   overflow-x: hidden;
+  background: var(--mh-bg);
 }
 
 .mobile-home-page {
@@ -1619,54 +1621,57 @@
   color: white;
 }
 
-/* ── Breakpoints: 360 / 375 / 390 / 412 / 430 ── */
+/* ── Breakpoints: fluid width scaling (360 → tablet) ── */
 @media (min-width: 360px) {
   .mobile-home-shell {
-    --mh-page-x: clamp(0.875rem, 3.8vw, 1.125rem);
+    --mh-page-x: clamp(0.875rem, 3.8vw, 1.25rem);
   }
 }
 
 @media (min-width: 375px) {
   .mobile-home-shell {
-    --mh-text-lg: clamp(1.375rem, 5vw, 1.625rem);
+    --mh-text-lg: clamp(1.375rem, 5vw, 1.75rem);
   }
 }
 
 @media (min-width: 390px) {
   .mobile-home-shell {
-    --mh-card-width: clamp(16.5rem, 72vw, 18.5rem);
-    --mh-category-icon: clamp(3.5rem, 13vw, 4.5rem);
+    --mh-card-width: clamp(16.5rem, 68vw, 20rem);
+    --mh-category-icon: clamp(3.5rem, 11vw, 4.25rem);
   }
 }
 
-@media (min-width: 412px) {
+@media (min-width: 480px) {
   .mobile-home-shell {
-    --mh-page-x: 1.125rem;
-    --mh-nav-max: 26rem;
+    --mh-page-max: min(100%, 36rem);
+    --mh-nav-max: min(100%, 36rem);
+    --mh-page-x: clamp(1rem, 4.5vw, 1.375rem);
+    --mh-card-width: clamp(17rem, 46vw, 21rem);
   }
 }
 
-@media (min-width: 430px) {
+@media (min-width: 600px) {
   .mobile-home-shell {
-    --mh-page-max: 26rem;
-    --mh-nav-max: 26rem;
-    --mh-card-width: 18.5rem;
+    --mh-page-max: min(100%, 40rem);
+    --mh-nav-max: min(100%, 40rem);
+    --mh-section-gap: 1.5rem;
+    --mh-category-icon: clamp(3.75rem, 9vw, 4.5rem);
   }
 
-  .mobile-home-page {
-    margin-inline: auto;
+  .mobile-home-emirates__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.875rem;
   }
 }
 
-/* ── Tablet mobile layout (768px, still lg:hidden) ── */
 @media (min-width: 768px) {
   .mobile-home-shell {
-    --mh-page-max: 42rem;
-    --mh-nav-max: 42rem;
+    --mh-page-max: min(100%, 44rem);
+    --mh-nav-max: min(100%, 44rem);
     --mh-page-x: 1.5rem;
     --mh-section-gap: 1.75rem;
     --mh-text-lg: 1.75rem;
-    --mh-card-width: 20rem;
+    --mh-card-width: 21rem;
     --mh-category-icon: 4.5rem;
   }
 
@@ -1684,6 +1689,18 @@
 
   .mobile-bottom-nav__grid {
     padding-inline: 1rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .mobile-home-shell {
+    --mh-page-max: min(100%, 48rem);
+    --mh-nav-max: min(100%, 48rem);
+    --mh-hero-media-height: 15rem;
+  }
+
+  .mobile-home-hero__media {
+    height: var(--mh-hero-media-height, clamp(11rem, 38vw, 14rem));
   }
 }
 

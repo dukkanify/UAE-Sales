@@ -12,10 +12,10 @@
   --mh-error: #ef4444;
 
   /* Fluid layout */
-  --mh-page-x: clamp(0.75rem, 3.6vw, 1.25rem);
-  --mh-section-gap: clamp(1rem, 2.8vw, 1.5rem);
+  --mh-page-x: clamp(0.875rem, 4vw, 1.5rem);
+  --mh-section-gap: clamp(1rem, 2.8vw, 1.75rem);
   --mh-page-max: 100%;
-  --mh-nav-max: min(100%, 28rem);
+  --mh-nav-max: 100%;
 
   /* Fluid typography */
   --mh-text-xs: clamp(0.5625rem, 2.6vw, 0.6875rem);
@@ -28,8 +28,8 @@
   --mh-radius-lg: clamp(0.875rem, 2.6vw, 1rem);
   --mh-radius-xl: clamp(1rem, 3vw, 1.25rem);
   --mh-radius-2xl: clamp(1.125rem, 3.6vw, 1.5rem);
-  --mh-card-width: clamp(15.5rem, 78vw, 19rem);
-  --mh-category-icon: clamp(3.25rem, 12.5vw, 3.75rem);
+  --mh-card-width: clamp(15.5rem, 72vw, 22rem);
+  --mh-category-icon: clamp(3.25rem, 11vw, 4.5rem);
   --mh-fab-size: clamp(2.75rem, 10.5vw, 3.25rem);
   --mh-bottom-nav-clearance: calc(
     clamp(4.25rem, 14vw, 4.75rem) + (var(--mh-fab-size) * 0.35) + 1.5rem +
