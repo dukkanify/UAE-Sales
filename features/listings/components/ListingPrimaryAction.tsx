@@ -22,7 +22,7 @@ import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
-import { Icon } from "@/shared/ui/Icon";
+import { Icon, type IconName } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -36,6 +36,16 @@ type ListingPrimaryActionProps = {
   listing: Listing;
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "accent";
+};
+
+const PRIMARY_ACTION_ICONS: Partial<Record<ListingActionType, IconName>> = {
+  APPLY_JOB: "briefcase",
+  BOOK_SERVICE: "wrench",
+  BOOK_VIEWING: "eye",
+  BUY_NOW: "package",
+  CONTACT_SELLER: "phone",
+  REQUEST_QUOTE: "send",
+  RESERVE: "car",
 };
 
 export function ListingPrimaryAction({
@@ -136,7 +146,14 @@ export function ListingPrimaryAction({
         size={size}
         variant={variant}
       >
-        {ACTION_LABELS[action]}
+        {PRIMARY_ACTION_ICONS[action] ? (
+          <span className="inline-flex items-center justify-center gap-2">
+            <Icon name={PRIMARY_ACTION_ICONS[action]} size={16} />
+            {ACTION_LABELS[action]}
+          </span>
+        ) : (
+          ACTION_LABELS[action]
+        )}
       </Button>
       {phoneConfirm && tel ? (
         <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">

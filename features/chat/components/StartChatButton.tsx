@@ -14,6 +14,7 @@ type StartChatButtonProps = {
   className?: string;
   fullWidth?: boolean;
   iconOnly?: boolean;
+  layout?: "default" | "icon" | "stacked";
   listing: Listing;
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "ghost" | "accent";
@@ -23,6 +24,7 @@ export function StartChatButton({
   className,
   fullWidth = false,
   iconOnly = false,
+  layout = "default",
   listing,
   size = "md",
   variant = "secondary",
@@ -62,10 +64,11 @@ export function StartChatButton({
     }
   }
 
+  const resolvedLayout = layout === "default" && iconOnly ? "icon" : layout;
+
   return (
     <div className={fullWidth ? "w-full" : ""}>
       <Button
-        aria-label={iconOnly ? "محادثة البائع" : undefined}
         className={className}
         fullWidth={fullWidth}
         loading={isLoading}
@@ -74,7 +77,18 @@ export function StartChatButton({
         type="button"
         variant={variant}
       >
-        {iconOnly ? <Icon name="message" size={20} /> : "محادثة البائع"}
+        {resolvedLayout === "icon" ? (
+          <Icon name="message" size={20} />
+        ) : resolvedLayout === "stacked" ? (
+          <>
+            <span className="grid size-8 place-items-center rounded-full bg-primary/8 text-primary">
+              <Icon name="message" size={17} />
+            </span>
+            <span className="text-[0.625rem] font-bold leading-none text-ink">محادثة</span>
+          </>
+        ) : (
+          "محادثة البائع"
+        )}
       </Button>
       {error ? (
         <div className="mt-2">
