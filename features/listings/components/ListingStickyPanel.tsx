@@ -55,8 +55,9 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
       : listing.city;
 
   return (
-    <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="lg:sticky lg:top-[5.25rem] lg:z-10 lg:self-start">
+      <Card className="marketplace-panel p-6">
+        <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
         <Badge variant={conditionVariants[listing.condition]}>
           {conditionLabels[listing.condition]}
@@ -64,14 +65,14 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         {showsEscrowProtection(listing) ? (
           <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}
-      </div>
+        </div>
 
-      <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
-      <div className="mt-4">
-        <CurrencyAmount amount={listing.price} size="xl" />
-      </div>
+        <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
+        <div className="mt-4">
+          <CurrencyAmount amount={listing.price} size="xl" />
+        </div>
 
-      <div className="mt-6 grid gap-3 text-sm">
+        <div className="mt-6 grid gap-3 text-sm">
         <div className="flex items-center justify-between border-b border-border pb-3">
           <span className="font-medium text-muted">الموقع</span>
           <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
@@ -103,14 +104,19 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         {!isOwn ? (
           <ListingPrimaryAction action={config.primaryAction} listing={listing} />
         ) : null}
-        <SellerContactActions listing={listing} stacked />
+        <SellerContactActions
+          hidePhone={config.primaryAction === "CONTACT_SELLER"}
+          listing={listing}
+          stacked
+        />
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <FavoriteButton className="w-full" listing={listing} />
         <ShareButton className="w-full" listing={listing} />
       </div>
-    </Card>
+      </Card>
+    </div>
   );
 }
 

@@ -200,11 +200,13 @@ export function ListingPrimaryAction({
 }
 
 type SellerContactActionsProps = {
+  hidePhone?: boolean;
   listing: Listing;
   stacked?: boolean;
 };
 
 export function SellerContactActions({
+  hidePhone = false,
   listing,
   stacked = false,
 }: SellerContactActionsProps) {
@@ -216,7 +218,7 @@ export function SellerContactActions({
 
   return (
     <div className={gridClass}>
-      {tel ? (
+      {tel && !hidePhone ? (
         <Button onClick={() => setPhoneConfirm(true)} variant="secondary">
           اتصال
         </Button>

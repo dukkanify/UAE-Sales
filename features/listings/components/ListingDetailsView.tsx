@@ -50,10 +50,10 @@ export function ListingDetailsView({
 
   return (
     <>
-      <section className="app-container page-padding pb-28 lg:pb-8">
+      <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+        <div className="grid w-full min-w-0 gap-6 overflow-x-clip lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
           <div className="min-w-0">
             <ListingGallery listing={listing} />
 
@@ -112,12 +112,14 @@ export function ListingDetailsView({
             </div>
           </div>
 
-          <div className="hidden lg:grid lg:gap-4">
-            <ListingStickyPanel category={category} listing={listing} />
-            <SellerPanel listing={listing} />
-            <EscrowProtectionCard listing={listing} />
-            <ListingPlatformNotice listing={listing} />
-          </div>
+          <aside className="hidden min-w-0 lg:block lg:self-start">
+            <div className="flex flex-col gap-4">
+              <ListingStickyPanel category={category} listing={listing} />
+              <SellerPanel listing={listing} />
+              <EscrowProtectionCard listing={listing} />
+              <ListingPlatformNotice listing={listing} />
+            </div>
+          </aside>
         </div>
       </section>
 
