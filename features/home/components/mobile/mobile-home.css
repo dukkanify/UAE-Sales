@@ -1344,6 +1344,11 @@
   height: 1.75rem;
 }
 
+.mobile-home-app__store-btn-icon--play .mobile-home-app__store-btn-graphic {
+  width: 1.125rem;
+  height: auto;
+}
+
 .mobile-home-app__store-btn-graphic {
   display: block;
   width: 100%;

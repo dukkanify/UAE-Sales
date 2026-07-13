@@ -18,11 +18,28 @@ function AppleIcon() {
 
 function GooglePlayIcon() {
   return (
-    <svg aria-hidden className="mobile-home-app__store-btn-graphic" viewBox="0 0 24 24">
-      <path d="M4 3.5v17l10.2-8.5L4 3.5Z" fill="#32BBFF" />
-      <path d="M15.8 12 6.5 19.8l11.2-6.5-1.9-1.3Z" fill="#F9AB00" />
-      <path d="M6.5 4.2 15.8 12l1.9-1.1L17.7 4.4 6.5 4.2Z" fill="#3DDC84" />
-      <path d="m17.7 19.6-1.9-1.1L15.8 12l1.9 1.1 2.8 1.6c.5.3.5 1 0 1.3l-2.8 1.6Z" fill="#EA4335" />
+    <svg
+      aria-hidden
+      className="mobile-home-app__store-btn-graphic"
+      viewBox="0 0 28.99 31.99"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M13.54 15.28.12 29.34a3.66 3.66 0 0 0 5.33 2.16l15.1-8.6Z"
+        fill="#EA4335"
+      />
+      <path
+        d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.54 3.54 0 0 0 1.5-4.79 3.62 3.62 0 0 0-1.5-1.5z"
+        fill="#FBBC04"
+      />
+      <path
+        d="M.12 2.66a3.57 3.57 0 0 0-.12.92v24.84a3.57 3.57 0 0 0 .12.92L14 15.64Z"
+        fill="#4285F4"
+      />
+      <path
+        d="m13.64 16 6.94-6.85L5.5.51A3.73 3.73 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z"
+        fill="#34A853"
+      />
     </svg>
   );
 }
