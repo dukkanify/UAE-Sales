@@ -1409,7 +1409,7 @@
 }
 
 .mobile-home-app__device-screen {
-  container-type: size;
+  container-type: inline-size;
   container-name: device-screen;
   position: relative;
   height: calc(100% - 0.6875rem);
@@ -1442,11 +1442,9 @@
   left: 50%;
   width: 390px;
   max-width: none;
-  height: calc(100cqh / var(--preview-scale));
   direction: rtl;
   transform: translateX(-50%) scale(var(--preview-scale));
   transform-origin: top center;
-  overflow: hidden;
   pointer-events: none;
   user-select: none;
 
@@ -1607,10 +1605,6 @@
 @supports not (width: 1cqw) {
   .mobile-home-app__device-preview {
     --preview-scale: 0.42;
-  }
-
-  .mobile-home-app__device-preview-inner {
-    height: calc(100% / var(--preview-scale));
   }
 }
 
