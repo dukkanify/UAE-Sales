@@ -21,7 +21,7 @@ import {
   updateOrder,
 } from "@/services/payments/order-store";
 import { logPaymentEvent } from "@/services/payments/payment-log";
-import { isStripeConfigured } from "@/services/payments/payment-config";
+import { isStripeConfigured, isMockCheckoutAllowed } from "@/services/payments/payment-config";
 import type { CreateCheckoutInput } from "@/services/payments/payment-schemas";
 import {
   createCheckoutSession,
@@ -98,6 +98,9 @@ export async function initiateCheckout(
     guest ? buyerEmail : undefined,
   );
   if (existingPending) {
+    if (input.forceMock && isMockCheckoutAllowed()) {
+      return { mode: "mock", orderId: existingPending.id };
+    }
     return {
       mode: isStripeConfigured() ? "checkout" : "mock",
       orderId: existingPending.id,
@@ -161,8 +164,10 @@ export async function initiateCheckout(
     saveAddress: input.deliveryAddress?.saveAddress,
   });
 
-  if (!isStripeConfigured()) {
-    if (process.env.NODE_ENV !== "production") {
+  if (!isStripeConfigured() || (input.forceMock && isMockCheckoutAllowed())) {
+    if (input.forceMock && isMockCheckoutAllowed()) {
+      console.warn("[Sooqna Payments] Forced mock checkout (testing).");
+    } else if (process.env.NODE_ENV !== "production") {
       console.warn(
         "[Sooqna Payments] STRIPE_SECRET_KEY is missing — using mock checkout fallback.",
       );

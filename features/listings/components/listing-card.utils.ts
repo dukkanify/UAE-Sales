@@ -1,3 +1,4 @@
+import { imagesForSlug } from "@/mock/listing-images.mock";
 import type { Listing } from "@/types";
 
 export const listingPriceFormatter = new Intl.NumberFormat("ar-AE", {
@@ -19,8 +20,35 @@ export function getListingLocation(listing: Listing): string {
 
 import { getCategoryFallbackUrl } from "@/shared/constants/image-fallbacks";
 
+/** Canonical gallery for mock listings — slug map wins over stale embedded URLs. */
+export function getListingImages(listing: Listing): string[] {
+  if (listing.id.startsWith("local-")) {
+    if (listing.images?.length) {
+      return listing.images;
+    }
+    if (listing.imageUrl) {
+      return [listing.imageUrl];
+    }
+    return [];
+  }
+
+  const curated = imagesForSlug(listing.slug);
+  if (curated.length > 0) {
+    return curated;
+  }
+
+  if (listing.images?.length) {
+    return listing.images;
+  }
+  if (listing.imageUrl) {
+    return [listing.imageUrl];
+  }
+
+  return [getCategoryFallbackUrl(listing.categoryId)];
+}
+
 export function getListingImageUrl(listing: Listing): string {
-  return listing.images?.[0] ?? listing.imageUrl ?? getCategoryFallbackUrl(listing.categoryId);
+  return getListingImages(listing)[0];
 }
 
 export const conditionLabels: Record<Listing["condition"], string> = {

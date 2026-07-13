@@ -7,8 +7,9 @@ import type {
   ListingStatus,
 } from "@/types";
 import { imagesForSlug } from "./listing-images.mock";
-import { resolveSeller } from "./sellers.mock";
+import { resolveSeller, getSellerDemoPhone } from "./sellers.mock";
 import { extrasForSlug } from "./listing-specs.mock";
+import { verticalListingSeeds } from "./listings-verticals.mock";
 
 type ListingSeed = {
   id: string;
@@ -51,7 +52,7 @@ function buildListing(seed: ListingSeed): Listing {
     descriptionEnglish: seed.descriptionEnglish,
     categoryId: seed.categoryId,
     subcategory: seed.subcategory,
-    city: seed.emirate,
+    city: seed.city,
     emirate: seed.emirate,
     area: seed.area,
     country: "الإمارات العربية المتحدة",
@@ -69,6 +70,10 @@ function buildListing(seed: ListingSeed): Listing {
     escrowAvailable: seed.escrowAvailable,
     postedAt: seed.postedAt,
     contactMethod: seed.contactMethod,
+    contactPhone:
+      seed.contactMethod === "phone" || seed.contactMethod === "both"
+        ? getSellerDemoPhone(seed.sellerKey)
+        : undefined,
     deliveryOption: seed.deliveryOption,
     imageTone: seed.imageTone,
     features: extras?.features,
@@ -1074,6 +1079,7 @@ const listingSeeds: ListingSeed[] = [
     listingStatus: "active",
     imageTone: "rose",
   },
+  ...verticalListingSeeds,
 ];
 
 export const marketplaceListings: Listing[] = listingSeeds.map(buildListing);

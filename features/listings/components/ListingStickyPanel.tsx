@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import type { Category, Listing } from "@/types";
 import { ListingPrimaryAction } from "@/features/listings/components/ListingPrimaryAction";
 import { SellerContactActions } from "@/features/listings/components/ListingPrimaryAction";
@@ -54,8 +55,8 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
       : listing.city;
 
   return (
-    <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
-      <div className="flex flex-wrap items-center gap-2">
+    <Card className="marketplace-panel w-full min-w-0 p-6">
+        <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
         <Badge variant={conditionVariants[listing.condition]}>
           {conditionLabels[listing.condition]}
@@ -63,17 +64,17 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         {showsEscrowProtection(listing) ? (
           <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}
-      </div>
+        </div>
 
-      <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
-      <div className="mt-4">
-        <CurrencyAmount amount={listing.price} size="xl" />
-      </div>
+        <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
+        <div className="mt-4">
+          <CurrencyAmount amount={listing.price} size="xl" />
+        </div>
 
-      <div className="mt-6 grid gap-3 text-sm">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <span className="font-medium text-muted">الموقع</span>
-          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+        <div className="mt-6 grid gap-3 text-sm">
+        <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+          <span className="shrink-0 font-medium text-muted">الموقع</span>
+          <span className="min-w-0 text-end inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
             {locationLabel}
           </span>
@@ -102,7 +103,11 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         {!isOwn ? (
           <ListingPrimaryAction action={config.primaryAction} listing={listing} />
         ) : null}
-        <SellerContactActions listing={listing} stacked />
+        <SellerContactActions
+          hidePhone={config.primaryAction === "CONTACT_SELLER"}
+          listing={listing}
+          stacked
+        />
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -117,6 +122,51 @@ type MobileStickyActionBarProps = {
   listing: Listing;
 };
 
+const MOBILE_BAR_PRIMARY_CLASS =
+  "!inline-flex !min-h-11 !flex-1 !items-center !justify-center !gap-1.5 !rounded-full !bg-primary !px-4 !text-[0.8125rem] !font-bold !text-secondary !shadow-[0_4px_14px_rgb(15_23_42/14%)] hover:!bg-[#1a2844] active:!scale-[0.98]";
+
+const MOBILE_CONTACT_BTN_CLASS =
+  "focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-border/70 bg-white text-ink shadow-[0_1px_6px_rgb(15_23_42/6%)] transition duration-200 hover:border-secondary/30 hover:bg-surface-muted active:scale-[0.96]";
+
+const MOBILE_CHAT_BTN_CLASS = `${MOBILE_CONTACT_BTN_CLASS} !min-h-0 !p-0 !text-primary hover:!bg-surface-muted`;
+
+function MobileContactIconButton({
+  ariaLabel,
+  children,
+  className = "",
+  external = false,
+  href,
+  onClick,
+}: {
+  ariaLabel: string;
+  children: ReactNode;
+  className?: string;
+  external?: boolean;
+  href?: string;
+  onClick?: () => void;
+}) {
+  const classes = `${MOBILE_CONTACT_BTN_CLASS} ${className}`.trim();
+
+  if (href) {
+    return (
+      <a
+        aria-label={ariaLabel}
+        className={classes}
+        href={href}
+        {...(external ? { rel: "noopener noreferrer", target: "_blank" } : {})}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <button aria-label={ariaLabel} className={classes} onClick={onClick} type="button">
+      {children}
+    </button>
+  );
+}
+
 export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const router = useRouter();
   const config = getListingActionConfig(listing);
@@ -124,55 +174,72 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const isOwn = user ? isOwnListing(listing, user) : false;
   const tel = getTelHref(listing);
   const whatsapp = getWhatsAppHref(listing, getListingCanonicalUrl(listing));
+  const showContactRail = Boolean(tel || whatsapp);
+  const showPhoneInRail = Boolean(tel && config.primaryAction !== "CONTACT_SELLER");
 
   const primaryLabel = ACTION_LABELS[config.primaryAction];
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface/95 px-3 py-2 backdrop-blur-md lg:hidden"
-      style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-white/96 shadow-[0_-8px_32px_rgb(15_23_42/8%)] backdrop-blur-lg lg:hidden"
+      style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto flex max-w-lg items-center gap-2">
-        {tel ? (
-          <a
-            aria-label="اتصال"
-            className="focus-ring inline-flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-xl)] bg-surface-muted px-2 text-[0.65rem] font-semibold"
-            href={tel}
-          >
-            <Icon name="phone" size={16} />
-            اتصال
-          </a>
-        ) : null}
-        {whatsapp ? (
-          <a
-            aria-label="واتساب"
-            className="focus-ring inline-flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-xl)] bg-surface-muted px-2 text-[0.65rem] font-semibold"
-            href={whatsapp}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            واتساب
-          </a>
-        ) : null}
-        <div className="min-w-[4.25rem]">
-          <StartChatButton listing={listing} size="sm" variant="secondary" />
-        </div>
+      <div className="mx-auto flex max-w-lg items-center gap-2 px-3.5 py-2">
         {!isOwn && config.showBuyNow ? (
           <button
-            className="focus-ring inline-flex min-h-11 flex-1 items-center justify-center rounded-[var(--radius-xl)] bg-secondary px-3 text-sm font-bold text-primary"
+            className={`focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-[0.8125rem] font-bold text-secondary shadow-[0_4px_14px_rgb(15_23_42/14%)] transition hover:bg-[#1a2844] active:scale-[0.98] ${showContactRail ? "" : "w-full"}`}
             onClick={() => router.push(getCheckoutPath(listing))}
             type="button"
           >
+            <Icon name="package" size={16} />
             {primaryLabel}
           </button>
         ) : !isOwn ? (
-          <div className="flex-1">
+          <div className={`min-w-0 flex-1 ${showContactRail ? "" : "w-full"}`}>
             <ListingPrimaryAction
               action={config.primaryAction}
+              className={MOBILE_BAR_PRIMARY_CLASS}
               listing={listing}
               size="sm"
             />
           </div>
+        ) : null}
+
+        {showContactRail ? (
+          <div className="flex shrink-0 items-center gap-1.5">
+            <StartChatButton
+              className={MOBILE_CHAT_BTN_CLASS}
+              layout="icon"
+              listing={listing}
+              size="sm"
+              variant="ghost"
+            />
+
+            {whatsapp ? (
+              <MobileContactIconButton
+                ariaLabel="مراسلة عبر واتساب"
+                className="text-[#1a9f5c]"
+                external
+                href={whatsapp}
+              >
+                <Icon name="whatsapp" size={18} />
+              </MobileContactIconButton>
+            ) : null}
+
+            {showPhoneInRail ? (
+              <MobileContactIconButton ariaLabel="اتصال بالبائع" className="text-primary" href={tel ?? undefined}>
+                <Icon name="phone" size={18} />
+              </MobileContactIconButton>
+            ) : null}
+          </div>
+        ) : !isOwn ? (
+          <StartChatButton
+            className={MOBILE_CHAT_BTN_CLASS}
+            layout="icon"
+            listing={listing}
+            size="sm"
+            variant="ghost"
+          />
         ) : null}
       </div>
     </div>

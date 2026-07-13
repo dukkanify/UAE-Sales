@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -36,13 +37,13 @@ export function Modal({
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div
       aria-labelledby={titleId}
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
       role="dialog"
     >
       <button
@@ -69,6 +70,7 @@ export function Modal({
         </div>
         <div className="mt-5">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

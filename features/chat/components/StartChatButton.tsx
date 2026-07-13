@@ -8,10 +8,13 @@ import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon } from "@/shared/ui/Icon";
 
 type StartChatButtonProps = {
   className?: string;
   fullWidth?: boolean;
+  iconOnly?: boolean;
+  layout?: "default" | "icon" | "stacked";
   listing: Listing;
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "ghost" | "accent";
@@ -20,6 +23,8 @@ type StartChatButtonProps = {
 export function StartChatButton({
   className,
   fullWidth = false,
+  iconOnly = false,
+  layout = "default",
   listing,
   size = "md",
   variant = "secondary",
@@ -59,6 +64,8 @@ export function StartChatButton({
     }
   }
 
+  const resolvedLayout = layout === "default" && iconOnly ? "icon" : layout;
+
   return (
     <div className={fullWidth ? "w-full" : ""}>
       <Button
@@ -70,7 +77,18 @@ export function StartChatButton({
         type="button"
         variant={variant}
       >
-        محادثة البائع
+        {resolvedLayout === "icon" ? (
+          <Icon name="message" size={20} />
+        ) : resolvedLayout === "stacked" ? (
+          <>
+            <span className="grid size-8 place-items-center rounded-full bg-primary/8 text-primary">
+              <Icon name="message" size={17} />
+            </span>
+            <span className="text-[0.625rem] font-bold leading-none text-ink">محادثة</span>
+          </>
+        ) : (
+          "محادثة البائع"
+        )}
       </Button>
       {error ? (
         <div className="mt-2">

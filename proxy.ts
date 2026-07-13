@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 
 const APEX_HOST = "sooqna.site";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const forwardedProto = request.headers.get("x-forwarded-proto");
   const isProduction = process.env.NODE_ENV === "production";

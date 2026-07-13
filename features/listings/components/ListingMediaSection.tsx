@@ -1,3 +1,4 @@
+import { AppImage } from "@/shared/components/AppImage";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -36,13 +37,13 @@ export function ListingMediaSection({
                 {existingImages.map((url, index) => (
                   <div
                     key={`existing-${index}`}
-                    className="relative h-20 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
+                    className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
                   >
-                    <div
-                      aria-label={`صورة محفوظة ${index + 1}`}
-                      className="absolute inset-0 bg-cover bg-center"
-                      role="img"
-                      style={{ backgroundImage: `url(${url})` }}
+                    <AppImage
+                      alt={`صورة محفوظة ${index + 1}`}
+                      className="h-full w-full"
+                      fill
+                      src={url}
                     />
                   </div>
                 ))}
@@ -56,7 +57,10 @@ export function ListingMediaSection({
               aria-label="رفع صور إضافية"
               className="sr-only"
               multiple
-              onChange={(event) => onImageChange(event.target.files)}
+              onChange={(event) => {
+                onImageChange(event.target.files);
+                event.target.value = "";
+              }}
               type="file"
             />
             <span>
@@ -75,14 +79,14 @@ export function ListingMediaSection({
               <div className="grid grid-cols-3 gap-2">
                 {imagePreviews.map((url, index) => (
                   <div
-                    key={url}
-                    className="relative h-20 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
+                    key={`${url}-${index}`}
+                    className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
                   >
-                    <div
-                      aria-label={`معاينة صورة جديدة ${index + 1}`}
-                      className="absolute inset-0 bg-cover bg-center"
-                      role="img"
-                      style={{ backgroundImage: `url(${url})` }}
+                    <AppImage
+                      alt={`معاينة صورة جديدة ${index + 1}`}
+                      className="h-full w-full"
+                      fill
+                      src={url}
                     />
                   </div>
                 ))}

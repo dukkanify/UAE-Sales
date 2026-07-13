@@ -3,21 +3,21 @@ import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
-import { getEscrowProtectionSteps } from "@/services/content";
+import { escrowProtectionSteps } from "@/services/content/homepage-marketplace.content";
 
 type EscrowProtectionCardProps = {
   listing: Listing;
 };
 
-export async function EscrowProtectionCard({ listing }: EscrowProtectionCardProps) {
+export function EscrowProtectionCard({ listing }: EscrowProtectionCardProps) {
   if (!showsEscrowProtection(listing)) {
     return null;
   }
 
-  const protectionSteps = await getEscrowProtectionSteps();
+  const protectionSteps = escrowProtectionSteps;
 
   return (
-    <Card className="marketplace-panel p-6">
+    <Card className="marketplace-panel w-full min-w-0 p-6">
       <div className="flex items-center gap-2">
         <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-success-soft text-success">
           <Icon name="shield" size={18} />

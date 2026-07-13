@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Listing } from "@/types";
+import { getListingImages } from "@/features/listings/components/listing-card.utils";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
@@ -13,13 +14,11 @@ type ListingGalleryProps = {
   listing: Listing;
 };
 
+const GALLERY_OVERLAY_BTN_CLASS =
+  "!min-h-0 !size-8 !min-w-0 !rounded-full !border-0 !bg-white/92 !p-0 !shadow-sm backdrop-blur-sm";
+
 export function ListingGallery({ listing }: ListingGalleryProps) {
-  const galleryImages =
-    listing.images && listing.images.length > 0
-      ? listing.images
-      : listing.imageUrl
-        ? [listing.imageUrl]
-        : [];
+  const galleryImages = getListingImages(listing);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -53,7 +52,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 60vw"
           src=""
         />
       </div>
@@ -83,40 +82,54 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             />
           </button>
 
-          <div className="pointer-events-none absolute start-4 top-4 z-10 flex flex-wrap gap-2">
-            {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-            {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-            {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
-            {showsEscrowProtection(listing) ? (
-              <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
-            ) : null}
-          </div>
+          <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2.5">
+            <div className="hidden min-w-0 flex-1 flex-wrap gap-1.5 lg:flex">
+              {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
+              {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
+              {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+              {showsEscrowProtection(listing) ? (
+                <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+              ) : null}
+            </div>
 
-          <div className="absolute end-3 top-3 z-10 flex gap-2 lg:hidden">
-            <FavoriteButton iconOnly listing={listing} />
-            <ShareButton iconOnly listing={listing} />
+            <div className="ms-auto flex shrink-0 gap-1 lg:hidden">
+              <FavoriteButton
+                className={GALLERY_OVERLAY_BTN_CLASS}
+                iconOnly
+                listing={listing}
+              />
+              <ShareButton className={GALLERY_OVERLAY_BTN_CLASS} iconOnly listing={listing} />
+            </div>
           </div>
 
           {galleryImages.length > 1 ? (
             <>
               <button
                 aria-label="الصورة السابقة"
-                className="focus-ring absolute start-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white"
-                onClick={goPrev}
+                className="focus-ring absolute start-2 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm sm:start-3 sm:size-9"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  goPrev();
+                }}
                 type="button"
               >
-                <Icon name="chevron-right" size={18} />
+                <Icon name="chevron-right" size={16} />
               </button>
               <button
                 aria-label="الصورة التالية"
-                className="focus-ring absolute end-3 top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white"
-                onClick={goNext}
+                className="focus-ring absolute end-2 top-1/2 z-10 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-black/40 text-white backdrop-blur-sm sm:end-3 sm:size-9"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  goNext();
+                }}
                 type="button"
               >
-                <Icon name="chevron-left" size={18} />
+                <Icon name="chevron-left" size={16} />
               </button>
-              <p className="absolute bottom-4 end-4 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white">
-                {activeIndex + 1} / {galleryImages.length}
+              <p className="absolute bottom-2.5 end-2.5 rounded-full bg-black/50 px-2.5 py-0.5 text-[0.6875rem] font-semibold text-white backdrop-blur-sm sm:bottom-3 sm:end-3 sm:px-3 sm:py-1 sm:text-xs">
+                {activeIndex + 1}
+                <span className="px-0.5 opacity-80">/</span>
+                {galleryImages.length}
               </p>
             </>
           ) : null}
@@ -157,13 +170,13 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
       </div>
 
       {galleryImages.length > 1 ? (
-        <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden">
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5 lg:hidden">
           {galleryImages.map((url, index) => (
             <button
               key={`mobile-${url}-${index}`}
               aria-label={`عرض صورة ${index + 1}`}
               aria-pressed={activeIndex === index}
-              className={`relative aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-[var(--radius-xl)] border-2 ${activeIndex === index ? "border-secondary" : "border-border"}`}
+              className={`relative aspect-square w-14 shrink-0 overflow-hidden rounded-xl border-2 transition ${activeIndex === index ? "border-secondary ring-1 ring-secondary/30" : "border-border/80 opacity-75"}`}
               onClick={() => setActiveIndex(index)}
               type="button"
             >
@@ -173,7 +186,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                 fallbackCategory={listing.categoryId}
                 fill
                 loading="lazy"
-                sizes="80px"
+                sizes="56px"
                 src={url}
               />
             </button>
@@ -209,7 +222,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               className="object-contain"
               fallbackCategory={listing.categoryId}
               fill
-              sizes="100vw"
+              sizes="(max-width: 1024px) min(100vw, 64rem), 60vw"
               src={activeImage}
             />
           </div>
@@ -222,7 +235,9 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             <Icon name="chevron-left" size={20} />
           </button>
           <p className="absolute bottom-6 rounded-full bg-black/50 px-3 py-1 text-sm font-semibold text-white">
-            {activeIndex + 1} / {galleryImages.length}
+            {activeIndex + 1}
+            <span className="px-0.5 opacity-80">/</span>
+            {galleryImages.length}
           </p>
         </div>
       ) : null}

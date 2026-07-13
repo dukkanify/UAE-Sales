@@ -38,7 +38,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
     typeof listing.seller.completedTransactions === "number";
 
   return (
-    <Card className="marketplace-panel p-6">
+    <Card className="marketplace-panel w-full min-w-0 p-6">
       <h2 className="text-base font-black text-ink">البائع</h2>
       <div className="mt-4 flex items-center gap-3">
         {listing.seller.avatarUrl ? (

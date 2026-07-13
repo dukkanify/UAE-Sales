@@ -1,6 +1,7 @@
 "use client";
 
 import type { Category } from "@/types";
+import { useCallback, useRef } from "react";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -17,6 +18,7 @@ type AddListingFormProps = {
 };
 
 export function AddListingForm({ categories }: AddListingFormProps) {
+  const detailsSectionRef = useRef<HTMLDivElement>(null);
   const {
     errors,
     handleImageChange,
@@ -30,6 +32,22 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     setSelectedCategoryId,
     submitListing,
   } = useAddListingForm(categories);
+
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => {
+      setSelectedCategoryId(categoryId);
+
+      window.requestAnimationFrame(() => {
+        window.setTimeout(() => {
+          detailsSectionRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 120);
+      });
+    },
+    [setSelectedCategoryId],
+  );
 
   if (!isAllowed) {
     return (
@@ -46,28 +64,34 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
   return (
     <form
-      className="grid gap-6 lg:grid-cols-[1fr_22rem]"
+      className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6"
       noValidate
       onSubmit={submitListing}
     >
       <input name="categoryId" type="hidden" value={selectedCategoryId} />
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 lg:gap-6">
         <AddListingStepProgress />
 
         <CategorySelectionStep
           categories={categories}
           errors={errors}
-          onSelectCategory={setSelectedCategoryId}
+          onSelectCategory={handleSelectCategory}
           selectedCategory={selectedCategory}
           selectedCategoryId={selectedCategoryId}
         />
 
-        {useDynamicFields ? (
-          <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
-        ) : (
-          <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
-        )}
+        <div
+          ref={detailsSectionRef}
+          className="scroll-mt-24 transition-shadow duration-500"
+          id="add-listing-details"
+        >
+          {useDynamicFields ? (
+            <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
+          ) : (
+            <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
+          )}
+        </div>
 
         <MediaContactStep
           errors={errors}
@@ -75,7 +99,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           onImageChange={handleImageChange}
         />
 
-        <Card className="flex flex-wrap items-center justify-between gap-4 bg-primary p-5 text-white">
+        <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
           <p className="font-medium">
             بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
           </p>

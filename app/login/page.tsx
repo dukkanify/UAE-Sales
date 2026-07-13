@@ -7,7 +7,7 @@ export default function LoginPage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="auth-page">
         <AuthShell
           description="منصة إماراتية موثوقة لبيع وشراء المنتجات والخدمات مع نظام ضمان مالي يحمي حقوق المشتري والبائع."
           footerAction={{

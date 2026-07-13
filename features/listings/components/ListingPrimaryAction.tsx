@@ -22,6 +22,7 @@ import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon, type IconName } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,14 +31,26 @@ type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
 
 type ListingPrimaryActionProps = {
   action: ListingActionType;
+  className?: string;
   fullWidth?: boolean;
   listing: Listing;
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "accent";
 };
 
+const PRIMARY_ACTION_ICONS: Partial<Record<ListingActionType, IconName>> = {
+  APPLY_JOB: "briefcase",
+  BOOK_SERVICE: "wrench",
+  BOOK_VIEWING: "eye",
+  BUY_NOW: "package",
+  CONTACT_SELLER: "phone",
+  REQUEST_QUOTE: "send",
+  RESERVE: "car",
+};
+
 export function ListingPrimaryAction({
   action,
+  className,
   fullWidth = true,
   listing,
   size = "lg",
@@ -127,12 +140,20 @@ export function ListingPrimaryAction({
   return (
     <>
       <Button
+        className={className}
         fullWidth={fullWidth}
         onClick={handleClick}
         size={size}
         variant={variant}
       >
-        {ACTION_LABELS[action]}
+        {PRIMARY_ACTION_ICONS[action] ? (
+          <span className="inline-flex items-center justify-center gap-2">
+            <Icon name={PRIMARY_ACTION_ICONS[action]} size={16} />
+            {ACTION_LABELS[action]}
+          </span>
+        ) : (
+          ACTION_LABELS[action]
+        )}
       </Button>
       {phoneConfirm && tel ? (
         <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">
@@ -179,11 +200,13 @@ export function ListingPrimaryAction({
 }
 
 type SellerContactActionsProps = {
+  hidePhone?: boolean;
   listing: Listing;
   stacked?: boolean;
 };
 
 export function SellerContactActions({
+  hidePhone = false,
   listing,
   stacked = false,
 }: SellerContactActionsProps) {
@@ -195,18 +218,19 @@ export function SellerContactActions({
 
   return (
     <div className={gridClass}>
-      {tel ? (
+      {tel && !hidePhone ? (
         <Button onClick={() => setPhoneConfirm(true)} variant="secondary">
           اتصال
         </Button>
       ) : null}
       {whatsapp ? (
         <a
-          className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-5 text-sm font-semibold text-ink shadow-[var(--shadow-xs)] transition duration-200 hover:border-secondary/50"
+          className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[#25D366]/25 bg-gradient-to-br from-[#25D366]/10 to-[#128C7E]/10 px-5 text-sm font-semibold text-[#128C7E] shadow-[var(--shadow-xs)] transition duration-200 hover:border-[#25D366]/45"
           href={whatsapp}
           rel="noopener noreferrer"
           target="_blank"
         >
+          <Icon name="whatsapp" size={16} />
           واتساب
         </a>
       ) : null}

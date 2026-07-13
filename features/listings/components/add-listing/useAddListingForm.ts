@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useImagePreviews } from "./useImagePreviews";
 import { cities, countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import type { Category, Listing } from "@/types";
@@ -39,8 +40,15 @@ function buildSellerFromSession(user: NonNullable<ReturnType<typeof getSessionUs
 export function useAddListingForm(categories: Category[]) {
   const router = useRouter();
   const [errors, setErrors] = useState<AddListingErrors & Record<string, string | undefined>>({});
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const { handleImageChange: setListingImages, imageFiles, imagePreviews } =
+    useImagePreviews();
+
+  const handleImageChange = useCallback(
+    (fileList: FileList | null, mode: "append" | "replace" = "replace") => {
+      setListingImages(fileList, 6, mode);
+    },
+    [setListingImages],
+  );
   const [preview, setPreview] = useState<ListingPreview>(defaultPreview);
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     categories[0]?.id ?? "",
@@ -150,26 +158,6 @@ export function useAddListingForm(categories: Category[]) {
       router.replace("/login?next=/listings/new");
     }
   }, [isAllowed, router]);
-
-  useEffect(() => {
-    return () => {
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [imagePreviews]);
-
-  function handleImageChange(fileList: FileList | null) {
-    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-
-    if (!fileList || fileList.length === 0) {
-      setImageFiles([]);
-      setImagePreviews([]);
-      return;
-    }
-
-    const files = Array.from(fileList).slice(0, 6);
-    setImageFiles(files);
-    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
-  }
 
   return {
     errors,

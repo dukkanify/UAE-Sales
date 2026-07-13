@@ -34,58 +34,46 @@ export function DemoAccountsPanel({
   }
 
   return (
-    <div className="marketplace-panel mt-6 p-4 text-sm">
-      <p className="text-xs font-bold text-[#B8955F]">
+    <div className="auth-demo">
+      <p className="auth-demo__title">
         {showAllDemoAccounts ? "حسابات العرض التجريبية" : "دخول المدير (عرض تجريبي)"}
       </p>
       {!showAllDemoAccounts ? (
-        <p className="mt-2 text-xs leading-6 text-muted">
-          استخدم الزر أدناه للدخول مباشرة. كلمة المرور حساسة لحالة الأحرف:{" "}
+        <p className="auth-demo__hint">
+          استخدم الزر أدناه للدخول مباشرة. كلمة المرور:{" "}
           <span className="font-semibold text-ink">Admin@123</span>
         </p>
       ) : null}
 
-      <div className="mt-4 grid gap-3">
+      <div className="auth-demo__list">
         {accounts.map((account) => (
-          <div
-            key={account.email}
-            className="rounded-[var(--radius-xl)] border border-border bg-surface-muted/60 p-3"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <p className="text-xs font-bold text-ink">{account.label}</p>
-              <div className="flex shrink-0 gap-2">
-                {onFillAccount ? (
-                  <button
-                    className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-bold text-primary transition hover:border-secondary/50 disabled:opacity-60"
-                    disabled={isLoading}
-                    onClick={() => onFillAccount(account.email, account.password)}
-                    type="button"
-                  >
-                    تعبئة
-                  </button>
-                ) : null}
-                {onLoginAccount ? (
-                  <button
-                    className="rounded-full bg-primary px-3 py-1 text-xs font-bold text-white transition hover:opacity-90 disabled:opacity-60"
-                    disabled={isLoading}
-                    onClick={() => onLoginAccount(account.email, account.password)}
-                    type="button"
-                  >
-                    {isLoading ? "جاري الدخول..." : "دخول مباشر"}
-                  </button>
-                ) : null}
-              </div>
+          <div key={account.email} className="auth-demo__item">
+            <div className="min-w-0">
+              <p className="auth-demo__item-label">{account.label}</p>
+              <p className="mt-1 truncate text-xs text-muted">{account.email}</p>
             </div>
-            <dl className="mt-2 grid gap-1 text-xs text-muted">
-              <div className="flex justify-between gap-3">
-                <dt>البريد</dt>
-                <dd className="font-semibold text-ink">{account.email}</dd>
-              </div>
-              <div className="flex justify-between gap-3">
-                <dt>كلمة المرور</dt>
-                <dd className="font-semibold text-ink">{account.password}</dd>
-              </div>
-            </dl>
+            <div className="auth-demo__item-actions">
+              {onFillAccount ? (
+                <button
+                  className="auth-demo__btn auth-demo__btn--ghost"
+                  disabled={isLoading}
+                  onClick={() => onFillAccount(account.email, account.password)}
+                  type="button"
+                >
+                  تعبئة
+                </button>
+              ) : null}
+              {onLoginAccount ? (
+                <button
+                  className="auth-demo__btn auth-demo__btn--primary"
+                  disabled={isLoading}
+                  onClick={() => onLoginAccount(account.email, account.password)}
+                  type="button"
+                >
+                  {isLoading ? "جاري الدخول..." : "دخول"}
+                </button>
+              ) : null}
+            </div>
           </div>
         ))}
       </div>

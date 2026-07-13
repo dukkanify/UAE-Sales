@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 import type { Listing } from "@/types";
+import { getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import {
   getFavoritesSnapshot,
   subscribeFavorites,
@@ -57,7 +58,7 @@ export function FavoriteButton({
       slug: listing.slug,
       title: listing.title,
       price: listing.price,
-      imageUrl: listing.imageUrl ?? listing.images?.[0],
+      imageUrl: getListingImageUrl(listing),
       savedAt: new Date().toISOString(),
     };
 

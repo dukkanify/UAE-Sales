@@ -6,10 +6,8 @@ import { useState } from "react";
 import { Modal } from "@/shared/ui/Modal";
 import { Input } from "@/shared/ui/Input";
 import { Textarea } from "@/shared/ui/Textarea";
-import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
-import { cities } from "@/shared/constants/locations";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { getSessionUser } from "@/services/storage";
 
@@ -21,6 +19,22 @@ type QuoteRequestModalProps = {
   open: boolean;
 };
 
+function getDefaultPreferredDate() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  return tomorrow.toISOString().slice(0, 10);
+}
+
+function buildDefaultDescription(listingTitle: string, isBooking: boolean, notes: string) {
+  if (notes.length >= 10) return notes;
+
+  const fallback = isBooking
+    ? `طلب حجز خدمة «${listingTitle}»`
+    : `طلب عرض سعر لخدمة «${listingTitle}»`;
+
+  return notes ? `${fallback} — ${notes}` : fallback;
+}
+
 export function QuoteRequestModal({
   kind = "quote",
   listing,
@@ -31,10 +45,11 @@ export function QuoteRequestModal({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [attachmentName, setAttachmentName] = useState("");
 
   const isBooking = kind === "service_booking";
   const title = isBooking ? "احجز الخدمة" : "طلب عرض سعر";
+  const user = typeof window !== "undefined" ? getSessionUser() : null;
+  const minDate = getDefaultPreferredDate();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -43,6 +58,14 @@ export function QuoteRequestModal({
     if (!user) return;
 
     const form = new FormData(event.currentTarget);
+    const phone = String(form.get("phone") ?? "").trim();
+    const notes = String(form.get("notes") ?? "").trim();
+
+    if (phone.length < 8) {
+      setError("أدخل رقم هاتف صحيح للتواصل.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/quote-requests", {
@@ -54,22 +77,19 @@ export function QuoteRequestModal({
           listingTitle: listing.title,
           listingSlug: listing.slug,
           requesterId: user.id,
-          requesterName: String(form.get("fullName") ?? user.fullName),
-          requesterEmail: String(form.get("email") ?? user.email),
-          phone: String(form.get("phone") ?? ""),
-          serviceRequired: String(form.get("serviceRequired") ?? listing.title),
-          description: String(form.get("description") ?? ""),
-          emirate: String(form.get("emirate") ?? ""),
-          area: String(form.get("area") ?? ""),
-          preferredDate: String(form.get("preferredDate") ?? ""),
-          preferredTime: String(form.get("preferredTime") ?? ""),
-          budgetMin: form.get("budgetMin")
-            ? Number(form.get("budgetMin"))
-            : undefined,
-          budgetMax: form.get("budgetMax")
-            ? Number(form.get("budgetMax"))
-            : undefined,
-          attachmentName: attachmentName || undefined,
+          requesterName: user.fullName,
+          requesterEmail: user.email,
+          phone,
+          serviceRequired: listing.title,
+          description: buildDefaultDescription(listing.title, isBooking, notes),
+          emirate: listing.emirate ?? listing.city ?? user.city ?? "دبي",
+          area: listing.area ?? "غير محدد",
+          preferredDate: isBooking
+            ? String(form.get("preferredDate") ?? "")
+            : minDate,
+          preferredTime: isBooking
+            ? String(form.get("preferredTime") ?? "")
+            : "10:00",
           providerId: listing.seller.id,
           providerName: listing.seller.name,
         }),
@@ -85,7 +105,7 @@ export function QuoteRequestModal({
         return;
       }
       if (response.status === 400) {
-        setError("تحقق من الحقول المطلوبة وصيغة المرفق.");
+        setError("تحقق من البيانات وأعد المحاولة.");
         return;
       }
       if (!response.ok) {
@@ -102,11 +122,6 @@ export function QuoteRequestModal({
     }
   }
 
-  const user = typeof window !== "undefined" ? getSessionUser() : null;
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const minDate = tomorrow.toISOString().slice(0, 10);
-
   return (
     <Modal
       description={listing.title}
@@ -117,70 +132,58 @@ export function QuoteRequestModal({
       {success ? (
         <FormMessage variant="success">
           {isBooking
-            ? "تم إرسال طلب حجز الخدمة. سيتواصل مزود الخدمة معك قريباً."
-            : "تم إرسال طلب عرض السعر. سيتواصل مزود الخدمة معك قريباً."}
+            ? "تم إرسال طلب الحجز. سيتواصل مزود الخدمة معك قريباً."
+            : "تم إرسال طلبك. سيتواصل مزود الخدمة معك قريباً."}
         </FormMessage>
       ) : (
-        <form className="grid gap-3" onSubmit={handleSubmit}>
+        <form className="grid gap-4" onSubmit={handleSubmit}>
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}
+
+          <p className="rounded-[var(--radius-xl)] border border-border/70 bg-surface-muted/60 px-4 py-3 text-sm leading-6 text-muted">
+            {isBooking
+              ? "اختر الموعد المناسب وأرسل رقمك — نكمل الباقي نيابةً عنك."
+              : "أرسل رقمك فقط — نرجع لك بالعرض بأسرع وقت."}
+          </p>
+
           <Input
-            defaultValue={user?.fullName}
-            label="الاسم الكامل"
-            name="fullName"
+            autoComplete="tel"
+            defaultValue={user?.phone}
+            hint="سيستخدم مزود الخدمة هذا الرقم للتواصل معك"
+            inputMode="tel"
+            label="رقم الهاتف"
+            name="phone"
+            placeholder="05xxxxxxxx"
             required
+            type="tel"
           />
-          <Input
-            defaultValue={user?.email}
-            label="البريد الإلكتروني"
-            name="email"
-            required
-            type="email"
-          />
-          <Input label="رقم الهاتف" name="phone" required type="tel" />
-          <Input
-            defaultValue={listing.title}
-            label="الخدمة المطلوبة"
-            name="serviceRequired"
-            required
-          />
-          <Textarea
-            label="وصف الطلب"
-            name="description"
-            placeholder="صف احتياجك بالتفصيل..."
-            required
-          />
-          <Select
-            label="الإمارة"
-            name="emirate"
-            options={cities.map((city) => ({ label: city.name, value: city.name }))}
-            required
-          />
-          <Input label="المنطقة" name="area" required />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Input label="التاريخ المفضل" min={minDate} name="preferredDate" required type="date" />
-            <Input label="الوقت المفضل" name="preferredTime" required type="time" />
-          </div>
-          {!isBooking ? (
+
+          {isBooking ? (
             <div className="grid gap-3 sm:grid-cols-2">
-              <Input label="الميزانية من" name="budgetMin" type="number" />
-              <Input label="الميزانية إلى" name="budgetMax" type="number" />
+              <Input
+                label="التاريخ"
+                min={minDate}
+                name="preferredDate"
+                required
+                type="date"
+              />
+              <Input label="الوقت" name="preferredTime" required type="time" />
             </div>
           ) : null}
-          <div>
-            <label className="mb-1 block text-sm font-semibold text-ink">
-              مرفق (اختياري)
-            </label>
-            <input
-              className="block w-full text-sm"
-              onChange={(event) => setAttachmentName(event.target.files?.[0]?.name ?? "")}
-              type="file"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Button loading={isSubmitting} type="submit" variant="accent">
-              إرسال
+
+          <Textarea
+            className="min-h-24"
+            hint="اختياري — أضف أي تفاصيل تهمك"
+            label="ملاحظة سريعة"
+            name="notes"
+            placeholder="مثال: أفضل التواصل واتساب بعد المغرب"
+            rows={3}
+          />
+
+          <div className="grid gap-2 pt-1">
+            <Button fullWidth loading={isSubmitting} type="submit" variant="accent">
+              {isBooking ? "تأكيد الحجز" : "إرسال الطلب"}
             </Button>
-            <Button onClick={onClose} type="button" variant="secondary">
+            <Button fullWidth onClick={onClose} type="button" variant="secondary">
               إلغاء
             </Button>
           </div>

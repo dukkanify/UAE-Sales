@@ -7,7 +7,7 @@ export default function RegisterPage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="auth-page">
         <AuthShell
           description="انضم إلى منصة إماراتية موثوقة تتيح لك بيع وشراء المنتجات والخدمات مع ضمان مالي وتجربة آمنة داخل الإمارات."
           footerAction={{

@@ -50,15 +50,17 @@ export function ListingDetailsView({
 
   return (
     <>
-      <section className="app-container page-padding pb-28 lg:pb-8">
+      <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
-          <div className="min-w-0">
+        <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start lg:gap-x-8">
+          <div className="min-w-0 lg:col-start-1">
             <ListingGallery listing={listing} />
 
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">
+                {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
+                {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
                 {category ? <Badge variant="muted">{category.name}</Badge> : null}
                 <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
                 {escrowProtected ? (
@@ -110,12 +112,25 @@ export function ListingDetailsView({
             </div>
           </div>
 
-          <div className="hidden lg:grid lg:gap-4">
-            <ListingStickyPanel category={category} listing={listing} />
-            <SellerPanel listing={listing} />
-            <EscrowProtectionCard listing={listing} />
-            <ListingPlatformNotice listing={listing} />
-          </div>
+          <aside
+            aria-label="ملخص الإعلان والبائع"
+            className="hidden min-w-0 w-full max-w-full lg:col-start-2 lg:block"
+          >
+            <div className="flex w-full min-w-0 max-w-full flex-col gap-6">
+              <section aria-label="تفاصيل الإعلان والإجراءات">
+                <ListingStickyPanel category={category} listing={listing} />
+              </section>
+
+              <section aria-label="معلومات البائع">
+                <SellerPanel listing={listing} />
+              </section>
+
+              <section aria-label="الضمان والحماية" className="flex flex-col gap-6">
+                <EscrowProtectionCard listing={listing} />
+                <ListingPlatformNotice listing={listing} />
+              </section>
+            </div>
+          </aside>
         </div>
       </section>
 

@@ -71,7 +71,7 @@ export const mockCategories: Category[] = [
     icon: "watch",
     listingCount: 1420,
     imageUrl: categoryImages.fashion,
-    featuredListingSlug: "apple-watch-ultra-2",
+    featuredListingSlug: "rolex-submariner-date-dubai",
     subcategories: ["ساعات", "حقائب", "ملابس", "عطور"],
   },
   {
@@ -91,6 +91,7 @@ export const mockCategories: Category[] = [
     icon: "paw",
     listingCount: 680,
     imageUrl: categoryImages.pets,
+    featuredListingSlug: "golden-retriever-vaccinated-dubai",
     subcategories: ["قطط", "كلاب", "طيور", "مستلزمات"],
   },
   {
@@ -100,6 +101,7 @@ export const mockCategories: Category[] = [
     icon: "baby",
     listingCount: 920,
     imageUrl: categoryImages.kids,
+    featuredListingSlug: "bugaboo-fox-5-stroller",
     subcategories: ["عربات أطفال", "ألعاب", "ملابس أطفال", "مستلزمات"],
   },
   {
@@ -109,6 +111,7 @@ export const mockCategories: Category[] = [
     icon: "book",
     listingCount: 540,
     imageUrl: categoryImages.books,
+    featuredListingSlug: "arabic-novels-collection-20",
     subcategories: ["كتب عربية", "كتب جامعية", "روايات", "مناهج"],
   },
   {
@@ -118,6 +121,7 @@ export const mockCategories: Category[] = [
     icon: "sport",
     listingCount: 1180,
     imageUrl: categoryImages.sports,
+    featuredListingSlug: "peloton-bike-plus-dubai",
     subcategories: ["معدات رياضية", "دراجات", "لياقة", "تخييم"],
   },
   {
@@ -127,6 +131,7 @@ export const mockCategories: Category[] = [
     icon: "food",
     listingCount: 430,
     imageUrl: categoryImages.food,
+    featuredListingSlug: "fujairah-premium-dates-gift-box",
     subcategories: ["أكلات منزلية", "تمور", "حلويات", "ضيافة"],
   },
 ];

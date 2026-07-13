@@ -12,35 +12,38 @@ import {
   formatViews,
   getListingHref,
   getListingImageUrl,
+  getListingImages,
   getListingLocation,
 } from "@/features/listings/components/listing-card.utils";
 
 type MobileFeaturedCardProps = {
+  imageFit?: "contain" | "cover";
   listing: Listing;
   priority?: boolean;
 };
 
 export const MobileFeaturedCard = memo(function MobileFeaturedCard({
+  imageFit = "cover",
   listing,
   priority = false,
 }: MobileFeaturedCardProps) {
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
-  const photoCount = listing.images?.length ?? (listing.imageUrl ? 1 : 0);
+  const photoCount = getListingImages(listing).length;
   const isVerified =
     listing.verifiedSeller ??
     listing.seller.isVerified ??
     (listing.seller.rating ?? 0) >= 4.8;
 
   return (
-    <article className="mobile-home-featured-card">
+    <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
       <div className="mobile-home-featured-card__media">
         <Link className="absolute inset-0" href={href}>
           <span className="sr-only">{listing.title}</span>
           <AppImage
             alt={listing.title}
-            className="mobile-home-featured-card__image object-cover"
+            className={`mobile-home-featured-card__image ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
             fallbackCategory={listing.categoryId}
             fill
             loading={priority ? undefined : "lazy"}

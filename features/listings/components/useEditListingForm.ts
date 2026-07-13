@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
+import { useImagePreviews } from "./add-listing/useImagePreviews";
 import { cities, countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
@@ -29,8 +30,8 @@ export function useEditListingForm(listingId: string) {
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(() => readListing(listingId));
   const [errors, setErrors] = useState<CategoryFieldErrors>({});
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const { handleImageChange: setImagePreviewsFromFiles, imageFiles, imagePreviews } =
+    useImagePreviews();
   const [saveMessage, setSaveMessage] = useState("");
 
   useEffect(() => {
@@ -108,28 +109,15 @@ export function useEditListingForm(listingId: string) {
 
   const { isLoading, run: handleSubmit } = useAsyncAction(saveChanges);
 
-  useEffect(() => {
-    return () => {
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [imagePreviews]);
-
-  function handleImageChange(fileList: FileList | null) {
-    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-
-    if (!fileList || fileList.length === 0) {
-      setImageFiles([]);
-      setImagePreviews([]);
-      return;
-    }
-
-    const current = readListing(listingId);
-    const existingCount = current ? getListingImages(current).length : 0;
-    const maxNew = Math.max(0, 6 - existingCount);
-    const files = Array.from(fileList).slice(0, maxNew);
-    setImageFiles(files);
-    setImagePreviews(files.map((file) => URL.createObjectURL(file)));
-  }
+  const handleImageChange = useCallback(
+    (fileList: FileList | null, mode: "append" | "replace" = "replace") => {
+      const current = readListing(listingId);
+      const existingCount = current ? getListingImages(current).length : 0;
+      const maxNew = Math.max(0, 6 - existingCount);
+      setImagePreviewsFromFiles(fileList, maxNew, mode);
+    },
+    [listingId, setImagePreviewsFromFiles],
+  );
 
   return {
     defaults: listing ? buildCategoryFieldsDefaults(listing) : undefined,

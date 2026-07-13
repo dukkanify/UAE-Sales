@@ -1,9 +1,9 @@
+import { listingSafetyTips } from "@/services/content/homepage-marketplace.content";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
-import { getListingSafetyTips } from "@/services/content";
 
-export async function ListingSafetyTips() {
-  const tips = await getListingSafetyTips();
+export function ListingSafetyTips() {
+  const tips = listingSafetyTips;
 
   return (
     <Card className="mt-8 marketplace-panel p-6">

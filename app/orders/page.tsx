@@ -12,8 +12,8 @@ export default async function OrdersPage() {
       <SiteHeader />
       <main>
         <DashboardShell
-          activePath="/profile"
-          description="طلباتك كمشتري أو بائع."
+          activePath="/orders"
+          description="طلباتك كمشتري أو بائع — تابع حالة الدفع والتسليم."
           title="طلباتي"
           user={user}
         >

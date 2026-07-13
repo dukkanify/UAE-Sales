@@ -8,7 +8,7 @@ export default function VerifyEmailPage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="auth-page">
         <AuthShell
           description="أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال العملية."
           footerAction={{

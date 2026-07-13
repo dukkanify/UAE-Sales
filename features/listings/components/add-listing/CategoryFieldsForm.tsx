@@ -5,6 +5,13 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import {
+  addListingDynamicFieldsGridClass,
+  addListingStepCardClass,
+  addListingStepDescClass,
+  addListingStepFooterClass,
+  addListingStepTitleClass,
+} from "./utils";
 
 export type CategoryFieldErrors = Record<string, string | undefined>;
 
@@ -51,6 +58,7 @@ function renderField(
     return (
       <Textarea
         key={field.key}
+        compact
         defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
         label={field.label}
         name={name}
@@ -64,6 +72,7 @@ function renderField(
     return (
       <Select
         key={field.key}
+        compact
         defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
         label={field.label}
         name={name}
@@ -75,13 +84,18 @@ function renderField(
 
   if (field.type === "checkbox-group") {
     return (
-      <fieldset key={field.key} className="grid gap-2 rounded-[var(--radius-xl)] border border-border p-4">
-        <legend className="px-1 text-sm font-semibold text-ink">{field.label}</legend>
-        <div className="grid gap-2 sm:grid-cols-2">
+      <fieldset
+        key={field.key}
+        className="grid gap-1.5 rounded-[var(--radius-lg)] border border-border p-3 sm:rounded-[var(--radius-xl)] sm:p-4"
+      >
+        <legend className="px-1 text-xs font-semibold text-ink sm:text-sm">
+          {field.label}
+        </legend>
+        <div className="grid gap-1.5 sm:grid-cols-2 sm:gap-2">
           {(field.options ?? []).map((option) => (
             <label
               key={option.value}
-              className="flex items-center gap-2 text-sm font-medium text-muted"
+              className="flex items-center gap-2 text-xs font-medium text-muted sm:text-sm"
             >
               <input
                 className="size-4 accent-primary"
@@ -101,6 +115,7 @@ function renderField(
   return (
     <Input
       key={field.key}
+      compact
       defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
       inputMode={field.type === "number" ? "numeric" : undefined}
       label={field.label}
@@ -146,25 +161,28 @@ export function CategoryFieldsForm({
       : defaults?.condition;
 
   return (
-    <Card key={categoryId} className="p-6">
+    <Card key={categoryId} className={addListingStepCardClass}>
       {stepLabel ? (
         <p className="text-xs font-bold uppercase tracking-wide text-secondary">
           {stepLabel}
         </p>
       ) : null}
-      <h2 className={`${stepLabel ? "mt-1" : ""} text-2xl font-black text-ink`}>
+      <h2 className={`${stepLabel ? "mt-1" : ""} ${addListingStepTitleClass}`}>
         {heading}
       </h2>
-      <p className="mt-2 text-sm font-medium text-muted">
+      <p className={addListingStepDescClass}>
         الحقول تتغير تلقائياً حسب القسم — يُعرض فقط ما تدخله.
       </p>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className={addListingDynamicFieldsGridClass}>
         {fields.map((field) => {
+          const spansFullWidth = field.type === "textarea";
+
           if (field.key === "condition" && conditionDefault) {
             return (
-              <div key={field.key}>
+              <div key={field.key} className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}>
                 <Select
+                  compact
                   defaultValue={String(conditionDefault)}
                   label={field.label}
                   name={`spec_${field.key}`}
@@ -179,7 +197,10 @@ export function CategoryFieldsForm({
           }
 
           return (
-            <div key={field.key} className={field.type === "textarea" ? "md:col-span-2" : ""}>
+            <div
+              key={field.key}
+              className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
+            >
               {renderField(field, defaults, selectedFeatures)}
               {errors[field.key] ? (
                 <FormMessage variant="error">{String(errors[field.key])}</FormMessage>
@@ -190,15 +211,16 @@ export function CategoryFieldsForm({
       </div>
 
       {featureField ? (
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           {renderField(featureField, defaults, selectedFeatures)}
         </div>
       ) : null}
 
-      <div className="mt-5 grid gap-4">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
+      <div className={addListingStepFooterClass}>
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-2">
+          <div className="col-span-2 sm:col-span-1">
             <Input
+              compact
               defaultValue={defaults?.price}
               inputMode="numeric"
               label="السعر بالدرهم"
@@ -216,6 +238,7 @@ export function CategoryFieldsForm({
 
         <div>
           <Textarea
+            compact
             defaultValue={defaults?.description}
             label="الوصف"
             name="description"
@@ -230,6 +253,7 @@ export function CategoryFieldsForm({
         {showContact ? (
           <div>
             <Input
+              compact
               defaultValue={defaults?.contactPhone}
               label="رقم التواصل"
               name="contact"

@@ -1,4 +1,5 @@
 import type { Listing, UserProfile } from "@/types";
+import type { DeliveryAddressInput } from "@/services/payments/payment-schemas";
 import type { ShippingMethodId } from "@/types/domain/address";
 import { getListingActionConfig } from "@/shared/constants/listingActionConfig";
 import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
@@ -14,7 +15,8 @@ export const CHECKOUT_ERRORS = {
   invalidEmail: "اكتب بريدًا إلكترونيًا صحيحًا.",
   invalidPhone: "اكتب رقم هاتف إماراتي صحيحًا.",
   nameRequired: "الاسم الكامل مطلوب.",
-  addressRequired: "أكمل بيانات العنوان للتوصيل.",
+  addressRequired: "اختر الإمارة واكتب عنوان التوصيل.",
+  savedAddressRequired: "اختر عنوان التوصيل المحفوظ.",
 } as const;
 
 export type CheckoutReviewValidation =
@@ -30,14 +32,7 @@ export type GuestBuyerInfo = {
 export type GuestDeliveryInfo = GuestBuyerInfo & {
   shippingMethod: ShippingMethodId;
   emirate?: string;
-  city?: string;
-  area?: string;
-  street?: string;
-  building?: string;
-  unit?: string;
-  landmark?: string;
-  notes?: string;
-  companyName?: string;
+  addressLine?: string;
   saveAddress?: boolean;
 };
 
@@ -105,18 +100,18 @@ export function validateGuestDeliveryStep(
   requiresAddress: boolean,
 ): string | null {
   const buyerError = validateGuestBuyerInfo(input);
-  if (buyerError) return buyerError;
+  if (buyerError) {
+    return buyerError;
+  }
 
   if (!requiresAddress || input.shippingMethod === "pickup") {
     return null;
   }
 
-  if (
-    !input.emirate?.trim() ||
-    !input.city?.trim() ||
-    !input.area?.trim() ||
-    !input.street?.trim()
-  ) {
+  const emirate = input.emirate?.trim() ?? "";
+  const addressLine = input.addressLine?.trim() ?? "";
+
+  if (!emirate || addressLine.length < 4) {
     return CHECKOUT_ERRORS.addressRequired;
   }
 
@@ -129,4 +124,30 @@ export function normalizeGuestBuyer(input: GuestBuyerInfo): GuestBuyerInfo {
     email: input.email.trim().toLowerCase(),
     phone: normalizeUaePhone(input.phone),
   };
+}
+
+export function buildDeliveryAddressInput(
+  guestInfo: GuestDeliveryInfo,
+  buyer: GuestBuyerInfo,
+): DeliveryAddressInput {
+  const emirate = guestInfo.emirate?.trim() ?? "";
+  const addressLine = guestInfo.addressLine?.trim() ?? "";
+
+  return {
+    fullName: buyer.fullName,
+    phone: buyer.phone,
+    emirate,
+    city: emirate,
+    area: addressLine,
+    street: addressLine,
+    saveAddress: guestInfo.saveAddress,
+  };
+}
+
+export function formatSavedAddressLine(address: {
+  area: string;
+  street: string;
+}): string {
+  const parts = [address.area, address.street].map((part) => part.trim()).filter(Boolean);
+  return parts.join("، ");
 }

@@ -22,9 +22,8 @@ export type EmirateImageKey =
   | "dubai"
   | "fujairah"
   | "ras-al-khaimah"
-  | "sharjah";
-
-const q = "auto=format&fit=crop&w=1200&q=85";
+  | "sharjah"
+  | "umm-al-quwain";
 
 export function unsplashUrl(photoId: string, width = 1200): string {
   return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=85`;
@@ -33,21 +32,14 @@ export function unsplashUrl(photoId: string, width = 1200): string {
 /** Verified Unsplash photo IDs — HTTP 200 checked */
 export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]> = {
   cars: [
-    "photo-1618843479313-40f8afb4b4d8",
-    "photo-1549317661-bd32c8ce0db2",
-    "photo-1552519507-da3b142c6e3d",
-    "photo-1503376780353-7e6692767b70",
-    "photo-1492144534655-ae79c964c9d7",
-    "photo-1544636331-e26879cd4d9b",
-    "photo-1533473359331-0135ef1b58bf",
-    "photo-1486262715619-67b85e0b08d3",
-    "photo-1502877338535-766e1452684a",
-    "photo-1555215695-3004980ad54e",
-    "photo-1617531653332-bd46c24f2068",
-    "photo-1560958089-b8a1929cea89",
-    "photo-1536700503339-1e4b06520771",
-    "photo-1617788138017-80ad40651399",
-    "photo-1619767886558-efdc259cde1a",
+    "photo-1609184166822-bd1f1b991a06",
+    "photo-1709620435533-56483034bdd4",
+    "photo-1742230285052-8c3b445c01fc",
+    "photo-1701985470695-e430a8fdc8d6",
+    "photo-1670332361054-7ddef413097e",
+    "photo-1690917448793-cf9a81b31940",
+    "photo-1740815514959-07d12c339e8f",
+    "photo-1749454006837-d2e73bb8a677",
   ],
   "real-estate": [
     "photo-1600585154340-be6161a56a0c",
@@ -65,16 +57,12 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1497366754035-f200968a6e72",
   ],
   mobiles: [
-    "photo-1695048133142-1a20484d2569",
-    "photo-1592750475338-74b7b21085ab",
-    "photo-1511707171634-5f897ff02aa9",
-    "photo-1585060544812-6b45742d762f",
-    "photo-1592899677977-9c10ca588bbd",
-    "photo-1556656793-08538906a9f8",
+    "photo-1727013884184-b313982327f3",
+    "photo-1678911820864-e2c567c655d7",
+    "photo-1736767431540-0d590ba5efc2",
     "photo-1544244015-0df4b3ffc6b0",
     "photo-1561154464-82e9adf32764",
-    "photo-1434493789847-2f02dc6ca35d",
-    "photo-1546868871-7041f2a55e12",
+    "photo-1517336714731-489689fd1ca8",
   ],
   electronics: [
     "photo-1606813907291-d86efa9b94db",
@@ -122,9 +110,9 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1586281380349-632531db7ed4",
   ],
   fashion: [
-    "photo-1523170335258-f5ed11844a49",
-    "photo-1434389677669-e08b4cac3105",
-    "photo-1579586337278-3befd40fd17a",
+    "photo-1662384205880-2c7a9879cc0c",
+    "photo-1590739169125-a9438401596a",
+    "photo-1687078426457-89ce2b562eaf",
     "photo-1523275335684-37898b6baf30",
   ],
   kids: [
@@ -135,10 +123,26 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1516627145497-ae6968895b74",
     "photo-1502086223501-7ea6ecd79368",
   ],
-  pets: ["photo-1574158622682-e40e69881006"],
-  books: ["photo-1495446815901-a7297e633e8d"],
-  sports: ["photo-1461896836934-ffe607ba8211"],
-  food: ["photo-1504674900247-0877df9cc836"],
+  pets: [
+    "photo-1574158622682-e40e69881006",
+    "photo-1587300003388-59208cc962cb",
+    "photo-1548199973-03cce0bbc87b",
+  ],
+  books: [
+    "photo-1495446815901-a7297e633e8d",
+    "photo-1512820790803-83ca734da794",
+    "photo-1481627834876-b7833e8f5570",
+  ],
+  sports: [
+    "photo-1461896836934-ffe607ba8211",
+    "photo-1534438327276-14e5300c3a48",
+    "photo-1571902943202-507ec2618e8f",
+  ],
+  food: [
+    "photo-1504674900247-0877df9cc836",
+    "photo-1488477181941-6428a0291777",
+    "photo-1546069901-ba9599a7e63c",
+  ],
   avatar: [
     "photo-1507003211169-0a1dd7228f2d",
     "photo-1494790108377-be9c29b29330",
@@ -156,13 +160,25 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
   ],
 };
 
+/** Verified landmark photos per emirate — location-checked on Unsplash */
 export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   dubai: "photo-1512453979798-5ea266f8880c",
-  "abu-dhabi": "photo-1577717903315-1691ae25ab3f",
-  sharjah: "photo-1506905925346-21bda4d32df4",
-  ajman: "photo-1507525428034-b723cf961d3e",
-  "ras-al-khaimah": "photo-1464822759023-fed622ff2c3b",
-  fujairah: "photo-1520250497591-112f2f40a3f4",
+  "abu-dhabi": "photo-1620148369396-235e930c3caf",
+  sharjah: "photo-1679197982381-7a43e5d910a4",
+  ajman: "photo-1593334305856-1c6281efaa18",
+  "umm-al-quwain": "photo-1687080625802-967beded8abc",
+  "ras-al-khaimah": "photo-1633981871770-214950461624",
+  fujairah: "photo-1730626480563-10d80cab5201",
+};
+
+export const emirateLandmarkLabels: Record<EmirateImageKey, string> = {
+  dubai: "برج خليفة وأفق دبي",
+  "abu-dhabi": "مسجد الشيخ زايد الكبير",
+  sharjah: "أفق الشارقة عند الغروب",
+  ajman: "كورنيش عجمان",
+  "umm-al-quwain": "شاطئ المانجروف — أم القيوين",
+  "ras-al-khaimah": "طريق جبل جيس",
+  fujairah: "قلعة الفجيرة",
 };
 
 export function getEmirateImageUrl(emirateId: string, width = 2000): string {
@@ -222,7 +238,7 @@ export function galleryFromPool(
   return urls;
 }
 
-export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?${q}`;
+export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&h=900&q=90`;
 
 /** Verified seller portrait URLs */
 export const sellerAvatarUrls = {
