@@ -1,14 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Category } from "@/types";
-import { CategoryIcon } from "@/shared/ui/CategoryIcon";
-import { Icon } from "@/shared/ui/Icon";
 import {
   getMobileCategoryPages,
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "./mobile-home.config";
+import { MobileCategoryTile } from "./MobileCategoryTile";
 
 type MobileCategoryGridProps = {
   categories: Category[];
@@ -63,9 +61,6 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
     setActivePage(nextIndex);
   };
 
-  const canGoPrev = activePage > 0;
-  const canGoNext = activePage < pages.length - 1;
-
   return (
     <section aria-label="التصنيفات" className="mobile-home-categories">
       <div
@@ -75,71 +70,37 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
         {pages.map((page, pageIndex) => (
           <div key={pageIndex} className="mobile-home-categories__page">
             {page.map((category) => (
-              <Link
+              <MobileCategoryTile
                 key={category.id}
-                className="mobile-home-categories__card"
+                category={category}
                 href={`/categories/${category.slug}`}
-              >
-                <span className="mobile-home-categories__icon">
-                  <CategoryIcon
-                    category={category}
-                    className="mobile-home-categories__icon-svg"
-                    size={28}
-                  />
-                </span>
-                <span className="mobile-home-categories__label">
-                  {MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}
-                </span>
-              </Link>
+                label={MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}
+              />
             ))}
 
             {pageIndex === pages.length - 1 ? (
-              <Link className="mobile-home-categories__card" href="/categories">
-                <span className="mobile-home-categories__icon mobile-home-categories__icon--more">
-                  <Icon className="mobile-home-categories__icon-svg" name="grid" size={26} />
-                </span>
-                <span className="mobile-home-categories__label">المزيد</span>
-              </Link>
+              <MobileCategoryTile href="/categories" label="المزيد" variant="more" />
             ) : null}
           </div>
         ))}
       </div>
 
       {pages.length > 1 ? (
-        <div className="mobile-home-categories__controls">
+        <div className="mobile-home-categories__indicator">
           <button
-            aria-label="الصفحة السابقة"
-            className="mobile-home-categories__arrow"
-            disabled={!canGoPrev}
-            onClick={() => scrollToPage(activePage - 1)}
+            aria-label="تصفح صفحات التصنيفات"
+            className="mobile-home-categories__indicator-track"
+            onClick={() => scrollToPage(activePage === 0 ? 1 : 0)}
             type="button"
           >
-            <Icon name="chevron-right" size={18} />
-          </button>
-
-          <div className="mobile-home-categories__dots" aria-label="صفحات التصنيفات">
-            {pages.map((_, index) => (
-              <button
-                key={index}
-                aria-current={activePage === index ? "true" : undefined}
-                aria-label={`صفحة ${index + 1}`}
-                className={`mobile-home-categories__dot ${
-                  activePage === index ? "mobile-home-categories__dot--active" : ""
-                }`}
-                onClick={() => scrollToPage(index)}
-                type="button"
-              />
-            ))}
-          </div>
-
-          <button
-            aria-label="الصفحة التالية"
-            className="mobile-home-categories__arrow"
-            disabled={!canGoNext}
-            onClick={() => scrollToPage(activePage + 1)}
-            type="button"
-          >
-            <Icon name="chevron-left" size={18} />
+            <span
+              aria-hidden
+              className="mobile-home-categories__indicator-fill"
+              style={{
+                width: `${100 / pages.length}%`,
+                transform: `translateX(${activePage * 100}%)`,
+              }}
+            />
           </button>
         </div>
       ) : null}

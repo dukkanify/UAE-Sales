@@ -29,7 +29,7 @@
   --mh-radius-xl: clamp(1rem, 3vw, 1.25rem);
   --mh-radius-2xl: clamp(1.125rem, 3.6vw, 1.5rem);
   --mh-card-width: clamp(15.5rem, 78vw, 19rem);
-  --mh-category-icon: clamp(3rem, 14vw, 4.75rem);
+  --mh-category-icon: clamp(3.25rem, 12.5vw, 3.75rem);
   --mh-fab-size: clamp(3rem, 12vw, 3.75rem);
   --mh-bottom-nav-clearance: calc(
     clamp(4.25rem, 14vw, 4.75rem) + (var(--mh-fab-size) * 0.35) + 1.5rem +
