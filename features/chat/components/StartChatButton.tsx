@@ -8,10 +8,12 @@ import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon } from "@/shared/ui/Icon";
 
 type StartChatButtonProps = {
   className?: string;
   fullWidth?: boolean;
+  iconOnly?: boolean;
   listing: Listing;
   size?: "sm" | "md" | "lg";
   variant?: "primary" | "secondary" | "ghost" | "accent";
@@ -20,6 +22,7 @@ type StartChatButtonProps = {
 export function StartChatButton({
   className,
   fullWidth = false,
+  iconOnly = false,
   listing,
   size = "md",
   variant = "secondary",
@@ -62,6 +65,7 @@ export function StartChatButton({
   return (
     <div className={fullWidth ? "w-full" : ""}>
       <Button
+        aria-label={iconOnly ? "محادثة البائع" : undefined}
         className={className}
         fullWidth={fullWidth}
         loading={isLoading}
@@ -70,7 +74,7 @@ export function StartChatButton({
         type="button"
         variant={variant}
       >
-        محادثة البائع
+        {iconOnly ? <Icon name="message" size={20} /> : "محادثة البائع"}
       </Button>
       {error ? (
         <div className="mt-2">

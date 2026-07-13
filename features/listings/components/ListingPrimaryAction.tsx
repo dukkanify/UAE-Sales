@@ -31,6 +31,7 @@ type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
 
 type ListingPrimaryActionProps = {
   action: ListingActionType;
+  className?: string;
   fullWidth?: boolean;
   listing: Listing;
   size?: "sm" | "md" | "lg";
@@ -39,6 +40,7 @@ type ListingPrimaryActionProps = {
 
 export function ListingPrimaryAction({
   action,
+  className,
   fullWidth = true,
   listing,
   size = "lg",
@@ -128,6 +130,7 @@ export function ListingPrimaryAction({
   return (
     <>
       <Button
+        className={className}
         fullWidth={fullWidth}
         onClick={handleClick}
         size={size}

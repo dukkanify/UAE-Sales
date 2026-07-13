@@ -117,6 +117,12 @@ type MobileStickyActionBarProps = {
   listing: Listing;
 };
 
+const MOBILE_BAR_PRIMARY_CLASS =
+  "!min-h-11 !rounded-2xl !bg-primary !px-4 !text-sm !font-bold !text-secondary !shadow-[0_4px_16px_rgb(15_23_42/14%)] hover:!bg-[#1a2844] active:!scale-[0.98]";
+
+const MOBILE_CONTACT_ICON_CLASS =
+  "focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-border/75 bg-surface text-ink shadow-[var(--shadow-xs)] transition duration-200 hover:border-secondary/35 hover:bg-surface-muted active:scale-95";
+
 export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const router = useRouter();
   const config = getListingActionConfig(listing);
@@ -130,73 +136,79 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/70 bg-surface/96 px-3 py-2.5 shadow-[0_-10px_40px_rgb(15_23_42/10%)] backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/50 bg-white/94 shadow-[0_-6px_28px_rgb(15_23_42/7%)] backdrop-blur-lg lg:hidden"
       style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto flex max-w-lg items-stretch gap-2">
+      <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-3">
         {!isOwn && config.showBuyNow ? (
           <button
-            className="focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center rounded-[var(--radius-xl)] bg-secondary px-3 text-sm font-bold text-primary shadow-[0_6px_18px_rgb(201_164_92/28%)] transition active:scale-[0.98]"
+            className={`focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center rounded-2xl bg-primary px-4 text-sm font-bold text-secondary shadow-[0_4px_16px_rgb(15_23_42/14%)] transition hover:bg-[#1a2844] active:scale-[0.98] ${showContactRail ? "" : "w-full"}`}
             onClick={() => router.push(getCheckoutPath(listing))}
             type="button"
           >
             {primaryLabel}
           </button>
         ) : !isOwn ? (
-          <div className="min-w-0 flex-1">
+          <div className={`min-w-0 flex-1 ${showContactRail ? "" : "w-full"}`}>
             <ListingPrimaryAction
               action={config.primaryAction}
+              className={MOBILE_BAR_PRIMARY_CLASS}
               listing={listing}
               size="sm"
             />
           </div>
         ) : null}
 
-        <div className="flex min-w-0 items-stretch gap-1.5">
-          {showContactRail ? (
-            <div className="flex items-center gap-1 rounded-[1.125rem] border border-border/70 bg-surface-muted/70 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/65%)]">
+        {showContactRail ? (
+          <>
+            <span
+              aria-hidden
+              className="h-9 w-px shrink-0 bg-border/80"
+            />
+
+            <div className="flex shrink-0 items-center gap-2">
               <StartChatButton
-                className="!min-h-10 !rounded-xl !border-0 !bg-transparent !px-2.5 !text-[0.68rem] !font-bold !shadow-none hover:!bg-surface"
+                className={`${MOBILE_CONTACT_ICON_CLASS} !min-h-11 !w-11 !p-0 !shadow-[var(--shadow-xs)]`}
+                iconOnly
                 listing={listing}
                 size="sm"
-                variant="ghost"
+                variant="secondary"
               />
 
               {tel ? (
                 <a
                   aria-label="اتصال بالبائع"
-                  className="focus-ring grid size-10 shrink-0 place-items-center rounded-xl border border-border/60 bg-surface text-primary transition hover:border-secondary/40 hover:bg-surface active:scale-95"
+                  className={MOBILE_CONTACT_ICON_CLASS}
                   href={tel}
                 >
-                  <Icon name="phone" size={17} />
+                  <Icon name="phone" size={19} />
                 </a>
               ) : null}
 
               {whatsapp ? (
                 <a
                   aria-label="واتساب"
-                  className="focus-ring inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#25D366] via-[#1ebe5d] to-[#128C7E] px-2.5 text-[0.68rem] font-extrabold text-white shadow-[0_4px_16px_rgb(37_211_102/38%)] transition active:scale-95"
+                  className="focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-[#25D366]/28 bg-[#25D366]/10 text-[#1a9f5c] shadow-[var(--shadow-xs)] transition duration-200 hover:border-[#25D366]/45 hover:bg-[#25D366]/16 active:scale-95"
                   href={whatsapp}
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  <Icon className="drop-shadow-sm" name="whatsapp" size={17} />
-                  <span>واتساب</span>
+                  <Icon name="whatsapp" size={19} />
                 </a>
               ) : null}
             </div>
-          ) : (
-            <div className="flex min-w-[7.5rem] items-center">
-              <StartChatButton
-                className="!min-h-11 !rounded-xl"
-                fullWidth
-                listing={listing}
-                size="sm"
-                variant="secondary"
-              />
-            </div>
-          )}
-        </div>
+          </>
+        ) : !isOwn ? (
+          <div className="shrink-0">
+            <StartChatButton
+              className={`${MOBILE_CONTACT_ICON_CLASS} !min-h-11 !w-11 !p-0`}
+              iconOnly
+              listing={listing}
+              size="sm"
+              variant="secondary"
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
