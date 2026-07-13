@@ -1,4 +1,8 @@
 /* Scoped design tokens — mobile homepage reference (#0F172A / #C9A45C) */
+:root {
+  --mh-category-icon: clamp(3.25rem, 11vw, 4.5rem);
+}
+
 .mobile-home-shell {
   /* Colors */
   --mh-bg: #ffffff;

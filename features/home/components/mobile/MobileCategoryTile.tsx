@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import { AppImage } from "@/shared/components/AppImage";
+import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
 import { Icon } from "@/shared/ui/Icon";
 
 type MobileCategoryTileProps = {
@@ -18,25 +18,13 @@ export function MobileCategoryTile({
 }: MobileCategoryTileProps) {
   return (
     <Link className="mobile-home-categories__card" href={href}>
-      <span
-        className={`mobile-home-categories__thumb ${
-          variant === "more" ? "mobile-home-categories__thumb--more" : ""
-        }`}
-      >
-        {variant === "more" ? (
+      {variant === "more" ? (
+        <span className="mobile-home-categories__thumb mobile-home-categories__thumb--more">
           <Icon aria-hidden name="grid" size={22} />
-        ) : category ? (
-          <AppImage
-            alt=""
-            aria-hidden
-            className="object-cover"
-            fallbackCategory={category.id}
-            fill
-            sizes="72px"
-            src={category.imageUrl}
-          />
-        ) : null}
-      </span>
+        </span>
+      ) : category ? (
+        <CategoryThumbnail category={category} className="mx-0" />
+      ) : null}
       <span className="mobile-home-categories__label">{label}</span>
     </Link>
   );

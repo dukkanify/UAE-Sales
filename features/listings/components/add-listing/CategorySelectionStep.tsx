@@ -34,7 +34,7 @@ export function CategorySelectionStep({
             <button
               key={category.id}
               aria-pressed={isSelected}
-              className={`rounded-[var(--radius-xl)] border p-4 text-center transition ${
+              className={`mobile-home-categories__card rounded-[var(--radius-xl)] border p-4 transition ${
                 isSelected
                   ? "border-secondary bg-secondary-soft shadow-[var(--shadow-xs)]"
                   : "border-border bg-surface hover:border-secondary/40"
@@ -43,7 +43,9 @@ export function CategorySelectionStep({
               type="button"
             >
               <CategoryThumbnail category={category} selected={isSelected} />
-              <p className="mt-2 text-sm font-semibold text-ink">{category.name}</p>
+              <span className="mobile-home-categories__label text-sm font-semibold text-ink">
+                {category.name}
+              </span>
             </button>
           );
         })}
