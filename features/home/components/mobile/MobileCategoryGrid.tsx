@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import { CategoryIcon } from "@/shared/ui/CategoryIcon";
+import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
 import {
   getMobileMainCategories,
   MOBILE_MAIN_CATEGORY_LABELS,
@@ -24,9 +24,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
             className="mobile-home-categories__card"
             href={`/categories/${category.slug}`}
           >
-            <span className="mobile-home-categories__icon">
-              <CategoryIcon category={category} className="text-[var(--mh-gold)]" size={24} />
-            </span>
+            <CategoryThumbnail category={category} size="md" />
             <span className="mobile-home-categories__label">
               {MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}
             </span>

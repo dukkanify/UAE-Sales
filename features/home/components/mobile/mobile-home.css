@@ -568,21 +568,11 @@
   text-align: center;
 }
 
-.mobile-home-categories__icon {
-  display: grid;
-  width: 100%;
-  max-width: var(--mh-category-icon);
-  aspect-ratio: 1;
-  place-items: center;
-  border: 1px solid var(--mh-border);
-  border-radius: var(--mh-radius-lg);
-  background: var(--mh-bg);
-  box-shadow: var(--mh-shadow-sm);
-  transition: transform var(--mh-duration) var(--mh-ease);
-}
-
-.mobile-home-categories__card:active .mobile-home-categories__icon {
-  transform: scale(0.96);
+.mobile-home-categories__card:active .category-thumbnail {
+  transform: scale(0.95);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 4%),
+    0 4px 12px rgb(15 23 42 / 7%);
 }
 
 .mobile-home-categories__label {
@@ -1001,7 +991,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mobile-home-categories__icon,
+  .category-thumbnail,
   .mobile-home-search-card__submit,
   .mobile-bottom-nav__fab {
     transition: none !important;

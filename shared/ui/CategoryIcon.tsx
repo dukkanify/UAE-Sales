@@ -1,18 +1,26 @@
 import type { Category } from "@/types";
-import { Icon } from "@/shared/ui/Icon";
+import {
+  CategoryThumbnail,
+  sizeFromPixels,
+} from "@/shared/components/CategoryThumbnail";
 
 type CategoryIconProps = {
-  category: Pick<Category, "icon">;
+  category: Pick<Category, "id" | "imageUrl" | "name">;
   className?: string;
   size?: number;
 };
 
+/** @deprecated Prefer `CategoryThumbnail` — kept for existing imports. */
 export function CategoryIcon({
   category,
   className = "",
   size = 20,
 }: CategoryIconProps) {
   return (
-    <Icon className={className} name={category.icon} size={size} />
+    <CategoryThumbnail
+      category={category}
+      className={className}
+      size={sizeFromPixels(size)}
+    />
   );
 }

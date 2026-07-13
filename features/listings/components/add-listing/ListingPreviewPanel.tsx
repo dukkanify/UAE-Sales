@@ -1,7 +1,7 @@
 import type { Category } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
 import { Card } from "@/shared/ui/Card";
-import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { Icon } from "@/shared/ui/Icon";
 import type { ListingPreview } from "./types";
 import { conditionLabels } from "./utils";
@@ -31,11 +31,11 @@ export function ListingPreviewPanel({
                 style={{ backgroundImage: `url(${imagePreviews[0]})` }}
               />
             ) : (
-              <div className="grid h-full place-items-center text-secondary">
+              <div className="grid h-full place-items-center">
                 {selectedCategory ? (
-                  <CategoryIcon category={selectedCategory} size={36} />
+                  <CategoryThumbnail category={selectedCategory} size="xl" />
                 ) : (
-                  <Icon name="package" size={36} />
+                  <Icon className="text-secondary" name="package" size={36} />
                 )}
               </div>
             )}
