@@ -1,6 +1,6 @@
 import type { Category } from "@/types";
+import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
 import { Card } from "@/shared/ui/Card";
-import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Select } from "@/shared/ui/Select";
 import type { AddListingErrors } from "./types";
@@ -42,12 +42,7 @@ export function CategorySelectionStep({
               onClick={() => onSelectCategory(category.id)}
               type="button"
             >
-              <span
-                className="mx-auto grid size-10 place-items-center text-secondary"
-                aria-hidden
-              >
-                <CategoryIcon category={category} size={22} />
-              </span>
+              <CategoryThumbnail category={category} selected={isSelected} />
               <p className="mt-2 text-sm font-semibold text-ink">{category.name}</p>
             </button>
           );
