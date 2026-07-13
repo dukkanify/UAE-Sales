@@ -1,6 +1,7 @@
 "use client";
 
 import type { Category } from "@/types";
+import { useCallback, useRef } from "react";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -17,6 +18,7 @@ type AddListingFormProps = {
 };
 
 export function AddListingForm({ categories }: AddListingFormProps) {
+  const detailsSectionRef = useRef<HTMLDivElement>(null);
   const {
     errors,
     handleImageChange,
@@ -30,6 +32,22 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     setSelectedCategoryId,
     submitListing,
   } = useAddListingForm(categories);
+
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => {
+      setSelectedCategoryId(categoryId);
+
+      window.requestAnimationFrame(() => {
+        window.setTimeout(() => {
+          detailsSectionRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }, 120);
+      });
+    },
+    [setSelectedCategoryId],
+  );
 
   if (!isAllowed) {
     return (
@@ -58,16 +76,22 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         <CategorySelectionStep
           categories={categories}
           errors={errors}
-          onSelectCategory={setSelectedCategoryId}
+          onSelectCategory={handleSelectCategory}
           selectedCategory={selectedCategory}
           selectedCategoryId={selectedCategoryId}
         />
 
-        {useDynamicFields ? (
-          <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
-        ) : (
-          <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
-        )}
+        <div
+          ref={detailsSectionRef}
+          className="scroll-mt-24 transition-shadow duration-500"
+          id="add-listing-details"
+        >
+          {useDynamicFields ? (
+            <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
+          ) : (
+            <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
+          )}
+        </div>
 
         <MediaContactStep
           errors={errors}
