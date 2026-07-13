@@ -188,32 +188,37 @@
 }
 
 .mobile-home-hero-block,
-.mobile-home-stats,
-.mobile-home-trending,
 .mobile-home-categories,
 .mobile-home-promo,
-.mobile-home-featured {
+.mobile-home-featured,
+.mobile-home-nearby,
+.mobile-home-trust,
+.mobile-home-app {
   animation: mobile-home-fade-up 360ms var(--mh-ease) both;
 }
 
-.mobile-home-stats {
-  animation-delay: 60ms;
-}
-
-.mobile-home-trending {
-  animation-delay: 100ms;
-}
-
 .mobile-home-categories {
-  animation-delay: 140ms;
+  animation-delay: 80ms;
 }
 
 .mobile-home-promo {
-  animation-delay: 180ms;
+  animation-delay: 140ms;
 }
 
 .mobile-home-featured {
-  animation-delay: 220ms;
+  animation-delay: 200ms;
+}
+
+.mobile-home-nearby {
+  animation-delay: 260ms;
+}
+
+.mobile-home-trust {
+  animation-delay: 320ms;
+}
+
+.mobile-home-app {
+  animation-delay: 380ms;
 }
 
 .mobile-home-header__icon-btn {
@@ -551,12 +556,26 @@
   color: var(--mh-muted);
 }
 
-/* ── Categories ── */
-.mobile-home-categories__grid {
+/* ── Categories carousel ── */
+.mobile-home-categories__track {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.mobile-home-categories__page {
   display: grid;
+  flex: 0 0 100%;
+  min-width: 100%;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: clamp(0.25rem, 1.5vw, 0.625rem);
   padding-inline: var(--mh-page-x);
+  scroll-snap-align: start;
 }
 
 .mobile-home-categories__card {
@@ -581,6 +600,11 @@
   transition: transform var(--mh-duration) var(--mh-ease);
 }
 
+.mobile-home-categories__icon--more {
+  background: var(--mh-gold-soft);
+  border-color: rgb(201 164 92 / 28%);
+}
+
 .mobile-home-categories__card:active .mobile-home-categories__icon {
   transform: scale(0.96);
 }
@@ -603,8 +627,14 @@
 .mobile-home-categories__dot {
   width: 0.3125rem;
   height: 0.3125rem;
+  border: 0;
   border-radius: 999px;
   background: var(--mh-border);
+  padding: 0;
+  cursor: pointer;
+  transition:
+    width var(--mh-duration) var(--mh-ease),
+    background var(--mh-duration) var(--mh-ease);
 }
 
 .mobile-home-categories__dot--active {
@@ -829,6 +859,240 @@
   color: var(--mh-muted);
 }
 
+/* ── Nearby ── */
+.mobile-home-nearby {
+  min-width: 0;
+  overflow: visible;
+}
+
+.mobile-home-nearby__track {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  flex-wrap: nowrap;
+  gap: 0.625rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: var(--mh-page-x);
+  padding-bottom: 0.25rem;
+  scroll-snap-type: x mandatory;
+}
+
+.mobile-home-nearby-card {
+  width: clamp(6.75rem, 30vw, 8.5rem);
+  min-width: clamp(6.75rem, 30vw, 8.5rem);
+}
+
+.mobile-home-nearby-card__media {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--mh-radius-xl);
+  border: 1px solid var(--mh-border);
+  box-shadow: var(--mh-shadow-sm);
+}
+
+.mobile-home-nearby-card__distance {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 2;
+  background: linear-gradient(180deg, transparent 0%, rgb(15 23 42 / 82%) 100%);
+  padding: 1.5rem 0.4375rem 0.4375rem;
+  font-size: var(--mh-text-xs);
+  font-weight: 800;
+  color: white;
+  text-align: center;
+}
+
+.mobile-home-nearby-card__title {
+  margin-top: 0.375rem;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: var(--mh-text-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mh-primary);
+}
+
+/* ── Trust ── */
+.mobile-home-trust {
+  padding-inline: var(--mh-page-x);
+}
+
+.mobile-home-trust__panel {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  border: 1px solid rgb(201 164 92 / 22%);
+  border-radius: var(--mh-radius-2xl);
+  background: linear-gradient(135deg, #fdfbf7 0%, #fff 55%, #f8f3ea 100%);
+  padding: clamp(0.875rem, 3vw, 1.125rem);
+  box-shadow: var(--mh-shadow-sm);
+}
+
+.mobile-home-trust__icon-wrap {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: clamp(3.25rem, 14vw, 4rem);
+  height: clamp(3.25rem, 14vw, 4rem);
+  border-radius: var(--mh-radius-xl);
+  background: rgb(201 164 92 / 12%);
+}
+
+.mobile-home-trust__copy {
+  min-width: 0;
+}
+
+.mobile-home-trust__title {
+  font-size: var(--mh-text-base);
+  font-weight: 800;
+  color: var(--mh-primary);
+}
+
+.mobile-home-trust__desc {
+  margin-top: 0.25rem;
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--mh-muted);
+}
+
+.mobile-home-trust__link {
+  display: inline-flex;
+  margin-top: 0.5rem;
+  align-items: center;
+  gap: 0.125rem;
+  font-size: var(--mh-text-sm);
+  font-weight: 800;
+  color: var(--mh-gold);
+}
+
+/* ── App download ── */
+.mobile-home-app {
+  padding-inline: var(--mh-page-x);
+}
+
+.mobile-home-app__panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(5.5rem, 24vw, 7rem);
+  align-items: center;
+  gap: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--mh-border);
+  border-radius: var(--mh-radius-2xl);
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  padding: clamp(0.875rem, 3vw, 1.125rem);
+  box-shadow: var(--mh-shadow-lg);
+}
+
+.mobile-home-app__eyebrow {
+  font-size: var(--mh-text-xs);
+  font-weight: 700;
+  color: var(--mh-gold);
+}
+
+.mobile-home-app__title {
+  margin-top: 0.1875rem;
+  font-size: var(--mh-text-base);
+  font-weight: 800;
+  line-height: 1.45;
+  color: white;
+}
+
+.mobile-home-app__desc {
+  margin-top: 0.3125rem;
+  font-size: var(--mh-text-xs);
+  font-weight: 500;
+  line-height: 1.55;
+  color: rgb(255 255 255 / 72%);
+}
+
+.mobile-home-app__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.625rem;
+}
+
+.mobile-home-app__badge {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.375rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: var(--mh-radius-md);
+  background: rgb(255 255 255 / 8%);
+  padding: 0.375rem 0.625rem;
+  color: white;
+  transition: background var(--mh-duration) var(--mh-ease);
+}
+
+.mobile-home-app__badge:active {
+  background: rgb(255 255 255 / 14%);
+}
+
+.mobile-home-app__badge-label {
+  display: block;
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: rgb(255 255 255 / 65%);
+  line-height: 1.1;
+}
+
+.mobile-home-app__badge-store {
+  display: block;
+  font-family: var(--font-latin);
+  font-size: var(--mh-text-xs);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.mobile-home-app__phone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border: 2px solid rgb(255 255 255 / 18%);
+  border-radius: 1rem;
+  background: rgb(15 23 42 / 65%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 6%);
+}
+
+.mobile-home-app__phone-notch {
+  width: 38%;
+  height: 0.3125rem;
+  margin: 0.375rem auto 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 18%);
+}
+
+.mobile-home-app__phone-screen {
+  display: flex;
+  height: calc(100% - 1rem);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+.mobile-home-app__phone-logo {
+  font-size: var(--mh-text-sm);
+  font-weight: 800;
+  color: var(--mh-gold);
+}
+
+.mobile-home-app__phone-tag {
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: rgb(255 255 255 / 70%);
+}
+
 /* ── Bottom nav ── */
 .mobile-bottom-nav {
   border-top: 1px solid var(--mh-border);
@@ -981,6 +1245,10 @@
     grid-template-columns: minmax(0, 1fr) 10rem;
   }
 
+  .mobile-home-app__panel {
+    grid-template-columns: minmax(0, 1fr) 8rem;
+  }
+
   .mobile-bottom-nav__grid {
     padding-inline: 1rem;
   }
@@ -1005,7 +1273,14 @@
 @media (prefers-reduced-motion: reduce) {
   .mobile-home-categories__icon,
   .mobile-home-search-card__submit,
-  .mobile-bottom-nav__fab {
-    transition: none !important;
+  .mobile-bottom-nav__fab,
+  .mobile-home-hero-block,
+  .mobile-home-categories,
+  .mobile-home-promo,
+  .mobile-home-featured,
+  .mobile-home-nearby,
+  .mobile-home-trust,
+  .mobile-home-app {
+    animation: none !important;
   }
 }

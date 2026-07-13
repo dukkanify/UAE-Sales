@@ -38,6 +38,15 @@ export function MobileHomeHeader() {
         </Link>
 
         <div className="mobile-home-header__actions">
+          <Link
+            aria-label="الإشعارات"
+            className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge"
+            href="/profile"
+          >
+            <Icon name="bell" size={18} />
+            <span className="mobile-home-header__badge">3</span>
+          </Link>
+
           <label className="mobile-home-header__location">
             <Icon className="mobile-home-header__location-icon" name="map" size={14} />
             <select
@@ -54,15 +63,6 @@ export function MobileHomeHeader() {
             </select>
             <Icon className="mobile-home-header__chevron" name="chevron-left" size={12} />
           </label>
-
-          <Link
-            aria-label="الإشعارات"
-            className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge"
-            href="/profile"
-          >
-            <Icon name="bell" size={18} />
-            <span className="mobile-home-header__badge">3</span>
-          </Link>
         </div>
       </div>
 

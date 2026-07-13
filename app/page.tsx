@@ -7,14 +7,15 @@ import {
   MarketHero,
   MarketPreviewStrip,
   MarketSiteFooter,
+  MobileAppDownload,
   MobileCategoryGrid,
   MobileFeaturedRail,
   MobileHeroBlock,
   MobileHomeHeader,
   MobileHomeShell,
+  MobileNearbyRail,
   MobilePromoBanner,
-  MobileStatsRow,
-  MobileTrendingSearches,
+  MobileTrustSection,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
 import { getCategories } from "@/services/categories";
@@ -49,11 +50,12 @@ export default async function Home() {
           <MobileHomeHeader />
           <main className="mobile-home-main">
             <MobileHeroBlock categories={categories} />
-            <MobileStatsRow />
-            <MobileTrendingSearches />
             <MobileCategoryGrid categories={categories} />
             <MobilePromoBanner />
             <MobileFeaturedRail listings={featuredListings} />
+            <MobileNearbyRail listings={allListings} />
+            <MobileTrustSection />
+            <MobileAppDownload />
           </main>
         </MobileHomeShell>
       </div>

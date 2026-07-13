@@ -40,7 +40,7 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
           </label>
 
           <label className="mobile-home-search-card__segment">
-            <span className="mobile-home-search-card__segment-label">المدينة</span>
+            <span className="mobile-home-search-card__segment-label">الموقع</span>
             <span className="mobile-home-search-card__segment-control">
               <Icon name="map" size={11} />
               <select className="mobile-home-search-card__select" defaultValue="دبي" name="city">
@@ -54,7 +54,7 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
           </label>
 
           <label className="mobile-home-search-card__segment">
-            <span className="mobile-home-search-card__segment-label">السعر</span>
+            <span className="mobile-home-search-card__segment-label">د.إ السعر</span>
             <span className="mobile-home-search-card__segment-control">
               <Icon name="filter" size={11} />
               <select className="mobile-home-search-card__select" defaultValue="" name="price">

@@ -1,21 +1,47 @@
-import type { Category } from "@/types";
+import type { Category, Listing } from "@/types";
 
+/** Reference order: cars, electronics, jobs, furniture, watches */
 export const MOBILE_MAIN_CATEGORY_ORDER = [
-  "services",
-  "jobs",
-  "electronics",
-  "real-estate",
   "cars",
+  "electronics",
+  "jobs",
+  "furniture",
+  "fashion",
+] as const;
+
+export const MOBILE_CATEGORY_PAGE_ORDER = [
+  ["cars", "electronics", "jobs", "furniture", "fashion"],
+  ["mobiles", "real-estate", "services", "pets"],
 ] as const;
 
 export const MOBILE_MAIN_CATEGORY_LABELS: Record<string, string> = {
-  services: "خدمات",
-  jobs: "وظائف",
-  electronics: "إلكترونيات",
-  "real-estate": "عقارات",
   cars: "سيارات",
+  electronics: "إلكترونيات",
+  jobs: "وظائف",
+  furniture: "أثاث",
+  fashion: "ساعات",
+  mobiles: "موبايلات",
+  "real-estate": "عقارات",
+  services: "خدمات",
+  pets: "حيوانات",
+  sports: "رياضة",
 };
 
+export const MOBILE_NEARBY_DISTANCES = [
+  "1.2 كم",
+  "2.4 كم",
+  "0.9 كم",
+  "3.1 كم",
+  "4.8 كم",
+  "5.2 كم",
+] as const;
+
+export const MOBILE_APP_LINKS = {
+  appStore: "https://apps.apple.com/",
+  playStore: "https://play.google.com/store",
+} as const;
+
+/** @deprecated Kept for legacy section — not used on mobile homepage v3 */
 export const MOBILE_TRENDING_SEARCHES = [
   { emoji: "⌚", href: "/search?q=ساعات", label: "ساعات" },
   { emoji: "🏢", href: "/search?q=شقة", label: "شقق" },
@@ -24,6 +50,7 @@ export const MOBILE_TRENDING_SEARCHES = [
   { emoji: "🚗", href: "/search?q=Land+Cruiser", label: "Land Cruiser" },
 ] as const;
 
+/** @deprecated Kept for legacy section — not used on mobile homepage v3 */
 export const MOBILE_TRUST_STATS = [
   { icon: "grid" as const, label: "إعلان نشط", tone: "gold" as const, value: "24K+" },
   { icon: "user" as const, label: "مستخدم موثق", tone: "muted" as const, value: "18K+" },
@@ -36,4 +63,24 @@ export function getMobileMainCategories(categories: Category[]): Category[] {
   return MOBILE_MAIN_CATEGORY_ORDER.map((id) => byId.get(id)).filter(
     (item): item is Category => Boolean(item),
   );
+}
+
+export function getMobileCategoryPages(categories: Category[]): Category[][] {
+  const byId = new Map(categories.map((item) => [item.id, item]));
+
+  return MOBILE_CATEGORY_PAGE_ORDER.map((page) =>
+    page.map((id) => byId.get(id)).filter((item): item is Category => Boolean(item)),
+  ).filter((page) => page.length > 0);
+}
+
+export type NearbyListing = {
+  distance: string;
+  listing: Listing;
+};
+
+export function getNearbyListings(listings: Listing[], limit = 6): NearbyListing[] {
+  return listings.slice(0, limit).map((listing, index) => ({
+    listing,
+    distance: MOBILE_NEARBY_DISTANCES[index % MOBILE_NEARBY_DISTANCES.length],
+  }));
 }

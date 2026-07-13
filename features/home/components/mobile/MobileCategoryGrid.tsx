@@ -1,44 +1,103 @@
+"use client";
+
 import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Category } from "@/types";
 import { CategoryIcon } from "@/shared/ui/CategoryIcon";
+import { Icon } from "@/shared/ui/Icon";
 import {
-  getMobileMainCategories,
+  getMobileCategoryPages,
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "./mobile-home.config";
-import { MobileSectionHeader } from "./MobileSectionHeader";
 
 type MobileCategoryGridProps = {
   categories: Category[];
 };
 
 export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
-  const items = getMobileMainCategories(categories);
+  const pages = getMobileCategoryPages(categories);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [activePage, setActivePage] = useState(0);
+
+  const updateActivePage = useCallback(() => {
+    const track = trackRef.current;
+    if (!track || pages.length === 0) return;
+
+    const pageWidth = track.clientWidth;
+    if (pageWidth <= 0) return;
+
+    const index = Math.round(track.scrollLeft / pageWidth);
+    setActivePage(Math.min(Math.max(index, 0), pages.length - 1));
+  }, [pages.length]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return undefined;
+
+    updateActivePage();
+    track.addEventListener("scroll", updateActivePage, { passive: true });
+    window.addEventListener("resize", updateActivePage);
+
+    return () => {
+      track.removeEventListener("scroll", updateActivePage);
+      window.removeEventListener("resize", updateActivePage);
+    };
+  }, [updateActivePage]);
+
+  const scrollToPage = (index: number) => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollTo({ behavior: "smooth", left: index * track.clientWidth });
+  };
 
   return (
-    <section aria-label="التصنيفات الرئيسية" className="mobile-home-categories">
-      <MobileSectionHeader actionHref="/categories" title="التصنيفات الرئيسية" />
-      <div className="mobile-home-categories__grid">
-        {items.map((category) => (
-          <Link
-            key={category.id}
-            className="mobile-home-categories__card"
-            href={`/categories/${category.slug}`}
-          >
-            <span className="mobile-home-categories__icon">
-              <CategoryIcon category={category} className="text-[var(--mh-gold)]" size={24} />
-            </span>
-            <span className="mobile-home-categories__label">
-              {MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}
-            </span>
-          </Link>
+    <section aria-label="التصنيفات" className="mobile-home-categories">
+      <div
+        ref={trackRef}
+        className="mobile-home-categories__track mobile-home-scroll"
+      >
+        {pages.map((page, pageIndex) => (
+          <div key={pageIndex} className="mobile-home-categories__page">
+            {page.map((category) => (
+              <Link
+                key={category.id}
+                className="mobile-home-categories__card"
+                href={`/categories/${category.slug}`}
+              >
+                <span className="mobile-home-categories__icon">
+                  <CategoryIcon category={category} className="text-[var(--mh-gold)]" size={24} />
+                </span>
+                <span className="mobile-home-categories__label">
+                  {MOBILE_MAIN_CATEGORY_LABELS[category.id] ?? category.name}
+                </span>
+              </Link>
+            ))}
+
+            {pageIndex === pages.length - 1 ? (
+              <Link className="mobile-home-categories__card" href="/categories">
+                <span className="mobile-home-categories__icon mobile-home-categories__icon--more">
+                  <Icon className="text-[var(--mh-gold)]" name="grid" size={22} />
+                </span>
+                <span className="mobile-home-categories__label">المزيد</span>
+              </Link>
+            ) : null}
+          </div>
         ))}
       </div>
-      <div className="mobile-home-categories__dots">
-        <span className="mobile-home-categories__dot mobile-home-categories__dot--active" />
-        <span className="mobile-home-categories__dot" />
-        <span className="mobile-home-categories__dot" />
-        <span className="mobile-home-categories__dot" />
-        <span className="mobile-home-categories__dot" />
+
+      <div className="mobile-home-categories__dots" aria-label="صفحات التصنيفات">
+        {pages.map((_, index) => (
+          <button
+            key={index}
+            aria-current={activePage === index ? "true" : undefined}
+            aria-label={`صفحة ${index + 1}`}
+            className={`mobile-home-categories__dot ${
+              activePage === index ? "mobile-home-categories__dot--active" : ""
+            }`}
+            onClick={() => scrollToPage(index)}
+            type="button"
+          />
+        ))}
       </div>
     </section>
   );

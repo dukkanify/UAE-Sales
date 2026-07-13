@@ -9,6 +9,7 @@ export { MarketPreviewStrip } from "./components/marketplace/MarketPreviewStrip"
 export { MarketSectionHeader, MarketSectionShell } from "./components/marketplace/MarketSectionHeader";
 export { MarketSiteFooter } from "./components/marketplace/MarketSiteFooter";
 export {
+  MobileAppDownload,
   MobileBottomNav,
   MobileCategoryGrid,
   MobileFeaturedCard,
@@ -18,9 +19,11 @@ export {
   MobileHeroSection,
   MobileHomeHeader,
   MobileHomeShell,
+  MobileNearbyRail,
   MobilePromoBanner,
   MobileSearchCard,
   MobileSectionHeader,
   MobileStatsRow,
   MobileTrendingSearches,
+  MobileTrustSection,
 } from "./components/mobile";
