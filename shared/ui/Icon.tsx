@@ -62,7 +62,7 @@ const paths: Record<IconName, string> = {
     "M12 20s-6.5-4.2-8.8-8.2C1.4 8.4 3.6 5.5 6.7 5.5c1.7 0 3.2.8 4.3 2.1 1.1-1.3 2.6-2.1 4.3-2.1 3.1 0 5.3 2.9 3.5 6.3C18.5 15.8 12 20 12 20Z",
   user: "M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z",
   home:
-    "M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z",
+    "M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z M12 7.5V11",
   grid: "M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z",
   wallet:
     "M4 7h14a2 2 0 0 1 2 2v1h-3a3 3 0 0 0 0 6h3v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm14 5h-2a1 1 0 0 0 0 2h2v-2Z",
@@ -91,7 +91,7 @@ const paths: Record<IconName, string> = {
   "share-2":
     "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13",
   phone:
-    "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
+    "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 15h.01",
   whatsapp:
     "M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l4.99-1.31A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.2c-.22.62-1.08 1.15-1.78 1.3-.45.1-1.04.18-3.02-.65-2.54-1.1-4.18-4.65-4.31-4.87-.13-.22-1.03-1.37-1.03-2.61 0-1.24.65-1.85.88-2.1.22-.24.48-.3.64-.3h.46c.15 0 .35-.06.54.42.2.48.67 1.63.73 1.75.06.12.1.27-.02.43-.12.16-.18.27-.35.43-.17.16-.36.36-.51.48-.17.12-.35.25-.15.49.2.24.89 1.47 1.91 2.38 1.31 1.17 2.41 1.53 2.76 1.7.35.18.56.15.76-.09.2-.24.87-1.02 1.1-1.37.23-.35.46-.29.76-.18.31.12 1.95.92 2.28 1.09.33.17.55.26.63.4.08.14.08.81-.14 1.43z",
   "chevron-left": "M15 6l-6 6 6 6",
@@ -104,15 +104,15 @@ const paths: Record<IconName, string> = {
   chart:
     "M5 19V9M10 19V5M15 19v-7M20 19V11",
   car:
-    "M5 17h14M6 17v2M18 17v2M4 12h16l-1.5-5a2 2 0 0 0-2-1.5H7.5a2 2 0 0 0-2 1.5L4 12Zm3-3h10",
+    "M5 16H3v-3l1.8-5.2A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.3L21 13.5V16h-2M5 16h14M7.5 9.5 9 7h6l1.5 2.5M7 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z",
   laptop:
-    "M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V7Zm-1 10h18",
+    "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V6ZM3 16h18M2 18h20",
   sofa:
-    "M5 12V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4M4 12h16v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4Z",
+    "M3 12V9a2 2 0 0 1 2-2h1V6a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1h1a2 2 0 0 1 2 2v3M3 12h18v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3ZM7 14h10",
   briefcase:
-    "M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9Z",
+    "M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M4 9h16v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9Zm4 0V7h8v2M12 12v3",
   watch:
-    "M9 3h6l1 4H8l1-4Zm-1 14h8l1 4H8l1-4ZM12 8a4 4 0 1 0 4 4 4 4 0 0 0-4-4Z",
+    "M9 2.5h6V6H9V2.5Zm0 15H9v3.5h6V17.5H9ZM12 7a4.5 4.5 0 1 0 4.5 4.5A4.5 4.5 0 0 0 12 7Zm0 2a2.5 2.5 0 1 1-2.5 2.5A2.5 2.5 0 0 1 12 9Z",
   paw:
     "M8.5 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM6 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Zm12 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM12 20c2.8 0 5-2 5-4.5S14.8 11 12 11s-5 1.5-5 4.5S9.2 20 12 20Z",
   wrench:
@@ -122,7 +122,7 @@ const paths: Record<IconName, string> = {
   book:
     "M5 4h9a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Zm11 2h3v14h-3",
   sport:
-    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-16a7 7 0 0 1 0 14",
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14.5L14.5 11H9.5L12 6.5Zm-5.8 3.5h5.6L12 15l-2.8-5Zm0 7 2.8-5 2.8 5H6.2Zm11.6 0h-5.6l2.8-5 2.8 5Z",
   food:
     "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
 };
@@ -130,10 +130,31 @@ const paths: Record<IconName, string> = {
 const MENU_LINES = ["M4 7h16", "M4 12h16", "M4 17h16"] as const;
 const CLOSE_LINES = ["M6 6l12 12", "M18 6 6 18"] as const;
 
+const CATEGORY_ICONS = new Set<IconName>([
+  "baby",
+  "book",
+  "briefcase",
+  "car",
+  "food",
+  "home",
+  "laptop",
+  "paw",
+  "phone",
+  "sofa",
+  "sport",
+  "watch",
+  "wrench",
+]);
+
 export function Icon({ className = "", filled = false, name, size = 20 }: IconProps) {
   const isFilledHeart = name === "heart-filled" || (name === "heart" && filled);
   const isFilledIcon = isFilledHeart || name === "whatsapp";
-  const strokeWidth = name === "menu" || name === "close" ? 2.25 : 1.75;
+  const strokeWidth =
+    name === "menu" || name === "close"
+      ? 2.25
+      : CATEGORY_ICONS.has(name)
+        ? 2
+        : 1.75;
   const linePaths = name === "menu" ? MENU_LINES : name === "close" ? CLOSE_LINES : null;
 
   return (

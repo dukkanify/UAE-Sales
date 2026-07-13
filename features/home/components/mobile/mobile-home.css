@@ -584,6 +584,7 @@
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x mandatory;
+  direction: ltr;
 }
 
 .mobile-home-categories__page {
@@ -594,6 +595,8 @@
   gap: clamp(0.25rem, 1.5vw, 0.625rem);
   padding-inline: var(--mh-page-x);
   scroll-snap-align: start;
+  scroll-snap-stop: always;
+  direction: rtl;
 }
 
 .mobile-home-categories__card {
@@ -611,16 +614,21 @@
   max-width: var(--mh-category-icon);
   aspect-ratio: 1;
   place-items: center;
-  border: 1px solid var(--mh-border);
+  border: 1px solid rgb(201 164 92 / 22%);
   border-radius: var(--mh-radius-lg);
-  background: var(--mh-bg);
+  background: linear-gradient(165deg, #fff 8%, var(--mh-gold-soft) 100%);
   box-shadow: var(--mh-shadow-sm);
   transition: transform var(--mh-duration) var(--mh-ease);
 }
 
+.mobile-home-categories__icon-svg {
+  flex-shrink: 0;
+  color: var(--mh-gold);
+}
+
 .mobile-home-categories__icon--more {
-  background: var(--mh-gold-soft);
-  border-color: rgb(201 164 92 / 28%);
+  background: linear-gradient(165deg, var(--mh-gold-soft) 0%, rgb(201 164 92 / 18%) 100%);
+  border-color: rgb(201 164 92 / 32%);
 }
 
 .mobile-home-categories__card:active .mobile-home-categories__icon {
@@ -634,12 +642,52 @@
   line-height: 1.25;
 }
 
+.mobile-home-categories__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-inline: var(--mh-page-x);
+}
+
+.mobile-home-categories__arrow {
+  display: grid;
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--mh-border);
+  border-radius: 999px;
+  background: var(--mh-bg);
+  color: var(--mh-primary);
+  box-shadow: var(--mh-shadow-sm);
+  cursor: pointer;
+  transition:
+    background var(--mh-duration) var(--mh-ease),
+    border-color var(--mh-duration) var(--mh-ease),
+    transform var(--mh-duration) var(--mh-ease);
+}
+
+.mobile-home-categories__arrow:not(:disabled):active {
+  transform: scale(0.94);
+}
+
+.mobile-home-categories__arrow:not(:disabled):hover {
+  border-color: rgb(201 164 92 / 40%);
+  background: var(--mh-gold-soft);
+}
+
+.mobile-home-categories__arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .mobile-home-categories__dots {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.3125rem;
-  margin-top: 0.75rem;
 }
 
 .mobile-home-categories__dot {
