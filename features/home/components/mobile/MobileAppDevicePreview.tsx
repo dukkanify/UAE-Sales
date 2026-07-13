@@ -18,28 +18,30 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
         <div className="mobile-home-app__device-preview-inner mobile-home-shell">
         <header className="mobile-home-header mobile-home-app__device-preview-header">
           <div className="mobile-home-header__bar">
-            <span className="mobile-home-header__icon-btn">
-              <Icon className="shrink-0 text-[var(--mh-primary)]" name="menu" size={22} />
-            </span>
-
-            <div className="mobile-home-header__logo">
-              <BrandMark size={32} variant="default" />
-              <span className="mobile-home-header__logo-text">
-                <span className="mobile-home-header__logo-en">{BRAND.nameEn}</span>
-                <span className="mobile-home-header__logo-ar">{BRAND.nameAr}</span>
+            <div className="mobile-home-header__side mobile-home-header__side--start">
+              <span className="mobile-home-header__icon-btn">
+                <Icon name="menu" size={20} />
               </span>
             </div>
 
-            <div className="mobile-home-header__actions">
-              <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge">
-                <Icon name="bell" size={18} />
-                <span className="mobile-home-header__badge">3</span>
+            <div className="mobile-home-header__brand">
+              <BrandMark size={34} variant="default" />
+              <span className="mobile-home-header__brand-text">
+                <span className="mobile-home-header__brand-en">{BRAND.nameEn}</span>
+                <span className="mobile-home-header__brand-ar">{BRAND.nameAr}</span>
               </span>
+            </div>
 
+            <div className="mobile-home-header__side mobile-home-header__side--end">
               <span className="mobile-home-header__location">
                 <Icon className="mobile-home-header__location-icon" name="map" size={14} />
                 <span className="mobile-home-header__location-value">دبي</span>
-                <Icon className="mobile-home-header__chevron" name="chevron-left" size={12} />
+                <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
+              </span>
+
+              <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge">
+                <Icon name="bell" size={18} />
+                <span className="mobile-home-header__badge">3</span>
               </span>
             </div>
           </div>
