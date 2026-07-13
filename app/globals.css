@@ -57,6 +57,11 @@ body {
   line-height: 1.6;
 }
 
+/* Next.js dev overlay host — prevent layout shifts in development */
+nextjs-portal {
+  position: absolute;
+}
+
 body::selection {
   background: var(--color-primary);
   color: white;
