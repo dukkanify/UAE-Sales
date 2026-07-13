@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { BRAND } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
 import { getFeaturedListings } from "@/services/listings";
 import { MobileAppDevicePreview } from "./MobileAppDevicePreview";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
-import { AppStoreBadgeSvg, GooglePlayBadgeSvg } from "./MobileStoreBadges";
+import { AppStoreBadgeLink, GooglePlayBadgeLink } from "./MobileStoreBadges";
 
 const APP_FEATURES = [
   { icon: "bell" as const, label: "إشعارات فورية" },
@@ -23,9 +22,22 @@ export async function MobileAppDownload() {
         <span aria-hidden className="mobile-home-app__glow mobile-home-app__glow--navy" />
 
         <div className="mobile-home-app__layout">
+          <div aria-hidden className="mobile-home-app__device-wrap">
+            <div className="mobile-home-app__device">
+              <div className="mobile-home-app__device-island" />
+              <div className="mobile-home-app__device-screen">
+                {previewListing ? (
+                  <MobileAppDevicePreview listing={previewListing} />
+                ) : (
+                  <div className="mobile-home-app__device-fallback" />
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="mobile-home-app__copy">
             <span className="mobile-home-app__eyebrow">
-              <Icon name="phone" size={12} />
+              <Icon name="phone" size={13} />
               حمّل التطبيق
             </span>
 
@@ -41,44 +53,17 @@ export async function MobileAppDownload() {
             <ul className="mobile-home-app__features">
               {APP_FEATURES.map((feature) => (
                 <li key={feature.label} className="mobile-home-app__feature">
-                  <Icon name={feature.icon} size={12} />
+                  <span className="mobile-home-app__feature-icon">
+                    <Icon name={feature.icon} size={13} />
+                  </span>
                   {feature.label}
                 </li>
               ))}
             </ul>
 
             <div className="mobile-home-app__badges">
-              <Link
-                aria-label="حمّل من App Store"
-                className="mobile-home-app__store-badge"
-                href={MOBILE_APP_LINKS.appStore}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <AppStoreBadgeSvg />
-              </Link>
-              <Link
-                aria-label="متوفر على Google Play"
-                className="mobile-home-app__store-badge"
-                href={MOBILE_APP_LINKS.playStore}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                <GooglePlayBadgeSvg />
-              </Link>
-            </div>
-          </div>
-
-          <div aria-hidden className="mobile-home-app__device-wrap">
-            <div className="mobile-home-app__device">
-              <div className="mobile-home-app__device-island" />
-              <div className="mobile-home-app__device-screen">
-                {previewListing ? (
-                  <MobileAppDevicePreview listing={previewListing} />
-                ) : (
-                  <div className="mobile-home-app__device-fallback" />
-                )}
-              </div>
+              <AppStoreBadgeLink href={MOBILE_APP_LINKS.appStore} />
+              <GooglePlayBadgeLink href={MOBILE_APP_LINKS.playStore} />
             </div>
           </div>
         </div>
