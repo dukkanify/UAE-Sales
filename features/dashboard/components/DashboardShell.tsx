@@ -16,7 +16,12 @@ import {
 import { removeSessionCookie } from "@/services/auth/session-sync";
 
 type DashboardShellProps = {
-  activePath: "/profile" | "/dashboard/listings" | "/dashboard/business-onboarding" | "/chat";
+  activePath:
+    | "/profile"
+    | "/orders"
+    | "/dashboard/listings"
+    | "/dashboard/business-onboarding"
+    | "/chat";
   children: ReactNode;
   description: string;
   title: string;
@@ -25,6 +30,7 @@ type DashboardShellProps = {
 
 const dashboardLinks = [
   { href: "/profile", icon: "user" as const, label: "الملف الشخصي" },
+  { href: "/orders", icon: "package" as const, label: "طلباتي" },
   { href: "/dashboard/listings", icon: "grid" as const, label: "إعلاناتي" },
   { href: "/listings/new", icon: "plus" as const, label: "إضافة إعلان" },
   { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
