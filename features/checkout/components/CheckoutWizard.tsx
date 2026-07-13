@@ -9,6 +9,8 @@ import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import {
   CHECKOUT_ERRORS,
+  buildDeliveryAddressInput,
+  formatSavedAddressLine,
   normalizeGuestBuyer,
   validateCheckoutReviewStep,
   validateGuestDeliveryStep,
@@ -61,15 +63,8 @@ const defaultGuestInfo: GuestDeliveryInfo = {
   email: "",
   phone: "",
   shippingMethod: "standard",
-  emirate: "",
-  city: "",
-  area: "",
-  street: "",
-  building: "",
-  unit: "",
-  landmark: "",
-  notes: "",
-  companyName: "",
+  emirate: "دبي",
+  addressLine: "",
   saveAddress: false,
 };
 
@@ -143,6 +138,7 @@ export function CheckoutWizard({
       fullName: prev.fullName || sessionUser.fullName,
       email: prev.email || sessionUser.email,
       phone: prev.phone || sessionUser.phone,
+      emirate: prev.emirate || sessionUser.city || "دبي",
     }));
   }
 
@@ -163,13 +159,7 @@ export function CheckoutWizard({
         fullName: defaultAddress.fullName,
         phone: defaultAddress.phone,
         emirate: defaultAddress.emirate,
-        city: defaultAddress.city,
-        area: defaultAddress.area,
-        street: defaultAddress.street,
-        building: defaultAddress.building ?? "",
-        unit: defaultAddress.unit ?? "",
-        landmark: defaultAddress.landmark ?? "",
-        notes: defaultAddress.notes ?? "",
+        addressLine: formatSavedAddressLine(defaultAddress),
       }));
     }
   }
@@ -237,30 +227,28 @@ export function CheckoutWizard({
 
     setError("");
     const buyer = getSessionSnapshot();
-    const info = normalizeGuestBuyer(guestInfo);
+    const deliveryInfo: GuestDeliveryInfo = {
+      ...guestInfo,
+      ...normalizeGuestBuyer(guestInfo),
+      shippingMethod,
+    };
 
-    if (guestCheckout && !buyer) {
-      const validationError = validateGuestDeliveryStep(
-        { ...info, shippingMethod },
-        requiresAddress,
-      );
-      if (validationError) {
-        setError(validationError);
+    if (buyer && shippable && requiresAddress && addresses.length > 0) {
+      if (!selectedAddressId) {
+        setError(CHECKOUT_ERRORS.savedAddressRequired);
+        scrollPanelToTop();
         return;
       }
-      setGuestInfo((prev) => ({ ...prev, ...info, shippingMethod }));
-    } else if (shippable && requiresAddress) {
-      if (!selectedAddressId && addresses.length === 0) {
-        const validationError = validateGuestDeliveryStep(
-          { ...info, shippingMethod },
-          true,
-        );
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
+    } else {
+      const validationError = validateGuestDeliveryStep(deliveryInfo, requiresAddress);
+      if (validationError) {
+        setError(validationError);
+        scrollPanelToTop();
+        return;
       }
     }
+
+    setGuestInfo(deliveryInfo);
 
     transitionLockRef.current = true;
     setIsContinuing(true);
@@ -280,12 +268,14 @@ export function CheckoutWizard({
       const sessionUser = getSessionSnapshot();
       const normalized = normalizeGuestBuyer(guestInfo);
       const isGuest = guestCheckout && !sessionUser;
+      const deliveryInfo: GuestDeliveryInfo = {
+        ...guestInfo,
+        ...normalized,
+        shippingMethod,
+      };
 
       if (isGuest) {
-        const validationError = validateGuestDeliveryStep(
-          { ...normalized, shippingMethod },
-          requiresAddress,
-        );
+        const validationError = validateGuestDeliveryStep(deliveryInfo, requiresAddress);
         if (validationError) {
           setError(validationError);
           return;
@@ -327,20 +317,7 @@ export function CheckoutWizard({
           addressId: sessionUser && selectedAddressId ? selectedAddressId : undefined,
           deliveryAddress:
             requiresAddress && (!sessionUser || !selectedAddress)
-              ? {
-                  fullName: normalized.fullName,
-                  phone: normalized.phone,
-                  emirate: guestInfo.emirate,
-                  city: guestInfo.city,
-                  area: guestInfo.area,
-                  street: guestInfo.street,
-                  building: guestInfo.building,
-                  unit: guestInfo.unit,
-                  landmark: guestInfo.landmark,
-                  notes: guestInfo.notes,
-                  companyName: guestInfo.companyName,
-                  saveAddress: guestInfo.saveAddress,
-                }
+              ? buildDeliveryAddressInput(deliveryInfo, normalized)
               : undefined,
         }),
       });
@@ -487,6 +464,8 @@ export function CheckoutWizard({
                 value={guestInfo.email}
               />
               <Input
+                dir="ltr"
+                inputMode="tel"
                 label="رقم الجوال"
                 name="phone"
                 onChange={(event) =>
@@ -545,93 +524,45 @@ export function CheckoutWizard({
                         value={selectedAddressId}
                       />
                     ) : null}
-                    <div className="grid gap-3 md:grid-cols-2">
-                      <Select
-                        label="الإمارة"
-                        name="emirate"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, emirate: event.target.value }))
-                        }
-                        options={cities.map((city) => ({ label: city.name, value: city.name }))}
-                        value={guestInfo.emirate}
-                      />
-                      <Input
-                        label="المدينة"
-                        name="city"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, city: event.target.value }))
-                        }
-                        required
-                        value={guestInfo.city}
-                      />
-                      <Input
-                        label="المنطقة"
-                        name="area"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, area: event.target.value }))
-                        }
-                        required
-                        value={guestInfo.area}
-                      />
-                      <Input
-                        label="الشارع / المبنى"
-                        name="street"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, street: event.target.value }))
-                        }
-                        required
-                        value={guestInfo.street}
-                      />
-                      <Input
-                        label="رقم الشقة / الفيلا"
-                        name="unit"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, unit: event.target.value }))
-                        }
-                        value={guestInfo.unit}
-                      />
-                      <Input
-                        label="اسم الشركة (اختياري)"
-                        name="companyName"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, companyName: event.target.value }))
-                        }
-                        value={guestInfo.companyName}
-                      />
-                      <Input
-                        className="md:col-span-2"
-                        label="علامة مميزة (اختياري)"
-                        name="landmark"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, landmark: event.target.value }))
-                        }
-                        value={guestInfo.landmark}
-                      />
-                      <Input
-                        className="md:col-span-2"
-                        label="ملاحظات التوصيل (اختياري)"
-                        name="notes"
-                        onChange={(event) =>
-                          setGuestInfo((prev) => ({ ...prev, notes: event.target.value }))
-                        }
-                        value={guestInfo.notes}
-                      />
-                    </div>
-                    {sessionUser ? (
-                      <label className="flex items-center gap-2 text-sm text-muted">
-                        <input
-                          checked={guestInfo.saveAddress}
+                    {(!sessionUser || addresses.length === 0) && (
+                      <div className="grid gap-3">
+                        <Select
+                          label="الإمارة"
+                          name="emirate"
                           onChange={(event) =>
-                            setGuestInfo((prev) => ({
-                              ...prev,
-                              saveAddress: event.target.checked,
-                            }))
+                            setGuestInfo((prev) => ({ ...prev, emirate: event.target.value }))
                           }
-                          type="checkbox"
+                          options={cities.map((city) => ({ label: city.name, value: city.name }))}
+                          required
+                          value={guestInfo.emirate}
                         />
-                        حفظ العنوان
-                      </label>
-                    ) : null}
+                        <Input
+                          label="عنوان التوصيل"
+                          name="addressLine"
+                          onChange={(event) =>
+                            setGuestInfo((prev) => ({ ...prev, addressLine: event.target.value }))
+                          }
+                          placeholder="مثال: الخليج التجاري، برج الإمارات، الطابق 12"
+                          required
+                          value={guestInfo.addressLine}
+                        />
+                        {sessionUser ? (
+                          <label className="flex items-center gap-2 text-sm text-muted">
+                            <input
+                              checked={guestInfo.saveAddress}
+                              onChange={(event) =>
+                                setGuestInfo((prev) => ({
+                                  ...prev,
+                                  saveAddress: event.target.checked,
+                                }))
+                              }
+                              type="checkbox"
+                            />
+                            حفظ العنوان
+                          </label>
+                        ) : null}
+                      </div>
+                    )}
                   </>
                 ) : (
                   <p className="text-sm text-muted">
@@ -641,8 +572,9 @@ export function CheckoutWizard({
               </>
             ) : null}
 
-            <div className="flex gap-2">
+            <div className="sticky bottom-0 z-10 -mx-2 flex gap-2 border-t border-border bg-surface/95 p-4 backdrop-blur-sm supports-[backdrop-filter]:bg-surface/90 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
               <Button
+                className="flex-1 md:flex-none"
                 loading={isContinuing}
                 onClick={handleContinueFromDelivery}
                 type="button"
