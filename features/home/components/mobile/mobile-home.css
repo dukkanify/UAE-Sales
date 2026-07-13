@@ -791,6 +791,12 @@
     0 0 0 2px rgb(201 164 92 / 28%);
 }
 
+.add-listing-category-thumb {
+  width: clamp(2.65rem, 8.5vw, 3.15rem);
+  height: clamp(2.65rem, 8.5vw, 3.15rem);
+  border-radius: 0.875rem;
+}
+
 .mobile-home-categories__thumb--more {
   display: grid;
   place-items: center;

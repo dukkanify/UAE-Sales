@@ -5,6 +5,12 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import {
+  addListingStepBodyClass,
+  addListingStepCardClass,
+  addListingStepDescClass,
+  addListingStepTitleClass,
+} from "./utils";
 
 export type CategoryFieldErrors = Record<string, string | undefined>;
 
@@ -146,20 +152,20 @@ export function CategoryFieldsForm({
       : defaults?.condition;
 
   return (
-    <Card key={categoryId} className="p-6">
+    <Card key={categoryId} className={addListingStepCardClass}>
       {stepLabel ? (
         <p className="text-xs font-bold uppercase tracking-wide text-secondary">
           {stepLabel}
         </p>
       ) : null}
-      <h2 className={`${stepLabel ? "mt-1" : ""} text-2xl font-black text-ink`}>
+      <h2 className={`${stepLabel ? "mt-1" : ""} ${addListingStepTitleClass}`}>
         {heading}
       </h2>
-      <p className="mt-2 text-sm font-medium text-muted">
+      <p className={addListingStepDescClass}>
         الحقول تتغير تلقائياً حسب القسم — يُعرض فقط ما تدخله.
       </p>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+      <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
         {fields.map((field) => {
           if (field.key === "condition" && conditionDefault) {
             return (

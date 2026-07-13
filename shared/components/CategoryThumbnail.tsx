@@ -5,6 +5,7 @@ type CategoryThumbnailProps = {
   category: Category;
   className?: string;
   selected?: boolean;
+  variant?: "compact" | "default";
 };
 
 /** Same category photo tile used on the mobile homepage grid. */
@@ -12,12 +13,13 @@ export function CategoryThumbnail({
   category,
   className = "",
   selected = false,
+  variant = "default",
 }: CategoryThumbnailProps) {
   return (
     <span
       className={`mobile-home-categories__thumb mx-auto ${
-        selected ? "mobile-home-categories__thumb--selected" : ""
-      } ${className}`.trim()}
+        variant === "compact" ? "add-listing-category-thumb" : ""
+      } ${selected ? "mobile-home-categories__thumb--selected" : ""} ${className}`.trim()}
     >
       <AppImage
         alt=""

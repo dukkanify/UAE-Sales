@@ -4,6 +4,11 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import type { AddListingErrors } from "./types";
+import {
+  addListingStepBodyClass,
+  addListingStepCardClass,
+  addListingStepTitleClass,
+} from "./utils";
 
 type MediaContactStepProps = {
   errors: AddListingErrors;
@@ -22,9 +27,9 @@ export function MediaContactStep({
   const hasImages = imagePreviews.length > 0;
 
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-black text-ink">3. الصور والتواصل</h2>
-      <div className="mt-5 grid gap-4 md:grid-cols-2">
+    <Card className={addListingStepCardClass}>
+      <h2 className={addListingStepTitleClass}>3. الصور والتواصل</h2>
+      <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
         <div className="grid gap-3">
           <div
             className={`rounded-[var(--radius-2xl)] border border-dashed border-secondary bg-secondary-soft p-4 transition ${

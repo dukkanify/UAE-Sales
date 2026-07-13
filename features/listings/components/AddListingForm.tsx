@@ -64,13 +64,13 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
   return (
     <form
-      className="grid gap-6 lg:grid-cols-[1fr_22rem]"
+      className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6"
       noValidate
       onSubmit={submitListing}
     >
       <input name="categoryId" type="hidden" value={selectedCategoryId} />
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 lg:gap-6">
         <AddListingStepProgress />
 
         <CategorySelectionStep
@@ -99,7 +99,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           onImageChange={handleImageChange}
         />
 
-        <Card className="flex flex-wrap items-center justify-between gap-4 bg-primary p-5 text-white">
+        <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
           <p className="font-medium">
             بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
           </p>

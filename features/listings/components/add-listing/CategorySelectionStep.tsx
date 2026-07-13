@@ -4,6 +4,11 @@ import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Select } from "@/shared/ui/Select";
 import type { AddListingErrors } from "./types";
+import {
+  addListingStepCardClass,
+  addListingStepDescClass,
+  addListingStepTitleClass,
+} from "./utils";
 
 type CategorySelectionStepProps = {
   categories: Category[];
@@ -21,12 +26,12 @@ export function CategorySelectionStep({
   selectedCategoryId,
 }: CategorySelectionStepProps) {
   return (
-    <Card className="p-6">
-      <h2 className="text-2xl font-black text-ink">1. اختر القسم</h2>
-      <p className="mt-2 text-sm font-medium text-muted">
+    <Card className={addListingStepCardClass}>
+      <h2 className={addListingStepTitleClass}>1. اختر القسم</h2>
+      <p className={addListingStepDescClass}>
         اختر القسم الأنسب لإعلانك ليظهر أمام المشترين المناسبين.
       </p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:mt-4 sm:grid-cols-4 sm:gap-2.5 lg:grid-cols-5">
         {categories.map((category) => {
           const isSelected = category.id === selectedCategoryId;
 
@@ -34,7 +39,7 @@ export function CategorySelectionStep({
             <button
               key={category.id}
               aria-pressed={isSelected}
-              className={`mobile-home-categories__card rounded-[var(--radius-xl)] border p-4 transition ${
+              className={`mobile-home-categories__card gap-1 rounded-[var(--radius-lg)] border p-2 transition sm:gap-1.5 sm:rounded-[var(--radius-xl)] sm:p-2.5 ${
                 isSelected
                   ? "border-secondary bg-secondary-soft shadow-[var(--shadow-xs)]"
                   : "border-border bg-surface hover:border-secondary/40"
@@ -42,8 +47,13 @@ export function CategorySelectionStep({
               onClick={() => onSelectCategory(category.id)}
               type="button"
             >
-              <CategoryThumbnail category={category} selected={isSelected} />
-              <span className="mobile-home-categories__label text-sm font-semibold text-ink">
+              <CategoryThumbnail
+                category={category}
+                className="mx-0"
+                selected={isSelected}
+                variant="compact"
+              />
+              <span className="mobile-home-categories__label line-clamp-2 text-[10px] font-semibold leading-tight text-ink sm:text-xs">
                 {category.name}
               </span>
             </button>
@@ -55,7 +65,7 @@ export function CategorySelectionStep({
       ) : null}
 
       {(selectedCategory?.subcategories.length ?? 0) > 0 ? (
-        <div className="mt-5">
+        <div className="mt-4">
           <Select
             label="القسم الفرعي (اختياري)"
             name="subcategory"
