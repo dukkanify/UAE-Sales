@@ -1,6 +1,7 @@
 export { MobileAppDownload } from "./MobileAppDownload";
 export { MobileBottomNav } from "./MobileBottomNav";
 export { MobileCategoryGrid } from "./MobileCategoryGrid";
+export { MobileCategoryRail } from "./MobileCategoryRail";
 export { MobileEmiratesSection } from "./MobileEmiratesSection";
 export { MobileFeaturedCard } from "./MobileFeaturedCard";
 export { MobileFeaturedCardSkeleton } from "./MobileFeaturedCardSkeleton";
@@ -11,6 +12,7 @@ export { MobileHomeHeader } from "./MobileHomeHeader";
 export { MobileHomeShell } from "./MobileHomeShell";
 export { MobileNearbyCard } from "./MobileNearbyCard";
 export { MobileNearbyRail } from "./MobileNearbyRail";
+export { MobilePreviewStrip } from "./MobilePreviewStrip";
 export { MobilePromoBanner } from "./MobilePromoBanner";
 export { MobileSearchCard } from "./MobileSearchCard";
 export { MobileSectionHeader } from "./MobileSectionHeader";

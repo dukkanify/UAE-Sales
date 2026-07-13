@@ -1,4 +1,5 @@
 import {
+  MarketAppDownload,
   MarketCategoryGrid,
   MarketCategorySection,
   MarketEmirates,
@@ -6,17 +7,20 @@ import {
   MarketFeatured,
   MarketHeader,
   MarketHero,
+  MarketNearbySection,
   MarketPreviewStrip,
+  MarketPromoBanner,
   MobileAppDownload,
   MobileCategoryGrid,
+  MobileCategoryRail,
   MobileEmiratesSection,
   MobileFeaturedRail,
   MobileHeroBlock,
   MobileHomeHeader,
   MobileHomeShell,
   MobileNearbyRail,
+  MobilePreviewStrip,
   MobilePromoBanner,
-  MobileTrustSection,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -45,6 +49,9 @@ export default async function Home() {
       .slice(0, 4),
   }));
 
+  const appPreviewListing =
+    featuredListings.find((listing) => listing.isFeatured) ?? featuredListings[0];
+
   return (
     <>
       <div className="lg:hidden">
@@ -54,11 +61,20 @@ export default async function Home() {
             <MobileHeroBlock categories={categories} />
             <MobileCategoryGrid categories={categories} />
             <MobilePromoBanner />
+            <MobilePreviewStrip listings={featuredListings} />
             <MobileFeaturedRail listings={featuredListings} />
             <MobileNearbyRail listings={allListings} />
-            <MobileTrustSection />
-            <MobileAppDownload />
             <MobileEmiratesSection />
+            {sectionListings.map((section) => (
+              <MobileCategoryRail
+                key={section.categoryId}
+                categorySlug={categoryById(section.categoryId)}
+                listings={section.items}
+                title={section.title}
+              />
+            ))}
+            <MarketEscrow />
+            <MobileAppDownload />
           </main>
         </MobileHomeShell>
       </div>
@@ -68,8 +84,10 @@ export default async function Home() {
         <main>
           <MarketHero categories={categories} />
           <MarketCategoryGrid categories={categories} />
+          <MarketPromoBanner />
           <MarketPreviewStrip />
           <MarketFeatured categories={categoryMeta} listings={featuredListings} />
+          <MarketNearbySection listings={allListings} />
           <MarketEmirates />
           {sectionListings.map((section) => (
             <MarketCategorySection
@@ -84,6 +102,7 @@ export default async function Home() {
             />
           ))}
           <MarketEscrow />
+          <MarketAppDownload previewListing={appPreviewListing} />
         </main>
       </div>
 
