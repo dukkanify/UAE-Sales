@@ -33,7 +33,7 @@ export function MobileBottomNav() {
             return (
               <div key={item.label} className="mobile-bottom-nav__fab-slot">
                 <Link aria-label={item.label} className="mobile-bottom-nav__fab" href={item.href}>
-                  <Icon name={item.icon} size={22} />
+                  <Icon name={item.icon} size={20} />
                 </Link>
                 <span className="mobile-bottom-nav__fab-label">{item.label}</span>
               </div>

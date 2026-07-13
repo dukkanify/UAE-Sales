@@ -1581,7 +1581,7 @@
   border-radius: 999px;
   background: linear-gradient(135deg, #d4b06a 0%, var(--mh-gold) 52%, #a88642 100%);
   color: white;
-  box-shadow: 0 8px 24px rgb(201 164 92 / 35%);
+  box-shadow: 0 6px 18px rgb(201 164 92 / 30%);
 }
 
 .mobile-bottom-nav__fab-label {
