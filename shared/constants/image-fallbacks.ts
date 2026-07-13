@@ -25,8 +25,6 @@ export type EmirateImageKey =
   | "sharjah"
   | "umm-al-quwain";
 
-const q = "auto=format&fit=crop&w=1200&q=85";
-
 export function unsplashUrl(photoId: string, width = 1200): string {
   return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=85`;
 }
@@ -235,7 +233,7 @@ export function galleryFromPool(
   return urls;
 }
 
-export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?${q}`;
+export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&h=900&q=90`;
 
 /** Verified seller portrait URLs */
 export const sellerAvatarUrls = {

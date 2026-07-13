@@ -48,26 +48,28 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
         <div className="mobile-home-hero-block">
           <div className="mobile-home-hero-panel">
           <section className="mobile-home-hero">
-            <div className="mobile-home-hero__bg">
-              <AppImage
-                alt=""
-                aria-hidden
-                className="object-cover object-center"
-                fallback="emirates"
-                fill
-                priority
-                sizes="390px"
-                src={heroBackgroundUrl}
-              />
-            </div>
-            <div aria-hidden className="mobile-home-hero__overlay" />
+            <div className="mobile-home-hero__media">
+              <div className="mobile-home-hero__bg">
+                <AppImage
+                  alt=""
+                  aria-hidden
+                  className="object-cover"
+                  fallback="emirates"
+                  fill
+                  priority
+                  sizes="390px"
+                  src={heroBackgroundUrl}
+                />
+              </div>
+              <div aria-hidden className="mobile-home-hero__media-overlay" />
 
-            <div className="mobile-home-hero__content">
               <span className="mobile-home-hero__badge">
                 <span className="inline-block h-3 w-4 overflow-hidden rounded-sm uae-flag-strip" />
                 منصة إماراتية موثوقة
               </span>
+            </div>
 
+            <div className="mobile-home-hero__content">
               <h2 className="mobile-home-hero__title">
                 بيع وشراء بثقة في{" "}
                 <span className="mobile-home-hero__title-accent">الإمارات</span>
