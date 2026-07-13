@@ -53,7 +53,7 @@ export function ListingDetailsView({
       <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
+        <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start lg:gap-x-8">
           <div className="min-w-0 lg:col-start-1">
             <ListingGallery listing={listing} />
 
@@ -112,12 +112,23 @@ export function ListingDetailsView({
             </div>
           </div>
 
-          <aside className="hidden min-w-0 w-full max-w-full overflow-hidden lg:col-start-2 lg:block">
-            <div className="flex w-full min-w-0 max-w-full flex-col gap-4">
-              <ListingStickyPanel category={category} listing={listing} />
-              <SellerPanel listing={listing} />
-              <EscrowProtectionCard listing={listing} />
-              <ListingPlatformNotice listing={listing} />
+          <aside
+            aria-label="ملخص الإعلان والبائع"
+            className="hidden min-w-0 w-full max-w-full lg:col-start-2 lg:block"
+          >
+            <div className="flex w-full min-w-0 max-w-full flex-col gap-6">
+              <section aria-label="تفاصيل الإعلان والإجراءات">
+                <ListingStickyPanel category={category} listing={listing} />
+              </section>
+
+              <section aria-label="معلومات البائع">
+                <SellerPanel listing={listing} />
+              </section>
+
+              <section aria-label="الضمان والحماية" className="flex flex-col gap-6">
+                <EscrowProtectionCard listing={listing} />
+                <ListingPlatformNotice listing={listing} />
+              </section>
             </div>
           </aside>
         </div>

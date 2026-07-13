@@ -55,8 +55,7 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
       : listing.city;
 
   return (
-    <div className="w-full min-w-0 max-w-full lg:sticky lg:top-[5.25rem] lg:self-start">
-      <Card className="marketplace-panel w-full min-w-0 p-6">
+    <Card className="marketplace-panel w-full min-w-0 p-6">
         <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
         <Badge variant={conditionVariants[listing.condition]}>
@@ -115,8 +114,7 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         <FavoriteButton className="w-full" listing={listing} />
         <ShareButton className="w-full" listing={listing} />
       </div>
-      </Card>
-    </div>
+    </Card>
   );
 }
 
