@@ -126,16 +126,16 @@ export function RegisterForm() {
   );
 
   return (
-    <form className="grid gap-5" noValidate onSubmit={handleSubmit}>
-      <div>
-        <p className="text-sm font-bold text-primary">حساب جديد</p>
-        <h2 className="mt-2 text-2xl font-black text-ink">
-          {emailOtpEnabled ? "ابدأ بالبريد الإلكتروني فقط" : "إنشاء حساب جديد"}
+    <form className="auth-form" noValidate onSubmit={handleSubmit}>
+      <div className="auth-form__header">
+        <p className="auth-form__eyebrow">حساب جديد</p>
+        <h2 className="auth-form__title">
+          {emailOtpEnabled ? "ابدأ بالبريد الإلكتروني" : "إنشاء حساب جديد"}
         </h2>
-        <p className="mt-3 leading-8 text-muted">
+        <p className="auth-form__subtitle">
           {emailOtpEnabled
-            ? "سجّل بالبريد الإلكتروني وسنرسل لك رمز تحقق لتفعيل حسابك فورًا — بدون كلمة مرور إلزامية."
-            : "يمكنك إنشاء حساب الآن أو متابعة الشراء كضيف أثناء الدفع."}
+            ? "سنرسل لك رمز تحقق لتفعيل حسابك — بدون كلمة مرور إلزامية."
+            : "أنشئ حسابك الآن وابدأ البيع والشراء بثقة في الإمارات."}
         </p>
       </div>
 

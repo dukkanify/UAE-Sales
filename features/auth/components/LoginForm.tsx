@@ -150,16 +150,14 @@ export function LoginForm() {
 
   return (
     <>
-      <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
-        <div>
-          <p className="text-xs font-bold tracking-wide text-secondary uppercase">
-            تسجيل الدخول
-          </p>
-          <h2 className="mt-1 text-xl font-black text-ink">ادخل إلى حسابك</h2>
-          <p className="mt-2 text-sm font-medium text-muted">
+      <form className="auth-form" noValidate onSubmit={handleSubmit}>
+        <div className="auth-form__header">
+          <p className="auth-form__eyebrow">تسجيل الدخول</p>
+          <h2 className="auth-form__title">ادخل إلى حسابك</h2>
+          <p className="auth-form__subtitle">
             {emailOtpEnabled
               ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
-              : "أدخل بريدك الإلكتروني وكلمة المرور"}
+              : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
           </p>
         </div>
 
@@ -191,7 +189,7 @@ export function LoginForm() {
 
         {authError ? <FormMessage variant="error">{authError}</FormMessage> : null}
 
-        <div className="flex items-center justify-between text-sm font-medium">
+        <div className="auth-form__links">
           {emailOtpEnabled ? (
             <button
               className="text-primary"
@@ -216,7 +214,7 @@ export function LoginForm() {
           ) : null}
         </div>
 
-        <Button fullWidth loading={isBusy} type="submit" variant="primary">
+        <Button fullWidth loading={isBusy} type="submit" variant="accent">
           {usePassword || !emailOtpEnabled ? "تسجيل الدخول" : "إرسال رمز الدخول"}
         </Button>
       </form>

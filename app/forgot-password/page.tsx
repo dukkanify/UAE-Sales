@@ -8,7 +8,7 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <SiteHeader />
-      <main>
+      <main className="auth-page">
         <AuthShell
           description="استعد الوصول إلى حسابك بخطوات بسيطة وآمنة عبر البريد الإلكتروني."
           footerAction={{
