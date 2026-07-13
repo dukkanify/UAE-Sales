@@ -40,32 +40,34 @@ export function MobileHomeHeader() {
         </Link>
 
         <div className="mobile-home-header__side mobile-home-header__side--end">
-          <label className="mobile-home-header__location">
-            <Icon className="mobile-home-header__location-icon" name="map" size={14} />
-            <span className="mobile-home-header__location-value">{city}</span>
-            <select
-              aria-label="الإمارة"
-              className="mobile-home-header__location-select"
-              onChange={(event) => setCity(event.target.value)}
-              value={city}
+          <div className="mobile-home-header__actions">
+            <Link
+              aria-label="الإشعارات"
+              className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--badge"
+              href="/profile"
             >
-              {cities.map((item) => (
-                <option key={item.id} value={item.name}>
-                  {item.name}
-                </option>
-              ))}
-            </select>
-            <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
-          </label>
+              <Icon name="bell" size={19} />
+              <span className="mobile-home-header__badge">3</span>
+            </Link>
 
-          <Link
-            aria-label="الإشعارات"
-            className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge"
-            href="/profile"
-          >
-            <Icon name="bell" size={18} />
-            <span className="mobile-home-header__badge">3</span>
-          </Link>
+            <label className="mobile-home-header__location">
+              <Icon className="mobile-home-header__location-icon" name="map" size={14} />
+              <span className="mobile-home-header__location-value">{city}</span>
+              <select
+                aria-label="الإمارة"
+                className="mobile-home-header__location-select"
+                onChange={(event) => setCity(event.target.value)}
+                value={city}
+              >
+                {cities.map((item) => (
+                  <option key={item.id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
+            </label>
+          </div>
         </div>
       </div>
 

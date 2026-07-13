@@ -34,19 +34,19 @@
   position: sticky;
   top: 0;
   z-index: 60;
-  border-bottom: 1px solid rgb(15 23 42 / 6%);
-  background: rgb(255 255 255 / 96%);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 4px 18px rgb(15 23 42 / 4%);
+  border-bottom: 1px solid rgb(15 23 42 / 5%);
+  background: rgb(255 255 255 / 92%);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 80%) inset, 0 8px 24px rgb(15 23 42 / 5%);
 }
 
 .mobile-home-header__bar {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: 0.625rem;
-  min-height: 3.625rem;
-  padding: 0.5rem var(--mh-page-x);
+  gap: 0.5rem;
+  min-height: 3.5rem;
+  padding: 0.4375rem var(--mh-page-x);
 }
 
 .mobile-home-header__side {
@@ -61,16 +61,22 @@
 
 .mobile-home-header__side--end {
   justify-content: flex-end;
-  gap: 0.5rem;
+}
+
+.mobile-home-header__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .mobile-home-header__brand {
   display: inline-flex;
   max-width: 100%;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4375rem;
   justify-self: center;
   min-width: 0;
+  padding-inline: 0.125rem;
 }
 
 .mobile-home-header__brand-text {
@@ -81,11 +87,11 @@
   display: block;
   overflow: hidden;
   font-family: var(--font-latin);
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 800;
   color: var(--mh-primary);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 1;
+  letter-spacing: -0.025em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -93,10 +99,11 @@
 .mobile-home-header__brand-ar {
   display: block;
   overflow: hidden;
-  font-size: 0.6875rem;
+  margin-top: 0.0625rem;
+  font-size: 0.625rem;
   font-weight: 800;
   color: var(--mh-gold);
-  line-height: 1.2;
+  line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -105,14 +112,15 @@
   position: relative;
   z-index: 2;
   display: inline-flex;
-  max-width: clamp(6.5rem, 28vw, 8.5rem);
-  height: 2.375rem;
+  max-width: clamp(6.25rem, 26vw, 8rem);
+  height: 2.25rem;
   align-items: center;
-  gap: 0.3125rem;
-  border: 1px solid rgb(15 23 42 / 8%);
+  gap: 0.25rem;
+  border: 1px solid rgb(15 23 42 / 6%);
   border-radius: 999px;
-  background: rgb(248 250 252);
-  padding-inline: 0.625rem;
+  background: rgb(248 250 252 / 90%);
+  padding-inline: 0.5625rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
 }
 
 .mobile-home-header__location-icon {
@@ -266,10 +274,22 @@
     transform var(--mh-duration) var(--mh-ease);
 }
 
+.mobile-home-header__icon-btn--ghost {
+  width: 2.125rem;
+  height: 2.125rem;
+  border-color: transparent;
+  background: transparent;
+}
+
 .mobile-home-header__icon-btn:active {
   transform: scale(0.96);
   border-color: rgb(201 164 92 / 28%);
   background: var(--mh-gold-soft);
+}
+
+.mobile-home-header__icon-btn--ghost:active {
+  border-color: transparent;
+  background: rgb(15 23 42 / 5%);
 }
 
 .mobile-home-header__icon-btn--badge {
@@ -278,20 +298,21 @@
 
 .mobile-home-header__badge {
   position: absolute;
-  top: -0.0625rem;
-  inset-inline-end: -0.0625rem;
+  top: 0.0625rem;
+  inset-inline-end: 0;
   display: grid;
-  min-width: 1rem;
-  height: 1rem;
+  min-width: 0.9375rem;
+  height: 0.9375rem;
   place-items: center;
-  border: 2px solid #fff;
+  border: 1.5px solid #fff;
   border-radius: 999px;
   background: var(--mh-error);
-  padding-inline: 0.1875rem;
-  font-size: 0.5625rem;
+  padding-inline: 0.125rem;
+  font-size: 0.5rem;
   font-weight: 800;
   color: white;
   line-height: 1;
+  box-shadow: 0 1px 4px rgb(239 68 68 / 35%);
 }
 
 /* ── Hero block ── */
@@ -1728,15 +1749,21 @@
 }
 
 /* ── Compact phones (320px) ── */
-@media (max-width: 359px) {
+@media (max-width: 399px) {
   .mobile-home-header__brand-en {
     display: none;
   }
 
   .mobile-home-header__brand {
-    gap: 0;
+    gap: 0.25rem;
   }
 
+  .mobile-home-header__location-value {
+    max-width: 3.25rem;
+  }
+}
+
+@media (max-width: 359px) {
   .mobile-home-search-card__segment-label {
     display: none;
   }
