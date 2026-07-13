@@ -84,11 +84,15 @@ export function MarketHeader() {
             <button
               aria-expanded={menuOpen}
               aria-label="القائمة"
-              className="grid size-10 place-items-center rounded-lg border border-border lg:hidden"
+              className="focus-ring grid size-11 shrink-0 place-items-center overflow-visible rounded-lg border border-border bg-white text-primary lg:hidden"
               onClick={() => setMenuOpen((o) => !o)}
               type="button"
             >
-              <Icon name={menuOpen ? "close" : "menu"} size={18} />
+              <Icon
+                className="shrink-0 text-primary"
+                name={menuOpen ? "close" : "menu"}
+                size={22}
+              />
             </button>
           </div>
         </div>

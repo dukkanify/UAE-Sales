@@ -84,17 +84,19 @@ export function SiteHeader() {
               <Icon className="shrink-0" name="plus" size={16} />
               أضف إعلانك
             </Button>
-            <Button
-              aria-label="القائمة"
+            <button
               aria-expanded={menuOpen}
-              className="size-11 min-w-11 p-0 lg:hidden"
+              aria-label="القائمة"
+              className="focus-ring grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
-              size="md"
               type="button"
-              variant="secondary"
             >
-              <Icon name={menuOpen ? "close" : "menu"} size={18} />
-            </Button>
+              <Icon
+                className="shrink-0 text-primary"
+                name={menuOpen ? "close" : "menu"}
+                size={22}
+              />
+            </button>
           </div>
         </div>
 
