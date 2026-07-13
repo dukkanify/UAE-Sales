@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Category } from "@/types";
+import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import {
   getMobileCategoryPages,
   MOBILE_MAIN_CATEGORY_LABELS,
@@ -63,7 +64,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
 
   return (
     <section aria-label="التصنيفات" className="mobile-home-categories">
-      <div
+      <DragScrollRow
         ref={trackRef}
         className="mobile-home-categories__track mobile-home-scroll"
       >
@@ -83,7 +84,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
             ) : null}
           </div>
         ))}
-      </div>
+      </DragScrollRow>
 
       {pages.length > 1 ? (
         <div className="mobile-home-categories__indicator">
