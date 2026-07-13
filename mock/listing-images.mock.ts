@@ -114,16 +114,13 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1505693416388-ac5ce068fe85",
   ],
   "iphone-16-pro-max-256gb": [
-    "photo-1592750475338-74b7b21085ab",
-    "photo-1511707171634-5f897ff02aa9",
+    "photo-1727013884184-b313982327f3",
   ],
   "samsung-galaxy-s25-ultra": [
-    "photo-1556656793-08538906a9f8",
-    "photo-1592750475338-74b7b21085ab",
+    "photo-1678911820864-e2c567c655d7",
   ],
   "iphone-15-pro-128gb": [
-    "photo-1695048133142-1a20484d2569",
-    "photo-1592750475338-74b7b21085ab",
+    "photo-1736767431540-0d590ba5efc2",
   ],
   "ipad-pro-m4-13-inch": [
     "photo-1544244015-0df4b3ffc6b0",
@@ -134,8 +131,8 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1496181133206-80ce9b88a853",
   ],
   "sony-playstation-5": [
-    "photo-1606813907291-d86efa9b94db",
     "photo-1622297845775-5ff3fef71d13",
+    "photo-1606813907291-d86efa9b94db",
   ],
   "lg-oled-tv-65-inch": [
     "photo-1593359677879-a4bb92f829d1",
@@ -146,8 +143,7 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1452587925148-ce544e77e70d",
   ],
   "apple-watch-ultra-2": [
-    "photo-1579586337278-3befd40fd17a",
-    "photo-1523275335684-37898b6baf30",
+    "photo-1687078426457-89ce2b562eaf",
   ],
   "luxury-italian-sofa-set": [
     "photo-1555041469-a586c61ea9bc",
@@ -162,8 +158,8 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1486262715619-67b85e0b08d3",
   ],
   "golden-retriever-vaccinated-dubai": [
+    "photo-1591160690555-5debfba289f0",
     "photo-1587300003388-59208cc962cb",
-    "photo-1548199973-03cce0bbc87b",
   ],
   "persian-cat-sharjah": [
     "photo-1574158622682-e40e69881006",
@@ -174,7 +170,7 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1502086223501-7ea6ecd79368",
   ],
   "peloton-bike-plus-dubai": [
-    "photo-1461896836934-ffe607ba8211",
+    "photo-1770026137109-d60587762e8e",
     "photo-1534438327276-14e5300c3a48",
   ],
   "fujairah-premium-dates-gift-box": [
@@ -301,8 +297,7 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1742230285052-8c3b445c01fc",
   ],
   "my-iphone-15-pro-sale": [
-    "photo-1695048133142-1a20484d2569",
-    "photo-1592750475338-74b7b21085ab",
+    "photo-1736767431540-0d590ba5efc2",
   ],
   "my-dining-table-draft": [
     "photo-1616486338812-3dadae4b4ace",
@@ -311,15 +306,13 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
     "photo-1522708323590-d24dbb6b0267",
   ],
   "my-apple-watch-rejected": [
-    "photo-1579586337278-3befd40fd17a",
+    "photo-1687078426457-89ce2b562eaf",
   ],
   "rolex-submariner-date-dubai": [
-    "photo-1523170335258-f5ed11844a49",
-    "photo-1579586337278-3befd40fd17a",
+    "photo-1662384205880-2c7a9879cc0c",
   ],
   "louis-vuitton-neverfull-mm": [
-    "photo-1434389677669-e08b4cac3105",
-    "photo-1523170335258-f5ed11844a49",
+    "photo-1590739169125-a9438401596a",
   ],
 };
 

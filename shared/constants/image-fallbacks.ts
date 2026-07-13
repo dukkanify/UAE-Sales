@@ -57,16 +57,12 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1497366754035-f200968a6e72",
   ],
   mobiles: [
-    "photo-1695048133142-1a20484d2569",
-    "photo-1592750475338-74b7b21085ab",
-    "photo-1511707171634-5f897ff02aa9",
-    "photo-1585060544812-6b45742d762f",
-    "photo-1592899677977-9c10ca588bbd",
-    "photo-1556656793-08538906a9f8",
+    "photo-1727013884184-b313982327f3",
+    "photo-1678911820864-e2c567c655d7",
+    "photo-1736767431540-0d590ba5efc2",
     "photo-1544244015-0df4b3ffc6b0",
     "photo-1561154464-82e9adf32764",
-    "photo-1434493789847-2f02dc6ca35d",
-    "photo-1546868871-7041f2a55e12",
+    "photo-1517336714731-489689fd1ca8",
   ],
   electronics: [
     "photo-1606813907291-d86efa9b94db",
@@ -114,9 +110,9 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1586281380349-632531db7ed4",
   ],
   fashion: [
-    "photo-1523170335258-f5ed11844a49",
-    "photo-1434389677669-e08b4cac3105",
-    "photo-1579586337278-3befd40fd17a",
+    "photo-1662384205880-2c7a9879cc0c",
+    "photo-1590739169125-a9438401596a",
+    "photo-1687078426457-89ce2b562eaf",
     "photo-1523275335684-37898b6baf30",
   ],
   kids: [
