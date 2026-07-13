@@ -43,13 +43,13 @@ export function MediaContactStep({
               {imagePreviews.map((url, index) => (
                 <div
                   key={url}
-                  className="relative h-20 overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface"
+                  className="relative flex h-20 items-center justify-center overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface-muted p-1"
                 >
-                  <div
-                    aria-label={`معاينة صورة ${index + 1}`}
-                    className="absolute inset-0 bg-cover bg-center"
-                    role="img"
-                    style={{ backgroundImage: `url(${url})` }}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    alt={`معاينة صورة ${index + 1}`}
+                    className="max-h-full max-w-full object-contain"
+                    src={url}
                   />
                 </div>
               ))}

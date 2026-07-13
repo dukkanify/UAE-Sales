@@ -22,16 +22,19 @@ export function ListingPreviewPanel({
       <Card className="p-5">
         <p className="text-sm font-semibold text-muted">معاينة الإعلان</p>
         <div className="mt-4 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted">
-          <div className="relative h-44">
+          <div className="relative bg-gradient-to-b from-surface-muted to-[#e8edf3]">
             {imagePreviews[0] ? (
-              <div
-                aria-label="معاينة صورة الإعلان"
-                className="absolute inset-0 bg-cover bg-center"
-                role="img"
-                style={{ backgroundImage: `url(${imagePreviews[0]})` }}
-              />
+              <div className="flex min-h-44 items-center justify-center p-3 sm:min-h-52 sm:p-4">
+                {/* Blob preview URLs from local file picks — native img keeps full image visible */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  alt="معاينة صورة الإعلان"
+                  className="mx-auto block max-h-80 w-auto max-w-full object-contain"
+                  src={imagePreviews[0]}
+                />
+              </div>
             ) : (
-              <div className="grid h-full place-items-center">
+              <div className="grid h-44 place-items-center sm:h-52">
                 {selectedCategory ? (
                   <CategoryThumbnail category={selectedCategory} size="xl" />
                 ) : (
@@ -39,7 +42,7 @@ export function ListingPreviewPanel({
                 )}
               </div>
             )}
-            <span className="absolute start-4 top-4 rounded-[var(--radius-lg)] bg-surface/90 px-3 py-1 text-xs font-semibold text-primary">
+            <span className="pointer-events-none absolute start-4 top-4 z-10 rounded-[var(--radius-lg)] bg-surface/90 px-3 py-1 text-xs font-semibold text-primary shadow-[var(--shadow-xs)] backdrop-blur-sm">
               {selectedCategory?.name ?? "قسم"}
             </span>
           </div>
