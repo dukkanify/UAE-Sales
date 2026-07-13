@@ -12,8 +12,6 @@ import { Icon } from "@/shared/ui/Icon";
 export function MobileHomeHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
-  const accountHref = user ? "/profile" : "/login";
-  const accountLabel = user ? "حسابي" : "تسجيل الدخول";
 
   return (
     <header className="mobile-home-header">
@@ -44,15 +42,6 @@ export function MobileHomeHeader() {
 
         <div className="mobile-home-header__side mobile-home-header__side--end">
           <div className="mobile-home-header__actions">
-            <Link
-              aria-label={accountLabel}
-              className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--account"
-              href={accountHref}
-              title={accountLabel}
-            >
-              <Icon name="user" size={19} />
-            </Link>
-
             <Link
               aria-label="الإشعارات"
               className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--badge"

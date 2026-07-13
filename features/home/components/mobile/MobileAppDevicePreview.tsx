@@ -34,10 +34,6 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
 
             <div className="mobile-home-header__side mobile-home-header__side--end">
               <div className="mobile-home-header__actions">
-                <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--account">
-                  <Icon name="user" size={19} />
-                </span>
-
                 <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--badge">
                   <Icon name="bell" size={19} />
                   <span className="mobile-home-header__badge">3</span>
