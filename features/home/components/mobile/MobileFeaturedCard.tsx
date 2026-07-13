@@ -34,7 +34,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
     (listing.seller.rating ?? 0) >= 4.8;
 
   return (
-    <article className="mobile-home-featured-card">
+    <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
       <div className="mobile-home-featured-card__media">
         <Link className="absolute inset-0" href={href}>
           <span className="sr-only">{listing.title}</span>
