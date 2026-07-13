@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Listing } from "@/types";
+import { getListingImages } from "@/features/listings/components/listing-card.utils";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
@@ -17,12 +18,7 @@ const GALLERY_OVERLAY_BTN_CLASS =
   "!min-h-0 !size-8 !min-w-0 !rounded-full !border-0 !bg-white/92 !p-0 !shadow-sm backdrop-blur-sm";
 
 export function ListingGallery({ listing }: ListingGalleryProps) {
-  const galleryImages =
-    listing.images && listing.images.length > 0
-      ? listing.images
-      : listing.imageUrl
-        ? [listing.imageUrl]
-        : [];
+  const galleryImages = getListingImages(listing);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);

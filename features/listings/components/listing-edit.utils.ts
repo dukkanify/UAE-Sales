@@ -13,12 +13,4 @@ export function buildCategoryFieldsDefaults(listing: Listing): CategoryFieldsDef
   };
 }
 
-export function getListingImages(listing: Listing): string[] {
-  if (listing.images && listing.images.length > 0) {
-    return listing.images;
-  }
-  if (listing.imageUrl) {
-    return [listing.imageUrl];
-  }
-  return [];
-}
+export { getListingImages } from "./listing-card.utils";

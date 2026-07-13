@@ -32,6 +32,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { PageHero } from "@/shared/ui/PageHero";
 import { AppImage } from "@/shared/components/AppImage";
+import { getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { cities } from "@/shared/constants/locations";
 
 type CheckoutWizardProps = {
@@ -420,7 +421,7 @@ export function CheckoutWizard({
                   fallbackCategory={listing.categoryId}
                   fill
                   sizes="96px"
-                  src={listing.imageUrl ?? listing.images?.[0] ?? ""}
+                  src={getListingImageUrl(listing)}
                 />
               </div>
               <div>

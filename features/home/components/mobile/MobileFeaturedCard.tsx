@@ -12,6 +12,7 @@ import {
   formatViews,
   getListingHref,
   getListingImageUrl,
+  getListingImages,
   getListingLocation,
 } from "@/features/listings/components/listing-card.utils";
 
@@ -29,7 +30,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
-  const photoCount = listing.images?.length ?? (listing.imageUrl ? 1 : 0);
+  const photoCount = getListingImages(listing).length;
   const isVerified =
     listing.verifiedSeller ??
     listing.seller.isVerified ??

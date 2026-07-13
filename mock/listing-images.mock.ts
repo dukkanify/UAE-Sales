@@ -80,13 +80,13 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
   ],
   "toyota-land-cruiser-2023": [
     "photo-1549317661-bd32c8ce0db2",
-    "photo-1533473359331-0135ef1b58bf",
-    "photo-1552519507-da3b142c6e3d",
+    "photo-1536700503339-1e4b06520771",
+    "photo-1617788138017-80ad40651399",
   ],
   "nissan-patrol-platinum-2022": [
-    "photo-1552519507-da3b142c6e3d",
-    "photo-1503376780353-7e6692767b70",
-    "photo-1492144534655-ae79c964c9d7",
+    "photo-1618843479313-40f8afb4b4d8",
+    "photo-1536700503339-1e4b06520771",
+    "photo-1502877338535-766e1452684a",
   ],
   "bmw-x7-2023": [
     "photo-1555215695-3004980ad54e",
@@ -184,6 +184,139 @@ const curatedPhotoIds: Record<string, readonly string[]> = {
   "fujairah-premium-dates-gift-box": [
     "photo-1504674900247-0877df9cc836",
     "photo-1488477181941-6428a0291777",
+  ],
+  "bose-soundbar-900": [
+    "photo-1484704849700-f032a568e944",
+    "photo-1558618666-fcd25c85cd64",
+  ],
+  "modern-dining-table-8-seater": [
+    "photo-1616486338812-3dadae4b4ace",
+    "photo-1586023492125-27b2c045efd7",
+  ],
+  "master-bedroom-set-king": [
+    "photo-1616594039964-ae9021a400a0",
+    "photo-1631049307264-da0ec9d70304",
+  ],
+  "executive-office-desk": [
+    "photo-1497366811353-6870744d04b2",
+    "photo-1524758631624-e2822e304c36",
+  ],
+  "outdoor-garden-furniture-set": [
+    "photo-1600047509358-9dc75507daeb",
+    "photo-1493663284031-b7e3aefcae8e",
+  ],
+  "villa-maintenance-service": [
+    "photo-1621905251189-08b45d6a269e",
+    "photo-1504307651254-35680f356dfd",
+  ],
+  "moving-service-uae": [
+    "photo-1586528116311-ad8dd3c8310d",
+    "photo-1600880292203-757bb62b4baf",
+  ],
+  "ac-repair-service": [
+    "photo-1628177142898-93e36e4e3a50",
+    "photo-1503387762-592deb58ef4e",
+  ],
+  "sales-executive-dubai": [
+    "photo-1600880292089-90a7e086ee0c",
+    "photo-1560472354-b33ff0c44a43",
+  ],
+  "real-estate-agent-abu-dhabi": [
+    "photo-1573496359142-b8d87734a5a2",
+    "photo-1556761175-5973dc0f32e7",
+  ],
+  "delivery-driver-sharjah": [
+    "photo-1566576912321-d58ddd7a6088",
+    "photo-1554224155-6726b3ff858f",
+  ],
+  "accountant-fujairah": [
+    "photo-1454165804606-c3d57bc86b40",
+    "photo-1561070791-2526d30994b5",
+  ],
+  "graphic-designer-dubai": [
+    "photo-1521737711867-e3b97375f902",
+    "photo-1556761175-b413da4baf72",
+  ],
+  "designer-abaya-limited-edition": [
+    "photo-1523170335258-f5ed11844a49",
+    "photo-1434389677669-e08b4cac3105",
+  ],
+  "premium-arabic-oud-gift-set": [
+    "photo-1523275335684-37898b6baf30",
+    "photo-1523170335258-f5ed11844a49",
+  ],
+  "marine-aquarium-complete-setup": [
+    "photo-1548199973-03cce0bbc87b",
+    "photo-1574158622682-e40e69881006",
+  ],
+  "budgie-pair-umm-al-quwain": [
+    "photo-1548199973-03cce0bbc87b",
+  ],
+  "lego-collector-sets-bundle": [
+    "photo-1544776193-352d25ca82cd",
+    "photo-1516627145497-ae6968895b74",
+  ],
+  "nursery-furniture-complete-set": [
+    "photo-1502086223501-7ea6ecd79368",
+    "photo-1544776193-352d25ca82cd",
+  ],
+  "school-uniform-bundle-gems": [
+    "photo-1502086223501-7ea6ecd79368",
+  ],
+  "arabic-novels-collection-20": [
+    "photo-1495446815901-a7297e633e8d",
+    "photo-1512820790803-83ca734da794",
+  ],
+  "ielts-academic-prep-bundle": [
+    "photo-1481627834876-b7833e8f5570",
+    "photo-1495446815901-a7297e633e8d",
+  ],
+  "university-textbooks-engineering": [
+    "photo-1512820790803-83ca734da794",
+    "photo-1481627834876-b7833e8f5570",
+  ],
+  "luxury-quran-gift-set": [
+    "photo-1481627834876-b7833e8f5570",
+  ],
+  "callaway-golf-clubs-set": [
+    "photo-1534438327276-14e5300c3a48",
+    "photo-1571902943202-507ec2618e8f",
+  ],
+  "desert-camping-gear-bundle": [
+    "photo-1571902943202-507ec2618e8f",
+    "photo-1534438327276-14e5300c3a48",
+  ],
+  "home-gym-rack-weights": [
+    "photo-1571902943202-507ec2618e8f",
+    "photo-1461896836934-ffe607ba8211",
+  ],
+  "emirati-home-catering-tray-20": [
+    "photo-1546069901-ba9599a7e63c",
+    "photo-1504674900247-0877df9cc836",
+  ],
+  "ajman-natural-sidrah-honey": [
+    "photo-1488477181941-6428a0291777",
+  ],
+  "emirati-sweets-assorted-platter": [
+    "photo-1546069901-ba9599a7e63c",
+    "photo-1488477181941-6428a0291777",
+  ],
+  "my-nissan-patrol-platinum-2022": [
+    "photo-1618843479313-40f8afb4b4d8",
+    "photo-1536700503339-1e4b06520771",
+  ],
+  "my-iphone-15-pro-sale": [
+    "photo-1695048133142-1a20484d2569",
+    "photo-1592750475338-74b7b21085ab",
+  ],
+  "my-dining-table-draft": [
+    "photo-1616486338812-3dadae4b4ace",
+  ],
+  "my-studio-jvc-rent": [
+    "photo-1522708323590-d24dbb6b0267",
+  ],
+  "my-apple-watch-rejected": [
+    "photo-1579586337278-3befd40fd17a",
   ],
   "rolex-submariner-date-dubai": [
     "photo-1523170335258-f5ed11844a49",
