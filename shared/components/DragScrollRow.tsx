@@ -15,7 +15,7 @@ type DragScrollRowProps = {
   className?: string;
 };
 
-const DRAG_THRESHOLD = 6;
+const DRAG_THRESHOLD = 8;
 
 /**
  * Horizontal scroll container that also supports click-and-drag (mouse/pen)
@@ -26,11 +26,12 @@ export const DragScrollRow = forwardRef<HTMLDivElement, DragScrollRowProps>(
   function DragScrollRow({ ariaLabel, children, className = "" }, forwardedRef) {
     const trackRef = useRef<HTMLDivElement | null>(null);
     const stateRef = useRef({
+      blockClick: false,
       dragging: false,
       moved: false,
-      startX: 0,
-      startScroll: 0,
       pointerId: -1,
+      startScroll: 0,
+      startX: 0,
     });
 
     const setTrackRef = useCallback(
@@ -45,17 +46,18 @@ export const DragScrollRow = forwardRef<HTMLDivElement, DragScrollRowProps>(
 
     function handlePointerDown(event: PointerEvent<HTMLDivElement>) {
       if (event.pointerType === "touch") return;
+
       const track = trackRef.current;
       if (!track) return;
 
       stateRef.current = {
+        blockClick: false,
         dragging: true,
         moved: false,
-        startX: event.clientX,
-        startScroll: track.scrollLeft,
         pointerId: event.pointerId,
+        startScroll: track.scrollLeft,
+        startX: event.clientX,
       };
-      track.classList.add("is-dragging");
     }
 
     function handlePointerMove(event: PointerEvent<HTMLDivElement>) {
@@ -64,22 +66,25 @@ export const DragScrollRow = forwardRef<HTMLDivElement, DragScrollRowProps>(
       if (!state.dragging || !track) return;
 
       const delta = event.clientX - state.startX;
-      if (Math.abs(delta) > DRAG_THRESHOLD) {
+      if (Math.abs(delta) <= DRAG_THRESHOLD) return;
+
+      if (!state.moved) {
         state.moved = true;
-        if (track.hasPointerCapture?.(state.pointerId) === false) {
-          try {
-            track.setPointerCapture(state.pointerId);
-          } catch {
-            /* ignore */
-          }
+        track.classList.add("is-dragging");
+        try {
+          track.setPointerCapture(state.pointerId);
+        } catch {
+          /* ignore */
         }
       }
+
       track.scrollLeft = state.startScroll - delta;
     }
 
     function endDrag() {
       const state = stateRef.current;
       const track = trackRef.current;
+
       if (track) {
         track.classList.remove("is-dragging");
         if (state.pointerId >= 0 && track.hasPointerCapture?.(state.pointerId)) {
@@ -90,18 +95,22 @@ export const DragScrollRow = forwardRef<HTMLDivElement, DragScrollRowProps>(
           }
         }
       }
+
+      if (state.moved) {
+        state.blockClick = true;
+      }
+
       state.dragging = false;
+      state.moved = false;
       state.pointerId = -1;
-      window.setTimeout(() => {
-        state.moved = false;
-      }, 0);
     }
 
     function handleClickCapture(event: React.MouseEvent<HTMLDivElement>) {
-      if (stateRef.current.moved) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
+      if (!stateRef.current.blockClick) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      stateRef.current.blockClick = false;
     }
 
     function handleWheel(event: WheelEvent<HTMLDivElement>) {
