@@ -7,7 +7,7 @@ import type {
   ListingStatus,
 } from "@/types";
 import { imagesForSlug } from "./listing-images.mock";
-import { resolveSeller } from "./sellers.mock";
+import { resolveSeller, getSellerDemoPhone } from "./sellers.mock";
 import { extrasForSlug } from "./listing-specs.mock";
 
 type ListingSeed = {
@@ -69,6 +69,10 @@ function buildListing(seed: ListingSeed): Listing {
     escrowAvailable: seed.escrowAvailable,
     postedAt: seed.postedAt,
     contactMethod: seed.contactMethod,
+    contactPhone:
+      seed.contactMethod === "phone" || seed.contactMethod === "both"
+        ? getSellerDemoPhone(seed.sellerKey)
+        : undefined,
     deliveryOption: seed.deliveryOption,
     imageTone: seed.imageTone,
     features: extras?.features,

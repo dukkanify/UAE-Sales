@@ -22,6 +22,7 @@ import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -202,11 +203,12 @@ export function SellerContactActions({
       ) : null}
       {whatsapp ? (
         <a
-          className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-5 text-sm font-semibold text-ink shadow-[var(--shadow-xs)] transition duration-200 hover:border-secondary/50"
+          className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[#25D366]/25 bg-gradient-to-br from-[#25D366]/10 to-[#128C7E]/10 px-5 text-sm font-semibold text-[#128C7E] shadow-[var(--shadow-xs)] transition duration-200 hover:border-[#25D366]/45"
           href={whatsapp}
           rel="noopener noreferrer"
           target="_blank"
         >
+          <Icon name="whatsapp" size={16} />
           واتساب
         </a>
       ) : null}

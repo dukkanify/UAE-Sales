@@ -124,49 +124,26 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const isOwn = user ? isOwnListing(listing, user) : false;
   const tel = getTelHref(listing);
   const whatsapp = getWhatsAppHref(listing, getListingCanonicalUrl(listing));
+  const showContactRail = Boolean(tel || whatsapp);
 
   const primaryLabel = ACTION_LABELS[config.primaryAction];
 
   return (
     <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface/95 px-3 py-2 backdrop-blur-md lg:hidden"
-      style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/70 bg-surface/96 px-3 py-2.5 shadow-[0_-10px_40px_rgb(15_23_42/10%)] backdrop-blur-xl lg:hidden"
+      style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto flex max-w-lg items-center gap-2">
-        {tel ? (
-          <a
-            aria-label="اتصال"
-            className="focus-ring inline-flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-xl)] bg-surface-muted px-2 text-[0.65rem] font-semibold"
-            href={tel}
-          >
-            <Icon name="phone" size={16} />
-            اتصال
-          </a>
-        ) : null}
-        {whatsapp ? (
-          <a
-            aria-label="واتساب"
-            className="focus-ring inline-flex min-h-11 min-w-[4.25rem] flex-col items-center justify-center gap-0.5 rounded-[var(--radius-xl)] bg-surface-muted px-2 text-[0.65rem] font-semibold"
-            href={whatsapp}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            واتساب
-          </a>
-        ) : null}
-        <div className="min-w-[4.25rem]">
-          <StartChatButton listing={listing} size="sm" variant="secondary" />
-        </div>
+      <div className="mx-auto flex max-w-lg items-stretch gap-2">
         {!isOwn && config.showBuyNow ? (
           <button
-            className="focus-ring inline-flex min-h-11 flex-1 items-center justify-center rounded-[var(--radius-xl)] bg-secondary px-3 text-sm font-bold text-primary"
+            className="focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center rounded-[var(--radius-xl)] bg-secondary px-3 text-sm font-bold text-primary shadow-[0_6px_18px_rgb(201_164_92/28%)] transition active:scale-[0.98]"
             onClick={() => router.push(getCheckoutPath(listing))}
             type="button"
           >
             {primaryLabel}
           </button>
         ) : !isOwn ? (
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <ListingPrimaryAction
               action={config.primaryAction}
               listing={listing}
@@ -174,6 +151,52 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
             />
           </div>
         ) : null}
+
+        <div className="flex min-w-0 items-stretch gap-1.5">
+          {showContactRail ? (
+            <div className="flex items-center gap-1 rounded-[1.125rem] border border-border/70 bg-surface-muted/70 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/65%)]">
+              <StartChatButton
+                className="!min-h-10 !rounded-xl !border-0 !bg-transparent !px-2.5 !text-[0.68rem] !font-bold !shadow-none hover:!bg-surface"
+                listing={listing}
+                size="sm"
+                variant="ghost"
+              />
+
+              {tel ? (
+                <a
+                  aria-label="اتصال بالبائع"
+                  className="focus-ring grid size-10 shrink-0 place-items-center rounded-xl border border-border/60 bg-surface text-primary transition hover:border-secondary/40 hover:bg-surface active:scale-95"
+                  href={tel}
+                >
+                  <Icon name="phone" size={17} />
+                </a>
+              ) : null}
+
+              {whatsapp ? (
+                <a
+                  aria-label="واتساب"
+                  className="focus-ring inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#25D366] via-[#1ebe5d] to-[#128C7E] px-2.5 text-[0.68rem] font-extrabold text-white shadow-[0_4px_16px_rgb(37_211_102/38%)] transition active:scale-95"
+                  href={whatsapp}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <Icon className="drop-shadow-sm" name="whatsapp" size={17} />
+                  <span>واتساب</span>
+                </a>
+              ) : null}
+            </div>
+          ) : (
+            <div className="flex min-w-[7.5rem] items-center">
+              <StartChatButton
+                className="!min-h-11 !rounded-xl"
+                fullWidth
+                listing={listing}
+                size="sm"
+                variant="secondary"
+              />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

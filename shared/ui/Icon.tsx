@@ -23,6 +23,7 @@ type IconName =
   | "share"
   | "share-2"
   | "phone"
+  | "whatsapp"
   | "chevron-left"
   | "chevron-right"
   | "arrow-left"
@@ -91,6 +92,8 @@ const paths: Record<IconName, string> = {
     "M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13",
   phone:
     "M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm4 14h.01",
+  whatsapp:
+    "M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l4.99-1.31A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm5.2 14.2c-.22.62-1.08 1.15-1.78 1.3-.45.1-1.04.18-3.02-.65-2.54-1.1-4.18-4.65-4.31-4.87-.13-.22-1.03-1.37-1.03-2.61 0-1.24.65-1.85.88-2.1.22-.24.48-.3.64-.3h.46c.15 0 .35-.06.54.42.2.48.67 1.63.73 1.75.06.12.1.27-.02.43-.12.16-.18.27-.35.43-.17.16-.36.36-.51.48-.17.12-.35.25-.15.49.2.24.89 1.47 1.91 2.38 1.31 1.17 2.41 1.53 2.76 1.7.35.18.56.15.76-.09.2-.24.87-1.02 1.1-1.37.23-.35.46-.29.76-.18.31.12 1.95.92 2.28 1.09.33.17.55.26.63.4.08.14.08.81-.14 1.43z",
   "chevron-left": "M15 6l-6 6 6 6",
   "chevron-right": "M9 6l6 6-6 6",
   "arrow-left": "M19 12H5M11 6l-6 6 6 6",
@@ -129,6 +132,7 @@ const CLOSE_LINES = ["M6 6l12 12", "M18 6 6 18"] as const;
 
 export function Icon({ className = "", filled = false, name, size = 20 }: IconProps) {
   const isFilledHeart = name === "heart-filled" || (name === "heart" && filled);
+  const isFilledIcon = isFilledHeart || name === "whatsapp";
   const strokeWidth = name === "menu" || name === "close" ? 2.25 : 1.75;
   const linePaths = name === "menu" ? MENU_LINES : name === "close" ? CLOSE_LINES : null;
 
@@ -136,7 +140,7 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
     <svg
       aria-hidden
       className={className}
-      fill={isFilledHeart ? "currentColor" : "none"}
+      fill={isFilledIcon ? "currentColor" : "none"}
       height={size}
       stroke="currentColor"
       strokeLinecap="round"

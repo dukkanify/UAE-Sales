@@ -138,6 +138,24 @@ export const marketplaceSellers: Record<string, SellerProfile> = {
   },
 };
 
+/** Demo UAE numbers for marketplace listings when contact allows phone/WhatsApp */
+export const sellerDemoPhones: Record<string, string> = {
+  "al-noor-motors": "971501234567",
+  "dubai-elite-properties": "971502345678",
+  "gulf-electronics": "971503456789",
+  "emirates-home-services": "971504567890",
+  "golden-key-real-estate": "971505678901",
+  "khalid-al-mansoori": "971506789012",
+  "fatima-al-zaabi": "971507890123",
+  "omar-hassan": "971508901234",
+  "priya-sharma": "971509012345",
+  "ahmed-al-mansoori": "971500123456",
+};
+
+export function getSellerDemoPhone(sellerKey: string): string {
+  return sellerDemoPhones[sellerKey] ?? "971500000001";
+}
+
 export function resolveSeller(sellerKey: string): ListingSeller {
   const seller = marketplaceSellers[sellerKey];
   if (!seller) {
