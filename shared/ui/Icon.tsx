@@ -124,8 +124,14 @@ const paths: Record<IconName, string> = {
     "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
 };
 
+const MENU_LINES = ["M4 7h16", "M4 12h16", "M4 17h16"] as const;
+const CLOSE_LINES = ["M6 6l12 12", "M18 6 6 18"] as const;
+
 export function Icon({ className = "", filled = false, name, size = 20 }: IconProps) {
   const isFilledHeart = name === "heart-filled" || (name === "heart" && filled);
+  const strokeWidth = name === "menu" || name === "close" ? 2.25 : 1.75;
+  const linePaths = name === "menu" ? MENU_LINES : name === "close" ? CLOSE_LINES : null;
+
   return (
     <svg
       aria-hidden
@@ -135,11 +141,15 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="1.75"
+      strokeWidth={strokeWidth}
       viewBox="0 0 24 24"
       width={size}
     >
-      <path d={paths[name === "heart-filled" ? "heart-filled" : name]} />
+      {linePaths ? (
+        linePaths.map((d) => <path key={d} d={d} />)
+      ) : (
+        <path d={paths[name === "heart-filled" ? "heart-filled" : name]} />
+      )}
     </svg>
   );
 }
