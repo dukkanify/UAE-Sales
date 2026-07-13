@@ -74,14 +74,14 @@ const slugCategories: Record<string, ImageFallbackCategory> = {
 /** Product-specific Unsplash photos for accurate marketplace previews */
 const curatedPhotoIds: Record<string, readonly string[]> = {
   "mercedes-amg-g63-2024": [
-    "photo-1618843479313-40f8afb4b4d8",
     "photo-1617531653332-bd46c24f2068",
-    "photo-1544636331-e26879cd4d9b",
+    "photo-1617788138017-80ad40651399",
+    "photo-1533473359331-0135ef1b58bf",
   ],
   "toyota-land-cruiser-2023": [
-    "photo-1544636331-e26879cd4d9b",
-    "photo-1552519507-da3b142c6e3d",
+    "photo-1549317661-bd32c8ce0db2",
     "photo-1533473359331-0135ef1b58bf",
+    "photo-1552519507-da3b142c6e3d",
   ],
   "nissan-patrol-platinum-2022": [
     "photo-1552519507-da3b142c6e3d",

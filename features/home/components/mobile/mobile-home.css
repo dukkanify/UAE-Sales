@@ -1598,20 +1598,31 @@
   display: flex;
   min-height: 0;
   flex: 1;
-  gap: 0.3125rem;
-  overflow: hidden;
+  gap: 0.375rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  padding-bottom: 0.125rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.mobile-home-app__mock-rail::-webkit-scrollbar {
+  display: none;
 }
 
 .mobile-home-app__mock-card {
   display: flex;
-  min-width: 0;
-  flex: 1;
+  width: 74%;
+  min-width: 74%;
+  flex: 0 0 74%;
   flex-direction: column;
   overflow: hidden;
   border: 1px solid rgb(15 23 42 / 7%);
   border-radius: 0.75rem;
   background: #fff;
   box-shadow: 0 4px 12px rgb(15 23 42 / 6%);
+  scroll-snap-align: start;
 }
 
 .mobile-home-app__mock-card--ghost {
@@ -1620,7 +1631,7 @@
 
 .mobile-home-app__mock-card-media {
   position: relative;
-  height: 3.375rem;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: linear-gradient(180deg, #eef2f7 0%, #e2e8f0 100%);
 }
@@ -1631,23 +1642,21 @@
 
 .mobile-home-app__mock-card-badge {
   position: absolute;
-  top: 0.25rem;
-  inset-inline-start: 0.25rem;
+  top: 0.3125rem;
+  inset-inline-start: 0.3125rem;
+  z-index: 1;
   border-radius: 999px;
   background: var(--mh-gold);
-  padding: 0.125rem 0.3125rem;
+  padding: 0.125rem 0.375rem;
   font-size: 0.4375rem;
   font-weight: 800;
   color: var(--mh-primary);
 }
 
 .mobile-home-app__mock-card-body {
-  display: flex;
-  min-height: 0;
-  flex: 1;
-  flex-direction: column;
+  display: grid;
   gap: 0.125rem;
-  padding: 0.3125rem 0.375rem 0.375rem;
+  padding: 0.375rem 0.4375rem 0.4375rem;
 }
 
 .mobile-home-app__mock-card-title {
@@ -1671,7 +1680,6 @@
 }
 
 .mobile-home-app__mock-card-price {
-  margin-top: auto;
   font-family: var(--font-latin);
   font-size: 0.5625rem;
   font-weight: 800;

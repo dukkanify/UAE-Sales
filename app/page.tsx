@@ -22,6 +22,7 @@ import {
   MobilePreviewStrip,
   MobilePromoBanner,
 } from "@/features/home";
+import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
 import { mockHomeCategorySections } from "@/mock";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { getCategories } from "@/services/categories";
@@ -49,7 +50,7 @@ export default async function Home() {
       .slice(0, 4),
   }));
 
-  const appPreviewListings = featuredListings.slice(0, 2);
+  const appPreviewListings = resolveAppPreviewListings(allListings);
 
   return (
     <>

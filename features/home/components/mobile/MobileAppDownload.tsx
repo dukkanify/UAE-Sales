@@ -1,7 +1,8 @@
 import { BRAND } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
-import { getFeaturedListings } from "@/services/listings";
+import { getListings } from "@/services/listings";
 import { MobileAppDevicePreview } from "./MobileAppDevicePreview";
+import { resolveAppPreviewListings } from "./mobile-app-preview.config";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
 import { AppStoreBadgeLink, GooglePlayBadgeLink } from "./MobileStoreBadges";
 
@@ -12,7 +13,8 @@ const APP_FEATURES = [
 ] as const;
 
 export async function MobileAppDownload() {
-  const featured = await getFeaturedListings();
+  const listings = await getListings();
+  const previewListings = resolveAppPreviewListings(listings);
 
   return (
     <section aria-label="تطبيق سوقنا" className="mobile-home-app">
@@ -25,8 +27,8 @@ export async function MobileAppDownload() {
             <div className="mobile-home-app__device">
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
-                {previewListing ? (
-                  <MobileAppDevicePreview listings={featured.slice(0, 2)} />
+                {previewListings.length > 0 ? (
+                  <MobileAppDevicePreview listings={previewListings} />
                 ) : (
                   <div className="mobile-home-app__device-fallback" />
                 )}

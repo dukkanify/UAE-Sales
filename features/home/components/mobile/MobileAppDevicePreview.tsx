@@ -5,6 +5,7 @@ import { BRAND } from "@/shared/constants/brand";
 import { getListingImageUrl, getListingLocation } from "@/features/listings/components/listing-card.utils";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
+import { getAppPreviewImageUrl } from "./mobile-app-preview.config";
 
 type MobileAppDevicePreviewProps = {
   listings: Listing[];
@@ -13,7 +14,7 @@ type MobileAppDevicePreviewProps = {
 const CATEGORY_CHIPS = ["سيارات", "عقارات", "إلكترونيات"] as const;
 
 function MockListingCard({ listing }: { listing: Listing }) {
-  const listingImage = getListingImageUrl(listing);
+  const listingImage = getAppPreviewImageUrl(listing.slug, getListingImageUrl(listing));
   const location = getListingLocation(listing);
 
   return (
@@ -25,7 +26,8 @@ function MockListingCard({ listing }: { listing: Listing }) {
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
-          sizes="96px"
+          priority
+          sizes="180px"
           src={listingImage}
         />
         {listing.isFeatured ? (
@@ -44,10 +46,9 @@ function MockListingCard({ listing }: { listing: Listing }) {
 }
 
 export function MobileAppDevicePreview({ listings }: MobileAppDevicePreviewProps) {
-  const primary = listings[0];
-  const secondary = listings[1];
+  const cards = listings.slice(0, 2);
 
-  if (!primary) return null;
+  if (cards.length === 0) return null;
 
   return (
     <div className="mobile-home-app__device-preview" aria-hidden>
@@ -100,19 +101,9 @@ export function MobileAppDevicePreview({ listings }: MobileAppDevicePreviewProps
         </div>
 
         <div className="mobile-home-app__mock-rail">
-          <MockListingCard listing={primary} />
-          {secondary ? (
-            <MockListingCard listing={secondary} />
-          ) : (
-            <div aria-hidden className="mobile-home-app__mock-card mobile-home-app__mock-card--ghost">
-              <div className="mobile-home-app__mock-card-media mobile-home-app__mock-card-media--ghost" />
-              <div className="mobile-home-app__mock-card-body">
-                <span className="mobile-home-app__mock-skeleton mobile-home-app__mock-skeleton--title" />
-                <span className="mobile-home-app__mock-skeleton mobile-home-app__mock-skeleton--meta" />
-                <span className="mobile-home-app__mock-skeleton mobile-home-app__mock-skeleton--price" />
-              </div>
-            </div>
-          )}
+          {cards.map((listing) => (
+            <MockListingCard key={listing.id} listing={listing} />
+          ))}
         </div>
 
         <nav className="mobile-home-app__mock-nav">

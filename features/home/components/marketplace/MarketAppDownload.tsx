@@ -2,6 +2,7 @@ import type { Listing } from "@/types";
 import { BRAND } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
 import { MobileAppDevicePreview } from "@/features/home/components/mobile/MobileAppDevicePreview";
+import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
 import { MOBILE_APP_LINKS } from "@/features/home/components/mobile/mobile-home.config";
 import {
   AppStoreBadgeLink,
@@ -38,7 +39,7 @@ export function MarketAppDownload({ previewListings = [] }: MarketAppDownloadPro
               <div className="absolute top-2 inset-x-0 z-10 mx-auto h-5 w-24 rounded-full bg-black/80" />
               <div className="absolute inset-[6px] overflow-hidden rounded-[1.4rem] bg-[#f4f6f8]">
                 {previewListings.length > 0 ? (
-                  <MobileAppDevicePreview listings={previewListings.slice(0, 2)} />
+                  <MobileAppDevicePreview listings={resolveAppPreviewListings(previewListings)} />
                 ) : (
                   <div className="size-full bg-[#e8edf2]" />
                 )}
