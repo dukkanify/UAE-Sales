@@ -67,7 +67,7 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
           </label>
 
           <button className="mobile-home-search-card__submit" type="submit">
-            <Icon name="search" size={15} />
+            <Icon aria-hidden name="search" size={16} />
             <span>بحث</span>
           </button>
         </div>

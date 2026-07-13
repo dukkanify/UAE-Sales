@@ -112,7 +112,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
                 </span>
 
                 <span className="mobile-home-search-card__submit">
-                  <Icon name="search" size={15} />
+                  <Icon aria-hidden name="search" size={16} />
                   <span>بحث</span>
                 </span>
               </div>
