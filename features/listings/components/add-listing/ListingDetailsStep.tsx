@@ -27,6 +27,7 @@ export function ListingDetailsStep({
       <div className={addListingStepBodyClass}>
         <div>
           <Input
+            compact
             label="عنوان الإعلان"
             name="title"
             onChange={(event) =>
@@ -43,6 +44,7 @@ export function ListingDetailsStep({
         </div>
 
         <Textarea
+          compact
           label="الوصف"
           name="description"
           onChange={(event) =>
@@ -58,9 +60,10 @@ export function ListingDetailsStep({
           <FormMessage variant="error">{errors.description}</FormMessage>
         ) : null}
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3">
           <div>
             <Input
+              compact
               inputMode="numeric"
               label="السعر بالدرهم"
               min="1"
@@ -79,6 +82,7 @@ export function ListingDetailsStep({
             ) : null}
           </div>
           <Select
+            compact
             label="حالة المنتج"
             name="condition"
             onChange={(event) =>
@@ -93,22 +97,25 @@ export function ListingDetailsStep({
               { label: "ممتاز", value: "excellent" },
             ]}
           />
-          <Select
-            label="الإمارة / المدينة"
-            name="city"
-            onChange={(event) =>
-              onPreviewChange((current) => ({
-                ...current,
-                city:
-                  cities.find((city) => city.id === event.target.value)?.name ??
-                  "دبي",
-              }))
-            }
-            options={cities.map((city) => ({
-              label: city.name,
-              value: city.id,
-            }))}
-          />
+          <div className="col-span-2 md:col-span-1">
+            <Select
+              compact
+              label="الإمارة / المدينة"
+              name="city"
+              onChange={(event) =>
+                onPreviewChange((current) => ({
+                  ...current,
+                  city:
+                    cities.find((city) => city.id === event.target.value)?.name ??
+                    "دبي",
+                }))
+              }
+              options={cities.map((city) => ({
+                label: city.name,
+                value: city.id,
+              }))}
+            />
+          </div>
         </div>
       </div>
     </Card>
