@@ -49,6 +49,7 @@ export function MobileHomeHeader() {
 
           <label className="mobile-home-header__location">
             <Icon className="mobile-home-header__location-icon" name="map" size={14} />
+            <span className="mobile-home-header__location-value">{city}</span>
             <select
               aria-label="الإمارة"
               className="mobile-home-header__location-select"
