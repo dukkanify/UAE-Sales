@@ -1,6 +1,7 @@
 export { MobileAppDownload } from "./MobileAppDownload";
 export { MobileBottomNav } from "./MobileBottomNav";
 export { MobileCategoryGrid } from "./MobileCategoryGrid";
+export { MobileEmiratesSection } from "./MobileEmiratesSection";
 export { MobileFeaturedCard } from "./MobileFeaturedCard";
 export { MobileFeaturedCardSkeleton } from "./MobileFeaturedCardSkeleton";
 export { MobileFeaturedRail } from "./MobileFeaturedRail";

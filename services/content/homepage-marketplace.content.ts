@@ -97,6 +97,7 @@ export async function getMarketEmirateImages(): Promise<Record<string, string>> 
     "abu-dhabi": getEmirateImageUrl("abu-dhabi"),
     sharjah: getEmirateImageUrl("sharjah"),
     ajman: getEmirateImageUrl("ajman"),
+    "umm-al-quwain": getEmirateImageUrl("umm-al-quwain"),
     "ras-al-khaimah": getEmirateImageUrl("ras-al-khaimah"),
     fujairah: getEmirateImageUrl("fujairah"),
   };

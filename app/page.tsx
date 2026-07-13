@@ -9,6 +9,7 @@ import {
   MarketSiteFooter,
   MobileAppDownload,
   MobileCategoryGrid,
+  MobileEmiratesSection,
   MobileFeaturedRail,
   MobileHeroBlock,
   MobileHomeHeader,
@@ -56,6 +57,7 @@ export default async function Home() {
             <MobileNearbyRail listings={allListings} />
             <MobileTrustSection />
             <MobileAppDownload />
+            <MobileEmiratesSection />
           </main>
         </MobileHomeShell>
       </div>

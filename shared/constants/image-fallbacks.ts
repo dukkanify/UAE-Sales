@@ -22,7 +22,8 @@ export type EmirateImageKey =
   | "dubai"
   | "fujairah"
   | "ras-al-khaimah"
-  | "sharjah";
+  | "sharjah"
+  | "umm-al-quwain";
 
 const q = "auto=format&fit=crop&w=1200&q=85";
 
@@ -161,6 +162,7 @@ export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   "abu-dhabi": "photo-1577717903315-1691ae25ab3f",
   sharjah: "photo-1506905925346-21bda4d32df4",
   ajman: "photo-1507525428034-b723cf961d3e",
+  "umm-al-quwain": "photo-1566073771259-6a8506099945",
   "ras-al-khaimah": "photo-1464822759023-fed622ff2c3b",
   fujairah: "photo-1520250497591-112f2f40a3f4",
 };

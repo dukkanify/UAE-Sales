@@ -5,6 +5,7 @@ export const mockEmirateHighlights: HomeCityHighlight[] = [
   { cityId: "abu-dhabi", listingCount: 5620 },
   { cityId: "sharjah", listingCount: 3180 },
   { cityId: "ajman", listingCount: 1240 },
+  { cityId: "umm-al-quwain", listingCount: 540 },
   { cityId: "rak", listingCount: 890 },
   { cityId: "fujairah", listingCount: 620 },
 ];

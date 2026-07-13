@@ -12,6 +12,7 @@ export {
   MobileAppDownload,
   MobileBottomNav,
   MobileCategoryGrid,
+  MobileEmiratesSection,
   MobileFeaturedCard,
   MobileFeaturedCardSkeleton,
   MobileFeaturedRail,
