@@ -134,10 +134,26 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1516627145497-ae6968895b74",
     "photo-1502086223501-7ea6ecd79368",
   ],
-  pets: ["photo-1574158622682-e40e69881006"],
-  books: ["photo-1495446815901-a7297e633e8d"],
-  sports: ["photo-1461896836934-ffe607ba8211"],
-  food: ["photo-1504674900247-0877df9cc836"],
+  pets: [
+    "photo-1574158622682-e40e69881006",
+    "photo-1587300003388-59208cc962cb",
+    "photo-1548199973-03cce0bbc87b",
+  ],
+  books: [
+    "photo-1495446815901-a7297e633e8d",
+    "photo-1512820790803-83ca734da794",
+    "photo-1481627834876-b7833e8f5570",
+  ],
+  sports: [
+    "photo-1461896836934-ffe607ba8211",
+    "photo-1534438327276-14e5300c3a48",
+    "photo-1571902943202-507ec2618e8f",
+  ],
+  food: [
+    "photo-1504674900247-0877df9cc836",
+    "photo-1488477181941-6428a0291777",
+    "photo-1546069901-ba9599a7e63c",
+  ],
   avatar: [
     "photo-1507003211169-0a1dd7228f2d",
     "photo-1494790108377-be9c29b29330",

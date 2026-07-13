@@ -79,7 +79,24 @@ export type NearbyListing = {
 };
 
 export function getNearbyListings(listings: Listing[], limit = 6): NearbyListing[] {
-  return listings.slice(0, limit).map((listing, index) => ({
+  const active = listings.filter((listing) => listing.status === "active");
+  const picked: Listing[] = [];
+  const seenCategories = new Set<string>();
+
+  for (const listing of active) {
+    if (picked.length >= limit) break;
+    if (seenCategories.has(listing.categoryId)) continue;
+    seenCategories.add(listing.categoryId);
+    picked.push(listing);
+  }
+
+  for (const listing of active) {
+    if (picked.length >= limit) break;
+    if (picked.some((item) => item.id === listing.id)) continue;
+    picked.push(listing);
+  }
+
+  return picked.map((listing, index) => ({
     listing,
     distance: MOBILE_NEARBY_DISTANCES[index % MOBILE_NEARBY_DISTANCES.length],
   }));

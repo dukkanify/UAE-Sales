@@ -9,6 +9,7 @@ import type {
 import { imagesForSlug } from "./listing-images.mock";
 import { resolveSeller, getSellerDemoPhone } from "./sellers.mock";
 import { extrasForSlug } from "./listing-specs.mock";
+import { verticalListingSeeds } from "./listings-verticals.mock";
 
 type ListingSeed = {
   id: string;
@@ -51,7 +52,7 @@ function buildListing(seed: ListingSeed): Listing {
     descriptionEnglish: seed.descriptionEnglish,
     categoryId: seed.categoryId,
     subcategory: seed.subcategory,
-    city: seed.emirate,
+    city: seed.city,
     emirate: seed.emirate,
     area: seed.area,
     country: "الإمارات العربية المتحدة",
@@ -1078,6 +1079,7 @@ const listingSeeds: ListingSeed[] = [
     listingStatus: "active",
     imageTone: "rose",
   },
+  ...verticalListingSeeds,
 ];
 
 export const marketplaceListings: Listing[] = listingSeeds.map(buildListing);
