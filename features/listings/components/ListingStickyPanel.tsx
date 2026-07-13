@@ -119,13 +119,12 @@ type MobileStickyActionBarProps = {
 };
 
 const MOBILE_BAR_PRIMARY_CLASS =
-  "!inline-flex !min-h-[3.35rem] !flex-1 !items-center !justify-center !gap-2 !rounded-2xl !bg-primary !px-4 !text-sm !font-extrabold !text-secondary !shadow-[0_6px_20px_rgb(15_23_42/16%)] hover:!bg-[#1a2844] active:!scale-[0.98]";
+  "!inline-flex !min-h-11 !flex-1 !items-center !justify-center !gap-1.5 !rounded-full !bg-primary !px-4 !text-[0.8125rem] !font-bold !text-secondary !shadow-[0_4px_14px_rgb(15_23_42/14%)] hover:!bg-[#1a2844] active:!scale-[0.98]";
 
 const MOBILE_CONTACT_BTN_CLASS =
-  "focus-ring flex min-h-[3.35rem] min-w-[4.35rem] flex-col items-center justify-center gap-1 rounded-xl border border-border/80 bg-white px-2 py-1.5 text-ink shadow-[0_2px_10px_rgb(15_23_42/5%)] transition duration-200 hover:border-secondary/35 hover:bg-surface-muted active:scale-[0.97]";
+  "focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-border/70 bg-white text-ink shadow-[0_1px_6px_rgb(15_23_42/6%)] transition duration-200 hover:border-secondary/30 hover:bg-surface-muted active:scale-[0.96]";
 
-const MOBILE_CONTACT_ICON_WRAP =
-  "grid size-8 place-items-center rounded-full";
+const MOBILE_CHAT_BTN_CLASS = `${MOBILE_CONTACT_BTN_CLASS} !min-h-0 !p-0 !text-primary hover:!bg-surface-muted`;
 
 function MobileContactIconButton({
   ariaLabel,
@@ -181,14 +180,14 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-white/96 shadow-[0_-8px_32px_rgb(15_23_42/8%)] backdrop-blur-lg lg:hidden"
       style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
     >
-      <div className="mx-auto flex max-w-lg items-stretch gap-2.5 px-4 py-3">
+      <div className="mx-auto flex max-w-lg items-center gap-2 px-3.5 py-2">
         {!isOwn && config.showBuyNow ? (
           <button
-            className={`focus-ring inline-flex min-h-[3.35rem] min-w-0 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-sm font-extrabold text-secondary shadow-[0_6px_20px_rgb(15_23_42/16%)] transition hover:bg-[#1a2844] active:scale-[0.98] ${showContactRail ? "" : "w-full"}`}
+            className={`focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-[0.8125rem] font-bold text-secondary shadow-[0_4px_14px_rgb(15_23_42/14%)] transition hover:bg-[#1a2844] active:scale-[0.98] ${showContactRail ? "" : "w-full"}`}
             onClick={() => router.push(getCheckoutPath(listing))}
             type="button"
           >
-            <Icon name="package" size={17} />
+            <Icon name="package" size={16} />
             {primaryLabel}
           </button>
         ) : !isOwn ? (
@@ -203,37 +202,36 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
         ) : null}
 
         {showContactRail ? (
-          <div className="flex shrink-0 items-stretch gap-1.5">
+          <div className="flex shrink-0 items-center gap-1.5">
             <StartChatButton
-              className={`${MOBILE_CONTACT_BTN_CLASS} !flex !min-h-[3.35rem] !min-w-[4.35rem] !flex-col !gap-1 !border-border/80 !bg-white !p-0 !shadow-[0_2px_10px_rgb(15_23_42/5%)] hover:!border-secondary/35 hover:!bg-surface-muted`}
-              layout="stacked"
+              className={MOBILE_CHAT_BTN_CLASS}
+              layout="icon"
               listing={listing}
               size="sm"
               variant="ghost"
             />
 
             {whatsapp ? (
-              <MobileContactIconButton ariaLabel="مراسلة عبر واتساب" external href={whatsapp}>
-                <span className={`${MOBILE_CONTACT_ICON_WRAP} bg-[#25D366]/12 text-[#1a9f5c]`}>
-                  <Icon name="whatsapp" size={17} />
-                </span>
-                <span className="text-[0.625rem] font-bold leading-none text-ink">واتساب</span>
+              <MobileContactIconButton
+                ariaLabel="مراسلة عبر واتساب"
+                className="text-[#1a9f5c]"
+                external
+                href={whatsapp}
+              >
+                <Icon name="whatsapp" size={18} />
               </MobileContactIconButton>
             ) : null}
 
             {showPhoneInRail ? (
-              <MobileContactIconButton ariaLabel="اتصال بالبائع" href={tel ?? undefined}>
-                <span className={`${MOBILE_CONTACT_ICON_WRAP} bg-primary/8 text-primary`}>
-                  <Icon name="phone" size={17} />
-                </span>
-                <span className="text-[0.625rem] font-bold leading-none text-ink">اتصال</span>
+              <MobileContactIconButton ariaLabel="اتصال بالبائع" className="text-primary" href={tel ?? undefined}>
+                <Icon name="phone" size={18} />
               </MobileContactIconButton>
             ) : null}
           </div>
         ) : !isOwn ? (
           <StartChatButton
-            className={`${MOBILE_CONTACT_BTN_CLASS} !flex !min-h-[3.35rem] !min-w-[4.35rem] !flex-col !gap-1 !p-0`}
-            layout="stacked"
+            className={MOBILE_CHAT_BTN_CLASS}
+            layout="icon"
             listing={listing}
             size="sm"
             variant="ghost"
