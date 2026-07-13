@@ -73,7 +73,11 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
               <div aria-hidden className="category-directory-card__hero-overlay" />
               <div className="category-directory-card__hero-content">
                 <div className="category-directory-card__hero-main">
-                  <CategoryThumbnail category={category} variant="compact" />
+                  <CategoryThumbnail
+                    category={category}
+                    className="mx-0 shrink-0"
+                    variant="compact"
+                  />
                   <h2 className="category-directory-card__title">{category.name}</h2>
                 </div>
                 <span className="category-directory-card__count">

@@ -54,12 +54,13 @@ function AppImageInner({
 
   const [activeSrc, setActiveSrc] = useState(src || fallbackUrl);
   const [isLoaded, setIsLoaded] = useState(isInlineImageSrc(src));
-  const usingFallback = activeSrc === fallbackUrl;
+  const [usedErrorFallback, setUsedErrorFallback] = useState(false);
   const useNativeImage = isInlineImageSrc(activeSrc);
 
   function handleError() {
     if (activeSrc !== fallbackUrl) {
       setActiveSrc(fallbackUrl);
+      setUsedErrorFallback(true);
       setIsLoaded(false);
     }
   }
@@ -102,7 +103,7 @@ function AppImageInner({
           width={fill ? undefined : width}
         />
       )}
-      {usingFallback ? (
+      {usedErrorFallback && alt ? (
         <span className="sr-only">صورة بديلة لـ {alt}</span>
       ) : null}
     </span>
