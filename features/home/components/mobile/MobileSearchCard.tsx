@@ -24,52 +24,56 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
         </label>
 
         <div className="mobile-home-search-card__filters">
-          <label className="mobile-home-search-card__segment">
-            <span className="mobile-home-search-card__segment-label">التصنيف</span>
-            <span className="mobile-home-search-card__segment-control">
-              <Icon name="grid" size={11} />
-              <select className="mobile-home-search-card__select" defaultValue="" name="category">
-                <option value="">الكل</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.slug}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
+          <div className="mobile-home-search-card__filter-row">
+            <label className="mobile-home-search-card__segment">
+              <span className="mobile-home-search-card__segment-label">التصنيف</span>
+              <span className="mobile-home-search-card__segment-control">
+                <Icon aria-hidden className="mobile-home-search-card__segment-icon" name="grid" size={11} />
+                <select className="mobile-home-search-card__select" defaultValue="" name="category">
+                  <option value="">الكل</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.slug}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
 
-          <label className="mobile-home-search-card__segment">
-            <span className="mobile-home-search-card__segment-label">الموقع</span>
-            <span className="mobile-home-search-card__segment-control">
-              <Icon name="map" size={11} />
-              <select className="mobile-home-search-card__select" defaultValue="دبي" name="city">
-                {cities.map((item) => (
-                  <option key={item.id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </span>
-          </label>
+            <label className="mobile-home-search-card__segment">
+              <span className="mobile-home-search-card__segment-label">الموقع</span>
+              <span className="mobile-home-search-card__segment-control">
+                <Icon aria-hidden className="mobile-home-search-card__segment-icon" name="map" size={11} />
+                <select className="mobile-home-search-card__select" defaultValue="دبي" name="city">
+                  {cities.map((item) => (
+                    <option key={item.id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+          </div>
 
-          <label className="mobile-home-search-card__segment">
-            <span className="mobile-home-search-card__segment-label">السعر AED</span>
-            <span className="mobile-home-search-card__segment-control">
-              <Icon name="filter" size={11} />
-              <select className="mobile-home-search-card__select" defaultValue="" name="price">
-                <option value="">أي سعر</option>
-                <option value="0-50000">50K-</option>
-                <option value="50000-200000">50-200K</option>
-                <option value="200000+">200K+</option>
-              </select>
-            </span>
-          </label>
+          <div className="mobile-home-search-card__filter-row mobile-home-search-card__filter-row--action">
+            <label className="mobile-home-search-card__segment">
+              <span className="mobile-home-search-card__segment-label">السعر AED</span>
+              <span className="mobile-home-search-card__segment-control">
+                <Icon aria-hidden className="mobile-home-search-card__segment-icon" name="filter" size={11} />
+                <select className="mobile-home-search-card__select" defaultValue="" name="price">
+                  <option value="">أي سعر</option>
+                  <option value="0-50000">50K-</option>
+                  <option value="50000-200000">50-200K</option>
+                  <option value="200000+">200K+</option>
+                </select>
+              </span>
+            </label>
 
-          <button className="mobile-home-search-card__submit" type="submit">
-            <Icon aria-hidden name="search" size={16} />
-            <span>بحث</span>
-          </button>
+            <button className="mobile-home-search-card__submit" type="submit">
+              <Icon aria-hidden name="search" size={16} />
+              <span>بحث</span>
+            </button>
+          </div>
         </div>
       </form>
     </section>
