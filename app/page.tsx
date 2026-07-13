@@ -7,6 +7,14 @@ import {
   MarketHero,
   MarketPreviewStrip,
   MarketSiteFooter,
+  MobileCategoryGrid,
+  MobileFeaturedRail,
+  MobileHeroBlock,
+  MobileHomeHeader,
+  MobileHomeShell,
+  MobilePromoBanner,
+  MobileStatsRow,
+  MobileTrendingSearches,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
 import { getCategories } from "@/services/categories";
@@ -36,27 +44,43 @@ export default async function Home() {
 
   return (
     <>
-      <MarketHeader />
-      <main>
-        <MarketHero categories={categories} />
-        <MarketPreviewStrip />
-        <MarketFeatured categories={categoryMeta} listings={featuredListings} />
-        {sectionListings.map((section) => (
-          <MarketCategorySection
-            key={section.categoryId}
-            categoryId={section.categoryId}
-            categorySlug={categoryById(section.categoryId)}
-            description={section.description}
-            eyebrow={section.eyebrow}
-            listings={section.items}
-            title={section.title}
-            variant={section.variant}
-          />
-        ))}
-        <MarketEscrow />
-        <MarketEmirates />
-      </main>
-      <MarketSiteFooter />
+      <div className="lg:hidden">
+        <MobileHomeShell>
+          <MobileHomeHeader />
+          <main className="mobile-home-main">
+            <MobileHeroBlock categories={categories} />
+            <MobileStatsRow />
+            <MobileTrendingSearches />
+            <MobileCategoryGrid categories={categories} />
+            <MobilePromoBanner />
+            <MobileFeaturedRail listings={featuredListings} />
+          </main>
+        </MobileHomeShell>
+      </div>
+
+      <div className="hidden lg:contents">
+        <MarketHeader />
+        <main>
+          <MarketHero categories={categories} />
+          <MarketPreviewStrip />
+          <MarketFeatured categories={categoryMeta} listings={featuredListings} />
+          {sectionListings.map((section) => (
+            <MarketCategorySection
+              key={section.categoryId}
+              categoryId={section.categoryId}
+              categorySlug={categoryById(section.categoryId)}
+              description={section.description}
+              eyebrow={section.eyebrow}
+              listings={section.items}
+              title={section.title}
+              variant={section.variant}
+            />
+          ))}
+          <MarketEscrow />
+          <MarketEmirates />
+        </main>
+        <MarketSiteFooter />
+      </div>
     </>
   );
 }
