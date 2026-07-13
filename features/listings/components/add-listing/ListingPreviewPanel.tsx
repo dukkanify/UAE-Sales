@@ -1,4 +1,5 @@
 import type { Category } from "@/types";
+import { AppImage } from "@/shared/components/AppImage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { CategoryIcon } from "@/shared/ui/CategoryIcon";
@@ -24,11 +25,12 @@ export function ListingPreviewPanel({
         <div className="mt-4 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted">
           <div className="relative h-44">
             {imagePreviews[0] ? (
-              <div
-                aria-label="معاينة صورة الإعلان"
-                className="absolute inset-0 bg-cover bg-center"
-                role="img"
-                style={{ backgroundImage: `url(${imagePreviews[0]})` }}
+              <AppImage
+                alt="معاينة صورة الإعلان"
+                className="h-full w-full"
+                fill
+                priority
+                src={imagePreviews[0]}
               />
             ) : (
               <div className="grid h-full place-items-center text-secondary">
