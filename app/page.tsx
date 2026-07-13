@@ -7,7 +7,6 @@ import {
   MarketHeader,
   MarketHero,
   MarketPreviewStrip,
-  MarketSiteFooter,
   MobileAppDownload,
   MobileCategoryGrid,
   MobileEmiratesSection,
@@ -20,6 +19,7 @@ import {
   MobileTrustSection,
 } from "@/features/home";
 import { mockHomeCategorySections } from "@/mock";
+import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { getCategories } from "@/services/categories";
 import { getFeaturedListings, getListings } from "@/services/listings";
 
@@ -85,8 +85,9 @@ export default async function Home() {
           ))}
           <MarketEscrow />
         </main>
-        <MarketSiteFooter />
       </div>
+
+      <SiteFooter />
     </>
   );
 }
