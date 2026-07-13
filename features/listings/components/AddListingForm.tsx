@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import type { Category } from "@/types";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { Button } from "@/shared/ui/Button";
@@ -16,9 +17,22 @@ type AddListingFormProps = {
   categories: Category[];
 };
 
+function focusFirstDetailsField(container: HTMLElement | null) {
+  const field = container?.querySelector<HTMLElement>(
+    "input:not([type='hidden']), textarea, select",
+  );
+  field?.focus({ preventScroll: true });
+}
+
 export function AddListingForm({ categories }: AddListingFormProps) {
+  const categoryStepRef = useRef<HTMLDivElement>(null);
+  const detailsStepRef = useRef<HTMLDivElement>(null);
+  const shouldScrollToDetailsRef = useRef(false);
+
   const {
+    categoryStepExpanded,
     errors,
+    expandCategoryStep,
     handleImageChange,
     imagePreviews,
     isAllowed,
@@ -26,10 +40,37 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     preview,
     selectedCategory,
     selectedCategoryId,
+    selectCategory,
     setPreview,
-    setSelectedCategoryId,
     submitListing,
   } = useAddListingForm(categories);
+
+  const handleSelectCategory = useCallback(
+    (categoryId: string) => {
+      shouldScrollToDetailsRef.current = true;
+      selectCategory(categoryId);
+    },
+    [selectCategory],
+  );
+
+  useEffect(() => {
+    if (!shouldScrollToDetailsRef.current || !selectedCategoryId) {
+      return;
+    }
+
+    shouldScrollToDetailsRef.current = false;
+    requestAnimationFrame(() => {
+      detailsStepRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.setTimeout(() => focusFirstDetailsField(detailsStepRef.current), 420);
+    });
+  }, [selectedCategoryId]);
+
+  const handleExpandCategoryStep = useCallback(() => {
+    expandCategoryStep();
+    requestAnimationFrame(() => {
+      categoryStepRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [expandCategoryStep]);
 
   if (!isAllowed) {
     return (
@@ -55,34 +96,52 @@ export function AddListingForm({ categories }: AddListingFormProps) {
       <div className="grid gap-6">
         <AddListingStepProgress />
 
-        <CategorySelectionStep
-          categories={categories}
-          errors={errors}
-          onSelectCategory={setSelectedCategoryId}
-          selectedCategory={selectedCategory}
-          selectedCategoryId={selectedCategoryId}
-        />
+        <div ref={categoryStepRef}>
+          <CategorySelectionStep
+            categories={categories}
+            errors={errors}
+            isExpanded={categoryStepExpanded}
+            onExpand={handleExpandCategoryStep}
+            onSelectCategory={handleSelectCategory}
+            selectedCategory={selectedCategory}
+            selectedCategoryId={selectedCategoryId}
+          />
+        </div>
 
-        {useDynamicFields ? (
-          <CategoryFieldsStep categoryId={selectedCategoryId} errors={errors} />
-        ) : (
-          <ListingDetailsStep errors={errors} onPreviewChange={setPreview} />
-        )}
+        {selectedCategoryId ? (
+          <>
+            <div ref={detailsStepRef}>
+              {useDynamicFields ? (
+                <CategoryFieldsStep
+                  categoryId={selectedCategoryId}
+                  errors={errors}
+                  subcategories={selectedCategory?.subcategories ?? []}
+                />
+              ) : (
+                <ListingDetailsStep
+                  errors={errors}
+                  onPreviewChange={setPreview}
+                  subcategories={selectedCategory?.subcategories ?? []}
+                />
+              )}
+            </div>
 
-        <MediaContactStep
-          errors={errors}
-          imagePreviews={imagePreviews}
-          onImageChange={handleImageChange}
-        />
+            <MediaContactStep
+              errors={errors}
+              imagePreviews={imagePreviews}
+              onImageChange={handleImageChange}
+            />
 
-        <Card className="flex flex-wrap items-center justify-between gap-4 bg-primary p-5 text-white">
-          <p className="font-medium">
-            بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
-          </p>
-          <Button className="shrink-0" loading={isSubmitting} type="submit">
-            نشر الإعلان
-          </Button>
-        </Card>
+            <Card className="flex flex-wrap items-center justify-between gap-4 bg-primary p-5 text-white">
+              <p className="font-medium">
+                بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
+              </p>
+              <Button className="shrink-0" loading={isSubmitting} type="submit">
+                نشر الإعلان
+              </Button>
+            </Card>
+          </>
+        ) : null}
       </div>
 
       <ListingPreviewPanel

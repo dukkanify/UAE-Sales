@@ -42,9 +42,8 @@ export function useAddListingForm(categories: Category[]) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [preview, setPreview] = useState<ListingPreview>(defaultPreview);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    categories[0]?.id ?? "",
-  );
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [categoryStepExpanded, setCategoryStepExpanded] = useState(true);
   const [isAllowed] = useState(
     () => typeof window !== "undefined" && Boolean(getSessionUser()),
   );
@@ -171,8 +170,27 @@ export function useAddListingForm(categories: Category[]) {
     setImagePreviews(files.map((file) => URL.createObjectURL(file)));
   }
 
+  function selectCategory(categoryId: string) {
+    setSelectedCategoryId(categoryId);
+    setCategoryStepExpanded(false);
+    setErrors((current) => {
+      if (!current.category) {
+        return current;
+      }
+      const next = { ...current };
+      delete next.category;
+      return next;
+    });
+  }
+
+  function expandCategoryStep() {
+    setCategoryStepExpanded(true);
+  }
+
   return {
+    categoryStepExpanded,
     errors,
+    expandCategoryStep,
     handleImageChange,
     imagePreviews,
     isAllowed,
@@ -180,8 +198,8 @@ export function useAddListingForm(categories: Category[]) {
     preview,
     selectedCategory,
     selectedCategoryId,
+    selectCategory,
     setPreview,
-    setSelectedCategoryId,
     submitListing,
   };
 }

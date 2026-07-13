@@ -5,21 +5,26 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import { SubcategoryField } from "./SubcategoryField";
 import type { AddListingErrors, ListingPreview } from "./types";
 
 type ListingDetailsStepProps = {
   errors: AddListingErrors;
   onPreviewChange: (updater: (current: ListingPreview) => ListingPreview) => void;
+  subcategories?: string[];
 };
 
 export function ListingDetailsStep({
   errors,
   onPreviewChange,
+  subcategories = [],
 }: ListingDetailsStepProps) {
   return (
     <Card className="p-6">
       <h2 className="text-2xl font-black text-ink">2. تفاصيل الإعلان</h2>
       <div className="mt-5 grid gap-4">
+        <SubcategoryField subcategories={subcategories} />
+
         <div>
           <Input
             label="عنوان الإعلان"

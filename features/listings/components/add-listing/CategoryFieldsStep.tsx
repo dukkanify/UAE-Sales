@@ -1,14 +1,20 @@
 import type { CategoryFieldsDefaults, CategoryFieldErrors } from "./CategoryFieldsForm";
 import { CategoryFieldsForm } from "./CategoryFieldsForm";
+import { SubcategoryField } from "./SubcategoryField";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import type { AddListingErrors } from "./types";
 
 type CategoryFieldsStepProps = {
   categoryId: string;
   errors: AddListingErrors & CategoryFieldErrors;
+  subcategories?: string[];
 };
 
-export function CategoryFieldsStep({ categoryId, errors }: CategoryFieldsStepProps) {
+export function CategoryFieldsStep({
+  categoryId,
+  errors,
+  subcategories = [],
+}: CategoryFieldsStepProps) {
   if (!isDynamicCategory(categoryId)) {
     return null;
   }
@@ -19,6 +25,7 @@ export function CategoryFieldsStep({ categoryId, errors }: CategoryFieldsStepPro
       errors={errors}
       heading="2. تفاصيل الإعلان"
       stepLabel="الخطوة 2"
+      subcategoryField={<SubcategoryField subcategories={subcategories} />}
     />
   );
 }
