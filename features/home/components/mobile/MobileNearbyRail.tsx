@@ -1,4 +1,5 @@
 import type { Listing } from "@/types";
+import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { getNearbyListings } from "./mobile-home.config";
 import { MobileNearbyCard } from "./MobileNearbyCard";
 import { MobileSectionHeader } from "./MobileSectionHeader";
@@ -15,7 +16,7 @@ export function MobileNearbyRail({ listings }: MobileNearbyRailProps) {
   return (
     <section aria-label="القريبة منك" className="mobile-home-nearby">
       <MobileSectionHeader actionHref="/search" icon="map" title="القريبة منك" />
-      <div className="mobile-home-nearby__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
+      <DragScrollRow className="mobile-home-nearby__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
         {nearby.map(({ distance, listing }, index) => (
           <MobileNearbyCard
             key={listing.id}
@@ -24,7 +25,7 @@ export function MobileNearbyRail({ listings }: MobileNearbyRailProps) {
             priority={index < 2}
           />
         ))}
-      </div>
+      </DragScrollRow>
     </section>
   );
 }

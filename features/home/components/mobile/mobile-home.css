@@ -23,10 +23,35 @@
 .mobile-home-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  scroll-behavior: smooth;
 }
 
 .mobile-home-scroll::-webkit-scrollbar {
   display: none;
+}
+
+/* Drag-to-scroll rails (mouse/pen) */
+.drag-scroll-row {
+  cursor: grab;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.drag-scroll-row.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+  user-select: none;
+}
+
+.drag-scroll-row.is-dragging a {
+  pointer-events: none;
+}
+
+@media (hover: none) {
+  .drag-scroll-row {
+    cursor: default;
+  }
 }
 
 /* ── Header ── */

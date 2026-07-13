@@ -1,4 +1,5 @@
 import type { Listing } from "@/types";
+import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { MobileFeaturedCard } from "./MobileFeaturedCard";
 import { MobileSectionHeader } from "./MobileSectionHeader";
 
@@ -17,11 +18,11 @@ export function MobilePreviewStrip({ listings }: MobilePreviewStripProps) {
       <p className="px-[var(--mh-page-x)] pb-1 text-xs font-medium text-[var(--mh-muted)]">
         إعلانات مميزة الآن — مختارة لك من سوقنا.
       </p>
-      <div className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
+      <DragScrollRow className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
         {previews.map((listing, index) => (
           <MobileFeaturedCard key={listing.id} listing={listing} priority={index < 2} />
         ))}
-      </div>
+      </DragScrollRow>
     </section>
   );
 }
