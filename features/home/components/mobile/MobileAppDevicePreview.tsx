@@ -14,7 +14,8 @@ type MobileAppDevicePreviewProps = {
 export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps) {
   return (
     <div className="mobile-home-app__device-preview" aria-hidden>
-      <div className="mobile-home-app__device-preview-inner mobile-home-shell">
+      <div className="mobile-home-app__device-preview-frame">
+        <div className="mobile-home-app__device-preview-inner mobile-home-shell">
         <header className="mobile-home-header mobile-home-app__device-preview-header">
           <div className="mobile-home-header__bar">
             <span className="mobile-home-header__icon-btn">
@@ -114,6 +115,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
             <MobileFeaturedCard listing={listing} priority />
           </div>
         </section>
+        </div>
       </div>
     </div>
   );

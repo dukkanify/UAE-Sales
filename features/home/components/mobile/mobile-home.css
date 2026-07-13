@@ -1274,35 +1274,71 @@
 
 .mobile-home-app__device-screen {
   container-type: inline-size;
+  container-name: device-screen;
   position: relative;
   height: calc(100% - 0.75rem);
   overflow: hidden;
   border-radius: 1rem;
   isolation: isolate;
   background: #fff;
+  --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview {
   position: absolute;
   inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   overflow: hidden;
   border-radius: inherit;
   background: #fff;
 }
 
+.mobile-home-app__device-preview-frame {
+  width: calc(390px * var(--preview-scale));
+  height: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
 .mobile-home-app__device-preview-inner {
-  position: relative;
-  left: 50%;
   width: 390px;
-  margin-left: -195px;
-  transform: scale(calc(100cqw / 390px));
-  transform-origin: top center;
+  transform: scale(var(--preview-scale));
+  transform-origin: top left;
   pointer-events: none;
   user-select: none;
+
+  /* Lock tokens to a 390px canvas — vw units break inside the phone mockup */
+  --mh-page-x: 1rem;
+  --mh-section-gap: 1rem;
+  --mh-text-xs: 0.6875rem;
+  --mh-text-sm: 0.8125rem;
+  --mh-text-base: 0.9375rem;
+  --mh-text-lg: 1.5rem;
+  --mh-radius-md: 0.75rem;
+  --mh-radius-lg: 1rem;
+  --mh-radius-xl: 1.25rem;
+  --mh-radius-2xl: 1.5rem;
+  --mh-card-width: 16.5rem;
+  --mh-category-icon: 3.5rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-header__bar {
+  min-height: 3.25rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-header__location {
+  max-width: 7.5rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-header__logo {
+  max-width: calc(100% - 11rem);
 }
 
 .mobile-home-app__device-preview-header {
   position: relative;
+  top: auto;
 }
 
 .mobile-home-app__device-preview-placeholder {
@@ -1321,6 +1357,21 @@
 
 .mobile-home-app__device-preview-featured .mobile-home-featured__track {
   overflow: hidden;
+  padding-inline: var(--mh-page-x);
+}
+
+.mobile-home-app__device-preview-featured .mobile-home-featured-card {
+  width: var(--mh-card-width);
+  min-width: 0;
+  max-width: var(--mh-card-width);
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-hero {
+  padding-top: 1rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-search-card__panel {
+  padding: 0.875rem;
 }
 
 .mobile-home-app__device-fallback {
@@ -1329,8 +1380,8 @@
 }
 
 @supports not (width: 1cqw) {
-  .mobile-home-app__device-preview-inner {
-    transform: scale(0.345);
+  .mobile-home-app__device-screen {
+    --preview-scale: 0.36;
   }
 }
 
