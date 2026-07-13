@@ -49,8 +49,7 @@ export default async function Home() {
       .slice(0, 4),
   }));
 
-  const appPreviewListing =
-    featuredListings.find((listing) => listing.isFeatured) ?? featuredListings[0];
+  const appPreviewListings = featuredListings.slice(0, 2);
 
   return (
     <>
@@ -102,7 +101,7 @@ export default async function Home() {
             />
           ))}
           <MarketEscrow />
-          <MarketAppDownload previewListing={appPreviewListing} />
+          <MarketAppDownload previewListings={appPreviewListings} />
         </main>
       </div>
 

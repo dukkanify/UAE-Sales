@@ -13,7 +13,6 @@ const APP_FEATURES = [
 
 export async function MobileAppDownload() {
   const featured = await getFeaturedListings();
-  const previewListing = featured.find((listing) => listing.isFeatured) ?? featured[0];
 
   return (
     <section aria-label="تطبيق سوقنا" className="mobile-home-app">
@@ -27,7 +26,7 @@ export async function MobileAppDownload() {
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
                 {previewListing ? (
-                  <MobileAppDevicePreview listing={previewListing} />
+                  <MobileAppDevicePreview listings={featured.slice(0, 2)} />
                 ) : (
                   <div className="mobile-home-app__device-fallback" />
                 )}

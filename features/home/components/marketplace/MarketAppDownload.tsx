@@ -16,10 +16,10 @@ const APP_FEATURES = [
 ] as const;
 
 type MarketAppDownloadProps = {
-  previewListing?: Listing;
+  previewListings?: Listing[];
 };
 
-export function MarketAppDownload({ previewListing }: MarketAppDownloadProps) {
+export function MarketAppDownload({ previewListings = [] }: MarketAppDownloadProps) {
   return (
     <MarketSectionShell variant="sand">
       <div className="relative overflow-hidden rounded-3xl border border-secondary/20 bg-gradient-to-br from-primary via-[#162033] to-primary p-8 shadow-[0_20px_50px_rgb(15_23_42/20%)] md:p-10">
@@ -37,8 +37,8 @@ export function MarketAppDownload({ previewListing }: MarketAppDownloadProps) {
             <div className="relative mx-auto aspect-[9/19] w-full overflow-hidden rounded-[2rem] border-[6px] border-[#1a2332] bg-[#0b1220] shadow-[0_24px_60px_rgb(0_0_0/35%)]">
               <div className="absolute top-2 inset-x-0 z-10 mx-auto h-5 w-24 rounded-full bg-black/80" />
               <div className="absolute inset-[6px] overflow-hidden rounded-[1.4rem] bg-[#f4f6f8]">
-                {previewListing ? (
-                  <MobileAppDevicePreview listing={previewListing} />
+                {previewListings.length > 0 ? (
+                  <MobileAppDevicePreview listings={previewListings.slice(0, 2)} />
                 ) : (
                   <div className="size-full bg-[#e8edf2]" />
                 )}
