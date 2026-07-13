@@ -63,7 +63,7 @@ const defaultGuestInfo: GuestDeliveryInfo = {
   email: "",
   phone: "",
   shippingMethod: "standard",
-  emirate: "",
+  emirate: "دبي",
   addressLine: "",
   saveAddress: false,
 };
@@ -138,6 +138,7 @@ export function CheckoutWizard({
       fullName: prev.fullName || sessionUser.fullName,
       email: prev.email || sessionUser.email,
       phone: prev.phone || sessionUser.phone,
+      emirate: prev.emirate || sessionUser.city || "دبي",
     }));
   }
 
@@ -232,27 +233,22 @@ export function CheckoutWizard({
       shippingMethod,
     };
 
-    if (guestCheckout && !buyer) {
+    if (buyer && shippable && requiresAddress && addresses.length > 0) {
+      if (!selectedAddressId) {
+        setError(CHECKOUT_ERRORS.savedAddressRequired);
+        scrollPanelToTop();
+        return;
+      }
+    } else {
       const validationError = validateGuestDeliveryStep(deliveryInfo, requiresAddress);
       if (validationError) {
         setError(validationError);
+        scrollPanelToTop();
         return;
       }
-      setGuestInfo(deliveryInfo);
-    } else if (shippable && requiresAddress) {
-      if (buyer && addresses.length > 0) {
-        if (!selectedAddressId) {
-          setError(CHECKOUT_ERRORS.savedAddressRequired);
-          return;
-        }
-      } else {
-        const validationError = validateGuestDeliveryStep(deliveryInfo, true);
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
-      }
     }
+
+    setGuestInfo(deliveryInfo);
 
     transitionLockRef.current = true;
     setIsContinuing(true);
@@ -468,6 +464,8 @@ export function CheckoutWizard({
                 value={guestInfo.email}
               />
               <Input
+                dir="ltr"
+                inputMode="tel"
                 label="رقم الجوال"
                 name="phone"
                 onChange={(event) =>
@@ -574,8 +572,9 @@ export function CheckoutWizard({
               </>
             ) : null}
 
-            <div className="flex gap-2">
+            <div className="sticky bottom-0 z-10 -mx-2 flex gap-2 border-t border-border bg-surface/95 p-4 backdrop-blur-sm supports-[backdrop-filter]:bg-surface/90 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
               <Button
+                className="flex-1 md:flex-none"
                 loading={isContinuing}
                 onClick={handleContinueFromDelivery}
                 type="button"
