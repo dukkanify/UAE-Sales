@@ -103,10 +103,11 @@ export function findDemoAccount(
 ): DemoAccount | undefined {
   const normalized = normalizeIdentifier(identifier);
   const phone = normalizePhone(identifier);
+  const normalizedPassword = password.trim();
 
   return demoAccounts.find(
     (account) =>
-      account.password === password &&
+      account.password === normalizedPassword &&
       (normalizeIdentifier(account.email) === normalized ||
         normalizePhone(account.phone) === phone),
   );
