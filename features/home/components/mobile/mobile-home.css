@@ -1417,6 +1417,7 @@
   border-radius: 1.125rem;
   isolation: isolate;
   background: #fff;
+  --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview {
@@ -1426,7 +1427,6 @@
   border-radius: inherit;
   background: #fff;
   direction: ltr;
-  --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview-frame {
@@ -1434,19 +1434,21 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  direction: ltr;
 }
 
 .mobile-home-app__device-preview-inner {
   position: absolute;
   top: 0;
-  left: 50%;
+  left: 0;
   width: 390px;
   max-width: none;
   direction: rtl;
-  transform: translateX(-50%) scale(var(--preview-scale));
-  transform-origin: top center;
+  transform: scale(var(--preview-scale));
+  transform-origin: top left;
   pointer-events: none;
   user-select: none;
+  background: #fff;
 
   /* Lock tokens to a 390px canvas — vw units break inside the phone mockup */
   --mh-page-x: 1rem;
@@ -1603,7 +1605,7 @@
 }
 
 @supports not (width: 1cqw) {
-  .mobile-home-app__device-preview {
+  .mobile-home-app__device-screen {
     --preview-scale: 0.42;
   }
 }

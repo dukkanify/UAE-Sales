@@ -15,7 +15,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
   return (
     <div className="mobile-home-app__device-preview" aria-hidden>
       <div className="mobile-home-app__device-preview-frame">
-        <div className="mobile-home-app__device-preview-inner mobile-home-shell">
+        <div className="mobile-home-app__device-preview-inner">
         <header className="mobile-home-header mobile-home-app__device-preview-header">
           <div className="mobile-home-header__bar">
             <div className="mobile-home-header__side mobile-home-header__side--start">
