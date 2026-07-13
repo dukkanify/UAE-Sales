@@ -1223,7 +1223,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.125rem;
+  gap: 1.25rem;
 }
 
 .mobile-home-app__copy {
@@ -1388,15 +1388,16 @@
 
 .mobile-home-app__device {
   position: relative;
-  width: min(100%, 10.75rem);
-  aspect-ratio: 9 / 18;
-  border: 2px solid rgb(255 255 255 / 18%);
-  border-radius: 1.5rem;
+  width: min(74vw, 12.75rem);
+  aspect-ratio: 9 / 19;
+  border: 2px solid rgb(255 255 255 / 22%);
+  border-radius: 1.75rem;
   background: linear-gradient(180deg, #1a2438 0%, #0d1424 100%);
-  padding: 0.5rem;
+  padding: 0.5625rem;
   box-shadow:
-    0 20px 44px rgb(0 0 0 / 38%),
-    inset 0 1px 0 rgb(255 255 255 / 12%);
+    0 24px 52px rgb(0 0 0 / 42%),
+    0 0 0 1px rgb(255 255 255 / 6%) inset,
+    inset 0 1px 0 rgb(255 255 255 / 14%);
 }
 
 .mobile-home-app__device-island {
@@ -1408,12 +1409,12 @@
 }
 
 .mobile-home-app__device-screen {
-  container-type: inline-size;
+  container-type: size;
   container-name: device-screen;
   position: relative;
-  height: calc(100% - 0.75rem);
+  height: calc(100% - 0.6875rem);
   overflow: hidden;
-  border-radius: 1rem;
+  border-radius: 1.125rem;
   isolation: isolate;
   background: #fff;
 }
@@ -1424,39 +1425,43 @@
   overflow: hidden;
   border-radius: inherit;
   background: #fff;
-  /* Isolate scaling math from page RTL — block flow must anchor top-left */
   direction: ltr;
-  /* cqw must be read from a child of the query container, not on device-screen itself */
   --preview-scale: calc(100cqw / 390);
 }
 
 .mobile-home-app__device-preview-frame {
+  position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
 .mobile-home-app__device-preview-inner {
+  position: absolute;
+  top: 0;
+  left: 50%;
   width: 390px;
-  max-width: 390px;
+  max-width: none;
+  height: calc(100cqh / var(--preview-scale));
   direction: rtl;
-  transform: scale(var(--preview-scale));
-  transform-origin: top left;
+  transform: translateX(-50%) scale(var(--preview-scale));
+  transform-origin: top center;
+  overflow: hidden;
   pointer-events: none;
   user-select: none;
 
   /* Lock tokens to a 390px canvas — vw units break inside the phone mockup */
   --mh-page-x: 1rem;
-  --mh-section-gap: 1rem;
+  --mh-section-gap: 0.875rem;
   --mh-text-xs: 0.6875rem;
   --mh-text-sm: 0.8125rem;
   --mh-text-base: 0.9375rem;
-  --mh-text-lg: 1.5rem;
+  --mh-text-lg: 1.375rem;
   --mh-radius-md: 0.75rem;
   --mh-radius-lg: 1rem;
   --mh-radius-xl: 1.25rem;
   --mh-radius-2xl: 1.5rem;
-  --mh-card-width: 16.5rem;
+  --mh-card-width: 15.5rem;
   --mh-category-icon: 3.5rem;
 }
 
@@ -1504,7 +1509,7 @@
 }
 
 .mobile-home-app__device-preview-featured {
-  margin-top: 0.25rem;
+  margin-top: 0.125rem;
   overflow: hidden;
 }
 
@@ -1519,16 +1524,54 @@
   max-width: var(--mh-card-width);
 }
 
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__media {
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__image {
+  object-fit: contain !important;
+  object-position: center center !important;
+}
+
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__body {
+  padding: 0.5rem 0.625rem 0.625rem;
+}
+
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__title {
+  -webkit-line-clamp: 1;
+}
+
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__meta,
+.mobile-home-app__device-preview-featured .mobile-home-featured-card__footer {
+  display: none;
+}
+
 .mobile-home-app__device-preview-inner .mobile-home-hero-block {
-  padding-inline: 1rem;
+  padding-inline: 0.875rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-hero-panel {
+  border-radius: var(--mh-radius-xl);
 }
 
 .mobile-home-app__device-preview-inner .mobile-home-hero__media {
-  height: 6.75rem;
+  height: 7.25rem;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-hero__bg img {
+  object-fit: contain !important;
+  object-position: center center !important;
 }
 
 .mobile-home-app__device-preview-inner .mobile-home-hero__content {
-  padding: 0.625rem 0.75rem 0.75rem;
+  padding: 0.5625rem 0.75rem 0.6875rem;
+}
+
+.mobile-home-app__device-preview-inner .mobile-home-hero__title {
+  font-size: 1rem;
+  line-height: 1.35;
 }
 
 .mobile-home-app__device-preview-inner .mobile-home-hero__badge {
@@ -1563,22 +1606,26 @@
 
 @supports not (width: 1cqw) {
   .mobile-home-app__device-preview {
-    --preview-scale: 0.36;
+    --preview-scale: 0.42;
+  }
+
+  .mobile-home-app__device-preview-inner {
+    height: calc(100% / var(--preview-scale));
   }
 }
 
 @media (min-width: 520px) {
   .mobile-home-app__layout {
     display: grid;
-    grid-template-columns: minmax(7.75rem, 34%) minmax(0, 1fr);
+    grid-template-columns: minmax(9.5rem, 38%) minmax(0, 1fr);
     align-items: center;
-    gap: 1.25rem;
+    gap: 1.5rem;
   }
 
   .mobile-home-app__device-wrap {
     order: 2;
     justify-content: center;
-    padding-block: 0;
+    padding-block: 0.25rem;
   }
 
   .mobile-home-app__copy {
@@ -1586,8 +1633,8 @@
   }
 
   .mobile-home-app__device {
-    width: 100%;
-    transform: rotate(-3deg);
+    width: min(100%, 11.5rem);
+    transform: none;
   }
 
   .mobile-home-app__features {

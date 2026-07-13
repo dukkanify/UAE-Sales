@@ -16,11 +16,13 @@ import {
 } from "@/features/listings/components/listing-card.utils";
 
 type MobileFeaturedCardProps = {
+  imageFit?: "contain" | "cover";
   listing: Listing;
   priority?: boolean;
 };
 
 export const MobileFeaturedCard = memo(function MobileFeaturedCard({
+  imageFit = "cover",
   listing,
   priority = false,
 }: MobileFeaturedCardProps) {
@@ -40,7 +42,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
           <span className="sr-only">{listing.title}</span>
           <AppImage
             alt={listing.title}
-            className="mobile-home-featured-card__image object-cover"
+            className={`mobile-home-featured-card__image ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
             fallbackCategory={listing.categoryId}
             fill
             loading={priority ? undefined : "lazy"}

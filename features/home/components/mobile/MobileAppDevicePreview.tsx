@@ -61,7 +61,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
                 <AppImage
                   alt=""
                   aria-hidden
-                  className="object-cover"
+                  className="object-contain"
                   fallback="emirates"
                   fill
                   priority
@@ -124,7 +124,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
         <section className="mobile-home-featured mobile-home-app__device-preview-featured">
           <MobileSectionHeader icon="star" title="إعلانات مميزة" />
           <div className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-hidden overscroll-x-contain">
-            <MobileFeaturedCard listing={listing} priority />
+            <MobileFeaturedCard imageFit="contain" listing={listing} priority />
           </div>
         </section>
         </div>
