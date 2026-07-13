@@ -1,0 +1,39 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  trigger-vercel-deploy:
+    name: Trigger Vercel production deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Deploy Hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK secret is not configured."
+            echo "Create a Deploy Hook in Vercel (project: sooqna, branch: main),"
+            echo "then add the URL as repository secret VERCEL_DEPLOY_HOOK."
+            exit 0
+          fi
+
+          response="$(curl --silent --show-error --write-out '\n%{http_code}' -X POST "$DEPLOY_HOOK_URL")"
+          body="$(printf '%s' "$response" | sed '$d')"
+          status="$(printf '%s' "$response" | tail -n 1)"
+
+          echo "Deploy Hook response ($status):"
+          echo "$body"
+
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "::error::Deploy Hook request failed with HTTP $status"
+            exit 1
+          fi

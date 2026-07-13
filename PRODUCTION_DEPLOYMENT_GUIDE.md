@@ -48,6 +48,48 @@ On Vercel / similar: set env vars in the dashboard, then deploy from `main`.
 
 ---
 
+## Deploy Hook (Production)
+
+Use a Vercel Deploy Hook when Git auto-deploy is blocked (e.g. rate limit) or you want an explicit production trigger from GitHub Actions.
+
+### 1. Create the hook in Vercel
+
+1. Open [Vercel Dashboard](https://vercel.com) → project **sooqna** (production domain: `sooqna.site`)
+2. **Settings** → **Git** → **Deploy Hooks**
+3. **Create Hook**
+   - Name: `production-main`
+   - Branch: `main`
+4. Copy the generated URL (format: `https://api.vercel.com/v1/integrations/deploy/...`)
+
+### 2. Add GitHub secret
+
+1. GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+2. **New repository secret**
+   - Name: `VERCEL_DEPLOY_HOOK`
+   - Value: paste the Deploy Hook URL from step 1
+
+### 3. Automatic trigger
+
+Workflow `.github/workflows/deploy-production.yml` runs on every push to `main` and calls the hook.
+
+Manual trigger: **Actions** → **Deploy Production** → **Run workflow**.
+
+### 4. Manual curl (optional)
+
+```bash
+curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_xxx/yyy"
+```
+
+Expected success response:
+
+```json
+{"job":{"id":"...","state":"PENDING","createdAt":...}}
+```
+
+> **Note:** Deploy Hooks still count toward your Vercel plan's daily deployment limit. If you see `Deployment rate limited — retry in 24 hours`, wait for the quota to reset or upgrade the plan before the hook can succeed.
+
+---
+
 ## DNS Checklist
 
 | Record | Type | Value | Notes |
