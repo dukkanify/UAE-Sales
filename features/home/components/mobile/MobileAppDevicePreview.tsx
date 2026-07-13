@@ -33,16 +33,18 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
             </div>
 
             <div className="mobile-home-header__side mobile-home-header__side--end">
-              <span className="mobile-home-header__location">
-                <Icon className="mobile-home-header__location-icon" name="map" size={14} />
-                <span className="mobile-home-header__location-value">دبي</span>
-                <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
-              </span>
+              <div className="mobile-home-header__actions">
+                <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--badge">
+                  <Icon name="bell" size={19} />
+                  <span className="mobile-home-header__badge">3</span>
+                </span>
 
-              <span className="mobile-home-header__icon-btn mobile-home-header__icon-btn--badge">
-                <Icon name="bell" size={18} />
-                <span className="mobile-home-header__badge">3</span>
-              </span>
+                <span className="mobile-home-header__location">
+                  <Icon className="mobile-home-header__location-icon" name="map" size={14} />
+                  <span className="mobile-home-header__location-value">دبي</span>
+                  <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
+                </span>
+              </div>
             </div>
           </div>
         </header>
