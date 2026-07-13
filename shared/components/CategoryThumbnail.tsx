@@ -22,8 +22,7 @@ export function CategoryThumbnail({
       } ${selected ? "mobile-home-categories__thumb--selected" : ""} ${className}`.trim()}
     >
       <AppImage
-        alt=""
-        aria-hidden
+        alt={category.name}
         className="object-cover"
         fallbackCategory={category.id}
         fill
