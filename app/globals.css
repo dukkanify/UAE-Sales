@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/design-tokens.css";
+@import "../features/home/components/mobile/mobile-home.css";
 
 @theme inline {
   --color-primary: var(--color-primary);

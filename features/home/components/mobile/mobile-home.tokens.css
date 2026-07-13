@@ -1,0 +1,46 @@
+/* Scoped design tokens — mobile homepage reference (#0F172A / #C9A45C) */
+.mobile-home-shell {
+  /* Colors */
+  --mh-bg: #ffffff;
+  --mh-primary: #0f172a;
+  --mh-gold: #c9a45c;
+  --mh-gold-soft: #f8f3ea;
+  --mh-muted: #6b7280;
+  --mh-border: #e5e7eb;
+  --mh-success: #10b981;
+  --mh-success-soft: #ecfdf5;
+  --mh-error: #ef4444;
+
+  /* Fluid layout */
+  --mh-page-x: clamp(0.75rem, 3.6vw, 1.25rem);
+  --mh-section-gap: clamp(1rem, 2.8vw, 1.5rem);
+  --mh-page-max: 100%;
+  --mh-nav-max: min(100%, 28rem);
+
+  /* Fluid typography */
+  --mh-text-xs: clamp(0.5625rem, 2.6vw, 0.6875rem);
+  --mh-text-sm: clamp(0.6875rem, 3vw, 0.8125rem);
+  --mh-text-base: clamp(0.8125rem, 3.4vw, 0.9375rem);
+  --mh-text-lg: clamp(1.25rem, 4.8vw, 1.625rem);
+
+  /* Fluid surfaces */
+  --mh-radius-md: clamp(0.625rem, 2vw, 0.75rem);
+  --mh-radius-lg: clamp(0.875rem, 2.6vw, 1rem);
+  --mh-radius-xl: clamp(1rem, 3vw, 1.25rem);
+  --mh-radius-2xl: clamp(1.125rem, 3.6vw, 1.5rem);
+  --mh-card-width: clamp(15.5rem, 78vw, 19rem);
+  --mh-category-icon: clamp(3rem, 14vw, 4.75rem);
+  --mh-fab-size: clamp(3rem, 12vw, 3.75rem);
+
+  /* Shadows & motion */
+  --mh-shadow-sm: 0 2px 8px rgb(15 23 42 / 5%);
+  --mh-shadow-md: 0 8px 24px rgb(15 23 42 / 8%);
+  --mh-shadow-lg: 0 16px 40px rgb(15 23 42 / 10%);
+  --mh-shadow-card: 0 10px 32px rgb(15 23 42 / 7%);
+  --mh-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --mh-duration: 220ms;
+
+  background: var(--mh-bg);
+  color: var(--mh-primary);
+  -webkit-tap-highlight-color: transparent;
+}
