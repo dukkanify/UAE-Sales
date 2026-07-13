@@ -53,7 +53,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
-          sizes="100vw"
+          sizes="(max-width: 1024px) 100vw, 60vw"
           src=""
         />
       </div>
@@ -209,7 +209,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               className="object-contain"
               fallbackCategory={listing.categoryId}
               fill
-              sizes="100vw"
+              sizes="(max-width: 1024px) min(100vw, 64rem), 60vw"
               src={activeImage}
             />
           </div>

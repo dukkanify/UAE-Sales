@@ -14,7 +14,7 @@ export async function MobileHeroSection() {
             fallback="emirates"
             fill
             priority
-            sizes="(max-width: 768px) 100vw, 480px"
+            sizes="(max-width: 768px) calc(100vw - 2 * var(--mh-page-x, 1rem)), 480px"
             src={backgroundUrl}
           />
         </div>

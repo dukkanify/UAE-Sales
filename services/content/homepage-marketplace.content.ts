@@ -72,23 +72,27 @@ export async function getMarketEscrowSteps(): Promise<MarketEscrowStep[]> {
   ];
 }
 
+export const escrowProtectionSteps = [
+  "حجز المبلغ في محفظة آمنة",
+  "تسليم المنتج أو الخدمة",
+  "تأكيد المشتري للاستلام",
+  "تحرير الدفع للبائع",
+] as const;
+
+export const listingSafetyTips = [
+  "التقِ في مكان عام عند المعاينة — خاصة للسيارات والعقارات.",
+  "استخدم الضمان المالي بدلاً من التحويل المباشر للمبالغ الكبيرة.",
+  "تحقق من هوية البائع وشارة التوثيق قبل الدفع.",
+  "لا تشارك رموز التحقق أو بيانات بطاقتك عبر المحادثة.",
+  "وثّق حالة المنتج بالصور قبل وبعد الاستلام.",
+] as const;
+
 export async function getEscrowProtectionSteps(): Promise<string[]> {
-  return [
-    "حجز المبلغ في محفظة آمنة",
-    "تسليم المنتج أو الخدمة",
-    "تأكيد المشتري للاستلام",
-    "تحرير الدفع للبائع",
-  ];
+  return [...escrowProtectionSteps];
 }
 
 export async function getListingSafetyTips(): Promise<string[]> {
-  return [
-    "التقِ في مكان عام عند المعاينة — خاصة للسيارات والعقارات.",
-    "استخدم الضمان المالي بدلاً من التحويل المباشر للمبالغ الكبيرة.",
-    "تحقق من هوية البائع وشارة التوثيق قبل الدفع.",
-    "لا تشارك رموز التحقق أو بيانات بطاقتك عبر المحادثة.",
-    "وثّق حالة المنتج بالصور قبل وبعد الاستلام.",
-  ];
+  return [...listingSafetyTips];
 }
 
 export async function getMarketEmirateImages(): Promise<Record<string, string>> {

@@ -65,6 +65,7 @@ export default function RootLayout({
   return (
     <html
       className={`${ibmPlexArabic.variable} ${inter.variable}`}
+      data-scroll-behavior="smooth"
       dir="rtl"
       lang="ar"
     >
