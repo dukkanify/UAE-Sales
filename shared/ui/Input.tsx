@@ -1,6 +1,7 @@
 import type { InputHTMLAttributes } from "react";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
+  compact?: boolean;
   error?: string;
   hint?: string;
   label?: string;
@@ -8,6 +9,7 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export function Input({
   className = "",
+  compact = false,
   error,
   hint,
   label,
@@ -16,13 +18,21 @@ export function Input({
   const hasError = Boolean(error);
 
   return (
-    <label className="grid gap-1.5">
+    <label className={`grid ${compact ? "gap-1" : "gap-1.5"}`}>
       {label ? (
-        <span className="text-sm font-medium text-ink">{label}</span>
+        <span
+          className={
+            compact
+              ? "text-xs font-semibold text-muted"
+              : "text-sm font-medium text-ink"
+          }
+        >
+          {label}
+        </span>
       ) : null}
       <input
         aria-invalid={hasError || undefined}
-        className={`focus-ring min-h-11 rounded-[var(--radius-xl)] border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
+        className={`focus-ring rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
         {...props}
       />
       {error ? (

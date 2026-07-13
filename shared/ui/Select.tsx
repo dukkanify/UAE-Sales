@@ -6,6 +6,7 @@ type SelectOption = {
 };
 
 type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  compact?: boolean;
   error?: string;
   label: string;
   options: SelectOption[];
@@ -13,6 +14,7 @@ type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
 
 export function Select({
   className = "",
+  compact = false,
   error,
   label,
   options,
@@ -21,11 +23,17 @@ export function Select({
   const hasError = Boolean(error);
 
   return (
-    <label className="grid gap-1.5">
-      <span className="text-sm font-medium text-ink">{label}</span>
+    <label className={`grid ${compact ? "gap-1" : "gap-1.5"}`}>
+      <span
+        className={
+          compact ? "text-xs font-semibold text-muted" : "text-sm font-medium text-ink"
+        }
+      >
+        {label}
+      </span>
       <select
         aria-invalid={hasError || undefined}
-        className={`focus-ring min-h-11 rounded-[var(--radius-xl)] border bg-surface px-4 text-sm font-medium text-ink shadow-[var(--shadow-xs)] transition ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
+        className={`focus-ring rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${className}`}
         {...props}
       >
         {options.map((option) => (
