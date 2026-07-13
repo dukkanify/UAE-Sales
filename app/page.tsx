@@ -68,6 +68,7 @@ export default async function Home() {
           <MarketHero categories={categories} />
           <MarketPreviewStrip />
           <MarketFeatured categories={categoryMeta} listings={featuredListings} />
+          <MarketEmirates />
           {sectionListings.map((section) => (
             <MarketCategorySection
               key={section.categoryId}
@@ -81,7 +82,6 @@ export default async function Home() {
             />
           ))}
           <MarketEscrow />
-          <MarketEmirates />
         </main>
         <MarketSiteFooter />
       </div>

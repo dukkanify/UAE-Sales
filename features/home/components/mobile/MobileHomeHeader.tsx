@@ -3,14 +3,13 @@
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/shared/components/BrandMark";
+import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { BRAND } from "@/shared/constants/brand";
 import { primaryNavigation } from "@/shared/constants/navigation";
-import { cities } from "@/shared/constants/locations";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
 
 export function MobileHomeHeader() {
-  const [city, setCity] = useState("دبي");
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
   const accountHref = user ? "/profile" : "/login";
@@ -63,23 +62,7 @@ export function MobileHomeHeader() {
               <span className="mobile-home-header__badge">3</span>
             </Link>
 
-            <label className="mobile-home-header__location">
-              <Icon className="mobile-home-header__location-icon" name="map" size={14} />
-              <span className="mobile-home-header__location-value">{city}</span>
-              <select
-                aria-label="الإمارة"
-                className="mobile-home-header__location-select"
-                onChange={(event) => setCity(event.target.value)}
-                value={city}
-              >
-                {cities.map((item) => (
-                  <option key={item.id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
-            </label>
+            <EmirateLocationSelect variant="mobile" />
           </div>
         </div>
       </div>

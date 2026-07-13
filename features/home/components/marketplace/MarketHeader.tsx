@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
+import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -50,7 +51,9 @@ export function MarketHeader() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <span className="hidden items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 md:inline-flex">
+            <EmirateLocationSelect className="hidden lg:inline-flex" variant="desktop" />
+
+            <span className="hidden items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 md:inline-flex lg:hidden">
               <span className="inline-block h-3.5 w-5 overflow-hidden rounded-sm uae-flag-strip" />
               <span className="text-xs font-bold text-ink">العربية</span>
             </span>
