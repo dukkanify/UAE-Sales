@@ -1,4 +1,5 @@
 import {
+  MarketCategoryGrid,
   MarketCategorySection,
   MarketEmirates,
   MarketEscrow,
@@ -66,6 +67,7 @@ export default async function Home() {
         <MarketHeader />
         <main>
           <MarketHero categories={categories} />
+          <MarketCategoryGrid categories={categories} />
           <MarketPreviewStrip />
           <MarketFeatured categories={categoryMeta} listings={featuredListings} />
           <MarketEmirates />

@@ -1,3 +1,4 @@
+export { MarketCategoryGrid } from "./components/marketplace/MarketCategoryGrid";
 export { MarketCategorySection } from "./components/marketplace/MarketCategorySection";
 export { MarketEmirates } from "./components/marketplace/MarketEmirates";
 export { MarketEscrow } from "./components/marketplace/MarketEscrow";
