@@ -83,18 +83,23 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             />
           </button>
 
-          <div className="pointer-events-none absolute start-4 top-4 z-10 flex flex-wrap gap-2">
-            {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-            {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-            {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
-            {showsEscrowProtection(listing) ? (
-              <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
-            ) : null}
-          </div>
+          <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
+            <div className="flex min-w-0 flex-1 flex-wrap gap-1.5 pe-1 lg:max-w-none lg:pe-0">
+              {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
+              {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
+              {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+              {showsEscrowProtection(listing) ? (
+                <Badge className="max-w-full whitespace-normal text-[0.6875rem] leading-4 sm:text-xs" variant="escrow">
+                  <span className="sm:hidden">ضمان مالي</span>
+                  <span className="hidden sm:inline">ضمان مالي — دفع عبر المنصة</span>
+                </Badge>
+              ) : null}
+            </div>
 
-          <div className="absolute end-3 top-3 z-10 flex gap-2 lg:hidden">
-            <FavoriteButton iconOnly listing={listing} />
-            <ShareButton iconOnly listing={listing} />
+            <div className="flex shrink-0 gap-1.5 lg:hidden">
+              <FavoriteButton iconOnly listing={listing} />
+              <ShareButton iconOnly listing={listing} />
+            </div>
           </div>
 
           {galleryImages.length > 1 ? (
@@ -115,7 +120,10 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               >
                 <Icon name="chevron-left" size={18} />
               </button>
-              <p className="absolute bottom-4 end-4 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white">
+              <p
+                className="absolute bottom-4 end-4 rounded-full bg-black/55 px-3 py-1 text-xs font-semibold text-white"
+                dir="ltr"
+              >
                 {activeIndex + 1} / {galleryImages.length}
               </p>
             </>
@@ -221,7 +229,10 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           >
             <Icon name="chevron-left" size={20} />
           </button>
-          <p className="absolute bottom-6 rounded-full bg-black/50 px-3 py-1 text-sm font-semibold text-white">
+          <p
+            className="absolute bottom-6 rounded-full bg-black/50 px-3 py-1 text-sm font-semibold text-white"
+            dir="ltr"
+          >
             {activeIndex + 1} / {galleryImages.length}
           </p>
         </div>
