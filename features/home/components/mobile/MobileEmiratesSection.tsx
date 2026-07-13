@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { cities } from "@/shared/constants/locations";
+import { emirateLandmarkLabels, type EmirateImageKey } from "@/shared/constants/image-fallbacks";
 import { Icon } from "@/shared/ui/Icon";
 import { getHomeCityHighlights } from "@/services/content";
 import { getMarketEmirateImages } from "@/services/content/homepage-marketplace.content";
@@ -28,6 +29,8 @@ export async function MobileEmiratesSection() {
         {cities.map((city) => {
           const countKey = EMIRATE_COUNT_ALIASES[city.id] ?? city.id;
           const count = countMap.get(countKey) ?? 500;
+          const landmark =
+            emirateLandmarkLabels[city.id as EmirateImageKey] ?? city.name;
 
           return (
             <Link
@@ -36,7 +39,7 @@ export async function MobileEmiratesSection() {
               href={`/search?city=${encodeURIComponent(city.name)}`}
             >
               <AppImage
-                alt={`إعلانات ${city.name}`}
+                alt={`${city.name} — ${landmark}`}
                 className="object-cover transition duration-500 group-active:scale-[1.02]"
                 fallback="emirates"
                 fill

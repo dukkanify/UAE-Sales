@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cities } from "@/shared/constants/locations";
 import { AppImage } from "@/shared/components/AppImage";
+import { emirateLandmarkLabels, type EmirateImageKey } from "@/shared/constants/image-fallbacks";
 import { Icon } from "@/shared/ui/Icon";
 import { getHomeCityHighlights } from "@/services/content";
 import { getMarketEmirateImages } from "@/services/content/homepage-marketplace.content";
@@ -34,7 +35,7 @@ export async function MarketEmirates() {
               href={`/search?city=${encodeURIComponent(city.name)}`}
             >
               <AppImage
-                alt={city.name}
+                alt={`${city.name} — ${emirateLandmarkLabels[city.id as EmirateImageKey] ?? city.name}`}
                 className="object-cover transition duration-500 group-hover:scale-[1.03]"
                 fallback="emirates"
                 fill

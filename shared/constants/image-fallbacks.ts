@@ -157,14 +157,25 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
   ],
 };
 
+/** Verified landmark photos per emirate — location-checked on Unsplash */
 export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   dubai: "photo-1512453979798-5ea266f8880c",
-  "abu-dhabi": "photo-1577717903315-1691ae25ab3f",
-  sharjah: "photo-1506905925346-21bda4d32df4",
-  ajman: "photo-1507525428034-b723cf961d3e",
-  "umm-al-quwain": "photo-1566073771259-6a8506099945",
-  "ras-al-khaimah": "photo-1464822759023-fed622ff2c3b",
-  fujairah: "photo-1520250497591-112f2f40a3f4",
+  "abu-dhabi": "photo-1620148369396-235e930c3caf",
+  sharjah: "photo-1679197982381-7a43e5d910a4",
+  ajman: "photo-1694316919196-26d087b36ca7",
+  "umm-al-quwain": "photo-1687080625802-967beded8abc",
+  "ras-al-khaimah": "photo-1633981871770-214950461624",
+  fujairah: "photo-1730626480563-10d80cab5201",
+};
+
+export const emirateLandmarkLabels: Record<EmirateImageKey, string> = {
+  dubai: "برج خليفة وأفق دبي",
+  "abu-dhabi": "مسجد الشيخ زايد الكبير",
+  sharjah: "أفق الشارقة عند الغروب",
+  ajman: "برج الساعة وكورنيش عجمان",
+  "umm-al-quwain": "شاطئ المانجروف — أم القيوين",
+  "ras-al-khaimah": "طريق جبل جيس",
+  fujairah: "قلعة الفجيرة",
 };
 
 export function getEmirateImageUrl(emirateId: string, width = 2000): string {
