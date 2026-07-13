@@ -53,8 +53,8 @@ export function ListingDetailsView({
       <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
 
-        <div className="grid w-full min-w-0 gap-6 overflow-x-clip lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start">
-          <div className="min-w-0">
+        <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
+          <div className="min-w-0 lg:col-start-1">
             <ListingGallery listing={listing} />
 
             <div className="mt-4 lg:hidden">
@@ -112,8 +112,8 @@ export function ListingDetailsView({
             </div>
           </div>
 
-          <aside className="hidden min-w-0 lg:block lg:self-start">
-            <div className="flex flex-col gap-4">
+          <aside className="hidden min-w-0 w-full max-w-full overflow-hidden lg:col-start-2 lg:block">
+            <div className="flex w-full min-w-0 max-w-full flex-col gap-4">
               <ListingStickyPanel category={category} listing={listing} />
               <SellerPanel listing={listing} />
               <EscrowProtectionCard listing={listing} />

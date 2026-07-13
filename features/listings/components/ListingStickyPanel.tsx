@@ -55,8 +55,8 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
       : listing.city;
 
   return (
-    <div className="lg:sticky lg:top-[5.25rem] lg:z-10 lg:self-start">
-      <Card className="marketplace-panel p-6">
+    <div className="w-full min-w-0 max-w-full lg:sticky lg:top-[5.25rem] lg:self-start">
+      <Card className="marketplace-panel w-full min-w-0 p-6">
         <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
         <Badge variant={conditionVariants[listing.condition]}>
@@ -73,9 +73,9 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         </div>
 
         <div className="mt-6 grid gap-3 text-sm">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <span className="font-medium text-muted">الموقع</span>
-          <span className="inline-flex items-center gap-1.5 font-semibold text-ink">
+        <div className="flex items-center justify-between gap-2 border-b border-border pb-3">
+          <span className="shrink-0 font-medium text-muted">الموقع</span>
+          <span className="min-w-0 text-end inline-flex items-center gap-1.5 font-semibold text-ink">
             <Icon name="map" size={14} />
             {locationLabel}
           </span>

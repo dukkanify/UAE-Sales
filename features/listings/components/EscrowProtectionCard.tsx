@@ -17,7 +17,7 @@ export function EscrowProtectionCard({ listing }: EscrowProtectionCardProps) {
   const protectionSteps = escrowProtectionSteps;
 
   return (
-    <Card className="marketplace-panel p-6">
+    <Card className="marketplace-panel w-full min-w-0 p-6">
       <div className="flex items-center gap-2">
         <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-success-soft text-success">
           <Icon name="shield" size={18} />
