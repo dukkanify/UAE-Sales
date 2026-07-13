@@ -59,6 +59,8 @@ export function ListingDetailsView({
 
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">
+                {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
+                {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
                 {category ? <Badge variant="muted">{category.name}</Badge> : null}
                 <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
                 {escrowProtected ? (
