@@ -9,8 +9,10 @@ type MobileHeroBlockProps = {
 export function MobileHeroBlock({ categories }: MobileHeroBlockProps) {
   return (
     <div className="mobile-home-hero-block">
-      <MobileHeroSection />
-      <MobileSearchCard categories={categories} />
+      <div className="mobile-home-hero-panel">
+        <MobileHeroSection />
+        <MobileSearchCard categories={categories} />
+      </div>
     </div>
   );
 }

@@ -46,6 +46,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
         </header>
 
         <div className="mobile-home-hero-block">
+          <div className="mobile-home-hero-panel">
           <section className="mobile-home-hero">
             <div className="mobile-home-hero__bg">
               <AppImage
@@ -107,6 +108,7 @@ export function MobileAppDevicePreview({ listing }: MobileAppDevicePreviewProps)
               </div>
             </div>
           </section>
+          </div>
         </div>
 
         <section className="mobile-home-featured mobile-home-app__device-preview-featured">
