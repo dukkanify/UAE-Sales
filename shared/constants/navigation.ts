@@ -1,7 +1,6 @@
 export const primaryNavigation = [
   { label: "الرئيسية", href: "/" },
   { label: "التصنيفات", href: "/categories" },
-  { label: "أضف إعلانك", href: "/listings/new" },
   { label: "الضمان المالي", href: "/escrow" },
 ];
 

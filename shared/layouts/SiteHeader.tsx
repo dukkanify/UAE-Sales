@@ -15,10 +15,9 @@ import {
 import { removeSessionCookie } from "@/services/auth/session-sync";
 import type { UserProfile } from "@/types";
 
-const drawerIcons: Record<string, "home" | "grid" | "plus" | "shield"> = {
+const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
   "/": "home",
   "/categories": "grid",
-  "/listings/new": "plus",
   "/escrow": "shield",
 };
 
