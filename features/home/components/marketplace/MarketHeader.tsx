@@ -77,7 +77,7 @@ export function MarketHeader() {
             )}
 
             <Link
-              className="sooqna-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-white shadow-[0_6px_20px_rgb(201_169_98/30%)] sm:inline-flex"
+              className="sooqna-gold-gradient hidden min-h-10 items-center gap-1.5 rounded-full px-5 text-sm font-bold text-primary shadow-[0_8px_24px_rgb(201_169_98/28%)] sm:inline-flex"
               href="/listings/new"
             >
               <Icon name="plus" size={16} />
