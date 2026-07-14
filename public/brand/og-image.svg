@@ -1,9 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label="سوقنا Sooqna">
   <rect width="1200" height="630" fill="#0B1628"/>
-  <rect x="80" y="165" width="300" height="300" rx="68" fill="#152238"/>
-  <path d="M268 240c0-22-18-40-40-40s-40 18-40 40c0 15 8 28 20 35-22 7-36 26-36 48 0 28 23 51 51 51s51-23 51-51" stroke="#FAF9F7" stroke-width="17" stroke-linecap="round"/>
-  <path d="M188 275c18-14 39-14 57 0" stroke="#C9A962" stroke-width="14" stroke-linecap="round"/>
-  <text x="440" y="290" font-family="Inter, system-ui, sans-serif" font-size="96" font-weight="700" fill="#FAF9F7">Sooqna</text>
-  <text x="440" y="390" font-family="IBM Plex Sans Arabic, system-ui, sans-serif" font-size="72" font-weight="700" fill="#C9A962">3HBF'</text>
-  <text x="440" y="460" font-family="IBM Plex Sans Arabic, system-ui, sans-serif" font-size="32" font-weight="500" fill="#FAF9F7" opacity="0.7">CD E' *-*',G... AJ EC'F H'-/</text>
+  <defs>
+    <linearGradient id="sooqnaOgMarkBg" x1="116" y1="189" x2="344" y2="441" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#152238"/>
+      <stop offset="100%" stop-color="#1A2D4A"/>
+    </linearGradient>
+  </defs>
+  <rect x="100" y="165" width="280" height="280" rx="76" fill="url(#sooqnaOgMarkBg)"/>
+  <rect x="103" y="168" width="274" height="274" rx="74" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="4"/>
+  <path d="M288 248c0-23-18-41-44-41s-43 17-43 39c0 13 7 24 18 31-19 6-31 23-31 43 0 25 21 46 47 46s47-20 47-46c0-17-10-32-24-39" stroke="#FAF9F7" stroke-width="17" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M215 298c18-14 39-14 57 0" stroke="#C9A962" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <text x="440" y="290" font-family="IBM Plex Sans Arabic, Tahoma, sans-serif" font-size="96" font-weight="800" fill="#FAF9F7">سوقنا</text>
+  <text x="440" y="370" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="700" fill="#C9A962" letter-spacing="0.06em">Sooqna</text>
+  <text x="440" y="440" font-family="IBM Plex Sans Arabic, Tahoma, sans-serif" font-size="30" font-weight="500" fill="#FAF9F7" opacity="0.72">كل ما تحتاجه... في مكان واحد</text>
 </svg>

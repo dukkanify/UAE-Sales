@@ -69,8 +69,8 @@ export function MobileAppDevicePreview({ listings }: MobileAppDevicePreviewProps
           <div className="mobile-home-app__mock-header-brand">
             <BrandMark size={18} variant="default" />
             <div className="mobile-home-app__mock-header-copy">
-              <span className="mobile-home-app__mock-header-en">{BRAND.nameEn}</span>
               <span className="mobile-home-app__mock-header-ar">{BRAND.nameAr}</span>
+              <span className="mobile-home-app__mock-header-en">{BRAND.nameEn}</span>
             </div>
           </div>
           <span className="mobile-home-app__mock-header-pill">

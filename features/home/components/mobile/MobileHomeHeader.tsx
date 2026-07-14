@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { BrandMark } from "@/shared/components/BrandMark";
+import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
-import { BRAND } from "@/shared/constants/brand";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
@@ -28,17 +27,9 @@ export function MobileHomeHeader() {
           </button>
         </div>
 
-        <Link
-          aria-label={`${BRAND.nameAr} ${BRAND.nameEn}`}
-          className="mobile-home-header__brand"
-          href="/"
-        >
-          <BrandMark size={34} variant="default" />
-          <span className="mobile-home-header__brand-text">
-            <span className="mobile-home-header__brand-en">{BRAND.nameEn}</span>
-            <span className="mobile-home-header__brand-ar">{BRAND.nameAr}</span>
-          </span>
-        </Link>
+        <div className="mobile-home-header__brand">
+          <BrandLogo href="/" showTagline={false} size="sm" />
+        </div>
 
         <div className="mobile-home-header__side mobile-home-header__side--end">
           <div className="mobile-home-header__actions">
