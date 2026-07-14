@@ -107,32 +107,36 @@ export function ShareButton({
             </p>
             <div className="mt-5 grid gap-2">
               <button
-                className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
                 onClick={copyLink}
                 type="button"
               >
+                <Icon className="shrink-0 text-muted" name="share-2" size={16} />
                 نسخ الرابط
               </button>
               <a
-                className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-center text-sm font-semibold leading-[2.75rem]"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] bg-[#25D366]/12 px-4 text-sm font-semibold text-[#128C7E]"
                 href={`https://wa.me/?text=${encodeURIComponent(`${sharePayload.text}\n${shareUrl}`)}`}
                 rel="noopener noreferrer"
                 target="_blank"
               >
+                <Icon className="shrink-0" name="whatsapp" size={18} />
                 واتساب
               </a>
               <a
-                className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-center text-sm font-semibold leading-[2.75rem]"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
                 href={`mailto:?subject=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(`${sharePayload.text}\n${shareUrl}`)}`}
               >
+                <Icon className="shrink-0 text-muted" name="mail" size={16} />
                 البريد الإلكتروني
               </a>
               {typeof navigator !== "undefined" && "share" in navigator ? (
                 <button
-                  className="min-h-11 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] bg-surface-muted px-4 text-sm font-semibold"
                   onClick={handleShare}
                   type="button"
                 >
+                  <Icon className="shrink-0 text-muted" name="share-2" size={16} />
                   مشاركة عبر النظام
                 </button>
               ) : null}

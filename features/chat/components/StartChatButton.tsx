@@ -87,7 +87,10 @@ export function StartChatButton({
             <span className="text-[0.625rem] font-bold leading-none text-ink">محادثة</span>
           </>
         ) : (
-          "محادثة البائع"
+          <>
+            <Icon className="shrink-0" name="message" size={16} />
+            محادثة البائع
+          </>
         )}
       </Button>
       {error ? (

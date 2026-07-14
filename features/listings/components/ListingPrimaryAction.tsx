@@ -161,6 +161,7 @@ export function ListingPrimaryAction({
           {masked ? <p className="mt-1 text-xs text-muted">{masked}</p> : null}
           <div className="mt-3 flex gap-2">
             <Button href={tel} size="sm" variant="accent">
+              <Icon className="shrink-0" name="phone-call" size={14} />
               اتصال
             </Button>
             <Button onClick={() => setPhoneConfirm(false)} size="sm" variant="secondary">
@@ -220,6 +221,7 @@ export function SellerContactActions({
     <div className={gridClass}>
       {tel && !hidePhone ? (
         <Button onClick={() => setPhoneConfirm(true)} variant="secondary">
+          <Icon className="shrink-0" name="phone-call" size={16} />
           اتصال
         </Button>
       ) : null}
@@ -230,7 +232,7 @@ export function SellerContactActions({
           rel="noopener noreferrer"
           target="_blank"
         >
-          <Icon name="whatsapp" size={16} />
+          <Icon name="whatsapp" size={18} />
           واتساب
         </a>
       ) : null}
@@ -242,6 +244,7 @@ export function SellerContactActions({
           </FormMessage>
           <div className="mt-2 flex gap-2">
             <Button href={tel} size="sm" variant="accent">
+              <Icon className="shrink-0" name="phone-call" size={14} />
               تأكيد الاتصال
             </Button>
             <Button onClick={() => setPhoneConfirm(false)} size="sm" variant="ghost">
