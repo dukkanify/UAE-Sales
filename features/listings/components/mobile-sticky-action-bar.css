@@ -53,14 +53,14 @@
   gap: 0.5rem !important;
   border: 0 !important;
   border-radius: 1rem !important;
-  background: linear-gradient(135deg, #101c33 0%, #0b1628 58%, #15263f 100%) !important;
+  background: linear-gradient(135deg, #d4b87a 0%, #c9a962 52%, #9a7d4a 100%) !important;
   padding-inline: 1rem !important;
   font-size: 0.875rem !important;
   font-weight: 800 !important;
-  color: #d4b76e !important;
+  color: #0b1628 !important;
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 10%) inset,
-    0 10px 24px rgb(11 22 40 / 18%) !important;
+    0 1px 0 rgb(255 255 255 / 35%) inset,
+    0 10px 24px rgb(201 169 98 / 28%) !important;
   transition:
     transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -70,10 +70,10 @@
 .mobile-sticky-bar__cta:hover,
 .mobile-sticky-bar a.mobile-sticky-bar__cta:hover,
 .mobile-sticky-bar button.mobile-sticky-bar__cta:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.04);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 12%) inset,
-    0 12px 28px rgb(11 22 40 / 22%) !important;
+    0 1px 0 rgb(255 255 255 / 40%) inset,
+    0 12px 28px rgb(201 169 98 / 34%) !important;
 }
 
 .mobile-sticky-bar__cta:active,
@@ -83,7 +83,7 @@
 }
 
 .mobile-sticky-bar__cta svg {
-  color: #d4b76e;
+  color: #0b1628;
   flex-shrink: 0;
 }
 

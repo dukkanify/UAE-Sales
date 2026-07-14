@@ -14,14 +14,16 @@ type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & {
   variant?: ButtonVariant;
 };
 
+/** Filled brand CTA — gold. `primary` and `accent` stay aliased for call-site compatibility. */
+const GOLD_CTA =
+  "sooqna-gold-gradient border border-transparent text-primary shadow-[0_8px_24px_rgb(201_169_98/28%)] hover:brightness-[1.03] active:brightness-[0.98]";
+
 const variantClasses: Record<ButtonVariant, string> = {
-  primary:
-    "bg-primary text-white shadow-[var(--shadow-xs)] hover:shadow-[var(--shadow-sm)]",
+  primary: GOLD_CTA,
+  accent: GOLD_CTA,
   secondary:
-    "border border-border bg-surface text-ink shadow-[var(--shadow-xs)] hover:border-secondary/50",
-  ghost: "text-muted hover:bg-surface-muted hover:text-ink",
-  accent:
-    "bg-secondary text-primary shadow-[var(--shadow-glow)] hover:bg-primary hover:text-white",
+    "border border-secondary/45 bg-secondary-soft/70 text-primary shadow-[var(--shadow-xs)] hover:border-secondary hover:bg-secondary-soft",
+  ghost: "text-muted hover:bg-secondary-soft/60 hover:text-primary",
 };
 
 const sizeClasses = {

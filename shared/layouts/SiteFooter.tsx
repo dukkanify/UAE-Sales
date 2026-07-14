@@ -83,7 +83,7 @@ export function SiteFooter() {
                 ))}
               </div>
               <Link
-                className="focus-ring inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-primary px-5 text-sm font-bold text-secondary shadow-[0_4px_14px_rgb(15_23_42/12%)] transition hover:bg-[#1a2844]"
+                className="focus-ring sooqna-gold-gradient inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-primary shadow-[0_8px_24px_rgb(201_169_98/28%)] transition hover:brightness-[1.03]"
                 href="/listings/new"
               >
                 <Icon name="plus" size={16} />
