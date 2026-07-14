@@ -23,9 +23,8 @@ export function PageHero({
           : "mb-8 p-6 md:mb-10 md:p-8"
       }`}
     >
-      {children}
       {eyebrow ? (
-        <p className="text-xs font-medium tracking-wide text-secondary uppercase">
+        <p className="text-xs font-bold tracking-wide text-secondary">
           {eyebrow}
         </p>
       ) : null}
@@ -45,6 +44,7 @@ export function PageHero({
           {description}
         </p>
       ) : null}
+      {children ? <div className={compact ? "mt-3" : "mt-4"}>{children}</div> : null}
     </div>
   );
 }

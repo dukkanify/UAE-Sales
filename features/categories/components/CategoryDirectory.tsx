@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import type { Category } from "@/types";
-import { CategoryThumbnail } from "@/shared/components/CategoryThumbnail";
-import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { AppImage } from "@/shared/components/AppImage";
+import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { Icon } from "@/shared/ui/Icon";
 import "./category-directory.css";
 
@@ -13,13 +12,13 @@ type CategoryDirectoryProps = {
 };
 
 function CategorySubcategories({ category }: { category: Category }) {
-  const subcategories = category.subcategories.slice(0, 6);
+  const subcategories = category.subcategories.slice(0, 5);
   if (subcategories.length === 0) return null;
 
   return (
     <DragScrollRow
       ariaLabel={`تصنيفات فرعية لـ ${category.name}`}
-      className="category-directory-card__subs mobile-home-scroll"
+      className="category-directory-card__subs"
     >
       {subcategories.map((subcategory) => (
         <Link
@@ -35,20 +34,37 @@ function CategorySubcategories({ category }: { category: Category }) {
 }
 
 export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
+  if (categories.length === 0) {
+    return (
+      <div className="category-directory-empty">
+        <p>لا توجد أقسام متاحة حالياً.</p>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="category-directory">
       <section aria-label="وصول سريع للأقسام" className="category-directory-quick">
         <DragScrollRow
           ariaLabel="وصول سريع للأقسام"
-          className="category-directory-quick__track mobile-home-scroll"
+          className="category-directory-quick__track"
         >
           {categories.map((category) => (
             <Link
-              key={category.id}
+              key={`quick-${category.id}`}
               className="category-directory-quick__item"
               href={`/categories/${category.slug}`}
             >
-              <CategoryThumbnail category={category} variant="compact" />
+              <span className="category-directory-quick__thumb">
+                <AppImage
+                  alt={category.name}
+                  className="object-cover"
+                  fallbackCategory={category.id}
+                  fill
+                  sizes="64px"
+                  src={category.imageUrl}
+                />
+              </span>
               <span className="category-directory-quick__label">{category.name}</span>
             </Link>
           ))}
@@ -58,32 +74,39 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
       <div className="category-directory-grid">
         {categories.map((category) => (
           <article key={category.id} className="category-directory-card">
-            <Link className="category-directory-card__hero" href={`/categories/${category.slug}`}>
-              <div className="category-directory-card__hero-media">
+            <Link
+              className="category-directory-card__hero"
+              href={`/categories/${category.slug}`}
+            >
+              <span className="category-directory-card__hero-media">
                 <AppImage
-                  alt=""
-                  aria-hidden
+                  alt={category.name}
                   className="object-cover"
                   fallbackCategory={category.id}
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   src={category.imageUrl}
                 />
-              </div>
-              <div aria-hidden className="category-directory-card__hero-overlay" />
-              <div className="category-directory-card__hero-content">
-                <div className="category-directory-card__hero-main">
-                  <CategoryThumbnail
-                    category={category}
-                    className="mx-0 shrink-0"
-                    variant="compact"
-                  />
+              </span>
+              <span aria-hidden className="category-directory-card__hero-overlay" />
+              <span className="category-directory-card__hero-content">
+                <span className="category-directory-card__title-wrap">
+                  <span className="category-directory-card__thumb">
+                    <AppImage
+                      alt=""
+                      className="object-cover"
+                      fallbackCategory={category.id}
+                      fill
+                      sizes="56px"
+                      src={category.imageUrl}
+                    />
+                  </span>
                   <h2 className="category-directory-card__title">{category.name}</h2>
-                </div>
+                </span>
                 <span className="category-directory-card__count">
                   {category.listingCount.toLocaleString("ar-AE")} إعلان
                 </span>
-              </div>
+              </span>
             </Link>
 
             <div className="category-directory-card__body">
@@ -94,7 +117,6 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
                 >
                   <Icon aria-hidden name="star" size={12} />
                   إعلان مميز في هذا القسم
-                  <Icon aria-hidden name="arrow-left" size={12} />
                 </Link>
               ) : null}
 
