@@ -63,7 +63,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
 
   return (
     <>
-      <div className="grid gap-3 lg:grid-cols-[1fr_7rem]">
+      <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-2">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border shadow-[var(--shadow-lg)]">
           <button
             aria-label="عرض جميع الصور"
@@ -144,13 +144,13 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         </div>
 
         {galleryImages.length > 1 ? (
-          <div className="hidden max-h-[28rem] grid-cols-1 gap-2 overflow-y-auto lg:grid">
+          <div className="hidden w-[4.75rem] flex-col gap-1.5 overflow-y-auto lg:flex lg:max-h-[min(100%,28rem)]">
             {galleryImages.map((url, index) => (
               <button
                 key={`${url}-${index}`}
                 aria-label={`عرض صورة ${index + 1}`}
                 aria-pressed={activeIndex === index}
-                className={`relative aspect-[4/3] overflow-hidden rounded-[var(--radius-xl)] border-2 transition ${activeIndex === index ? "border-secondary ring-2 ring-secondary/25" : "border-border opacity-80 hover:opacity-100"}`}
+                className={`relative aspect-square w-full shrink-0 overflow-hidden rounded-xl border-2 transition ${activeIndex === index ? "border-secondary ring-2 ring-secondary/25" : "border-border opacity-80 hover:opacity-100"}`}
                 onClick={() => setActiveIndex(index)}
                 type="button"
               >
@@ -160,7 +160,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                   fallbackCategory={listing.categoryId}
                   fill
                   loading="lazy"
-                  sizes="112px"
+                  sizes="76px"
                   src={url}
                 />
               </button>
@@ -170,7 +170,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
       </div>
 
       {galleryImages.length > 1 ? (
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5 lg:hidden">
+        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5 lg:hidden">
           {galleryImages.map((url, index) => (
             <button
               key={`mobile-${url}-${index}`}
