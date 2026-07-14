@@ -43,12 +43,13 @@ export async function MobileAppDownload() {
             </span>
 
             <h2 className="mobile-home-app__title">
-              تسوّق أسرع مع تطبيق{" "}
-              <span className="mobile-home-app__title-brand">{BRAND.nameEn}</span>
+              السوق في راحة يدك مع{" "}
+              <span className="mobile-home-app__title-brand">{BRAND.nameAr}</span>
             </h2>
 
             <p className="mobile-home-app__desc">
-              كل مزايا سوقنا في جيبك — تصفّح، تواصل، وانشر إعلاناتك بسهولة.
+              تجربة سوقنا كاملة على الجوال — تصفّح أسرع، تواصل أوضح، ونشر إعلانك
+              بخطوات بسيطة.
             </p>
 
             <ul className="mobile-home-app__features">

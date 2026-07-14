@@ -1,0 +1,272 @@
+.market-app-download {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 80% 60% at 85% 20%, rgb(201 169 98 / 18%), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 8% 90%, rgb(15 23 42 / 8%), transparent 50%),
+    linear-gradient(165deg, #0a1120 0%, #121c2e 42%, #0b1628 100%);
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.market-app-download__mesh {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 3%) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 70% at 70% 40%, black, transparent 75%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.market-app-download__orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(40px);
+  pointer-events: none;
+}
+
+.market-app-download__orb--gold {
+  top: -6rem;
+  inset-inline-end: 8%;
+  width: 22rem;
+  height: 22rem;
+  background: rgb(201 169 98 / 28%);
+}
+
+.market-app-download__orb--ink {
+  bottom: -8rem;
+  inset-inline-start: -4rem;
+  width: 24rem;
+  height: 24rem;
+  background: rgb(0 0 0 / 35%);
+}
+
+.market-app-download__shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+
+@media (min-width: 1024px) {
+  .market-app-download__shell {
+    grid-template-columns: minmax(0, 1.05fr) minmax(17rem, 22rem);
+    gap: 3.5rem;
+  }
+}
+
+.market-app-download__copy {
+  max-width: 36rem;
+}
+
+.market-app-download__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(201 169 98 / 35%);
+  border-radius: 999px;
+  background: rgb(201 169 98 / 10%);
+  padding: 0.375rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #e2c882;
+}
+
+.market-app-download__title {
+  margin-top: 1.25rem;
+  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: #faf9f7;
+}
+
+.market-app-download__title-brand {
+  background: linear-gradient(120deg, #f0d9a0 0%, #c9a962 45%, #9a7d4a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.market-app-download__desc {
+  margin-top: 1rem;
+  max-width: 32rem;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.85;
+  color: rgb(250 249 247 / 72%);
+}
+
+.market-app-download__features {
+  display: grid;
+  gap: 0;
+  margin-top: 1.75rem;
+  border-block: 1px solid rgb(255 255 255 / 10%);
+}
+
+.market-app-download__feature {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  gap: 0.875rem;
+  align-items: center;
+  padding-block: 0.9375rem;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.market-app-download__feature:last-child {
+  border-bottom: 0;
+}
+
+.market-app-download__feature-index {
+  font-family: var(--font-latin, Inter, system-ui, sans-serif);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #c9a962;
+}
+
+.market-app-download__feature-label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: rgb(250 249 247 / 92%);
+}
+
+.market-app-download__feature-icon {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: rgb(201 169 98 / 14%);
+  color: #e2c882;
+}
+
+.market-app-download__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.market-app-download__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 22rem;
+}
+
+.market-app-download__ring {
+  position: absolute;
+  inset-inline: 8%;
+  top: 8%;
+  bottom: 4%;
+  border: 1px solid rgb(201 169 98 / 28%);
+  border-radius: 999px;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.market-app-download__ring::after {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border: 1px dashed rgb(201 169 98 / 18%);
+  border-radius: 999px;
+}
+
+.market-app-download__device {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 17.5rem);
+  aspect-ratio: 9 / 19;
+  overflow: hidden;
+  border: 7px solid #1b2436;
+  border-radius: 2.15rem;
+  background: #0b1220;
+  box-shadow:
+    0 30px 80px rgb(0 0 0 / 45%),
+    0 0 0 1px rgb(201 169 98 / 20%),
+    inset 0 1px 0 rgb(255 255 255 / 12%);
+  transform: rotate(-5deg) translateY(0);
+  transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: market-app-float 6.5s ease-in-out infinite;
+}
+
+.market-app-download__device:hover {
+  transform: rotate(-1deg) translateY(-0.35rem);
+  animation-play-state: paused;
+}
+
+.market-app-download__device-island {
+  position: absolute;
+  top: 0.55rem;
+  inset-inline: 0;
+  z-index: 2;
+  margin-inline: auto;
+  width: 5.5rem;
+  height: 1.15rem;
+  border-radius: 999px;
+  background: #000;
+}
+
+.market-app-download__device-screen {
+  position: absolute;
+  inset: 0.4rem;
+  overflow: hidden;
+  border-radius: 1.55rem;
+  background: #f4f6f8;
+}
+
+@keyframes market-app-float {
+  0%,
+  100% {
+    transform: rotate(-5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-5deg) translateY(-0.65rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-app-download__device {
+    animation: none;
+  }
+
+  .market-app-download__device:hover {
+    transform: rotate(-2deg);
+  }
+}
+
+@media (max-width: 1023px) {
+  .market-app-download__shell {
+    text-align: center;
+  }
+
+  .market-app-download__copy {
+    margin-inline: auto;
+  }
+
+  .market-app-download__desc {
+    margin-inline: auto;
+  }
+
+  .market-app-download__features {
+    text-align: start;
+  }
+
+  .market-app-download__actions {
+    justify-content: center;
+  }
+
+  .market-app-download__device {
+    width: min(100%, 15.5rem);
+  }
+}
