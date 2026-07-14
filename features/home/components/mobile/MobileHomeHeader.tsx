@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
@@ -8,7 +9,20 @@ import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
 
+const drawerIcons: Record<string, "home" | "grid" | "plus" | "shield"> = {
+  "/": "home",
+  "/categories": "grid",
+  "/listings/new": "plus",
+  "/escrow": "shield",
+};
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function MobileHomeHeader() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
 
@@ -83,16 +97,25 @@ export function MobileHomeHeader() {
               </div>
             )}
 
-            {primaryNavigation.map((item) => (
-              <Link
-                key={item.href}
-                className="mobile-home-header__drawer-link"
-                href={item.href}
-                onClick={() => setMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {primaryNavigation.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              const icon = drawerIcons[item.href] ?? "grid";
+              return (
+                <Link
+                  key={item.href}
+                  className={`mobile-home-header__drawer-link${
+                    active ? " mobile-home-header__drawer-link--active" : ""
+                  }`}
+                  href={item.href}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span className="mobile-home-header__drawer-link-icon">
+                    <Icon name={icon} size={16} />
+                  </span>
+                  <span className="mobile-home-header__drawer-link-label">{item.label}</span>
+                </Link>
+              );
+            })}
             <Link
               className="mobile-home-header__drawer-cta"
               href="/listings/new"

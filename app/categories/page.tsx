@@ -1,5 +1,6 @@
 import { BRAND } from "@/shared/constants/brand";
 import { CategoryDirectory } from "@/features/categories/components/CategoryDirectory";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
 import { PageHero } from "@/shared/ui/PageHero";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -14,7 +15,7 @@ export default async function CategoriesPage() {
     <>
       <SiteHeader />
       <main>
-        <section className="app-container px-3 pb-8 pt-4 md:page-padding">
+        <section className="app-container px-3 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] pt-4 md:page-padding md:pb-10">
           <PageHero
             compact
             description={`تصفح ${BRAND.nameAr} عبر أقسام واضحة تصلك مباشرة للإعلانات المناسبة.`}
@@ -36,6 +37,7 @@ export default async function CategoriesPage() {
         </section>
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </>
   );
 }
