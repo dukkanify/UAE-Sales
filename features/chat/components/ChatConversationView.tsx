@@ -13,6 +13,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
 
 type ChatConversationViewProps = {
@@ -144,6 +145,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <Button type="submit" variant="primary">
+              <Icon className="shrink-0" name="send" size={16} />
               إرسال
             </Button>
             <Link className="text-sm font-medium text-muted hover:text-ink" href="/chat">
