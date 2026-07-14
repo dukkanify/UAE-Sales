@@ -9,10 +9,9 @@ import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
 
-const drawerIcons: Record<string, "home" | "grid" | "plus" | "shield"> = {
+const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
   "/": "home",
   "/categories": "grid",
-  "/listings/new": "plus",
   "/escrow": "shield",
 };
 
