@@ -25,6 +25,7 @@ import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { getSessionUser } from "@/services/storage";
+import "./mobile-sticky-action-bar.css";
 
 type ListingStickyPanelProps = {
   category?: Category;
@@ -122,14 +123,6 @@ type MobileStickyActionBarProps = {
   listing: Listing;
 };
 
-const MOBILE_BAR_PRIMARY_CLASS =
-  "!inline-flex !min-h-11 !flex-1 !items-center !justify-center !gap-1.5 !rounded-full !bg-primary !px-4 !text-[0.8125rem] !font-bold !text-secondary !shadow-[0_4px_14px_rgb(15_23_42/14%)] hover:!bg-[#1a2844] active:!scale-[0.98]";
-
-const MOBILE_CONTACT_BTN_CLASS =
-  "focus-ring grid size-11 shrink-0 place-items-center rounded-full border border-border/70 bg-white text-ink shadow-[0_1px_6px_rgb(15_23_42/6%)] transition duration-200 hover:border-secondary/30 hover:bg-surface-muted active:scale-[0.96]";
-
-const MOBILE_CHAT_BTN_CLASS = `${MOBILE_CONTACT_BTN_CLASS} !min-h-0 !p-0 !text-primary hover:!bg-surface-muted`;
-
 function MobileContactIconButton({
   ariaLabel,
   children,
@@ -145,7 +138,7 @@ function MobileContactIconButton({
   href?: string;
   onClick?: () => void;
 }) {
-  const classes = `${MOBILE_CONTACT_BTN_CLASS} ${className}`.trim();
+  const classes = `focus-ring mobile-sticky-bar__icon ${className}`.trim();
 
   if (href) {
     return (
@@ -176,29 +169,25 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const whatsapp = getWhatsAppHref(listing, getListingCanonicalUrl(listing));
   const showContactRail = Boolean(tel || whatsapp);
   const showPhoneInRail = Boolean(tel && config.primaryAction !== "CONTACT_SELLER");
-
   const primaryLabel = ACTION_LABELS[config.primaryAction];
 
   return (
-    <div
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-border/60 bg-white/96 shadow-[0_-8px_32px_rgb(15_23_42/8%)] backdrop-blur-lg lg:hidden"
-      style={{ paddingBottom: "max(0.625rem, env(safe-area-inset-bottom))" }}
-    >
-      <div className="mx-auto flex max-w-lg items-center gap-2 px-3.5 py-2">
+    <div className="mobile-sticky-bar">
+      <div className="mobile-sticky-bar__inner">
         {!isOwn && config.showBuyNow ? (
           <button
-            className={`focus-ring inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-full bg-primary px-4 text-[0.8125rem] font-bold text-secondary shadow-[0_4px_14px_rgb(15_23_42/14%)] transition hover:bg-[#1a2844] active:scale-[0.98] ${showContactRail ? "" : "w-full"}`}
+            className="focus-ring mobile-sticky-bar__cta"
             onClick={() => router.push(getCheckoutPath(listing))}
             type="button"
           >
-            <Icon name="package" size={16} />
+            <Icon name="package" size={18} />
             {primaryLabel}
           </button>
         ) : !isOwn ? (
-          <div className={`min-w-0 flex-1 ${showContactRail ? "" : "w-full"}`}>
+          <div className="mobile-sticky-bar__cta-shell">
             <ListingPrimaryAction
               action={config.primaryAction}
-              className={MOBILE_BAR_PRIMARY_CLASS}
+              className="mobile-sticky-bar__cta"
               listing={listing}
               size="sm"
             />
@@ -206,9 +195,9 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
         ) : null}
 
         {showContactRail ? (
-          <div className="flex shrink-0 items-center gap-1.5">
+          <div className="mobile-sticky-bar__actions">
             <StartChatButton
-              className={MOBILE_CHAT_BTN_CLASS}
+              className="mobile-sticky-bar__icon mobile-sticky-bar__icon--chat"
               layout="icon"
               listing={listing}
               size="sm"
@@ -218,28 +207,34 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
             {whatsapp ? (
               <MobileContactIconButton
                 ariaLabel="مراسلة عبر واتساب"
-                className="text-[#1a9f5c]"
+                className="mobile-sticky-bar__icon--whatsapp"
                 external
                 href={whatsapp}
               >
-                <Icon name="whatsapp" size={18} />
+                <Icon name="whatsapp" size={20} />
               </MobileContactIconButton>
             ) : null}
 
             {showPhoneInRail ? (
-              <MobileContactIconButton ariaLabel="اتصال بالبائع" className="text-primary" href={tel ?? undefined}>
-                <Icon name="phone" size={18} />
+              <MobileContactIconButton
+                ariaLabel="اتصال بالبائع"
+                className="mobile-sticky-bar__icon--call"
+                href={tel ?? undefined}
+              >
+                <Icon name="phone-call" size={19} />
               </MobileContactIconButton>
             ) : null}
           </div>
         ) : !isOwn ? (
-          <StartChatButton
-            className={MOBILE_CHAT_BTN_CLASS}
-            layout="icon"
-            listing={listing}
-            size="sm"
-            variant="ghost"
-          />
+          <div className="mobile-sticky-bar__actions">
+            <StartChatButton
+              className="mobile-sticky-bar__icon mobile-sticky-bar__icon--chat"
+              layout="icon"
+              listing={listing}
+              size="sm"
+              variant="ghost"
+            />
+          </div>
         ) : null}
       </div>
     </div>

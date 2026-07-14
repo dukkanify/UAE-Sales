@@ -43,7 +43,7 @@ const PRIMARY_ACTION_ICONS: Partial<Record<ListingActionType, IconName>> = {
   BOOK_SERVICE: "wrench",
   BOOK_VIEWING: "eye",
   BUY_NOW: "package",
-  CONTACT_SELLER: "phone",
+  CONTACT_SELLER: "phone-call",
   REQUEST_QUOTE: "send",
   RESERVE: "car",
 };
