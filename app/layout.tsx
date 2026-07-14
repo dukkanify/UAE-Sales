@@ -30,11 +30,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    apple: "/brand/app-icon.svg",
-    icon: [
-      { url: "/brand/logo-icon.svg", type: "image/svg+xml" },
-      { url: "/brand/logo-icon.svg", sizes: "32x32" },
-    ],
+    apple: "/apple-icon",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
   },
   openGraph: {
     description: BRAND.description,

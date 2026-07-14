@@ -98,39 +98,13 @@
   display: inline-flex;
   max-width: 100%;
   align-items: center;
-  gap: 0.4375rem;
   justify-self: center;
   min-width: 0;
   padding-inline: 0.125rem;
 }
 
-.mobile-home-header__brand-text {
-  min-width: 0;
-}
-
-.mobile-home-header__brand-en {
-  display: block;
-  overflow: hidden;
-  font-family: var(--font-latin);
-  font-size: 0.875rem;
-  font-weight: 800;
-  color: var(--mh-primary);
-  line-height: 1;
-  letter-spacing: -0.025em;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.mobile-home-header__brand-ar {
-  display: block;
-  overflow: hidden;
-  margin-top: 0.0625rem;
-  font-size: 0.625rem;
-  font-weight: 800;
-  color: var(--mh-gold);
-  line-height: 1.15;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.mobile-home-header__brand a {
+  max-width: 100%;
 }
 
 .mobile-home-header__location {
@@ -1564,10 +1538,9 @@
   gap: 0.0625rem;
 }
 
-.mobile-home-app__mock-header-en {
+.mobile-home-app__mock-header-ar {
   overflow: hidden;
-  font-family: var(--font-latin);
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
   font-weight: 800;
   line-height: 1;
   color: var(--mh-primary);
@@ -1575,11 +1548,14 @@
   white-space: nowrap;
 }
 
-.mobile-home-app__mock-header-ar {
+.mobile-home-app__mock-header-en {
   overflow: hidden;
+  margin-top: 0.0625rem;
+  font-family: var(--font-latin);
   font-size: 0.4375rem;
   font-weight: 800;
   line-height: 1;
+  letter-spacing: 0.04em;
   color: var(--mh-gold);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2133,7 +2109,7 @@
 
 /* ── Compact phones (320px) ── */
 @media (max-width: 399px) {
-  .mobile-home-header__brand-en {
+  .mobile-home-header__brand .font-latin {
     display: none;
   }
 

@@ -13,10 +13,26 @@ type BrandLogoProps = {
 
 const markSizes = { sm: 32, md: 40, lg: 48 } as const;
 
+const titleSizes = {
+  sm: "text-base",
+  md: "text-lg",
+  lg: "text-xl",
+} as const;
+
+const enSizes = {
+  sm: "text-[0.65rem]",
+  md: "text-[0.7rem]",
+  lg: "text-xs",
+} as const;
+
+/**
+ * Canonical Sooqna wordmark: mark + Arabic primary + English secondary.
+ * Use this everywhere instead of custom header/footer brand markup.
+ */
 export function BrandLogo({
   className = "",
   href = "/",
-  showTagline = true,
+  showTagline = false,
   size = "md",
   theme = "light",
   variant = "horizontal",
@@ -24,27 +40,25 @@ export function BrandLogo({
   const markSize = markSizes[size];
   const isDark = theme === "dark";
   const ink = isDark ? "text-white" : "text-ink";
-  const gold = isDark ? "text-secondary" : "text-secondary";
-  const muted = isDark ? "text-white/70" : "text-muted";
+  const gold = "text-secondary";
+  const muted = isDark ? "text-white/65" : "text-muted";
 
   const iconOnly = (
     <BrandMark size={markSize} variant={isDark ? "dark" : "default"} />
   );
 
   const wordmark = (
-    <span className="min-w-0">
+    <span className="min-w-0 text-start leading-none">
+      <span className={`block font-black tracking-tight ${titleSizes[size]} ${ink}`}>
+        {BRAND.nameAr}
+      </span>
       <span
-        className={`block font-latin text-sm font-bold tracking-tight ${ink} sm:text-base`}
+        className={`mt-1 block font-latin font-bold tracking-[0.04em] ${enSizes[size]} ${gold}`}
       >
         {BRAND.nameEn}
       </span>
-      {variant !== "icon" ? (
-        <span className={`block text-[0.65rem] font-bold ${gold}`}>
-          {BRAND.nameAr}
-        </span>
-      ) : null}
-      {showTagline && variant === "bilingual" ? (
-        <span className={`mt-0.5 block text-[0.6rem] font-medium ${muted}`}>
+      {showTagline || variant === "bilingual" ? (
+        <span className={`mt-1.5 block text-[0.6rem] font-medium leading-snug ${muted}`}>
           {BRAND.taglineAr}
         </span>
       ) : null}
@@ -55,7 +69,7 @@ export function BrandLogo({
     variant === "icon" ? (
       iconOnly
     ) : variant === "vertical" ? (
-      <span className={`inline-flex flex-col items-center gap-2 ${className}`}>
+      <span className={`inline-flex flex-col items-center gap-2.5 text-center ${className}`}>
         {iconOnly}
         {wordmark}
       </span>
@@ -71,7 +85,11 @@ export function BrandLogo({
   }
 
   return (
-    <Link aria-label={`${BRAND.nameAr} ${BRAND.nameEn}`} className="shrink-0" href={href}>
+    <Link
+      aria-label={`${BRAND.nameAr} — ${BRAND.nameEn}`}
+      className="inline-flex shrink-0 items-center"
+      href={href}
+    >
       {content}
     </Link>
   );

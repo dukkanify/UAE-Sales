@@ -17,7 +17,7 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "ar",
     name: `${BRAND.nameAr} — ${BRAND.nameEn}`,
     orientation: "portrait",
-    short_name: BRAND.nameEn,
+    short_name: BRAND.nameAr,
     start_url: "/",
     theme_color: "#0B1628",
   };
