@@ -20,19 +20,41 @@ function getNumberParam(params: SearchParams, key: string) {
   return Number.isFinite(numberValue) ? numberValue : undefined;
 }
 
+function parseHomePriceBand(band?: string): {
+  maxPrice?: number;
+  minPrice?: number;
+} {
+  if (!band) return {};
+
+  if (band.endsWith("+")) {
+    const minPrice = Number(band.slice(0, -1));
+    return Number.isFinite(minPrice) ? { minPrice } : {};
+  }
+
+  const [rawMin, rawMax] = band.split("-");
+  const minPrice = Number(rawMin);
+  const maxPrice = Number(rawMax);
+
+  return {
+    ...(Number.isFinite(minPrice) ? { minPrice } : {}),
+    ...(Number.isFinite(maxPrice) ? { maxPrice } : {}),
+  };
+}
+
 export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
+  const priceBand = parseHomePriceBand(getParam(params, "price"));
   const selectedFilters = {
     category: getParam(params, "category") ?? "",
     city: getParam(params, "city") ?? "",
     condition: getParam(params, "condition") ?? "",
     country: getParam(params, "country") ?? "",
-    maxPrice: getParam(params, "maxPrice") ?? "",
-    minPrice: getParam(params, "minPrice") ?? "",
+    maxPrice: getParam(params, "maxPrice") ?? (priceBand.maxPrice?.toString() ?? ""),
+    minPrice: getParam(params, "minPrice") ?? (priceBand.minPrice?.toString() ?? ""),
     query: getParam(params, "q") ?? "",
     sort: getParam(params, "sort") ?? "newest",
   };
@@ -49,8 +71,8 @@ export default async function SearchPage({
           ? selectedFilters.condition
           : undefined,
       country: selectedFilters.country || undefined,
-      maxPrice: getNumberParam(params, "maxPrice"),
-      minPrice: getNumberParam(params, "minPrice"),
+      maxPrice: getNumberParam(params, "maxPrice") ?? priceBand.maxPrice,
+      minPrice: getNumberParam(params, "minPrice") ?? priceBand.minPrice,
       query: selectedFilters.query || undefined,
       sort:
         selectedFilters.sort === "price_asc" ||
