@@ -207,7 +207,7 @@ export function LoginForm() {
               أو أكمل الشراء كضيف.
             </p>
           )}
-          {usePassword || !emailOtpEnabled ? (
+          {emailOtpEnabled ? (
             <Link className="text-primary" href="/forgot-password">
               نسيت كلمة المرور؟
             </Link>

@@ -2,16 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import { useSyncExternalStore } from "react";
 import type { Category, Listing } from "@/types";
 import { ListingPrimaryAction } from "@/features/listings/components/ListingPrimaryAction";
 import { SellerContactActions } from "@/features/listings/components/ListingPrimaryAction";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { useToast } from "@/shared/components/ToastProvider";
 import {
   ACTION_LABELS,
   getListingActionConfig,
 } from "@/shared/constants/listingActionConfig";
+import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
+import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listing-url";
@@ -24,6 +28,7 @@ import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
+import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { getSessionUser } from "@/services/storage";
 import "./mobile-sticky-action-bar.css";
 
@@ -162,8 +167,9 @@ function MobileContactIconButton({
 
 export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const config = getListingActionConfig(listing);
-  const user = typeof window !== "undefined" ? getSessionUser() : null;
+  const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
   const isOwn = user ? isOwnListing(listing, user) : false;
   const tel = getTelHref(listing);
   const whatsapp = getWhatsAppHref(listing, getListingCanonicalUrl(listing));
@@ -171,13 +177,31 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   const showPhoneInRail = Boolean(tel && config.primaryAction !== "CONTACT_SELLER");
   const primaryLabel = ACTION_LABELS[config.primaryAction];
 
+  function handleBuyNow() {
+    if (listing.status !== "active") {
+      showToast(LISTING_ERRORS.listingUnavailable, "error");
+      return;
+    }
+    const sessionUser = getSessionUser();
+    if (sessionUser && isOwnListing(listing, sessionUser)) {
+      showToast(LISTING_ERRORS.ownListing, "error");
+      return;
+    }
+    const checkoutPath = getCheckoutPath(listing);
+    if (!isGuestCheckoutEnabled() && !sessionUser) {
+      router.push(`/login?next=${encodeURIComponent(checkoutPath)}`);
+      return;
+    }
+    router.push(checkoutPath);
+  }
+
   return (
     <div className="mobile-sticky-bar">
       <div className="mobile-sticky-bar__inner">
         {!isOwn && config.showBuyNow ? (
           <button
             className="focus-ring mobile-sticky-bar__cta"
-            onClick={() => router.push(getCheckoutPath(listing))}
+            onClick={handleBuyNow}
             type="button"
           >
             <Icon name="package" size={18} />
@@ -188,6 +212,7 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
             <ListingPrimaryAction
               action={config.primaryAction}
               className="mobile-sticky-bar__cta"
+              embedPhoneConfirm={false}
               listing={listing}
               size="sm"
             />

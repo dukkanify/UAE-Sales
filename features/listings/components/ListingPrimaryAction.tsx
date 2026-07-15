@@ -32,6 +32,8 @@ type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
 type ListingPrimaryActionProps = {
   action: ListingActionType;
   className?: string;
+  /** When false, phone confirmation is not rendered under the button (e.g. sticky bars). */
+  embedPhoneConfirm?: boolean;
   fullWidth?: boolean;
   listing: Listing;
   size?: "sm" | "md" | "lg";
@@ -51,6 +53,7 @@ const PRIMARY_ACTION_ICONS: Partial<Record<ListingActionType, IconName>> = {
 export function ListingPrimaryAction({
   action,
   className,
+  embedPhoneConfirm = true,
   fullWidth = true,
   listing,
   size = "lg",
@@ -114,6 +117,10 @@ export function ListingPrimaryAction({
           showToast(LISTING_ERRORS.phoneUnavailable, "error");
           return;
         }
+        if (!embedPhoneConfirm) {
+          window.location.href = tel;
+          return;
+        }
         setPhoneConfirm(true);
         break;
       }
@@ -155,7 +162,7 @@ export function ListingPrimaryAction({
           ACTION_LABELS[action]
         )}
       </Button>
-      {phoneConfirm && tel ? (
+      {embedPhoneConfirm && phoneConfirm && tel ? (
         <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">
           <p className="text-sm font-semibold text-ink">هل تريد الاتصال بالبائع؟</p>
           {masked ? <p className="mt-1 text-xs text-muted">{masked}</p> : null}

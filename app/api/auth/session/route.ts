@@ -10,7 +10,8 @@ const userSchema = z.object({
   id: z.string().min(1),
   fullName: z.string().min(1),
   email: z.string().email(),
-  phone: z.string().min(1),
+  // Registration may create accounts without a phone yet.
+  phone: z.string(),
   city: z.string().min(1),
   accountType: z.enum(["buyer", "seller", "business", "individual", "company"]),
   isVerified: z.boolean(),

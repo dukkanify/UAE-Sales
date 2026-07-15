@@ -1,17 +1,22 @@
 import { z } from "zod";
 
+const optionalPhoneSchema = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().min(8).optional(),
+);
+
 export const buyerSessionSchema = z.object({
   id: z.string().min(1).optional(),
   email: z.string().email(),
   fullName: z.string().min(1),
-  phone: z.string().min(8).optional(),
+  phone: optionalPhoneSchema,
   role: z.enum(["user", "business", "admin"]).optional(),
 });
 
 export const deliveryAddressInputSchema = z.object({
   label: z.string().optional(),
   fullName: z.string().min(1).optional(),
-  phone: z.string().min(8).optional(),
+  phone: optionalPhoneSchema,
   emirate: z.string().min(1),
   city: z.string().min(1),
   area: z.string().min(1),
