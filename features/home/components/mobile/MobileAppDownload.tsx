@@ -1,16 +1,10 @@
+import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND } from "@/shared/constants/brand";
-import { Icon } from "@/shared/ui/Icon";
 import { getListings } from "@/services/listings";
 import { MobileAppDevicePreview } from "./MobileAppDevicePreview";
 import { resolveAppPreviewListings } from "./mobile-app-preview.config";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
 import { AppStoreBadgeLink, GooglePlayBadgeLink } from "./MobileStoreBadges";
-
-const APP_FEATURES = [
-  { icon: "bell" as const, label: "إشعارات فورية" },
-  { icon: "message" as const, label: "محادثات مباشرة" },
-  { icon: "grid" as const, label: "إدارة إعلاناتك" },
-] as const;
 
 export async function MobileAppDownload() {
   const listings = await getListings();
@@ -19,11 +13,32 @@ export async function MobileAppDownload() {
   return (
     <section aria-label="تطبيق سوقنا" className="mobile-home-app">
       <div className="mobile-home-app__panel">
+        <span aria-hidden className="mobile-home-app__mesh" />
         <span aria-hidden className="mobile-home-app__glow mobile-home-app__glow--gold" />
-        <span aria-hidden className="mobile-home-app__glow mobile-home-app__glow--navy" />
+        <span aria-hidden className="mobile-home-app__glow mobile-home-app__glow--depth" />
 
         <div className="mobile-home-app__layout">
+          <div className="mobile-home-app__copy">
+            <div className="mobile-home-app__brand">
+              <BrandMark size={36} variant="gold" />
+              <div className="mobile-home-app__brand-text">
+                <p className="mobile-home-app__eyebrow">تطبيق الجوال</p>
+                <p className="mobile-home-app__brand-name">{BRAND.nameAr}</p>
+              </div>
+            </div>
+
+            <h2 className="mobile-home-app__title">
+              السوق في راحة يدك
+              <span className="mobile-home-app__title-brand">{BRAND.nameAr}</span>
+            </h2>
+
+            <p className="mobile-home-app__desc">
+              تصفّح أوضح، تواصل أسرع، ونشر إعلانك بخطوات بسيطة من أي مكان في الإمارات.
+            </p>
+          </div>
+
           <div aria-hidden className="mobile-home-app__device-wrap">
+            <span className="mobile-home-app__device-aura" />
             <div className="mobile-home-app__device">
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
@@ -36,37 +51,9 @@ export async function MobileAppDownload() {
             </div>
           </div>
 
-          <div className="mobile-home-app__copy">
-            <span className="mobile-home-app__eyebrow">
-              <Icon name="phone" size={13} />
-              حمّل التطبيق
-            </span>
-
-            <h2 className="mobile-home-app__title">
-              السوق في راحة يدك مع{" "}
-              <span className="mobile-home-app__title-brand">{BRAND.nameAr}</span>
-            </h2>
-
-            <p className="mobile-home-app__desc">
-              تجربة سوقنا كاملة على الجوال — تصفّح أسرع، تواصل أوضح، ونشر إعلانك
-              بخطوات بسيطة.
-            </p>
-
-            <ul className="mobile-home-app__features">
-              {APP_FEATURES.map((feature) => (
-                <li key={feature.label} className="mobile-home-app__feature">
-                  <span className="mobile-home-app__feature-icon">
-                    <Icon name={feature.icon} size={13} />
-                  </span>
-                  {feature.label}
-                </li>
-              ))}
-            </ul>
-
-            <div className="mobile-home-app__badges">
-              <AppStoreBadgeLink href={MOBILE_APP_LINKS.appStore} />
-              <GooglePlayBadgeLink href={MOBILE_APP_LINKS.playStore} />
-            </div>
+          <div className="mobile-home-app__actions">
+            <AppStoreBadgeLink href={MOBILE_APP_LINKS.appStore} />
+            <GooglePlayBadgeLink href={MOBILE_APP_LINKS.playStore} />
           </div>
         </div>
       </div>
