@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Category } from "@/types";
 import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import {
+  getNormalizedScrollLeft,
+  setNormalizedScrollLeft,
+} from "@/shared/utils/rtl-scroll";
+import {
   getMobileCategoryPages,
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "./mobile-home.config";
@@ -13,15 +17,11 @@ type MobileCategoryGridProps = {
   categories: Category[];
 };
 
-function getPageScrollLeft(track: HTMLElement, pageIndex: number): number {
-  return pageIndex * track.clientWidth;
-}
-
 function getActivePageIndex(track: HTMLElement, pageCount: number): number {
   const pageWidth = track.clientWidth;
   if (pageWidth <= 0 || pageCount === 0) return 0;
 
-  const index = Math.round(track.scrollLeft / pageWidth);
+  const index = Math.round(getNormalizedScrollLeft(track) / pageWidth);
   return Math.min(Math.max(index, 0), pageCount - 1);
 }
 
@@ -55,10 +55,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
     if (!track || pages.length === 0) return;
 
     const nextIndex = Math.min(Math.max(index, 0), pages.length - 1);
-    track.scrollTo({
-      behavior: "smooth",
-      left: getPageScrollLeft(track, nextIndex),
-    });
+    setNormalizedScrollLeft(track, nextIndex * track.clientWidth, "smooth");
     setActivePage(nextIndex);
   };
 

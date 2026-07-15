@@ -314,7 +314,7 @@ export function CheckoutWizard({
             id: sessionUser?.id,
             email: sessionUser?.email ?? normalized.email,
             fullName: sessionUser?.fullName ?? normalized.fullName,
-            phone: sessionUser?.phone ?? normalized.phone,
+            phone: sessionUser?.phone?.trim() || normalized.phone,
             role: sessionUser?.role,
           },
           localListing: listing.id.startsWith("local-")

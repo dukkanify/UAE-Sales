@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { Listing } from "@/types";
 import { openListingConversation } from "@/services/chat";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
+import { useToast } from "@/shared/components/ToastProvider";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -30,6 +31,7 @@ export function StartChatButton({
   variant = "secondary",
 }: StartChatButtonProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -48,7 +50,12 @@ export function StartChatButton({
       }
 
       if (isOwnListing(listing, user)) {
-        setError("لا يمكنك مراسلة نفسك بخصوص إعلانك.");
+        const message = "لا يمكنك مراسلة نفسك بخصوص إعلانك.";
+        if (layout === "icon" || iconOnly) {
+          showToast(message, "error");
+        } else {
+          setError(message);
+        }
         return;
       }
 
@@ -58,13 +65,33 @@ export function StartChatButton({
       });
       router.push(`/chat/${conversationId}`);
     } catch {
-      setError("تعذر فتح المحادثة. حاول مرة أخرى.");
+      const message = "تعذر فتح المحادثة. حاول مرة أخرى.";
+      if (layout === "icon" || iconOnly) {
+        showToast(message, "error");
+      } else {
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
   const resolvedLayout = layout === "default" && iconOnly ? "icon" : layout;
+
+  if (resolvedLayout === "icon") {
+    return (
+      <button
+        aria-busy={isLoading}
+        aria-label="محادثة البائع"
+        className={`focus-ring ${className ?? ""}`.trim()}
+        disabled={isLoading}
+        onClick={handleClick}
+        type="button"
+      >
+        <Icon name="message" size={20} />
+      </button>
+    );
+  }
 
   return (
     <div className={fullWidth ? "w-full" : ""}>
@@ -77,9 +104,7 @@ export function StartChatButton({
         type="button"
         variant={variant}
       >
-        {resolvedLayout === "icon" ? (
-          <Icon name="message" size={20} />
-        ) : resolvedLayout === "stacked" ? (
+        {resolvedLayout === "stacked" ? (
           <>
             <span className="grid size-8 place-items-center rounded-full bg-primary/8 text-primary">
               <Icon name="message" size={17} />

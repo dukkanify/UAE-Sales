@@ -25,7 +25,7 @@ export default async function ProfilePage() {
           <div className="mt-6">
             <SecuritySettingsPanel />
           </div>
-          <Card className="mt-6 p-5" variant="flat">
+          <Card className="mt-6 scroll-mt-24 p-5" id="favorites" variant="flat">
             <h2 className="text-sm font-semibold text-ink">المفضلة</h2>
             <div className="mt-4">
               <FavoritesPanel />
