@@ -64,8 +64,16 @@ export function MobileBottomNav() {
               }`}
               href={item.href}
             >
-              <span className="mobile-bottom-nav__icon-wrap">
-                <Icon filled={item.icon === "heart" && isActive} name={item.icon} size={20} />
+              <span
+                className={`mobile-bottom-nav__icon-wrap${
+                  isActive ? " mobile-bottom-nav__icon-wrap--active" : ""
+                }`}
+              >
+                <Icon
+                  filled={item.icon === "heart" && isActive}
+                  name={item.icon}
+                  size={item.icon === "heart" ? 21 : 20}
+                />
                 {"badge" in item && item.badge ? (
                   <span className="mobile-bottom-nav__badge">{item.badge}</span>
                 ) : null}
