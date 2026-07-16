@@ -70,9 +70,8 @@ const paths: Partial<Record<IconName, string>> = {
   grid: "M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z",
   wallet:
     "M4 7h14a2 2 0 0 1 2 2v1h-3a3 3 0 0 0 0 6h3v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm14 5h-2a1 1 0 0 0 0 2h2v-2Z",
-  /** Round chat bubble — universal messaging/chat cue */
-  message:
-    "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z",
+  /** Rounded chat square — messaging / الرسائل */
+  message: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
   plus: "M12 5v14M5 12h14",
   check: "M5 12.5 9.5 17 19 7",
   star: "M12 3.5 14.2 9l5.8.5-4.4 3.8 1.3 5.7L12 16.2 7.1 18.9 8.4 13.3 4 9.5l5.8-.5L12 3.5Z",
@@ -101,8 +100,8 @@ const paths: Partial<Record<IconName, string>> = {
   "chevron-right": "M9 6l6 6-6 6",
   "arrow-left": "M19 12H5M11 6l-6 6 6 6",
   package: "M12 3 20 7v10l-8 4-8-4V7l8-4Zm0 8 8-4M12 11 4 7M12 11v10",
-  /** Classic notification bell — stroke body; clapper rendered separately */
-  bell: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9",
+  /** Notification bell — stroke body; clapper rendered separately */
+  bell: "M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9",
   chart: "M5 19V9M10 19V5M15 19v-7M20 19V11",
   car: "M5 16H3v-3l1.8-5.2A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.3L21 13.5V16h-2M5 16h14M7.5 9.5 9 7h6l1.5 2.5M7 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z",
   laptop: "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V6ZM3 16h18M2 18h20",
@@ -136,7 +135,27 @@ const CONTACT_ICONS = new Set<IconName>([
   "whatsapp",
 ]);
 
-const BELL_CLAPPER = "M10.3 21a1.94 1.94 0 0 0 3.4 0";
+const BELL_CLAPPER = "M13.73 21a2 2 0 0 1-3.46 0";
+
+function MessageGlyph() {
+  return (
+    <>
+      <path d={paths.message} />
+      <circle cx="9" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="10" r="1" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="10" r="1" fill="currentColor" stroke="none" />
+    </>
+  );
+}
+
+function BellGlyph() {
+  return (
+    <>
+      <path d={paths.bell} />
+      <path d={BELL_CLAPPER} />
+    </>
+  );
+}
 
 const CATEGORY_ICONS = new Set<IconName>([
   "baby",
@@ -191,12 +210,9 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
   if (isWhatsApp) {
     body = <path d={WHATSAPP_PATH} fill="currentColor" stroke="none" />;
   } else if (name === "bell") {
-    body = (
-      <>
-        <path d={paths.bell} />
-        <path d={BELL_CLAPPER} />
-      </>
-    );
+    body = <BellGlyph />;
+  } else if (name === "message") {
+    body = <MessageGlyph />;
   } else if (name === "share" || name === "share-2") {
     body = <ShareNodes />;
   } else if (linePaths) {
