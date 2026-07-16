@@ -64,38 +64,35 @@ export function MobileHomeHeader() {
       {menuOpen ? (
         <nav className="mobile-home-header__drawer">
           <div className="mobile-home-header__drawer-inner">
-            {user ? (
+            <Link
+              className="mobile-home-header__drawer-profile"
+              href={user ? "/profile" : "/login"}
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className="mobile-home-header__drawer-profile-icon">
+                <Icon name="user" size={18} />
+              </span>
+              <span className="mobile-home-header__drawer-profile-copy">
+                <span className="mobile-home-header__drawer-profile-eyebrow">حسابي</span>
+                <span className="mobile-home-header__drawer-profile-name">
+                  {user ? user.fullName : "سجّل الدخول للمتابعة"}
+                </span>
+              </span>
+              <span className="mobile-home-header__drawer-profile-action">
+                {user ? "الملف" : "دخول"}
+                <Icon name="chevron-left" size={14} />
+              </span>
+            </Link>
+
+            {!user ? (
               <Link
-                className="mobile-home-header__drawer-profile"
-                href="/profile"
+                className="mobile-home-header__drawer-register"
+                href="/register"
                 onClick={() => setMenuOpen(false)}
               >
-                <span className="mobile-home-header__drawer-profile-icon">
-                  <Icon name="user" size={18} />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-xs font-semibold text-[var(--mh-muted)]">حسابي</span>
-                  <span className="block truncate text-sm font-bold text-ink">{user.fullName}</span>
-                </span>
+                ليس لديك حساب؟ <span>إنشاء حساب</span>
               </Link>
-            ) : (
-              <div className="mobile-home-header__drawer-auth">
-                <Link
-                  className="mobile-home-header__drawer-auth-primary"
-                  href="/login"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  تسجيل الدخول
-                </Link>
-                <Link
-                  className="mobile-home-header__drawer-auth-secondary"
-                  href="/register"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  إنشاء حساب
-                </Link>
-              </div>
-            )}
+            ) : null}
 
             {primaryNavigation.map((item) => {
               const active = isActivePath(pathname, item.href);
