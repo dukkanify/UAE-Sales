@@ -69,7 +69,7 @@ export function ListingMapPlaceholder({ listing }: ListingMapPlaceholderProps) {
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <a
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-800 text-ink transition hover:border-[rgb(201_164_92_/_40%)] hover:bg-[rgb(248_243_234_/_80%)]"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-extrabold text-ink transition hover:border-[rgb(201_164_92_/_40%)] hover:bg-[rgb(248_243_234_/_80%)]"
             href={osmUrl}
             rel="noopener noreferrer"
             target="_blank"
