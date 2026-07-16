@@ -52,7 +52,7 @@ export function MobileHomeHeader() {
               href="/profile"
             >
               <span className="mobile-home-header__notify-ring" aria-hidden />
-              <Icon name="bell" size={18} />
+              <Icon className="mobile-home-header__notify-icon" name="bell" size={19} />
               <span className="mobile-home-header__badge">3</span>
             </Link>
 
