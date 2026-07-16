@@ -2071,19 +2071,35 @@
   min-width: 0;
   flex-direction: column;
   align-items: center;
-  gap: 0.1875rem;
+  gap: 0.25rem;
   padding-bottom: 0.125rem;
-  color: var(--mh-muted);
+  color: #6b7280;
+  transition: color var(--mh-duration) var(--mh-ease);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-bottom-nav__link--active {
-  color: var(--mh-gold);
+  color: #a88642;
 }
 
 .mobile-bottom-nav__icon-wrap {
   position: relative;
   display: grid;
+  width: 2rem;
+  height: 1.75rem;
   place-items: center;
+  border-radius: 0.7rem;
+  transition:
+    background var(--mh-duration) var(--mh-ease),
+    transform var(--mh-duration) var(--mh-ease);
+}
+
+.mobile-bottom-nav__icon-wrap--active {
+  background: rgb(201 164 92 / 14%);
+}
+
+.mobile-bottom-nav__link:active .mobile-bottom-nav__icon-wrap {
+  transform: scale(0.94);
 }
 
 .mobile-bottom-nav__label {
