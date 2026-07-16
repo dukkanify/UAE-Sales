@@ -100,7 +100,8 @@ const paths: Partial<Record<IconName, string>> = {
   "chevron-right": "M9 6l6 6-6 6",
   "arrow-left": "M19 12H5M11 6l-6 6 6 6",
   package: "M12 3 20 7v10l-8 4-8-4V7l8-4Zm0 8 8-4M12 11 4 7M12 11v10",
-  bell: "M15 17H9l-1 2h8l-1-2Zm-3 3a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2ZM18 14a6 6 0 1 0-12 0v4h12v-4Z",
+  /** Classic notification bell — stroke body; clapper rendered separately */
+  bell: "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9",
   chart: "M5 19V9M10 19V5M15 19v-7M20 19V11",
   car: "M5 16H3v-3l1.8-5.2A2 2 0 0 1 6.7 7h10.6a2 2 0 0 1 1.9 1.3L21 13.5V16h-2M5 16h14M7.5 9.5 9 7h6l1.5 2.5M7 16a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm7 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z",
   laptop: "M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8H4V6ZM3 16h18M2 18h20",
@@ -124,6 +125,7 @@ const CLOSE_LINES = ["M6 6l12 12", "M18 6 6 18"] as const;
 
 /** Contact icons that benefit from slightly heavier strokes at small sizes */
 const CONTACT_ICONS = new Set<IconName>([
+  "bell",
   "mail",
   "message",
   "phone-call",
@@ -132,6 +134,8 @@ const CONTACT_ICONS = new Set<IconName>([
   "share-2",
   "whatsapp",
 ]);
+
+const BELL_CLAPPER = "M10.3 21a1.94 1.94 0 0 0 3.4 0";
 
 const CATEGORY_ICONS = new Set<IconName>([
   "baby",
@@ -185,6 +189,13 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
 
   if (isWhatsApp) {
     body = <path d={WHATSAPP_PATH} fill="currentColor" stroke="none" />;
+  } else if (name === "bell") {
+    body = (
+      <>
+        <path d={paths.bell} />
+        <path d={BELL_CLAPPER} />
+      </>
+    );
   } else if (name === "share" || name === "share-2") {
     body = <ShareNodes />;
   } else if (linePaths) {

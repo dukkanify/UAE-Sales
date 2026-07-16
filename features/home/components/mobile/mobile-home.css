@@ -379,23 +379,72 @@
   position: relative;
 }
 
+.mobile-home-header__notify {
+  position: relative;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid rgb(15 23 42 / 6%);
+  border-radius: 0.8rem;
+  background:
+    linear-gradient(160deg, #ffffff 0%, #f7f8fa 100%);
+  color: var(--mh-primary);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 90%) inset,
+    0 4px 12px rgb(15 23 42 / 5%);
+  transition:
+    transform var(--mh-duration) var(--mh-ease),
+    border-color var(--mh-duration) var(--mh-ease),
+    box-shadow var(--mh-duration) var(--mh-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-home-header__notify-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgb(201 164 92 / 0%);
+  pointer-events: none;
+  transition: box-shadow var(--mh-duration) var(--mh-ease);
+}
+
+.mobile-home-header__notify:active {
+  transform: scale(0.96);
+  border-color: rgb(201 164 92 / 28%);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 90%) inset,
+    0 2px 8px rgb(15 23 42 / 6%);
+}
+
+.mobile-home-header__notify:active .mobile-home-header__notify-ring {
+  box-shadow: inset 0 0 0 1px rgb(201 164 92 / 35%);
+}
+
+.mobile-home-header__notify svg {
+  position: relative;
+  z-index: 1;
+}
+
 .mobile-home-header__badge {
   position: absolute;
-  top: 0.0625rem;
-  inset-inline-end: 0;
+  top: -0.15rem;
+  inset-inline-end: -0.15rem;
+  z-index: 2;
   display: grid;
-  min-width: 0.9375rem;
-  height: 0.9375rem;
+  min-width: 1rem;
+  height: 1rem;
   place-items: center;
   border: 1.5px solid #fff;
   border-radius: 999px;
-  background: var(--mh-error);
-  padding-inline: 0.125rem;
-  font-size: 0.5rem;
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  padding-inline: 0.2rem;
+  box-shadow: 0 2px 6px rgb(239 68 68 / 35%);
+  font-size: 0.5625rem;
   font-weight: 800;
-  color: white;
   line-height: 1;
-  box-shadow: 0 1px 4px rgb(239 68 68 / 35%);
+  color: #fff;
 }
 
 /* ── Hero block ── */

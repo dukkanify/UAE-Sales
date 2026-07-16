@@ -48,10 +48,11 @@ export function MobileHomeHeader() {
           <div className="mobile-home-header__actions">
             <Link
               aria-label="الإشعارات"
-              className="mobile-home-header__icon-btn mobile-home-header__icon-btn--ghost mobile-home-header__icon-btn--badge"
+              className="mobile-home-header__notify"
               href="/profile"
             >
-              <Icon name="bell" size={19} />
+              <span className="mobile-home-header__notify-ring" aria-hidden />
+              <Icon name="bell" size={18} />
               <span className="mobile-home-header__badge">3</span>
             </Link>
 
