@@ -9,7 +9,7 @@ export async function ProfileActivityPanel() {
 
   return (
     <div className="mt-6 grid gap-5">
-      <Card className="p-5" variant="flat">
+      <Card className="scroll-mt-24 p-5" id="notifications" variant="flat">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">الإشعارات</h2>
           {unread > 0 ? (
