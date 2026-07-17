@@ -47,7 +47,7 @@ export function LocalListingDetails({
         category={category}
         listing={listing}
       />
-      <div className="app-container -mt-20 pb-28 lg:pb-8">
+      <div className="app-container -mt-20 pb-44 lg:pb-8">
         <Button
           href={`/listings/local/${listingId}/edit`}
           size="sm"

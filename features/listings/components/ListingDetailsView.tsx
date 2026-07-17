@@ -14,6 +14,7 @@ import {
 } from "@/features/listings/components/ListingStickyPanel";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
@@ -50,7 +51,7 @@ export function ListingDetailsView({
 
   return (
     <>
-      <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
+      <section className="app-container page-padding scroll-mt-20 pb-44 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
 
         <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start lg:gap-x-8">
@@ -135,7 +136,7 @@ export function ListingDetailsView({
       </section>
 
       {relatedListings.length > 0 ? (
-        <section className="app-container page-padding pb-28 lg:pb-8">
+        <section className="app-container page-padding pb-44 lg:pb-8">
           <SectionHeader
             description="إعلانات من نفس التصنيف قد تعجبك."
             eyebrow="مشابه"
@@ -154,6 +155,7 @@ export function ListingDetailsView({
       ) : null}
 
       <MobileStickyActionBar listing={listing} />
+      <MobileBottomNav />
     </>
   );
 }

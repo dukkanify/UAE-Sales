@@ -1,14 +1,17 @@
 .mobile-sticky-bar {
   position: fixed;
   inset-inline: 0;
-  bottom: 0;
-  z-index: 50;
+  /* Sit above the shared mobile bottom nav (+ FAB overhang) on listing pages */
+  bottom: calc(
+    clamp(4.25rem, 14vw, 4.75rem) + 0.85rem + env(safe-area-inset-bottom, 0px)
+  );
+  z-index: 40;
   border-top: 1px solid rgb(15 23 42 / 6%);
   background:
     linear-gradient(180deg, rgb(255 255 255 / 86%) 0%, rgb(255 255 255 / 96%) 100%);
   box-shadow: 0 -12px 40px rgb(15 23 42 / 8%);
   backdrop-filter: blur(18px) saturate(1.35);
-  padding-bottom: max(0.55rem, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 0.55rem;
 }
 
 .mobile-sticky-bar::before {
