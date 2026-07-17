@@ -1,6 +1,7 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { FavoritesPanel } from "@/features/profile/components/FavoritesPanel";
 import { ProfileActivityPanel } from "@/features/profile/components/ProfileActivityPanel";
+import { ProfileHashScroll } from "@/features/profile/components/ProfileHashScroll";
 import { SecuritySettingsPanel } from "@/features/profile/components/SecuritySettingsPanel";
 import { ProfileForm } from "@/features/profile/components/ProfileForm";
 import { Card } from "@/shared/ui/Card";
@@ -15,6 +16,7 @@ export default async function ProfilePage() {
     <>
       <SiteHeader />
       <main>
+        <ProfileHashScroll />
         <DashboardShell
           activePath="/profile"
           description="عرض وتعديل بيانات المستخدم، مع مساحة واضحة لحالة التوثيق والمفضلة."
