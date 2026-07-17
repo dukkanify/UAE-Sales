@@ -2073,10 +2073,21 @@
 
 /* ── Bottom nav ── */
 .mobile-bottom-nav {
+  /* Works outside .mobile-home-shell (e.g. /categories) */
+  --mh-border: #e5e7eb;
+  --mh-muted: #6b7280;
+  --mh-gold: #c9a45c;
+  --mh-text-xs: clamp(0.5625rem, 2.6vw, 0.6875rem);
+  --mh-fab-size: clamp(2.75rem, 10.5vw, 3.25rem);
+  --mh-nav-max: 100%;
+  --mh-duration: 220ms;
+  --mh-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   border-top: 1px solid var(--mh-border);
   background: rgb(255 255 255 / 98%);
   backdrop-filter: blur(14px);
   padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -8px 28px rgb(15 23 42 / 8%);
 }
 
 .mobile-bottom-nav__inner {
