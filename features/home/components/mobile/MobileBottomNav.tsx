@@ -18,6 +18,13 @@ const items = [
   { account: true, href: "/profile", icon: "user" as const, label: "الحساب" },
 ];
 
+function scrollProfileHashIntoView() {
+  const id = window.location.hash.replace(/^#/, "");
+  if (!id) return;
+  const el = document.getElementById(id);
+  el?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
@@ -30,10 +37,7 @@ export function MobileBottomNav() {
   }, [pathname]);
 
   return (
-    <nav
-      aria-label="التنقل السفلي"
-      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[60] lg:hidden"
-    >
+    <nav aria-label="التنقل السفلي" className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 lg:hidden">
       <div className="mobile-bottom-nav__inner">
         <div className="mobile-bottom-nav__grid">
         {items.map((item) => {
@@ -66,6 +70,12 @@ export function MobileBottomNav() {
                 isActive ? "mobile-bottom-nav__link--active" : ""
               }`}
               href={item.href}
+              onClick={() => {
+                if (!item.href.includes("#")) return;
+                // Same-route hash clicks need an explicit scroll into المفضلة.
+                window.setTimeout(scrollProfileHashIntoView, 0);
+                window.setTimeout(scrollProfileHashIntoView, 120);
+              }}
             >
               <span
                 className={`mobile-bottom-nav__icon-wrap${

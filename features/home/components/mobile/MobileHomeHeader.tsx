@@ -49,7 +49,7 @@ export function MobileHomeHeader() {
             <Link
               aria-label="الإشعارات"
               className="mobile-home-header__notify"
-              href="/profile"
+              href="/profile#notifications"
             >
               <span className="mobile-home-header__notify-ring" aria-hidden />
               <Icon className="mobile-home-header__notify-icon" name="bell" size={19} />
