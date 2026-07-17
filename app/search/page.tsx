@@ -1,4 +1,5 @@
 import { cities, countries } from "@/shared/constants/locations";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -86,7 +87,7 @@ export default async function SearchPage({
     <>
       <SiteHeader />
       <main className="bg-[#fdfbf7]">
-        <section className="app-container page-padding">
+        <section className="app-container page-padding pb-28 lg:pb-8">
           <div className="mb-8">
             <p className="text-xs font-bold text-[#B8955F]">بحث السوق</p>
             <h1 className="mt-1 text-2xl font-bold text-ink md:text-3xl">
@@ -122,6 +123,7 @@ export default async function SearchPage({
         </section>
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </>
   );
 }
