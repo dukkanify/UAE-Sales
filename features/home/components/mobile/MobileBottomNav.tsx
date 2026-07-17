@@ -30,7 +30,10 @@ export function MobileBottomNav() {
   }, [pathname]);
 
   return (
-    <nav aria-label="التنقل السفلي" className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-50 lg:hidden">
+    <nav
+      aria-label="التنقل السفلي"
+      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[60] lg:hidden"
+    >
       <div className="mobile-bottom-nav__inner">
         <div className="mobile-bottom-nav__grid">
         {items.map((item) => {

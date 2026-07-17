@@ -3,6 +3,7 @@ import { BRAND } from "@/shared/constants/brand";
 import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
 import { Badge } from "@/shared/ui/Badge";
@@ -109,7 +110,7 @@ export default async function CategoryPage({
     <>
       <SiteHeader />
       <main>
-        <section className="app-container page-padding">
+        <section className="app-container page-padding pb-28 lg:pb-8">
           <Breadcrumbs
             items={[
               { href: "/", label: "الرئيسية" },
@@ -166,6 +167,7 @@ export default async function CategoryPage({
         </section>
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </>
   );
 }
