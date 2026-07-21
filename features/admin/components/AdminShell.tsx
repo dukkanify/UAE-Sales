@@ -86,35 +86,30 @@ export function AdminShell({
   const pathname = usePathname();
 
   useEffect(() => {
+    const sessionUser = getSessionUser();
+    if (!sessionUser) {
+      // Immediate client redirect if cookie gate somehow skipped (localStorage-only session).
+      router.replace(`/login?next=${encodeURIComponent(activePath)}`);
+      return;
+    }
     const timeoutId = window.setTimeout(() => {
-      const sessionUser = getSessionUser();
-      if (!sessionUser) {
-        setAuthState("guest");
-        setDisplayUser(null);
-        return;
-      }
       setDisplayUser(sessionUser);
       setAuthState(sessionUser.role === "admin" ? "admin" : "user");
     }, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (authState !== "guest") return;
-    router.replace(`/login?next=${encodeURIComponent(activePath)}`);
-  }, [authState, activePath, router]);
+  }, [pathname, activePath, router]);
 
   async function handleLogout() {
     clearSessionUser();
     await removeSessionCookie();
-    router.push("/login");
+    router.push("/login?next=/admin");
   }
 
-  if (authState === "loading" || authState === "guest") {
+  if (authState === "loading") {
     return (
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm font-medium text-muted">جاري التحقق من صلاحية الأدمن...</p>
+          <p className="text-sm font-medium text-muted">جاري توجيهك لتسجيل الدخول...</p>
         </Card>
       </section>
     );

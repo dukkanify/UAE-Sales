@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -17,7 +18,9 @@ export default function LoginPage() {
           }}
           title="مرحباً بك في سوقنا"
         >
-          <LoginForm />
+          <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
+            <LoginForm />
+          </Suspense>
         </AuthShell>
       </main>
       <SiteFooter />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useState } from "react";
 import { DemoAccountsPanel } from "@/features/auth/components/DemoAccountsPanel";
@@ -44,6 +44,9 @@ export function LoginForm() {
   const emailOtpEnabled = isEmailOtpEnabled();
   const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next");
+  const isAdminNext = Boolean(nextPath?.startsWith("/admin"));
 
   const completePasswordLogin = useCallback(
     async (nextEmail: string, nextPassword: string) => {
@@ -152,12 +155,18 @@ export function LoginForm() {
     <>
       <form className="auth-form" noValidate onSubmit={handleSubmit}>
         <div className="auth-form__header">
-          <p className="auth-form__eyebrow">تسجيل الدخول</p>
-          <h2 className="auth-form__title">ادخل إلى حسابك</h2>
+          <p className="auth-form__eyebrow">
+            {isAdminNext ? "دخول لوحة الإدارة" : "تسجيل الدخول"}
+          </p>
+          <h2 className="auth-form__title">
+            {isAdminNext ? "سجّل الدخول للمتابعة إلى الأدمن" : "ادخل إلى حسابك"}
+          </h2>
           <p className="auth-form__subtitle">
-            {emailOtpEnabled
-              ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
-              : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
+            {isAdminNext
+              ? "هذه المنطقة محمية. استخدم حساب المدير للوصول إلى غرفة العمليات."
+              : emailOtpEnabled
+                ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
+                : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
           </p>
         </div>
 
