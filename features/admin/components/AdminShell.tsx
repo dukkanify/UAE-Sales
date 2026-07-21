@@ -241,28 +241,26 @@ export function AdminShell({
   return (
     <div className="admin-ops">
       <div className="admin-ops__aura" aria-hidden />
-      <div className="admin-ops__orb admin-ops__orb--a" aria-hidden />
-      <div className="admin-ops__orb admin-ops__orb--b" aria-hidden />
       <header className="admin-ops__topbar">
         <div className="admin-ops__brand">
           <Image
             alt={BRAND.nameAr}
             className="admin-ops__mark"
-            height={44}
+            height={40}
             priority
             src="/brand/logo-icon.svg"
             unoptimized
-            width={44}
+            width={40}
           />
           <div className="admin-ops__brand-copy">
             <p className="admin-ops__brand-name">{BRAND.nameAr}</p>
-            <p className="admin-ops__brand-sub">Control Center</p>
+            <p className="admin-ops__brand-sub">Control</p>
           </div>
         </div>
         <div className="admin-ops__top-actions">
           <span className="admin-ops__live" aria-live="polite">
             <span className="admin-ops__live-dot" aria-hidden />
-            Live Ops
+            مباشر
           </span>
           <div className="admin-ops__who">
             <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
@@ -344,7 +342,7 @@ export function AdminShell({
           </div>
 
           <div className="admin-ops__hero">
-            <p className="admin-ops__eyebrow">Sooqna Command</p>
+            <p className="admin-ops__eyebrow">Sooqna</p>
             <h1 className="admin-ops__title">{title}</h1>
             <p className="admin-ops__desc">{description}</p>
           </div>
