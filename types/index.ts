@@ -35,6 +35,20 @@ export type { City, Country } from "./domain/location";
 export type { AccountType, UserProfile, UserRole } from "./domain/user";
 
 export type {
+  AdminCategoryCreateInput,
+  AdminCategoryPatch,
+  AdminCategoryRecord,
+  AdminDisputePatch,
+  AdminDisputeRecord,
+  AdminListingPatch,
+  AdminListingRecord,
+  AdminModerationSummary,
+  AdminUserPatch,
+  AdminUserRecord,
+  DisputeStatus,
+} from "./domain/admin";
+
+export type {
   EscrowStatus,
   Order,
   OrderAuditEvent,
