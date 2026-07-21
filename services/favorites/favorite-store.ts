@@ -50,6 +50,10 @@ export async function removeFavorite(
   return true;
 }
 
+export async function getAllFavorites(): Promise<ServerFavorite[]> {
+  return loadCollection<ServerFavorite>(FILE);
+}
+
 export async function syncFavoritesForUser(
   userId: string,
   incoming: Omit<ServerFavorite, "id" | "userId" | "savedAt">[],

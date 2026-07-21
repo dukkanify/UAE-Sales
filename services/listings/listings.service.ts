@@ -1,32 +1,37 @@
 import type { Listing, ListingSearchFilters } from "@/types";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
-import { mockListings, mockUserListings } from "@/mock";
+import {
+  getAllListings,
+  getListingBySlug as getStoredListingBySlug,
+} from "@/services/listings/listing-store";
 
 export type { ListingSearchFilters };
 
 export async function getListings(): Promise<Listing[]> {
-  return mockListings;
+  return getAllListings();
 }
 
-export async function getMyListings(): Promise<Listing[]> {
-  return mockUserListings;
+export async function getMyListings(userId?: string): Promise<Listing[]> {
+  const listings = await getAllListings();
+  if (!userId) return listings.filter((listing) => listing.id.startsWith("local-"));
+  return listings.filter((listing) => listing.seller.id === userId);
 }
 
 export async function getListingBySlug(slug: string): Promise<Listing | undefined> {
-  return [...mockListings, ...mockUserListings].find(
-    (listing) => listing.slug === slug,
-  );
+  return getStoredListingBySlug(slug);
 }
 
 export async function getFeaturedListings(): Promise<Listing[]> {
-  return mockListings.filter((listing) => listing.isFeatured);
+  const listings = await getAllListings();
+  return listings.filter((listing) => listing.isFeatured && listing.status === "active");
 }
 
 export async function getRelatedListings(
   categoryId: string,
   excludedId: string,
 ): Promise<Listing[]> {
-  return mockListings
+  const listings = await getAllListings();
+  return listings
     .filter((listing) => listing.status === "active")
     .filter((listing) => listing.categoryId === categoryId)
     .filter((listing) => listing.id !== excludedId)
@@ -42,8 +47,9 @@ export async function searchListings(
 ): Promise<Listing[]> {
   const normalizedQuery = filters.query?.trim().toLowerCase();
   const emirateFilter = filters.emirate ?? filters.city;
+  const listings = await getAllListings();
 
-  const results = mockListings
+  const results = listings
     .filter((listing) => listing.status === "active")
     .filter((listing) =>
       normalizedQuery ? matchesQuery(listing, normalizedQuery) : true,

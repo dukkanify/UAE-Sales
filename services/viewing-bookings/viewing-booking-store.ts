@@ -92,3 +92,15 @@ export async function createViewingBooking(
   await saveCollection(FILE, all);
   return booking;
 }
+
+export async function updateViewingBookingStatus(
+  id: string,
+  status: ViewingBooking["status"],
+): Promise<ViewingBooking | undefined> {
+  const all = await loadCollection<ViewingBooking>(FILE);
+  const index = all.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+  all[index] = { ...all[index], status };
+  await saveCollection(FILE, all);
+  return all[index];
+}

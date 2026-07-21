@@ -245,6 +245,49 @@ export async function updateUserOnboarding(
   return toProfile(updated);
 }
 
+export async function updateUserAdmin(
+  userId: string,
+  patch: Partial<Pick<StoredUser, "isVerified" | "accountStatus" | "role">>,
+): Promise<StoredUser | null> {
+  const user = await findUserById(userId);
+  if (!user) return null;
+  const updated: StoredUser = {
+    ...user,
+    ...patch,
+  };
+  await saveUser(updated);
+  return updated;
+}
+
+export function toAdminUserRecord(
+  user: StoredUser,
+  listingsCount = 0,
+): {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  city: string;
+  role: NonNullable<StoredUser["role"]>;
+  isVerified: boolean;
+  accountStatus: AccountStatus;
+  joinedAt: string;
+  listingsCount: number;
+} {
+  return {
+    id: user.id,
+    fullName: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    city: user.city,
+    role: user.role ?? "user",
+    isVerified: user.isVerified,
+    accountStatus: user.accountStatus ?? "active",
+    joinedAt: user.joinedAt,
+    listingsCount,
+  };
+}
+
 export function toUserProfile(user: StoredUser): UserProfile {
   return toProfile(user);
 }
