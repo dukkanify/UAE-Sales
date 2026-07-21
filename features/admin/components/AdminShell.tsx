@@ -30,6 +30,9 @@ export type AdminPath =
   | "/admin/escrow"
   | "/admin/wallets"
   | "/admin/stripe"
+  | "/admin/favorites"
+  | "/admin/notifications"
+  | "/admin/addresses"
   | "/admin/job-applications"
   | "/admin/viewing-bookings"
   | "/admin/quote-requests"
@@ -128,6 +131,27 @@ const adminLinks: {
     label: "Stripe",
     group: "money",
     keywords: "دفع بوابة webhook payments",
+  },
+  {
+    href: "/admin/favorites",
+    icon: "heart",
+    label: "المفضلة",
+    group: "insight",
+    keywords: "favorites اهتمام",
+  },
+  {
+    href: "/admin/notifications",
+    icon: "bell",
+    label: "الإشعارات",
+    group: "leads",
+    keywords: "تنبيهات notifications",
+  },
+  {
+    href: "/admin/addresses",
+    icon: "map",
+    label: "العناوين",
+    group: "leads",
+    keywords: "توصيل addresses",
   },
   {
     href: "/admin/job-applications",

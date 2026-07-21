@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { AdminListingRecord, ListingStatus } from "@/types";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
-import { getSessionUser } from "@/services/storage";
+import { getLocalListings, getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -39,10 +39,29 @@ export function AdminListingsPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/listings", { headers: { "x-admin-role": "admin" } })
-      .then((res) => res.json())
-      .then((data) => setListings(data.listings ?? []))
-      .catch(() => setListings([]));
+
+    const timeoutId = window.setTimeout(() => {
+      const localListings = getLocalListings();
+      const sync =
+        localListings.length > 0
+          ? fetch("/api/admin/listings", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-admin-role": "admin",
+              },
+              body: JSON.stringify({ listings: localListings }),
+            }).then((res) => res.json())
+          : fetch("/api/admin/listings", {
+              headers: { "x-admin-role": "admin" },
+            }).then((res) => res.json());
+
+      sync
+        .then((data) => setListings(data.listings ?? []))
+        .catch(() => setListings([]));
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   const filtered = useMemo(() => {

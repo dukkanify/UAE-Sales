@@ -29,6 +29,7 @@ import {
 } from "@/services/payments/stripe.service";
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
+import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
 import { formatCurrencyLabel } from "@/shared/utils/currency";
 import { normalizeUaePhone } from "@/shared/utils/phone";
 
@@ -77,6 +78,7 @@ function isGuestCheckout(input: CreateCheckoutInput): boolean {
 export async function initiateCheckout(
   input: CreateCheckoutInput,
 ): Promise<CheckoutSessionResult> {
+  await hydrateListingCatalog();
   const context = resolveListingCheckoutContext(input);
   if (!context) {
     throw new Error("LISTING_NOT_FOUND");

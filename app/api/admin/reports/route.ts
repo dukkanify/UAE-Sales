@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
-import { getListings, getModerationSummary } from "@/services/admin/admin-ops-store";
 import {
   buildDailySeries,
   buildListingCategorySlices,
   buildOrderStatusSlices,
 } from "@/services/admin/admin-analytics";
+import { getOpenDisputeCount } from "@/services/admin/dispute-store";
+import { getAllUsers } from "@/services/auth/user-store";
+import {
+  getAdminListingRecords,
+  getListingsModerationSummary,
+} from "@/services/listings/listing-store";
 import { getAllOrders } from "@/services/payments/order-store";
 import { getPaymentEvents } from "@/services/payments/payment-log";
 import { getAllWalletAccounts } from "@/services/payments/wallet-ledger";
@@ -15,13 +20,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
   }
 
-  const moderation = getModerationSummary();
-  const listings = getListings();
-  const [orders, events, wallets] = await Promise.all([
-    getAllOrders(),
-    getPaymentEvents(),
-    getAllWalletAccounts(),
-  ]);
+  const [users, listingStats, listings, openDisputes, orders, events, wallets] =
+    await Promise.all([
+      getAllUsers(),
+      getListingsModerationSummary(),
+      getAdminListingRecords(),
+      getOpenDisputeCount(),
+      getAllOrders(),
+      getPaymentEvents(),
+      getAllWalletAccounts(),
+    ]);
 
   const paidOrders = orders.filter((o) => o.paymentStatus === "succeeded");
   const refundedOrders = orders.filter((o) => o.status === "refunded");
@@ -42,10 +50,10 @@ export async function GET(request: Request) {
         orders.length === 0
           ? 0
           : Math.round((paidOrders.length / orders.length) * 100),
-      totalUsers: moderation.totalUsers,
-      totalListings: moderation.totalListings,
-      pendingListings: moderation.pendingListings,
-      openDisputes: moderation.openDisputes,
+      totalUsers: users.length,
+      totalListings: listingStats.totalListings,
+      pendingListings: listingStats.pendingListings,
+      openDisputes,
     },
     daily: buildDailySeries(orders, 7),
     orderStatuses: buildOrderStatusSlices(orders),

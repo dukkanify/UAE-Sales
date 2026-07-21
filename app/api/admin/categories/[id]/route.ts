@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { patchCategory } from "@/services/admin/admin-ops-store";
+import { patchCategoryRecord } from "@/services/categories/category-store";
 import type { AdminCategoryPatch } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -12,7 +12,7 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminCategoryPatch;
-  const category = patchCategory(id, body);
+  const category = await patchCategoryRecord(id, body);
 
   if (!category) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });

@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { patchUser } from "@/services/admin/admin-ops-store";
+import {
+  toAdminUserRecord,
+  updateUserAdmin,
+} from "@/services/auth/user-store";
+import { getAllListings } from "@/services/listings/listing-store";
 import type { AdminUserPatch } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -12,11 +16,14 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminUserPatch;
-  const user = patchUser(id, body);
+  const user = await updateUserAdmin(id, body);
 
   if (!user) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }
 
-  return NextResponse.json({ user });
+  const listings = await getAllListings();
+  const listingsCount = listings.filter((item) => item.seller.id === id).length;
+
+  return NextResponse.json({ user: toAdminUserRecord(user, listingsCount) });
 }

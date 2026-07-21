@@ -101,6 +101,11 @@ export function useEditListingForm(listingId: string) {
       };
 
       saveLocalListing(updatedListing);
+      void fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing: updatedListing }),
+      }).catch(() => undefined);
       setSaveMessage("تم حفظ التعديلات بنجاح.");
       router.push(`/listings/local/${currentListing.id}`);
     },

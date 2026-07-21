@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { patchDispute } from "@/services/admin/admin-ops-store";
+import { patchAdminDispute } from "@/services/admin/dispute-store";
 import type { AdminDisputePatch } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -12,7 +12,7 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminDisputePatch;
-  const dispute = patchDispute(id, body);
+  const dispute = await patchAdminDispute(id, body);
 
   if (!dispute) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });

@@ -145,6 +145,11 @@ export function useAddListingForm(categories: Category[]) {
       };
 
       saveLocalListing(listing);
+      void fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing }),
+      }).catch(() => undefined);
       router.push(`/listings/local/${id}`);
     },
     [imageFiles, router, selectedCategoryId],

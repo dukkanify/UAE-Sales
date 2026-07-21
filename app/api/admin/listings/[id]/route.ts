@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { patchListing } from "@/services/admin/admin-ops-store";
+import {
+  patchListingRecord,
+  toAdminListingRecord,
+} from "@/services/listings/listing-store";
 import type { AdminListingPatch } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -12,11 +15,11 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminListingPatch;
-  const listing = patchListing(id, body);
+  const listing = await patchListingRecord(id, body);
 
   if (!listing) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }
 
-  return NextResponse.json({ listing });
+  return NextResponse.json({ listing: toAdminListingRecord(listing) });
 }

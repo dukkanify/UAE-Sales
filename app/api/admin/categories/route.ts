@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import {
-  createCategory,
-  getCategories,
-} from "@/services/admin/admin-ops-store";
+  createCategoryRecord,
+  getAdminCategoryRecords,
+} from "@/services/categories/category-store";
 import type { AdminCategoryCreateInput } from "@/types";
 
 export async function GET(request: Request) {
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   if (role !== "admin") {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
   }
-  return NextResponse.json({ categories: getCategories() });
+  return NextResponse.json({ categories: await getAdminCategoryRecords() });
 }
 
 export async function POST(request: Request) {
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  const category = createCategory({
+  const category = await createCategoryRecord({
     name: body.name,
     slug: body.slug,
     icon: body.icon,

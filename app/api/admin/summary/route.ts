@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
 import { getAdminAuditLog } from "@/services/admin/admin-audit-store";
-import { getListings, getModerationSummary } from "@/services/admin/admin-ops-store";
 import {
   buildDailySeries,
   buildListingCategorySlices,
   buildOrderStatusSlices,
   buildPaymentStatusSlices,
 } from "@/services/admin/admin-analytics";
+import { getOpenDisputeCount } from "@/services/admin/dispute-store";
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
+import { getAllAddresses } from "@/services/addresses/address-store";
+import { getAllUsers } from "@/services/auth/user-store";
+import { getAdminCategoryRecords } from "@/services/categories/category-store";
+import { getAllFavorites } from "@/services/favorites/favorite-store";
+import { getAllJobApplications } from "@/services/job-applications/job-application-store";
+import {
+  getAdminListingRecords,
+  getAllListings,
+  getListingsModerationSummary,
+} from "@/services/listings/listing-store";
+import { getAllNotifications } from "@/services/payments/notification-store";
 import { getAllOrders } from "@/services/payments/order-store";
 import { getPaymentEvents } from "@/services/payments/payment-log";
 import { getAllWalletAccounts } from "@/services/payments/wallet-ledger";
-import { loadCollection } from "@/services/payments/data-store";
+import { getAllQuoteRequests } from "@/services/quote-requests/quote-request-store";
+import { getAllViewingBookings } from "@/services/viewing-bookings/viewing-booking-store";
 import {
   getStripeCurrency,
   getStripePublishableKey,
@@ -20,26 +32,48 @@ import {
   isStripeConfigured,
 } from "@/services/payments/payment-config";
 
-type LeadRow = { id: string; createdAt?: string };
-
 export async function GET(request: Request) {
   const role = request.headers.get("x-admin-role");
   if (role !== "admin") {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
   }
 
-  const moderation = getModerationSummary();
-  const listings = getListings();
   const settings = await getAdminSettings();
 
-  const [orders, events, jobs, bookings, quotes, wallets, audit] = await Promise.all([
+  const [
+    users,
+    listings,
+    listingStats,
+    adminListings,
+    categories,
+    openDisputes,
+    orders,
+    events,
+    jobs,
+    bookings,
+    quotes,
+    wallets,
+    audit,
+    notifications,
+    favorites,
+    addresses,
+  ] = await Promise.all([
+    getAllUsers(),
+    getAllListings(),
+    getListingsModerationSummary(),
+    getAdminListingRecords(),
+    getAdminCategoryRecords(),
+    getOpenDisputeCount(),
     getAllOrders(),
     getPaymentEvents(),
-    loadCollection<LeadRow>("job-applications.json").catch(() => [] as LeadRow[]),
-    loadCollection<LeadRow>("viewing-bookings.json").catch(() => [] as LeadRow[]),
-    loadCollection<LeadRow>("quote-requests.json").catch(() => [] as LeadRow[]),
+    getAllJobApplications(),
+    getAllViewingBookings(),
+    getAllQuoteRequests(),
     getAllWalletAccounts(),
     getAdminAuditLog(20),
+    getAllNotifications(),
+    getAllFavorites(),
+    getAllAddresses(),
   ]);
 
   const paid = orders.filter((o) => o.paymentStatus === "succeeded");
@@ -55,28 +89,34 @@ export async function GET(request: Request) {
   const fees = paid.reduce((sum, o) => sum + o.fees.platformFee, 0);
   const walletHeld = wallets.reduce((sum, w) => sum + w.heldInEscrow, 0);
   const walletAvailable = wallets.reduce((sum, w) => sum + w.availableBalance, 0);
+  const suspendedUsers = users.filter((u) => u.accountStatus === "suspended").length;
+  const disabledCategories = categories.filter((c) => !c.enabled).length;
+  const unreadNotifications = notifications.filter((n) => !n.read).length;
+  const submittedJobs = jobs.filter((j) => j.status === "submitted").length;
+  const activeBookings = bookings.filter((b) => b.status === "confirmed").length;
+  const openQuotes = quotes.filter((q) => q.status === "submitted").length;
 
   const attention = [
     {
       href: "/admin/listings",
       label: "إعلانات بانتظار المراجعة",
       meta: "اعتماد أو رفض",
-      count: moderation.pendingListings,
-      alert: moderation.pendingListings > 0,
+      count: listingStats.pendingListings,
+      alert: listingStats.pendingListings > 0,
     },
     {
       href: "/admin/disputes",
       label: "نزاعات مفتوحة",
       meta: "تحتاج حكم إداري",
-      count: moderation.openDisputes,
-      alert: moderation.openDisputes > 0,
+      count: openDisputes,
+      alert: openDisputes > 0,
     },
     {
       href: "/admin/users",
       label: "حسابات موقوفة",
       meta: "مراجعة حالة الحساب",
-      count: moderation.suspendedUsers,
-      alert: moderation.suspendedUsers > 0,
+      count: suspendedUsers,
+      alert: suspendedUsers > 0,
     },
     {
       href: "/admin/orders",
@@ -101,24 +141,31 @@ export async function GET(request: Request) {
     },
     {
       href: "/admin/job-applications",
-      label: "طلبات توظيف",
-      meta: "وارد جديد",
-      count: jobs.length,
-      alert: false,
+      label: "طلبات توظيف جديدة",
+      meta: "وارد",
+      count: submittedJobs,
+      alert: submittedJobs > 0,
     },
     {
       href: "/admin/viewing-bookings",
-      label: "حجوزات معاينة",
+      label: "معاينات مؤكدة",
       meta: "عقارات",
-      count: bookings.length,
+      count: activeBookings,
       alert: false,
     },
     {
       href: "/admin/quote-requests",
-      label: "عروض أسعار",
+      label: "عروض أسعار جديدة",
       meta: "خدمات",
-      count: quotes.length,
-      alert: false,
+      count: openQuotes,
+      alert: openQuotes > 0,
+    },
+    {
+      href: "/admin/notifications",
+      label: "إشعارات غير مقروءة",
+      meta: "تنبيهات المستخدمين",
+      count: unreadNotifications,
+      alert: unreadNotifications > 20,
     },
   ];
 
@@ -140,30 +187,30 @@ export async function GET(request: Request) {
     {
       href: "/admin/users",
       label: "المستخدمون",
-      meta: "تحقق وتعليق",
+      meta: "من حسابات الموقع الحية",
       group: "moderation",
-      count: moderation.totalUsers,
+      count: users.length,
     },
     {
       href: "/admin/listings",
       label: "الإعلانات",
-      meta: `${moderation.pendingListings} بانتظار المراجعة`,
+      meta: `${listingStats.pendingListings} بانتظار المراجعة`,
       group: "moderation",
-      count: moderation.totalListings,
+      count: listings.length,
     },
     {
       href: "/admin/disputes",
       label: "النزاعات",
-      meta: "حكم إداري",
+      meta: "من الطلبات + السجل",
       group: "moderation",
-      count: moderation.openDisputes,
+      count: openDisputes,
     },
     {
       href: "/admin/categories",
       label: "التصنيفات",
-      meta: "هيكل السوق",
+      meta: disabledCategories ? `${disabledCategories} معطّل` : "هيكل السوق",
       group: "moderation",
-      count: moderation.disabledCategories,
+      count: categories.length,
     },
     {
       href: "/admin/orders",
@@ -192,6 +239,27 @@ export async function GET(request: Request) {
       meta: isStripeConfigured() ? "متصل" : "غير مُعدّ",
       group: "money",
       count: events.length,
+    },
+    {
+      href: "/admin/favorites",
+      label: "المفضلة",
+      meta: "اهتمام المستخدمين",
+      group: "insight",
+      count: favorites.length,
+    },
+    {
+      href: "/admin/notifications",
+      label: "الإشعارات",
+      meta: `${unreadNotifications} غير مقروء`,
+      group: "leads",
+      count: notifications.length,
+    },
+    {
+      href: "/admin/addresses",
+      label: "العناوين",
+      meta: "عناوين التوصيل",
+      group: "leads",
+      count: addresses.length,
     },
     {
       href: "/admin/job-applications",
@@ -240,15 +308,20 @@ export async function GET(request: Request) {
       fees,
       currency: "AED",
       recentEvents: events.length,
-      pendingListings: moderation.pendingListings,
-      openDisputes: moderation.openDisputes,
-      totalUsers: moderation.totalUsers,
-      totalListings: moderation.totalListings,
+      pendingListings: listingStats.pendingListings,
+      openDisputes,
+      totalUsers: users.length,
+      totalListings: listings.length,
       walletAccounts: wallets.length,
       walletAvailable,
       walletHeld,
       conversionRate:
         orders.length === 0 ? 0 : Math.round((paid.length / orders.length) * 100),
+      favorites: favorites.length,
+      notifications: notifications.length,
+      unreadNotifications,
+      addresses: addresses.length,
+      activeListings: listingStats.activeListings,
     },
     attention,
     sections,
@@ -256,7 +329,7 @@ export async function GET(request: Request) {
       daily: buildDailySeries(orders, 7),
       orderStatuses: buildOrderStatusSlices(orders),
       paymentStatuses: buildPaymentStatusSlices(orders),
-      topCategories: buildListingCategorySlices(listings),
+      topCategories: buildListingCategorySlices(adminListings),
     },
     stripe: {
       configured: isStripeConfigured(),
