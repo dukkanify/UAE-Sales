@@ -46,16 +46,11 @@
 }
 
 .admin-ops__mark {
-  display: grid;
-  width: 2.35rem;
-  height: 2.35rem;
-  place-items: center;
+  display: block;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.85rem;
-  background: linear-gradient(135deg, #d4b06a 0%, var(--admin-gold) 55%, var(--admin-gold-deep) 100%);
-  font-size: 1rem;
-  font-weight: 900;
-  color: #0b1628;
-  box-shadow: 0 8px 20px rgb(201 164 92 / 28%);
+  box-shadow: 0 8px 20px rgb(11 22 40 / 22%);
 }
 
 .admin-ops__brand-name {

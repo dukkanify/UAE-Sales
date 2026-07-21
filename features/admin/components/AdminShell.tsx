@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -8,6 +9,7 @@ import type { UserProfile } from "@/types";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { BRAND } from "@/shared/constants/brand";
 import {
   clearSessionUser,
   getSessionUser,
@@ -119,9 +121,17 @@ export function AdminShell({
       <div className="admin-ops__aura" aria-hidden />
       <header className="admin-ops__topbar">
         <div className="admin-ops__brand">
-          <span className="admin-ops__mark">س</span>
+          <Image
+            alt={BRAND.nameAr}
+            className="admin-ops__mark"
+            height={40}
+            priority
+            src="/brand/logo-icon.svg"
+            unoptimized
+            width={40}
+          />
           <div>
-            <p className="admin-ops__brand-name">Sooqna Control</p>
+            <p className="admin-ops__brand-name">{BRAND.nameAr} Control</p>
             <p className="admin-ops__brand-sub">لوحة تشغيل السوق</p>
           </div>
         </div>

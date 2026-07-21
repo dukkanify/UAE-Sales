@@ -68,30 +68,20 @@
   text-align: center;
 }
 
-.admin-login__mark {
+.admin-login__logo {
   display: block;
+  width: min(100%, 17.5rem);
+  height: auto;
   margin-inline: auto;
-  border-radius: 1rem;
+  border-radius: 0.85rem;
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 45%) inset,
-    0 18px 40px rgb(212 176 106 / 28%);
+    0 1px 0 rgb(255 255 255 / 12%) inset,
+    0 18px 40px rgb(0 0 0 / 35%);
   animation: admin-login-pulse 3.4s ease-in-out infinite;
 }
 
-.admin-login__name {
-  margin-top: 0.85rem;
-  font-size: clamp(2.4rem, 8vw, 3.4rem);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  background: linear-gradient(180deg, #fff8ea 0%, #e8c57a 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
 .admin-login__tag {
-  margin-top: 0.55rem;
+  margin-top: 0.85rem;
   font-size: 0.8125rem;
   font-weight: 600;
   color: rgb(247 241 230 / 68%);
