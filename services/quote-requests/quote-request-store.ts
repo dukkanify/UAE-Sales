@@ -44,3 +44,15 @@ export async function createQuoteRequest(
   await saveCollection(FILE, all);
   return request;
 }
+
+export async function updateQuoteRequestStatus(
+  id: string,
+  status: QuoteRequest["status"],
+): Promise<QuoteRequest | undefined> {
+  const all = await loadCollection<QuoteRequest>(FILE);
+  const index = all.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+  all[index] = { ...all[index], status };
+  await saveCollection(FILE, all);
+  return all[index];
+}

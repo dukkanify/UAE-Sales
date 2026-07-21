@@ -33,7 +33,8 @@ export type AdminPath =
   | "/admin/job-applications"
   | "/admin/viewing-bookings"
   | "/admin/quote-requests"
-  | "/admin/settings";
+  | "/admin/settings"
+  | "/admin/audit";
 
 type AdminShellProps = {
   activePath: AdminPath;
@@ -155,6 +156,13 @@ const adminLinks: {
     label: "إعدادات الموقع",
     group: "system",
     keywords: "رسوم صيانة stripe url",
+  },
+  {
+    href: "/admin/audit",
+    icon: "clock",
+    label: "سجل العمليات",
+    group: "system",
+    keywords: "audit log تاريخ",
   },
 ];
 

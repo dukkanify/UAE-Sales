@@ -38,3 +38,15 @@ export async function createJobApplication(
   await saveCollection(FILE, all);
   return application;
 }
+
+export async function updateJobApplicationStatus(
+  id: string,
+  status: JobApplication["status"],
+): Promise<JobApplication | undefined> {
+  const all = await loadCollection<JobApplication>(FILE);
+  const index = all.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+  all[index] = { ...all[index], status };
+  await saveCollection(FILE, all);
+  return all[index];
+}

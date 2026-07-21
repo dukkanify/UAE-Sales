@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { logAdminAction } from "@/services/admin/admin-audit-store";
 import {
   getAdminSettings,
   updateAdminSettings,
@@ -44,6 +45,17 @@ export async function PATCH(request: Request) {
       typeof body.stripeDashboardUrl === "string"
         ? body.stripeDashboardUrl
         : undefined,
+  });
+
+  await logAdminAction({
+    actorId: typeof body.actorId === "string" ? body.actorId : "admin",
+    actorName: typeof body.actorName === "string" ? body.actorName : "Admin",
+    action: "settings_update",
+    targetType: "settings",
+    targetId: "site",
+    detail: `رسوم ${settings.platformFeePercent}% · صيانة ${
+      settings.maintenanceMode ? "نعم" : "لا"
+    }`,
   });
 
   return NextResponse.json({ settings });

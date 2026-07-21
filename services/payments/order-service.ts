@@ -467,3 +467,109 @@ export async function refundOrder(
 
   return updated;
 }
+
+/** Admin force-release of held escrow to the seller (no buyer confirmation). */
+export async function adminReleaseEscrow(
+  orderId: string,
+  adminRole?: string,
+): Promise<Order | undefined> {
+  if (adminRole !== "admin") {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+
+  if (order.escrowStatus === "released" && order.status === "released") {
+    return order;
+  }
+
+  if (order.escrowStatus === "refunded" || order.status === "refunded") {
+    throw new Error("ALREADY_REFUNDED");
+  }
+
+  if (order.escrowStatus !== "held" && order.status !== "paid_held_in_escrow") {
+    throw new Error("NOT_HELD");
+  }
+
+  let working = order;
+
+  if (working.status === "paid_held_in_escrow" || working.status === "delivered") {
+    if (!isValidOrderTransition(working.status, "confirmed")) {
+      throw new Error("INVALID_STATUS");
+    }
+    const confirmed = await updateOrder(
+      orderId,
+      {
+        status: "confirmed",
+        escrowStatus: "released",
+        confirmedAt: new Date().toISOString(),
+        releasedAt: new Date().toISOString(),
+      },
+      {
+        type: "admin_escrow_release",
+        message: "حرّر المدير الضمان إدارياً",
+      },
+    );
+    if (!confirmed) return undefined;
+    working = confirmed;
+  } else if (working.status === "confirmed" || working.status === "disputed") {
+    if (!isValidOrderTransition(working.status, "released")) {
+      throw new Error("INVALID_STATUS");
+    }
+    const releasedMid = await updateOrder(
+      orderId,
+      {
+        status: "released",
+        escrowStatus: "released",
+        releasedAt: new Date().toISOString(),
+      },
+      {
+        type: "admin_escrow_release",
+        message: "حرّر المدير الضمان إدارياً",
+      },
+    );
+    if (!releasedMid) return undefined;
+
+    const sellerNet = order.fees.productPrice;
+    await addWalletTransaction(order.sellerId, {
+      orderId: order.id,
+      type: "escrow_release",
+      amount: sellerNet,
+      description: `تحرير إداري للضمان — ${order.listingTitle}`,
+      status: "completed",
+    });
+
+    await createNotification({
+      userId: order.sellerId,
+      orderId: order.id,
+      type: "order_released",
+      title: "تم تحويل المبلغ",
+      body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+    });
+
+    return releasedMid;
+  } else {
+    throw new Error("INVALID_STATUS");
+  }
+
+  const sellerNet = order.fees.productPrice;
+  await addWalletTransaction(order.sellerId, {
+    orderId: order.id,
+    type: "escrow_release",
+    amount: sellerNet,
+    description: `تحرير إداري للضمان — ${order.listingTitle}`,
+    status: "completed",
+  });
+
+  await createNotification({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "order_released",
+    title: "تم تحويل المبلغ",
+    body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+  });
+
+  const released = await updateOrder(orderId, { status: "released" });
+  return released;
+}

@@ -25,6 +25,7 @@ export function AdminSettingsPanel() {
 
   async function handleSave() {
     if (!settings) return;
+    const user = getSessionUser();
     setSaving(true);
     setMessage("");
     try {
@@ -34,7 +35,11 @@ export function AdminSettingsPanel() {
           "content-type": "application/json",
           "x-admin-role": "admin",
         },
-        body: JSON.stringify(settings),
+        body: JSON.stringify({
+          ...settings,
+          actorId: user?.id,
+          actorName: user?.fullName,
+        }),
       });
       const data = await res.json();
       if (data?.settings) {

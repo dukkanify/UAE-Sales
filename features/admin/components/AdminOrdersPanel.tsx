@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import type { Order } from "@/types";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
-import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
@@ -17,23 +16,25 @@ const customerTypeLabels: Record<NonNullable<Order["customerType"]>, string> = {
 
 export function AdminOrdersPanel() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [refundingId, setRefundingId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-  useEffect(() => {
+  function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/orders", {
-      headers: { "x-admin-role": "admin" },
-    })
+    fetch("/api/admin/orders", { headers: { "x-admin-role": "admin" } })
       .then((res) => res.json())
       .then((data) => setOrders(data.orders ?? []))
       .catch(() => setOrders([]));
+  }
+
+  useEffect(() => {
+    load();
   }, []);
 
   async function handleRefund(orderId: string) {
     const user = getSessionUser();
     if (!user) return;
-    setRefundingId(orderId);
+    setBusyId(orderId);
     try {
       const response = await fetch(`/api/orders/${orderId}/refund`, {
         method: "POST",
@@ -54,7 +55,34 @@ export function AdminOrdersPanel() {
         );
       }
     } finally {
-      setRefundingId(null);
+      setBusyId(null);
+    }
+  }
+
+  async function handleRelease(orderId: string) {
+    const user = getSessionUser();
+    if (!user) return;
+    setBusyId(orderId);
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/release`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-admin-role": "admin",
+        },
+        body: JSON.stringify({
+          actorId: user.id,
+          actorName: user.fullName,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.order) {
+        setOrders((prev) =>
+          prev.map((order) => (order.id === orderId ? data.order : order)),
+        );
+      }
+    } finally {
+      setBusyId(null);
     }
   }
 
@@ -65,81 +93,74 @@ export function AdminOrdersPanel() {
           <p className="text-sm text-muted">لا توجد طلبات بعد.</p>
         </Card>
       ) : (
-        orders.map((order) => (
-          <Card key={order.id} className="p-5" variant="flat">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold text-ink">{order.listingTitle}</p>
-                <p className="mt-1 text-xs text-muted">{order.id}</p>
-                <p className="mt-2 text-sm">
-                  {order.buyerName} → {order.sellerName}
-                </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {order.customerType ? (
-                    <Badge variant="muted">{customerTypeLabels[order.customerType]}</Badge>
-                  ) : null}
-                  {order.emailDeliveryStatus ? (
-                    <Badge variant="muted">البريد: {order.emailDeliveryStatus}</Badge>
-                  ) : null}
-                  {order.accountSetupEmailSent ? (
-                    <Badge variant="muted">رابط إعداد الحساب: مرسل</Badge>
-                  ) : null}
-                </div>
-                {order.guestEmail ? (
-                  <p className="mt-2 text-xs text-muted">
-                    ضيف: {order.guestEmail}
-                    {order.guestPhone ? ` — ${order.guestPhone}` : ""}
+        <ul className="admin-ops__queue">
+          {orders.map((order) => {
+            const held =
+              order.escrowStatus === "held" ||
+              order.status === "paid_held_in_escrow";
+            return (
+              <li key={order.id} className="admin-ops__queue-item" style={{ alignItems: "flex-start" }}>
+                <div>
+                  <p className="admin-ops__queue-label">{order.listingTitle}</p>
+                  <p className="admin-ops__queue-meta">{order.id}</p>
+                  <p className="admin-ops__queue-meta">
+                    {order.buyerName} → {order.sellerName}
+                    {order.customerType
+                      ? ` · ${customerTypeLabels[order.customerType]}`
+                      : ""}
                   </p>
-                ) : null}
-                {order.buyerId ? (
-                  <Link
-                    className="mt-1 inline-block text-xs font-semibold text-primary"
-                    href={`/profile`}
-                  >
-                    حساب المشتري: {order.buyerId}
-                  </Link>
-                ) : null}
-              </div>
-              <div className="text-left">
-                <CurrencyAmount amount={order.fees.total} size="lg" />
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <Badge variant="muted">{order.status}</Badge>
-                  <Badge variant="escrow">{order.paymentStatus}</Badge>
+                  {order.stripePaymentIntentId ? (
+                    <p className="admin-ops__queue-meta font-mono">
+                      Stripe: {order.stripePaymentIntentId}
+                    </p>
+                  ) : null}
+                  <ul className="mt-2 grid gap-1">
+                    {order.auditLog.slice(0, 2).map((event) => (
+                      <li key={event.id} className="admin-ops__queue-meta">
+                        {event.message}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            </div>
-            {order.stripePaymentIntentId ? (
-              <p className="mt-3 font-mono text-xs text-muted">
-                Stripe: {order.stripePaymentIntentId}
-              </p>
-            ) : null}
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button href={`/orders/${order.id}`} size="sm" variant="secondary">
-                عرض
-              </Button>
-              {order.status !== "refunded" ? (
-                <Button
-                  loading={refundingId === order.id}
-                  onClick={() => handleRefund(order.id)}
-                  size="sm"
-                  variant="ghost"
-                >
-                  استرداد
-                </Button>
-              ) : null}
-            </div>
-            <ul className="mt-4 grid gap-1 border-t border-border pt-3">
-              {order.auditLog.slice(0, 3).map((event) => (
-                <li key={event.id} className="text-xs text-muted">
-                  {event.message} — {new Date(event.createdAt).toLocaleString("ar-AE")}
-                </li>
-              ))}
-            </ul>
-          </Card>
-        ))
+                <div className="flex flex-col items-end gap-2">
+                  <CurrencyAmount amount={order.fees.total} size="sm" />
+                  <span className="admin-ops__status-chip">
+                    {order.status} · {order.paymentStatus}
+                  </span>
+                  <div className="flex flex-wrap justify-end gap-2">
+                    <Button href={`/orders/${order.id}`} size="sm" variant="secondary">
+                      عرض
+                    </Button>
+                    {held ? (
+                      <Button
+                        loading={busyId === order.id}
+                        onClick={() => handleRelease(order.id)}
+                        size="sm"
+                        type="button"
+                      >
+                        تحرير ضمان
+                      </Button>
+                    ) : null}
+                    {order.status !== "refunded" ? (
+                      <Button
+                        loading={busyId === order.id}
+                        onClick={() => handleRefund(order.id)}
+                        size="sm"
+                        type="button"
+                        variant="ghost"
+                      >
+                        استرداد
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
-      <Link className="text-sm font-semibold text-primary" href="/admin">
-        ← العودة للإدارة
+      <Link className="admin-ops__text-link" href="/admin">
+        غرفة التحكم
       </Link>
     </div>
   );

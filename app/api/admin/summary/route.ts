@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAdminAuditLog } from "@/services/admin/admin-audit-store";
 import { getListings, getModerationSummary } from "@/services/admin/admin-ops-store";
 import {
   buildDailySeries,
@@ -31,13 +32,14 @@ export async function GET(request: Request) {
   const listings = getListings();
   const settings = await getAdminSettings();
 
-  const [orders, events, jobs, bookings, quotes, wallets] = await Promise.all([
+  const [orders, events, jobs, bookings, quotes, wallets, audit] = await Promise.all([
     getAllOrders(),
     getPaymentEvents(),
     loadCollection<LeadRow>("job-applications.json").catch(() => [] as LeadRow[]),
     loadCollection<LeadRow>("viewing-bookings.json").catch(() => [] as LeadRow[]),
     loadCollection<LeadRow>("quote-requests.json").catch(() => [] as LeadRow[]),
     getAllWalletAccounts(),
+    getAdminAuditLog(20),
   ]);
 
   const paid = orders.filter((o) => o.paymentStatus === "succeeded");
@@ -218,6 +220,13 @@ export async function GET(request: Request) {
       meta: settings.maintenanceMode ? "وضع الصيانة" : "تشغيل عادي",
       group: "system",
       count: settings.platformFeePercent,
+    },
+    {
+      href: "/admin/audit",
+      label: "سجل العمليات",
+      meta: "تتبع إجراءات المدير",
+      group: "system",
+      count: audit.length,
     },
   ];
 
