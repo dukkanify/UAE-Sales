@@ -151,12 +151,14 @@ export function AdminOpsCockpit() {
       </div>
 
       <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
-        <div className="admin-ops__kpi">
+        <div className="admin-ops__kpi admin-ops__kpi--feature">
           <p className="admin-ops__kpi-label">حجم المدفوعات</p>
           <div className="admin-ops__kpi-value">
-            <CurrencyAmount amount={kpis.volume} size="md" />
+            <CurrencyAmount amount={kpis.volume} size="lg" />
           </div>
-          <p className="admin-ops__kpi-hint">{kpis.paidOrders} طلب مدفوع</p>
+          <p className="admin-ops__kpi-hint">
+            {kpis.paidOrders} طلب مدفوع · تحويل {kpis.conversionRate}%
+          </p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">رسوم المنصة</p>
@@ -164,13 +166,6 @@ export function AdminOpsCockpit() {
             <CurrencyAmount amount={kpis.fees} size="md" />
           </div>
           <p className="admin-ops__kpi-hint">إيراد تشغيلي</p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">نسبة التحويل</p>
-          <p className="admin-ops__kpi-value">{kpis.conversionRate}%</p>
-          <p className="admin-ops__kpi-hint">
-            {kpis.paidOrders}/{kpis.totalOrders} طلب
-          </p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">بانتظار المراجعة</p>

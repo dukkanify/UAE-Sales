@@ -46,12 +46,10 @@
   pointer-events: none;
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(rgb(255 255 255 / 3.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 3.5%) 1px, transparent 1px);
-  background-size: 42px 42px;
-  mask-image: radial-gradient(circle at center, #000 28%, transparent 78%);
-  opacity: 0.55;
+  background-image: url("/brand/pattern.svg");
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, #000 18%, transparent 72%);
+  opacity: 0.28;
 }
 
 .admin-login__stage {

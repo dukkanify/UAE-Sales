@@ -5,8 +5,8 @@ export default function AdminPage() {
   return (
     <AdminShell
       activePath="/admin"
-      description="تقارير، تحليلات، إشراف، مدفوعات Stripe، ومحافظ — كل أقسام الموقع من مكان واحد."
-      title="غرفة التحكم الكاملة"
+      description="نبض السوق بين يديك — تقارير، تحليلات، مدفوعات Stripe، وإشراف كامل من غرفة قيادة واحدة."
+      title="غرفة قيادة سوقنا"
     >
       <AdminOpsCockpit />
     </AdminShell>
