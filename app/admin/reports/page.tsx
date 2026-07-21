@@ -5,8 +5,8 @@ export default function AdminReportsPage() {
   return (
     <AdminShell
       activePath="/admin/reports"
-      description="حجم المدفوعات، رسوم المنصة، وسجل أحداث Stripe."
-      title="تقارير الدفع"
+      description="تقارير مالية تفصيلية: الحجم، الرسوم، التحويل، المحافظ، وسجل أحداث الدفع."
+      title="التقارير المالية"
     >
       <AdminReportsPanel />
     </AdminShell>

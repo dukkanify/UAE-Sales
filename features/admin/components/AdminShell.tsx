@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { UserProfile } from "@/types";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import type { IconName } from "@/shared/ui/Icon";
 import { BRAND } from "@/shared/constants/brand";
 import {
   clearSessionUser,
@@ -19,16 +20,20 @@ import "./admin-ops.css";
 
 export type AdminPath =
   | "/admin"
+  | "/admin/analytics"
+  | "/admin/reports"
   | "/admin/users"
   | "/admin/listings"
   | "/admin/disputes"
   | "/admin/categories"
   | "/admin/orders"
   | "/admin/escrow"
-  | "/admin/reports"
+  | "/admin/wallets"
+  | "/admin/stripe"
   | "/admin/job-applications"
   | "/admin/viewing-bookings"
-  | "/admin/quote-requests";
+  | "/admin/quote-requests"
+  | "/admin/settings";
 
 type AdminShellProps = {
   activePath: AdminPath;
@@ -37,40 +42,138 @@ type AdminShellProps = {
   title: string;
 };
 
+type NavGroup = "ops" | "insight" | "moderation" | "money" | "leads" | "system";
+
 const adminLinks: {
   href: AdminPath;
-  icon:
-    | "chart"
-    | "user"
-    | "grid"
-    | "message"
-    | "briefcase"
-    | "package"
-    | "shield"
-    | "wallet"
-    | "home"
-    | "wrench";
+  icon: IconName;
   label: string;
-  group: "ops" | "moderation" | "money" | "leads";
+  group: NavGroup;
+  keywords: string;
 }[] = [
-  { href: "/admin", icon: "chart", label: "غرفة العمليات", group: "ops" },
-  { href: "/admin/users", icon: "user", label: "المستخدمون", group: "moderation" },
-  { href: "/admin/listings", icon: "grid", label: "الإعلانات", group: "moderation" },
-  { href: "/admin/disputes", icon: "message", label: "النزاعات", group: "moderation" },
-  { href: "/admin/categories", icon: "briefcase", label: "التصنيفات", group: "moderation" },
-  { href: "/admin/orders", icon: "package", label: "الطلبات", group: "money" },
-  { href: "/admin/escrow", icon: "shield", label: "الضمان", group: "money" },
-  { href: "/admin/reports", icon: "wallet", label: "التقارير", group: "money" },
-  { href: "/admin/job-applications", icon: "briefcase", label: "التوظيف", group: "leads" },
-  { href: "/admin/viewing-bookings", icon: "home", label: "المعاينات", group: "leads" },
-  { href: "/admin/quote-requests", icon: "wrench", label: "عروض الأسعار", group: "leads" },
+  {
+    href: "/admin",
+    icon: "home",
+    label: "غرفة التحكم",
+    group: "ops",
+    keywords: "لوحة رئيسية dashboard",
+  },
+  {
+    href: "/admin/analytics",
+    icon: "chart",
+    label: "التحليلات",
+    group: "insight",
+    keywords: "إحصائيات charts trends",
+  },
+  {
+    href: "/admin/reports",
+    icon: "wallet",
+    label: "التقارير",
+    group: "insight",
+    keywords: "مالية fees volume",
+  },
+  {
+    href: "/admin/users",
+    icon: "user",
+    label: "المستخدمون",
+    group: "moderation",
+    keywords: "حسابات تعليق تحقق",
+  },
+  {
+    href: "/admin/listings",
+    icon: "grid",
+    label: "الإعلانات",
+    group: "moderation",
+    keywords: "مراجعة اعتماد",
+  },
+  {
+    href: "/admin/disputes",
+    icon: "message",
+    label: "النزاعات",
+    group: "moderation",
+    keywords: "خلاف حكم",
+  },
+  {
+    href: "/admin/categories",
+    icon: "briefcase",
+    label: "التصنيفات",
+    group: "moderation",
+    keywords: "فئات",
+  },
+  {
+    href: "/admin/orders",
+    icon: "package",
+    label: "الطلبات",
+    group: "money",
+    keywords: "استرداد checkout",
+  },
+  {
+    href: "/admin/escrow",
+    icon: "shield",
+    label: "الضمان",
+    group: "money",
+    keywords: "حجز escrow",
+  },
+  {
+    href: "/admin/wallets",
+    icon: "wallet",
+    label: "المحافظ",
+    group: "money",
+    keywords: "أرصدة",
+  },
+  {
+    href: "/admin/stripe",
+    icon: "star",
+    label: "Stripe",
+    group: "money",
+    keywords: "دفع بوابة webhook payments",
+  },
+  {
+    href: "/admin/job-applications",
+    icon: "briefcase",
+    label: "التوظيف",
+    group: "leads",
+    keywords: "وظائف",
+  },
+  {
+    href: "/admin/viewing-bookings",
+    icon: "home",
+    label: "المعاينات",
+    group: "leads",
+    keywords: "عقارات",
+  },
+  {
+    href: "/admin/quote-requests",
+    icon: "wrench",
+    label: "عروض الأسعار",
+    group: "leads",
+    keywords: "خدمات",
+  },
+  {
+    href: "/admin/settings",
+    icon: "filter",
+    label: "إعدادات الموقع",
+    group: "system",
+    keywords: "رسوم صيانة stripe url",
+  },
 ];
 
-const groupLabels: Record<(typeof adminLinks)[number]["group"], string> = {
+const groupOrder: NavGroup[] = [
+  "ops",
+  "insight",
+  "moderation",
+  "money",
+  "leads",
+  "system",
+];
+
+const groupLabels: Record<NavGroup, string> = {
   ops: "القيادة",
+  insight: "تقارير وتحليلات",
   moderation: "الإشراف",
-  money: "المال",
+  money: "المال والمدفوعات",
   leads: "الوارد",
+  system: "النظام",
 };
 
 export function AdminShell({
@@ -83,13 +186,13 @@ export function AdminShell({
     "loading",
   );
   const [displayUser, setDisplayUser] = useState<UserProfile | null>(null);
+  const [query, setQuery] = useState("");
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     const sessionUser = getSessionUser();
     if (!sessionUser || sessionUser.role !== "admin") {
-      // Guests and non-admins go straight to login — no unauthorized interstitial.
       router.replace(`/login?next=${encodeURIComponent(activePath)}`);
       return;
     }
@@ -99,6 +202,17 @@ export function AdminShell({
     }, 0);
     return () => window.clearTimeout(timeoutId);
   }, [pathname, activePath, router]);
+
+  const filteredLinks = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return adminLinks;
+    return adminLinks.filter(
+      (link) =>
+        link.label.includes(query.trim()) ||
+        link.keywords.toLowerCase().includes(q) ||
+        link.href.includes(q),
+    );
+  }, [query]);
 
   async function handleLogout() {
     clearSessionUser();
@@ -132,7 +246,7 @@ export function AdminShell({
           />
           <div>
             <p className="admin-ops__brand-name">{BRAND.nameAr} Control</p>
-            <p className="admin-ops__brand-sub">لوحة تشغيل السوق</p>
+            <p className="admin-ops__brand-sub">لوحة تحكم كاملة للموقع</p>
           </div>
         </div>
         <div className="admin-ops__top-actions">
@@ -148,13 +262,24 @@ export function AdminShell({
 
       <div className="admin-ops__layout">
         <aside className="admin-ops__sidebar" aria-label="تنقل الإدارة">
+          <label className="admin-ops__search">
+            <Icon name="search" size={14} />
+            <input
+              aria-label="بحث في أقسام اللوحة"
+              placeholder="بحث سريع في الأقسام..."
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </label>
           <nav className="admin-ops__nav">
-            {(["ops", "moderation", "money", "leads"] as const).map((group) => (
-              <div key={group} className="admin-ops__nav-group">
-                <p className="admin-ops__nav-group-label">{groupLabels[group]}</p>
-                {adminLinks
-                  .filter((link) => link.group === group)
-                  .map((link) => {
+            {groupOrder.map((group) => {
+              const links = filteredLinks.filter((link) => link.group === group);
+              if (links.length === 0) return null;
+              return (
+                <div key={group} className="admin-ops__nav-group">
+                  <p className="admin-ops__nav-group-label">{groupLabels[group]}</p>
+                  {links.map((link) => {
                     const active = link.href === activePath;
                     return (
                       <Link
@@ -169,12 +294,23 @@ export function AdminShell({
                       </Link>
                     );
                   })}
-              </div>
-            ))}
+                </div>
+              );
+            })}
           </nav>
-          <Link className="admin-ops__back" href="/">
-            ← العودة لسوقنا
-          </Link>
+          <div className="admin-ops__sidebar-footer">
+            <a
+              className="admin-ops__back"
+              href="https://dashboard.stripe.com"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Stripe Dashboard ↗
+            </a>
+            <Link className="admin-ops__back" href="/">
+              ← العودة لسوقنا
+            </Link>
+          </div>
         </aside>
 
         <div className="admin-ops__main">
@@ -194,7 +330,7 @@ export function AdminShell({
           </div>
 
           <div className="admin-ops__hero">
-            <p className="admin-ops__eyebrow">الإدارة</p>
+            <p className="admin-ops__eyebrow">لوحة التحكم الكاملة</p>
             <h1 className="admin-ops__title">{title}</h1>
             <p className="admin-ops__desc">{description}</p>
           </div>

@@ -4,6 +4,7 @@ import {
   buildDailySeries,
   buildListingCategorySlices,
   buildOrderStatusSlices,
+  buildPaymentStatusSlices,
 } from "@/services/admin/admin-analytics";
 import { getAllOrders } from "@/services/payments/order-store";
 import { getPaymentEvents } from "@/services/payments/payment-log";
@@ -23,38 +24,27 @@ export async function GET(request: Request) {
     getAllWalletAccounts(),
   ]);
 
-  const paidOrders = orders.filter((o) => o.paymentStatus === "succeeded");
-  const refundedOrders = orders.filter((o) => o.status === "refunded");
-  const totalVolume = paidOrders.reduce((sum, o) => sum + o.fees.total, 0);
-  const totalFees = paidOrders.reduce((sum, o) => sum + o.fees.platformFee, 0);
-  const gatewayFees = paidOrders.reduce((sum, o) => sum + o.fees.gatewayFee, 0);
+  const paid = orders.filter((o) => o.paymentStatus === "succeeded");
+  const volume = paid.reduce((sum, o) => sum + o.fees.total, 0);
+  const fees = paid.reduce((sum, o) => sum + o.fees.platformFee, 0);
 
   return NextResponse.json({
-    summary: {
+    overview: {
       totalOrders: orders.length,
-      paidOrders: paidOrders.length,
-      refundedOrders: refundedOrders.length,
-      totalVolume,
-      totalPlatformFees: totalFees,
-      totalGatewayFees: gatewayFees,
+      paidOrders: paid.length,
+      volume,
+      fees,
       currency: "AED",
       conversionRate:
-        orders.length === 0
-          ? 0
-          : Math.round((paidOrders.length / orders.length) * 100),
+        orders.length === 0 ? 0 : Math.round((paid.length / orders.length) * 100),
       totalUsers: moderation.totalUsers,
       totalListings: moderation.totalListings,
-      pendingListings: moderation.pendingListings,
-      openDisputes: moderation.openDisputes,
+      walletAccounts: wallets.length,
+      recentEvents: events.length,
     },
-    daily: buildDailySeries(orders, 7),
+    daily: buildDailySeries(orders, 14),
     orderStatuses: buildOrderStatusSlices(orders),
+    paymentStatuses: buildPaymentStatusSlices(orders),
     topCategories: buildListingCategorySlices(listings),
-    recentEvents: events.slice(0, 30),
-    walletAccounts: wallets.length,
-    walletBalances: {
-      available: wallets.reduce((sum, w) => sum + w.availableBalance, 0),
-      held: wallets.reduce((sum, w) => sum + w.heldInEscrow, 0),
-    },
   });
 }

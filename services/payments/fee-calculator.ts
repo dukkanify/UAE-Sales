@@ -1,17 +1,19 @@
 import type { OrderFeeBreakdown } from "@/types/domain/order";
-
-const PLATFORM_FEE_RATE = 0.025;
-const GATEWAY_FEE_RATE = 0.029;
-const GATEWAY_FEE_FIXED = 1;
+import { getAdminSettingsSync } from "@/services/admin/admin-settings-store";
 
 export function calculateOrderFees(
   productPrice: number,
   shippingFee = 0,
 ): OrderFeeBreakdown {
+  const settings = getAdminSettingsSync();
+  const platformRate = settings.platformFeePercent / 100;
+  const gatewayRate = settings.gatewayFeePercent / 100;
+  const gatewayFixed = settings.gatewayFeeFixed;
+
   const safePrice = Math.max(0, Math.round(productPrice));
   const safeShipping = Math.max(0, Math.round(shippingFee));
-  const platformFee = Math.round(safePrice * PLATFORM_FEE_RATE);
-  const gatewayFee = Math.round(safePrice * GATEWAY_FEE_RATE + GATEWAY_FEE_FIXED);
+  const platformFee = Math.round(safePrice * platformRate);
+  const gatewayFee = Math.round(safePrice * gatewayRate + gatewayFixed);
   const total = safePrice + safeShipping + platformFee + gatewayFee;
 
   return {
