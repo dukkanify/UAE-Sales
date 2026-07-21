@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
-import { AdminUnauthorized } from "@/features/admin/components/AdminUnauthorized";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
@@ -87,14 +86,14 @@ export function AdminShell({
 
   useEffect(() => {
     const sessionUser = getSessionUser();
-    if (!sessionUser) {
-      // Immediate client redirect if cookie gate somehow skipped (localStorage-only session).
+    if (!sessionUser || sessionUser.role !== "admin") {
+      // Guests and non-admins go straight to login — no unauthorized interstitial.
       router.replace(`/login?next=${encodeURIComponent(activePath)}`);
       return;
     }
     const timeoutId = window.setTimeout(() => {
       setDisplayUser(sessionUser);
-      setAuthState(sessionUser.role === "admin" ? "admin" : "user");
+      setAuthState("admin");
     }, 0);
     return () => window.clearTimeout(timeoutId);
   }, [pathname, activePath, router]);
@@ -105,7 +104,7 @@ export function AdminShell({
     router.push("/login?next=/admin");
   }
 
-  if (authState === "loading") {
+  if (authState !== "admin") {
     return (
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
@@ -113,10 +112,6 @@ export function AdminShell({
         </Card>
       </section>
     );
-  }
-
-  if (authState === "user") {
-    return <AdminUnauthorized />;
   }
 
   return (

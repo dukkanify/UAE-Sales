@@ -42,10 +42,10 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  // Admin requires login immediately — no flash of the control panel.
+  // Admin requires an admin session immediately.
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     const role = readSessionRole(request);
-    if (!role) {
+    if (role !== "admin") {
       return redirectToLogin(request, `${pathname}${request.nextUrl.search}`);
     }
   }
