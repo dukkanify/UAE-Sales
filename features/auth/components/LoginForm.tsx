@@ -37,16 +37,21 @@ function getLoginErrorMessage(data: { message?: string; error?: string }, email:
   return data.message ?? "بيانات الدخول غير صحيحة.";
 }
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Admin gate: only the credentials form, no demo account grid. */
+  variant?: "default" | "admin";
+};
+
+export function LoginForm({ variant = "default" }: LoginFormProps) {
   const [errors, setErrors] = useState<LoginErrors>({});
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const emailOtpEnabled = isEmailOtpEnabled();
-  const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
+  const [usePassword, setUsePassword] = useState(!emailOtpEnabled || variant === "admin");
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
-  const isAdminNext = Boolean(nextPath?.startsWith("/admin"));
+  const isAdminNext = variant === "admin" || Boolean(nextPath?.startsWith("/admin"));
 
   const completePasswordLogin = useCallback(
     async (nextEmail: string, nextPassword: string) => {
@@ -156,14 +161,14 @@ export function LoginForm() {
       <form className="auth-form" noValidate onSubmit={handleSubmit}>
         <div className="auth-form__header">
           <p className="auth-form__eyebrow">
-            {isAdminNext ? "دخول لوحة الإدارة" : "تسجيل الدخول"}
+            {isAdminNext ? "دخول آمن" : "تسجيل الدخول"}
           </p>
           <h2 className="auth-form__title">
-            {isAdminNext ? "سجّل الدخول للمتابعة إلى الأدمن" : "ادخل إلى حسابك"}
+            {isAdminNext ? "بيانات المدير" : "ادخل إلى حسابك"}
           </h2>
           <p className="auth-form__subtitle">
             {isAdminNext
-              ? "هذه المنطقة محمية. استخدم حساب المدير للوصول إلى غرفة العمليات."
+              ? "أدخل بريد المدير وكلمة المرور للمتابعة."
               : emailOtpEnabled
                 ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
                 : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
@@ -199,7 +204,9 @@ export function LoginForm() {
         {authError ? <FormMessage variant="error">{authError}</FormMessage> : null}
 
         <div className="auth-form__links">
-          {emailOtpEnabled ? (
+          {variant === "admin" ? (
+            <p className="text-muted">وصول محمي لغرفة عمليات سوقنا فقط.</p>
+          ) : emailOtpEnabled ? (
             <button
               className="text-primary"
               onClick={() => setUsePassword((value) => !value)}
@@ -216,7 +223,7 @@ export function LoginForm() {
               أو أكمل الشراء كضيف.
             </p>
           )}
-          {emailOtpEnabled ? (
+          {variant !== "admin" && emailOtpEnabled ? (
             <Link className="text-primary" href="/forgot-password">
               نسيت كلمة المرور؟
             </Link>
@@ -224,15 +231,21 @@ export function LoginForm() {
         </div>
 
         <Button fullWidth loading={isBusy} type="submit" variant="accent">
-          {usePassword || !emailOtpEnabled ? "تسجيل الدخول" : "إرسال رمز الدخول"}
+          {usePassword || !emailOtpEnabled || variant === "admin"
+            ? isAdminNext
+              ? "دخول غرفة التحكم"
+              : "تسجيل الدخول"
+            : "إرسال رمز الدخول"}
         </Button>
       </form>
 
-      <DemoAccountsPanel
-        isLoading={isBusy}
-        onFillAccount={fillDemoAccount}
-        onLoginAccount={loginDemoAccount}
-      />
+      {variant === "admin" ? null : (
+        <DemoAccountsPanel
+          isLoading={isBusy}
+          onFillAccount={fillDemoAccount}
+          onLoginAccount={loginDemoAccount}
+        />
+      )}
     </>
   );
 }
