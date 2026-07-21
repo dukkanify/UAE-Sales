@@ -69,16 +69,9 @@
 }
 
 .admin-login__mark {
-  display: grid;
-  width: 3.25rem;
-  height: 3.25rem;
+  display: block;
   margin-inline: auto;
-  place-items: center;
   border-radius: 1rem;
-  background: linear-gradient(145deg, #efd7a2 0%, var(--al-gold) 48%, var(--al-gold-deep) 100%);
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: var(--al-ink);
   box-shadow:
     0 1px 0 rgb(255 255 255 / 45%) inset,
     0 18px 40px rgb(212 176 106 / 28%);
