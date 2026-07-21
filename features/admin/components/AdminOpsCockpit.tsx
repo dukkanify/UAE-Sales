@@ -79,11 +79,11 @@ type OpsSummary = {
 };
 
 const sectionGroupLabels: Record<string, string> = {
-  insight: "تقارير وتحليلات",
-  moderation: "إشراف السوق",
-  money: "مال ومدفوعات",
-  leads: "وارد الطلبات",
-  system: "النظام",
+  insight: "تقارير",
+  moderation: "إشراف",
+  money: "مدفوعات",
+  leads: "وارد",
+  system: "نظام",
 };
 
 export function AdminOpsCockpit() {
@@ -106,7 +106,7 @@ export function AdminOpsCockpit() {
   if (!summary) {
     return (
       <Card className="p-8 text-center" variant="flat">
-        <p className="text-sm text-muted">جاري تحميل غرفة التحكم...</p>
+        <p className="text-sm text-muted">جاري تحميل لوحة التحكم...</p>
       </Card>
     );
   }
@@ -123,17 +123,17 @@ export function AdminOpsCockpit() {
             stripe.configured ? " admin-ops__status-chip--ok" : " admin-ops__status-chip--warn"
           }`}
         >
-          Stripe: {stripe.configured ? "متصل" : "غير مُعدّ"} · {stripe.currency.toUpperCase()}
+          Stripe {stripe.configured ? "متصل" : "غير مُعدّ"} · {stripe.currency.toUpperCase()}
         </div>
         <div className="admin-ops__status-chip">
           رسوم المنصة {settings.platformFeePercent}%
         </div>
         <div
           className={`admin-ops__status-chip${
-            settings.maintenanceMode ? " admin-ops__status-chip--warn" : ""
+            settings.maintenanceMode ? " admin-ops__status-chip--warn" : " admin-ops__status-chip--ok"
           }`}
         >
-          {settings.maintenanceMode ? "وضع الصيانة" : "تشغيل عادي"}
+          {settings.maintenanceMode ? "صيانة" : "تشغيل عادي"}
         </div>
         <div className="admin-ops__status-actions">
           <a
@@ -142,22 +142,25 @@ export function AdminOpsCockpit() {
             rel="noopener noreferrer"
             target="_blank"
           >
-            لوحة Stripe ↗
+            Stripe ↗
           </a>
           <Link className="admin-ops__ext-link" href="/admin/settings">
             الإعدادات
+          </Link>
+          <Link className="admin-ops__ext-link" href="/admin/audit">
+            السجل
           </Link>
         </div>
       </div>
 
       <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
         <div className="admin-ops__kpi admin-ops__kpi--feature">
-          <p className="admin-ops__kpi-label">حجم المدفوعات</p>
+          <p className="admin-ops__kpi-label">إجمالي حجم المدفوعات</p>
           <div className="admin-ops__kpi-value">
             <CurrencyAmount amount={kpis.volume} size="lg" />
           </div>
           <p className="admin-ops__kpi-hint">
-            {kpis.paidOrders} طلب مدفوع · تحويل {kpis.conversionRate}%
+            {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع · تحويل {kpis.conversionRate}%
           </p>
         </div>
         <div className="admin-ops__kpi">
@@ -172,21 +175,19 @@ export function AdminOpsCockpit() {
           <p className="admin-ops__kpi-value">
             {kpis.pendingListings.toLocaleString("ar-AE")}
           </p>
-          <p className="admin-ops__kpi-hint">إعلانات تحتاج اعتماد</p>
+          <p className="admin-ops__kpi-hint">إعلانات</p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">نزاعات مفتوحة</p>
           <p className="admin-ops__kpi-value">
             {kpis.openDisputes.toLocaleString("ar-AE")}
           </p>
-          <p className="admin-ops__kpi-hint">حكم إداري مطلوب</p>
+          <p className="admin-ops__kpi-hint">تحتاج قرار</p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">ضمان محجوز</p>
           <p className="admin-ops__kpi-value">{kpis.heldEscrow.toLocaleString("ar-AE")}</p>
-          <p className="admin-ops__kpi-hint">
-            {kpis.refundedOrders} مسترد · {kpis.walletAccounts} محفظة
-          </p>
+          <p className="admin-ops__kpi-hint">{kpis.refundedOrders} مسترد</p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">المستخدمون</p>
@@ -208,57 +209,70 @@ export function AdminOpsCockpit() {
         </div>
       </div>
 
-      <section className="admin-ops__panel admin-ops__panel--chart">
-        <div className="admin-ops__panel-head">
-          <div>
-            <h2 className="admin-ops__panel-title">تحليل الحجم — آخر 7 أيام</h2>
-            <p className="admin-ops__panel-sub">مدفوعات ناجحة يومياً</p>
-          </div>
-          <Link className="admin-ops__text-link" href="/admin/analytics">
-            تفاصيل التحليلات
-          </Link>
-        </div>
-        <div className="admin-ops__bars" role="img" aria-label="مخطط حجم المدفوعات">
-          {analytics.daily.map((point) => (
-            <div key={point.date} className="admin-ops__bar-col">
-              <div className="admin-ops__bar-track">
-                <div
-                  className="admin-ops__bar-fill"
-                  style={{ height: `${Math.max(8, (point.volume / maxVolume) * 100)}%` }}
-                  title={`${point.volume} AED`}
-                />
-              </div>
-              <p className="admin-ops__bar-value">{point.orders}</p>
-              <p className="admin-ops__bar-label">{point.label}</p>
+      <div className="admin-ops__dash-row">
+        <section className="admin-ops__panel admin-ops__panel--chart">
+          <div className="admin-ops__panel-head">
+            <div>
+              <h2 className="admin-ops__panel-title">الأداء — 7 أيام</h2>
+              <p className="admin-ops__panel-sub">حجم المدفوعات الناجحة يومياً</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {critical.length > 0 ? (
-        <section className="admin-ops__panel admin-ops__panel--alert">
-          <h2 className="admin-ops__panel-title">عاجل — يحتاج قرارك الآن</h2>
-          <div className="admin-ops__queue">
-            {critical.map((item) => (
-              <Link key={item.href} className="admin-ops__queue-item" href={item.href}>
-                <div>
-                  <p className="admin-ops__queue-label">{item.label}</p>
-                  <p className="admin-ops__queue-meta">{item.meta}</p>
+            <Link className="admin-ops__text-link" href="/admin/analytics">
+              التحليلات
+            </Link>
+          </div>
+          <div className="admin-ops__bars" role="img" aria-label="مخطط حجم المدفوعات">
+            {analytics.daily.map((point) => (
+              <div key={point.date} className="admin-ops__bar-col">
+                <div className="admin-ops__bar-track">
+                  <div
+                    className="admin-ops__bar-fill"
+                    style={{ height: `${Math.max(8, (point.volume / maxVolume) * 100)}%` }}
+                    title={`${point.volume} AED`}
+                  />
                 </div>
-                <span className="admin-ops__queue-count admin-ops__queue-count--alert">
-                  {item.count.toLocaleString("ar-AE")}
-                </span>
-              </Link>
+                <p className="admin-ops__bar-value">{point.orders}</p>
+                <p className="admin-ops__bar-label">{point.label}</p>
+              </div>
             ))}
           </div>
         </section>
-      ) : null}
+
+        <section
+          className={`admin-ops__panel${critical.length > 0 ? " admin-ops__panel--alert" : ""}`}
+        >
+          <div className="admin-ops__panel-head">
+            <div>
+              <h2 className="admin-ops__panel-title">يحتاج قراراً</h2>
+              <p className="admin-ops__panel-sub">عناصر عاجلة في الطابور</p>
+            </div>
+          </div>
+          <div className="admin-ops__queue">
+            {critical.length === 0 ? (
+              <div className="admin-ops__queue-item">
+                <p className="admin-ops__queue-meta">لا توجد عناصر عاجلة حالياً.</p>
+              </div>
+            ) : (
+              critical.map((item) => (
+                <Link key={item.href} className="admin-ops__queue-item" href={item.href}>
+                  <div>
+                    <p className="admin-ops__queue-label">{item.label}</p>
+                    <p className="admin-ops__queue-meta">{item.meta}</p>
+                  </div>
+                  <span className="admin-ops__queue-count admin-ops__queue-count--alert">
+                    {item.count.toLocaleString("ar-AE")}
+                  </span>
+                </Link>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
 
       <section className="admin-ops__panel">
         <div className="admin-ops__panel-head">
           <div>
-            <h2 className="admin-ops__panel-title">خريطة التحكم — كل أقسام الموقع</h2>
-            <p className="admin-ops__panel-sub">اضغط للوصول المباشر لأي قسم</p>
+            <h2 className="admin-ops__panel-title">وحدات التحكم</h2>
+            <p className="admin-ops__panel-sub">وصول سريع لكل أقسام التشغيل</p>
           </div>
         </div>
         {(["insight", "moderation", "money", "leads", "system"] as const).map((group) => {
@@ -288,23 +302,23 @@ export function AdminOpsCockpit() {
       <div className="admin-ops__panels">
         <section className="admin-ops__panel">
           <div className="admin-ops__panel-head">
-            <h2 className="admin-ops__panel-title">تفاصيل التقارير</h2>
+            <h2 className="admin-ops__panel-title">ملخص الحالات</h2>
             <Link className="admin-ops__text-link" href="/admin/reports">
-              التقرير الكامل
+              التقارير
             </Link>
           </div>
           <div className="admin-ops__detail-grid">
-            {analytics.orderStatuses.slice(0, 5).map((slice) => (
+            {analytics.orderStatuses.slice(0, 6).map((slice) => (
               <div key={slice.key} className="admin-ops__detail-row">
                 <span>{slice.label}</span>
                 <strong>{slice.count.toLocaleString("ar-AE")}</strong>
               </div>
             ))}
           </div>
-          <div className="admin-ops__detail-grid" style={{ marginTop: "0.85rem" }}>
+          <div className="admin-ops__detail-grid" style={{ marginTop: "0.35rem" }}>
             {analytics.paymentStatuses.slice(0, 4).map((slice) => (
               <div key={slice.key} className="admin-ops__detail-row">
-                <span>دفع: {slice.label}</span>
+                <span>دفع · {slice.label}</span>
                 <strong>{slice.count.toLocaleString("ar-AE")}</strong>
               </div>
             ))}
@@ -313,20 +327,18 @@ export function AdminOpsCockpit() {
 
         <section className="admin-ops__panel">
           <div className="admin-ops__panel-head">
-            <h2 className="admin-ops__panel-title">نبض المدفوعات و Stripe</h2>
+            <h2 className="admin-ops__panel-title">نشاط المدفوعات</h2>
             <Link className="admin-ops__text-link" href="/admin/stripe">
-              إدارة Stripe
+              Stripe
             </Link>
           </div>
           <ul className="admin-ops__queue">
             {pulse.length === 0 ? (
               <li className="admin-ops__queue-item">
-                <p className="admin-ops__queue-meta">
-                  لا أحداث حديثة بعد — النظام جاهز للاستقبال.
-                </p>
+                <p className="admin-ops__queue-meta">لا أحداث حديثة.</p>
               </li>
             ) : (
-              pulse.map((item) => (
+              pulse.slice(0, 6).map((item) => (
                 <li key={item.id} className="admin-ops__queue-item">
                   <div>
                     <p className="admin-ops__queue-label">{item.text}</p>
@@ -348,7 +360,7 @@ export function AdminOpsCockpit() {
               rel="noopener noreferrer"
               target="_blank"
             >
-              مدفوعات Stripe
+              Payments
             </a>
             <a
               className="admin-ops__chip-link"
@@ -359,7 +371,7 @@ export function AdminOpsCockpit() {
               Webhooks
             </a>
             <Link className="admin-ops__chip-link" href="/admin/orders">
-              الطلبات والاسترداد
+              الطلبات
             </Link>
             <Link className="admin-ops__chip-link" href="/admin/wallets">
               المحافظ
@@ -369,7 +381,9 @@ export function AdminOpsCockpit() {
       </div>
 
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">طابور التشغيل الكامل</h2>
+        <div className="admin-ops__panel-head">
+          <h2 className="admin-ops__panel-title">طابور التشغيل</h2>
+        </div>
         <div className="admin-ops__queue admin-ops__queue--dense">
           {attention.map((item) => (
             <Link key={item.href} className="admin-ops__queue-item" href={item.href}>

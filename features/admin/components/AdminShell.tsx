@@ -240,45 +240,28 @@ export function AdminShell({
 
   return (
     <div className="admin-ops">
-      <div className="admin-ops__aura" aria-hidden />
-      <header className="admin-ops__topbar">
-        <div className="admin-ops__brand">
-          <Image
-            alt={BRAND.nameAr}
-            className="admin-ops__mark"
-            height={40}
-            priority
-            src="/brand/logo-icon.svg"
-            unoptimized
-            width={40}
-          />
-          <div className="admin-ops__brand-copy">
-            <p className="admin-ops__brand-name">{BRAND.nameAr}</p>
-            <p className="admin-ops__brand-sub">Control</p>
-          </div>
-        </div>
-        <div className="admin-ops__top-actions">
-          <span className="admin-ops__live" aria-live="polite">
-            <span className="admin-ops__live-dot" aria-hidden />
-            مباشر
-          </span>
-          <div className="admin-ops__who">
-            <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
-            <p className="admin-ops__who-role">مدير النظام</p>
-          </div>
-          <Button onClick={handleLogout} size="sm" type="button" variant="secondary">
-            خروج
-          </Button>
-        </div>
-      </header>
-
-      <div className="admin-ops__layout">
+      <div className="admin-ops__shell">
         <aside className="admin-ops__sidebar" aria-label="تنقل الإدارة">
+          <div className="admin-ops__sidebar-brand">
+            <Image
+              alt={BRAND.nameAr}
+              className="admin-ops__mark"
+              height={36}
+              priority
+              src="/brand/logo-icon.svg"
+              unoptimized
+              width={36}
+            />
+            <div className="admin-ops__brand-copy">
+              <p className="admin-ops__brand-name">{BRAND.nameAr}</p>
+              <p className="admin-ops__brand-sub">Admin</p>
+            </div>
+          </div>
           <label className="admin-ops__search">
             <Icon name="search" size={14} />
             <input
               aria-label="بحث في أقسام اللوحة"
-              placeholder="بحث سريع في الأقسام..."
+              placeholder="بحث في الأقسام..."
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -320,12 +303,45 @@ export function AdminShell({
               Stripe Dashboard ↗
             </a>
             <Link className="admin-ops__back" href="/">
-              ← العودة لسوقنا
+              العودة إلى السوق
             </Link>
+            <Button onClick={handleLogout} size="sm" type="button" variant="secondary">
+              تسجيل الخروج
+            </Button>
           </div>
         </aside>
 
-        <div className="admin-ops__main">
+        <div className="admin-ops__workspace">
+          <header className="admin-ops__topbar">
+            <div className="admin-ops__brand">
+              <Image
+                alt={BRAND.nameAr}
+                className="admin-ops__mark"
+                height={36}
+                src="/brand/logo-icon.svg"
+                unoptimized
+                width={36}
+              />
+              <div className="admin-ops__brand-copy">
+                <p className="admin-ops__brand-name">{BRAND.nameAr}</p>
+                <p className="admin-ops__brand-sub">Admin</p>
+              </div>
+            </div>
+            <div className="admin-ops__top-actions">
+              <span className="admin-ops__live" aria-live="polite">
+                <span className="admin-ops__live-dot" aria-hidden />
+                مباشر
+              </span>
+              <div className="admin-ops__who">
+                <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
+                <p className="admin-ops__who-role">مدير النظام</p>
+              </div>
+              <Button onClick={handleLogout} size="sm" type="button" variant="secondary">
+                خروج
+              </Button>
+            </div>
+          </header>
+
           <div className="admin-ops__mobile-nav" aria-label="تنقل سريع">
             {adminLinks.map((link) => {
               const active = link.href === activePath;
@@ -341,10 +357,22 @@ export function AdminShell({
             })}
           </div>
 
-          <div className="admin-ops__hero">
-            <p className="admin-ops__eyebrow">Sooqna</p>
-            <h1 className="admin-ops__title">{title}</h1>
-            <p className="admin-ops__desc">{description}</p>
+          <div className="admin-ops__pagehead">
+            <div>
+              <p className="admin-ops__eyebrow">Sooqna Admin</p>
+              <h1 className="admin-ops__title">{title}</h1>
+              <p className="admin-ops__desc">{description}</p>
+            </div>
+            <div className="admin-ops__pagehead-meta">
+              <span className="admin-ops__live" aria-live="polite">
+                <span className="admin-ops__live-dot" aria-hidden />
+                النظام يعمل
+              </span>
+              <div className="admin-ops__who">
+                <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
+                <p className="admin-ops__who-role">مدير النظام</p>
+              </div>
+            </div>
           </div>
 
           {children}

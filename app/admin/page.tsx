@@ -5,8 +5,8 @@ export default function AdminPage() {
   return (
     <AdminShell
       activePath="/admin"
-      description="تقارير وتحليلات ومدفوعات وإشراف — كل أدوات تشغيل السوق في مكان واحد."
-      title="غرفة التحكم"
+      description="نظرة تشغيلية شاملة على المدفوعات، الإشراف، والوارد — مع وصول مباشر لكل وحدة."
+      title="لوحة التحكم"
     >
       <AdminOpsCockpit />
     </AdminShell>
