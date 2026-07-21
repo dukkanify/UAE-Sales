@@ -117,10 +117,18 @@ function seedDisputes(): AdminDisputeRecord[] {
   ];
 }
 
-let usersStore: AdminUserRecord[] = seedUsers();
-let listingsStore: AdminListingRecord[] = seedListings();
-let disputesStore: AdminDisputeRecord[] = seedDisputes();
+const usersStore: AdminUserRecord[] = seedUsers();
+const listingsStore: AdminListingRecord[] = seedListings();
+const disputesStore: AdminDisputeRecord[] = seedDisputes();
 let categoriesStore: AdminCategoryRecord[] = seedCategories();
+
+// Demo moderation backlog so the cockpit feels alive.
+for (const listing of listingsStore.slice(0, 3)) {
+  listing.status = "pending_review";
+}
+if (usersStore[1]) {
+  usersStore[1].accountStatus = "suspended";
+}
 
 export function getUsers(): AdminUserRecord[] {
   return usersStore.map((user) => ({ ...user }));

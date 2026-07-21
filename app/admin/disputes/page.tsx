@@ -1,14 +1,11 @@
 import { AdminDisputesPanel } from "@/features/admin/components/AdminDisputesPanel";
-import {
-  AdminShell,
-  type AdminPath,
-} from "@/features/admin/components/AdminShell";
+import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminDisputesPage() {
   return (
     <AdminShell
-      activePath={"/admin/disputes" as AdminPath}
-      description="النزاعات المفتوحة وقرارات الضمان — راجع الأسباب وأصدر الحكم بسرعة."
+      activePath="/admin/disputes"
+      description="فض النزاعات بين المشتري والبائع بقرار واضح."
       title="النزاعات"
     >
       <AdminDisputesPanel />

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getModerationSummary } from "@/services/admin/admin-ops-store";
 import { getAllOrders } from "@/services/payments/order-store";
 import { getPaymentEvents } from "@/services/payments/payment-log";
 import { loadCollection } from "@/services/payments/data-store";
@@ -11,6 +12,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
   }
 
+  const moderation = getModerationSummary();
   const [orders, events, jobs, bookings, quotes] = await Promise.all([
     getAllOrders(),
     getPaymentEvents(),
@@ -26,6 +28,27 @@ export async function GET(request: Request) {
   const fees = paid.reduce((sum, o) => sum + o.fees.platformFee, 0);
 
   const attention = [
+    {
+      href: "/admin/listings",
+      label: "إعلانات بانتظار المراجعة",
+      meta: "اعتماد أو رفض",
+      count: moderation.pendingListings,
+      alert: moderation.pendingListings > 0,
+    },
+    {
+      href: "/admin/disputes",
+      label: "نزاعات مفتوحة",
+      meta: "تحتاج حكم إداري",
+      count: moderation.openDisputes,
+      alert: moderation.openDisputes > 0,
+    },
+    {
+      href: "/admin/users",
+      label: "حسابات موقوفة",
+      meta: "مراجعة حالة الحساب",
+      count: moderation.suspendedUsers,
+      alert: false,
+    },
     {
       href: "/admin/orders",
       label: "طلبات تحتاج متابعة",
@@ -79,6 +102,10 @@ export async function GET(request: Request) {
       fees,
       currency: "AED",
       recentEvents: events.length,
+      pendingListings: moderation.pendingListings,
+      openDisputes: moderation.openDisputes,
+      totalUsers: moderation.totalUsers,
+      totalListings: moderation.totalListings,
     },
     attention,
     pulse: events.slice(0, 8).map((event) => ({

@@ -18,6 +18,10 @@ import "./admin-ops.css";
 
 export type AdminPath =
   | "/admin"
+  | "/admin/users"
+  | "/admin/listings"
+  | "/admin/disputes"
+  | "/admin/categories"
   | "/admin/orders"
   | "/admin/escrow"
   | "/admin/reports"
@@ -34,17 +38,39 @@ type AdminShellProps = {
 
 const adminLinks: {
   href: AdminPath;
-  icon: "chart" | "package" | "shield" | "wallet" | "briefcase" | "home" | "wrench";
+  icon:
+    | "chart"
+    | "user"
+    | "grid"
+    | "message"
+    | "briefcase"
+    | "package"
+    | "shield"
+    | "wallet"
+    | "home"
+    | "wrench";
   label: string;
+  group: "ops" | "moderation" | "money" | "leads";
 }[] = [
-  { href: "/admin", icon: "chart", label: "غرفة العمليات" },
-  { href: "/admin/orders", icon: "package", label: "الطلبات" },
-  { href: "/admin/escrow", icon: "shield", label: "الضمان" },
-  { href: "/admin/reports", icon: "wallet", label: "التقارير" },
-  { href: "/admin/job-applications", icon: "briefcase", label: "التوظيف" },
-  { href: "/admin/viewing-bookings", icon: "home", label: "المعاينات" },
-  { href: "/admin/quote-requests", icon: "wrench", label: "عروض الأسعار" },
+  { href: "/admin", icon: "chart", label: "غرفة العمليات", group: "ops" },
+  { href: "/admin/users", icon: "user", label: "المستخدمون", group: "moderation" },
+  { href: "/admin/listings", icon: "grid", label: "الإعلانات", group: "moderation" },
+  { href: "/admin/disputes", icon: "message", label: "النزاعات", group: "moderation" },
+  { href: "/admin/categories", icon: "briefcase", label: "التصنيفات", group: "moderation" },
+  { href: "/admin/orders", icon: "package", label: "الطلبات", group: "money" },
+  { href: "/admin/escrow", icon: "shield", label: "الضمان", group: "money" },
+  { href: "/admin/reports", icon: "wallet", label: "التقارير", group: "money" },
+  { href: "/admin/job-applications", icon: "briefcase", label: "التوظيف", group: "leads" },
+  { href: "/admin/viewing-bookings", icon: "home", label: "المعاينات", group: "leads" },
+  { href: "/admin/quote-requests", icon: "wrench", label: "عروض الأسعار", group: "leads" },
 ];
+
+const groupLabels: Record<(typeof adminLinks)[number]["group"], string> = {
+  ops: "القيادة",
+  moderation: "الإشراف",
+  money: "المال",
+  leads: "الوارد",
+};
 
 export function AdminShell({
   activePath,
@@ -123,19 +149,28 @@ export function AdminShell({
       <div className="admin-ops__layout">
         <aside className="admin-ops__sidebar" aria-label="تنقل الإدارة">
           <nav className="admin-ops__nav">
-            {adminLinks.map((link) => {
-              const active = link.href === activePath;
-              return (
-                <Link
-                  key={link.href}
-                  className={`admin-ops__nav-link${active ? " admin-ops__nav-link--active" : ""}`}
-                  href={link.href}
-                >
-                  <Icon name={link.icon} size={16} />
-                  <span>{link.label}</span>
-                </Link>
-              );
-            })}
+            {(["ops", "moderation", "money", "leads"] as const).map((group) => (
+              <div key={group} className="admin-ops__nav-group">
+                <p className="admin-ops__nav-group-label">{groupLabels[group]}</p>
+                {adminLinks
+                  .filter((link) => link.group === group)
+                  .map((link) => {
+                    const active = link.href === activePath;
+                    return (
+                      <Link
+                        key={link.href}
+                        className={`admin-ops__nav-link${
+                          active ? " admin-ops__nav-link--active" : ""
+                        }`}
+                        href={link.href}
+                      >
+                        <Icon name={link.icon} size={16} />
+                        <span>{link.label}</span>
+                      </Link>
+                    );
+                  })}
+              </div>
+            ))}
           </nav>
           <Link className="admin-ops__back" href="/">
             ← العودة لسوقنا

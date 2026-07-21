@@ -1,15 +1,12 @@
 import { AdminCategoriesPanel } from "@/features/admin/components/AdminCategoriesPanel";
-import {
-  AdminShell,
-  type AdminPath,
-} from "@/features/admin/components/AdminShell";
+import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminCategoriesPage() {
   return (
     <AdminShell
-      activePath={"/admin/categories" as AdminPath}
-      description="إدارة فئات السوق — تفعيل، تعطيل، وإضافة فئات جديدة."
-      title="الفئات"
+      activePath="/admin/categories"
+      description="إدارة أقسام السوق وتفعيلها أو إيقافها."
+      title="التصنيفات"
     >
       <AdminCategoriesPanel />
     </AdminShell>
