@@ -52,20 +52,20 @@
 }
 
 .admin-ops__brand-name {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1.1rem;
+  font-weight: 900;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: #fff;
+  color: #ffffff;
 }
 
 .admin-ops__brand-sub {
-  margin-top: 0.15rem;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  margin-top: 0.18rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 55%);
+  color: #e2c882;
   font-family: var(--font-latin);
 }
 
@@ -695,9 +695,10 @@
 .admin-ops__sidebar-footer button {
   margin-top: 0.35rem;
   width: 100%;
-  border-color: rgb(255 255 255 / 14%) !important;
-  background: rgb(255 255 255 / 6%) !important;
-  color: #fff !important;
+  border-color: rgb(255 255 255 / 24%) !important;
+  background: rgb(255 255 255 / 14%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
 }
 
 .admin-ops__pagehead-meta .admin-ops__live {
