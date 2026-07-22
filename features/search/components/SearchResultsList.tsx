@@ -8,10 +8,13 @@ import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { Button } from "@/shared/ui/Button";
 import {
   getLocalListingsForSeller,
   getSessionUser,
 } from "@/services/storage";
+
+const PAGE_SIZE = 12;
 
 type SearchResultsListProps = {
   categoryId?: string;
@@ -36,9 +39,18 @@ export function SearchResultsList({
   selectedFilters = {},
 }: SearchResultsListProps) {
   const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const resultsSignature = `${categoryId ?? ""}:${listings.length}:${JSON.stringify(selectedFilters)}`;
+  const [activeSignature, setActiveSignature] = useState(resultsSignature);
 
-  const categoryNames = new Map(
-    categories.map((category) => [category.id, category.name]),
+  if (activeSignature !== resultsSignature) {
+    setActiveSignature(resultsSignature);
+    setVisibleCount(PAGE_SIZE);
+  }
+
+  const categoryNames = useMemo(
+    () => new Map(categories.map((category) => [category.id, category.name])),
+    [categories],
   );
 
   const visibleListings = useMemo(() => {
@@ -130,6 +142,9 @@ export function SearchResultsList({
     );
   }
 
+  const pageItems = visibleListings.slice(0, visibleCount);
+  const hasMore = visibleCount < visibleListings.length;
+
   return (
     <>
       <SearchResultsToolbar
@@ -138,14 +153,25 @@ export function SearchResultsList({
         selectedFilters={selectedFilters}
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 page-enter">
-      {visibleListings.map((listing) => (
-        <ListingCard
-          key={listing.id}
-          categoryName={categoryNames.get(listing.categoryId)}
-          listing={listing}
-        />
-      ))}
+        {pageItems.map((listing) => (
+          <ListingCard
+            key={listing.id}
+            categoryName={categoryNames.get(listing.categoryId)}
+            listing={listing}
+          />
+        ))}
       </div>
+      {hasMore ? (
+        <div className="mt-6 flex justify-center">
+          <Button
+            onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
+            size="md"
+            variant="secondary"
+          >
+            عرض المزيد ({visibleListings.length - visibleCount})
+          </Button>
+        </div>
+      ) : null}
     </>
   );
 }

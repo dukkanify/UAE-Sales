@@ -43,7 +43,7 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
         {featuredListing ? (
           <div className="border-t border-border p-4 lg:border-s lg:border-t-0 lg:p-5">
             <p className="mb-3 text-xs font-bold text-[#B8955F]">إعلان مميز</p>
-            <PremiumListingCard listing={featuredListing} priority />
+            <PremiumListingCard listing={featuredListing} />
             <Link
               className="mt-3 inline-block text-xs font-semibold text-primary"
               href={`/listings/${featuredListing.slug}`}

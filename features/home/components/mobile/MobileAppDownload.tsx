@@ -1,14 +1,19 @@
+import type { Listing } from "@/types";
 import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND } from "@/shared/constants/brand";
-import { getListings } from "@/services/listings";
 import { MobileAppDevicePreview } from "./MobileAppDevicePreview";
 import { resolveAppPreviewListings } from "./mobile-app-preview.config";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
 import { AppStoreBadgeLink, GooglePlayBadgeLink } from "./MobileStoreBadges";
 
-export async function MobileAppDownload() {
-  const listings = await getListings();
-  const previewListings = resolveAppPreviewListings(listings);
+type MobileAppDownloadProps = {
+  previewListings?: Listing[];
+};
+
+export function MobileAppDownload({
+  previewListings = [],
+}: MobileAppDownloadProps) {
+  const previews = resolveAppPreviewListings(previewListings);
 
   return (
     <section aria-label="تطبيق سوقنا" className="mobile-home-app">
@@ -42,8 +47,8 @@ export async function MobileAppDownload() {
             <div className="mobile-home-app__device">
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
-                {previewListings.length > 0 ? (
-                  <MobileAppDevicePreview listings={previewListings} />
+                {previews.length > 0 ? (
+                  <MobileAppDevicePreview listings={previews} />
                 ) : (
                   <div className="mobile-home-app__device-fallback" />
                 )}

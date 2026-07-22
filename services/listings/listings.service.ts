@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Listing, ListingSearchFilters } from "@/types";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
 import {
@@ -7,9 +8,9 @@ import {
 
 export type { ListingSearchFilters };
 
-export async function getListings(): Promise<Listing[]> {
+export const getListings = cache(async (): Promise<Listing[]> => {
   return getAllListings();
-}
+});
 
 export async function getMyListings(userId?: string): Promise<Listing[]> {
   const listings = await getAllListings();
@@ -21,10 +22,10 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
   return getStoredListingBySlug(slug);
 }
 
-export async function getFeaturedListings(): Promise<Listing[]> {
+export const getFeaturedListings = cache(async (): Promise<Listing[]> => {
   const listings = await getAllListings();
   return listings.filter((listing) => listing.isFeatured && listing.status === "active");
-}
+});
 
 export async function getRelatedListings(
   categoryId: string,

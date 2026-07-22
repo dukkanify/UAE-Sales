@@ -26,12 +26,11 @@ export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {featured.map((listing, index) => (
+        {featured.map((listing) => (
           <PremiumListingCard
             key={listing.id}
             categoryName={categoryMap.get(listing.categoryId)}
             listing={listing}
-            priority={index < 3}
           />
         ))}
       </div>

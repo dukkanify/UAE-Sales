@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { Listing } from "@/types";
 import {
   buildGoogleMapsUrl,
@@ -13,6 +16,7 @@ type ListingMapPlaceholderProps = {
 };
 
 export function ListingMapPlaceholder({ listing }: ListingMapPlaceholderProps) {
+  const [showMap, setShowMap] = useState(false);
   const point = resolveDemoMapPoint({
     area: listing.area,
     emirate: listing.emirate,
@@ -44,14 +48,28 @@ export function ListingMapPlaceholder({ listing }: ListingMapPlaceholderProps) {
 
       <div className="relative min-h-[16rem] overflow-hidden bg-gradient-to-br from-[#e8eef5] via-[#f4f7fb] to-[#dfe8f2]">
         <div className="pointer-events-none absolute inset-0 opacity-20 uae-geometric-texture" />
-        <iframe
-          title={`خريطة موقع ${point.label}`}
-          src={embedUrl}
-          className="relative z-[1] block h-[16rem] w-full border-0 bg-[#eef2f7] sm:h-[18rem]"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          allowFullScreen
-        />
+        {showMap ? (
+          <iframe
+            title={`خريطة موقع ${point.label}`}
+            src={embedUrl}
+            className="relative z-[1] block h-[16rem] w-full border-0 bg-[#eef2f7] sm:h-[18rem]"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            className="relative z-[1] flex h-[16rem] w-full flex-col items-center justify-center gap-3 bg-[#eef2f7]/70 text-ink transition hover:bg-[#e8eef5] sm:h-[18rem]"
+            onClick={() => setShowMap(true)}
+            type="button"
+          >
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+              <Icon name="map" size={22} />
+            </span>
+            <span className="text-sm font-bold">عرض الخريطة</span>
+            <span className="text-xs text-muted">يُحمّل عند الطلب لتسريع الصفحة</span>
+          </button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-6 py-3">

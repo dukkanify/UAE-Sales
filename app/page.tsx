@@ -27,8 +27,15 @@ import { mockHomeCategorySections } from "@/mock";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { getCategories } from "@/services/categories";
 import { getFeaturedListings, getListings } from "@/services/listings";
+import { headers } from "next/headers";
+import { userAgent } from "next/server";
+import "@/features/home/components/mobile/mobile-home.css";
 
 export default async function Home() {
+  const ua = userAgent({ headers: await headers() });
+  const preferMobile =
+    ua.device.type === "mobile" || ua.device.type === "tablet";
+
   const [categories, featuredListings, allListings] = await Promise.all([
     getCategories(),
     getFeaturedListings(),
@@ -50,19 +57,20 @@ export default async function Home() {
       .slice(0, 4),
   }));
 
+  const featuredForHome = featuredListings.slice(0, 6);
   const appPreviewListings = resolveAppPreviewListings(allListings);
 
-  return (
-    <>
-      <div className="lg:hidden">
-        <MobileHomeShell>
+  if (preferMobile) {
+    return (
+      <>
+        <MobileHomeShell fullWidth>
           <MobileHomeHeader />
           <main className="mobile-home-main">
             <MobileHeroBlock categories={categories} />
             <MobileCategoryGrid categories={categories} />
             <MobilePromoBanner />
-            <MobilePreviewStrip listings={featuredListings} />
-            <MobileFeaturedRail listings={featuredListings} />
+            <MobilePreviewStrip listings={featuredForHome} />
+            <MobileFeaturedRail listings={featuredForHome} />
             <MobileNearbyRail listings={allListings} />
             <MobileEmiratesSection />
             {sectionListings.map((section) => (
@@ -74,38 +82,43 @@ export default async function Home() {
               />
             ))}
             <MarketEscrow />
-            <MobileAppDownload />
+            <MobileAppDownload previewListings={appPreviewListings} />
           </main>
         </MobileHomeShell>
-      </div>
+        <SiteFooter />
+      </>
+    );
+  }
 
-      <div className="hidden lg:contents">
-        <MarketHeader />
-        <main>
-          <MarketHero categories={categories} />
-          <MarketCategoryGrid categories={categories} />
-          <MarketPromoBanner />
-          <MarketPreviewStrip />
-          <MarketFeatured categories={categoryMeta} listings={featuredListings} />
-          <MarketNearbySection listings={allListings} />
-          <MarketEmirates />
-          {sectionListings.map((section) => (
-            <MarketCategorySection
-              key={section.categoryId}
-              categoryId={section.categoryId}
-              categorySlug={categoryById(section.categoryId)}
-              description={section.description}
-              eyebrow={section.eyebrow}
-              listings={section.items}
-              title={section.title}
-              variant={section.variant}
-            />
-          ))}
-          <MarketEscrow />
-          <MarketAppDownload previewListings={appPreviewListings} />
-        </main>
-      </div>
-
+  return (
+    <>
+      <MarketHeader />
+      <main>
+        <MarketHero categories={categories} />
+        <MarketCategoryGrid categories={categories} />
+        <MarketPromoBanner />
+        <MarketPreviewStrip
+          categories={categoryMeta}
+          listings={featuredForHome}
+        />
+        <MarketFeatured categories={categoryMeta} listings={featuredForHome} />
+        <MarketNearbySection listings={allListings} />
+        <MarketEmirates />
+        {sectionListings.map((section) => (
+          <MarketCategorySection
+            key={section.categoryId}
+            categoryId={section.categoryId}
+            categorySlug={categoryById(section.categoryId)}
+            description={section.description}
+            eyebrow={section.eyebrow}
+            listings={section.items}
+            title={section.title}
+            variant={section.variant}
+          />
+        ))}
+        <MarketEscrow />
+        <MarketAppDownload previewListings={appPreviewListings} />
+      </main>
       <SiteFooter />
     </>
   );
