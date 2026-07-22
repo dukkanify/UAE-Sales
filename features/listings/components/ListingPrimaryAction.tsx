@@ -2,9 +2,6 @@
 
 import type { Listing } from "@/types";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
-import { JobApplicationModal } from "@/features/listings/components/JobApplicationModal";
-import { QuoteRequestModal } from "@/features/listings/components/QuoteRequestModal";
-import { ViewingBookingModal } from "@/features/listings/components/ViewingBookingModal";
 import {
   ACTION_LABELS,
   getListingActionConfig,
@@ -24,8 +21,31 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon, type IconName } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+const JobApplicationModal = dynamic(
+  () =>
+    import("@/features/listings/components/JobApplicationModal").then(
+      (mod) => mod.JobApplicationModal,
+    ),
+  { ssr: false },
+);
+const ViewingBookingModal = dynamic(
+  () =>
+    import("@/features/listings/components/ViewingBookingModal").then(
+      (mod) => mod.ViewingBookingModal,
+    ),
+  { ssr: false },
+);
+const QuoteRequestModal = dynamic(
+  () =>
+    import("@/features/listings/components/QuoteRequestModal").then(
+      (mod) => mod.QuoteRequestModal,
+    ),
+  { ssr: false },
+);
 
 type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
 
@@ -178,31 +198,39 @@ export function ListingPrimaryAction({
         </div>
       ) : null}
 
-      <JobApplicationModal
-        listing={listing}
-        onClose={() => setActiveModal(null)}
-        onSuccess={() => showToast("تم إرسال طلب التوظيف بنجاح")}
-        open={activeModal === "job"}
-      />
-      <ViewingBookingModal
-        listing={listing}
-        onClose={() => setActiveModal(null)}
-        onSuccess={() => showToast("تم تأكيد حجز المعاينة")}
-        open={activeModal === "viewing"}
-      />
-      <QuoteRequestModal
-        listing={listing}
-        onClose={() => setActiveModal(null)}
-        onSuccess={() => showToast("تم إرسال الطلب بنجاح")}
-        open={activeModal === "quote"}
-      />
-      <QuoteRequestModal
-        kind="service_booking"
-        listing={listing}
-        onClose={() => setActiveModal(null)}
-        onSuccess={() => showToast("تم إرسال طلب حجز الخدمة")}
-        open={activeModal === "service"}
-      />
+      {activeModal === "job" ? (
+        <JobApplicationModal
+          listing={listing}
+          onClose={() => setActiveModal(null)}
+          onSuccess={() => showToast("تم إرسال طلب التوظيف بنجاح")}
+          open
+        />
+      ) : null}
+      {activeModal === "viewing" ? (
+        <ViewingBookingModal
+          listing={listing}
+          onClose={() => setActiveModal(null)}
+          onSuccess={() => showToast("تم تأكيد حجز المعاينة")}
+          open
+        />
+      ) : null}
+      {activeModal === "quote" ? (
+        <QuoteRequestModal
+          listing={listing}
+          onClose={() => setActiveModal(null)}
+          onSuccess={() => showToast("تم إرسال الطلب بنجاح")}
+          open
+        />
+      ) : null}
+      {activeModal === "service" ? (
+        <QuoteRequestModal
+          kind="service_booking"
+          listing={listing}
+          onClose={() => setActiveModal(null)}
+          onSuccess={() => showToast("تم إرسال طلب حجز الخدمة")}
+          open
+        />
+      ) : null}
     </>
   );
 }

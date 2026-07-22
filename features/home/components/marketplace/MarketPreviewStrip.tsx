@@ -1,15 +1,20 @@
 import Link from "next/link";
+import type { Listing } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
-import { getCategories } from "@/services/categories";
-import { getFeaturedListings } from "@/services/listings";
 
-export async function MarketPreviewStrip() {
-  const [categories, listings] = await Promise.all([
-    getCategories(),
-    getFeaturedListings(),
-  ]);
+type MarketPreviewStripProps = {
+  categories: { id: string; name: string }[];
+  listings: Listing[];
+};
+
+export function MarketPreviewStrip({
+  categories,
+  listings,
+}: MarketPreviewStripProps) {
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
   const previews = listings.slice(0, 4);
+
+  if (previews.length === 0) return null;
 
   return (
     <section className="relative z-10 border-t border-[#B8955F]/10 bg-[#fdfbf7] py-10 md:py-14">
@@ -30,12 +35,11 @@ export async function MarketPreviewStrip() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {previews.map((listing, index) => (
+          {previews.map((listing) => (
             <PremiumListingCard
               key={listing.id}
               categoryName={categoryMap.get(listing.categoryId)}
               listing={listing}
-              priority={index === 0}
             />
           ))}
         </div>

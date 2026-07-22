@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   getCategoryFallbackUrl,
   getFallbackUrl,
@@ -26,6 +26,19 @@ function isInlineImageSrc(src?: string) {
   return Boolean(src?.startsWith("data:") || src?.startsWith("blob:"));
 }
 
+function resolveFallbackUrl({
+  fallback,
+  fallbackCategory,
+  fill,
+  width,
+}: Pick<AppImageProps, "fallback" | "fallbackCategory" | "fill" | "width">) {
+  const size = fill ? 1200 : (width ?? 800);
+  if (fallback === "avatar") return getFallbackUrl("avatar", fill ? 400 : (width ?? 800));
+  if (fallback) return getFallbackUrl(fallback, size);
+  if (fallbackCategory) return getCategoryFallbackUrl(fallbackCategory, size);
+  return getFallbackUrl("default", size);
+}
+
 function AppImageInner({
   alt,
   className = "",
@@ -39,19 +52,12 @@ function AppImageInner({
   src,
   width = 800,
 }: AppImageProps) {
-  const fallbackUrl = useMemo(() => {
-    if (fallback === "avatar") {
-      return getFallbackUrl("avatar", fill ? 400 : width);
-    }
-    if (fallback) {
-      return getFallbackUrl(fallback, fill ? 1200 : width);
-    }
-    if (fallbackCategory) {
-      return getCategoryFallbackUrl(fallbackCategory, fill ? 1200 : width);
-    }
-    return getFallbackUrl("default", fill ? 1200 : width);
-  }, [fallback, fallbackCategory, fill, width]);
-
+  const fallbackUrl = resolveFallbackUrl({
+    fallback,
+    fallbackCategory,
+    fill,
+    width,
+  });
   const [activeSrc, setActiveSrc] = useState(src || fallbackUrl);
   const [isLoaded, setIsLoaded] = useState(isInlineImageSrc(src));
   const [usedErrorFallback, setUsedErrorFallback] = useState(false);

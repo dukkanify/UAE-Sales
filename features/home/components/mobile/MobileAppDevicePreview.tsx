@@ -26,7 +26,7 @@ function MockListingCard({ listing }: { listing: Listing }) {
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
-          priority
+          loading="lazy"
           sizes="240px"
           src={listingImage}
         />

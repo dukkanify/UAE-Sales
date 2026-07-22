@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { mockCategories } from "@/mock/categories.mock";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
 import type { Category } from "@/types";
@@ -12,7 +13,8 @@ const FILE = "categories.json";
 
 type StoredCategory = Category & { enabled: boolean };
 
-let cache: StoredCategory[] | null = null;
+let cacheRows: StoredCategory[] | null = null;
+let inflight: Promise<StoredCategory[]> | null = null;
 
 function seedCategories(): StoredCategory[] {
   return mockCategories.map((category) => ({
@@ -21,38 +23,45 @@ function seedCategories(): StoredCategory[] {
   }));
 }
 
-function setCache(rows: StoredCategory[]) {
-  cache = rows.map((row) => ({ ...row, subcategories: [...row.subcategories] }));
-  return cache;
-}
-
-export async function getAllCategoryRecords(): Promise<StoredCategory[]> {
-  if (cache) {
-    return cache.map((row) => ({
-      ...row,
-      subcategories: [...row.subcategories],
-    }));
-  }
-
-  const stored = await loadCollection<StoredCategory>(FILE).catch(
-    () => [] as StoredCategory[],
-  );
-  if (stored.length === 0) {
-    const seeded = seedCategories();
-    await saveCollection(FILE, seeded);
-    return setCache(seeded).map((row) => ({
-      ...row,
-      subcategories: [...row.subcategories],
-    }));
-  }
-
-  return setCache(stored).map((row) => ({
+function cloneCategories(rows: StoredCategory[]) {
+  return rows.map((row) => ({
     ...row,
     subcategories: [...row.subcategories],
   }));
 }
 
-export async function getEnabledCategories(): Promise<Category[]> {
+function setCache(rows: StoredCategory[]) {
+  cacheRows = cloneCategories(rows);
+  return cacheRows;
+}
+
+async function loadCategoryRecordsUncached(): Promise<StoredCategory[]> {
+  if (cacheRows) return cloneCategories(cacheRows);
+
+  if (!inflight) {
+    inflight = (async () => {
+      const stored = await loadCollection<StoredCategory>(FILE).catch(
+        () => [] as StoredCategory[],
+      );
+      if (stored.length === 0) {
+        const seeded = seedCategories();
+        await saveCollection(FILE, seeded);
+        return setCache(seeded);
+      }
+      return setCache(stored);
+    })().finally(() => {
+      inflight = null;
+    });
+  }
+
+  return cloneCategories(await inflight);
+}
+
+export const getAllCategoryRecords = cache(async (): Promise<StoredCategory[]> => {
+  return loadCategoryRecordsUncached();
+});
+
+export const getEnabledCategories = cache(async (): Promise<Category[]> => {
   const [categories, listings] = await Promise.all([
     getAllCategoryRecords(),
     getAllListings(),
@@ -74,7 +83,7 @@ export async function getEnabledCategories(): Promise<Category[]> {
       listingCount: counts.get(category.id) ?? category.listingCount ?? 0,
       subcategories: [...category.subcategories],
     }));
-}
+});
 
 export async function getCategoryBySlug(
   slug: string,
@@ -107,7 +116,7 @@ export async function getAdminCategoryRecords(): Promise<AdminCategoryRecord[]> 
 export async function createCategoryRecord(
   input: AdminCategoryCreateInput,
 ): Promise<AdminCategoryRecord> {
-  const categories = await getAllCategoryRecords();
+  const categories = await loadCategoryRecordsUncached();
   const slug = input.slug.trim().toLowerCase().replace(/\s+/g, "-");
   const record: StoredCategory = {
     id: `cat-${Date.now()}`,
@@ -136,7 +145,7 @@ export async function patchCategoryRecord(
   id: string,
   patch: AdminCategoryPatch,
 ): Promise<AdminCategoryRecord | undefined> {
-  const categories = await getAllCategoryRecords();
+  const categories = await loadCategoryRecordsUncached();
   const index = categories.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
   categories[index] = {

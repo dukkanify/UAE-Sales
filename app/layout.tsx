@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
-import { OfflineBanner } from "@/shared/components/OfflineBanner";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
+import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner";
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
@@ -17,8 +17,9 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
+  preload: false,
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700"],
+  weight: ["500", "700"],
 });
 
 const siteUrl = getAppUrl();
@@ -69,7 +70,7 @@ export default function RootLayout({
       <body className={ibmPlexArabic.className}>
         <ToastProvider>
           <BrandJsonLd />
-          <OfflineBanner />
+          <DeferredOfflineBanner />
           {children}
         </ToastProvider>
       </body>

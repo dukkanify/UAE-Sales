@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   marketplaceListings,
   marketplaceUserListings,
@@ -8,7 +9,8 @@ import type { AdminListingPatch, AdminListingRecord } from "@/types/domain/admin
 
 const FILE = "listings.json";
 
-let cache: Listing[] | null = null;
+let cacheRows: Listing[] | null = null;
+let inflight: Promise<Listing[]> | null = null;
 
 function seedListings(): Listing[] {
   const byId = new Map<string, Listing>();
@@ -23,27 +25,45 @@ function seedListings(): Listing[] {
   return seeded;
 }
 
-function setCache(listings: Listing[]) {
-  cache = listings.map((listing) => ({ ...listing }));
-  return cache;
+function cloneListings(listings: Listing[]) {
+  return listings.map((listing) => ({ ...listing }));
 }
 
-export async function getAllListings(): Promise<Listing[]> {
-  if (cache) return cache.map((listing) => ({ ...listing }));
+function setCache(listings: Listing[]) {
+  cacheRows = cloneListings(listings);
+  return cacheRows;
+}
 
-  const stored = await loadCollection<Listing>(FILE).catch(() => [] as Listing[]);
-  if (stored.length === 0) {
-    const seeded = seedListings();
-    await saveCollection(FILE, seeded);
-    return setCache(seeded).map((listing) => ({ ...listing }));
+async function loadListingsUncached(): Promise<Listing[]> {
+  if (cacheRows) return cloneListings(cacheRows);
+
+  if (!inflight) {
+    inflight = (async () => {
+      const stored = await loadCollection<Listing>(FILE).catch(
+        () => [] as Listing[],
+      );
+      if (stored.length === 0) {
+        const seeded = seedListings();
+        await saveCollection(FILE, seeded);
+        return setCache(seeded);
+      }
+      return setCache(stored);
+    })().finally(() => {
+      inflight = null;
+    });
   }
 
-  return setCache(stored).map((listing) => ({ ...listing }));
+  return cloneListings(await inflight);
 }
+
+/** Request-deduped catalog read for RSC trees. */
+export const getAllListings = cache(async (): Promise<Listing[]> => {
+  return loadListingsUncached();
+});
 
 /** Sync read for checkout resolvers — uses cache or mock seed fallback. */
 export function getListingSync(idOrSlug: string): Listing | undefined {
-  const source = cache ?? [...marketplaceListings, ...marketplaceUserListings];
+  const source = cacheRows ?? [...marketplaceListings, ...marketplaceUserListings];
   return source.find(
     (listing) => listing.id === idOrSlug || listing.slug === idOrSlug,
   );
@@ -60,7 +80,7 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
 }
 
 export async function upsertListing(listing: Listing): Promise<Listing> {
-  const listings = await getAllListings();
+  const listings = await loadListingsUncached();
   const index = listings.findIndex((item) => item.id === listing.id);
   const next = { ...listing };
   if (index >= 0) listings[index] = next;
@@ -74,7 +94,7 @@ export async function patchListingRecord(
   id: string,
   patch: AdminListingPatch,
 ): Promise<Listing | undefined> {
-  const listings = await getAllListings();
+  const listings = await loadListingsUncached();
   const index = listings.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
   listings[index] = { ...listings[index], ...patch };
