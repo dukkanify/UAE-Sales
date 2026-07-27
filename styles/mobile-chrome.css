@@ -177,6 +177,14 @@
   color: #a88642;
 }
 
+html[data-theme="dark"] .mobile-bottom-nav__link {
+  color: #a8b0c0;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav__link--active {
+  color: #d4b87a;
+}
+
 .mobile-bottom-nav__icon-wrap {
   position: relative;
   display: grid;

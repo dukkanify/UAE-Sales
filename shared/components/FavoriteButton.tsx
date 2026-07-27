@@ -23,6 +23,10 @@ type FavoriteButtonProps = {
 const baseClass =
   "focus-ring interactive-lift inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
+/** Overlay chips — avoid text-ink/bg-surface so dark mode stays high-contrast. */
+const iconOnlyClass =
+  "focus-ring interactive-lift inline-flex items-center justify-center rounded-full border transition";
+
 export function FavoriteButton({
   className = "",
   iconOnly = false,
@@ -74,15 +78,23 @@ export function FavoriteButton({
     }
   }, [isLoggedIn, listing, router, showToast]);
 
+  const shellClass = iconOnly
+    ? `${iconOnlyClass} ${className}`
+    : `${baseClass} ${isFavorite ? "border-accent/40 bg-accent-soft text-accent" : ""} ${className}`;
+
   return (
     <button
       aria-label={isFavorite ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
       aria-pressed={isFavorite}
-      className={`${baseClass} ${isFavorite ? "border-accent/40 bg-accent-soft text-accent" : ""} ${className}`}
+      className={shellClass}
       onClick={handleToggle}
       type="button"
     >
-      <Icon filled={isFavorite} name={isFavorite ? "heart-filled" : "heart"} size={18} />
+      <Icon
+        filled={isFavorite}
+        name={isFavorite ? "heart-filled" : "heart"}
+        size={iconOnly ? 15 : 18}
+      />
       {!iconOnly ? (isFavorite ? "محفوظ" : "مفضلة") : null}
     </button>
   );

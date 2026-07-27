@@ -81,27 +81,49 @@ html[data-theme="dark"] .bg-\[\#fdfbf7\] {
   background-color: var(--color-background) !important;
 }
 
-/* Listing image overlay actions — always readable in light & dark */
+/* Listing image overlay actions — solid chip + navy glyph in light & dark */
 .card-media-action {
-  background-color: rgb(255 255 255 / 0.95) !important;
+  background-color: #ffffff !important;
   color: #0b1628 !important;
-  border-color: transparent !important;
-  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+  border-color: rgb(15 23 42 / 10%) !important;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 28%);
 }
 
 .card-media-action:hover {
   background-color: #ffffff !important;
   color: #0b1628 !important;
+  border-color: rgb(15 23 42 / 16%) !important;
 }
 
 .card-media-action[aria-pressed="true"] {
   background-color: #ffffff !important;
   color: #e11d48 !important;
+  border-color: rgb(225 29 72 / 28%) !important;
 }
 
 .card-media-action svg {
-  color: inherit !important;
-  stroke: currentColor;
+  color: #0b1628 !important;
+  stroke: #0b1628 !important;
+  fill: none !important;
+  stroke-width: 2.25px !important;
+}
+
+.card-media-action svg [data-icon-fill="true"],
+.card-media-action svg circle {
+  fill: #0b1628 !important;
+  stroke: none !important;
+}
+
+.card-media-action[aria-pressed="true"] svg {
+  color: #e11d48 !important;
+  stroke: none !important;
+  fill: #e11d48 !important;
+}
+
+.card-media-action[aria-pressed="true"] svg [data-icon-fill="true"],
+.card-media-action[aria-pressed="true"] svg circle {
+  fill: #e11d48 !important;
+  stroke: none !important;
 }
 
 /* Soft status badges readable on dark surfaces */
@@ -131,7 +153,18 @@ html[data-theme="dark"] .text-\[\#8a7040\] {
 }
 
 html[data-theme="dark"] .marketplace-card-meta-icon {
+  color: #e8eef8 !important;
+  stroke: currentColor !important;
+  opacity: 1;
+}
+
+html[data-theme="dark"] .marketplace-card .text-muted {
   color: #c5cddc;
+}
+
+html[data-theme="dark"] .theme-toggle {
+  color: #eef2f8;
+  background-color: var(--color-surface);
 }
 
 body::selection {
