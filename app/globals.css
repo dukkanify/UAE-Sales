@@ -381,6 +381,12 @@ html[data-theme="dark"] .market-hero-search {
   box-shadow: 0 24px 72px rgb(0 0 0 / 45%);
 }
 
+/* Night navy panels — stay dark even when --color-primary flips in dark mode */
+.market-site-footer {
+  background-color: #0b1628 !important;
+  color: #ffffff;
+}
+
 .font-latin {
   font-family: var(--font-latin);
 }

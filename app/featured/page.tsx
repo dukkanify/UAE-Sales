@@ -13,7 +13,7 @@ export default async function FeaturedPage() {
   return (
     <>
       <SiteHeader />
-      <main className="bg-[#fdfbf7]">
+      <main className="bg-background">
         <section className="app-container page-padding">
           <div className="mb-8">
             <p className="text-xs font-bold text-[#B8955F]">إعلانات مميزة</p>

@@ -32,7 +32,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
           return (
             <Link
               key={listing.id}
-              className="group overflow-hidden rounded-2xl border border-border bg-white shadow-[0_8px_24px_rgb(15_23_42/6%)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgb(15_23_42/10%)]"
+              className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_8px_24px_rgb(15_23_42/6%)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgb(15_23_42/10%)]"
               href={href}
             >
               <div className="relative aspect-square overflow-hidden">
