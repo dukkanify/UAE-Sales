@@ -59,7 +59,8 @@ function AppImageInner({
     width,
   });
   const [activeSrc, setActiveSrc] = useState(src || fallbackUrl);
-  const [isLoaded, setIsLoaded] = useState(isInlineImageSrc(src));
+  // Priority images must paint immediately — opacity gating delays LCP.
+  const [isLoaded, setIsLoaded] = useState(priority || isInlineImageSrc(src));
   const [usedErrorFallback, setUsedErrorFallback] = useState(false);
   const useNativeImage = isInlineImageSrc(activeSrc);
 
@@ -67,16 +68,17 @@ function AppImageInner({
     if (activeSrc !== fallbackUrl) {
       setActiveSrc(fallbackUrl);
       setUsedErrorFallback(true);
-      setIsLoaded(false);
+      if (!priority) setIsLoaded(false);
     }
   }
 
   const imageClassName = `object-cover ${className}`.trim();
   const wrapperClassName = `overflow-hidden ${fill ? "absolute inset-0" : "relative block"}`;
+  const visibleClass = priority || isLoaded ? "opacity-100" : "opacity-0";
 
   return (
     <span className={wrapperClassName}>
-      {!isLoaded ? (
+      {!isLoaded && !priority ? (
         <span
           aria-hidden
           className={`absolute inset-0 skeleton ${fill ? "" : "min-h-[inherit]"}`}
@@ -86,7 +88,7 @@ function AppImageInner({
         // eslint-disable-next-line @next/next/no-img-element
         <img
           alt={alt}
-          className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"} ${fill ? "absolute inset-0 h-full w-full" : ""}`}
+          className={`${imageClassName} ${priority ? "" : "transition-opacity duration-300"} ${visibleClass} ${fill ? "absolute inset-0 h-full w-full" : ""}`}
           height={fill ? undefined : height}
           loading={priority ? "eager" : loading ?? "lazy"}
           onError={handleError}
@@ -97,13 +99,14 @@ function AppImageInner({
       ) : (
         <Image
           alt={alt}
-          className={`${imageClassName} transition-opacity duration-300 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+          className={`${imageClassName} ${priority ? "" : "transition-opacity duration-300"} ${visibleClass}`}
           fill={fill}
           height={fill ? undefined : height}
           loading={priority ? undefined : loading ?? "lazy"}
           onError={handleError}
           onLoad={() => setIsLoaded(true)}
           priority={priority}
+          quality={priority ? 78 : 70}
           sizes={sizes}
           src={activeSrc}
           width={fill ? undefined : width}

@@ -1,8 +1,6 @@
 import {
-  MarketAppDownload,
   MarketCategoryGrid,
   MarketCategorySection,
-  MarketEmirates,
   MarketEscrow,
   MarketFeatured,
   MarketHeader,
@@ -10,37 +8,21 @@ import {
   MarketNearbySection,
   MarketPreviewStrip,
   MarketPromoBanner,
-  MobileAppDownload,
-  MobileCategoryGrid,
-  MobileCategoryRail,
-  MobileEmiratesSection,
-  MobileFeaturedRail,
-  MobileHeroBlock,
-  MobileHomeHeader,
-  MobileHomeShell,
-  MobileNearbyRail,
-  MobilePreviewStrip,
-  MobilePromoBanner,
 } from "@/features/home";
+import { DeferredHomeBelowFold } from "@/features/home/components/marketplace/DeferredHomeBelowFold";
 import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
-import { mockHomeCategorySections } from "@/mock";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { getCategories } from "@/services/categories";
-import { getFeaturedListings, getListings } from "@/services/listings";
+import { getHomeFeed } from "@/services/listings/home-feed";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
-import "@/features/home/components/mobile/mobile-home.css";
 
 export default async function Home() {
   const ua = userAgent({ headers: await headers() });
   const preferMobile =
     ua.device.type === "mobile" || ua.device.type === "tablet";
 
-  const [categories, featuredListings, allListings] = await Promise.all([
-    getCategories(),
-    getFeaturedListings(),
-    getListings(),
-  ]);
+  const [categories, feed] = await Promise.all([getCategories(), getHomeFeed()]);
 
   const categoryMeta = categories.map((category) => ({
     id: category.id,
@@ -50,45 +32,39 @@ export default async function Home() {
   const categoryById = (id: string) =>
     categories.find((c) => c.id === id)?.slug ?? id;
 
-  const sectionListings = mockHomeCategorySections.map((section) => ({
-    ...section,
-    items: allListings
-      .filter((listing) => listing.categoryId === section.categoryId)
-      .slice(0, 4),
+  const sectionListings = feed.sections.map((section) => ({
+    categoryId: section.categoryId,
+    categorySlug: categoryById(section.categoryId),
+    description: section.description,
+    eyebrow: section.eyebrow,
+    listings: section.items,
+    title: section.title,
+    variant: section.variant,
   }));
 
-  const featuredForHome = featuredListings.slice(0, 6);
-  const appPreviewListings = resolveAppPreviewListings(allListings);
+  const appPreviewListings = resolveAppPreviewListings([
+    ...feed.featured,
+    ...feed.nearbySource,
+  ]);
 
   if (preferMobile) {
+    const { MobileHomePage } = await import(
+      "@/features/home/components/mobile/MobileHomePage"
+    );
     return (
-      <>
-        <MobileHomeShell fullWidth>
-          <MobileHomeHeader />
-          <main className="mobile-home-main">
-            <MobileHeroBlock categories={categories} />
-            <MobileCategoryGrid categories={categories} />
-            <MobilePromoBanner />
-            <MobilePreviewStrip listings={featuredForHome} />
-            <MobileFeaturedRail listings={featuredForHome} />
-            <MobileNearbyRail listings={allListings} />
-            <MobileEmiratesSection />
-            {sectionListings.map((section) => (
-              <MobileCategoryRail
-                key={section.categoryId}
-                categorySlug={categoryById(section.categoryId)}
-                listings={section.items}
-                title={section.title}
-              />
-            ))}
-            <MarketEscrow />
-            <MobileAppDownload previewListings={appPreviewListings} />
-          </main>
-        </MobileHomeShell>
-        <SiteFooter />
-      </>
+      <MobileHomePage
+        appPreviewListings={appPreviewListings}
+        categories={categories}
+        categoryById={categoryById}
+        featuredListings={feed.featured}
+        nearbyListings={feed.nearbySource}
+        sectionListings={feed.sections}
+      />
     );
   }
+
+  const aboveFoldSections = sectionListings.slice(0, 2);
+  const belowFoldSections = sectionListings.slice(2);
 
   return (
     <>
@@ -97,27 +73,26 @@ export default async function Home() {
         <MarketHero categories={categories} />
         <MarketCategoryGrid categories={categories} />
         <MarketPromoBanner />
-        <MarketPreviewStrip
-          categories={categoryMeta}
-          listings={featuredForHome}
-        />
-        <MarketFeatured categories={categoryMeta} listings={featuredForHome} />
-        <MarketNearbySection listings={allListings} />
-        <MarketEmirates />
-        {sectionListings.map((section) => (
+        <MarketPreviewStrip categories={categoryMeta} listings={feed.preview} />
+        <MarketFeatured categories={categoryMeta} listings={feed.featured} />
+        <MarketNearbySection listings={feed.nearbySource} />
+        {aboveFoldSections.map((section) => (
           <MarketCategorySection
             key={section.categoryId}
             categoryId={section.categoryId}
-            categorySlug={categoryById(section.categoryId)}
+            categorySlug={section.categorySlug}
             description={section.description}
             eyebrow={section.eyebrow}
-            listings={section.items}
+            listings={section.listings}
             title={section.title}
             variant={section.variant}
           />
         ))}
         <MarketEscrow />
-        <MarketAppDownload previewListings={appPreviewListings} />
+        <DeferredHomeBelowFold
+          appPreviewListings={appPreviewListings}
+          sections={belowFoldSections}
+        />
       </main>
       <SiteFooter />
     </>

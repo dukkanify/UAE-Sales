@@ -17,7 +17,8 @@ import {
   getCategories,
   getCategoryBySlug,
 } from "@/services/categories";
-import { getListings, searchListings } from "@/services/listings";
+import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
+import { searchListings } from "@/services/listings";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
@@ -86,7 +87,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings, catalog] = await Promise.all([
+  const [categories, listings, suggestionTitles] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -107,13 +108,13 @@ export default async function CategoryPage({
           ? selectedFilters.sort
           : "newest",
     }),
-    getListings(),
+    getSearchSuggestionTitles(),
   ]);
 
   const suggestions = buildSearchSuggestions({
     categories,
     cities,
-    listings: catalog.filter((listing) => listing.status === "active"),
+    listings: suggestionTitles,
     selectedFilters,
   });
 

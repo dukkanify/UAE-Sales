@@ -7,7 +7,8 @@ import { buildSearchSuggestions } from "@/features/search/components/search-sugg
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
-import { getListings, searchListings } from "@/services/listings";
+import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
+import { searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -62,7 +63,7 @@ export default async function SearchPage({
     sort: getParam(params, "sort") ?? "newest",
   };
 
-  const [categories, listings, catalog] = await Promise.all([
+  const [categories, listings, suggestionTitles] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: selectedFilters.category || undefined,
@@ -83,19 +84,18 @@ export default async function SearchPage({
           ? selectedFilters.sort
           : "newest",
     }),
-    getListings(),
+    getSearchSuggestionTitles(),
   ]);
 
   const suggestions = buildSearchSuggestions({
     categories,
     cities,
-    listings: catalog.filter((listing) => listing.status === "active"),
+    listings: suggestionTitles,
     selectedFilters,
   });
 
   return (
     <>
-      <SiteHeader />
       <SiteHeader />
       <RecordRecentSearch query={selectedFilters.query} />
       <main className="bg-background">

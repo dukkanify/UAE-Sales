@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
-import { StickySearchDock } from "@/features/search/components/StickySearchDock";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -17,6 +17,14 @@ import {
 } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
 import type { UserProfile } from "@/types";
+
+const StickySearchDock = dynamic(
+  () =>
+    import("@/features/search/components/StickySearchDock").then(
+      (mod) => mod.StickySearchDock,
+    ),
+  { ssr: false },
+);
 
 const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
   "/": "home",

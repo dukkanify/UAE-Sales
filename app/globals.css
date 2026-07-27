@@ -59,6 +59,7 @@ body {
   color: var(--color-ink);
   font-family: var(--font-arabic);
   line-height: 1.6;
+  font-synthesis-weight: none;
 }
 
 /* Next.js dev overlay host — prevent layout shifts in development */

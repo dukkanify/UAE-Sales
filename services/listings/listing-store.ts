@@ -61,7 +61,7 @@ function setCache(listings: Listing[]) {
 }
 
 async function loadListingsUncached(): Promise<Listing[]> {
-  if (cacheRows) return cloneListings(cacheRows);
+  if (cacheRows) return cacheRows;
 
   if (!inflight) {
     inflight = (async () => {
@@ -80,7 +80,7 @@ async function loadListingsUncached(): Promise<Listing[]> {
     });
   }
 
-  return cloneListings(await inflight);
+  return await inflight;
 }
 
 /** Request-deduped catalog read for RSC trees. */
