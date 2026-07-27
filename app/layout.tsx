@@ -12,7 +12,7 @@ const ibmPlexArabic = IBM_Plex_Sans_Arabic({
   subsets: ["arabic"],
   display: "swap",
   variable: "--font-ibm-plex-arabic",
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
 });
 
 const inter = Inter({
@@ -20,7 +20,7 @@ const inter = Inter({
   display: "swap",
   preload: false,
   variable: "--font-inter",
-  weight: ["500", "700"],
+  weight: ["700"],
 });
 
 const siteUrl = getAppUrl();
