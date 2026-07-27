@@ -114,7 +114,7 @@ export default async function SearchPage({
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
-            <aside className="overflow-visible lg:sticky lg:top-24 lg:self-start">
+            <aside className="lg:sticky lg:top-24 lg:self-start">
               <SearchFilters
                 categories={categories}
                 cities={cities}

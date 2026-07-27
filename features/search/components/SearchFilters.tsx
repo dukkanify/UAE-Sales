@@ -169,10 +169,10 @@ export function SearchFilters({
   }
 
   return (
-    <div className="marketplace-panel overflow-visible p-0">
+    <div className="marketplace-panel flex max-h-none flex-col overflow-hidden p-0 lg:max-h-[calc(100vh-6.5rem)]">
       <button
         aria-expanded={mobileOpen}
-        className="flex w-full items-center justify-between gap-3 border-b border-border/70 px-4 py-3 text-start lg:hidden"
+        className="flex w-full shrink-0 items-center justify-between gap-3 border-b border-border/70 px-4 py-3 text-start lg:hidden"
         onClick={() => setMobileOpen((open) => !open)}
         type="button"
       >
@@ -192,10 +192,12 @@ export function SearchFilters({
         />
       </button>
 
-      <div className={`px-4 pb-4 pt-3 ${mobileOpen ? "block" : "hidden"} lg:block`}>
-        <h2 className="mb-2 hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
-
-        <form action={action} className="grid gap-2.5">
+      <form
+        action={action}
+        className={`${mobileOpen ? "flex" : "hidden"} min-h-0 flex-1 flex-col lg:flex`}
+      >
+        <div className="relative z-20 shrink-0 space-y-2.5 overflow-visible px-4 pt-3">
+          <h2 className="hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
           <SearchTypeahead
             compact
             defaultValue={selectedFilters.query}
@@ -205,7 +207,9 @@ export function SearchFilters({
             selectedFilters={selectedFilters}
             suggestions={suggestions}
           />
+        </div>
 
+        <div className="min-h-0 flex-1 space-y-2.5 overflow-x-hidden overflow-y-auto px-4 pt-2.5">
           <div className="grid grid-cols-2 gap-2">
             <Select
               compact
@@ -297,14 +301,19 @@ export function SearchFilters({
               </div>
             </div>
           </details>
+        </div>
 
-          <div className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] z-10 -mx-1 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)] to-transparent px-1 pb-1 pt-2 lg:static lg:bg-none lg:p-0">
-            <Button className="motion-press w-full shrink-0" size="sm" type="submit" variant="primary">
-              تطبيق الفلاتر
-            </Button>
-          </div>
-        </form>
-      </div>
+        <div className="shrink-0 border-t border-border/70 bg-surface px-4 py-3">
+          <Button
+            className="motion-press w-full"
+            size="sm"
+            type="submit"
+            variant="primary"
+          >
+            تطبيق الفلاتر
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }
