@@ -237,13 +237,14 @@ textarea {
 }
 
 .uae-flag-strip {
+  /* Literal UAE flag colors — do not follow flipped dark theme tokens */
   background:
-    linear-gradient(90deg, var(--color-uae-red) 0 18%, transparent 18%),
+    linear-gradient(90deg, #c41e3a 0 18%, transparent 18%),
     linear-gradient(
       180deg,
-      var(--color-secondary) 0 33.333%,
-      var(--color-uae-white) 33.333% 66.666%,
-      var(--color-uae-black) 66.666% 100%
+      #c9a962 0 33.333%,
+      #ffffff 33.333% 66.666%,
+      #0b1628 66.666% 100%
     );
 }
 
@@ -490,6 +491,19 @@ a.bg-night *,
 button.bg-uae-black *,
 a.bg-uae-black * {
   color: inherit !important;
+}
+
+/* Keep solid primary fills navy when --color-primary flips light in dark mode */
+html[data-theme="dark"] .bg-primary {
+  background-color: #0b1628 !important;
+}
+
+html[data-theme="dark"] .bg-primary\/85 {
+  background-color: rgb(11 22 40 / 0.85) !important;
+}
+
+html[data-theme="dark"] .bg-uae-black {
+  background-color: #0b1628 !important;
 }
 
 button:disabled {
