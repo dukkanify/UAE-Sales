@@ -31,6 +31,7 @@ export const STORAGE_EVENTS = {
   recentlyViewedChange: "sooqna-recently-viewed-change",
   chatChange: "sooqna-chat-change",
   favoritesChange: "sooqna-favorites-change",
+  recentSearchesChange: "sooqna-recent-searches-change",
 } as const;
 
 export const STORAGE_KEYS = {
@@ -38,6 +39,7 @@ export const STORAGE_KEYS = {
   localListings: "sooqna-local-listings",
   recentlyViewed: "sooqna-recently-viewed",
   savedSearches: "sooqna-saved-searches",
+  recentSearches: "sooqna-recent-searches",
   chatConversations: "sooqna-chat-conversations",
   favorites: "sooqna-favorites",
 } as const;

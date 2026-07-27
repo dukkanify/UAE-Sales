@@ -1,11 +1,13 @@
 import { cities, countries } from "@/shared/constants/locations";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
-import { searchListings } from "@/services/listings";
+import { getListings, searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -60,7 +62,7 @@ export default async function SearchPage({
     sort: getParam(params, "sort") ?? "newest",
   };
 
-  const [categories, listings] = await Promise.all([
+  const [categories, listings, catalog] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: selectedFilters.category || undefined,
@@ -81,11 +83,20 @@ export default async function SearchPage({
           ? selectedFilters.sort
           : "newest",
     }),
+    getListings(),
   ]);
+
+  const suggestions = buildSearchSuggestions({
+    categories,
+    cities,
+    listings: catalog.filter((listing) => listing.status === "active"),
+    selectedFilters,
+  });
 
   return (
     <>
       <SiteHeader />
+      <RecordRecentSearch query={selectedFilters.query} />
       <main className="bg-[#fdfbf7]">
         <section className="app-container page-padding pb-28 lg:pb-8">
           <div className="mb-8">
@@ -102,13 +113,14 @@ export default async function SearchPage({
           </div>
 
           <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
+            <aside className="overflow-visible lg:sticky lg:top-24 lg:self-start">
               <SearchFilters
                 categories={categories}
                 cities={cities}
                 countries={countries}
                 layout="sidebar"
                 selectedFilters={selectedFilters}
+                suggestions={suggestions}
               />
             </aside>
 

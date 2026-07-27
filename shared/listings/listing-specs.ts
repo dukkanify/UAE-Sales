@@ -1,5 +1,9 @@
 import type { Listing } from "@/types";
 import { getCategoryFieldLabel, getCategoryFields } from "@/shared/constants/category-fields";
+import {
+  CATEGORY_SEARCH_KEYWORDS,
+  searchTextMatches,
+} from "@/shared/listings/search-text";
 
 export type SpecEntry = {
   key: string;
@@ -153,7 +157,7 @@ export function getListingFeatureItems(listing: Listing): string[] {
 }
 
 export function listingMatchesQuery(listing: Listing, query: string): boolean {
-  const normalized = query.trim().toLowerCase();
+  const normalized = query.trim();
   if (!normalized) return true;
 
   const specValues = listing.categorySpecs
@@ -176,8 +180,10 @@ export function listingMatchesQuery(listing: Listing, query: string): boolean {
     ...(listing.features ?? []),
   ]
     .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+    .join(" ");
 
-  return haystack.includes(normalized);
+  if (searchTextMatches(haystack, normalized)) return true;
+
+  const categoryKeywords = CATEGORY_SEARCH_KEYWORDS[listing.categoryId] ?? [];
+  return categoryKeywords.some((keyword) => searchTextMatches(keyword, normalized));
 }

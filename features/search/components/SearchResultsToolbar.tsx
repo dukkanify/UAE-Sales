@@ -3,6 +3,7 @@
 import type { Category } from "@/types";
 import { SavedSearches } from "./SavedSearches";
 import { SearchFilterChips } from "./SearchFilterChips";
+import { SearchQuickFilters } from "./SearchQuickFilters";
 
 type SearchResultsToolbarProps = {
   categories: Category[];
@@ -56,6 +57,7 @@ export function SearchResultsToolbar({
           إعلان
         </p>
       </div>
+      <SearchQuickFilters categories={categories} selectedFilters={selectedFilters} />
       <SearchFilterChips categories={categories} selectedFilters={selectedFilters} />
       <SavedSearches currentLabel={buildLabel(selectedFilters)} currentUrl={currentUrl} />
     </div>

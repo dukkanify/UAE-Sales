@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { ChipLink } from "@/shared/ui/ChipLink";
@@ -15,7 +17,7 @@ import {
   getCategories,
   getCategoryBySlug,
 } from "@/services/categories";
-import { searchListings } from "@/services/listings";
+import { getListings, searchListings } from "@/services/listings";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
@@ -74,6 +76,7 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const selectedFilters = {
+    category: category.id,
     city: getParam(queryParams, "city") ?? "",
     condition: getParam(queryParams, "condition") ?? "",
     country: getParam(queryParams, "country") ?? "",
@@ -83,7 +86,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings] = await Promise.all([
+  const [categories, listings, catalog] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -104,11 +107,20 @@ export default async function CategoryPage({
           ? selectedFilters.sort
           : "newest",
     }),
+    getListings(),
   ]);
+
+  const suggestions = buildSearchSuggestions({
+    categories,
+    cities,
+    listings: catalog.filter((listing) => listing.status === "active"),
+    selectedFilters,
+  });
 
   return (
     <>
       <SiteHeader />
+      <RecordRecentSearch query={selectedFilters.query} />
       <main>
         <section className="app-container page-padding pb-28 lg:pb-8">
           <Breadcrumbs
@@ -141,6 +153,7 @@ export default async function CategoryPage({
                 layout="sidebar"
                 selectedFilters={selectedFilters}
                 showCategory={false}
+                suggestions={suggestions}
               />
             </aside>
 

@@ -1,10 +1,13 @@
 export {
+  addRecentSearch,
+  clearRecentSearches,
   clearSessionUser,
   deleteLocalListing,
   getFavorites,
   getLocalListingById,
   getLocalListings,
   getLocalListingsForSeller,
+  getRecentSearches,
   getSessionUser,
   isFavoriteListing,
   saveLocalListing,

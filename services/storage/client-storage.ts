@@ -152,3 +152,43 @@ export function toggleFavorite(entry: FavoriteRecord): boolean {
   window.dispatchEvent(new Event(STORAGE_EVENTS.favoritesChange));
   return !exists;
 }
+
+const MAX_RECENT_SEARCHES = 8;
+
+export function getRecentSearches(): string[] {
+  if (!canUseStorage()) return [];
+  const raw = window.localStorage.getItem(STORAGE_KEYS.recentSearches);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => String(item).trim())
+      .filter(Boolean)
+      .slice(0, MAX_RECENT_SEARCHES);
+  } catch {
+    return [];
+  }
+}
+
+export function addRecentSearch(query: string) {
+  if (!canUseStorage()) return;
+  const normalized = query.trim();
+  if (normalized.length < 2) return;
+
+  const next = [
+    normalized,
+    ...getRecentSearches().filter(
+      (item) => item.toLowerCase() !== normalized.toLowerCase(),
+    ),
+  ].slice(0, MAX_RECENT_SEARCHES);
+
+  if (!safeSetItem(STORAGE_KEYS.recentSearches, JSON.stringify(next))) return;
+  window.dispatchEvent(new Event(STORAGE_EVENTS.recentSearchesChange));
+}
+
+export function clearRecentSearches() {
+  if (!canUseStorage()) return;
+  window.localStorage.removeItem(STORAGE_KEYS.recentSearches);
+  window.dispatchEvent(new Event(STORAGE_EVENTS.recentSearchesChange));
+}
