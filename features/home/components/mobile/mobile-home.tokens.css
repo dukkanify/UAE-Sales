@@ -52,3 +52,17 @@
   color: var(--mh-primary);
   -webkit-tap-highlight-color: transparent;
 }
+
+html[data-theme="dark"] .mobile-home-shell {
+  --mh-bg: #0a101c;
+  --mh-primary: #eef2f8;
+  --mh-gold: #d4b87a;
+  --mh-gold-soft: #2a2418;
+  --mh-muted: #b0b8c9;
+  --mh-border: #2a3448;
+  --mh-success-soft: #0f2e22;
+  --mh-shadow-sm: 0 2px 8px rgb(0 0 0 / 35%);
+  --mh-shadow-md: 0 8px 24px rgb(0 0 0 / 40%);
+  --mh-shadow-lg: 0 16px 40px rgb(0 0 0 / 45%);
+  --mh-shadow-card: 0 10px 32px rgb(0 0 0 / 42%);
+}

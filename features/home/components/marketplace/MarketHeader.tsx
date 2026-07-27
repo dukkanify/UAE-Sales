@@ -30,7 +30,7 @@ export function MarketHeader() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-white/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-border/50 bg-surface/95 backdrop-blur-md">
       <div className="h-0.5 uae-header-accent" />
       <div className="app-container">
         <div className="flex min-h-[4.25rem] items-center justify-between gap-4 md:min-h-[4.5rem]">

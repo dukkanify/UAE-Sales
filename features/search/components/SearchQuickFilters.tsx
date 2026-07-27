@@ -97,7 +97,7 @@ export function SearchQuickFilters({
             className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
               chip.active
                 ? "border-[#c9a45c] bg-[#c9a45c] text-[#0b1628]"
-                : "border-border bg-white text-ink hover:border-[#c9a45c]/50 hover:bg-[#f8f3ea]"
+                : "border-border bg-surface text-ink hover:border-[#c9a45c]/50 hover:bg-secondary-soft"
             }`}
             href={chip.href}
           >

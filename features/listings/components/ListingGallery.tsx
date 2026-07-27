@@ -16,7 +16,7 @@ type ListingGalleryProps = {
 };
 
 const GALLERY_OVERLAY_BTN_CLASS =
-  "!min-h-0 !size-8 !min-w-0 !rounded-full !border-0 !bg-white/92 !p-0 !shadow-sm backdrop-blur-sm";
+  "card-media-action !min-h-0 !size-8 !min-w-0 !rounded-full !p-0";
 
 export function ListingGallery({ listing }: ListingGalleryProps) {
   const galleryImages = getListingImages(listing);

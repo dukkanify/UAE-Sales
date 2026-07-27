@@ -56,7 +56,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
 
         <div className="mobile-home-featured-card__actions">
           <FavoriteButton
-            className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--mh-shadow-sm)]"
+            className="card-media-action !min-h-8 !size-8 !min-w-8 !rounded-full !p-0"
             iconOnly
             listing={listing}
           />

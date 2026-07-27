@@ -72,7 +72,8 @@ html[data-theme="dark"] .uae-gold-gradient {
   color: #0b1628 !important;
 }
 
-html[data-theme="dark"] .bg-white {
+/* Remap plain white surfaces — keep translucent media chips bright */
+html[data-theme="dark"] .bg-white:not(.card-media-action):not([class*="bg-white/"]) {
   background-color: var(--color-surface) !important;
 }
 
@@ -80,9 +81,62 @@ html[data-theme="dark"] .bg-\[\#fdfbf7\] {
   background-color: var(--color-background) !important;
 }
 
+/* Listing image overlay actions — always readable in light & dark */
+.card-media-action {
+  background-color: rgb(255 255 255 / 0.95) !important;
+  color: #0b1628 !important;
+  border-color: transparent !important;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 22%);
+}
+
+.card-media-action:hover {
+  background-color: #ffffff !important;
+  color: #0b1628 !important;
+}
+
+.card-media-action[aria-pressed="true"] {
+  background-color: #ffffff !important;
+  color: #e11d48 !important;
+}
+
+.card-media-action svg {
+  color: inherit !important;
+  stroke: currentColor;
+}
+
+/* Soft status badges readable on dark surfaces */
+html[data-theme="dark"] .bg-sky-50 {
+  background-color: rgb(14 165 233 / 18%) !important;
+}
+html[data-theme="dark"] .text-sky-700 {
+  color: #7dd3fc !important;
+}
+html[data-theme="dark"] .bg-emerald-50 {
+  background-color: rgb(16 185 129 / 18%) !important;
+}
+html[data-theme="dark"] .text-emerald-700 {
+  color: #6ee7b7 !important;
+}
+html[data-theme="dark"] .bg-amber-50 {
+  background-color: rgb(245 158 11 / 18%) !important;
+}
+html[data-theme="dark"] .text-amber-800 {
+  color: #fcd34d !important;
+}
+html[data-theme="dark"] .bg-rose-50 {
+  background-color: rgb(244 63 94 / 18%) !important;
+}
+html[data-theme="dark"] .text-\[\#8a7040\] {
+  color: #e4c787 !important;
+}
+
+html[data-theme="dark"] .marketplace-card-meta-icon {
+  color: #c5cddc;
+}
+
 body::selection {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-secondary);
+  color: #0b1628;
 }
 
 a {

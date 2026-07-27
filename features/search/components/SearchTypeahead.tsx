@@ -184,7 +184,7 @@ export function SearchTypeahead({
 
       {open && items.length > 0 ? (
         <div
-          className="absolute inset-x-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-xl border border-border bg-white shadow-[0_12px_32px_rgb(15_23_42/12%)]"
+          className="absolute inset-x-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-xl border border-border bg-surface shadow-[0_12px_32px_rgb(15_23_42/12%)]"
           id={listId}
           role="listbox"
         >
