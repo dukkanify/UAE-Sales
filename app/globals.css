@@ -721,13 +721,24 @@ html[data-theme="dark"] .market-header__drawer-top {
   background: linear-gradient(270deg, rgb(212 184 122 / 16%), rgb(26 35 54 / 90%));
 }
 
-html[data-theme="dark"] .market-header__drawer-link {
+html[data-theme="dark"] .market-header__drawer-link:not(.is-active) {
   background: rgb(18 26 42 / 88%);
+}
+
+html[data-theme="dark"] .market-header__drawer-link.is-active {
+  background: #0b1628;
+  color: #fff;
+  box-shadow: 0 10px 24px rgb(0 0 0 / 35%);
 }
 
 html[data-theme="dark"] .market-header__drawer-icon {
   background: #0b1628;
   color: #eef2f8;
+}
+
+html[data-theme="dark"] .market-header__drawer-link.is-active .market-header__drawer-icon {
+  background: rgb(255 255 255 / 12%);
+  color: #d4b87a;
 }
 
 html[data-theme="dark"] .market-header__drawer-account {

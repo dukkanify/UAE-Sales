@@ -288,6 +288,14 @@ html[data-theme="dark"] .mobile-home-categories__label {
   color: #c5cddc;
 }
 
+html[data-theme="dark"] .mobile-home-categories__thumb {
+  border-color: rgb(255 255 255 / 10%);
+  background: #1a2336;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 30%),
+    0 8px 20px rgb(0 0 0 / 28%);
+}
+
 html[data-theme="dark"] .mobile-bottom-nav {
   --mh-border: #2a3448;
   --mh-muted: #a8b0c0;
