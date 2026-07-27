@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
@@ -53,10 +54,12 @@ export function MarketHeader() {
           <div className="flex items-center gap-2">
             <EmirateLocationSelect className="hidden lg:inline-flex" variant="desktop" />
 
-            <span className="hidden items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 md:inline-flex lg:hidden">
+            <span className="hidden items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5 md:inline-flex lg:hidden">
               <span className="inline-block h-3.5 w-5 overflow-hidden rounded-sm uae-flag-strip" />
               <span className="text-xs font-bold text-ink">العربية</span>
             </span>
+
+            <ThemeToggle className="hidden sm:grid" />
 
             <Link
               aria-label="بحث"
@@ -83,6 +86,8 @@ export function MarketHeader() {
               <Icon name="plus" size={16} />
               أضف إعلانك
             </Link>
+
+            <ThemeToggle className="sm:hidden" />
 
             <button
               aria-expanded={menuOpen}

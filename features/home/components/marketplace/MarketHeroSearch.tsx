@@ -16,7 +16,7 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
   return (
     <form
       action="/search"
-      className="overflow-hidden rounded-2xl border border-white/80 bg-surface shadow-[0_24px_72px_rgb(15_20_25/14%)] ring-1 ring-black/[0.04]"
+      className="market-hero-search overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_24px_72px_rgb(15_20_25/14%)] ring-1 ring-black/[0.04]"
       data-search-anchor
     >
       <div className="h-1 uae-gold-gradient" />

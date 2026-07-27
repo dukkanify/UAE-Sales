@@ -520,11 +520,31 @@
   pointer-events: none;
 }
 
+html[data-theme="dark"] .mobile-home-hero__media-overlay {
+  background:
+    linear-gradient(180deg, rgb(10 16 28 / 45%) 0%, transparent 48%),
+    linear-gradient(0deg, rgb(10 16 28 / 100%) 0%, rgb(10 16 28 / 0%) 40%);
+}
+
+html[data-theme="dark"] .mobile-home-hero__bg img {
+  filter: brightness(0.55) saturate(0.85);
+}
+
 .mobile-home-hero__content {
   position: relative;
   z-index: 1;
   background: #fff;
   padding: 0.875rem 1rem 0.75rem;
+}
+
+html[data-theme="dark"] .mobile-home-hero__content {
+  background: var(--mh-bg, #0a101c);
+}
+
+html[data-theme="dark"] .mobile-home-hero__badge {
+  border-color: rgb(212 184 122 / 28%);
+  background: rgb(18 26 42 / 0.9);
+  color: #e4c787;
 }
 
 .mobile-home-hero__badge {
