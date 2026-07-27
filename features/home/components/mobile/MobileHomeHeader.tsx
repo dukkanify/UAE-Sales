@@ -10,10 +10,12 @@ import { getSessionSnapshot, subscribeSession } from "@/services/storage/externa
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
 
-const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
+const drawerIcons: Record<string, "home" | "grid" | "shield" | "star" | "search"> = {
   "/": "home",
   "/categories": "grid",
   "/escrow": "shield",
+  "/featured": "star",
+  "/search": "search",
 };
 
 function isActivePath(pathname: string, href: string) {
@@ -32,12 +34,12 @@ export function MobileHomeHeader() {
         <div className="mobile-home-header__side mobile-home-header__side--start">
           <button
             aria-expanded={menuOpen}
-            aria-label="القائمة"
+            aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
             className="mobile-home-header__icon-btn"
             onClick={() => setMenuOpen((open) => !open)}
             type="button"
           >
-            <Icon name={menuOpen ? "close" : "menu"} size={20} />
+            <Icon name={menuOpen ? "close" : "menu"} size={19} />
           </button>
         </div>
 
@@ -46,8 +48,16 @@ export function MobileHomeHeader() {
         </div>
 
         <div className="mobile-home-header__side mobile-home-header__side--end">
-          <div className="mobile-home-header__actions">
-            <ThemeToggle className="!size-9 !rounded-xl" />
+          <div className="mobile-home-header__cluster">
+            <Link
+              aria-label="بحث"
+              className="mobile-home-header__icon-btn"
+              href="/search"
+            >
+              <Icon name="search" size={17} />
+            </Link>
+
+            <ThemeToggle className="mobile-home-header__icon-btn !size-[2.25rem] !min-h-0 !rounded-full !border-0 !shadow-none" />
 
             <Link
               aria-label="الإشعارات"
@@ -55,13 +65,19 @@ export function MobileHomeHeader() {
               href="/profile#notifications"
             >
               <span className="mobile-home-header__notify-ring" aria-hidden />
-              <Icon className="mobile-home-header__notify-icon" name="bell" size={19} />
+              <Icon className="mobile-home-header__notify-icon" name="bell" size={17} />
               <span className="mobile-home-header__badge">3</span>
             </Link>
-
-            <EmirateLocationSelect variant="mobile" />
           </div>
         </div>
+      </div>
+
+      <div className="mobile-home-header__smart-row">
+        <EmirateLocationSelect variant="mobile" />
+        <Link className="mobile-home-header__quick-search" href="/search">
+          <Icon name="search" size={14} />
+          <span>ابحث في سوقنا...</span>
+        </Link>
       </div>
 
       {menuOpen ? (
