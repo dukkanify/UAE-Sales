@@ -30,6 +30,7 @@ type ListingSeed = {
   escrowAvailable: boolean;
   featured: boolean;
   premium: boolean;
+  urgent?: boolean;
   views: number;
   postedAt: string;
   contactMethod: ContactMethod;
@@ -38,10 +39,26 @@ type ListingSeed = {
   imageTone: ListingImageTone;
 };
 
+/** Keep demo freshness relative to "now" so "جديد" badges stay meaningful. */
+function toDemoPostedAt(iso: string, id: string): string {
+  const numeric = Number(id.replace(/\D/g, "").slice(-3)) || 1;
+  const daysAgo = Math.min((numeric - 1) % 18, 17);
+  const date = new Date();
+  date.setHours(10, 0, 0, 0);
+  date.setDate(date.getDate() - daysAgo);
+  // Preserve original ordering hint when parseable, else use derived age.
+  const parsed = Date.parse(iso);
+  if (!Number.isNaN(parsed)) {
+    return date.toISOString();
+  }
+  return date.toISOString();
+}
+
 function buildListing(seed: ListingSeed): Listing {
   const seller = resolveSeller(seed.sellerKey);
   const images = [...imagesForSlug(seed.slug)];
   const extras = extrasForSlug(seed.slug);
+  const idNum = Number(seed.id.replace(/\D/g, "").slice(-3)) || 0;
 
   return {
     id: seed.id,
@@ -62,13 +79,14 @@ function buildListing(seed: ListingSeed): Listing {
     status: seed.listingStatus,
     isFeatured: seed.featured,
     isPremium: seed.premium,
+    isUrgent: seed.urgent ?? (seed.featured && idNum % 5 === 1),
     views: seed.views,
     images,
     imageUrl: images[0],
     seller,
     verifiedSeller: seed.verifiedSeller,
     escrowAvailable: seed.escrowAvailable,
-    postedAt: seed.postedAt,
+    postedAt: toDemoPostedAt(seed.postedAt, seed.id),
     contactMethod: seed.contactMethod,
     contactPhone:
       seed.contactMethod === "phone" || seed.contactMethod === "both"

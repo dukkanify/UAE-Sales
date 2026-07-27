@@ -5,6 +5,8 @@ import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
+import { isListingVerified } from "@/features/listings/components/listing-card-badges";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -31,10 +33,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
   const photoCount = getListingImages(listing).length;
-  const isVerified =
-    listing.verifiedSeller ??
-    listing.seller.isVerified ??
-    (listing.seller.rating ?? 0) >= 4.8;
+  const isVerified = isListingVerified(listing);
 
   return (
     <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
@@ -53,9 +52,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
           />
         </Link>
 
-        {listing.isFeatured ? (
-          <span className="mobile-home-featured-card__badge-featured">مميز</span>
-        ) : null}
+        <ListingCardBadges className="!start-2 !top-2" listing={listing} />
 
         <div className="mobile-home-featured-card__actions">
           <FavoriteButton
