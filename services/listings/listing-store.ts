@@ -25,6 +25,28 @@ function seedListings(): Listing[] {
   return seeded;
 }
 
+/** Merge newly added mock inventory into an older persisted catalog. */
+async function mergeMissingSeedListings(stored: Listing[]): Promise<Listing[]> {
+  const seeded = seedListings();
+  if (stored.length >= seeded.length) {
+    return stored;
+  }
+
+  const byId = new Map<string, Listing>();
+  for (const listing of stored) {
+    byId.set(listing.id, { ...listing });
+  }
+  for (const listing of seeded) {
+    if (!byId.has(listing.id)) {
+      byId.set(listing.id, { ...listing });
+    }
+  }
+
+  const merged = Array.from(byId.values());
+  await saveCollection(FILE, merged);
+  return merged;
+}
+
 function cloneListings(listings: Listing[]) {
   return listings.map((listing) => ({ ...listing }));
 }
@@ -47,7 +69,8 @@ async function loadListingsUncached(): Promise<Listing[]> {
         await saveCollection(FILE, seeded);
         return setCache(seeded);
       }
-      return setCache(stored);
+      const merged = await mergeMissingSeedListings(stored);
+      return setCache(merged);
     })().finally(() => {
       inflight = null;
     });
