@@ -133,6 +133,8 @@ export async function createListingFromAdmin(
   const slugBase = slugifyTitle(input.title);
   const slug = `${slugBase}-${String(now).slice(-5)}`;
   const sellerName = input.sellerName?.trim() || "إدارة سوقنا";
+  const city = input.city.trim();
+  const emirate = input.emirate?.trim() || city;
 
   const listing: Listing = {
     id: `admin-${now}`,
@@ -142,8 +144,9 @@ export async function createListingFromAdmin(
       input.description?.trim() ||
       `إعلان مضاف من لوحة التحكم: ${input.title.trim()}`,
     categoryId: input.categoryId,
-    city: input.city,
-    emirate: input.city,
+    city,
+    emirate,
+    area: input.area?.trim() || undefined,
     country: "الإمارات العربية المتحدة",
     price: input.price,
     currency: "AED",
@@ -163,8 +166,12 @@ export async function createListingFromAdmin(
     escrowAvailable: true,
     postedAt: new Date().toISOString(),
     contactMethod: "both",
+    contactPhone: input.contactPhone?.trim() || undefined,
     deliveryOption: "both",
     imageTone: "gold",
+    categorySpecs: input.categorySpecs,
+    features: input.features?.length ? input.features : undefined,
+    negotiable: input.negotiable,
   };
 
   return upsertListing(listing);

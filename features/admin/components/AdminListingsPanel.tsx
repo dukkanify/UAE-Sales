@@ -1,15 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import type { AdminCategoryRecord, AdminListingRecord, ListingStatus } from "@/types";
 import { cities } from "@/shared/constants/locations";
+import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
 import { getLocalListings, getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import {
+  CategoryFieldsForm,
+  type CategoryFieldErrors,
+} from "@/features/listings/components/add-listing/CategoryFieldsForm";
+import { parseCategoryForm } from "@/features/listings/components/add-listing/category-form-utils";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
@@ -55,6 +62,7 @@ const emptyForm = {
   condition: "used",
   status: "active",
   sellerName: "",
+  contactPhone: "",
   isFeatured: false,
   isUrgent: false,
 };
@@ -66,7 +74,9 @@ export function AdminListingsPanel() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<CategoryFieldErrors>({});
   const [form, setForm] = useState(emptyForm);
+  const [formKey, setFormKey] = useState(0);
 
   useEffect(() => {
     const user = getSessionUser();
@@ -100,7 +110,11 @@ export function AdminListingsPanel() {
           setForm((current) =>
             current.categoryId
               ? current
-              : { ...current, categoryId: rows.find((row) => row.enabled)?.id ?? rows[0]?.id ?? "" },
+              : {
+                  ...current,
+                  categoryId:
+                    rows.find((row) => row.enabled)?.id ?? rows[0]?.id ?? "",
+                },
           );
         })
         .catch(() => setCategories([]));
@@ -121,6 +135,8 @@ export function AdminListingsPanel() {
         .map((category) => ({ label: category.name, value: category.id })),
     [categories],
   );
+
+  const isDynamic = isDynamicCategory(form.categoryId);
 
   async function patchListing(
     id: string,
@@ -149,15 +165,56 @@ export function AdminListingsPanel() {
     }
   }
 
-  async function handleCreate() {
+  async function handleCreate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     const session = getSessionUser();
     if (!session) return;
 
-    const price = Number(form.price);
-    if (!form.title.trim() || !form.categoryId || !form.city || !Number.isFinite(price) || price <= 0) {
-      setCreateError("أكمل العنوان والقسم والمدينة وسعرًا صحيحًا.");
+    const formData = new FormData(event.currentTarget);
+    formData.set("categoryId", form.categoryId);
+    formData.set("status", form.status);
+    formData.set("description", form.description);
+    if (!isDynamic) {
+      formData.set("title", form.title);
+      formData.set("price", form.price);
+      formData.set("city", form.city);
+      formData.set("condition", form.condition);
+    } else {
+      // Ensure price/description always present for parser
+      formData.set("price", String(formData.get("price") ?? form.price));
+      formData.set(
+        "description",
+        String(formData.get("description") ?? form.description),
+      );
+    }
+
+    const parsed = parseCategoryForm(formData, form.categoryId);
+    const nextErrors: CategoryFieldErrors = { ...parsed.errors };
+
+    if (!form.categoryId) {
+      nextErrors.category = "اختر القسم المناسب للإعلان.";
+    }
+
+    if (!isDynamic) {
+      const price = Number(form.price);
+      if (!form.title.trim()) nextErrors.title = "العنوان مطلوب.";
+      if (!form.city.trim()) nextErrors.city = "المدينة مطلوبة.";
+      if (!Number.isFinite(price) || price <= 0) {
+        nextErrors.price = "اكتب سعراً صحيحاً.";
+      }
+    }
+
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      setCreateError("أكمل الحقول المطلوبة للقسم المختار.");
       return;
     }
+
+    const price = Number(formData.get("price") ?? form.price);
+    const title = isDynamic ? parsed.title : form.title.trim();
+    const city = isDynamic ? parsed.city : form.city;
+    const description = String(formData.get("description") ?? form.description).trim();
+    const contactPhone = String(formData.get("contact") ?? form.contactPhone).trim();
 
     setCreating(true);
     setCreateError("");
@@ -170,16 +227,25 @@ export function AdminListingsPanel() {
         },
         body: JSON.stringify({
           create: {
-            title: form.title.trim(),
-            description: form.description.trim(),
+            title,
+            description,
             categoryId: form.categoryId,
-            city: form.city,
+            city,
+            emirate: parsed.emirate,
+            area:
+              typeof parsed.categorySpecs.community === "string"
+                ? parsed.categorySpecs.community
+                : undefined,
             price,
-            condition: form.condition,
+            condition: parsed.condition,
             status: form.status,
             isFeatured: form.isFeatured,
             isUrgent: form.isUrgent,
             sellerName: form.sellerName.trim() || undefined,
+            contactPhone: contactPhone || undefined,
+            categorySpecs: isDynamic ? parsed.categorySpecs : undefined,
+            features: parsed.features.length > 0 ? parsed.features : undefined,
+            negotiable: parsed.negotiable,
           },
         }),
       });
@@ -197,7 +263,10 @@ export function AdminListingsPanel() {
         ...emptyForm,
         categoryId: current.categoryId,
         city: current.city,
+        status: current.status,
       }));
+      setFieldErrors({});
+      setFormKey((key) => key + 1);
     } catch {
       setCreateError("تعذر الاتصال بالخادم.");
     } finally {
@@ -218,109 +287,165 @@ export function AdminListingsPanel() {
           </Button>
         </div>
         <p className="mt-2 text-xs text-muted">
-          اختر القسم (سيارات، عقارات، إلكترونيات...) ثم انشر مباشرة أو أرسل للمراجعة. يمكنك بعدها
-          اعتماد/رفض/تمييز أي إعلان من القائمة بالأسفل.
+          عند اختيار القسم تظهر حقوله الخاصة (مثل الغرف والحمامات للعقارات، أو العداد والماركة
+          للسيارات) بنفس منطق صفحة إضافة الإعلان.
         </p>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Input
-            label="عنوان الإعلان"
-            onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-            placeholder="مثال: تويوتا كامري 2022"
-            value={form.title}
-          />
-          <Input
-            label="السعر (د.إ)"
-            inputMode="numeric"
-            onChange={(event) => setForm((current) => ({ ...current, price: event.target.value }))}
-            placeholder="85000"
-            value={form.price}
-          />
-          <Select
-            label="القسم"
-            onChange={(event) =>
-              setForm((current) => ({ ...current, categoryId: event.target.value }))
-            }
-            options={
-              categoryOptions.length > 0
-                ? categoryOptions
-                : [{ label: "جاري التحميل...", value: "" }]
-            }
-            value={form.categoryId}
-          />
-          <Select
-            label="المدينة"
-            onChange={(event) => setForm((current) => ({ ...current, city: event.target.value }))}
-            options={cities.map((city) => ({ label: city.name, value: city.name }))}
-            value={form.city}
-          />
-          <Select
-            label="الحالة"
-            onChange={(event) =>
-              setForm((current) => ({ ...current, condition: event.target.value }))
-            }
-            options={conditionOptions}
-            value={form.condition}
-          />
-          <Select
-            label="حالة النشر"
-            onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-            options={publishStatusOptions}
-            value={form.status}
-          />
+        <form className="mt-4 grid gap-4" key={formKey} onSubmit={handleCreate}>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Select
+              label="القسم"
+              name="categoryId"
+              onChange={(event) => {
+                setForm((current) => ({
+                  ...current,
+                  categoryId: event.target.value,
+                }));
+                setFieldErrors({});
+                setCreateError("");
+              }}
+              options={
+                categoryOptions.length > 0
+                  ? categoryOptions
+                  : [{ label: "جاري التحميل...", value: "" }]
+              }
+              value={form.categoryId}
+            />
+            <Select
+              label="حالة النشر"
+              onChange={(event) =>
+                setForm((current) => ({ ...current, status: event.target.value }))
+              }
+              options={publishStatusOptions}
+              value={form.status}
+            />
+          </div>
+
+          {fieldErrors.category ? (
+            <FormMessage variant="error">{String(fieldErrors.category)}</FormMessage>
+          ) : null}
+
+          {isDynamic ? (
+            <CategoryFieldsForm
+              categoryId={form.categoryId}
+              errors={fieldErrors}
+              heading="تفاصيل القسم"
+              showContact
+            />
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Input
+                label="عنوان الإعلان"
+                name="title"
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, title: event.target.value }))
+                }
+                placeholder="مثال: طقم كنب مودرن"
+                value={form.title}
+              />
+              <Input
+                label="السعر (د.إ)"
+                inputMode="numeric"
+                name="price"
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, price: event.target.value }))
+                }
+                placeholder="85000"
+                value={form.price}
+              />
+              <Select
+                label="المدينة"
+                name="city"
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, city: event.target.value }))
+                }
+                options={cities.map((city) => ({
+                  label: city.name,
+                  value: city.name,
+                }))}
+                value={form.city}
+              />
+              <Select
+                label="الحالة"
+                name="condition"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    condition: event.target.value,
+                  }))
+                }
+                options={conditionOptions}
+                value={form.condition}
+              />
+              <div className="sm:col-span-2">
+                <Textarea
+                  label="الوصف"
+                  name="description"
+                  onChange={(event) =>
+                    setForm((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                  placeholder="تفاصيل تظهر في صفحة الإعلان"
+                  rows={3}
+                  value={form.description}
+                />
+              </div>
+            </div>
+          )}
+
           <Input
             label="اسم البائع (اختياري)"
             onChange={(event) =>
-              setForm((current) => ({ ...current, sellerName: event.target.value }))
+              setForm((current) => ({
+                ...current,
+                sellerName: event.target.value,
+              }))
             }
             placeholder="إدارة سوقنا"
             value={form.sellerName}
           />
-          <div className="grid content-end gap-2 sm:col-span-2">
-            <Textarea
-              label="الوصف (اختياري)"
-              onChange={(event) =>
-                setForm((current) => ({ ...current, description: event.target.value }))
-              }
-              placeholder="تفاصيل مختصرة تظهر في صفحة الإعلان"
-              rows={3}
-              value={form.description}
-            />
+
+          <div className="flex flex-wrap gap-4 text-sm text-ink">
+            <label className="inline-flex items-center gap-2">
+              <input
+                checked={form.isFeatured}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    isFeatured: event.target.checked,
+                  }))
+                }
+                type="checkbox"
+              />
+              مميز
+            </label>
+            <label className="inline-flex items-center gap-2">
+              <input
+                checked={form.isUrgent}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    isUrgent: event.target.checked,
+                  }))
+                }
+                type="checkbox"
+              />
+              عاجل
+            </label>
           </div>
-        </div>
 
-        <div className="mt-3 flex flex-wrap gap-4 text-sm text-ink">
-          <label className="inline-flex items-center gap-2">
-            <input
-              checked={form.isFeatured}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, isFeatured: event.target.checked }))
-              }
-              type="checkbox"
-            />
-            مميز
-          </label>
-          <label className="inline-flex items-center gap-2">
-            <input
-              checked={form.isUrgent}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, isUrgent: event.target.checked }))
-              }
-              type="checkbox"
-            />
-            عاجل
-          </label>
-        </div>
+          {createError ? (
+            <p className="text-sm font-medium text-error">{createError}</p>
+          ) : null}
 
-        {createError ? (
-          <p className="mt-3 text-sm font-medium text-error">{createError}</p>
-        ) : null}
-
-        <div className="mt-4">
-          <Button loading={creating} onClick={handleCreate} variant="primary">
-            نشر الإعلان
-          </Button>
-        </div>
+          <div>
+            <Button loading={creating} type="submit" variant="primary">
+              نشر الإعلان
+            </Button>
+          </div>
+        </form>
       </Card>
 
       <Card className="p-4" variant="flat">
@@ -376,9 +501,7 @@ export function AdminListingsPanel() {
               listing.status === "draft" ? (
                 <Button
                   loading={busyId === listing.id}
-                  onClick={() =>
-                    patchListing(listing.id, { status: "active" })
-                  }
+                  onClick={() => patchListing(listing.id, { status: "active" })}
                   size="sm"
                   variant="primary"
                 >

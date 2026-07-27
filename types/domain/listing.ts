@@ -88,6 +88,8 @@ export type Listing = {
   area?: string;
   images?: string[];
   isPremium?: boolean;
+  /** Urgent sale — highlighted on listing cards. */
+  isUrgent?: boolean;
   /** Eligible for escrow when purchased and paid in full through platform checkout. */
   escrowAvailable?: boolean;
   verifiedSeller?: boolean;

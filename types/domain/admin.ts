@@ -1,4 +1,5 @@
 import type { CategoryIconName } from "./category";
+import type { CategorySpecs } from "./category-fields";
 import type { ListingCondition, ListingStatus } from "./listing";
 import type { AccountStatus, UserRole } from "./user";
 
@@ -52,6 +53,12 @@ export type AdminListingCreateInput = {
   isFeatured?: boolean;
   isUrgent?: boolean;
   sellerName?: string;
+  emirate?: string;
+  area?: string;
+  contactPhone?: string;
+  features?: string[];
+  negotiable?: boolean;
+  categorySpecs?: CategorySpecs;
 };
 
 export type AdminListingPatch = Partial<
