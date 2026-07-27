@@ -278,6 +278,109 @@ textarea {
     radial-gradient(ellipse 40% 35% at 15% 85%, rgb(45 106 79 / 6%), transparent 62%);
 }
 
+/* Desktop homepage hero — light wash by default, navy wash in dark mode */
+.market-hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.88) 0%,
+    rgb(255 255 255 / 0.82) 45%,
+    rgb(253 251 247 / 0.96) 100%
+  );
+}
+
+.market-hero-title {
+  color: var(--color-ink);
+}
+
+.market-hero-lead {
+  color: var(--color-muted);
+}
+
+.market-hero-chip {
+  border: 1px solid rgb(184 149 95 / 25%);
+  background: rgb(255 255 255 / 0.92);
+  color: #8a7040;
+}
+
+.market-hero-pill {
+  border: 1px solid rgb(184 149 95 / 20%);
+  background: rgb(255 255 255 / 0.92);
+  color: var(--color-ink);
+}
+
+.market-hero-pill:hover {
+  border-color: rgb(184 149 95 / 35%);
+  background: rgb(184 149 95 / 8%);
+}
+
+.market-hero-stat {
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  background: rgb(255 255 255 / 0.88);
+  color: var(--color-ink);
+  backdrop-filter: blur(8px);
+}
+
+.market-hero-search {
+  box-shadow: 0 24px 72px rgb(15 20 25 / 14%);
+}
+
+html[data-theme="dark"] .market-hero-bg img {
+  filter: brightness(0.42) saturate(0.8) contrast(1.05);
+}
+
+html[data-theme="dark"] .market-hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgb(10 16 28 / 0.78) 0%,
+    rgb(10 16 28 / 0.72) 42%,
+    rgb(10 16 28 / 0.94) 100%
+  );
+}
+
+html[data-theme="dark"] .uae-hero-sand-wash {
+  opacity: 0.35;
+  background:
+    radial-gradient(ellipse 55% 45% at 85% 75%, rgb(212 184 122 / 14%), transparent 68%),
+    radial-gradient(ellipse 40% 35% at 15% 85%, rgb(61 143 106 / 8%), transparent 62%);
+}
+
+html[data-theme="dark"] .market-hero-title {
+  color: #f4f7fc;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 35%);
+}
+
+html[data-theme="dark"] .market-hero-lead {
+  color: #c5cddc;
+}
+
+html[data-theme="dark"] .market-hero-chip {
+  border-color: rgb(212 184 122 / 28%);
+  background: rgb(18 26 42 / 0.88);
+  color: #e4c787;
+}
+
+html[data-theme="dark"] .market-hero-pill {
+  border-color: rgb(212 184 122 / 22%);
+  background: rgb(18 26 42 / 0.82);
+  color: #eef2f8;
+}
+
+html[data-theme="dark"] .market-hero-pill:hover {
+  border-color: rgb(212 184 122 / 40%);
+  background: rgb(212 184 122 / 12%);
+}
+
+html[data-theme="dark"] .market-hero-stat {
+  border-color: rgb(42 52 72 / 90%);
+  background: rgb(18 26 42 / 0.86);
+  color: #eef2f8;
+}
+
+html[data-theme="dark"] .market-hero-search {
+  border-color: var(--color-border);
+  box-shadow: 0 24px 72px rgb(0 0 0 / 45%);
+}
+
 .font-latin {
   font-family: var(--font-latin);
 }

@@ -20,8 +20,8 @@ export async function MarketHero({ categories }: MarketHeroProps) {
   ]);
 
   return (
-    <section className="relative overflow-hidden">
-      <div className="absolute inset-0">
+    <section className="market-hero relative overflow-hidden">
+      <div className="market-hero-bg absolute inset-0">
         <AppImage
           alt="أفق دبي — برج خليفة وأفق المدينة"
           className="object-cover object-center"
@@ -31,7 +31,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
           sizes="100vw"
           src={backgroundUrl}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/88 via-white/82 to-[#fdfbf7]/96" />
+        <div className="market-hero-overlay absolute inset-0" />
         <div className="absolute inset-0 uae-hero-sand-wash opacity-70" />
         <div className="absolute inset-0 uae-geometric-texture opacity-[0.03]" />
       </div>
@@ -39,16 +39,16 @@ export async function MarketHero({ categories }: MarketHeroProps) {
       <div className="relative z-10">
         <div className="app-container px-4 py-12 md:py-16 lg:py-20">
           <div className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#B8955F]/25 bg-white/90 px-4 py-1.5 text-xs font-bold text-[#8a7040] shadow-sm">
+            <span className="market-hero-chip inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold shadow-sm">
               <span className="inline-block h-3.5 w-5 overflow-hidden rounded-sm uae-flag-strip" />
               منصة إماراتية موثوقة
             </span>
 
-            <h1 className="mt-5 text-3xl font-bold leading-tight tracking-tight text-ink sm:text-4xl md:text-5xl md:leading-[1.1]">
+            <h1 className="market-hero-title mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl md:leading-[1.1]">
               بيع وشراء بثقة في الإمارات
             </h1>
 
-            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted md:text-lg">
+            <p className="market-hero-lead mx-auto mt-4 max-w-2xl text-base leading-8 md:text-lg">
               كل ما تحتاجه من سيارات، عقارات، إلكترونيات وخدمات في منصة إماراتية
               واحدة مع ضمان مالي يحمي المشتري والبائع.
             </p>
@@ -61,7 +61,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
               {quickSearches.map((tag) => (
                 <Link
                   key={tag.href}
-                  className="rounded-full border border-[#B8955F]/20 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-ink shadow-sm transition hover:border-[#B8955F]/35 hover:bg-[#B8955F]/8"
+                  className="market-hero-pill rounded-full px-3.5 py-1.5 text-xs font-bold transition"
                   href={tag.href}
                 >
                   {tag.label}
@@ -71,12 +71,9 @@ export async function MarketHero({ categories }: MarketHeroProps) {
 
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
               {stats.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="rounded-xl border border-border/60 bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
-                >
-                  <p className="text-xl font-bold text-ink md:text-2xl">{stat.value}</p>
-                  <p className="mt-0.5 text-xs font-semibold text-muted">{stat.label}</p>
+                <div key={stat.label} className="market-hero-stat rounded-xl px-4 py-3 shadow-sm">
+                  <p className="text-xl font-bold md:text-2xl">{stat.value}</p>
+                  <p className="mt-0.5 text-xs font-semibold opacity-80">{stat.label}</p>
                 </div>
               ))}
             </div>

@@ -7,6 +7,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
+import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
 
 const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
@@ -46,6 +47,8 @@ export function MobileHomeHeader() {
 
         <div className="mobile-home-header__side mobile-home-header__side--end">
           <div className="mobile-home-header__actions">
+            <ThemeToggle className="!size-9 !rounded-xl" />
+
             <Link
               aria-label="الإشعارات"
               className="mobile-home-header__notify"
