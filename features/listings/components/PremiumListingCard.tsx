@@ -76,11 +76,15 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="absolute end-3 top-3 z-20 flex gap-1.5">
         <FavoriteButton
-          className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--shadow-sm)]"
+          className="card-media-action !min-h-8 !size-8 !min-w-8 !rounded-full !p-0"
           iconOnly
           listing={listing}
         />
-        <CardShareButton title={listing.title} url={shareUrl} />
+        <CardShareButton
+          className="card-media-action"
+          title={listing.title}
+          url={shareUrl}
+        />
       </div>
 
       {showEscrow ? (
@@ -103,7 +107,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <Link href={href}>
         <h3
-          className={`line-clamp-2 font-bold leading-snug text-ink transition group-hover:text-primary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
+          className={`line-clamp-2 font-bold leading-snug text-ink transition group-hover:text-secondary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
         >
           {listing.title}
         </h3>
@@ -115,7 +119,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="mt-2 flex items-center gap-2">
         {listing.seller.avatarUrl ? (
-          <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
+          <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-2 ring-surface">
             <AppImage
               alt={listing.seller.name}
               className="object-cover"
@@ -126,7 +130,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
             />
           </span>
         ) : (
-          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[0.6rem] font-bold text-primary">
+          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary-soft text-[0.6rem] font-bold text-[#8a7040]">
             {listing.seller.name.slice(0, 2)}
           </span>
         )}
@@ -158,11 +162,11 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-[0.65rem] font-medium text-muted sm:text-xs">
         <span className="inline-flex items-center gap-1">
-          <Icon name="clock" size={11} />
+          <Icon className="marketplace-card-meta-icon" name="clock" size={12} />
           {formatPostedTime(listing.postedAt)}
         </span>
         <span className="inline-flex items-center gap-1">
-          <Icon name="eye" size={11} />
+          <Icon className="marketplace-card-meta-icon" name="eye" size={12} />
           {formatViews(listing.views)} مشاهدة
         </span>
         {showStatus && listing.status !== "active" ? (
