@@ -34,7 +34,9 @@ export function isListingUrgent(listing: Listing): boolean {
   if (listing.features?.some((feature) => /عاجل|urgent/i.test(feature))) {
     return true;
   }
-  return false;
+  // Demo catalog fallback when persisted rows predate isUrgent.
+  const idNum = Number(listing.id.replace(/\D/g, "").slice(-3)) || 0;
+  return listing.isFeatured === true && idNum % 5 === 1;
 }
 
 /** Colored classification badges for listing cards — max 3 for clarity. */
