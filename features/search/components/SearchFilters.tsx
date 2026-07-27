@@ -298,9 +298,11 @@ export function SearchFilters({
             </div>
           </details>
 
-          <Button className="mt-1 w-full shrink-0" size="sm" type="submit" variant="primary">
-            تطبيق الفلاتر
-          </Button>
+          <div className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] z-10 -mx-1 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)] to-transparent px-1 pb-1 pt-2 lg:static lg:bg-none lg:p-0">
+            <Button className="motion-press w-full shrink-0" size="sm" type="submit" variant="primary">
+              تطبيق الفلاتر
+            </Button>
+          </div>
         </form>
       </div>
     </div>

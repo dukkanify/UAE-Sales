@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "../styles/design-tokens.css";
 @import "../styles/mobile-chrome.css";
+@import "../styles/sticky-search.css";
 
 @theme inline {
   --color-primary: var(--color-primary);
@@ -46,6 +47,9 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color var(--duration-normal) var(--ease-premium),
+    color var(--duration-normal) var(--ease-premium);
 }
 
 body {
@@ -60,6 +64,19 @@ body {
 /* Next.js dev overlay host — prevent layout shifts in development */
 nextjs-portal {
   position: absolute;
+}
+
+html[data-theme="dark"] .sooqna-gold-gradient,
+html[data-theme="dark"] .uae-gold-gradient {
+  color: #0b1628 !important;
+}
+
+html[data-theme="dark"] .bg-white {
+  background-color: var(--color-surface) !important;
+}
+
+html[data-theme="dark"] .bg-\[\#fdfbf7\] {
+  background-color: var(--color-background) !important;
 }
 
 body::selection {
@@ -192,6 +209,10 @@ textarea {
 .marketplace-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+}
+
+.marketplace-card:active {
+  transform: translateY(0) scale(0.985);
 }
 
 .marketplace-card-media {
@@ -333,6 +354,41 @@ button:disabled {
   box-shadow: var(--shadow-md);
 }
 
+.motion-press {
+  transition:
+    transform var(--duration-fast) var(--ease-premium),
+    filter var(--duration-fast) var(--ease-premium),
+    box-shadow var(--duration-fast) var(--ease-premium);
+}
+
+.motion-press:active {
+  transform: scale(0.97);
+}
+
+.motion-rise {
+  animation: fade-up var(--duration-normal) var(--ease-premium) both;
+}
+
+.theme-toggle__icon {
+  transition: transform var(--duration-normal) var(--ease-premium);
+}
+
+.theme-toggle__icon--moon {
+  transform: rotate(-12deg);
+}
+
+.theme-toggle__icon--sun {
+  transform: rotate(0deg);
+}
+
+.theme-toggle:hover .theme-toggle__icon--moon {
+  transform: rotate(-20deg) scale(1.06);
+}
+
+.theme-toggle:hover .theme-toggle__icon--sun {
+  transform: rotate(18deg) scale(1.06);
+}
+
 .premium-chip {
   display: inline-flex;
   align-items: center;
@@ -365,15 +421,19 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .page-enter,
+  .motion-rise,
   .marketplace-card,
   .marketplace-card-image,
-  .interactive-lift {
+  .interactive-lift,
+  .motion-press,
+  .theme-toggle__icon {
     animation: none !important;
     transition: none !important;
   }
 
   .marketplace-card:hover,
-  .marketplace-card:hover .marketplace-card-image {
+  .marketplace-card:hover .marketplace-card-image,
+  .motion-press:active {
     transform: none !important;
   }
 }

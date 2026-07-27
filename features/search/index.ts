@@ -6,3 +6,4 @@ export { SearchResultsList } from "./components/SearchResultsList";
 export { SearchResultsToolbar } from "./components/SearchResultsToolbar";
 export { SearchTypeahead } from "./components/SearchTypeahead";
 export { RecordRecentSearch } from "./components/RecordRecentSearch";
+export { StickySearchDock } from "./components/StickySearchDock";

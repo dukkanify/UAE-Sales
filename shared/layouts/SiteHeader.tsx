@@ -7,6 +7,8 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
+import { StickySearchDock } from "@/features/search/components/StickySearchDock";
+import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -41,6 +43,7 @@ export function SiteHeader() {
   }, []);
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
       <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
@@ -79,6 +82,7 @@ export function SiteHeader() {
           </form>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle className="hidden sm:grid" />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
@@ -103,10 +107,11 @@ export function SiteHeader() {
               <Icon className="shrink-0" name="plus" size={16} />
               أضف إعلانك
             </Button>
+            <ThemeToggle className="sm:hidden" />
             <button
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-              className="focus-ring grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
+              className="focus-ring motion-press grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
@@ -123,7 +128,7 @@ export function SiteHeader() {
           <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
             <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
               <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[0.65rem] font-bold text-primary">
+              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[0.65rem] font-bold text-[#0b1628]">
                 أقسام
               </span>
             </div>
@@ -137,7 +142,7 @@ export function SiteHeader() {
                     key={item.href}
                     className={`flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-bold transition ${
                       active
-                        ? "bg-primary text-white shadow-[0_10px_24px_rgba(15,23,42,0.22)]"
+                        ? "bg-[#0b1628] text-white shadow-[0_10px_24px_rgba(15,23,42,0.22)]"
                         : "bg-surface-muted/70 text-ink hover:bg-secondary-soft/70"
                     }`}
                     href={item.href}
@@ -210,6 +215,8 @@ export function SiteHeader() {
         ) : null}
       </div>
     </header>
+    <StickySearchDock />
+    </>
   );
 }
 

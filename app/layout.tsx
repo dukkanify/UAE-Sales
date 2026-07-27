@@ -5,6 +5,7 @@ import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import { THEME_BOOT_SCRIPT } from "@/shared/theme/theme";
 import "./globals.css";
 
 const ibmPlexArabic = IBM_Plex_Sans_Arabic({
@@ -66,7 +67,11 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       dir="rtl"
       lang="ar"
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
       <body className={ibmPlexArabic.className}>
         <ToastProvider>
           <BrandJsonLd />
