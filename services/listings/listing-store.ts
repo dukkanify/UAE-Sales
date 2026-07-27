@@ -5,7 +5,11 @@ import {
 } from "@/mock/listings.mock";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
 import type { Listing } from "@/types";
-import type { AdminListingPatch, AdminListingRecord } from "@/types/domain/admin";
+import type {
+  AdminListingCreateInput,
+  AdminListingPatch,
+  AdminListingRecord,
+} from "@/types/domain/admin";
 
 const FILE = "listings.json";
 
@@ -88,6 +92,59 @@ export async function upsertListing(listing: Listing): Promise<Listing> {
   await saveCollection(FILE, listings);
   setCache(listings);
   return { ...next };
+}
+
+function slugifyTitle(title: string) {
+  const base = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^\u0600-\u06FFa-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  return base || `listing-${Date.now()}`;
+}
+
+export async function createListingFromAdmin(
+  input: AdminListingCreateInput,
+): Promise<Listing> {
+  const now = Date.now();
+  const slugBase = slugifyTitle(input.title);
+  const slug = `${slugBase}-${String(now).slice(-5)}`;
+  const sellerName = input.sellerName?.trim() || "إدارة سوقنا";
+
+  const listing: Listing = {
+    id: `admin-${now}`,
+    slug,
+    title: input.title.trim(),
+    description:
+      input.description?.trim() ||
+      `إعلان مضاف من لوحة التحكم: ${input.title.trim()}`,
+    categoryId: input.categoryId,
+    city: input.city,
+    emirate: input.city,
+    country: "الإمارات العربية المتحدة",
+    price: input.price,
+    currency: "AED",
+    condition: input.condition ?? "used",
+    status: input.status ?? "active",
+    isFeatured: Boolean(input.isFeatured),
+    isUrgent: Boolean(input.isUrgent),
+    views: 0,
+    seller: {
+      id: "seller-admin-ops",
+      name: sellerName,
+      rating: 5,
+      isVerified: true,
+      sellerType: "business",
+    },
+    verifiedSeller: true,
+    escrowAvailable: true,
+    postedAt: new Date().toISOString(),
+    contactMethod: "both",
+    deliveryOption: "both",
+    imageTone: "gold",
+  };
+
+  return upsertListing(listing);
 }
 
 export async function patchListingRecord(
