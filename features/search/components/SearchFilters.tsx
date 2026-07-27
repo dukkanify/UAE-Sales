@@ -6,6 +6,10 @@ import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Icon } from "@/shared/ui/Icon";
+import {
+  SearchTypeahead,
+  type SearchSuggestion,
+} from "./SearchTypeahead";
 
 type SearchFiltersProps = {
   action?: string;
@@ -27,6 +31,7 @@ type SearchFiltersProps = {
     sort?: string;
   };
   showCategory?: boolean;
+  suggestions?: SearchSuggestion[];
 };
 
 const sortOptions = [
@@ -50,6 +55,7 @@ export function SearchFilters({
   layout = "bar",
   selectedFilters,
   showCategory = true,
+  suggestions = [],
 }: SearchFiltersProps) {
   const isSidebar = layout === "sidebar";
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -79,11 +85,13 @@ export function SearchFilters({
           action={action}
           className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
         >
-          <Input
+          <SearchTypeahead
             defaultValue={selectedFilters.query}
             label="كلمة البحث"
             name="q"
             placeholder="سيارة، هاتف، عقار..."
+            selectedFilters={selectedFilters}
+            suggestions={suggestions}
           />
           <Select
             defaultValue={selectedFilters.country}
@@ -188,12 +196,14 @@ export function SearchFilters({
         <h2 className="mb-2 hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
 
         <form action={action} className="grid gap-2.5">
-          <Input
+          <SearchTypeahead
             compact
             defaultValue={selectedFilters.query}
             label="كلمة البحث"
             name="q"
             placeholder="سيارة، هاتف، عقار..."
+            selectedFilters={selectedFilters}
+            suggestions={suggestions}
           />
 
           <div className="grid grid-cols-2 gap-2">

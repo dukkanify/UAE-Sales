@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -67,15 +68,13 @@ export function SiteHeader() {
 
           <form
             action="/search"
-            className="hidden max-w-xs flex-1 items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface-muted/60 px-3 md:flex"
+            className="relative hidden max-w-xs flex-1 md:block"
           >
-            <Icon className="text-muted" name="search" size={16} />
-            <input
-              aria-label="بحث سريع"
-              className="min-h-10 w-full bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted/60"
+            <SearchTypeahead
+              compact
+              label=""
               name="q"
               placeholder="ابحث..."
-              type="search"
             />
           </form>
 
@@ -216,15 +215,11 @@ export function SiteHeader() {
 
 function InputShell() {
   return (
-    <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-3">
-      <Icon className="text-muted" name="search" size={16} />
-      <input
-        aria-label="بحث"
-        className="min-h-11 w-full bg-transparent text-sm outline-none"
-        name="q"
-        placeholder="ابحث عن أي شيء..."
-        type="search"
-      />
-    </div>
+    <SearchTypeahead
+      compact
+      label=""
+      name="q"
+      placeholder="ابحث عن أي شيء..."
+    />
   );
 }
