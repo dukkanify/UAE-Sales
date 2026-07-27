@@ -350,6 +350,16 @@
   background: #eef0f3;
 }
 
+.admin-ops__ext-link--primary {
+  border-color: rgb(201 164 92 / 45%);
+  background: linear-gradient(135deg, #d4b06a 0%, #c9a45c 55%, #a88642 100%);
+  color: #0b1628;
+}
+
+.admin-ops__ext-link--primary:hover {
+  background: linear-gradient(135deg, #dbc07a 0%, #d0ad66 55%, #b4934c 100%);
+}
+
 .admin-ops__text-link {
   font-size: 0.72rem;
   font-weight: 750;

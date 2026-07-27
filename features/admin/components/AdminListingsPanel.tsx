@@ -217,6 +217,10 @@ export function AdminListingsPanel() {
             النموذج الكامل للموقع
           </Button>
         </div>
+        <p className="mt-2 text-xs text-muted">
+          اختر القسم (سيارات، عقارات، إلكترونيات...) ثم انشر مباشرة أو أرسل للمراجعة. يمكنك بعدها
+          اعتماد/رفض/تمييز أي إعلان من القائمة بالأسفل.
+        </p>
 
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <Input
