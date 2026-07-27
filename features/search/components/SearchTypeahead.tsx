@@ -7,6 +7,7 @@ import {
   getRecentSearches,
 } from "@/services/storage";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { searchTextMatches } from "@/shared/listings/search-text";
 import { Icon } from "@/shared/ui/Icon";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
 
@@ -94,7 +95,7 @@ export function SearchTypeahead({
     }
 
     for (const suggestion of suggestions) {
-      if (!suggestion.label.toLowerCase().includes(normalized)) continue;
+      if (!searchTextMatches(suggestion.label, normalized)) continue;
       next.push({
         ...suggestion,
         href:
@@ -143,8 +144,8 @@ export function SearchTypeahead({
           autoComplete="off"
           className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border border-border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/70 transition ${
             compact
-              ? "min-h-9 rounded-lg px-3 pe-9 text-xs font-medium"
-              : "min-h-11 px-4 pe-10 text-sm font-medium"
+              ? "min-h-10 rounded-lg px-3 pe-9 py-2 text-xs font-medium leading-normal"
+              : "min-h-11 px-4 pe-10 py-2.5 text-sm font-medium leading-normal"
           }`}
           name={name}
           onChange={(event) => {
@@ -183,7 +184,7 @@ export function SearchTypeahead({
 
       {open && items.length > 0 ? (
         <div
-          className="absolute inset-x-0 top-[calc(100%+0.35rem)] z-40 overflow-hidden rounded-xl border border-border bg-white shadow-[0_12px_32px_rgb(15_23_42/12%)]"
+          className="absolute inset-x-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-xl border border-border bg-white shadow-[0_12px_32px_rgb(15_23_42/12%)]"
           id={listId}
           role="listbox"
         >
