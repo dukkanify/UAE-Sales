@@ -50,7 +50,7 @@ export function MarketSectionShell({
 }) {
   return (
     <section
-      className={`py-16 md:py-20 ${variant === "sand" ? "bg-[#fdfbf7]" : "bg-white"}`}
+      className={`py-16 md:py-20 ${variant === "sand" ? "bg-background" : "bg-surface"}`}
     >
       <div className="app-container">{children}</div>
     </section>

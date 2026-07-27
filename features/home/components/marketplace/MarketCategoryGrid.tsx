@@ -24,7 +24,7 @@ export function MarketCategoryGrid({ categories }: MarketCategoryGridProps) {
   if (items.length === 0) return null;
 
   return (
-    <section aria-label="التصنيفات" className="border-b border-border/50 bg-[#fdfbf7] py-8 md:py-10">
+    <section aria-label="التصنيفات" className="border-b border-border/50 bg-background py-8 md:py-10">
       <div className="app-container px-4">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
@@ -46,7 +46,7 @@ export function MarketCategoryGrid({ categories }: MarketCategoryGridProps) {
               className="group flex min-w-0 flex-col items-center gap-2 text-center"
               href={`/categories/${category.slug}`}
             >
-              <span className="relative size-[4.25rem] overflow-hidden rounded-2xl border-2 border-white bg-surface-muted shadow-[0_8px_20px_rgb(15_23_42/9%)] transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_28px_rgb(15_23_42/12%)] md:size-[4.75rem]">
+              <span className="relative size-[4.25rem] overflow-hidden rounded-2xl border-2 border-surface bg-surface-muted shadow-[0_8px_20px_rgb(15_23_42/9%)] transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_12px_28px_rgb(15_23_42/12%)] md:size-[4.75rem]">
                 <AppImage
                   alt=""
                   aria-hidden
@@ -67,7 +67,7 @@ export function MarketCategoryGrid({ categories }: MarketCategoryGridProps) {
             className="group flex min-w-0 flex-col items-center gap-2 text-center"
             href="/categories"
           >
-            <span className="grid size-[4.25rem] place-items-center rounded-2xl border-2 border-white bg-primary text-secondary shadow-[0_8px_22px_rgb(15_23_42/18%)] transition duration-200 group-hover:-translate-y-0.5 md:size-[4.75rem]">
+            <span className="grid size-[4.25rem] place-items-center rounded-2xl border-2 border-surface bg-[#0b1628] text-secondary shadow-[0_8px_22px_rgb(15_23_42/18%)] transition duration-200 group-hover:-translate-y-0.5 md:size-[4.75rem]">
               <Icon aria-hidden name="grid" size={24} />
             </span>
             <span className="max-w-full truncate text-xs font-semibold text-ink">المزيد</span>

@@ -17,7 +17,7 @@ export function MarketPreviewStrip({
   if (previews.length === 0) return null;
 
   return (
-    <section className="relative z-10 border-t border-[#B8955F]/10 bg-[#fdfbf7] py-10 md:py-14">
+    <section className="relative z-10 border-t border-secondary/10 bg-background py-10 md:py-14">
       <div className="app-container">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>

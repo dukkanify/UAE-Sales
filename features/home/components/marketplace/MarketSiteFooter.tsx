@@ -35,7 +35,7 @@ const groups = [
 
 export function MarketSiteFooter() {
   return (
-    <footer className="border-t border-border bg-primary text-white">
+    <footer className="market-site-footer border-t border-border bg-[#0b1628] text-white">
       <div className="app-container py-14 md:py-16">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
