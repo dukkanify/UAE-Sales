@@ -184,9 +184,9 @@ const WHATSAPP_PATH =
 function ShareNodes() {
   return (
     <>
-      <circle cx="18" cy="5" r="2.4" />
-      <circle cx="6" cy="12" r="2.4" />
-      <circle cx="18" cy="19" r="2.4" />
+      <circle cx="18" cy="5" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
+      <circle cx="6" cy="12" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
+      <circle cx="18" cy="19" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
       <path d="M8.2 10.7 15.8 6.8M8.2 13.3l7.6 3.9" />
     </>
   );

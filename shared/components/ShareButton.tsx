@@ -16,6 +16,9 @@ type ShareButtonProps = {
 const baseClass =
   "focus-ring interactive-lift inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-border bg-surface px-4 text-sm font-semibold text-ink transition";
 
+const iconOnlyClass =
+  "focus-ring interactive-lift inline-flex items-center justify-center rounded-full border transition";
+
 export function ShareButton({
   className = "",
   iconOnly = false,
@@ -67,15 +70,19 @@ export function ShareButton({
     }
   }, [sharePayload]);
 
+  const shellClass = iconOnly
+    ? `${iconOnlyClass} ${className}`
+    : `${baseClass} ${className}`;
+
   return (
     <>
       <button
         aria-label="مشاركة الإعلان"
-        className={`${baseClass} ${className}`}
+        className={shellClass}
         onClick={handleShare}
         type="button"
       >
-        <Icon name="share-2" size={18} />
+        <Icon name="share-2" size={iconOnly ? 15 : 18} />
         {!iconOnly ? "مشاركة" : null}
       </button>
 

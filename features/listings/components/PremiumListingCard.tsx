@@ -105,9 +105,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </p>
       ) : null}
 
-      <Link href={href}>
+      <Link className="min-w-0" href={href}>
         <h3
-          className={`line-clamp-2 font-bold leading-snug text-ink transition group-hover:text-secondary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
+          className={`line-clamp-2 break-words font-bold leading-snug text-ink transition group-hover:text-secondary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
         >
           {listing.title}
         </h3>
@@ -162,11 +162,11 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-[0.65rem] font-medium text-muted sm:text-xs">
         <span className="inline-flex items-center gap-1">
-          <Icon className="marketplace-card-meta-icon" name="clock" size={12} />
+          <Icon className="marketplace-card-meta-icon" name="clock" size={13} />
           {formatPostedTime(listing.postedAt)}
         </span>
         <span className="inline-flex items-center gap-1">
-          <Icon className="marketplace-card-meta-icon" name="eye" size={12} />
+          <Icon className="marketplace-card-meta-icon" name="eye" size={13} />
           {formatViews(listing.views)} مشاهدة
         </span>
         {showStatus && listing.status !== "active" ? (
