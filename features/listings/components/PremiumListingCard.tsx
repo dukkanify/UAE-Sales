@@ -10,14 +10,14 @@ import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { ListingCardBadges } from "./ListingCardBadges";
+import { isListingVerified } from "./listing-card-badges";
 import {
   getListingHref,
   getListingImageUrl,
   getListingLocation,
   formatPostedTime,
   formatViews,
-  conditionBadgeVariant,
-  conditionLabels,
 } from "./listing-card.utils";
 
 export type PremiumListingCardProps = {
@@ -45,8 +45,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
     return href;
   }, [href]);
 
-  const isVerified =
-    listing.verifiedSeller ?? listing.seller.isVerified ?? (listing.seller.rating ?? 0) >= 4.8;
+  const isVerified = isListingVerified(listing);
   const showEscrow = showsEscrowProtection(listing);
 
   const imageArea = (
@@ -73,13 +72,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </Link>
       ) : null}
 
-      <div className="absolute start-3 top-3 z-10 flex flex-wrap gap-1.5">
-        {listing.isFeatured ? <Badge variant="featured">مميز</Badge> : null}
-        {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-        <Badge variant={conditionBadgeVariant[listing.condition]}>
-          {conditionLabels[listing.condition]}
-        </Badge>
-      </div>
+      <ListingCardBadges listing={listing} />
 
       <div className="absolute end-3 top-3 z-20 flex gap-1.5">
         <FavoriteButton

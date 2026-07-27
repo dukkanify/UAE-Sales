@@ -17,6 +17,7 @@ import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
+import { getListingCardBadges } from "@/features/listings/components/listing-card-badges";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { Icon } from "@/shared/ui/Icon";
@@ -27,12 +28,6 @@ type ListingDetailsViewProps = {
   category?: Category;
   listing: Listing;
   relatedListings?: Listing[];
-};
-
-const conditionLabels: Record<Listing["condition"], string> = {
-  excellent: "ممتاز",
-  new: "جديد",
-  used: "مستعمل",
 };
 
 export function ListingDetailsView({
@@ -59,10 +54,12 @@ export function ListingDetailsView({
 
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">
-                {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-                {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+                {getListingCardBadges(listing).map((badge) => (
+                  <Badge key={badge.key} variant={badge.variant}>
+                    {badge.label}
+                  </Badge>
+                ))}
                 {category ? <Badge variant="muted">{category.name}</Badge> : null}
-                <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
                 {escrowProtected ? (
                   <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
                 ) : null}

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { getListingImages } from "@/features/listings/components/listing-card.utils";
+import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
@@ -83,12 +84,12 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           </button>
 
           <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2.5">
-            <div className="hidden min-w-0 flex-1 flex-wrap gap-1.5 lg:flex">
-              {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-              {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-              {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+            <div className="hidden min-w-0 flex-1 lg:block">
+              <ListingCardBadges inline listing={listing} />
               {showsEscrowProtection(listing) ? (
-                <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+                </div>
               ) : null}
             </div>
 
