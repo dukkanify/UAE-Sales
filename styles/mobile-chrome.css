@@ -268,3 +268,35 @@ html[data-theme="dark"] .mobile-bottom-nav__link--active {
     animation: none !important;
   }
 }
+
+/* Dark mode — shared mobile chrome outside homepage shell */
+html[data-theme="dark"] .mobile-home-header__location {
+  border-color: rgb(255 255 255 / 8%);
+  background: rgb(18 26 42 / 92%);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 28%);
+}
+
+html[data-theme="dark"] .mobile-home-header__location-value {
+  color: #eef2f8;
+}
+
+html[data-theme="dark"] .mobile-home-header__chevron {
+  color: #a8b0c0;
+}
+
+html[data-theme="dark"] .mobile-home-categories__label {
+  color: #c5cddc;
+}
+
+html[data-theme="dark"] .mobile-bottom-nav {
+  --mh-border: #2a3448;
+  --mh-muted: #a8b0c0;
+  --mh-gold: #d4b87a;
+  border-top-color: #2a3448;
+  background: rgb(10 16 28 / 96%);
+  box-shadow: 0 -8px 28px rgb(0 0 0 / 45%);
+}
+
+html[data-theme="dark"] .mobile-bottom-nav__badge {
+  border-color: #0a101c;
+}

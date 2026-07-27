@@ -707,7 +707,7 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   padding: 0.5rem 0.75rem;
   border: 0;
   border-radius: var(--mh-radius-md);
-  background: linear-gradient(165deg, #1a2236 0%, var(--mh-primary) 52%, #0a0f1a 100%);
+  background: linear-gradient(165deg, #1a2236 0%, var(--mh-navy, #0b1628) 52%, #0a0f1a 100%);
   font-size: 0.75rem;
   font-weight: 800;
   line-height: 1;
@@ -945,7 +945,7 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   display: grid;
   place-items: center;
   border-color: rgb(255 255 255 / 14%);
-  background: linear-gradient(145deg, var(--mh-primary) 0%, #243049 100%);
+  background: linear-gradient(145deg, var(--mh-navy, #0b1628) 0%, #243049 100%);
   color: var(--mh-gold);
   box-shadow:
     0 1px 2px rgb(15 23 42 / 12%),
@@ -2366,4 +2366,71 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   .mobile-home-emirates {
     animation: none !important;
   }
+}
+
+/* ── Dark mode — mobile home chrome & surfaces ── */
+html[data-theme="dark"] .mobile-home-header {
+  border-bottom-color: rgb(255 255 255 / 6%);
+  background: rgb(10 16 28 / 94%);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 4%) inset, 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+html[data-theme="dark"] .mobile-home-header__location,
+html[data-theme="dark"] .mobile-home-header__icon-btn,
+html[data-theme="dark"] .mobile-home-header__notify {
+  border-color: rgb(255 255 255 / 8%);
+  background: rgb(18 26 42 / 92%);
+  color: #eef2f8;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 28%);
+}
+
+html[data-theme="dark"] .mobile-home-header__notify {
+  background: linear-gradient(160deg, #1a2436 0%, #121a2a 100%);
+}
+
+html[data-theme="dark"] .mobile-home-header__drawer-profile {
+  border-color: rgb(212 184 122 / 28%);
+  background: linear-gradient(135deg, #1a2336 0%, #121a2a 100%);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 28%);
+}
+
+html[data-theme="dark"] .mobile-home-header__drawer-profile-icon {
+  border-color: rgb(212 184 122 / 28%);
+  background: #0b1628;
+}
+
+html[data-theme="dark"] .mobile-home-header__drawer-profile-action {
+  background: rgb(255 255 255 / 6%);
+}
+
+html[data-theme="dark"] .mobile-home-header__drawer-link-icon {
+  background: #1a2336;
+  color: #eef2f8;
+}
+
+html[data-theme="dark"] .mobile-home-search-card__panel {
+  background: rgb(18 26 42 / 88%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+html[data-theme="dark"] .mobile-home-categories__label {
+  color: #c5cddc;
+}
+
+html[data-theme="dark"] .mobile-home-trust__panel {
+  border-color: rgb(212 184 122 / 24%);
+  background: linear-gradient(135deg, #1a2336 0%, #121a2a 55%, #0f1828 100%);
+}
+
+html[data-theme="dark"] .mobile-bottom-nav {
+  --mh-border: #2a3448;
+  --mh-muted: #a8b0c0;
+  --mh-gold: #d4b87a;
+  border-top-color: #2a3448;
+  background: rgb(10 16 28 / 96%);
+  box-shadow: 0 -8px 28px rgb(0 0 0 / 45%);
+}
+
+html[data-theme="dark"] .mobile-bottom-nav__badge {
+  border-color: #0a101c;
 }

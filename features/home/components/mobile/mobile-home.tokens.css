@@ -7,6 +7,7 @@
   /* Colors */
   --mh-bg: #ffffff;
   --mh-primary: #0f172a;
+  --mh-navy: #0b1628;
   --mh-gold: #c9a45c;
   --mh-gold-soft: #f8f3ea;
   --mh-muted: #6b7280;
@@ -56,6 +57,7 @@
 html[data-theme="dark"] .mobile-home-shell {
   --mh-bg: #0a101c;
   --mh-primary: #eef2f8;
+  --mh-navy: #0b1628;
   --mh-gold: #d4b87a;
   --mh-gold-soft: #2a2418;
   --mh-muted: #b0b8c9;
