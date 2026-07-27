@@ -27,7 +27,7 @@ export function EmirateLocationSelect({
   if (variant === "desktop") {
     return (
       <label
-        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 ${className}`.trim()}
+        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5 ${className}`.trim()}
       >
         <Icon className="shrink-0 text-[#B8955F]" name="map" size={14} />
         <span className="min-w-0 truncate text-xs font-bold text-ink">{city}</span>
