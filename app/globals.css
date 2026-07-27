@@ -289,6 +289,10 @@ textarea {
   );
 }
 
+.market-hero-copy {
+  position: relative;
+}
+
 .market-hero-title {
   color: var(--color-ink);
 }
@@ -321,60 +325,98 @@ textarea {
   backdrop-filter: blur(8px);
 }
 
+.market-hero-stat-label {
+  opacity: 0.8;
+}
+
 .market-hero-search {
   box-shadow: 0 24px 72px rgb(15 20 25 / 14%);
 }
 
 html[data-theme="dark"] .market-hero-bg img {
-  filter: brightness(0.42) saturate(0.8) contrast(1.05);
+  filter: brightness(0.3) saturate(0.72) contrast(1.08);
 }
 
 html[data-theme="dark"] .market-hero-overlay {
-  background: linear-gradient(
-    180deg,
-    rgb(10 16 28 / 0.78) 0%,
-    rgb(10 16 28 / 0.72) 42%,
-    rgb(10 16 28 / 0.94) 100%
-  );
+  background:
+    radial-gradient(ellipse 90% 58% at 50% 22%, rgb(6 10 18 / 0.72), transparent 72%),
+    linear-gradient(
+      180deg,
+      rgb(6 10 18 / 0.9) 0%,
+      rgb(8 13 22 / 0.86) 36%,
+      rgb(8 13 22 / 0.78) 58%,
+      rgb(6 10 18 / 0.96) 100%
+    );
 }
 
 html[data-theme="dark"] .uae-hero-sand-wash {
-  opacity: 0.35;
+  opacity: 0.22;
   background:
-    radial-gradient(ellipse 55% 45% at 85% 75%, rgb(212 184 122 / 14%), transparent 68%),
-    radial-gradient(ellipse 40% 35% at 15% 85%, rgb(61 143 106 / 8%), transparent 62%);
+    radial-gradient(ellipse 55% 45% at 85% 75%, rgb(212 184 122 / 10%), transparent 68%),
+    radial-gradient(ellipse 40% 35% at 15% 85%, rgb(61 143 106 / 6%), transparent 62%);
+}
+
+html[data-theme="dark"] .market-hero-copy::before {
+  content: "";
+  position: absolute;
+  inset: -0.75rem -1rem -1rem;
+  z-index: -1;
+  border-radius: 1.5rem;
+  background: radial-gradient(
+    ellipse 70% 80% at 50% 40%,
+    rgb(0 0 0 / 0.45),
+    transparent 72%
+  );
+  pointer-events: none;
 }
 
 html[data-theme="dark"] .market-hero-title {
-  color: #f4f7fc;
-  text-shadow: 0 2px 24px rgb(0 0 0 / 35%);
+  color: #ffffff;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 65%),
+    0 8px 28px rgb(0 0 0 / 55%);
 }
 
 html[data-theme="dark"] .market-hero-lead {
-  color: #c5cddc;
+  color: #f0f4fa;
+  font-weight: 600;
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 60%),
+    0 6px 22px rgb(0 0 0 / 50%);
 }
 
 html[data-theme="dark"] .market-hero-chip {
-  border-color: rgb(212 184 122 / 28%);
-  background: rgb(18 26 42 / 0.88);
-  color: #e4c787;
+  border-color: rgb(212 184 122 / 35%);
+  background: rgb(8 13 22 / 0.92);
+  color: #f0d9a0;
+  backdrop-filter: blur(10px);
 }
 
 html[data-theme="dark"] .market-hero-pill {
-  border-color: rgb(212 184 122 / 22%);
-  background: rgb(18 26 42 / 0.82);
-  color: #eef2f8;
+  border-color: rgb(255 255 255 / 16%);
+  background: rgb(8 13 22 / 0.92);
+  color: #ffffff;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 28%);
 }
 
 html[data-theme="dark"] .market-hero-pill:hover {
-  border-color: rgb(212 184 122 / 40%);
-  background: rgb(212 184 122 / 12%);
+  border-color: rgb(212 184 122 / 45%);
+  background: rgb(212 184 122 / 16%);
+  color: #fff7e8;
 }
 
 html[data-theme="dark"] .market-hero-stat {
-  border-color: rgb(42 52 72 / 90%);
-  background: rgb(18 26 42 / 0.86);
-  color: #eef2f8;
+  border-color: rgb(255 255 255 / 12%);
+  background: rgb(8 13 22 / 0.92);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 22px rgb(0 0 0 / 30%);
+}
+
+html[data-theme="dark"] .market-hero-stat-label {
+  color: #d7deea;
+  opacity: 1;
 }
 
 html[data-theme="dark"] .market-hero-search {
