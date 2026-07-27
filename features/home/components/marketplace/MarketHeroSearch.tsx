@@ -16,14 +16,15 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
   return (
     <form
       action="/search"
-      className="overflow-hidden rounded-2xl border border-white/80 bg-white shadow-[0_24px_72px_rgb(15_20_25/14%)] ring-1 ring-black/[0.04]"
+      className="overflow-hidden rounded-2xl border border-white/80 bg-surface shadow-[0_24px_72px_rgb(15_20_25/14%)] ring-1 ring-black/[0.04]"
+      data-search-anchor
     >
       <div className="h-1 uae-gold-gradient" />
       <div className="p-4 sm:p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.35fr_0.9fr_0.9fr_0.9fr_auto] lg:items-end lg:gap-3">
           <label className="grid gap-2 sm:col-span-2 lg:col-span-1">
             <span className="text-sm font-bold text-ink">{HOME_SEARCH_LABELS.query}</span>
-            <div className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-[#fdfbf7] px-4 focus-within:border-[#B8955F]/40 focus-within:ring-2 focus-within:ring-[#B8955F]/12">
+            <div className="flex min-h-14 items-center gap-3 rounded-xl border border-border bg-surface-muted px-4 focus-within:border-[#B8955F]/40 focus-within:ring-2 focus-within:ring-[#B8955F]/12">
               <Icon className="shrink-0 text-[#B8955F]" name="search" size={22} />
               <input
                 className="w-full bg-transparent text-base font-semibold text-ink outline-none placeholder:text-muted/50"
@@ -37,7 +38,7 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
           <label className="grid gap-2">
             <span className="text-sm font-bold text-ink">{HOME_SEARCH_LABELS.category}</span>
             <select
-              className="min-h-14 w-full rounded-xl border border-border bg-[#fdfbf7] px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
+              className="min-h-14 w-full rounded-xl border border-border bg-surface-muted px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
               defaultValue=""
               name="category"
             >
@@ -53,7 +54,7 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
           <label className="grid gap-2">
             <span className="text-sm font-bold text-ink">{HOME_SEARCH_LABELS.city}</span>
             <select
-              className="min-h-14 w-full rounded-xl border border-border bg-[#fdfbf7] px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
+              className="min-h-14 w-full rounded-xl border border-border bg-surface-muted px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
               defaultValue=""
               name="city"
             >
@@ -69,7 +70,7 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
           <label className="grid gap-2">
             <span className="text-sm font-bold text-ink">{HOME_SEARCH_LABELS.price}</span>
             <select
-              className="min-h-14 w-full rounded-xl border border-border bg-[#fdfbf7] px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
+              className="min-h-14 w-full rounded-xl border border-border bg-surface-muted px-4 text-base font-semibold text-ink outline-none focus:border-[#B8955F]/40 focus:ring-2 focus:ring-[#B8955F]/12"
               defaultValue=""
               name="price"
             >
@@ -82,7 +83,7 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
           </label>
 
           <button
-            className="uae-gold-gradient flex min-h-14 w-full items-center justify-center gap-2.5 rounded-xl px-7 text-base font-bold text-white shadow-[0_10px_32px_rgb(184_149_95/35%)] transition hover:brightness-105 sm:col-span-2 lg:col-span-1 lg:w-auto"
+            className="uae-gold-gradient motion-press flex min-h-14 w-full items-center justify-center gap-2.5 rounded-xl px-7 text-base font-bold text-white shadow-[0_10px_32px_rgb(184_149_95/35%)] transition hover:brightness-105 sm:col-span-2 lg:col-span-1 lg:w-auto"
             type="submit"
           >
             <Icon name="search" size={20} />

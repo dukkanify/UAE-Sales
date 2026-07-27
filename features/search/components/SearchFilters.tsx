@@ -161,7 +161,7 @@ export function SearchFilters({
   }
 
   return (
-    <div className="marketplace-panel overflow-hidden p-0">
+    <div className="marketplace-panel overflow-visible p-0">
       <button
         aria-expanded={mobileOpen}
         className="flex w-full items-center justify-between gap-3 border-b border-border/70 px-4 py-3 text-start lg:hidden"
@@ -184,7 +184,7 @@ export function SearchFilters({
         />
       </button>
 
-      <div className={`px-4 py-3 ${mobileOpen ? "block" : "hidden"} lg:block`}>
+      <div className={`px-4 pb-4 pt-3 ${mobileOpen ? "block" : "hidden"} lg:block`}>
         <h2 className="mb-2 hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
 
         <form action={action} className="grid gap-2.5">
@@ -288,9 +288,11 @@ export function SearchFilters({
             </div>
           </details>
 
-          <Button className="w-full" size="sm" type="submit" variant="primary">
-            تطبيق الفلاتر
-          </Button>
+          <div className="sticky bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] z-10 -mx-1 bg-gradient-to-t from-[var(--color-surface)] via-[var(--color-surface)] to-transparent px-1 pb-1 pt-2 lg:static lg:bg-none lg:p-0">
+            <Button className="motion-press w-full shrink-0" size="sm" type="submit" variant="primary">
+              تطبيق الفلاتر
+            </Button>
+          </div>
         </form>
       </div>
     </div>

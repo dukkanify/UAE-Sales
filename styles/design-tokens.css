@@ -79,4 +79,56 @@
   --section-gap: clamp(3.5rem, 7vw, 6rem);
   --font-arabic: var(--font-ibm-plex-arabic), "IBM Plex Sans Arabic", system-ui, sans-serif;
   --font-latin: var(--font-inter), "Inter", system-ui, sans-serif;
+
+  color-scheme: light;
+}
+
+/* ── Dark mode — navy / gold marketplace night surface ── */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-primary: #e8eef8;
+  --color-primary-dark: #f5f7fb;
+  --color-primary-soft: #1a2438;
+
+  --color-secondary: #d4b87a;
+  --color-secondary-soft: #2a2418;
+
+  --color-background: #0a101c;
+  --color-surface: #121a2a;
+  --color-surface-muted: #1a2336;
+  --color-surface-elevated: #1c263a;
+  --gradient-surface: linear-gradient(
+    135deg,
+    #1a2336 0%,
+    #121a2a 55%,
+    #0a101c 100%
+  );
+
+  --color-accent: #3d8f6a;
+  --color-accent-soft: #143528;
+
+  --color-uae-black: #e8eef8;
+  --color-uae-white: #121a2a;
+
+  --color-success-soft: #0f2e22;
+  --color-warning-soft: #2e2410;
+  --color-error-soft: #3a1515;
+  --color-info-soft: #152338;
+
+  --color-ink: #eef2f8;
+  --color-muted: #9aa3b5;
+  --color-border: #2a3448;
+  --color-night: #060a12;
+  --color-night-soft: #121a2a;
+  --color-glow: #d4b87a;
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 35%);
+  --shadow-sm: 0 4px 16px rgb(0 0 0 / 40%);
+  --shadow-md: 0 8px 32px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 16px 48px rgb(0 0 0 / 50%);
+  --shadow-xl: 0 24px 64px rgb(0 0 0 / 55%);
+  --shadow-card: 0 8px 32px rgb(0 0 0 / 42%);
+  --shadow-soft: 0 4px 20px rgb(0 0 0 / 38%);
+  --shadow-glow: 0 8px 40px rgb(212 184 122 / 22%);
 }

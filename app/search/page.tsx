@@ -86,7 +86,7 @@ export default async function SearchPage({
   return (
     <>
       <SiteHeader />
-      <main className="bg-[#fdfbf7]">
+      <main className="bg-background">
         <section className="app-container page-padding pb-28 lg:pb-8">
           <div className="mb-8">
             <p className="text-xs font-bold text-[#B8955F]">بحث السوق</p>
