@@ -1,5 +1,5 @@
 import type { CategoryIconName } from "./category";
-import type { ListingStatus } from "./listing";
+import type { ListingCondition, ListingStatus } from "./listing";
 import type { AccountStatus, UserRole } from "./user";
 
 export type DisputeStatus =
@@ -39,6 +39,19 @@ export type AdminListingRecord = {
   isFeatured: boolean;
   postedAt: string;
   city: string;
+};
+
+export type AdminListingCreateInput = {
+  title: string;
+  description?: string;
+  categoryId: string;
+  city: string;
+  price: number;
+  condition?: ListingCondition;
+  status?: ListingStatus;
+  isFeatured?: boolean;
+  isUrgent?: boolean;
+  sellerName?: string;
 };
 
 export type AdminListingPatch = Partial<

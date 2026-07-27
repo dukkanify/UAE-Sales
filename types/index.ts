@@ -40,6 +40,7 @@ export type {
   AdminCategoryRecord,
   AdminDisputePatch,
   AdminDisputeRecord,
+  AdminListingCreateInput,
   AdminListingPatch,
   AdminListingRecord,
   AdminModerationSummary,
