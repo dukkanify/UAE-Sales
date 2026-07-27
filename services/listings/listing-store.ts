@@ -29,6 +29,28 @@ function seedListings(): Listing[] {
   return seeded;
 }
 
+/** Merge newly added mock inventory into an older persisted catalog. */
+async function mergeMissingSeedListings(stored: Listing[]): Promise<Listing[]> {
+  const seeded = seedListings();
+  if (stored.length >= seeded.length) {
+    return stored;
+  }
+
+  const byId = new Map<string, Listing>();
+  for (const listing of stored) {
+    byId.set(listing.id, { ...listing });
+  }
+  for (const listing of seeded) {
+    if (!byId.has(listing.id)) {
+      byId.set(listing.id, { ...listing });
+    }
+  }
+
+  const merged = Array.from(byId.values());
+  await saveCollection(FILE, merged);
+  return merged;
+}
+
 function cloneListings(listings: Listing[]) {
   return listings.map((listing) => ({ ...listing }));
 }
@@ -51,7 +73,8 @@ async function loadListingsUncached(): Promise<Listing[]> {
         await saveCollection(FILE, seeded);
         return setCache(seeded);
       }
-      return setCache(stored);
+      const merged = await mergeMissingSeedListings(stored);
+      return setCache(merged);
     })().finally(() => {
       inflight = null;
     });
@@ -110,6 +133,8 @@ export async function createListingFromAdmin(
   const slugBase = slugifyTitle(input.title);
   const slug = `${slugBase}-${String(now).slice(-5)}`;
   const sellerName = input.sellerName?.trim() || "إدارة سوقنا";
+  const city = input.city.trim();
+  const emirate = input.emirate?.trim() || city;
 
   const listing: Listing = {
     id: `admin-${now}`,
@@ -119,8 +144,9 @@ export async function createListingFromAdmin(
       input.description?.trim() ||
       `إعلان مضاف من لوحة التحكم: ${input.title.trim()}`,
     categoryId: input.categoryId,
-    city: input.city,
-    emirate: input.city,
+    city,
+    emirate,
+    area: input.area?.trim() || undefined,
     country: "الإمارات العربية المتحدة",
     price: input.price,
     currency: "AED",
@@ -140,8 +166,12 @@ export async function createListingFromAdmin(
     escrowAvailable: true,
     postedAt: new Date().toISOString(),
     contactMethod: "both",
+    contactPhone: input.contactPhone?.trim() || undefined,
     deliveryOption: "both",
     imageTone: "gold",
+    categorySpecs: input.categorySpecs,
+    features: input.features?.length ? input.features : undefined,
+    negotiable: input.negotiable,
   };
 
   return upsertListing(listing);

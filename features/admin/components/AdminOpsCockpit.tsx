@@ -136,6 +136,9 @@ export function AdminOpsCockpit() {
           {settings.maintenanceMode ? "صيانة" : "تشغيل عادي"}
         </div>
         <div className="admin-ops__status-actions">
+          <Link className="admin-ops__ext-link admin-ops__ext-link--primary" href="/admin/listings">
+            + إضافة إعلان
+          </Link>
           <a
             className="admin-ops__ext-link"
             href={stripe.dashboardUrl}

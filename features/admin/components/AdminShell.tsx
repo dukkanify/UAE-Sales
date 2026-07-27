@@ -88,7 +88,7 @@ const adminLinks: {
     icon: "grid",
     label: "الإعلانات",
     group: "moderation",
-    keywords: "مراجعة اعتماد",
+    keywords: "مراجعة اعتماد إضافة نشر إعلان",
   },
   {
     href: "/admin/disputes",

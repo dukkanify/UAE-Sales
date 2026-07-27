@@ -41,7 +41,11 @@ function formatValue(key: string, value: string | number | boolean): string {
 }
 
 function isUserCreatedListing(listing: Listing): boolean {
-  return listing.id.startsWith("local-");
+  return (
+    listing.id.startsWith("local-") ||
+    listing.id.startsWith("admin-") ||
+    Boolean(listing.categorySpecs && Object.keys(listing.categorySpecs).length > 0)
+  );
 }
 
 /** Extract typed mock specs — only for catalog listings */
