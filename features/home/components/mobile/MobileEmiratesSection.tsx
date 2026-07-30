@@ -32,7 +32,7 @@ export async function MobileEmiratesSection() {
             <span aria-hidden className="mobile-home-emirates__overlay" />
             <span className="mobile-home-emirates__content">
               <span className="mobile-home-emirates__count">
-                {emirate.count.toLocaleString("ar-AE")} إعلان
+                {emirate.count.toLocaleString("ar-AE", { numberingSystem: "latn" })} إعلان
               </span>
               <span className="mobile-home-emirates__footer">
                 <span className="mobile-home-emirates__name">{emirate.name}</span>
