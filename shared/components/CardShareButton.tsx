@@ -10,6 +10,15 @@ type CardShareButtonProps = {
   url: string;
 };
 
+function resolveShareUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url;
+  try {
+    return new URL(url, window.location.origin).href;
+  } catch {
+    return url;
+  }
+}
+
 export function CardShareButton({
   ariaLabel = "مشاركة الإعلان",
   className = "",
@@ -22,14 +31,16 @@ export function CardShareButton({
     event.preventDefault();
     event.stopPropagation();
 
+    const shareUrl = resolveShareUrl(url);
+
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share({ title, url: shareUrl });
         setShared(true);
         return;
       }
 
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       setShared(true);
     } catch {
       setShared(false);

@@ -33,7 +33,7 @@ export async function MarketEmirates() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5">
               <p className="text-xs font-semibold text-white/75">
-                {emirate.count.toLocaleString("ar-AE")} إعلان
+                {emirate.count.toLocaleString("ar-AE", { numberingSystem: "latn" })} إعلان
               </p>
               <div className="mt-1 flex items-center justify-between gap-2">
                 <h3 className="text-xl font-bold text-white">{emirate.name}</h3>

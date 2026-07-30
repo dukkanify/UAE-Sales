@@ -18,11 +18,15 @@ export async function getMarketHeroBackground(): Promise<string> {
   return heroBackgroundUrl;
 }
 
+const trustStatNumber = new Intl.NumberFormat("ar-AE", {
+  numberingSystem: "latn",
+});
+
 export async function getMarketTrustStats(): Promise<MarketTrustStat[]> {
   const activeListings = getActiveListingCount();
 
   return [
-    { label: "إعلان نشط", value: activeListings.toLocaleString("ar-AE") },
+    { label: "إعلان نشط", value: trustStatNumber.format(activeListings) },
     { label: "مستخدم موثق", value: "18,542" },
     { label: "معاملة آمنة", value: "12,413" },
     { label: "تقييم المنصة", value: "4.8/5" },
@@ -120,6 +124,6 @@ export async function getAuthTrustPoints() {
     "ضمان مالي يحمي كل معاملة",
     "توثيق البائعين والمشترين",
     "دعم بالعربية على مدار الساعة",
-    `${activeListings.toLocaleString("ar-AE")} إعلان نشط في الإمارات`,
+    `${trustStatNumber.format(activeListings)} إعلان نشط في الإمارات`,
   ];
 }

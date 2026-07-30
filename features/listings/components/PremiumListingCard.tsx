@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { CardShareButton } from "@/shared/components/CardShareButton";
@@ -38,12 +38,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
-  const shareUrl = useMemo(() => {
-    if (typeof window !== "undefined") {
-      return `${window.location.origin}${href}`;
-    }
-    return href;
-  }, [href]);
+  const shareUrl = href;
 
   const isVerified = isListingVerified(listing);
   const showEscrow = showsEscrowProtection(listing);
@@ -53,10 +48,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
       className={`marketplace-card-media relative overflow-hidden ${layout === "row" ? "h-full min-h-full w-full" : "aspect-[4/3]"}`}
     >
       {imageUrl ? (
-        <Link className="absolute inset-0" href={href}>
-          <span className="sr-only">{listing.title}</span>
+        <Link aria-hidden className="absolute inset-0" href={href} tabIndex={-1}>
           <AppImage
-            alt={listing.title}
+            alt=""
             className="marketplace-card-image"
             fallbackCategory={listing.categoryId}
             fill

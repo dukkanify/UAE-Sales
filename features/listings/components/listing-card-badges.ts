@@ -8,8 +8,6 @@ export type ListingCardBadge = {
   variant: ListingCardBadgeKey;
 };
 
-const FRESH_LISTING_DAYS = 7;
-
 export function isListingVerified(listing: Listing): boolean {
   return Boolean(
     listing.verifiedSeller ??
@@ -19,14 +17,8 @@ export function isListingVerified(listing: Listing): boolean {
 }
 
 export function isListingFresh(listing: Listing): boolean {
-  if (listing.condition === "new") return true;
-  if (!listing.postedAt) return false;
-
-  const posted = new Date(listing.postedAt).getTime();
-  if (Number.isNaN(posted)) return false;
-
-  const ageMs = Date.now() - posted;
-  return ageMs >= 0 && ageMs <= FRESH_LISTING_DAYS * 24 * 60 * 60 * 1000;
+  // Only use stable listing fields — Date.now() age checks cause SSR/client hydration mismatches.
+  return listing.condition === "new";
 }
 
 export function isListingUrgent(listing: Listing): boolean {
