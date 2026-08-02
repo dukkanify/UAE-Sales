@@ -1,30 +1,21 @@
-export const publicRoutes = [
-  '/',
-  '/categories',
-  '/listings',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/profile',
-  '/wallet',
-  '/orders',
-  '/notifications',
-  '/chat',
-] as const;
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 
-export const adminRoutes = [
-  '/admin',
-  '/admin/users',
-  '/admin/listings',
-  '/admin/orders',
-  '/admin/escrow',
-  '/admin/disputes',
-  '/admin/categories',
-  '/admin/reports',
-] as const;
+type DiscoveredRoutes = {
+  publicRoutes: string[];
+  adminRoutes: string[];
+  apiRoutes: string[];
+};
 
-export const apiSmokeRoutes = [
-  '/api/health',
-  '/api/categories',
-  '/api/listings',
-] as const;
+const routeFile = path.resolve('qa-report/discovered-routes.json');
+
+export async function loadDiscoveredRoutes(): Promise<DiscoveredRoutes> {
+  const raw = await readFile(routeFile, 'utf8');
+  const parsed = JSON.parse(raw) as Partial<DiscoveredRoutes>;
+
+  return {
+    publicRoutes: [...new Set(parsed.publicRoutes ?? [])],
+    adminRoutes: [...new Set(parsed.adminRoutes ?? [])],
+    apiRoutes: [...new Set(parsed.apiRoutes ?? [])],
+  };
+}
