@@ -1,0 +1,75 @@
+name: Frontend QA
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - qa/playwright-setup
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright Frontend QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    env:
+      BASE_URL: ${{ secrets.BASE_URL || 'https://sooqna.site' }}
+      QA_ADMIN_EMAIL: ${{ secrets.QA_ADMIN_EMAIL }}
+      QA_ADMIN_PASSWORD: ${{ secrets.QA_ADMIN_PASSWORD }}
+      CI: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npx playwright test
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload screenshots videos and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-artifacts
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload JUnit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-junit-report
+          path: test-results/junit.xml
+          if-no-files-found: warn
+          retention-days: 14
