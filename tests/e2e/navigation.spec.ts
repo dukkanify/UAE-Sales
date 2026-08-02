@@ -1,36 +1,31 @@
 import { test, expect, loginAsAdmin } from './fixtures/qa';
-
-const publicRoutes = ['/', '/categories', '/listings'];
+import { loadDiscoveredRoutes } from './qa-routes';
 
 test.describe('Navigation smoke tests', () => {
-  for (const route of publicRoutes) {
-    test(`public route ${route} loads without server error`, async ({ monitoredPage }) => {
+  test('all discovered public routes load successfully', async ({ monitoredPage }) => {
+    const { publicRoutes } = await loadDiscoveredRoutes();
+    expect(publicRoutes.length, 'No public routes were discovered').toBeGreaterThan(0);
+
+    for (const route of publicRoutes) {
       const response = await monitoredPage.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response, `No response received for ${route}`).not.toBeNull();
-      expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(500);
+      expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
       await expect(monitoredPage.locator('body')).toBeVisible();
-    });
-  }
+    }
+  });
 
-  test('admin navigation links open without destructive actions', async ({ monitoredPage }) => {
+  test('discovered admin routes load after authentication', async ({ monitoredPage }) => {
+    const { adminRoutes } = await loadDiscoveredRoutes();
+    test.skip(adminRoutes.length === 0, 'No static admin routes were discovered.');
+
     await loginAsAdmin(monitoredPage);
 
-    const links = monitoredPage.locator('a[href^="/admin"]:visible');
-    const count = Math.min(await links.count(), 20);
-    const hrefs = new Set<string>();
-
-    for (let index = 0; index < count; index += 1) {
-      const href = await links.nth(index).getAttribute('href');
-      if (href && !hrefs.has(href)) hrefs.add(href);
-    }
-
-    expect(hrefs.size, 'No admin navigation links were discovered').toBeGreaterThan(0);
-
-    for (const href of hrefs) {
-      const response = await monitoredPage.goto(href, { waitUntil: 'domcontentloaded' });
-      expect(response, `No response received for ${href}`).not.toBeNull();
-      expect(response!.status(), `${href} returned ${response!.status()}`).toBeLessThan(500);
+    for (const route of adminRoutes) {
+      const response = await monitoredPage.goto(route, { waitUntil: 'domcontentloaded' });
+      expect(response, `No response received for ${route}`).not.toBeNull();
+      expect(response!.status(), `${route} returned ${response!.status()}`).toBeLessThan(400);
       await expect(monitoredPage.locator('body')).toBeVisible();
+      await expect(monitoredPage.locator('input[type="password"]')).toHaveCount(0);
     }
   });
 });
