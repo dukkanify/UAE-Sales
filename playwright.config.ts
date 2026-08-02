@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const desktopSmokeTests = /(?:admin-login|navigation|rbac|api-smoke|performance|console-network)\.spec\.ts/;
+const crossDeviceTests = /(?:responsive|visual-regression|accessibility)\.spec\.ts/;
+
 export default defineConfig({
   testDir: './tests/e2e',
   timeout: 60_000,
@@ -11,6 +14,7 @@ export default defineConfig({
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['json', { outputFile: 'test-results/results.json' }],
   ],
   use: {
     baseURL: process.env.BASE_URL || 'https://sooqna.site',
@@ -22,10 +26,31 @@ export default defineConfig({
     ignoreHTTPSErrors: false,
   },
   projects: [
-    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile-iphone', use: { ...devices['iPhone 13'] } },
-    { name: 'mobile-android', use: { ...devices['Pixel 7'] } },
-    { name: 'tablet', use: { ...devices['iPad Pro 11'] } },
+    {
+      name: 'desktop-chromium',
+      testMatch: desktopSmokeTests,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'desktop-visual',
+      testMatch: crossDeviceTests,
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'mobile-iphone',
+      testMatch: crossDeviceTests,
+      use: { ...devices['iPhone 13'] },
+    },
+    {
+      name: 'mobile-android',
+      testMatch: crossDeviceTests,
+      use: { ...devices['Pixel 7'] },
+    },
+    {
+      name: 'tablet',
+      testMatch: crossDeviceTests,
+      use: { ...devices['iPad Pro 11'] },
+    },
   ],
   outputDir: 'test-results/artifacts',
 });
