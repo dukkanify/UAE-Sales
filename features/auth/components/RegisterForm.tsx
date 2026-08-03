@@ -126,7 +126,15 @@ export function RegisterForm() {
   );
 
   return (
-    <form className="auth-form" noValidate onSubmit={handleSubmit}>
+    <form
+      className="auth-form"
+      method="post"
+      noValidate
+      onSubmit={(event) => {
+        event.preventDefault();
+        void handleSubmit(event);
+      }}
+    >
       <div className="auth-form__header">
         <p className="auth-form__eyebrow">حساب جديد</p>
         <h2 className="auth-form__title">

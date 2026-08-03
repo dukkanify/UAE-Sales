@@ -158,7 +158,16 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
 
   return (
     <>
-      <form className="auth-form" noValidate onSubmit={handleSubmit}>
+      <form
+        className="auth-form"
+        method="post"
+        noValidate
+        onSubmit={(event) => {
+          // Prevent native submit (default method was GET → credentials in URL).
+          event.preventDefault();
+          void handleSubmit(event);
+        }}
+      >
         <div className="auth-form__header">
           <p className="auth-form__eyebrow">
             {isAdminNext ? "دخول آمن" : "تسجيل الدخول"}

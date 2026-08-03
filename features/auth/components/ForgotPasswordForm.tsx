@@ -114,7 +114,14 @@ export function ForgotPasswordForm() {
 
   if (step === "password") {
     return (
-      <form className="grid gap-4" onSubmit={handleResetPassword}>
+      <form
+        className="grid gap-4"
+        method="post"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void handleResetPassword(event);
+        }}
+      >
         <div>
           <h2 className="text-xl font-black text-ink">كلمة مرور جديدة</h2>
           <p className="mt-1.5 text-sm font-medium text-muted">أنشئ كلمة مرور جديدة لحسابك.</p>
@@ -155,7 +162,14 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
+    <form
+      className="grid gap-4"
+      method="post"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void handleSubmit(event);
+      }}
+    >
       <div>
         <h2 className="text-xl font-black text-ink">نسيت كلمة المرور؟</h2>
         <p className="mt-1.5 text-sm font-medium text-muted">
