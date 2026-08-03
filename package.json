@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "qa:frontend": "node scripts/frontend-qa-pass.mjs http://127.0.0.1:3000"
   },
   "repository": {
     "type": "git",
@@ -41,6 +42,7 @@
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.9",
+    "playwright": "^1.54.2",
     "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3"
   },
