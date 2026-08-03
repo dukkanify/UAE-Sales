@@ -1,18 +1,13 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/services/auth/session-cookie";
+import { parseSessionCookieValue } from "@/services/auth/session-cookie-parse";
 
 const APEX_HOST = "sooqna.site";
 
 function readSessionRole(request: NextRequest): string | null {
   const raw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  if (!raw) return null;
-  try {
-    const parsed = JSON.parse(raw) as { role?: string };
-    return parsed.role ?? null;
-  } catch {
-    return null;
-  }
+  return parseSessionCookieValue(raw)?.role ?? null;
 }
 
 function redirectToLogin(request: NextRequest, nextPath: string) {

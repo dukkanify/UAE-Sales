@@ -1,8 +1,10 @@
 import { cookies } from "next/headers";
 import type { UserProfile } from "@/types";
 import { getSiteDomain } from "@/shared/constants/site";
+import { parseSessionCookieValue } from "@/services/auth/session-cookie-parse";
 
 export const SESSION_COOKIE_NAME = "sooqna_session";
+export { parseSessionCookieValue } from "@/services/auth/session-cookie-parse";
 
 type SessionCookieOptions = {
   domain?: string;
@@ -49,12 +51,5 @@ export async function clearSessionCookie(): Promise<void> {
 export async function getSessionFromCookie(): Promise<UserProfile | null> {
   const cookieStore = await cookies();
   const raw = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (!raw) {
-    return null;
-  }
-  try {
-    return JSON.parse(raw) as UserProfile;
-  } catch {
-    return null;
-  }
+  return parseSessionCookieValue(raw);
 }
