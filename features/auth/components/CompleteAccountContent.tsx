@@ -76,7 +76,15 @@ export function CompleteAccountContent({ token }: CompleteAccountContentProps) {
         title="إنشاء كلمة مرور"
       />
       <Card className="mx-auto mt-6 max-w-md p-6" variant="flat">
-        <form className="grid gap-4" noValidate onSubmit={handleSubmit}>
+        <form
+          className="grid gap-4"
+          method="post"
+          noValidate
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleSubmit(event);
+          }}
+        >
           <Input
             autoComplete="new-password"
             error={passwordError}
