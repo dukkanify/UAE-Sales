@@ -40,7 +40,10 @@ Track live items in **Ops Center → Roadmap** (`/super-admin/ops-center`). Narr
 
 Track work as GitHub issues and Ops feature requests (`FEAT-*`); keep critical production defects ahead of roadmap items.
 
+## Version 2.0
+
+See `docs/ROADMAP_V2.md` for native apps, proctoring, multi-tenant, CRM, corporate portal, i18n, and BI recommendations.
+
 ## Completed (project lifecycle)
 
-Tasks 001–020 delivered through feature branches `cursor/aep-*-0987`, culminating in Task 020 handover (`docs/HANDOVER.md`).  
-Task 021 adds post-launch hypercare, feature/KB/feedback modules, and Version 1.1 planning (`docs/POST_LAUNCH_SUPPORT.md`).
+Tasks 001–023 delivered through feature branches `cursor/aep-*-0987`, culminating in Task 023 project closure (`docs/PROJECT_CLOSURE_REPORT.md`).
