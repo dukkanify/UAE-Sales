@@ -2,7 +2,19 @@
 
 Base URL: same origin as the app.
 
-All authenticated routes expect session cookie. Mutating routes expect `x-csrf-token`.
+## Versioned mobile / integrations API (v1)
+
+**Primary contract for iOS / Android / React Native and partners.**  
+See `docs/MOBILE_API.md` and `GET /api/v1/openapi`.
+
+| Auth | Header |
+|------|--------|
+| Access JWT | `Authorization: Bearer <token>` |
+| API key | `x-api-key: aep_live_…` |
+| Web session | Cookie `aep_session` (optional fallback) |
+
+Mutating **web** routes under `/api/*` (non-v1) still expect `x-csrf-token`.  
+**v1** mobile routes use Bearer/API keys and do not require CSRF.
 
 ## Health
 
@@ -23,10 +35,12 @@ All authenticated routes expect session cookie. Mutating routes expect `x-csrf-t
 | GET | `/api/ops?view=checklist` | `audit.read` |
 | POST | `/api/ops` `{action:backup\|test_restore\|restore}` | `system.settings` + CSRF |
 | GET | `/api/ops/download?token=` | authenticated owner |
+| GET/POST | `/api/support-ops` | ops center (Task 017) |
+| GET/POST | `/api/v1/platform/*` | API keys, webhooks, queue, I/O |
 
-## Domain APIs (existing)
+## Domain APIs (existing web)
 
-Documented in module docs:
+Documented in module docs — cookie + CSRF:
 
 - Auth — `/api/auth/*`
 - Courses — `/api/courses/*`
@@ -42,4 +56,4 @@ Documented in module docs:
 
 ## Database schema
 
-See SQL files in `database/migrations/` (`001` … `013`) and `database/README.md`.
+See SQL files in `database/migrations/` (`001` … `016`) and `database/README.md`.

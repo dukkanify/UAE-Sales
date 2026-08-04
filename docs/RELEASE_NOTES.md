@@ -1,23 +1,22 @@
-# Release notes — ATPL PASS v1.1 (Task 017)
+# Release notes — ATPL PASS v1.2 (Task 018)
 
 ## Highlights
 
-- **Ops Center** for post-launch support: health dashboard, alerts, SLA, bugs, change requests, releases, roadmap, incidents, backup verification, and maintenance control.
-- Settings-driven **maintenance mode** enforced in middleware (Super Admin bypass) with professional public page (ETA + contact).
-- Deep health checks add auth + security event monitoring; 5s cache for dashboard performance.
-- SQL twin migration `015_support_ops.sql` for future Supabase cutover.
+- **Versioned Mobile & Integrations API (`/api/v1`)** with OpenAPI 3.1 (`GET /api/v1/openapi`).
+- JWT access + refresh tokens, API keys (hashed), OAuth-ready client placeholder.
+- Public catalog/blog/announcements/certificate verify with rate limits.
+- Webhook infrastructure (outbound HMAC + Zoom inbound).
+- Integration catalog (Zoom, SMTP, Stripe, calendars, Slack/Teams, CRM, marketing).
+- Background job queue, API/query/config cache with tag invalidation.
+- Import/export framework (CSV/JSON + PDF/XLSX placeholders).
+- API monitoring logs + Super Admin **API Platform** console.
+- SQL twin `016_api_platform.sql`.
 
-## Fixes / ops
+## Docs
 
-- Nav: Ops Center, Ops/Backups, and Activity Logs correctly separated for Super Admin.
+- `docs/MOBILE_API.md`
+- Updated `docs/API_OVERVIEW.md`
 
-## Prior (v1.0 / Task 016)
+## Notes
 
-- UAT harness (`npm run uat`), instructor course list RBAC fix, handover documentation pack.
-
-## Upgrade notes
-
-1. Merge `cursor/aep-ops-support-0987`.  
-2. Review Ops Center SLA defaults and adjust for your support team.  
-3. Record release `1.1.0` as deployed after production ship.  
-4. Keep `docs/OPS_SUPPORT.md` synchronized with process changes.
+Mobile native apps are **not** included — backend is ready for future iOS/Android/React Native clients without further architecture changes for core surfaces.
