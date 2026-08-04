@@ -38,4 +38,4 @@ Effort bands: **S** (&lt; 1 engineer-day) · **M** (1–3 days) · **L** (multi-
 2. Link PRs that create or retire debt
 3. Review monthly in Ops Center / planning
 
-Related: `docs/KNOWN_LIMITATIONS.md`, `docs/ROADMAP.md`, `docs/ENTERPRISE_READINESS_022.md`, `docs/ENTERPRISE_AUDIT_FINAL.md`, `docs/ENTERPRISE_REFACTOR_024.md`.
+Related: `docs/KNOWN_LIMITATIONS.md`, `docs/ROADMAP.md`, `docs/ENTERPRISE_READINESS_022.md`, `docs/ENTERPRISE_AUDIT_FINAL.md`, `docs/ENTERPRISE_REFACTOR_024.md`, `docs/PHASE2_ENTERPRISE_ROADMAP.md`.
