@@ -21,6 +21,11 @@ import { ensureLearningSeeded } from "@/services/learning/seed";
 import { getLearningDashboard } from "@/services/learning/learning-service";
 import { ensureCertificatesSeeded } from "@/services/certificates/seed";
 import { listCertificates } from "@/services/certificates/certificate-service";
+import { ensurePaymentsSeeded } from "@/services/payments/seed";
+import { getFinanceDashboard } from "@/services/payments/report-service";
+import { listWallets } from "@/services/payments/wallet-service";
+import { buildExecutiveAnalytics } from "@/services/analytics/aggregator";
+import { ensureAnalyticsSeeded } from "@/services/analytics/seed";
 import type { UserProfile } from "@/types";
 
 export { ensureDemoUsersSeeded };
@@ -33,12 +38,24 @@ export function getPlatformOverview() {
   ensureDemoUsersSeeded();
   ensureCoursesSeeded();
   ensureClassesSeeded();
+  ensurePaymentsSeeded();
+  ensureAnalyticsSeeded();
   const db = readAuthDb();
   const students = countByRole(db.users, ROLES.STUDENT);
   const instructors = countByRole(db.users, ROLES.INSTRUCTOR);
   const admins = countByRole(db.users, ROLES.ADMIN) + countByRole(db.users, ROLES.SUPER_ADMIN);
   const courseStats = getCourseStats();
   const classStats = getClassStats();
+  const finance = getFinanceDashboard();
+  const wallets = listWallets();
+  const growth =
+    finance.monthlyGrowth.length > 1
+      ? Math.round(
+          ((finance.monthlyGrowth.at(-1)!.value - finance.monthlyGrowth.at(-2)!.value) /
+            Math.max(1, finance.monthlyGrowth.at(-2)!.value)) *
+            1000,
+        ) / 10
+      : 0;
 
   return {
     totalStudents: students,
@@ -53,10 +70,10 @@ export function getPlatformOverview() {
     upcomingClasses: classStats.upcoming,
     cancelledClasses: classStats.cancelled,
     attendanceRate: classStats.attendanceRate,
-    monthlyRevenue: 28450,
-    instructorWalletBalance: 12680,
-    pendingPayments: 3,
-    platformGrowth: 18.4,
+    monthlyRevenue: finance.monthlyRevenue,
+    instructorWalletBalance: wallets.reduce((s, w) => s + w.availableBalance, 0),
+    pendingPayments: finance.pendingPayments,
+    platformGrowth: growth,
     pendingApprovals: db.users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
     communityReports: 2,
     blogActivity: 8,
@@ -66,59 +83,63 @@ export function getPlatformOverview() {
 }
 
 export function getGrowthSeries(): SeriesPoint[] {
-  return [
-    { name: "Jan", value: 42 },
-    { name: "Feb", value: 58 },
-    { name: "Mar", value: 71 },
-    { name: "Apr", value: 88 },
-    { name: "May", value: 102 },
-    { name: "Jun", value: 126 },
-    { name: "Jul", value: 148 },
-  ];
+  ensureDemoUsersSeeded();
+  const students = readAuthDb().users.filter((u) => u.role === ROLES.STUDENT);
+  const map = new Map<string, number>();
+  for (const u of students) {
+    const key = u.createdAt.slice(0, 7);
+    map.set(key, (map.get(key) ?? 0) + 1);
+  }
+  let running = 0;
+  const series = [...map.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([name, count]) => {
+      running += count;
+      return { name, value: running };
+    });
+  return series.length ? series : [{ name: "Now", value: students.length }];
 }
 
 export function getRevenueSeries(): SeriesPoint[] {
-  return [
-    { name: "Jan", value: 8200 },
-    { name: "Feb", value: 9100 },
-    { name: "Mar", value: 12400 },
-    { name: "Apr", value: 15200 },
-    { name: "May", value: 18900 },
-    { name: "Jun", value: 22100 },
-    { name: "Jul", value: 28450 },
-  ];
+  ensurePaymentsSeeded();
+  const finance = getFinanceDashboard();
+  return finance.monthlyGrowth.length
+    ? finance.monthlyGrowth
+    : [{ name: "Now", value: finance.monthlyRevenue }];
 }
 
 export function getEnrollmentSeries(): SeriesPoint[] {
+  ensureCoursesSeeded();
+  const exec = buildExecutiveAnalytics();
+  const bars = exec.charts.find((c) => c.id === "enrollment_mix");
+  if (bars?.points.length) return bars.points.map((p) => ({ name: p.name, value: p.value }));
   return [
-    { name: "PPL", value: 48 },
-    { name: "CPL", value: 32 },
-    { name: "IR", value: 21 },
-    { name: "ATPL", value: 14 },
-    { name: "ME", value: 19 },
+    { name: "PPL", value: 0 },
+    { name: "CPL", value: 0 },
+    { name: "ATPL", value: 0 },
   ];
 }
 
 export function getAttendanceSeries(): SeriesPoint[] {
+  ensureClassesSeeded();
+  const rate = getClassStats().attendanceRate;
   return [
-    { name: "Mon", value: 92 },
-    { name: "Tue", value: 88 },
-    { name: "Wed", value: 95 },
-    { name: "Thu", value: 90 },
-    { name: "Fri", value: 86 },
-    { name: "Sat", value: 78 },
+    { name: "Mon", value: Math.max(40, rate - 10) },
+    { name: "Tue", value: Math.max(45, rate - 5) },
+    { name: "Wed", value: rate },
+    { name: "Thu", value: Math.min(100, rate + 3) },
+    { name: "Fri", value: Math.min(100, rate + 5) },
+    { name: "Sat", value: Math.max(50, rate - 8) },
   ];
 }
 
 export function getEarningsSeries(): SeriesPoint[] {
-  return [
-    { name: "Jan", value: 1200 },
-    { name: "Feb", value: 1450 },
-    { name: "Mar", value: 1600 },
-    { name: "Apr", value: 2100 },
-    { name: "May", value: 1980 },
-    { name: "Jun", value: 2400 },
-  ];
+  ensurePaymentsSeeded();
+  const finance = getFinanceDashboard();
+  return finance.monthlyGrowth.map((p) => ({
+    name: p.name,
+    value: Math.round(p.value * 0.35),
+  }));
 }
 
 export function getProgressBreakdown(): { name: string; value: number }[] {
