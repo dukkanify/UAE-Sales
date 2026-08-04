@@ -8,11 +8,12 @@ Master index for **Version 1.0 GA** (Task 025). Prior closure materials (Task 02
 2. `docs/CLIENT_ACCEPTANCE_025.md`
 3. `docs/PRODUCTION_READINESS_025.md`
 4. `docs/BRAND_ASSETS_026.md`
-5. `docs/PRODUCTION_MODULE_VERIFICATION_025.md`
-6. `docs/OWNERSHIP_TRANSFER_025.md`
-7. `docs/WARRANTY_ACTIVATION_025.md`
-8. `docs/SUCCESS_METRICS_90D.md`
-9. `docs/V2_BACKLOG.md`
+5. `docs/PHASE2_ENTERPRISE_ROADMAP.md`
+6. `docs/PRODUCTION_MODULE_VERIFICATION_025.md`
+7. `docs/OWNERSHIP_TRANSFER_025.md`
+8. `docs/WARRANTY_ACTIVATION_025.md`
+9. `docs/SUCCESS_METRICS_90D.md`
+10. `docs/V2_BACKLOG.md`
 
 ## People guides & training
 
@@ -43,20 +44,22 @@ Master index for **Version 1.0 GA** (Task 025). Prior closure materials (Task 02
 
 ## Closure, enterprise & release
 
-| Doc                            | Topic                        |
-| ------------------------------ | ---------------------------- |
-| `PROJECT_CLOSURE_REPORT.md`    | Closure report (Task 023)    |
-| `HANDOVER.md`                  | Client handover              |
-| `FINAL_PROJECT_ACCEPTANCE.md`  | Prior acceptance (Task 023)  |
-| `INFRASTRUCTURE_HANDOVER.md`   | Hosting map                  |
-| `CREDENTIALS_REGISTER.md`      | Secrets inventory template   |
-| `SOURCE_CODE_HANDOVER.md`      | Repository delivery          |
-| `ENTERPRISE_READINESS_022.md`  | Audit package                |
-| `ENTERPRISE_REFACTOR_024.md`   | Refactor / excellence pass   |
-| `FINAL_RELEASE_025.md`         | GA release package           |
-| `BRAND_ASSETS_026.md`          | Branding & media integration |
-| `ROADMAP.md` / `ROADMAP_V2.md` | Near-term / major future     |
-| `RELEASE_NOTES.md`             | Versions                     |
-| `KNOWN_LIMITATIONS.md`         | Honest constraints           |
-| `TECHNICAL_DEBT.md`            | Debt register                |
-| `UAT_APPROVAL.md`              | UAT evidence                 |
+| Doc                            | Topic                         |
+| ------------------------------ | ----------------------------- |
+| `PROJECT_CLOSURE_REPORT.md`    | Closure report (Task 023)     |
+| `HANDOVER.md`                  | Client handover               |
+| `FINAL_PROJECT_ACCEPTANCE.md`  | Prior acceptance (Task 023)   |
+| `INFRASTRUCTURE_HANDOVER.md`   | Hosting map                   |
+| `CREDENTIALS_REGISTER.md`      | Secrets inventory template    |
+| `SOURCE_CODE_HANDOVER.md`      | Repository delivery           |
+| `ENTERPRISE_READINESS_022.md`  | Audit package                 |
+| `ENTERPRISE_REFACTOR_024.md`   | Refactor / excellence pass    |
+| `FINAL_RELEASE_025.md`         | GA release package            |
+| `BRAND_ASSETS_026.md`          | Branding & media integration  |
+| `PHASE2_ENTERPRISE_ROADMAP.md` | Version 2.0 expansion program |
+| `ARCHITECTURE_V2.md`           | Multi-tenant SaaS design      |
+| `ROADMAP.md` / `ROADMAP_V2.md` | Near-term / major future      |
+| `RELEASE_NOTES.md`             | Versions                      |
+| `KNOWN_LIMITATIONS.md`         | Honest constraints            |
+| `TECHNICAL_DEBT.md`            | Debt register                 |
+| `UAT_APPROVAL.md`              | UAT evidence                  |

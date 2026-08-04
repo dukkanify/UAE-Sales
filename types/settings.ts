@@ -160,6 +160,19 @@ export interface FeatureFlags {
   courses: boolean;
   calendar: boolean;
   ai: boolean;
+  /** Phase 2 — default off until contracted delivery */
+  mobileApps: boolean;
+  corporatePortal: boolean;
+  multiTenant: boolean;
+  aiProctoring: boolean;
+  learningPaths: boolean;
+  crmIntegration: boolean;
+  erpIntegration: boolean;
+  marketingAutomation: boolean;
+  enterpriseSso: boolean;
+  i18n: boolean;
+  whiteLabel: boolean;
+  biPredictive: boolean;
 }
 
 export interface PlatformSettings {
