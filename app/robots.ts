@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
-import { getAppUrl } from "@/shared/constants/site";
+
+import { siteConfig } from "@/config/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = getAppUrl();
   return {
     rules: {
-      allow: "/",
-      disallow: ["/api/", "/admin/unauthorized"],
       userAgent: "*",
+      allow: "/",
+      disallow: ["/dashboard/", "/api/", "/unauthorized", "/maintenance"],
     },
-    sitemap: `${base}/sitemap.xml`,
+    sitemap: `${siteConfig.url}/sitemap.xml`,
   };
 }

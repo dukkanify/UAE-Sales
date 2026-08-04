@@ -1,0 +1,38 @@
+-- =============================================================================
+-- AEP — Prisma schema (optional ORM layer over Supabase PostgreSQL)
+-- Generate: npx prisma generate --schema=database/prisma/schema.prisma
+-- =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  student
+  instructor
+  admin
+  super_admin
+
+  @@map("user_role")
+}
+
+model Profile {
+  id        String   @id @db.Uuid
+  email     String   @unique
+  fullName  String?  @map("full_name")
+  avatarUrl String?  @map("avatar_url")
+  role      UserRole @default(student)
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([role])
+  @@index([email])
+  @@map("profiles")
+}

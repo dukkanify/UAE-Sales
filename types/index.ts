@@ -1,76 +1,41 @@
-export type { ApiErrorCode, ApiErrorPayload } from "./api";
+import type { Role } from "@/constants/roles";
 
-export type { HomeCityHighlight } from "./domain/content";
+export type { Role };
 
-export type {
-  Category,
-  CategoryIconName,
-} from "./domain/category";
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  role: Role;
+  phone: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
-export type {
-  CategoryFieldDefinition,
-  CategoryFieldOption,
-  CategoryFieldType,
-  CategorySpecValue,
-  CategorySpecs,
-} from "./domain/category-fields";
+export interface AuthSession {
+  user: UserProfile | null;
+  accessToken: string | null;
+  isAuthenticated: boolean;
+}
 
-export type {
-  CarSpecs,
-  ContactMethod,
-  DeliveryOption,
-  ElectronicsSpecs,
-  Listing,
-  ListingCondition,
-  ListingImageTone,
-  ListingSearchFilters,
-  ListingSeller,
-  ListingStatus,
-  RealEstateSpecs,
-  SellerType,
-} from "./domain/listing";
+export interface ApiResponse<T = unknown> {
+  data: T | null;
+  error: string | null;
+  success: boolean;
+}
 
-export type { City, Country } from "./domain/location";
+export interface PaginatedResponse<T> {
+  data: T[];
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+}
 
-export type { AccountType, UserProfile, UserRole } from "./domain/user";
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
 
-export type {
-  AdminCategoryCreateInput,
-  AdminCategoryPatch,
-  AdminCategoryRecord,
-  AdminDisputePatch,
-  AdminDisputeRecord,
-  AdminListingCreateInput,
-  AdminListingPatch,
-  AdminListingRecord,
-  AdminModerationSummary,
-  AdminUserPatch,
-  AdminUserRecord,
-  DisputeStatus,
-} from "./domain/admin";
-
-export type {
-  EscrowStatus,
-  Order,
-  OrderAuditEvent,
-  OrderFeeBreakdown,
-  OrderStatus,
-  PaymentStatus,
-} from "./domain/order";
-
-export type {
-  WalletAccount,
-  WalletTransaction,
-  WalletTransactionType,
-} from "./domain/wallet";
-
-export type {
-  AppNotification,
-  NotificationType,
-} from "./domain/notification";
-
-export type {
-  CheckoutSessionResult,
-  PaymentEventLog,
-  StripePaymentMode,
-} from "./domain/payment";
+export type StatusVariant = "default" | "success" | "warning" | "error" | "info";

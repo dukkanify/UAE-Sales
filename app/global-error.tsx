@@ -1,34 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
-import { ErrorState } from "@/shared/components/ErrorState";
-import { SiteFooter } from "@/shared/layouts/SiteFooter";
-import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getErrorMessage } from "@/services/api";
-
-type GlobalErrorProps = {
+export default function GlobalError({
+  error,
+  reset,
+}: {
   error: Error & { digest?: string };
   reset: () => void;
-};
-
-export default function GlobalError({ error, reset }: GlobalErrorProps) {
-  useEffect(() => {
-    console.error("[GlobalError]", error);
-  }, [error]);
-
+}) {
   return (
-    <html lang="ar" dir="rtl">
-      <body>
-        <SiteHeader />
-        <main className="app-container page-padding">
-          <ErrorState
-            description={getErrorMessage(error)}
-            onRetry={reset}
-            title="حدث خطأ في التطبيق"
-            variant="server"
-          />
-        </main>
-        <SiteFooter />
+    <html lang="en">
+      <body className="flex min-h-screen items-center justify-center bg-background px-6 font-sans text-foreground">
+        <div className="max-w-md text-center">
+          <h1 className="font-display text-2xl font-semibold">Critical error</h1>
+          <p className="mt-3 text-muted-foreground">
+            {error.message || "The application failed to load."}
+          </p>
+          <button
+            type="button"
+            onClick={reset}
+            className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
+            Reload
+          </button>
+        </div>
       </body>
     </html>
   );
