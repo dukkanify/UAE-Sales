@@ -1,16 +1,10 @@
-import { RoleShell, type RoleNavItem } from "@/components/layout/role-shell";
+import { RoleShell } from "@/components/layout/role-shell";
 import { ROLES } from "@/constants/roles";
-
-const navItems: RoleNavItem[] = [
-  { label: "Dashboard", href: "/super-admin/dashboard", icon: "dashboard" },
-  { label: "Activity Logs", href: "/super-admin/activity-logs", icon: "activity" },
-  { label: "Settings", href: "/super-admin/settings", icon: "settings" },
-  { label: "Users", href: "/admin/users", icon: "users" },
-];
+import { SUPER_ADMIN_NAV } from "@/constants/dashboard-nav";
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RoleShell role={ROLES.SUPER_ADMIN} navItems={navItems}>
+    <RoleShell role={ROLES.SUPER_ADMIN} navItems={SUPER_ADMIN_NAV}>
       {children}
     </RoleShell>
   );

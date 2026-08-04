@@ -1,0 +1,101 @@
+/**
+ * Role-based sidebar navigation for dashboards.
+ */
+
+import type { Role } from "@/constants/roles";
+
+export type DashboardIcon =
+  | "dashboard"
+  | "users"
+  | "admins"
+  | "instructors"
+  | "students"
+  | "courses"
+  | "classes"
+  | "lessons"
+  | "communities"
+  | "blog"
+  | "payments"
+  | "wallets"
+  | "reports"
+  | "settings"
+  | "logs"
+  | "notifications"
+  | "profile"
+  | "calendar"
+  | "assignments"
+  | "quizzes"
+  | "certificates"
+  | "wallet"
+  | "activity";
+
+export interface DashboardNavItem {
+  label: string;
+  href: string;
+  icon: DashboardIcon;
+}
+
+export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
+  { label: "Dashboard", href: "/super-admin/dashboard", icon: "dashboard" },
+  { label: "Users", href: "/super-admin/users", icon: "users" },
+  { label: "Admins", href: "/super-admin/admins", icon: "admins" },
+  { label: "Instructors", href: "/super-admin/instructors", icon: "instructors" },
+  { label: "Students", href: "/super-admin/students", icon: "students" },
+  { label: "Courses", href: "/super-admin/courses", icon: "courses" },
+  { label: "Classes", href: "/super-admin/classes", icon: "classes" },
+  { label: "Communities", href: "/super-admin/communities", icon: "communities" },
+  { label: "Blog", href: "/super-admin/blog", icon: "blog" },
+  { label: "Payments", href: "/super-admin/payments", icon: "payments" },
+  { label: "Instructor Wallets", href: "/super-admin/wallets", icon: "wallets" },
+  { label: "Reports", href: "/super-admin/reports", icon: "reports" },
+  { label: "Platform Settings", href: "/super-admin/settings", icon: "settings" },
+  { label: "System Logs", href: "/super-admin/activity-logs", icon: "logs" },
+  { label: "Notifications", href: "/super-admin/notifications", icon: "notifications" },
+  { label: "Profile", href: "/super-admin/profile", icon: "profile" },
+];
+
+export const ADMIN_NAV: DashboardNavItem[] = [
+  { label: "Dashboard", href: "/admin/dashboard", icon: "dashboard" },
+  { label: "Students", href: "/admin/students", icon: "students" },
+  { label: "Instructors", href: "/admin/instructors", icon: "instructors" },
+  { label: "Courses", href: "/admin/courses", icon: "courses" },
+  { label: "Classes", href: "/admin/classes", icon: "classes" },
+  { label: "Communities", href: "/admin/communities", icon: "communities" },
+  { label: "Blog", href: "/admin/blog", icon: "blog" },
+  { label: "Reports", href: "/admin/reports", icon: "reports" },
+  { label: "Notifications", href: "/admin/notifications", icon: "notifications" },
+  { label: "Profile", href: "/admin/profile", icon: "profile" },
+];
+
+export const INSTRUCTOR_NAV: DashboardNavItem[] = [
+  { label: "Dashboard", href: "/instructor/dashboard", icon: "dashboard" },
+  { label: "My Courses", href: "/instructor/courses", icon: "courses" },
+  { label: "Lessons", href: "/instructor/lessons", icon: "lessons" },
+  { label: "Students", href: "/instructor/students", icon: "students" },
+  { label: "Assignments", href: "/instructor/assignments", icon: "assignments" },
+  { label: "Quizzes", href: "/instructor/quizzes", icon: "quizzes" },
+  { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
+  { label: "Wallet", href: "/instructor/wallet", icon: "wallet" },
+  { label: "Reports", href: "/instructor/reports", icon: "reports" },
+  { label: "Notifications", href: "/instructor/notifications", icon: "notifications" },
+  { label: "Profile", href: "/instructor/profile", icon: "profile" },
+];
+
+export const STUDENT_NAV: DashboardNavItem[] = [
+  { label: "Dashboard", href: "/student/dashboard", icon: "dashboard" },
+  { label: "My Courses", href: "/student/courses", icon: "courses" },
+  { label: "Calendar", href: "/student/calendar", icon: "calendar" },
+  { label: "Assignments", href: "/student/assignments", icon: "assignments" },
+  { label: "Quizzes", href: "/student/quizzes", icon: "quizzes" },
+  { label: "Certificates", href: "/student/certificates", icon: "certificates" },
+  { label: "Community", href: "/student/community", icon: "communities" },
+  { label: "Notifications", href: "/student/notifications", icon: "notifications" },
+  { label: "Profile", href: "/student/profile", icon: "profile" },
+];
+
+export const DASHBOARD_NAV: Record<Role, DashboardNavItem[]> = {
+  super_admin: SUPER_ADMIN_NAV,
+  admin: ADMIN_NAV,
+  instructor: INSTRUCTOR_NAV,
+  student: STUDENT_NAV,
+};
