@@ -130,7 +130,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     zoom: false,
     advertisements: false,
     wallet: false,
-    courses: false,
+    courses: true,
     calendar: false,
   },
   updatedAt: new Date(0).toISOString(),
