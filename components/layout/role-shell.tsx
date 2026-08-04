@@ -37,6 +37,7 @@ import {
   CreditCard,
   Bell,
   BarChart3,
+  LineChart,
   Layers,
   UsersRound,
 } from "lucide-react";
@@ -85,6 +86,7 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   payments: CreditCard,
   wallets: Wallet,
   reports: BarChart3,
+  analytics: LineChart,
   settings: Settings,
   logs: Activity,
   notifications: Bell,

@@ -7,9 +7,12 @@ import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { formatDate } from "@/utils/format";
+import type { KpiCard } from "@/types/analytics";
+import Link from "next/link";
 
 interface MonitoringData {
   recentLogins: Array<{
@@ -43,11 +46,16 @@ interface MonitoringData {
 
 function ActivityMonitoringPage() {
   const [data, setData] = React.useState<MonitoringData | null>(null);
+  const [healthKpis, setHealthKpis] = React.useState<KpiCard[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    void authFetch<MonitoringData>("/api/admin/monitoring").then((result) => {
-      if (result.success && result.data) setData(result.data);
+    void Promise.all([
+      authFetch<MonitoringData>("/api/admin/monitoring"),
+      authFetch<{ kpis?: KpiCard[] }>("/api/analytics/health"),
+    ]).then(([monitor, health]) => {
+      if (monitor.success && monitor.data) setData(monitor.data);
+      if (health.success && health.data?.kpis) setHealthKpis(health.data.kpis);
       setLoading(false);
     });
   }, []);
@@ -56,11 +64,16 @@ function ActivityMonitoringPage() {
     <div className="space-y-6">
       <PageHeader
         title="Activity monitoring"
-        description="Live platform health: logins, sessions, storage, and warnings."
+        description="Live platform health: logins, sessions, storage, queues, and Zoom status."
         breadcrumbs={[
           { label: "Super Admin", href: "/super-admin/dashboard" },
           { label: "Monitoring" },
         ]}
+        actions={
+          <Button size="sm" variant="outline" asChild>
+            <Link href="/super-admin/analytics">Open BI health dashboard</Link>
+          </Button>
+        }
       />
 
       {loading || !data ? (
@@ -71,6 +84,21 @@ function ActivityMonitoringPage() {
         </div>
       ) : (
         <>
+          {healthKpis.length ? (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              {healthKpis.slice(0, 10).map((kpi) => (
+                <Card key={kpi.id}>
+                  <CardContent className="p-4">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {kpi.label}
+                    </p>
+                    <p className="mt-1 font-display text-xl font-semibold">{String(kpi.value)}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : null}
+
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Online users" value={data.onlineUsers} icon={Users} />
             <StatCard
