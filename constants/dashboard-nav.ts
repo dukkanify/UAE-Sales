@@ -35,7 +35,10 @@ export type DashboardIcon =
   | "planner"
   | "history"
   | "search"
-  | "bookmark";
+  | "bookmark"
+  | "messages"
+  | "support"
+  | "megaphone";
 
 export interface DashboardNavItem {
   label: string;
@@ -53,8 +56,12 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/super-admin/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/super-admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/super-admin/classes", icon: "classes" },
+  { label: "Messages", href: "/super-admin/messages", icon: "messages" },
   { label: "Communities", href: "/super-admin/communities", icon: "communities" },
+  { label: "Announcements", href: "/super-admin/announcements", icon: "megaphone" },
   { label: "Blog", href: "/super-admin/blog", icon: "blog" },
+  { label: "Support", href: "/super-admin/support", icon: "support" },
+  { label: "Moderation", href: "/super-admin/moderation", icon: "logs" },
   { label: "Payments", href: "/super-admin/payments", icon: "payments" },
   { label: "Instructor Wallets", href: "/super-admin/wallets", icon: "wallets" },
   { label: "Reports", href: "/super-admin/reports", icon: "reports" },
@@ -73,8 +80,12 @@ export const ADMIN_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/admin/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/admin/classes", icon: "classes" },
+  { label: "Messages", href: "/admin/messages", icon: "messages" },
   { label: "Communities", href: "/admin/communities", icon: "communities" },
+  { label: "Announcements", href: "/admin/announcements", icon: "megaphone" },
   { label: "Blog", href: "/admin/blog", icon: "blog" },
+  { label: "Support", href: "/admin/support", icon: "support" },
+  { label: "Moderation", href: "/admin/moderation", icon: "logs" },
   { label: "Reports", href: "/admin/reports", icon: "reports" },
   { label: "Notifications", href: "/admin/notifications", icon: "notifications" },
   { label: "Profile", href: "/admin/profile", icon: "profile" },
@@ -90,6 +101,10 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Certificates", href: "/instructor/certificates", icon: "certificates" },
   { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
   { label: "Live Classes", href: "/instructor/classes", icon: "classes" },
+  { label: "Messages", href: "/instructor/messages", icon: "messages" },
+  { label: "Community", href: "/instructor/community", icon: "communities" },
+  { label: "Announcements", href: "/instructor/announcements", icon: "megaphone" },
+  { label: "Support", href: "/instructor/support", icon: "support" },
   { label: "Wallet", href: "/instructor/wallet", icon: "wallet" },
   { label: "Reports", href: "/instructor/reports", icon: "reports" },
   { label: "Notifications", href: "/instructor/notifications", icon: "notifications" },
@@ -111,7 +126,11 @@ export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Progress", href: "/student/progress", icon: "activity" },
   { label: "Certificates", href: "/student/certificates", icon: "certificates" },
   { label: "Transcript", href: "/student/transcript", icon: "reports" },
+  { label: "Messages", href: "/student/messages", icon: "messages" },
   { label: "Community", href: "/student/community", icon: "communities" },
+  { label: "Announcements", href: "/student/announcements", icon: "megaphone" },
+  { label: "Support", href: "/student/support", icon: "support" },
+  { label: "Comm Search", href: "/student/comm-search", icon: "search" },
   { label: "Notifications", href: "/student/notifications", icon: "notifications" },
   { label: "Profile", href: "/student/profile", icon: "profile" },
 ];
