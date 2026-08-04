@@ -94,6 +94,15 @@ export const ACTIVITY_ACTIONS = {
   ATTEMPT_SUBMITTED: "quizzes.attempt_submitted",
   ATTEMPT_GRADED: "quizzes.attempt_graded",
   SUSPICIOUS_ACTIVITY: "quizzes.suspicious_activity",
+  // Certificates & reports
+  CERTIFICATE_CREATED: "certificates.created",
+  CERTIFICATE_APPROVED: "certificates.approved",
+  CERTIFICATE_ISSUED: "certificates.issued",
+  CERTIFICATE_REVOKED: "certificates.revoked",
+  CERTIFICATE_REISSUED: "certificates.reissued",
+  CERTIFICATE_TEMPLATE_UPDATED: "certificates.template_updated",
+  TRANSCRIPT_GENERATED: "reports.transcript_generated",
+  REPORT_EXPORTED: "reports.exported",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];
