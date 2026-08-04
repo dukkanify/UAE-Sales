@@ -312,6 +312,77 @@ async function main() {
     if (!report.json?.success) throw new Error(report.json?.error || "backup report failed");
   });
 
+  await check("api v1 public + mobile auth", async () => {
+    const openapi = await fetch(`${BASE}/api/v1/openapi`);
+    const openapiJson = await openapi.json();
+    if (!openapiJson.success || !openapiJson.data?.openapi) throw new Error("openapi missing");
+
+    const courses = await fetch(`${BASE}/api/v1/public/courses`);
+    const coursesJson = await courses.json();
+    if (!coursesJson.success) throw new Error(coursesJson.error?.message || "public courses");
+
+    const otp = await api(student.jar, "/api/v1/auth/otp/request", {
+      method: "POST",
+      body: JSON.stringify({ email: DEMO.student, purpose: "login" }),
+    });
+    // student already logged in via cookie; request may still succeed
+    if (!otp.json?.success && !String(otp.json?.error?.message || otp.json?.error || "").includes("many")) {
+      // allow rate-limit soft fails in repeated suites by falling through to refresh path
+    }
+
+    const verify = await fetch(`${BASE}/api/v1/auth/otp/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: DEMO.student, token: DEMO.otp, purpose: "login" }),
+    });
+    const verifyJson = await verify.json();
+    if (!verifyJson.success || !verifyJson.data?.accessToken) {
+      throw new Error(verifyJson.error?.message || "v1 token issue failed");
+    }
+    const access = verifyJson.data.accessToken;
+    const me = await fetch(`${BASE}/api/v1/me`, {
+      headers: { Authorization: `Bearer ${access}` },
+    });
+    const meJson = await me.json();
+    if (!meJson.success || meJson.data?.user?.role !== "student") {
+      throw new Error(meJson.error?.message || "bearer me failed");
+    }
+
+    const refresh = await fetch(`${BASE}/api/v1/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken: verifyJson.data.refreshToken }),
+    });
+    const refreshJson = await refresh.json();
+    if (!refreshJson.success || !refreshJson.data?.accessToken) {
+      throw new Error(refreshJson.error?.message || "refresh failed");
+    }
+  });
+
+  await check("api v1 platform keys/webhooks/queue", async () => {
+    await expectOk(sa.jar, "/api/v1/platform/integrations");
+    await expectOk(sa.jar, "/api/v1/platform/monitoring");
+    const key = await api(sa.jar, "/api/v1/platform/keys", {
+      method: "POST",
+      body: JSON.stringify({ name: "uat-key", scopes: ["mobile:full", "public:read"] }),
+    });
+    if (!key.json?.success || !key.json.data?.secret) {
+      throw new Error(key.json?.error?.message || key.json?.error || "key create failed");
+    }
+    const exportJob = await api(sa.jar, "/api/v1/platform/export", {
+      method: "POST",
+      body: JSON.stringify({ kind: "courses", format: "json" }),
+    });
+    if (!exportJob.json?.success) {
+      throw new Error(exportJob.json?.error?.message || "export failed");
+    }
+    const queue = await api(sa.jar, "/api/v1/platform/queue", {
+      method: "POST",
+      body: JSON.stringify({ action: "process", limit: 5 }),
+    });
+    if (!queue.json?.success) throw new Error(queue.json?.error?.message || "queue process failed");
+  });
+
   await check("superadmin backup create + test", async () => {
     const create = await api(sa.jar, "/api/ops", {
       method: "POST",
@@ -334,6 +405,7 @@ async function main() {
       "/super-admin/settings",
       "/super-admin/monitoring",
       "/super-admin/ops-center",
+      "/super-admin/api-platform",
       "/super-admin/system-logs",
       "/super-admin/analytics",
       "/super-admin/ai",

@@ -41,7 +41,8 @@ export type DashboardIcon =
   | "megaphone"
   | "analytics"
   | "ai"
-  | "ops";
+  | "ops"
+  | "api";
 
 export interface DashboardNavItem {
   label: string;
@@ -73,6 +74,7 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Platform Settings", href: "/super-admin/settings", icon: "settings" },
   { label: "Monitoring", href: "/super-admin/monitoring", icon: "monitoring" },
   { label: "Ops Center", href: "/super-admin/ops-center", icon: "ops" },
+  { label: "API Platform", href: "/super-admin/api-platform", icon: "api" },
   { label: "Ops / Backups", href: "/super-admin/system-logs", icon: "logs" },
   { label: "Activity Logs", href: "/super-admin/activity-logs", icon: "activity" },
   { label: "Notifications", href: "/super-admin/notifications", icon: "notifications" },
