@@ -4,11 +4,7 @@
 
 import { logAudit, logActivity } from "@/services/auth/activity-log";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
-import {
-  getStoredSettings,
-  patchStoredSettings,
-  readSettingsDb,
-} from "@/services/settings/store";
+import { getStoredSettings, patchStoredSettings, readSettingsDb } from "@/services/settings/store";
 import { DEFAULT_PLATFORM_SETTINGS } from "@/services/settings/defaults";
 import type {
   PlatformSettings,
@@ -44,8 +40,8 @@ export function getPlatformSettings(): PlatformSettings {
   const settings = getStoredSettings();
   const configured = Boolean(
     process.env.ZOOM_ACCOUNT_ID?.trim() &&
-      process.env.ZOOM_CLIENT_ID?.trim() &&
-      process.env.ZOOM_CLIENT_SECRET?.trim(),
+    process.env.ZOOM_CLIENT_ID?.trim() &&
+    process.env.ZOOM_CLIENT_SECRET?.trim(),
   );
   return {
     ...settings,
@@ -56,9 +52,7 @@ export function getPlatformSettings(): PlatformSettings {
   };
 }
 
-export function getSettingsCategory<K extends SettingsCategory>(
-  category: K,
-): PlatformSettings[K] {
+export function getSettingsCategory<K extends SettingsCategory>(category: K): PlatformSettings[K] {
   return getStoredSettings()[category];
 }
 
@@ -131,6 +125,14 @@ export function getPublicBrandConfig() {
     accentColor: s.branding.accentColor,
     language: s.localization.language,
     englishOnly: s.localization.englishOnly,
+    metaDescription:
+      s.general.footerText || "Professional Aviation Education Platform for ATPL Training.",
+    pending: {
+      brandGuidelines: s.branding.brandGuidelinesPending,
+      colorPalette: s.branding.colorPalettePending,
+      typography: s.branding.typographyPending,
+      styleGuide: s.branding.styleGuidePending,
+    },
     features: s.features,
   };
 }

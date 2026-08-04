@@ -39,6 +39,8 @@ public/uploads/branding/*
 !public/uploads/branding/.gitkeep
 public/uploads/licenses/*
 !public/uploads/licenses/.gitkeep
+public/uploads/media-library/*
+!public/uploads/media-library/.gitkeep
 public/uploads/courses/*
 !public/uploads/courses/.gitkeep
 public/exports/*
