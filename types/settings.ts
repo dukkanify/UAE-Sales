@@ -14,7 +14,8 @@ export type SettingsCategory =
   | "security"
   | "storage"
   | "localization"
-  | "features";
+  | "features"
+  | "zoom";
 
 export interface GeneralSettings {
   platformName: string;
@@ -80,6 +81,20 @@ export interface NotificationSettings {
   reminderEmails: boolean;
   marketingEmails: boolean;
   systemAlerts: boolean;
+  /** Class reminder offsets (minutes before start) — Super Admin configurable */
+  classReminderOffsetsMinutes: number[];
+  classReminderFifteenMinutesEnabled: boolean;
+}
+
+export interface ZoomIntegrationSettings {
+  /** When true and credentials present, call Zoom API; otherwise mock */
+  enabled: boolean;
+  accountEmail: string;
+  defaultWaitingRoom: boolean;
+  defaultPasscode: boolean;
+  defaultMeetingType: "meeting" | "webinar";
+  /** Never returned to clients — server-only mirror of env readiness */
+  credentialsConfigured: boolean;
 }
 
 export interface AuthenticationSettings {
@@ -157,6 +172,7 @@ export interface PlatformSettings {
   storage: StorageSettings;
   localization: LocalizationSettings;
   features: FeatureFlags;
+  zoom: ZoomIntegrationSettings;
   updatedAt: string;
   updatedBy: string | null;
 }
@@ -185,4 +201,5 @@ export const SETTINGS_CATEGORIES: {
   { id: "storage", label: "Storage", description: "File storage provider and quotas" },
   { id: "localization", label: "Localization", description: "Language, timezone, and formats" },
   { id: "features", label: "Feature flags", description: "Enable or disable platform modules" },
+  { id: "zoom", label: "Zoom", description: "Live class meeting defaults (credentials via env)" },
 ];

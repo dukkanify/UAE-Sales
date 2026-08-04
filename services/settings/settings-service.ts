@@ -22,6 +22,7 @@ import type {
   StorageSettings,
   LocalizationSettings,
   FeatureFlags,
+  ZoomIntegrationSettings,
 } from "@/types/settings";
 
 export type CategoryPatch = {
@@ -35,10 +36,23 @@ export type CategoryPatch = {
   storage?: Partial<StorageSettings>;
   localization?: Partial<LocalizationSettings>;
   features?: Partial<FeatureFlags>;
+  zoom?: Partial<ZoomIntegrationSettings>;
 };
 
 export function getPlatformSettings(): PlatformSettings {
-  return getStoredSettings();
+  const settings = getStoredSettings();
+  const configured = Boolean(
+    process.env.ZOOM_ACCOUNT_ID?.trim() &&
+      process.env.ZOOM_CLIENT_ID?.trim() &&
+      process.env.ZOOM_CLIENT_SECRET?.trim(),
+  );
+  return {
+    ...settings,
+    zoom: {
+      ...settings.zoom,
+      credentialsConfigured: configured,
+    },
+  };
 }
 
 export function getSettingsCategory<K extends SettingsCategory>(
