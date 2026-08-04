@@ -1,4 +1,9 @@
 import type { CategoryFieldDefinition } from "@/types";
+import {
+  carBrandOptions,
+  electronicsBrandOptions,
+  mobileBrandOptions,
+} from "@/shared/constants/product-brands";
 
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
@@ -32,7 +37,16 @@ const carFeatureOptions = [
 ];
 
 const carFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: carBrandOptions,
+    placeholder: "ابحث عن الماركة (Toy… Nissan…)",
+  },
   { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
   { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
@@ -109,7 +123,16 @@ const realEstateFields: CategoryFieldDefinition[] = [
 ];
 
 const mobileFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: mobileBrandOptions,
+    placeholder: "ابحث عن الماركة (App… Sam…)",
+  },
   { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
   { key: "storage", label: "التخزين", type: "select", required: true, searchable: true, options: [
     { label: "64 GB", value: "64 GB" },
@@ -138,7 +161,16 @@ const mobileFields: CategoryFieldDefinition[] = [
 ];
 
 const electronicsFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: electronicsBrandOptions,
+    placeholder: "ابحث عن الماركة (App… Son…)",
+  },
   { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
     { label: "جديد", value: "جديد" },

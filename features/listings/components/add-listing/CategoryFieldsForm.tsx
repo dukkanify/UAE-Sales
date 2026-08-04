@@ -1,5 +1,6 @@
 import type { CategoryFieldDefinition, CategorySpecs, Listing, ListingCondition } from "@/types";
 import { getCategoryFields, isDynamicCategory } from "@/shared/constants/category-fields";
+import { BrandCombobox } from "@/shared/ui/BrandCombobox";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -80,6 +81,21 @@ function renderField(
         label={field.label}
         name={name}
         options={field.options ?? []}
+        required={field.required}
+      />
+    );
+  }
+
+  if (field.type === "combobox") {
+    return (
+      <BrandCombobox
+        key={field.key}
+        compact
+        defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
+        label={field.label}
+        name={name}
+        options={field.options ?? []}
+        placeholder={field.placeholder}
         required={field.required}
       />
     );
@@ -168,7 +184,7 @@ export function CategoryFieldsForm({
         {heading}
       </h2>
       <p className={addListingStepDescClass}>
-        الحقول تتغير تلقائياً حسب القسم — يُعرض فقط ما تدخله.
+        الحقول تتغير تلقائياً حسب القسم — ابحث عن الماركة بكتابة أول حروفها.
       </p>
 
       <div className={addListingDynamicFieldsGridClass}>
