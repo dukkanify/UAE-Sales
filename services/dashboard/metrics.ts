@@ -10,10 +10,14 @@ import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { getCourseStats } from "@/services/courses/course-service";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb } from "@/services/courses/store";
+import { getClassStats } from "@/services/classes/class-service";
+import { ensureClassesSeeded } from "@/services/classes/seed";
 import type { SeriesPoint } from "@/components/dashboard/charts";
 import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
 import { format, addDays } from "date-fns";
+import { getCalendarEventsForUser } from "@/services/classes/calendar-service";
+import type { UserProfile } from "@/types";
 
 export { ensureDemoUsersSeeded };
 
@@ -24,11 +28,13 @@ function countByRole(users: StoredUser[], role: Role): number {
 export function getPlatformOverview() {
   ensureDemoUsersSeeded();
   ensureCoursesSeeded();
+  ensureClassesSeeded();
   const db = readAuthDb();
   const students = countByRole(db.users, ROLES.STUDENT);
   const instructors = countByRole(db.users, ROLES.INSTRUCTOR);
   const admins = countByRole(db.users, ROLES.ADMIN) + countByRole(db.users, ROLES.SUPER_ADMIN);
   const courseStats = getCourseStats();
+  const classStats = getClassStats();
 
   return {
     totalStudents: students,
@@ -39,7 +45,10 @@ export function getPlatformOverview() {
     publishedCourses: courseStats.publishedCourses,
     draftCourses: courseStats.draftCourses,
     activeCourseStudents: courseStats.activeStudents,
-    activeClasses: 5,
+    activeClasses: classStats.liveNow + classStats.today,
+    upcomingClasses: classStats.upcoming,
+    cancelledClasses: classStats.cancelled,
+    attendanceRate: classStats.attendanceRate,
     monthlyRevenue: 28450,
     instructorWalletBalance: 12680,
     pendingPayments: 3,
@@ -47,7 +56,7 @@ export function getPlatformOverview() {
     pendingApprovals: db.users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
     communityReports: 2,
     blogActivity: 8,
-    liveClasses: 3,
+    liveClasses: classStats.liveNow,
     activeSessions: db.sessions.filter((s) => !s.revokedAt).length,
   };
 }
@@ -116,7 +125,17 @@ export function getProgressBreakdown(): { name: string; value: number }[] {
   ];
 }
 
-export function getDashboardCalendarEvents(): CalendarEvent[] {
+export function getDashboardCalendarEvents(user?: UserProfile | null): CalendarEvent[] {
+  ensureClassesSeeded();
+  if (user) {
+    return getCalendarEventsForUser(user).map((e) => ({
+      id: e.id,
+      title: e.title,
+      date: e.date,
+      time: e.time,
+      type: e.type,
+    }));
+  }
   const today = new Date();
   return [
     {
@@ -132,27 +151,6 @@ export function getDashboardCalendarEvents(): CalendarEvent[] {
       date: format(addDays(today, 1), "yyyy-MM-dd"),
       time: "14:00",
       type: "Live",
-    },
-    {
-      id: "3",
-      title: "Quiz: Meteorology",
-      date: format(addDays(today, 2), "yyyy-MM-dd"),
-      time: "11:00",
-      type: "Quiz",
-    },
-    {
-      id: "4",
-      title: "CPL Navigation",
-      date: format(addDays(today, 3), "yyyy-MM-dd"),
-      time: "10:30",
-      type: "Class",
-    },
-    {
-      id: "5",
-      title: "Office Hours",
-      date: format(addDays(today, 5), "yyyy-MM-dd"),
-      time: "16:00",
-      type: "Session",
     },
   ];
 }
@@ -179,12 +177,14 @@ export function listUsersByRole(role?: Role) {
 export function getInstructorOverview() {
   const overview = getPlatformOverview();
   ensureCoursesSeeded();
-  // Count courses where seeded instructors are assigned — approximate via stats
+  ensureClassesSeeded();
   const mine = listCoursesForMetrics({ role: "instructor" });
+  const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR);
+  const classStats = getClassStats(instructor?.id);
   return {
     myCourses: mine,
-    todaysClasses: 2,
-    upcomingClasses: 5,
+    todaysClasses: classStats.today,
+    upcomingClasses: classStats.upcoming,
     students: overview.totalStudents,
     assignments: 7,
     quizzes: 3,
