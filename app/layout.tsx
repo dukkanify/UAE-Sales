@@ -63,7 +63,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="ltr" className={`${dmSans.variable} ${outfit.variable}`}>
+    <html
+      lang="en"
+      dir="ltr"
+      className={`${dmSans.variable} ${outfit.variable}`}
+      suppressHydrationWarning
+    >
       <body className="min-h-screen font-sans antialiased">
         <AppProviders>{children}</AppProviders>
       </body>
