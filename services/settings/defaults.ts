@@ -43,8 +43,8 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     primaryColor: "#0B1F3A",
     secondaryColor: "#1E4A7A",
     accentColor: "#38BDF8",
-    typographyDisplay: "Outfit",
-    typographyBody: "DM Sans",
+  typographyDisplay: "Plus Jakarta Sans",
+  typographyBody: "DM Sans",
     footerInformation:
       "ATPL PASS — Kuwait & Dubai. Professional Aviation Education Platform for ATPL Training.",
     brandGuidelinesPending: true,
