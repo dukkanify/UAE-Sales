@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Settings, User, Plane } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 import { DASHBOARD_NAV_BY_ROLE } from "@/constants/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/providers/auth-provider";
+import { BrandLogo } from "@/components/brand/brand-logo";
+import { LayoutDashboard, Settings, User } from "lucide-react";
 
 interface SidebarProps {
   className?: string;
@@ -29,13 +28,7 @@ function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="flex h-16 items-center gap-2.5 px-5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
-          <Plane className="h-4 w-4" aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <p className="truncate font-display text-sm font-semibold">{siteConfig.name}</p>
-          <p className="truncate text-xs text-sidebar-foreground/60">Aviation Platform</p>
-        </div>
+        <BrandLogo variant="mark" href={routes.home} showWordmark />
       </div>
 
       <Separator className="bg-sidebar-border" />

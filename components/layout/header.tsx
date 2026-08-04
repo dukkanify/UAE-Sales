@@ -3,14 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Plane, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
 import { NAV_ITEMS } from "@/constants/navigation";
-import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand/brand-logo";
 
 function Header() {
   const pathname = usePathname();
@@ -23,14 +23,7 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-card/90 backdrop-blur-md">
       <div className="container-app flex h-16 items-center justify-between gap-4">
-        <Link href={routes.home} className="flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Plane className="h-4.5 w-4.5" aria-hidden />
-          </span>
-          <span className="font-display text-lg font-semibold tracking-tight text-primary">
-            {siteConfig.name}
-          </span>
-        </Link>
+        <BrandLogo priority />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => {

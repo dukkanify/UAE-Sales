@@ -8,36 +8,33 @@ node_modules/
 out/
 dist/
 build/
-
 # Environment
 .env
 .env*.local
 .env.production
-
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
 # Testing
 coverage/
 *.tsbuildinfo
-
 # IDE / OS
 .DS_Store
 *.pem
 .idea/
 .vscode/
 *.swp
-
 # Prisma
 prisma/*.db
 prisma/*.db-journal
-
 # Vercel
 .vercel
-
 # Misc
 .data/
 .turbo/
+public/uploads/branding/*
+!public/uploads/branding/.gitkeep
+public/uploads/licenses/*
+!public/uploads/licenses/.gitkeep

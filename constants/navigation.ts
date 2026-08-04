@@ -42,9 +42,8 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
 
 export const APP_METADATA = {
   title: {
-    default: "Eager Pilots | Aviation Education Platform",
-    template: "%s | Eager Pilots",
+    default: "ATPL PASS | Aviation Education Platform",
+    template: "%s | ATPL PASS",
   },
-  description:
-    "Professional aviation education, consultation, and pilot training by Eager Pilots.",
+  description: "Professional Aviation Education Platform for ATPL Training.",
 } as const;

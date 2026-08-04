@@ -59,6 +59,7 @@ import { routes } from "@/constants/routes";
 import { DASHBOARD_NAV, type DashboardIcon, type DashboardNavItem } from "@/constants/dashboard-nav";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { BrandLogo } from "@/components/brand/brand-logo";
 
 const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
@@ -84,6 +85,7 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   certificates: Award,
   wallet: Wallet,
   activity: Activity,
+  monitoring: Activity,
 };
 
 interface RoleShellProps {
@@ -114,15 +116,20 @@ function RoleSidebar({
       )}
     >
       <div className={cn("flex h-16 items-center gap-2.5 px-4", collapsed && "justify-center px-2")}>
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-accent text-accent-foreground">
-          <Globe className="h-4 w-4" />
-        </span>
-        {!collapsed ? (
+        {collapsed ? (
+          <BrandLogo variant="mark" href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`} />
+        ) : (
           <div className="min-w-0">
-            <p className="truncate font-display text-sm font-semibold">{siteConfig.name}</p>
-            <p className="truncate text-[11px] text-sidebar-foreground/55">{ROLE_LABELS[role]}</p>
+            <BrandLogo
+              variant="full"
+              href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`}
+              className="max-w-[140px]"
+            />
+            <p className="mt-0.5 truncate text-[11px] text-sidebar-foreground/55">
+              {ROLE_LABELS[role]}
+            </p>
           </div>
-        ) : null}
+        )}
       </div>
       <Separator className="bg-sidebar-border" />
       <ScrollArea className="flex-1 px-2 py-3">
@@ -201,21 +208,17 @@ function ProfileMenu() {
 }
 
 function LanguageSelector() {
-  const [lang, setLang] = React.useState("en");
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1.5 text-muted-foreground">
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline uppercase">{lang}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setLang("en")}>English</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLang("ar")}>العربية</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLang("fr")}>Français</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="ghost"
+      size="sm"
+      className="gap-1.5 text-muted-foreground"
+      title="Platform language: English only"
+      disabled
+    >
+      <Globe className="h-4 w-4" />
+      <span className="hidden sm:inline uppercase">{siteConfig.language}</span>
+    </Button>
   );
 }
 
