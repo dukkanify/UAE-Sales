@@ -3,79 +3,42 @@
  * for courses/classes/revenue (business modules not yet implemented).
  */
 
-import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { readAuthDb, toUserProfile, type StoredUser } from "@/services/auth/store";
 import { ROLES, type Role } from "@/constants/roles";
-import { generateId } from "@/lib/security/crypto";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
-import { writeAuthDb } from "@/services/auth/store";
+import { getCourseStats } from "@/services/courses/course-service";
+import { ensureCoursesSeeded } from "@/services/courses/seed";
+import { readCoursesDb } from "@/services/courses/store";
 import type { SeriesPoint } from "@/components/dashboard/charts";
 import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
 import { format, addDays } from "date-fns";
 
+export { ensureDemoUsersSeeded };
+
 function countByRole(users: StoredUser[], role: Role): number {
   return users.filter((u) => u.role === role).length;
 }
 
-/** Seed a handful of demo users so management tables are populated. */
-export function ensureDemoUsersSeeded(): void {
-  ensureSuperAdminSeeded();
-  const db = readAuthDb();
-  if (db.users.length > 1) return;
-
-  const now = new Date().toISOString();
-  const demo: Array<Partial<StoredUser> & { email: string; role: Role; firstName: string; lastName: string }> = [
-    { email: "admin@eagerpilots.com", role: ROLES.ADMIN, firstName: "Amina", lastName: "Hassan", status: ACCOUNT_STATUS.ACTIVE, profileComplete: true, emailVerified: true },
-    { email: "instructor.one@eagerpilots.com", role: ROLES.INSTRUCTOR, firstName: "James", lastName: "Carter", status: ACCOUNT_STATUS.ACTIVE, profileComplete: true, emailVerified: true, countryCode: "AE" },
-    { email: "instructor.two@eagerpilots.com", role: ROLES.INSTRUCTOR, firstName: "Sara", lastName: "Al Mansoori", status: ACCOUNT_STATUS.ACTIVE, profileComplete: true, emailVerified: true, countryCode: "AE" },
-    { email: "student.one@eagerpilots.com", role: ROLES.STUDENT, firstName: "Omar", lastName: "Khalil", status: ACCOUNT_STATUS.ACTIVE, profileComplete: true, emailVerified: true, countryCode: "EG" },
-    { email: "student.two@eagerpilots.com", role: ROLES.STUDENT, firstName: "Layla", lastName: "Nasser", status: ACCOUNT_STATUS.ACTIVE, profileComplete: true, emailVerified: true, countryCode: "SA" },
-    { email: "student.three@eagerpilots.com", role: ROLES.STUDENT, firstName: "Noah", lastName: "Brooks", status: ACCOUNT_STATUS.PENDING, profileComplete: false, emailVerified: true, countryCode: "US" },
-    { email: "student.four@eagerpilots.com", role: ROLES.STUDENT, firstName: "Mia", lastName: "Chen", status: ACCOUNT_STATUS.SUSPENDED, profileComplete: true, emailVerified: true, countryCode: "GB" },
-  ];
-
-  writeAuthDb((d) => {
-    for (const row of demo) {
-      if (d.users.some((u) => u.email === row.email)) continue;
-      d.users.push({
-        id: generateId(),
-        email: row.email,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        phone: null,
-        countryCode: row.countryCode ?? null,
-        nationality: null,
-        avatarUrl: null,
-        timezone: "UTC",
-        language: "en",
-        role: row.role,
-        status: row.status ?? ACCOUNT_STATUS.ACTIVE,
-        emailVerified: row.emailVerified ?? true,
-        profileComplete: row.profileComplete ?? true,
-        passwordHash: null,
-        passwordSalt: null,
-        lastLoginAt: null,
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
-  });
-}
-
 export function getPlatformOverview() {
   ensureDemoUsersSeeded();
+  ensureCoursesSeeded();
   const db = readAuthDb();
   const students = countByRole(db.users, ROLES.STUDENT);
   const instructors = countByRole(db.users, ROLES.INSTRUCTOR);
   const admins = countByRole(db.users, ROLES.ADMIN) + countByRole(db.users, ROLES.SUPER_ADMIN);
+  const courseStats = getCourseStats();
 
   return {
     totalStudents: students,
     totalInstructors: instructors,
     totalAdmins: admins,
     totalUsers: db.users.length,
-    totalCourses: 12, // placeholder until courses module
+    totalCourses: courseStats.totalCourses,
+    publishedCourses: courseStats.publishedCourses,
+    draftCourses: courseStats.draftCourses,
+    activeCourseStudents: courseStats.activeStudents,
     activeClasses: 5,
     monthlyRevenue: 28450,
     instructorWalletBalance: 12680,
@@ -215,8 +178,11 @@ export function listUsersByRole(role?: Role) {
 
 export function getInstructorOverview() {
   const overview = getPlatformOverview();
+  ensureCoursesSeeded();
+  // Count courses where seeded instructors are assigned — approximate via stats
+  const mine = listCoursesForMetrics({ role: "instructor" });
   return {
-    myCourses: 4,
+    myCourses: mine,
     todaysClasses: 2,
     upcomingClasses: 5,
     students: overview.totalStudents,
@@ -228,8 +194,10 @@ export function getInstructorOverview() {
 }
 
 export function getStudentOverview() {
+  ensureCoursesSeeded();
+  const enrolled = listCoursesForMetrics({ role: "student" });
   return {
-    currentCourses: 3,
+    currentCourses: enrolled,
     nextLiveClass: "IR Briefing · Tomorrow 14:00",
     progress: 68,
     certificates: 1,
@@ -240,6 +208,24 @@ export function getStudentOverview() {
     attendance: 91,
     learningHours: 28,
   };
+}
+
+function listCoursesForMetrics(opts: { role: "instructor" | "student" }): number {
+  const db = readCoursesDb();
+  const users = readAuthDb().users;
+  if (opts.role === "instructor") {
+    const instructor = users.find((u) => u.role === ROLES.INSTRUCTOR);
+    if (!instructor) return 0;
+    const ids = new Set(
+      db.instructors.filter((i) => i.userId === instructor.id).map((i) => i.courseId),
+    );
+    return db.courses.filter((c) => !c.deletedAt && ids.has(c.id)).length;
+  }
+  const student = users.find((u) => u.role === ROLES.STUDENT && u.status === ACCOUNT_STATUS.ACTIVE);
+  if (!student) return 0;
+  return db.enrollments.filter(
+    (e) => e.studentId === student.id && ["approved", "completed", "pending"].includes(e.status),
+  ).length;
 }
 
 export function getAdminOverview() {
