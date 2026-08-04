@@ -13,5 +13,6 @@ Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `type
 - Platform settings work via `.data/aep-settings.json` (Super Admin → Platform Settings)
 - No env vars are required for the mock/local data flow.
 - Validate changes via `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and `npm run uat` / `npm run test:e2e` when a server is available.
+- Closure / handover docs: `docs/DOCUMENTATION_INDEX.md`, `docs/PROJECT_CLOSURE_REPORT.md`.
 
 **ATPL PASS** — English LTR — aviation theme (deep blue / sky blue / light gray). Official brand guidelines pending; update via `config/branding.ts` or Super Admin branding settings.
