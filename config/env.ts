@@ -30,6 +30,17 @@ const serverEnvSchema = z.object({
   DATABASE_URL: z.string().optional(),
   DIRECT_URL: z.string().optional(),
   AUTH_OTP_EXPIRY_MINUTES: z.coerce.number().int().positive().default(10),
+  AUTH_SECRET: z.string().min(16).default("aep-dev-auth-secret-change-me"),
+  AUTH_SESSION_DAYS: z.coerce.number().int().positive().default(7),
+  AUTH_REMEMBER_ME_DAYS: z.coerce.number().int().positive().default(30),
+  ENABLE_DEMO_OTP: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((v) => v === "true"),
+  DEMO_OTP_CODE: z.string().regex(/^\d{6}$/).default("123456"),
+  SUPER_ADMIN_EMAIL: z.string().email().default("superadmin@eagerpilots.com"),
+  SUPER_ADMIN_FIRST_NAME: z.string().default("Super"),
+  SUPER_ADMIN_LAST_NAME: z.string().default("Admin"),
 });
 
 function parsePublicEnv() {
@@ -65,6 +76,14 @@ export function getServerEnv() {
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
     AUTH_OTP_EXPIRY_MINUTES: process.env.AUTH_OTP_EXPIRY_MINUTES,
+    AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_SESSION_DAYS: process.env.AUTH_SESSION_DAYS,
+    AUTH_REMEMBER_ME_DAYS: process.env.AUTH_REMEMBER_ME_DAYS,
+    ENABLE_DEMO_OTP: process.env.ENABLE_DEMO_OTP,
+    DEMO_OTP_CODE: process.env.DEMO_OTP_CODE,
+    SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL,
+    SUPER_ADMIN_FIRST_NAME: process.env.SUPER_ADMIN_FIRST_NAME,
+    SUPER_ADMIN_LAST_NAME: process.env.SUPER_ADMIN_LAST_NAME,
   });
 
   if (!result.success) {
