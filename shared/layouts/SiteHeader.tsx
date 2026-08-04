@@ -41,6 +41,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const isComposeListing = pathname.startsWith("/listings/new");
 
   useEffect(() => {
     const syncSession = () => setUser(getSessionUser());
@@ -106,15 +107,17 @@ export function SiteHeader() {
                 دخول
               </Link>
             )}
-            <Button
-              className="sooqna-gold-gradient hidden rounded-full sm:inline-flex"
-              href="/listings/new"
-              size="md"
-              variant="accent"
-            >
-              <Icon className="shrink-0" name="plus" size={16} />
-              أضف إعلانك
-            </Button>
+            {!isComposeListing ? (
+              <Button
+                className="sooqna-gold-gradient hidden rounded-full sm:inline-flex"
+                href="/listings/new"
+                size="md"
+                variant="accent"
+              >
+                <Icon className="shrink-0" name="plus" size={16} />
+                أضف إعلانك
+              </Button>
+            ) : null}
             <ThemeToggle className="sm:hidden" />
             <button
               aria-expanded={menuOpen}
@@ -175,17 +178,19 @@ export function SiteHeader() {
                 <InputShell />
               </form>
 
-              <Button
-                className="sooqna-gold-gradient mt-1 rounded-full"
-                fullWidth
-                href="/listings/new"
-                onClick={() => setMenuOpen(false)}
-                size="md"
-                variant="accent"
-              >
-                <Icon className="shrink-0" name="plus" size={16} />
-                أضف إعلانك
-              </Button>
+              {!isComposeListing ? (
+                <Button
+                  className="sooqna-gold-gradient mt-1 rounded-full"
+                  fullWidth
+                  href="/listings/new"
+                  onClick={() => setMenuOpen(false)}
+                  size="md"
+                  variant="accent"
+                >
+                  <Icon className="shrink-0" name="plus" size={16} />
+                  أضف إعلانك
+                </Button>
+              ) : null}
 
               {user ? (
                 <>

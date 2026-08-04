@@ -10,7 +10,11 @@ import { Icon } from "@/shared/ui/Icon";
  */
 export function StickySearchDock() {
   const pathname = usePathname();
-  const hideOnSearch = pathname === "/search";
+  const hideDock =
+    pathname === "/search" ||
+    pathname.startsWith("/listings/new") ||
+    /\/listings\/[^/]+\/edit$/.test(pathname) ||
+    /\/listings\/local\/[^/]+\/edit$/.test(pathname);
   const [visible, setVisible] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [expandPath, setExpandPath] = useState(pathname);
@@ -21,7 +25,7 @@ export function StickySearchDock() {
   }
 
   useEffect(() => {
-    if (hideOnSearch) return;
+    if (hideDock) return;
 
     const anchor = document.querySelector("[data-search-anchor]");
     if (anchor) {
@@ -40,9 +44,9 @@ export function StickySearchDock() {
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [hideOnSearch, pathname]);
+  }, [hideDock, pathname]);
 
-  if (hideOnSearch || !visible) return null;
+  if (hideDock || !visible) return null;
 
   return (
     <div
