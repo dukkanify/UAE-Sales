@@ -1,8 +1,8 @@
 # Client handover package — ATPL PASS
 
-**Milestone:** Task 021 — Post-launch support, maintenance & Version 1.1 roadmap  
-**Branch tip:** `cursor/aep-post-launch-ops-0987`  
-**Validation:** see `docs/FINAL_SYSTEM_VALIDATION.md` · ops guide `docs/POST_LAUNCH_SUPPORT.md`
+**Milestone:** Task 022 — Final project audit & enterprise readiness  
+**Branch tip:** `cursor/aep-enterprise-audit-0987`  
+**Validation:** see `docs/FINAL_SYSTEM_VALIDATION.md` · audit `docs/ENTERPRISE_READINESS_022.md` · ops `docs/POST_LAUNCH_SUPPORT.md`
 
 ## Delivery summary
 
@@ -18,6 +18,7 @@ ATPL PASS is **code-complete for launch** pending:
 | Item                         | Location                                                                                            |
 | ---------------------------- | --------------------------------------------------------------------------------------------------- |
 | Architecture overview        | `docs/ARCHITECTURE.md`                                                                              |
+| Enterprise audit (Task 022)  | `docs/ENTERPRISE_READINESS_022.md`, `docs/ENTERPRISE_AUDIT.md`, `docs/SECURITY_REVIEW_022.md`       |
 | Production readiness         | `docs/PRODUCTION.md`, `docs/PRODUCTION_OPTIMIZATION.md`                                             |
 | Final system validation      | `docs/FINAL_SYSTEM_VALIDATION.md`                                                                   |
 | Final security audit         | `docs/FINAL_SECURITY_AUDIT.md`                                                                      |

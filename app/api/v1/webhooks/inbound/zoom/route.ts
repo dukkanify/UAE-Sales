@@ -16,10 +16,21 @@ export const POST = withApiHandler(async (request) => {
 
   const raw = await request.text();
   const timestamp = request.headers.get("x-zm-request-timestamp") || "";
-  const signature = request.headers.get("x-zm-signature") || request.headers.get("x-aep-signature") || "";
+  const signature =
+    request.headers.get("x-zm-signature") || request.headers.get("x-aep-signature") || "";
   const secret = process.env.ZOOM_WEBHOOK_SECRET || "";
+  const requireSig =
+    Boolean(secret) ||
+    process.env.NODE_ENV === "production" ||
+    process.env.NEXT_PUBLIC_APP_ENV === "production";
 
-  if (secret && signature) {
+  if (requireSig) {
+    if (!secret) {
+      throw new ApiError(503, "webhook_misconfigured", "ZOOM_WEBHOOK_SECRET is not configured");
+    }
+    if (!signature) {
+      throw new ApiError(401, "missing_signature", "Webhook signature required");
+    }
     const okSig = verifyWebhookSignature(secret, raw, timestamp, signature.replace(/^v0=/, ""));
     if (!okSig) throw new ApiError(401, "invalid_signature", "Webhook signature invalid");
   }

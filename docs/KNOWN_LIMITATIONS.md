@@ -1,6 +1,6 @@
-# Known limitations — ATPL PASS v1.4
+# Known limitations — ATPL PASS v1.6
 
-Honest constraints for go-live and support.
+Honest constraints for go-live and support. Full audit: `docs/ENTERPRISE_READINESS_022.md`.
 
 ## Data layer
 

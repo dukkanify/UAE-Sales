@@ -8,9 +8,7 @@ import { z } from "zod";
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   NEXT_PUBLIC_APP_NAME: z.string().default("ATPL PASS"),
-  NEXT_PUBLIC_APP_ENV: z
-    .enum(["development", "staging", "production"])
-    .default("development"),
+  NEXT_PUBLIC_APP_ENV: z.enum(["development", "staging", "production"]).default("development"),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
   NEXT_PUBLIC_AUTH_REDIRECT_URL: z.string().url().optional(),
@@ -37,7 +35,10 @@ const serverEnvSchema = z.object({
     .enum(["true", "false"])
     .default("true")
     .transform((v) => v === "true"),
-  DEMO_OTP_CODE: z.string().regex(/^\d{6}$/).default("123456"),
+  DEMO_OTP_CODE: z
+    .string()
+    .regex(/^\d{6}$/)
+    .default("123456"),
   SUPER_ADMIN_EMAIL: z.string().email().default("superadmin@eagerpilots.com"),
   SUPER_ADMIN_FIRST_NAME: z.string().default("Super"),
   SUPER_ADMIN_LAST_NAME: z.string().default("Admin"),
@@ -106,14 +107,12 @@ export function getServerEnv() {
     data.AUTH_SECRET.length < 24;
 
   if (appEnv === "production" && weakSecret) {
-    throw new Error(
-      "AUTH_SECRET must be set to a strong unique value (≥24 chars) in production",
-    );
+    throw new Error("AUTH_SECRET must be set to a strong unique value (≥24 chars) in production");
   }
 
   if (appEnv === "production" && data.ENABLE_DEMO_OTP) {
-    console.warn(
-      "[security] ENABLE_DEMO_OTP is true in production — set ENABLE_DEMO_OTP=false before launch",
+    throw new Error(
+      "ENABLE_DEMO_OTP must be false in production (refuse to start with demo OTP enabled)",
     );
   }
 
@@ -127,9 +126,7 @@ export function isSupabaseConfigured(): boolean {
   if (!url || !key) return false;
 
   const isPlaceholder =
-    url.includes("your-project") ||
-    key.includes("your-anon") ||
-    key.includes("your-service");
+    url.includes("your-project") || key.includes("your-anon") || key.includes("your-service");
 
   return !isPlaceholder;
 }
