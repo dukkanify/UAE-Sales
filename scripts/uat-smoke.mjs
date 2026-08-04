@@ -113,7 +113,12 @@ async function check(name, fn) {
     results.push({ name, ok: true, ms: Date.now() - start });
     console.log(`PASS  ${name} (${Date.now() - start}ms)`);
   } catch (error) {
-    results.push({ name, ok: false, ms: Date.now() - start, error: String(error.message || error) });
+    results.push({
+      name,
+      ok: false,
+      ms: Date.now() - start,
+      error: String(error.message || error),
+    });
     console.error(`FAIL  ${name}: ${error.message || error}`);
   }
 }
@@ -259,7 +264,13 @@ async function main() {
   });
 
   await check("admin pages", async () => {
-    for (const p of ["/admin/dashboard", "/admin/courses", "/admin/analytics", "/admin/ai", "/admin/payments"]) {
+    for (const p of [
+      "/admin/dashboard",
+      "/admin/courses",
+      "/admin/analytics",
+      "/admin/ai",
+      "/admin/payments",
+    ]) {
       await expectPage(admin.jar, p);
     }
   });
@@ -293,6 +304,11 @@ async function main() {
     await expectOk(sa.jar, "/api/support-ops?view=sla");
     await expectOk(sa.jar, "/api/support-ops?view=bugs");
     await expectOk(sa.jar, "/api/support-ops?view=roadmap");
+    await expectOk(sa.jar, "/api/support-ops?view=hypercare");
+    await expectOk(sa.jar, "/api/support-ops?view=features");
+    await expectOk(sa.jar, "/api/support-ops?view=knowledge");
+    await expectOk(sa.jar, "/api/support-ops?view=feedback-summary");
+    await expectOk(sa.jar, "/api/support-ops?view=maintenance-dashboard");
     await expectOk(sa.jar, "/api/public/maintenance");
     const bug = await api(sa.jar, "/api/support-ops", {
       method: "POST",
@@ -305,6 +321,18 @@ async function main() {
       }),
     });
     if (!bug.json?.success) throw new Error(bug.json?.error || "create bug failed");
+    const feat = await api(sa.jar, "/api/support-ops", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "create_feature",
+        title: "UAT feature",
+        description: "Created by uat-smoke",
+        businessValue: "Validates feature intake",
+        priority: "low",
+        targetVersion: "1.1.0",
+      }),
+    });
+    if (!feat.json?.success) throw new Error(feat.json?.error || "create feature failed");
     const report = await api(sa.jar, "/api/support-ops", {
       method: "POST",
       body: JSON.stringify({ action: "backup_report", period: "ad_hoc", runRestoreTest: false }),
@@ -326,7 +354,10 @@ async function main() {
       body: JSON.stringify({ email: DEMO.student, purpose: "login" }),
     });
     // student already logged in via cookie; request may still succeed
-    if (!otp.json?.success && !String(otp.json?.error?.message || otp.json?.error || "").includes("many")) {
+    if (
+      !otp.json?.success &&
+      !String(otp.json?.error?.message || otp.json?.error || "").includes("many")
+    ) {
       // allow rate-limit soft fails in repeated suites by falling through to refresh path
     }
 
@@ -447,9 +478,10 @@ async function main() {
   });
 
   const failed = results.filter((r) => !r.ok);
-  const avg =
-    results.reduce((s, r) => s + r.ms, 0) / Math.max(1, results.length);
-  console.log(`\n${results.length - failed.length}/${results.length} passed · avg ${Math.round(avg)}ms`);
+  const avg = results.reduce((s, r) => s + r.ms, 0) / Math.max(1, results.length);
+  console.log(
+    `\n${results.length - failed.length}/${results.length} passed · avg ${Math.round(avg)}ms`,
+  );
   if (failed.length) {
     console.log("\nFailures:");
     for (const f of failed) console.log(` - ${f.name}: ${f.error}`);

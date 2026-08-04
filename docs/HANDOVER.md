@@ -1,8 +1,8 @@
 # Client handover package — ATPL PASS
 
-**Milestone:** Task 020 — Final optimization, production deployment prep & project handover  
-**Branch tip:** `cursor/aep-final-handover-0987`  
-**Validation:** see `docs/FINAL_SYSTEM_VALIDATION.md`
+**Milestone:** Task 021 — Post-launch support, maintenance & Version 1.1 roadmap  
+**Branch tip:** `cursor/aep-post-launch-ops-0987`  
+**Validation:** see `docs/FINAL_SYSTEM_VALIDATION.md` · ops guide `docs/POST_LAUNCH_SUPPORT.md`
 
 ## Delivery summary
 
@@ -15,33 +15,33 @@ ATPL PASS is **code-complete for launch** pending:
 
 ## Package contents
 
-| Item                         | Location                                                             |
-| ---------------------------- | -------------------------------------------------------------------- |
-| Architecture overview        | `docs/ARCHITECTURE.md`                                               |
-| Production readiness         | `docs/PRODUCTION.md`, `docs/PRODUCTION_OPTIMIZATION.md`              |
-| Final system validation      | `docs/FINAL_SYSTEM_VALIDATION.md`                                    |
-| Final security audit         | `docs/FINAL_SECURITY_AUDIT.md`                                       |
-| Final acceptance checklist   | `docs/FINAL_ACCEPTANCE_CHECKLIST.md`                                 |
-| Launch checklist             | `docs/PRODUCTION_CHECKLIST.md`                                       |
-| QA report                    | `docs/QA_REPORT.md`                                                  |
-| Bug tracker                  | `docs/BUG_TRACKER.md`                                                |
-| UAT approval form            | `docs/UAT_APPROVAL.md`                                               |
-| Student guide                | `docs/STUDENT_GUIDE.md`                                              |
-| Instructor guide / manual    | `docs/INSTRUCTOR_GUIDE.md`                                           |
-| Administrator guide / manual | `docs/ADMINISTRATOR_GUIDE.md`, `docs/ADMIN_MANUAL.md`                |
-| Administrator training       | `docs/TRAINING.md`                                                   |
-| API documentation            | `docs/API_OVERVIEW.md`, `docs/MOBILE_API.md`, `GET /api/v1/openapi`  |
-| Deployment guide             | `docs/DEPLOYMENT.md`                                                 |
-| Environment setup            | `docs/ENVIRONMENT_SETUP.md`                                          |
-| Database schema              | `docs/DATABASE_SCHEMA.md`, `database/migrations/`                    |
-| Maintenance guide            | `docs/MAINTENANCE.md`                                                |
-| Warranty & support           | `docs/WARRANTY_SUPPORT.md`, `docs/SUPPORT.md`, `docs/OPS_SUPPORT.md` |
-| Backup / DR                  | `docs/BACKUP_DISASTER_RECOVERY.md`                                   |
-| Security                     | `docs/SECURITY.md`                                                   |
-| Known limitations            | `docs/KNOWN_LIMITATIONS.md`                                          |
-| Roadmap                      | `docs/ROADMAP.md`                                                    |
-| Release notes                | `docs/RELEASE_NOTES.md`                                              |
-| Testing strategy             | `docs/TESTING.md`                                                    |
+| Item                         | Location                                                                                            |
+| ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| Architecture overview        | `docs/ARCHITECTURE.md`                                                                              |
+| Production readiness         | `docs/PRODUCTION.md`, `docs/PRODUCTION_OPTIMIZATION.md`                                             |
+| Final system validation      | `docs/FINAL_SYSTEM_VALIDATION.md`                                                                   |
+| Final security audit         | `docs/FINAL_SECURITY_AUDIT.md`                                                                      |
+| Final acceptance checklist   | `docs/FINAL_ACCEPTANCE_CHECKLIST.md`                                                                |
+| Launch checklist             | `docs/PRODUCTION_CHECKLIST.md`                                                                      |
+| QA report                    | `docs/QA_REPORT.md`                                                                                 |
+| Bug tracker                  | `docs/BUG_TRACKER.md`                                                                               |
+| UAT approval form            | `docs/UAT_APPROVAL.md`                                                                              |
+| Student guide                | `docs/STUDENT_GUIDE.md`                                                                             |
+| Instructor guide / manual    | `docs/INSTRUCTOR_GUIDE.md`                                                                          |
+| Administrator guide / manual | `docs/ADMINISTRATOR_GUIDE.md`, `docs/ADMIN_MANUAL.md`                                               |
+| Administrator training       | `docs/TRAINING.md`                                                                                  |
+| API documentation            | `docs/API_OVERVIEW.md`, `docs/MOBILE_API.md`, `GET /api/v1/openapi`                                 |
+| Deployment guide             | `docs/DEPLOYMENT.md`                                                                                |
+| Environment setup            | `docs/ENVIRONMENT_SETUP.md`                                                                         |
+| Database schema              | `docs/DATABASE_SCHEMA.md`, `database/migrations/`                                                   |
+| Maintenance guide            | `docs/MAINTENANCE.md`                                                                               |
+| Warranty & support           | `docs/WARRANTY_SUPPORT.md`, `docs/SUPPORT.md`, `docs/OPS_SUPPORT.md`, `docs/POST_LAUNCH_SUPPORT.md` |
+| Backup / DR                  | `docs/BACKUP_DISASTER_RECOVERY.md`                                                                  |
+| Security                     | `docs/SECURITY.md`                                                                                  |
+| Known limitations            | `docs/KNOWN_LIMITATIONS.md`                                                                         |
+| Roadmap                      | `docs/ROADMAP.md`                                                                                   |
+| Release notes                | `docs/RELEASE_NOTES.md`                                                                             |
+| Testing strategy             | `docs/TESTING.md`                                                                                   |
 
 ## Access (fill at go-live)
 

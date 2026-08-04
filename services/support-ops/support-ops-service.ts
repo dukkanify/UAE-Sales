@@ -9,11 +9,7 @@ import { listOpsLogs, writeOpsLog } from "@/services/ops/logging-service";
 import { getActivityMonitoring } from "@/services/settings/monitoring";
 import { getPlatformSettings, isMaintenanceMode } from "@/services/settings/settings-service";
 import { ensureSupportOpsSeeded } from "@/services/support-ops/seed";
-import {
-  nextNumber,
-  writeSupportOpsStore,
-  DEFAULT_SLA,
-} from "@/services/support-ops/store";
+import { nextNumber, writeSupportOpsStore, DEFAULT_SLA } from "@/services/support-ops/store";
 import type {
   AlertStatus,
   BackupVerificationReport,
@@ -72,7 +68,11 @@ export function updateSlaPolicy(
   return db.sla;
 }
 
-export function evaluateSlaBreach(priority: SupportPriority, createdAt: string, firstResponseAt: string | null) {
+export function evaluateSlaBreach(
+  priority: SupportPriority,
+  createdAt: string,
+  firstResponseAt: string | null,
+) {
   const sla = getSlaPolicy()[priority];
   const created = new Date(createdAt).getTime();
   const deadline = created + sla.responseHours * 3600_000;
@@ -179,9 +179,14 @@ export function updateSupportRequest(
 
 /* ─── Bugs ────────────────────────────────────────────── */
 
-export function listBugs(filters?: { status?: BugStatus | "all"; priority?: SupportPriority | "all"; q?: string }) {
+export function listBugs(filters?: {
+  status?: BugStatus | "all";
+  priority?: SupportPriority | "all";
+  q?: string;
+}) {
   let rows = [...ensure().bugs];
-  if (filters?.status && filters.status !== "all") rows = rows.filter((r) => r.status === filters.status);
+  if (filters?.status && filters.status !== "all")
+    rows = rows.filter((r) => r.status === filters.status);
   if (filters?.priority && filters.priority !== "all") {
     rows = rows.filter((r) => r.priority === filters.priority);
   }
@@ -301,7 +306,11 @@ export function updateChangeRequest(
   patch: Partial<
     Pick<
       ChangeRequest,
-      "approvalStatus" | "developmentStatus" | "estimatedTimeHours" | "estimatedCost" | "futurePhase"
+      | "approvalStatus"
+      | "developmentStatus"
+      | "estimatedTimeHours"
+      | "estimatedCost"
+      | "futurePhase"
     >
   >,
   actorId: string | null,
@@ -403,7 +412,8 @@ export function getMaintenancePublicStatus() {
       settings.general.footerText ||
       "ATPL PASS is undergoing scheduled maintenance. Please check again shortly.",
     estimatedReturnAt: latest?.estimatedReturnAt ?? null,
-    contactEmail: latest?.contactEmail || settings.general.supportEmail || settings.general.contactEmail,
+    contactEmail:
+      latest?.contactEmail || settings.general.supportEmail || settings.general.contactEmail,
     contactPhone: latest?.contactPhone || settings.general.contactPhone || "",
     platformName: settings.general.platformName,
   };
@@ -455,7 +465,11 @@ export function createIncident(input: {
   title: string;
   summary: string;
   severity: SupportPriority;
+  affectedModule?: string;
   affectedServices?: string[];
+  rootCause?: string | null;
+  resolution?: string | null;
+  preventiveAction?: string | null;
   createdBy?: string | null;
 }): IncidentReport {
   const db = ensure();
@@ -467,7 +481,11 @@ export function createIncident(input: {
     summary: input.summary.slice(0, 5000),
     severity: input.severity,
     status: "open",
+    affectedModule: (input.affectedModule ?? "general").slice(0, 80),
     affectedServices: input.affectedServices ?? [],
+    rootCause: input.rootCause ?? null,
+    resolution: input.resolution ?? null,
+    preventiveAction: input.preventiveAction ?? null,
     startedAt: now(),
     resolvedAt: null,
     postmortem: null,
@@ -502,7 +520,19 @@ export function createIncident(input: {
 
 export function updateIncident(
   id: string,
-  patch: Partial<Pick<IncidentReport, "status" | "postmortem" | "summary">>,
+  patch: Partial<
+    Pick<
+      IncidentReport,
+      | "status"
+      | "postmortem"
+      | "summary"
+      | "rootCause"
+      | "resolution"
+      | "preventiveAction"
+      | "affectedModule"
+      | "affectedServices"
+    >
+  >,
 ): IncidentReport {
   const db = ensure();
   const row = db.incidents.find((r) => r.id === id);
@@ -550,7 +580,9 @@ export function createRoadmapItem(input: {
 
 export function updateRoadmapItem(
   id: string,
-  patch: Partial<Pick<RoadmapItem, "status" | "priority" | "targetVersion" | "title" | "description">>,
+  patch: Partial<
+    Pick<RoadmapItem, "status" | "priority" | "targetVersion" | "title" | "description">
+  >,
 ): RoadmapItem {
   const db = ensure();
   const row = db.roadmapItems.find((r) => r.id === id);
@@ -668,12 +700,18 @@ export function getSystemHealthDashboard() {
   const queueHealth =
     settings.email.smtpHost || settings.email.provider !== "smtp" ? "healthy" : "degraded";
 
+  const db = ensure();
   return {
-    serverStatus: health.status === "ok" || health.status === "ok_with_warnings" ? "up" : "degraded",
+    serverStatus:
+      health.status === "ok" || health.status === "ok_with_warnings" ? "up" : "degraded",
     databaseStatus: health.checks.find((c) => c.id === "database")?.status ?? "warn",
     apiStatus: "pass" as const,
     storage: mon.storageUsage,
     queueHealth,
+    emailStatus: health.checks.find((c) => c.id === "email")?.status ?? "warn",
+    zoomStatus: health.checks.find((c) => c.id === "zoom")?.status ?? "warn",
+    paymentsStatus: health.checks.find((c) => c.id === "payments")?.status ?? "warn",
+    jobsStatus: health.checks.find((c) => c.id === "jobs" || c.id === "queue")?.status ?? "warn",
     activeUsers: mon.onlineUsers,
     errorCount: errors.length,
     securityAlerts: security.slice(0, 10),
@@ -687,6 +725,8 @@ export function getSystemHealthDashboard() {
       restoreTested: backups.some((b) => Boolean(b.restoreTestedAt)),
     },
     maintenance: getMaintenancePublicStatus(),
+    hypercare: db.hypercare,
+    recentReleases: db.releases.slice(0, 3),
     sla: getSlaPolicy(),
     timestamp: now(),
   };
@@ -702,8 +742,8 @@ export function generateBackupReport(input?: {
 }): BackupVerificationReport {
   const backups = listBackups();
   const target = input?.backupId
-    ? backups.find((b) => b.id === input.backupId) ?? null
-    : backups[0] ?? null;
+    ? (backups.find((b) => b.id === input.backupId) ?? null)
+    : (backups[0] ?? null);
   let restoreTestOk: boolean | null = null;
   if (input?.runRestoreTest && target) {
     const result = testRestore(target.id);
@@ -719,9 +759,7 @@ export function generateBackupReport(input?: {
     success: Boolean(target),
     integrityOk,
     restoreTestOk,
-    notes: target
-      ? `Verified backup ${target.id} (${target.retention})`
-      : "No backup available",
+    notes: target ? `Verified backup ${target.id} (${target.retention})` : "No backup available",
     generatedAt: now(),
     generatedBy: input?.generatedBy ?? null,
   };
@@ -746,15 +784,21 @@ export function listBackupReports(limit = 50) {
 export function getSupportOpsSummary() {
   const db = ensure();
   return {
-    openSupport: db.supportRequests.filter((r) => !["resolved", "closed"].includes(r.status)).length,
+    openSupport: db.supportRequests.filter((r) => !["resolved", "closed"].includes(r.status))
+      .length,
     openBugs: db.bugs.filter((r) => !["verified", "closed"].includes(r.status)).length,
     pendingCrs: db.changeRequests.filter((r) => r.approvalStatus === "pending").length,
+    pendingFeatures: db.featureRequests.filter((r) => r.approvalStatus === "pending").length,
     openIncidents: db.incidents.filter((r) => !["resolved", "closed"].includes(r.status)).length,
     openAlerts: db.alerts.filter((a) => a.status === "open").length,
     releases: db.releases.length,
     roadmapActive: db.roadmapItems.filter((r) =>
       ["planned", "approved", "in_development"].includes(r.status),
     ).length,
+    knowledgeArticles: db.knowledgeArticles.filter((a) => a.published).length,
+    feedbackNew: db.feedback.filter((f) => f.status === "new").length,
+    hypercareEnabled: Boolean(db.hypercare?.enabled),
+    optimizationOpen: db.optimizationNotes.filter((n) => n.status !== "done").length,
     sla: db.sla ?? DEFAULT_SLA,
   };
 }
