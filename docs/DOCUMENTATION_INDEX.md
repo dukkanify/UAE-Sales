@@ -1,13 +1,17 @@
 # Documentation index — ATPL PASS
 
-Master index for operational handover (Task 023).
+Master index for **Version 1.0 GA** (Task 025). Prior closure materials (Task 023) remain valid references.
 
-## Start here
+## Start here (GA)
 
-1. `docs/PROJECT_CLOSURE_REPORT.md`
-2. `docs/HANDOVER.md`
-3. `docs/PROJECT_COMPLETION_CHECKLIST.md`
-4. `docs/FINAL_PROJECT_ACCEPTANCE.md`
+1. `docs/FINAL_RELEASE_025.md`
+2. `docs/CLIENT_ACCEPTANCE_025.md`
+3. `docs/PRODUCTION_READINESS_025.md`
+4. `docs/PRODUCTION_MODULE_VERIFICATION_025.md`
+5. `docs/OWNERSHIP_TRANSFER_025.md`
+6. `docs/WARRANTY_ACTIVATION_025.md`
+7. `docs/SUCCESS_METRICS_90D.md`
+8. `docs/V2_BACKLOG.md`
 
 ## People guides & training
 
@@ -19,7 +23,7 @@ Master index for operational handover (Task 023).
 | `ADMINISTRATOR_GUIDE.md` / `ADMIN_MANUAL.md` | Admins                      |
 | `TRAINING.md`                                | Administrator live training |
 | `SUPPORT.md` / `SUPPORT_TRAINING.md`         | Support team                |
-| `WARRANTY_SUPPORT.md`                        | Warranty / SLA              |
+| `WARRANTY_SUPPORT.md`                        | Warranty / SLA policy       |
 
 ## Technical
 
@@ -36,16 +40,21 @@ Master index for operational handover (Task 023).
 | `MAINTENANCE.md` / `POST_LAUNCH_SUPPORT.md` | Ops                 |
 | `TESTING.md` / `CODING_STANDARDS.md`        | Quality             |
 
-## Closure & enterprise
+## Closure, enterprise & release
 
-| Doc                            | Topic                      |
-| ------------------------------ | -------------------------- |
-| `INFRASTRUCTURE_HANDOVER.md`   | Hosting map                |
-| `CREDENTIALS_REGISTER.md`      | Secrets inventory template |
-| `SOURCE_CODE_HANDOVER.md`      | Repo delivery              |
-| `ENTERPRISE_READINESS_022.md`  | Audit package              |
-| `ENTERPRISE_REFACTOR_024.md`   | Refactor / excellence pass |
-| `ROADMAP.md` / `ROADMAP_V2.md` | Future work                |
-| `RELEASE_NOTES.md`             | Versions                   |
-| `KNOWN_LIMITATIONS.md`         | Honest constraints         |
-| `TECHNICAL_DEBT.md`            | Debt register              |
+| Doc                            | Topic                       |
+| ------------------------------ | --------------------------- |
+| `PROJECT_CLOSURE_REPORT.md`    | Closure report (Task 023)   |
+| `HANDOVER.md`                  | Client handover             |
+| `FINAL_PROJECT_ACCEPTANCE.md`  | Prior acceptance (Task 023) |
+| `INFRASTRUCTURE_HANDOVER.md`   | Hosting map                 |
+| `CREDENTIALS_REGISTER.md`      | Secrets inventory template  |
+| `SOURCE_CODE_HANDOVER.md`      | Repository delivery         |
+| `ENTERPRISE_READINESS_022.md`  | Audit package               |
+| `ENTERPRISE_REFACTOR_024.md`   | Refactor / excellence pass  |
+| `FINAL_RELEASE_025.md`         | GA release package          |
+| `ROADMAP.md` / `ROADMAP_V2.md` | Near-term / major future    |
+| `RELEASE_NOTES.md`             | Versions                    |
+| `KNOWN_LIMITATIONS.md`         | Honest constraints          |
+| `TECHNICAL_DEBT.md`            | Debt register               |
+| `UAT_APPROVAL.md`              | UAT evidence                |
