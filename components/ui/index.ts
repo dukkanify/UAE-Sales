@@ -11,7 +11,6 @@ export * from "./banner";
 export * from "./button";
 export * from "./calendar";
 export * from "./card";
-export * from "./chart";
 export * from "./checkbox";
 export * from "./color-picker";
 export * from "./command";
