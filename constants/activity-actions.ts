@@ -113,6 +113,16 @@ export const ACTIVITY_ACTIONS = {
   SUPPORT_TICKET_CREATED: "support.ticket_created",
   SUPPORT_TICKET_UPDATED: "support.ticket_updated",
   MODERATION_ACTION: "moderation.action",
+
+  CHECKOUT_STARTED: "payments.checkout_started",
+  PAYMENT_COMPLETED: "payments.completed",
+  PAYMENT_FAILED: "payments.failed",
+  INVOICE_ISSUED: "invoices.issued",
+  COUPON_CREATED: "coupons.created",
+  REFUND_PROCESSED: "refunds.processed",
+  PAYOUT_REQUESTED: "wallet.payout_requested",
+  PAYOUT_PAID: "wallet.payout_paid",
+  FINANCE_REPORT_EXPORTED: "finance.report_exported",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];
