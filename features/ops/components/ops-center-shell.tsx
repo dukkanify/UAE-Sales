@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { authFetch } from "@/features/auth/services/auth-api";
+import { PostLaunchTabs } from "@/features/ops/components/post-launch-panels";
 
 type Dashboard = {
   serverStatus: string;
@@ -33,6 +34,10 @@ type Dashboard = {
   apiStatus: string;
   storage: { uploadsMb: number; dataMb: number; percentUsed: number; quotaGb: number };
   queueHealth: string;
+  emailStatus?: string;
+  zoomStatus?: string;
+  paymentsStatus?: string;
+  jobsStatus?: string;
   activeUsers: number;
   errorCount: number;
   openAlerts: Array<{
@@ -57,6 +62,8 @@ type Dashboard = {
     estimatedReturnAt: string | null;
     contactEmail: string;
   };
+  hypercare?: Record<string, unknown>;
+  recentReleases?: Array<Record<string, unknown>>;
   sla: {
     critical: { responseHours: number; resolutionHours: number };
     high: { responseHours: number; resolutionHours: number };
@@ -70,10 +77,15 @@ type Summary = {
   openSupport: number;
   openBugs: number;
   pendingCrs: number;
+  pendingFeatures?: number;
   openIncidents: number;
   openAlerts: number;
   releases: number;
   roadmapActive: number;
+  knowledgeArticles?: number;
+  feedbackNew?: number;
+  hypercareEnabled?: boolean;
+  optimizationOpen?: number;
 };
 
 function csrfHeader(): HeadersInit {
@@ -96,7 +108,11 @@ async function postAction(body: Record<string, unknown>) {
 
 function statusBadge(status: string) {
   const variant =
-    status === "pass" || status === "up" || status === "healthy" || status === "closed" || status === "verified"
+    status === "pass" ||
+    status === "up" ||
+    status === "healthy" ||
+    status === "closed" ||
+    status === "verified"
       ? "default"
       : status === "warn" || status === "degraded" || status === "open" || status === "new"
         ? "warning"
@@ -104,7 +120,10 @@ function statusBadge(status: string) {
           ? "destructive"
           : "secondary";
   return (
-    <Badge variant={variant as "default" | "warning" | "destructive" | "secondary"} className="capitalize">
+    <Badge
+      variant={variant as "default" | "warning" | "destructive" | "secondary"}
+      className="capitalize"
+    >
       {status.replaceAll("_", " ")}
     </Badge>
   );
@@ -120,6 +139,17 @@ export function OpsCenterShell() {
   const [roadmap, setRoadmap] = React.useState<Array<Record<string, unknown>>>([]);
   const [incidents, setIncidents] = React.useState<Array<Record<string, unknown>>>([]);
   const [backupReports, setBackupReports] = React.useState<Array<Record<string, unknown>>>([]);
+  const [hypercare, setHypercare] = React.useState<Record<string, unknown> | null>(null);
+  const [features, setFeatures] = React.useState<Array<Record<string, unknown>>>([]);
+  const [knowledge, setKnowledge] = React.useState<Array<Record<string, unknown>>>([]);
+  const [feedback, setFeedback] = React.useState<Array<Record<string, unknown>>>([]);
+  const [feedbackSummary, setFeedbackSummary] = React.useState<Record<string, unknown> | null>(
+    null,
+  );
+  const [optimization, setOptimization] = React.useState<Array<Record<string, unknown>>>([]);
+  const [maintenanceDash, setMaintenanceDash] = React.useState<Record<string, unknown> | null>(
+    null,
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [busy, setBusy] = React.useState(false);
 
@@ -132,7 +162,7 @@ export function OpsCenterShell() {
   const [slaDraft, setSlaDraft] = React.useState<Dashboard["sla"] | null>(null);
 
   const load = React.useCallback(async () => {
-    const [d, s, b, sup, c, r, road, inc, br] = await Promise.all([
+    const [d, s, b, sup, c, r, road, inc, br, hc, feat, kb, fb, fbs, opt, md] = await Promise.all([
       authFetch<Dashboard>("/api/support-ops?view=dashboard"),
       authFetch<Summary>("/api/support-ops?view=summary"),
       authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=bugs"),
@@ -142,6 +172,13 @@ export function OpsCenterShell() {
       authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=roadmap"),
       authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=incidents"),
       authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=backup-reports"),
+      authFetch<Record<string, unknown>>("/api/support-ops?view=hypercare"),
+      authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=features"),
+      authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=knowledge"),
+      authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=feedback"),
+      authFetch<Record<string, unknown>>("/api/support-ops?view=feedback-summary"),
+      authFetch<Array<Record<string, unknown>>>("/api/support-ops?view=optimization"),
+      authFetch<Record<string, unknown>>("/api/support-ops?view=maintenance-dashboard"),
     ]);
     if (d.data) {
       setDash(d.data);
@@ -157,6 +194,13 @@ export function OpsCenterShell() {
     setRoadmap(road.data ?? []);
     setIncidents(inc.data ?? []);
     setBackupReports(br.data ?? []);
+    setHypercare(hc.data ?? d.data?.hypercare ?? null);
+    setFeatures(feat.data ?? []);
+    setKnowledge(kb.data ?? []);
+    setFeedback(fb.data ?? []);
+    setFeedbackSummary(fbs.data ?? null);
+    setOptimization(opt.data ?? []);
+    setMaintenanceDash(md.data ?? null);
     if (!d.success) setError(d.error);
   }, []);
 
@@ -177,7 +221,7 @@ export function OpsCenterShell() {
     <div className="space-y-6">
       <PageHeader
         title="Ops Center"
-        description="Production health, support SLA, bugs, change requests, releases, and roadmap."
+        description="Post-launch hypercare, SLA support, incidents, feature requests, knowledge base, and Version 1.1 roadmap."
         breadcrumbs={[
           { label: "Super Admin", href: "/super-admin/dashboard" },
           { label: "Ops Center" },
@@ -214,22 +258,48 @@ export function OpsCenterShell() {
           value={summary?.openAlerts ?? dash?.openAlerts.length ?? "—"}
           icon={AlertTriangle}
         />
-        <StatCard label="Errors (buffer)" value={dash?.errorCount ?? "—"} icon={ShieldAlert} />
+        <StatCard
+          label={summary?.hypercareEnabled ? "Hypercare on" : "Errors (buffer)"}
+          value={
+            summary?.hypercareEnabled
+              ? (summary.pendingFeatures ?? summary.openIncidents ?? "—")
+              : (dash?.errorCount ?? "—")
+          }
+          icon={ShieldAlert}
+        />
       </div>
 
-      <Tabs defaultValue="health" className="space-y-4">
+      <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="flex h-auto flex-wrap justify-start gap-1">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="health">Health</TabsTrigger>
+          <TabsTrigger value="hypercare">Hypercare</TabsTrigger>
           <TabsTrigger value="support">Support</TabsTrigger>
           <TabsTrigger value="bugs">Bugs</TabsTrigger>
+          <TabsTrigger value="features">Features</TabsTrigger>
           <TabsTrigger value="crs">Change requests</TabsTrigger>
           <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
           <TabsTrigger value="incidents">Incidents</TabsTrigger>
+          <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback</TabsTrigger>
+          <TabsTrigger value="optimization">Optimize</TabsTrigger>
           <TabsTrigger value="backups">Backups</TabsTrigger>
           <TabsTrigger value="sla">SLA</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         </TabsList>
+
+        <PostLaunchTabs
+          busy={busy}
+          run={run}
+          hypercare={hypercare}
+          features={features}
+          knowledge={knowledge}
+          feedback={feedback}
+          feedbackSummary={feedbackSummary}
+          optimization={optimization}
+          maintenanceDash={maintenanceDash}
+        />
 
         <TabsContent value="health" className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-2">
@@ -244,7 +314,10 @@ export function OpsCenterShell() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {(dash?.checks ?? []).map((c) => (
-                  <div key={c.id} className="flex items-start justify-between gap-3 border-b border-border/60 py-2 last:border-0">
+                  <div
+                    key={c.id}
+                    className="flex items-start justify-between gap-3 border-b border-border/60 py-2 last:border-0"
+                  >
                     <div>
                       <p className="text-sm font-medium">{c.label}</p>
                       <p className="text-xs text-muted-foreground">{c.detail}</p>
@@ -267,6 +340,12 @@ export function OpsCenterShell() {
                 </p>
                 <p>
                   Queue health: <span className="capitalize">{dash?.queueHealth}</span>
+                </p>
+                <p className="flex flex-wrap items-center gap-2">
+                  Email {statusBadge(dash?.emailStatus ?? "warn")} · Zoom{" "}
+                  {statusBadge(dash?.zoomStatus ?? "warn")} · Payments{" "}
+                  {statusBadge(dash?.paymentsStatus ?? "warn")} · Jobs{" "}
+                  {statusBadge(dash?.jobsStatus ?? "warn")}
                 </p>
                 <p>
                   Database: {statusBadge(dash?.databaseStatus ?? "warn")} · API:{" "}
@@ -317,7 +396,8 @@ export function OpsCenterShell() {
                 <ClipboardList className="h-4 w-4" /> Support requests
               </CardTitle>
               <CardDescription>
-                Channels: ticket · email · admin report · Categories include technical, Zoom, payments
+                Channels: ticket · email · admin report · Categories include technical, Zoom,
+                payments
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -418,23 +498,19 @@ export function OpsCenterShell() {
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">Module: {String(row.module)}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {[
-                      "confirmed",
-                      "in_progress",
-                      "ready_for_testing",
-                      "verified",
-                      "closed",
-                    ].map((st) => (
-                      <Button
-                        key={st}
-                        size="sm"
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() => void run({ action: "update_bug", id: row.id, status: st })}
-                      >
-                        {st.replaceAll("_", " ")}
-                      </Button>
-                    ))}
+                    {["confirmed", "in_progress", "ready_for_testing", "verified", "closed"].map(
+                      (st) => (
+                        <Button
+                          key={st}
+                          size="sm"
+                          variant="outline"
+                          disabled={busy}
+                          onClick={() => void run({ action: "update_bug", id: row.id, status: st })}
+                        >
+                          {st.replaceAll("_", " ")}
+                        </Button>
+                      ),
+                    )}
                   </div>
                 </div>
               ))}
@@ -575,7 +651,9 @@ export function OpsCenterShell() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <Map className="h-4 w-4" /> Future roadmap
               </CardTitle>
-              <CardDescription>Planned · Approved · In development · Completed · Deferred</CardDescription>
+              <CardDescription>
+                Planned · Approved · In development · Completed · Deferred
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex flex-col gap-2 sm:flex-row">
@@ -646,7 +724,11 @@ export function OpsCenterShell() {
                     title: "Service degradation",
                     summary: "Investigating elevated error rate",
                     severity: "high",
+                    affectedModule: "api",
                     affectedServices: ["api", "auth"],
+                    rootCause: null,
+                    resolution: null,
+                    preventiveAction: null,
                   })
                 }
               >
@@ -666,6 +748,21 @@ export function OpsCenterShell() {
                         {statusBadge(String(row.status))}
                       </div>
                     </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Module: {String(row.affectedModule ?? "general")} ·{" "}
+                      {Array.isArray(row.affectedServices)
+                        ? (row.affectedServices as string[]).join(", ")
+                        : ""}
+                    </p>
+                    {row.rootCause ? (
+                      <p className="mt-1 text-xs">Root cause: {String(row.rootCause)}</p>
+                    ) : null}
+                    {row.resolution ? (
+                      <p className="text-xs">Resolution: {String(row.resolution)}</p>
+                    ) : null}
+                    {row.preventiveAction ? (
+                      <p className="text-xs">Preventive: {String(row.preventiveAction)}</p>
+                    ) : null}
                     <Button
                       className="mt-2"
                       size="sm"

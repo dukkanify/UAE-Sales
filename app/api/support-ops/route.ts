@@ -6,14 +6,22 @@ import { authErrorResponse, getRequestContext, requirePermission } from "@/servi
 import { updatePlatformSettings } from "@/services/settings/settings-service";
 import {
   acknowledgeAlert,
+  addHypercareCheckIn,
   captureHealthLog,
   createBug,
   createChangeRequest,
+  createFeatureRequest,
+  createFeedback,
   createIncident,
+  createKnowledgeArticle,
+  createOptimizationNote,
   createRelease,
   createRoadmapItem,
   createSupportRequest,
   generateBackupReport,
+  getFeedbackMonthlySummary,
+  getHypercare,
+  getMaintenanceDashboard,
   getSlaPolicy,
   getSupportOpsSummary,
   getSystemHealthDashboard,
@@ -21,9 +29,13 @@ import {
   listBackupReports,
   listBugs,
   listChangeRequests,
+  listFeatureRequests,
+  listFeedback,
   listHealthLogs,
   listIncidents,
+  listKnowledgeArticles,
   listMaintenanceLogs,
+  listOptimizationNotes,
   listReleases,
   listRoadmapItems,
   listSupportRequests,
@@ -32,7 +44,12 @@ import {
   resolveAlert,
   updateBug,
   updateChangeRequest,
+  updateFeatureRequest,
+  updateFeedback,
+  updateHypercare,
   updateIncident,
+  updateKnowledgeArticle,
+  updateOptimizationNote,
   updateRoadmapItem,
   updateSlaPolicy,
   updateSupportRequest,
@@ -41,8 +58,13 @@ import type {
   AlertStatus,
   BugStatus,
   ChangeRequest,
+  CustomerFeedback,
   DevelopmentStatus,
+  FeatureApprovalStatus,
   IncidentStatus,
+  KnowledgeAudience,
+  KnowledgeCategory,
+  OptimizationNote,
   RoadmapStatus,
   SupportPriority,
   SupportRequest,
@@ -115,6 +137,65 @@ export async function GET(request: Request) {
         });
       case "backup-reports":
         return NextResponse.json({ success: true, data: listBackupReports(), error: null });
+      case "hypercare":
+        return NextResponse.json({ success: true, data: getHypercare(), error: null });
+      case "features":
+        return NextResponse.json({
+          success: true,
+          data: listFeatureRequests({
+            approvalStatus:
+              (searchParams.get("approvalStatus") as FeatureApprovalStatus | "all") || "all",
+            priority: (searchParams.get("priority") as SupportPriority | "all") || "all",
+            q: searchParams.get("q") ?? undefined,
+          }),
+          error: null,
+        });
+      case "knowledge":
+        return NextResponse.json({
+          success: true,
+          data: listKnowledgeArticles({
+            category: (searchParams.get("category") as KnowledgeCategory | "all") || "all",
+            audience: (searchParams.get("audience") as KnowledgeAudience | "all") || "all",
+            published:
+              searchParams.get("published") === "true"
+                ? true
+                : searchParams.get("published") === "false"
+                  ? false
+                  : "all",
+            q: searchParams.get("q") ?? undefined,
+          }),
+          error: null,
+        });
+      case "feedback":
+        return NextResponse.json({
+          success: true,
+          data: listFeedback({
+            category:
+              (searchParams.get("category") as CustomerFeedback["category"] | "all") || "all",
+            status: (searchParams.get("status") as CustomerFeedback["status"] | "all") || "all",
+          }),
+          error: null,
+        });
+      case "feedback-summary":
+        return NextResponse.json({
+          success: true,
+          data: getFeedbackMonthlySummary(searchParams.get("month") ?? undefined),
+          error: null,
+        });
+      case "optimization":
+        return NextResponse.json({
+          success: true,
+          data: listOptimizationNotes(
+            (searchParams.get("status") as OptimizationNote["status"] | "all") || "all",
+          ),
+          error: null,
+        });
+      case "maintenance-dashboard":
+        return NextResponse.json({
+          success: true,
+          data: getMaintenanceDashboard(),
+          error: null,
+        });
       default:
         return NextResponse.json(
           { success: false, data: null, error: `Unknown view: ${view}` },
@@ -147,7 +228,8 @@ export async function POST(request: Request) {
       case "update_sla": {
         const data = updateSlaPolicy(
           {
-            critical: body.critical as { responseHours: number; resolutionHours: number } | undefined,
+            critical: body.critical as
+              { responseHours: number; resolutionHours: number } | undefined,
             high: body.high as { responseHours: number; resolutionHours: number } | undefined,
             medium: body.medium as { responseHours: number; resolutionHours: number } | undefined,
             low: body.low as { responseHours: number; resolutionHours: number } | undefined,
@@ -281,9 +363,13 @@ export async function POST(request: Request) {
           title: String(body.title ?? ""),
           summary: String(body.summary ?? ""),
           severity: (body.severity as SupportPriority) || "high",
+          affectedModule: body.affectedModule != null ? String(body.affectedModule) : "general",
           affectedServices: Array.isArray(body.affectedServices)
             ? body.affectedServices.map(String)
             : [],
+          rootCause: body.rootCause != null ? String(body.rootCause) : null,
+          resolution: body.resolution != null ? String(body.resolution) : null,
+          preventiveAction: body.preventiveAction != null ? String(body.preventiveAction) : null,
           createdBy: user.id,
         });
         return NextResponse.json({ success: true, data, error: null }, { status: 201 });
@@ -293,6 +379,137 @@ export async function POST(request: Request) {
           status: body.status as IncidentStatus | undefined,
           postmortem: body.postmortem != null ? String(body.postmortem) : undefined,
           summary: body.summary != null ? String(body.summary) : undefined,
+          rootCause: body.rootCause != null ? String(body.rootCause) : undefined,
+          resolution: body.resolution != null ? String(body.resolution) : undefined,
+          preventiveAction:
+            body.preventiveAction != null ? String(body.preventiveAction) : undefined,
+          affectedModule: body.affectedModule != null ? String(body.affectedModule) : undefined,
+        });
+        return NextResponse.json({ success: true, data, error: null });
+      }
+      case "update_hypercare": {
+        const data = updateHypercare({
+          enabled: body.enabled != null ? Boolean(body.enabled) : undefined,
+          label: body.label != null ? String(body.label) : undefined,
+          startedAt: body.startedAt != null ? String(body.startedAt) : undefined,
+          endsAt: body.endsAt != null ? String(body.endsAt) : undefined,
+          notes: body.notes != null ? String(body.notes) : undefined,
+          watchModules: Array.isArray(body.watchModules)
+            ? body.watchModules.map(String)
+            : undefined,
+        });
+        return NextResponse.json({ success: true, data, error: null });
+      }
+      case "hypercare_checkin": {
+        const data = addHypercareCheckIn({
+          summary: String(body.summary ?? ""),
+          stability: (body.stability as "stable" | "degraded" | "critical") || "stable",
+          openCritical: body.openCritical != null ? Number(body.openCritical) : undefined,
+          openHigh: body.openHigh != null ? Number(body.openHigh) : undefined,
+          notes: body.notes != null ? String(body.notes) : undefined,
+          actorId: user.id,
+        });
+        return NextResponse.json({ success: true, data, error: null }, { status: 201 });
+      }
+      case "create_feature": {
+        const data = createFeatureRequest({
+          title: String(body.title ?? ""),
+          description: String(body.description ?? ""),
+          businessValue: String(body.businessValue ?? ""),
+          priority: (body.priority as SupportPriority) || "medium",
+          estimatedEffortHours:
+            body.estimatedEffortHours != null ? Number(body.estimatedEffortHours) : null,
+          estimatedCost: body.estimatedCost != null ? Number(body.estimatedCost) : null,
+          currency: body.currency != null ? String(body.currency) : "USD",
+          targetVersion: body.targetVersion != null ? String(body.targetVersion) : null,
+          requestedBy: user.id,
+        });
+        return NextResponse.json({ success: true, data, error: null }, { status: 201 });
+      }
+      case "update_feature": {
+        const data = updateFeatureRequest(
+          String(body.id),
+          {
+            title: body.title != null ? String(body.title) : undefined,
+            description: body.description != null ? String(body.description) : undefined,
+            businessValue: body.businessValue != null ? String(body.businessValue) : undefined,
+            priority: body.priority as SupportPriority | undefined,
+            estimatedEffortHours:
+              body.estimatedEffortHours != null ? Number(body.estimatedEffortHours) : undefined,
+            estimatedCost: body.estimatedCost != null ? Number(body.estimatedCost) : undefined,
+            approvalStatus: body.approvalStatus as FeatureApprovalStatus | undefined,
+            developmentStatus: body.developmentStatus as DevelopmentStatus | undefined,
+            targetVersion: body.targetVersion != null ? String(body.targetVersion) : undefined,
+          },
+          user.id,
+        );
+        return NextResponse.json({ success: true, data, error: null });
+      }
+      case "create_knowledge": {
+        const data = createKnowledgeArticle({
+          title: String(body.title ?? ""),
+          summary: String(body.summary ?? ""),
+          body: String(body.body ?? ""),
+          category: (body.category as KnowledgeCategory) || "faq",
+          audience: (body.audience as KnowledgeAudience) || "internal",
+          published: body.published != null ? Boolean(body.published) : true,
+          tags: Array.isArray(body.tags) ? body.tags.map(String) : [],
+          updatedBy: user.id,
+        });
+        return NextResponse.json({ success: true, data, error: null }, { status: 201 });
+      }
+      case "update_knowledge": {
+        const data = updateKnowledgeArticle(
+          String(body.id),
+          {
+            title: body.title != null ? String(body.title) : undefined,
+            summary: body.summary != null ? String(body.summary) : undefined,
+            body: body.body != null ? String(body.body) : undefined,
+            category: body.category as KnowledgeCategory | undefined,
+            audience: body.audience as KnowledgeAudience | undefined,
+            published: body.published != null ? Boolean(body.published) : undefined,
+            tags: Array.isArray(body.tags) ? body.tags.map(String) : undefined,
+          },
+          user.id,
+        );
+        return NextResponse.json({ success: true, data, error: null });
+      }
+      case "create_feedback": {
+        const data = createFeedback({
+          category: (body.category as CustomerFeedback["category"]) || "comment",
+          title: String(body.title ?? ""),
+          comment: String(body.comment ?? ""),
+          rating: body.rating != null ? Number(body.rating) : null,
+          submitterEmail: body.submitterEmail != null ? String(body.submitterEmail) : user.email,
+          submitterRole: body.submitterRole != null ? String(body.submitterRole) : user.role,
+        });
+        return NextResponse.json({ success: true, data, error: null }, { status: 201 });
+      }
+      case "update_feedback": {
+        const data = updateFeedback(String(body.id), {
+          status: body.status as CustomerFeedback["status"] | undefined,
+          linkedFeatureId: body.linkedFeatureId != null ? String(body.linkedFeatureId) : undefined,
+          linkedBugId: body.linkedBugId != null ? String(body.linkedBugId) : undefined,
+        });
+        return NextResponse.json({ success: true, data, error: null });
+      }
+      case "create_optimization": {
+        const data = createOptimizationNote({
+          area: (body.area as OptimizationNote["area"]) || "api",
+          title: String(body.title ?? ""),
+          finding: String(body.finding ?? ""),
+          recommendedAction: String(body.recommendedAction ?? body.finding ?? ""),
+          status: (body.status as OptimizationNote["status"]) || "open",
+        });
+        return NextResponse.json({ success: true, data, error: null }, { status: 201 });
+      }
+      case "update_optimization": {
+        const data = updateOptimizationNote(String(body.id), {
+          status: body.status as OptimizationNote["status"] | undefined,
+          recommendedAction:
+            body.recommendedAction != null ? String(body.recommendedAction) : undefined,
+          finding: body.finding != null ? String(body.finding) : undefined,
+          title: body.title != null ? String(body.title) : undefined,
         });
         return NextResponse.json({ success: true, data, error: null });
       }
