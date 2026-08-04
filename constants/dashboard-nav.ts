@@ -77,6 +77,7 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Assignments", href: "/instructor/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/instructor/quizzes", icon: "quizzes" },
   { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
+  { label: "Live Classes", href: "/instructor/classes", icon: "classes" },
   { label: "Wallet", href: "/instructor/wallet", icon: "wallet" },
   { label: "Reports", href: "/instructor/reports", icon: "reports" },
   { label: "Notifications", href: "/instructor/notifications", icon: "notifications" },
