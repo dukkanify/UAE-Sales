@@ -62,6 +62,21 @@ export const ACTIVITY_ACTIONS = {
   REMINDER_QUEUED: "classes.reminder_queued",
   REMINDER_SENT: "classes.reminder_sent",
   RECORDING_REGISTERED: "classes.recording_registered",
+  // Student learning
+  LESSON_STARTED: "learning.lesson_started",
+  LESSON_COMPLETED: "learning.lesson_completed",
+  PROGRESS_UPDATED: "learning.progress_updated",
+  NOTE_CREATED: "learning.note_created",
+  NOTE_UPDATED: "learning.note_updated",
+  NOTE_DELETED: "learning.note_deleted",
+  BOOKMARK_ADDED: "learning.bookmark_added",
+  BOOKMARK_REMOVED: "learning.bookmark_removed",
+  FAVORITE_ADDED: "learning.favorite_added",
+  FAVORITE_REMOVED: "learning.favorite_removed",
+  GOAL_CREATED: "learning.goal_created",
+  GOAL_UPDATED: "learning.goal_updated",
+  STUDY_SESSION_CREATED: "learning.study_session_created",
+  RESOURCE_DOWNLOADED: "learning.resource_downloaded",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];

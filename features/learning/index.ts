@@ -1,0 +1,10 @@
+export { LearningDashboardView } from "@/features/learning/components/learning-dashboard-view";
+export { MyCoursesView } from "@/features/learning/components/my-courses-view";
+export { CoursePlayerView } from "@/features/learning/components/course-player-view";
+export { FavoritesView } from "@/features/learning/components/favorites-view";
+export { NotesLibraryView } from "@/features/learning/components/notes-library-view";
+export { ResourceLibraryView } from "@/features/learning/components/resource-library-view";
+export { StudyPlannerView } from "@/features/learning/components/study-planner-view";
+export { LearningHistoryView } from "@/features/learning/components/learning-history-view";
+export { LearningSearchView } from "@/features/learning/components/learning-search-view";
+export { LearningCalendarPageView } from "@/features/learning/components/learning-calendar-view";
