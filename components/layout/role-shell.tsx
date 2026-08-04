@@ -45,6 +45,7 @@ import {
   KeyRound,
   Images,
   Library,
+  Rocket,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -123,6 +124,7 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   api: KeyRound,
   assets: Images,
   media: Library,
+  phase2: Rocket,
 };
 
 interface RoleShellProps {

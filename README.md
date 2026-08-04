@@ -4,7 +4,7 @@
 
 Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, AI assistant, mobile API, and production operations.
 
-**Project status:** **Version 1.0 GA** — final release & acceptance package under `docs/FINAL_RELEASE_025.md` and `docs/DOCUMENTATION_INDEX.md`.
+**Project status:** **Version 1.0 GA** — Phase 2 (v2.0) enterprise expansion roadmap under `docs/PHASE2_ENTERPRISE_ROADMAP.md`.
 
 ## Tech stack
 
@@ -71,12 +71,13 @@ npm run test:e2e
 | `docs/SOURCE_CODE_HANDOVER.md`     | Repository delivery    |
 | `docs/TRAINING.md`                 | Admin training         |
 
-Also: `DEPLOYMENT.md`, `SECURITY.md`, `BACKUP_DISASTER_RECOVERY.md`, `WARRANTY_SUPPORT.md`, `ROADMAP_V2.md`, `DEVELOPER_GUIDE.md`.
+Also: `DEPLOYMENT.md`, `SECURITY.md`, `BACKUP_DISASTER_RECOVERY.md`, `WARRANTY_SUPPORT.md`, `PHASE2_ENTERPRISE_ROADMAP.md`, `ROADMAP_V2.md`, `DEVELOPER_GUIDE.md`.
 
 ## Project structure
 
 ```
 app/              App Router pages, layouts, API routes
+apps/mobile/      Phase 2 React Native bootstrap (see README)
 components/       UI primitives + layout shells
 features/         Domain UI modules
 services/         Domain logic + JSON / integration services

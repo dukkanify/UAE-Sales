@@ -1,19 +1,18 @@
-# Release notes — ATPL PASS Task 026 (Brand assets)
+# Release notes — Phase 2 Enterprise Expansion Roadmap
 
 ## Highlights
 
-- Official company information confirmed (ATPL PASS, English only, ME@ABDULAZIZALSHOAIL.COM, Kuwait & Dubai, @ABDULAZIZ_ALSHOAIL)
-- Centralized branding config + runtime `BrandProvider` / public brand API
-- Super Admin Asset Manager, Aviation Media Library, Commercial License vault
-- Social link editors in Platform Settings; email footer social links expanded
-- Docs: `BRAND_ASSETS_026.md`
+- Authoritative **Version 2.0 / Phase 2** enterprise expansion roadmap (12 pillars)
+- Architecture target for multi-tenant SaaS (`ARCHITECTURE_V2.md`)
+- Initiative briefs under `docs/phase2/`
+- Non-breaking foundations: Phase 2 feature flags (default off), capability API, Super Admin roadmap UI, mobile bootstrap README
+- v1.0 behavior unchanged — flags do not enable unfinished product surfaces
 
 ## Notes
 
-No architecture redesign. Pending official palette/typography remain editable via settings without code changes. Drop logo masters into `public/brand/source/`.
+Full delivery of native apps, SaaS tenancy, proctoring, CRM/ERP, etc. remains **execution under separate release trains**. This tip ships the program plan and safe scaffolding only.
 
-### Prior releases
+### Prior
 
+- **Task 026** — Brand assets & media systems
 - **v1.0 GA (Task 025)** — Final release & acceptance
-- **v1.8 (Task 024)** — Enterprise refactoring
-- **v1.7 (Task 023)** — Project closure
