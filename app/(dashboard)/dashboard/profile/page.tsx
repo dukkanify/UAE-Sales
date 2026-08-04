@@ -1,28 +1,11 @@
-import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import { PageHeader } from "@/components/shared/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
+import { getCurrentSession } from "@/services/auth/auth-service";
+import { ROLE_DASHBOARD } from "@/constants/roles";
 import { routes } from "@/constants/routes";
 
-export const metadata: Metadata = {
-  title: "Profile",
-};
-
-export default function ProfilePage() {
-  return (
-    <div>
-      <PageHeader
-        title="Profile"
-        description="Manage your personal information."
-        breadcrumbs={[
-          { label: "Dashboard", href: routes.dashboard },
-          { label: "Profile" },
-        ]}
-      />
-      <EmptyState
-        title="Profile coming soon"
-        description="Profile editing will connect to the Supabase profiles table once business features begin."
-      />
-    </div>
-  );
+export default async function LegacyDashboardProfileRedirect() {
+  const { user } = await getCurrentSession();
+  if (!user) redirect(routes.login);
+  redirect(`${ROLE_DASHBOARD[user.role].replace(/\/dashboard$/, "")}/profile`);
 }
