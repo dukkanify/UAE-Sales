@@ -49,7 +49,11 @@ Use before promoting staging → production.
 - [ ] Analytics / reports
 - [ ] AI assistant FAB + hub
 - [ ] Run `npm run acceptance` against staging
-- [ ] Run `npm run uat` against staging (28 checks)
+- [ ] Run `npm run uat` against staging (includes Ops Center checks)
+- [ ] Ops Center health dashboard loads (`/super-admin/ops-center`)
+- [ ] SLA policy reviewed
+- [ ] Maintenance page message/ETA configured for planned windows
+- [ ] Backup verification report generated
 
 ## Documentation
 
