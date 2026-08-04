@@ -77,6 +77,23 @@ export const ACTIVITY_ACTIONS = {
   GOAL_UPDATED: "learning.goal_updated",
   STUDY_SESSION_CREATED: "learning.study_session_created",
   RESOURCE_DOWNLOADED: "learning.resource_downloaded",
+  // Assessment / quizzes
+  QUIZ_CREATED: "quizzes.created",
+  QUIZ_UPDATED: "quizzes.updated",
+  QUIZ_DELETED: "quizzes.deleted",
+  QUIZ_PUBLISHED: "quizzes.published",
+  QUIZ_UNPUBLISHED: "quizzes.unpublished",
+  QUIZ_ARCHIVED: "quizzes.archived",
+  QUIZ_DUPLICATED: "quizzes.duplicated",
+  QUESTION_CREATED: "quizzes.question_created",
+  QUESTION_UPDATED: "quizzes.question_updated",
+  QUESTION_DELETED: "quizzes.question_deleted",
+  QUESTION_IMPORTED: "quizzes.question_imported",
+  ATTEMPT_STARTED: "quizzes.attempt_started",
+  ATTEMPT_SAVED: "quizzes.attempt_saved",
+  ATTEMPT_SUBMITTED: "quizzes.attempt_submitted",
+  ATTEMPT_GRADED: "quizzes.attempt_graded",
+  SUSPICIOUS_ACTIVITY: "quizzes.suspicious_activity",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];
