@@ -1,17 +1,27 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "My courses" };
+import * as React from "react";
 
-export default function Page() {
+import { CourseCatalogView } from "@/features/courses/components/course-catalog-view";
+import { authFetch } from "@/features/auth/services/auth-api";
+import type { UserProfile } from "@/types";
+
+export default function InstructorCoursesPage() {
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    void authFetch<{ user: UserProfile }>("/api/auth/me").then((res) => {
+      setUserId(res.data?.user?.id ?? null);
+    });
+  }, []);
+
   return (
-    <ModulePlaceholder
+    <CourseCatalogView
       title="My courses"
-      description="Your assigned courses will appear here once curriculum modules ship."
-      role="instructor"
-      href="/instructor/courses"
-      icon="BookOpen"
-      emptyTitle="My courses module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
+      description="Courses assigned to you as primary or assistant instructor."
+      roleLabel="Instructor"
+      mode="instructor"
+      instructorId={userId}
     />
   );
 }

@@ -1,17 +1,7 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Courses" };
+import { CourseManagementView } from "@/features/courses/components/course-management-view";
 
-export default function Page() {
-  return (
-    <ModulePlaceholder
-      title="Courses"
-      description="Course catalog management arrives in the curriculum phase."
-      role="super-admin"
-      href="/super-admin/courses"
-      icon="BookOpen"
-      emptyTitle="Courses module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
-  );
+export default function SuperAdminCoursesPage() {
+  return <CourseManagementView basePath="/super-admin/courses" roleLabel="Super Admin" />;
 }
