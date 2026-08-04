@@ -17,6 +17,8 @@ import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
 import { format, addDays } from "date-fns";
 import { getCalendarEventsForUser } from "@/services/classes/calendar-service";
+import { ensureLearningSeeded } from "@/services/learning/seed";
+import { getLearningDashboard } from "@/services/learning/learning-service";
 import type { UserProfile } from "@/types";
 
 export { ensureDemoUsersSeeded };
@@ -195,18 +197,37 @@ export function getInstructorOverview() {
 
 export function getStudentOverview() {
   ensureCoursesSeeded();
+  ensureLearningSeeded();
+  const student = readAuthDb().users.find(
+    (u) => u.role === ROLES.STUDENT && u.status === ACCOUNT_STATUS.ACTIVE,
+  );
+  if (student) {
+    const learning = getLearningDashboard(toUserProfile(student));
+    return {
+      currentCourses: learning.activeCourses,
+      nextLiveClass: learning.upcomingLiveClass ?? "None scheduled",
+      progress: Math.round(learning.progressPercent),
+      certificates: 0,
+      notifications: learning.notifications,
+      assignments: learning.assignments,
+      quizzes: 0,
+      weeklyProgress: learning.weeklyGoalPercent,
+      attendance: 91,
+      learningHours: learning.learningHours,
+    };
+  }
   const enrolled = listCoursesForMetrics({ role: "student" });
   return {
     currentCourses: enrolled,
-    nextLiveClass: "IR Briefing · Tomorrow 14:00",
-    progress: 68,
-    certificates: 1,
-    notifications: 4,
-    assignments: 2,
-    quizzes: 1,
-    weeklyProgress: 42,
-    attendance: 91,
-    learningHours: 28,
+    nextLiveClass: "None scheduled",
+    progress: 0,
+    certificates: 0,
+    notifications: 0,
+    assignments: 0,
+    quizzes: 0,
+    weeklyProgress: 0,
+    attendance: 0,
+    learningHours: 0,
   };
 }
 
