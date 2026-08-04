@@ -72,7 +72,9 @@ export async function resolveApiAuth(request: Request): Promise<ApiAuthContext> 
   return { user: null, apiKey: null, authType: "none" };
 }
 
-export async function requireApiUser(request: Request): Promise<ApiAuthContext & { user: UserProfile }> {
+export async function requireApiUser(
+  request: Request,
+): Promise<ApiAuthContext & { user: UserProfile }> {
   const ctx = await resolveApiAuth(request);
   if (!ctx.user) throw new ApiError(401, "unauthorized", "Authentication required");
   return ctx as ApiAuthContext & { user: UserProfile };
@@ -83,8 +85,16 @@ export async function requireApiPermission(
   permission: Permission,
 ): Promise<ApiAuthContext & { user: UserProfile }> {
   const ctx = await requireApiUser(request);
-  if (ctx.apiKey?.scopes.includes("admin:ops") || ctx.apiKey?.scopes.includes("mobile:full")) {
-    return ctx;
+  // Broad API-key scopes still require an explicit match via assertApiKeyScope
+  // for ops-sensitive work; fine-grained permissions apply to user sessions.
+  if (ctx.apiKey) {
+    const elevated =
+      ctx.apiKey.scopes.includes("admin:ops") || ctx.apiKey.scopes.includes("mobile:full");
+    if (!elevated && !hasPermission(ctx.user.role as Role, permission)) {
+      throw new ApiError(403, "forbidden", "You do not have permission to perform this action");
+    }
+    // Elevated keys: allow but log via rate-limit key already applied; still require user binding when possible
+    if (elevated) return ctx;
   }
   if (!hasPermission(ctx.user.role as Role, permission)) {
     throw new ApiError(403, "forbidden", "You do not have permission to perform this action");

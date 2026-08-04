@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { ROLES } from "@/constants/roles";
+import { resolveDashboardScope } from "@/lib/security/dashboard-scope";
 import { authErrorResponse, requireAuth } from "@/services/auth/guards";
 import {
   getAdminOverview,
@@ -15,56 +17,83 @@ import {
   getRevenueSeries,
   getStudentOverview,
 } from "@/services/dashboard/metrics";
-import { ROLES } from "@/constants/roles";
 
 export async function GET(request: Request) {
   try {
     const user = await requireAuth();
     const { searchParams } = new URL(request.url);
-    const scope = searchParams.get("scope") ?? user.role;
+    const scope = resolveDashboardScope(user.role, searchParams.get("scope"));
 
-    const charts = {
-      growth: getGrowthSeries(),
-      revenue: getRevenueSeries(),
-      enrollments: getEnrollmentSeries(),
-      attendance: getAttendanceSeries(),
-      earnings: getEarningsSeries(),
-      progress: getProgressBreakdown(),
-    };
+    const calendar = getDashboardCalendarEvents();
+    const activity = getRecentActivityFeed();
 
-    const shared = {
-      calendar: getDashboardCalendarEvents(),
-      activity: getRecentActivityFeed(),
-      charts,
-    };
-
-    if (scope === "super_admin" || user.role === ROLES.SUPER_ADMIN) {
+    if (scope === ROLES.SUPER_ADMIN) {
       return NextResponse.json({
         success: true,
-        data: { overview: getPlatformOverview(), ...shared },
+        data: {
+          overview: getPlatformOverview(),
+          calendar,
+          activity,
+          charts: {
+            growth: getGrowthSeries(),
+            revenue: getRevenueSeries(),
+            enrollments: getEnrollmentSeries(),
+            attendance: getAttendanceSeries(),
+            earnings: getEarningsSeries(),
+            progress: getProgressBreakdown(),
+          },
+        },
         error: null,
       });
     }
 
-    if (scope === "admin" || user.role === ROLES.ADMIN) {
+    if (scope === ROLES.ADMIN) {
       return NextResponse.json({
         success: true,
-        data: { overview: getAdminOverview(), ...shared },
+        data: {
+          overview: getAdminOverview(),
+          calendar,
+          activity,
+          charts: {
+            growth: getGrowthSeries(),
+            enrollments: getEnrollmentSeries(),
+            attendance: getAttendanceSeries(),
+            progress: getProgressBreakdown(),
+          },
+        },
         error: null,
       });
     }
 
-    if (scope === "instructor" || user.role === ROLES.INSTRUCTOR) {
+    if (scope === ROLES.INSTRUCTOR) {
       return NextResponse.json({
         success: true,
-        data: { overview: getInstructorOverview(), ...shared },
+        data: {
+          overview: getInstructorOverview(),
+          calendar,
+          activity,
+          charts: {
+            attendance: getAttendanceSeries(),
+            earnings: getEarningsSeries(),
+            enrollments: getEnrollmentSeries(),
+            progress: getProgressBreakdown(),
+          },
+        },
         error: null,
       });
     }
 
     return NextResponse.json({
       success: true,
-      data: { overview: getStudentOverview(), ...shared },
+      data: {
+        overview: getStudentOverview(),
+        calendar,
+        activity,
+        charts: {
+          progress: getProgressBreakdown(),
+          attendance: getAttendanceSeries(),
+        },
+      },
       error: null,
     });
   } catch (error) {

@@ -30,6 +30,12 @@ export async function GET(request: Request) {
     }
 
     if (resolved === "executive") {
+      if (user.role !== ROLES.SUPER_ADMIN) {
+        return NextResponse.json(
+          { success: false, data: null, error: "Executive reports require Super Admin" },
+          { status: 403 },
+        );
+      }
       await requirePermission(PERMISSIONS.REPORTS_VIEW);
       // Super admin also has reports.view via ALL; allow CERTIFICATES_MANAGE path
       if (format === "csv") {
@@ -49,6 +55,12 @@ export async function GET(request: Request) {
     }
 
     if (resolved === "admin") {
+      if (user.role !== ROLES.ADMIN && user.role !== ROLES.SUPER_ADMIN) {
+        return NextResponse.json(
+          { success: false, data: null, error: "Admin reports require Admin or Super Admin" },
+          { status: 403 },
+        );
+      }
       await requirePermission(PERMISSIONS.REPORTS_VIEW);
       if (format === "csv") {
         const csv = await exportAdminReportCsv(user);
@@ -67,7 +79,10 @@ export async function GET(request: Request) {
     }
 
     await requirePermission(PERMISSIONS.REPORTS_OWN);
-    const instructorId = searchParams.get("instructorId") || user.id;
+    let instructorId = searchParams.get("instructorId") || user.id;
+    if (instructorId !== user.id && user.role !== ROLES.ADMIN && user.role !== ROLES.SUPER_ADMIN) {
+      instructorId = user.id;
+    }
     if (format === "csv") {
       const csv = await exportInstructorReportCsv(user, instructorId);
       return new NextResponse(csv, {
