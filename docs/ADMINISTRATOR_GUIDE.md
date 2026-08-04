@@ -11,9 +11,16 @@ Companion to the short ops checklist in `docs/ADMIN_MANUAL.md`.
 
 ## Daily operations
 
-1. **Monitoring** — online users, failed logins, warnings.  
-2. **System logs** — filter errors; confirm checklist items.  
-3. Uptime probe: `GET /api/health?ready=1`.
+1. **Ops Center** — health checks, open alerts, SLA breaches.  
+2. **Monitoring** — online users, failed logins, warnings.  
+3. **Ops / Backups** (system logs) — error category filter; run backups.  
+4. Uptime probe: `GET /api/health?ready=1`.
+
+## Support & bugs
+
+- Communication tickets: `/super-admin/support`  
+- Formal support + bug workflow + CRs: `/super-admin/ops-center`  
+- Configure SLA targets under Ops Center → SLA  
 
 ## User & course management
 
@@ -27,9 +34,16 @@ Companion to the short ops checklist in `docs/ADMIN_MANUAL.md`.
 - Investigate failed checkouts in payments reports (Super Admin).  
 - Keep Stripe keys only in server env.
 
+## Releases & roadmap
+
+- Record versioned releases and mark deployed after each production ship.  
+- Manage roadmap statuses (planned → completed / deferred).  
+- Approved change requests auto-appear on the roadmap.
+
 ## Security settings
 
 - Maintenance mode, IP blocklist, rate limits, feature flags (`ai`, `payments`, …).  
+- Prefer Ops Center for maintenance (message + ETA + contact).  
 - Keep `ENABLE_DEMO_OTP=false` in production.  
 - Rotate `AUTH_SECRET` if compromised.
 

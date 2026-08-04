@@ -2,9 +2,10 @@
 
 ## Daily
 
-1. Open **Monitoring** — online users, failed logins, warnings
-2. Open **System logs** — error category filter
-3. Confirm `/api/health?ready=1` via uptime tool
+1. Open **Ops Center** — health, alerts, SLA breaches  
+2. Open **Monitoring** — online users, failed logins, warnings  
+3. Open **Ops / Backups** — error category filter  
+4. Confirm `/api/health?ready=1` via uptime tool
 
 ## Weekly
 
