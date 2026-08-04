@@ -1,0 +1,20 @@
+export { StatCard } from "./stat-card";
+export {
+  ChartCard,
+  AreaTrendChart,
+  LineTrendChart,
+  BarsChart,
+  DonutChart,
+  CHART_COLORS,
+} from "./charts";
+export type { SeriesPoint } from "./charts";
+export { QuickActions } from "./quick-actions";
+export type { QuickAction } from "./quick-actions";
+export { RecentActivity } from "./recent-activity";
+export type { ActivityItem } from "./recent-activity";
+export { CalendarWidget } from "./calendar-widget";
+export type { CalendarEvent } from "./calendar-widget";
+export { DataTable } from "./data-table";
+export type { DataTableColumn } from "./data-table";
+export { ProgressWidget } from "./progress-widget";
+export { ModulePlaceholder } from "./module-placeholder";

@@ -1,25 +1,15 @@
-import type { Metadata } from "next";
+"use client";
 
-import { PageHeader } from "@/components/shared/page-header";
-import { EmptyState } from "@/components/shared/empty-state";
-
-export const metadata: Metadata = { title: "Manage Users" };
+import { UserManagementTable } from "@/features/users/components/user-management-table";
 
 export default function AdminUsersPage() {
   return (
-    <div>
-      <PageHeader
-        title="Users"
-        description="Manage students and instructors. Creating admins is Super Admin only."
-        breadcrumbs={[
-          { label: "Admin", href: "/admin/dashboard" },
-          { label: "Users" },
-        ]}
-      />
-      <EmptyState
-        title="User management foundation"
-        description="CRUD interfaces for students and instructors will use the RBAC permission layer already in place."
-      />
-    </div>
+    <UserManagementTable
+      title="Users"
+      description="Manage students and instructors. Creating admins is Super Admin only."
+      roleFilter={null}
+      emptyTitle="No users found"
+      emptyAction={{ label: "Add student", href: "/admin/students" }}
+    />
   );
 }
