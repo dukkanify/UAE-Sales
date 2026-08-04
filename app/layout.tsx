@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Outfit } from "next/font/google";
+import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
 
 import { AppProviders } from "@/providers/app-providers";
 import { siteConfig } from "@/config/site";
@@ -13,9 +13,9 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
-const outfit = Outfit({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-outfit",
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
@@ -79,7 +79,7 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
-      className={`${dmSans.variable} ${outfit.variable}`}
+      className={`${dmSans.variable} ${plusJakarta.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen font-sans antialiased">

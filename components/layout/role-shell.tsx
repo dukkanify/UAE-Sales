@@ -60,6 +60,7 @@ import { DASHBOARD_NAV, type DashboardIcon, type DashboardNavItem } from "@/cons
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { CommandPalette } from "@/components/navigation/command-palette";
 
 const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
@@ -226,9 +227,11 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
   const items = navItems ?? DASHBOARD_NAV[role];
   const [collapsed, setCollapsed] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [commandOpen, setCommandOpen] = React.useState(false);
 
   return (
     <div className="flex min-h-screen bg-background">
+      <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
       <div className="hidden lg:block">
         <RoleSidebar
           role={role}
@@ -272,8 +275,9 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
               <SearchInput
                 value={search}
                 onChange={setSearch}
-                placeholder="Search dashboard..."
+                placeholder="Search dashboard… (⌘K)"
                 aria-label="Global search"
+                onFocus={() => setCommandOpen(true)}
               />
             </div>
 

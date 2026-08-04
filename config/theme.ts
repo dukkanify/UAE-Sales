@@ -49,8 +49,8 @@ export const theme = {
     foreground: "#0B1F3A",
   },
   radius: {
-    sm: "0.375rem",
-    md: "0.5rem",
+    sm: "0.5rem",
+    md: "0.625rem",
     lg: "0.75rem",
     xl: "1rem",
   },
