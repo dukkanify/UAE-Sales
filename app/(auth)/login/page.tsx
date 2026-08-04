@@ -26,6 +26,7 @@ export default function LoginPage() {
           <CardTitle>Sign in</CardTitle>
           <CardDescription>
             Enter your email to receive a one-time verification code.
+            Demo Super Admin: superadmin@eagerpilots.com / OTP 123456
           </CardDescription>
         </CardHeader>
         <CardContent>

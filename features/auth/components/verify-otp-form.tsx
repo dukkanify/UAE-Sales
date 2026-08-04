@@ -9,21 +9,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { verifyOtpSchema } from "@/utils/validation";
 import { sanitizeEmail } from "@/utils/sanitize";
-import { verifyOtp } from "@/services/auth/auth-service";
+import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
+import { useAuth } from "@/providers/auth-provider";
+import type { UserProfile } from "@/types";
 
 function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refresh, setUser } = useAuth();
   const [email, setEmail] = React.useState(searchParams.get("email") ?? "");
   const [token, setToken] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const purpose = (searchParams.get("purpose") ?? "login") as
+    | "login"
+    | "register"
+    | "reset_password"
+    | "verify_email";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = verifyOtpSchema.safeParse({
       email: sanitizeEmail(email),
       token: token.trim(),
+      purpose,
     });
 
     if (!parsed.success) {
@@ -33,13 +42,30 @@ function VerifyOtpForm() {
 
     setPending(true);
     try {
-      const result = await verifyOtp(parsed.data);
-      if (!result.success) {
+      const result = await authFetch<{
+        user: UserProfile;
+        redirectTo: string;
+        requiresProfile: boolean;
+      }>(routes.api.auth.verifyOtp, {
+        method: "POST",
+        body: JSON.stringify(parsed.data),
+      });
+
+      if (!result.success || !result.data) {
         toast.error(result.error ?? "Verification failed");
         return;
       }
+
+      if (purpose === "reset_password") {
+        toast.success("Code verified. Set your new password.");
+        router.replace(result.data.redirectTo);
+        return;
+      }
+
+      setUser(result.data.user);
+      await refresh();
       toast.success("Signed in successfully");
-      router.replace(routes.dashboard);
+      router.replace(result.data.redirectTo);
     } finally {
       setPending(false);
     }
@@ -71,6 +97,9 @@ function VerifyOtpForm() {
           onChange={(e) => setToken(e.target.value.replace(/\D/g, "").slice(0, 6))}
           required
         />
+        <p className="text-xs text-muted-foreground">
+          Demo mode uses code <span className="font-medium text-foreground">123456</span>
+        </p>
       </div>
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Verifying..." : "Verify and continue"}

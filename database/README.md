@@ -2,29 +2,48 @@
 
 ## Overview
 
-PostgreSQL hosted on **Supabase**, with:
+PostgreSQL on **Supabase** with:
 
-- Auth (`auth.users`)
-- Profiles table with RLS
-- Storage bucket `aep-uploads`
-- Optional Prisma ORM for complex queries
+- Auth (`auth.users`) + Email OTP
+- Profiles, Roles, Permissions, Role Permissions
+- Sessions, Notifications, Activity Logs, Audit Logs
+- Countries, Settings
+- Row Level Security on all sensitive tables
 
-## Setup
+## Migrations
 
-1. Create a Supabase project
-2. Copy credentials into `.env.local` (see `.env.example`)
-3. Run `database/migrations/001_initial_schema.sql` in the Supabase SQL editor
-4. (Optional) `npx prisma generate --schema=database/prisma/schema.prisma`
+| File | Purpose |
+|------|---------|
+| `001_initial_schema.sql` | Legacy slim profiles (superseded) |
+| `002_auth_rbac_schema.sql` | Full auth + RBAC schema |
+| `003_seed_permissions_countries.sql` | Permissions, role maps, countries, settings |
+
+Run `002` then `003` in the Supabase SQL editor for a fresh project.
+
+## Local development store
+
+When Supabase env vars are unset, the app uses `.data/aep-auth.json` for users, sessions, OTP challenges, notifications, and logs so authentication works end-to-end locally.
+
+## Super Admin seeder
+
+On first boot, a Super Admin is created from:
+
+- `SUPER_ADMIN_EMAIL` (default `superadmin@eagerpilots.com`)
+- `SUPER_ADMIN_FIRST_NAME` / `SUPER_ADMIN_LAST_NAME`
+
+Sign in with that email and demo OTP `123456` (when `ENABLE_DEMO_OTP=true`).
 
 ## Roles
 
-| Role | Description |
-|------|-------------|
-| `student` | Default learner |
-| `instructor` | Training staff |
-| `admin` | Platform administrator |
-| `super_admin` | Full system access |
+| Role | Dashboard |
+|------|-----------|
+| `student` | `/student/dashboard` |
+| `instructor` | `/instructor/dashboard` |
+| `admin` | `/admin/dashboard` |
+| `super_admin` | `/super-admin/dashboard` |
 
-## RLS
+## Prisma (optional)
 
-All profile reads/writes are gated by Row Level Security. Users can only update their own non-role fields. Admins can read all profiles.
+```bash
+npx prisma generate --schema=database/prisma/schema.prisma
+```
