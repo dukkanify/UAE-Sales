@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" role="img" aria-label="Aviation sky backdrop">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F3A"/>
+      <stop offset="0.45" stop-color="#163A62"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="horizon" x1="0" y1="620" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071426" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#0B1F3A" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <rect width="1440" height="900" fill="url(#sky)"/>
+  <ellipse cx="1180" cy="180" rx="220" ry="90" fill="#38BDF8" fill-opacity="0.18"/>
+  <ellipse cx="320" cy="240" rx="160" ry="60" fill="#FFFFFF" fill-opacity="0.08"/>
+  <path d="M0 640C240 580 480 700 720 640C960 580 1200 700 1440 620V900H0V640Z" fill="url(#horizon)"/>
+  <path d="M220 520L420 470L980 430L1220 455L980 480L420 520L220 520Z" fill="#E8EEF5" fill-opacity="0.12"/>
+  <circle cx="1080" cy="210" r="8" fill="#FFFFFF" fill-opacity="0.7"/>
+  <circle cx="240" cy="160" r="4" fill="#FFFFFF" fill-opacity="0.55"/>
+  <circle cx="560" cy="120" r="3" fill="#FFFFFF" fill-opacity="0.45"/>
+</svg>
