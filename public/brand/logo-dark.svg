@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" role="img" aria-label="ATPL PASS">
+  <rect x="0" y="8" width="64" height="64" rx="14" fill="#38BDF8"/>
+  <path d="M12 42L40 22L68 42L58 44L40 32L22 44L12 42Z" fill="#0B1F3A" transform="translate(-8 0)"/>
+  <path d="M30 36V54H34V36H30Z" fill="#FFFFFF"/>
+  <path d="M24 54H40V58H24V54Z" fill="#FFFFFF" fill-opacity="0.9"/>
+  <text x="80" y="36" font-family="Outfit, Arial, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF">ATPL PASS</text>
+  <text x="80" y="58" font-family="DM Sans, Arial, sans-serif" font-size="12" font-weight="500" fill="#BAE6FD" letter-spacing="0.08em">AVIATION EDUCATION</text>
+</svg>

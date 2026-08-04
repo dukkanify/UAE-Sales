@@ -2,21 +2,16 @@
 
 ## Cursor Cloud specific instructions
 
-This repo is **Aviation Education Platform (AEP)** — Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS 4 for **Eager Pilots for Aviation Consultation and Training**.
+This repo is **Aviation Education Platform (AEP)** — Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS 4 for **ATPL PASS**.
 
-### Auth & data
+Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `typecheck`); see `README.md`. Notes:
 
-- Local auth store (`.data/aep-auth.json`) when Supabase is unset — OTP login works with `ENABLE_DEMO_OTP=true` / `DEMO_OTP_CODE=123456`
+- Dev server: `npm run dev` serves the app on `http://localhost:3000` (Turbopack, hot reload).
 - Super Admin auto-seeded from `SUPER_ADMIN_EMAIL` (default `superadmin@eagerpilots.com`)
-- Role dashboards: `/student`, `/instructor`, `/admin`, `/super-admin`
-- SQL migrations under `database/migrations/` (002 + 003 for full RBAC)
-- Permission checks via `constants/permissions.ts` + `services/auth/guards.ts`
+- Demo OTP: `ENABLE_DEMO_OTP=true`, code `123456`
+- Auth works without Supabase via local store `.data/aep-auth.json`
+- Platform settings work via `.data/aep-settings.json` (Super Admin → Platform Settings)
+- No env vars are required for the mock/local data flow.
+- Validate changes via `npm run lint`, `npm run typecheck`, `npm run build`, and manual browser testing.
 
-### Commands
-
-- `npm run dev` → `http://localhost:3000`
-- Validate with `npm run lint`, `npm run typecheck`, `npm run build`
-
-### Brand
-
-**Eager Pilots** — English LTR — aviation theme (deep blue / sky blue / light gray).
+**ATPL PASS** — English LTR — aviation theme (deep blue / sky blue / light gray). Official brand guidelines pending; update via `config/branding.ts` or Super Admin branding settings.

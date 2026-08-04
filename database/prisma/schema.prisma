@@ -91,6 +91,7 @@ model Profile {
   emailVerified   Boolean       @default(false) @map("email_verified")
   profileComplete Boolean       @default(false) @map("profile_complete")
   lastLoginAt     DateTime?     @map("last_login_at") @db.Timestamptz(6)
+  deletedAt       DateTime?     @map("deleted_at") @db.Timestamptz(6)
   createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -100,6 +101,7 @@ model Profile {
   @@index([role])
   @@index([status])
   @@index([email])
+  @@index([deletedAt])
   @@map("profiles")
 }
 

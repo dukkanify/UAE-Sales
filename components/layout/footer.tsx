@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Plane } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 import { Separator } from "@/components/ui/separator";
+import { BrandLogo } from "@/components/brand/brand-logo";
 
 function Footer() {
   const year = new Date().getFullYear();
@@ -13,14 +13,9 @@ function Footer() {
       <div className="container-app py-12">
         <div className="grid gap-10 md:grid-cols-3">
           <div className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                <Plane className="h-4 w-4" aria-hidden />
-              </span>
-              <span className="font-display text-lg font-semibold">{siteConfig.name}</span>
-            </div>
+            <BrandLogo variant="dark" href={routes.home} />
             <p className="max-w-sm text-sm text-primary-foreground/70">
-              {siteConfig.legalName}. Professional aviation education and consultation.
+              {siteConfig.description} Primary locations: {siteConfig.locations.join(" · ")}.
             </p>
           </div>
 
@@ -62,6 +57,17 @@ function Footer() {
                   {siteConfig.contactEmail}
                 </a>
               </li>
+              <li>
+                <a
+                  href={siteConfig.social.instagram}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-accent"
+                >
+                  {siteConfig.socialHandle}
+                </a>
+              </li>
+              <li>{siteConfig.locations.join(" · ")}</li>
             </ul>
           </div>
         </div>
@@ -69,7 +75,7 @@ function Footer() {
         <Separator className="my-8 bg-primary-foreground/15" />
 
         <p className="text-center text-xs text-primary-foreground/60">
-          © {year} {siteConfig.name}. All rights reserved.
+          © {year} {siteConfig.name}. All rights reserved. English only.
         </p>
       </div>
     </footer>

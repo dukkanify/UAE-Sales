@@ -7,7 +7,7 @@ import { z } from "zod";
 
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
-  NEXT_PUBLIC_APP_NAME: z.string().default("Eager Pilots"),
+  NEXT_PUBLIC_APP_NAME: z.string().default("ATPL PASS"),
   NEXT_PUBLIC_APP_ENV: z
     .enum(["development", "staging", "production"])
     .default("development"),

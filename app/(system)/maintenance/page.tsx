@@ -11,7 +11,7 @@ export default function MaintenancePage() {
   return (
     <SystemPage
       title="We'll be right back"
-      description="Eager Pilots is undergoing scheduled maintenance. Please check again shortly."
+      description="ATPL PASS is undergoing scheduled maintenance. Please check again shortly."
       actionLabel="Refresh home"
     />
   );

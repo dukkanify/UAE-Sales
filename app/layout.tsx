@@ -26,11 +26,12 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.name }],
   keywords: [
-    "aviation",
-    "pilot training",
+    "ATPL PASS",
+    "ATPL training",
     "aviation education",
-    "flight consultation",
-    "Eager Pilots",
+    "pilot training",
+    "Kuwait",
+    "Dubai",
   ],
   openGraph: {
     type: "website",
@@ -39,11 +40,23 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     title: APP_METADATA.title.default,
     description: APP_METADATA.description,
+    images: [{ url: siteConfig.brand.openGraph, width: 1200, height: 630, alt: siteConfig.name }],
   },
   twitter: {
     card: "summary_large_image",
     title: APP_METADATA.title.default,
     description: APP_METADATA.description,
+    images: [siteConfig.brand.openGraph],
+  },
+  icons: {
+    icon: [{ url: siteConfig.brand.favicon, type: "image/svg+xml" }],
+    apple: [{ url: siteConfig.brand.icon }],
+  },
+  alternates: {
+    languages: { en: "/" },
+  },
+  other: {
+    "content-language": "en",
   },
   robots: {
     index: true,
