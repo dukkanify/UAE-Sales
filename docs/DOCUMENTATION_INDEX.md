@@ -4,16 +4,14 @@ Master index for **Version 1.0 GA** (Task 025). Prior closure materials (Task 02
 
 ## Start here (GA)
 
-1. `docs/FINAL_RELEASE_025.md`
-2. `docs/CLIENT_ACCEPTANCE_025.md`
-3. `docs/PRODUCTION_READINESS_025.md`
-4. `docs/BRAND_ASSETS_026.md`
-5. `docs/PHASE2_ENTERPRISE_ROADMAP.md`
-6. `docs/PRODUCTION_MODULE_VERIFICATION_025.md`
-7. `docs/OWNERSHIP_TRANSFER_025.md`
-8. `docs/WARRANTY_ACTIVATION_025.md`
-9. `docs/SUCCESS_METRICS_90D.md`
-10. `docs/V2_BACKLOG.md`
+1. `docs/ENTERPRISE_AUDIT_FINAL.md` ← **latest critical audit**
+2. `docs/FINAL_RELEASE_025.md`
+3. `docs/CLIENT_ACCEPTANCE_025.md`
+4. `docs/PRODUCTION_READINESS_025.md`
+5. `docs/BRAND_ASSETS_026.md`
+6. `docs/PHASE2_ENTERPRISE_ROADMAP.md`
+7. `docs/KNOWN_LIMITATIONS.md`
+8. `docs/TECHNICAL_DEBT.md`
 
 ## People guides & training
 
