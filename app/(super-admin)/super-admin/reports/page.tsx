@@ -1,17 +1,7 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Reports" };
+import { ReportsDashboardView } from "@/features/certificates";
 
-export default function Page() {
-  return (
-    <ModulePlaceholder
-      title="Reports"
-      description="Cross-platform analytics and exportable reports."
-      role="super-admin"
-      href="/super-admin/reports"
-      icon="BarChart3"
-      emptyTitle="Reports module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
-  );
+export default function SuperAdminReportsPage() {
+  return <ReportsDashboardView roleLabel="Super Admin" scope="executive" />;
 }
