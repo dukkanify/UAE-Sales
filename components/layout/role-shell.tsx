@@ -38,6 +38,7 @@ import {
   Bell,
   BarChart3,
   LineChart,
+  Sparkles,
   Layers,
   UsersRound,
 } from "lucide-react";
@@ -71,6 +72,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { CommandPalette } from "@/components/navigation/command-palette";
+import { FloatingAiAssistant } from "@/features/ai";
 
 const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
@@ -87,6 +89,7 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   wallets: Wallet,
   reports: BarChart3,
   analytics: LineChart,
+  ai: Sparkles,
   settings: Settings,
   logs: Activity,
   notifications: Bell,
@@ -324,6 +327,7 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
           </AnimatePresence>
         </main>
       </div>
+      <FloatingAiAssistant />
     </div>
   );
 }

@@ -12,6 +12,7 @@ export const FEATURE_FLAG_KEYS = [
   "wallet",
   "courses",
   "calendar",
+  "ai",
 ] as const;
 
 export type FeatureFlagKey = (typeof FEATURE_FLAG_KEYS)[number];
