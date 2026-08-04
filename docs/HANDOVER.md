@@ -1,65 +1,60 @@
 # Client handover package — ATPL PASS
 
-**Milestone:** Task 022 — Final project audit & enterprise readiness  
-**Branch tip:** `cursor/aep-enterprise-audit-0987`  
-**Validation:** see `docs/FINAL_SYSTEM_VALIDATION.md` · audit `docs/ENTERPRISE_READINESS_022.md` · ops `docs/POST_LAUNCH_SUPPORT.md`
+**Milestone:** Task 023 — Project completion, knowledge transfer & operational handover  
+**Branch tip:** `cursor/aep-project-closure-0987`  
+**Start here:** `docs/DOCUMENTATION_INDEX.md` · `docs/PROJECT_CLOSURE_REPORT.md` · `docs/FINAL_PROJECT_ACCEPTANCE.md`
 
 ## Delivery summary
 
-ATPL PASS is **code-complete for launch** pending:
+ATPL PASS development is **complete**. This package transfers ownership for long-term operation.
 
-1. Client production environment configuration (Vercel domain/SSL/CDN, secrets).
-2. Optional Supabase cutover for durable multi-instance data.
-3. Client UAT sign-off on staging/production (`docs/UAT_APPROVAL.md`).
-4. Contractual payment milestones before private source / credential release.
+Remaining client actions:
+
+1. Sign `docs/FINAL_PROJECT_ACCEPTANCE.md` after UAT.
+2. Configure production env / domain (see infrastructure + credentials docs).
+3. Complete training attendance records.
+4. Receive secrets via secure vault (never via git).
+5. Activate warranty / support channels.
 
 ## Package contents
 
-| Item                         | Location                                                                                            |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- |
-| Architecture overview        | `docs/ARCHITECTURE.md`                                                                              |
-| Enterprise audit (Task 022)  | `docs/ENTERPRISE_READINESS_022.md`, `docs/ENTERPRISE_AUDIT.md`, `docs/SECURITY_REVIEW_022.md`       |
-| Production readiness         | `docs/PRODUCTION.md`, `docs/PRODUCTION_OPTIMIZATION.md`                                             |
-| Final system validation      | `docs/FINAL_SYSTEM_VALIDATION.md`                                                                   |
-| Final security audit         | `docs/FINAL_SECURITY_AUDIT.md`                                                                      |
-| Final acceptance checklist   | `docs/FINAL_ACCEPTANCE_CHECKLIST.md`                                                                |
-| Launch checklist             | `docs/PRODUCTION_CHECKLIST.md`                                                                      |
-| QA report                    | `docs/QA_REPORT.md`                                                                                 |
-| Bug tracker                  | `docs/BUG_TRACKER.md`                                                                               |
-| UAT approval form            | `docs/UAT_APPROVAL.md`                                                                              |
-| Student guide                | `docs/STUDENT_GUIDE.md`                                                                             |
-| Instructor guide / manual    | `docs/INSTRUCTOR_GUIDE.md`                                                                          |
-| Administrator guide / manual | `docs/ADMINISTRATOR_GUIDE.md`, `docs/ADMIN_MANUAL.md`                                               |
-| Administrator training       | `docs/TRAINING.md`                                                                                  |
-| API documentation            | `docs/API_OVERVIEW.md`, `docs/MOBILE_API.md`, `GET /api/v1/openapi`                                 |
-| Deployment guide             | `docs/DEPLOYMENT.md`                                                                                |
-| Environment setup            | `docs/ENVIRONMENT_SETUP.md`                                                                         |
-| Database schema              | `docs/DATABASE_SCHEMA.md`, `database/migrations/`                                                   |
-| Maintenance guide            | `docs/MAINTENANCE.md`                                                                               |
-| Warranty & support           | `docs/WARRANTY_SUPPORT.md`, `docs/SUPPORT.md`, `docs/OPS_SUPPORT.md`, `docs/POST_LAUNCH_SUPPORT.md` |
-| Backup / DR                  | `docs/BACKUP_DISASTER_RECOVERY.md`                                                                  |
-| Security                     | `docs/SECURITY.md`                                                                                  |
-| Known limitations            | `docs/KNOWN_LIMITATIONS.md`                                                                         |
-| Roadmap                      | `docs/ROADMAP.md`                                                                                   |
-| Release notes                | `docs/RELEASE_NOTES.md`                                                                             |
-| Testing strategy             | `docs/TESTING.md`                                                                                   |
+| Item                                | Location                                                                                |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| Documentation index                 | `docs/DOCUMENTATION_INDEX.md`                                                           |
+| Project closure report              | `docs/PROJECT_CLOSURE_REPORT.md`                                                        |
+| Completion checklist                | `docs/PROJECT_COMPLETION_CHECKLIST.md`                                                  |
+| Final acceptance form               | `docs/FINAL_PROJECT_ACCEPTANCE.md`                                                      |
+| Source code handover                | `docs/SOURCE_CODE_HANDOVER.md`                                                          |
+| Infrastructure handover             | `docs/INFRASTRUCTURE_HANDOVER.md`                                                       |
+| Credentials register (template)     | `docs/CREDENTIALS_REGISTER.md`                                                          |
+| Administrator training              | `docs/TRAINING.md`                                                                      |
+| Instructor training                 | `docs/INSTRUCTOR_TRAINING.md`                                                           |
+| Support training                    | `docs/SUPPORT_TRAINING.md`                                                              |
+| Student / Instructor / Admin guides | `STUDENT_GUIDE.md`, `INSTRUCTOR_GUIDE.md`, `ADMINISTRATOR_GUIDE.md`                     |
+| API / DB / Deploy / Backup          | `API_OVERVIEW.md`, `DATABASE_SCHEMA.md`, `DEPLOYMENT.md`, `BACKUP_DISASTER_RECOVERY.md` |
+| Warranty & support                  | `WARRANTY_SUPPORT.md`, `SUPPORT.md`, `POST_LAUNCH_SUPPORT.md`                           |
+| Enterprise audit                    | `ENTERPRISE_READINESS_022.md`                                                           |
+| Roadmaps                            | `ROADMAP.md` (1.1), `ROADMAP_V2.md` (2.0)                                               |
+| Release notes                       | `RELEASE_NOTES.md`                                                                      |
+| Known limitations                   | `KNOWN_LIMITATIONS.md`                                                                  |
 
 ## Access (fill at go-live)
 
-| Field             | Value                                                   |
-| ----------------- | ------------------------------------------------------- |
-| Production URL    | _fill after Vercel promote_                             |
-| Staging URL       | _fill after preview deploy_                             |
-| Source repository | GitHub (this project) — release access per contract     |
-| Super Admin       | `superadmin@eagerpilots.com` → **rotate** in production |
-| Admin             | `admin@eagerpilots.com` → rotate                        |
-| Instructor demo   | `instructor.one@eagerpilots.com` → disable or rotate    |
-| Student demo      | `student.one@eagerpilots.com` → disable or rotate       |
-| Demo OTP          | **Disable in production** (`ENABLE_DEMO_OTP=false`)     |
+| Field             | Value                                    |
+| ----------------- | ---------------------------------------- |
+| Production URL    | _fill after Vercel promote_              |
+| Staging URL       | _fill after preview deploy_              |
+| Source repository | GitHub — access per contract             |
+| Super Admin       | rotate demo `superadmin@eagerpilots.com` |
+| Demo OTP          | **Disable** (`ENABLE_DEMO_OTP=false`)    |
 
-## Administrator training
+## Training
 
-Complete `docs/TRAINING.md` agenda (~90 min). Record attendees on that form.
+| Audience       | Session doc                   | Duration |
+| -------------- | ----------------------------- | -------- |
+| Administrators | `docs/TRAINING.md`            | ~90 min  |
+| Instructors    | `docs/INSTRUCTOR_TRAINING.md` | ~60 min  |
+| Support team   | `docs/SUPPORT_TRAINING.md`    | ~45 min  |
 
 ## Support
 
@@ -70,34 +65,18 @@ Complete `docs/TRAINING.md` agenda (~90 min). Record attendees on that form.
 | Vendor / Dukkanify | dukkanify@gmail.com |
 | Incident channel   | _fill Slack/email_  |
 
-Process & SLA: `docs/WARRANTY_SUPPORT.md`.
-
-## Deployment information
-
-1. Configure Vercel project + production env from `.env.production.example`.
-2. Attach custom domain (SSL automatic).
-3. Optional: apply `database/migrations/` on Supabase + storage bucket.
-4. Deploy `main` after merge of this tip (or agreed release tag).
-5. Run `docs/FINAL_ACCEPTANCE_CHECKLIST.md` / `docs/PRODUCTION_CHECKLIST.md`.
-6. Confirm monitoring on `/api/health?ready=1`.
-7. Verify backup + restore test in production Ops UI.
-
-## Project files
-
-- Env templates: `.env.example`, `.env.production.example`
-- Migrations: `database/migrations/`
-- CI: `.github/workflows/ci.yml`
-- Scripts: `npm run backup`, `uat`, `acceptance`, `test`, `test:e2e`
-
 ## Handover acknowledgement
 
-| Field                  | Value            |
-| ---------------------- | ---------------- |
-| Client representative  | ________________ |
-| Vendor representative  | ________________ |
-| Date                   | ________________ |
-| Documentation received | ☐                |
-| Training completed     | ☐                |
-| UAT approved           | ☐                |
-| Production operational | ☐                |
-| Support phase started  | ☐                |
+| Field                        | Value            |
+| ---------------------------- | ---------------- |
+| Client representative        | ________________ |
+| Vendor representative        | ________________ |
+| Date                         | ________________ |
+| Documentation received       | ☐                |
+| Training completed           | ☐                |
+| Credentials received (vault) | ☐                |
+| Repository access granted    | ☐                |
+| Infrastructure transferred   | ☐                |
+| UAT approved                 | ☐                |
+| Support phase started        | ☐                |
+| Final acceptance signed      | ☐                |

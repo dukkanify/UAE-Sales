@@ -2,7 +2,9 @@
 
 **ATPL PASS — Professional ATPL training**
 
-Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, and AI assistant. Production readiness guides live under `docs/PRODUCTION.md`.
+Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, AI assistant, mobile API, and production operations.
+
+**Project status:** Development complete — operational handover package under `docs/DOCUMENTATION_INDEX.md` and `docs/PROJECT_CLOSURE_REPORT.md`.
 
 ## Tech stack
 
@@ -23,47 +25,26 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Demo OTP `123456` (disabled in production).
+Open [http://localhost:3000](http://localhost:3000). Demo OTP `123456` (**must be disabled in production**).
 
 ## Environment
 
-See `.env.example` and `.env.production.example`. Set a strong `AUTH_SECRET` before production.
+| File                      | Use                                   |
+| ------------------------- | ------------------------------------- |
+| `.env.example`            | Local / development template          |
+| `.env.production.example` | Production / Vercel secrets checklist |
 
-## Production ops
+Never commit real secrets. Use `docs/CREDENTIALS_REGISTER.md` (external vault).
+
+## Validation & build
 
 ```bash
 npm run lint && npm run typecheck && npm run test && npm run build
 npm run backup
 npm run acceptance   # requires running server
-npm run uat          # full multi-role HTTP UAT
-npm run test:e2e     # Playwright
+npm run uat
+npm run test:e2e
 ```
-
-**Handover:** `docs/HANDOVER.md` · **Final checklist:** `docs/FINAL_ACCEPTANCE_CHECKLIST.md`  
-Also: `docs/PRODUCTION.md`, `docs/DEPLOYMENT.md`, `docs/ENVIRONMENT_SETUP.md`, `docs/SECURITY.md`, `docs/BACKUP_DISASTER_RECOVERY.md`, `docs/TRAINING.md`, `docs/WARRANTY_SUPPORT.md`.
-
-## Project structure
-
-```
-app/              App Router pages & layouts
-components/       UI primitives + layout shells
-features/         Feature modules (auth foundation)
-services/         Auth, storage, Supabase service layer
-hooks/            Shared React hooks
-providers/        App-wide providers
-types/            Shared TypeScript types
-utils/            Validation, sanitization, RBAC, formatting
-constants/        Routes, roles, navigation
-config/           Env, site, theme
-styles/           Global CSS + design tokens
-lib/              Utilities + Supabase clients
-middleware/       Route protection helpers
-database/         SQL migrations + Prisma schema
-public/           Static assets
-assets/           Design assets
-```
-
-## Scripts
 
 | Command             | Description             |
 | ------------------- | ----------------------- |
@@ -73,26 +54,53 @@ assets/           Design assets
 | `npm run lint`      | ESLint                  |
 | `npm run typecheck` | TypeScript check        |
 
+## Documentation (handover)
+
+| Doc                                | Purpose             |
+| ---------------------------------- | ------------------- |
+| `docs/DOCUMENTATION_INDEX.md`      | Master index        |
+| `docs/PROJECT_CLOSURE_REPORT.md`   | Closure report      |
+| `docs/HANDOVER.md`                 | Client handover     |
+| `docs/FINAL_PROJECT_ACCEPTANCE.md` | Formal acceptance   |
+| `docs/INFRASTRUCTURE_HANDOVER.md`  | Hosting map         |
+| `docs/SOURCE_CODE_HANDOVER.md`     | Repository delivery |
+| `docs/TRAINING.md`                 | Admin training      |
+| `docs/INSTRUCTOR_TRAINING.md`      | Instructor training |
+| `docs/SUPPORT_TRAINING.md`         | Support training    |
+
+Also: `docs/DEPLOYMENT.md`, `docs/ENVIRONMENT_SETUP.md`, `docs/SECURITY.md`, `docs/BACKUP_DISASTER_RECOVERY.md`, `docs/WARRANTY_SUPPORT.md`, `docs/ROADMAP_V2.md`.
+
+## Project structure
+
+```
+app/              App Router pages, layouts, API routes
+components/       UI primitives + layout shells
+features/         Domain UI modules
+services/         Domain logic + JSON / integration services
+hooks/            Shared React hooks
+providers/        App-wide providers
+types/            Shared TypeScript types
+utils/            Validation, sanitization, formatting
+constants/        Routes, roles, navigation, permissions
+config/           Env, site, theme
+styles/           Global CSS + design tokens
+lib/              Security, API helpers, Supabase clients
+middleware/       Helper modules
+database/         SQL migrations + Prisma schema
+docs/             Full documentation package
+scripts/          Backup, UAT, acceptance harnesses
+e2e/ tests/       Playwright + Vitest
+public/           Static assets
+assets/           Design assets
+```
+
 ## Database
 
-1. Create a Supabase project
-2. Run `database/migrations/001_initial_schema.sql` in the SQL editor
-3. Create storage bucket `aep-uploads`
-4. (Optional) `npx prisma generate --schema=database/prisma/schema.prisma`
+1. Create a Supabase project (production target).
+2. Apply `database/migrations/002` → `017` in order (see `database/README.md`).
+3. Create storage bucket `aep-uploads`.
+4. Until cutover, local JSON under `.data/` powers demos (not multi-instance safe).
 
-## Scope of this foundation
+## Support
 
-This milestone delivers architecture only — no business features yet:
-
-- Theme & design system
-- Layout (header, footer, sidebar, breadcrumb)
-- System pages (404, 500, maintenance, unauthorized)
-- Full reusable UI kit
-- Auth structure (Email OTP)
-- Middleware & RBAC helpers
-- Database schema + RLS
-- SEO metadata, robots, sitemap
-
-## License
-
-UNLICENSED — proprietary.
+Vendor: dukkanify@gmail.com · Process: `docs/WARRANTY_SUPPORT.md` · Ops: `/super-admin/ops-center`
