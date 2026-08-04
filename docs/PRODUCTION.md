@@ -12,11 +12,11 @@ This guide covers security, environments, monitoring, backups, CI/CD, and launch
 
 ## Environments
 
-| Env | `NEXT_PUBLIC_APP_ENV` | Notes |
-|-----|----------------------|--------|
-| Development | `development` | Demo OTP allowed |
-| Staging | `staging` | Production-like secrets, demo OTP off preferred |
-| Production | `production` | Strong `AUTH_SECRET` required; `ENABLE_DEMO_OTP=false` |
+| Env         | `NEXT_PUBLIC_APP_ENV` | Notes                                                  |
+| ----------- | --------------------- | ------------------------------------------------------ |
+| Development | `development`         | Demo OTP allowed                                       |
+| Staging     | `staging`             | Production-like secrets, demo OTP off preferred        |
+| Production  | `production`          | Strong `AUTH_SECRET` required; `ENABLE_DEMO_OTP=false` |
 
 Templates: `.env.example`, `.env.production.example`
 
@@ -63,16 +63,24 @@ Branch strategy: feature branches `cursor/*-0987` → PR → `main`.
 ```bash
 npm run lint
 npm run typecheck
+npm run test
 npm run build
-npm run acceptance   # requires running dev server
+npm run acceptance   # requires running server
+npm run uat
+npm run test:e2e
 ```
 
 ## Related docs
 
 - `docs/PRODUCTION_CHECKLIST.md`
+- `docs/FINAL_ACCEPTANCE_CHECKLIST.md`
+- `docs/FINAL_SYSTEM_VALIDATION.md`
+- `docs/PRODUCTION_OPTIMIZATION.md`
 - `docs/SECURITY.md`
 - `docs/DEPLOYMENT.md`
+- `docs/ENVIRONMENT_SETUP.md`
 - `docs/BACKUP_DISASTER_RECOVERY.md`
 - `docs/ARCHITECTURE.md`
 - `docs/ADMIN_MANUAL.md`
 - `docs/API_OVERVIEW.md`
+- `docs/HANDOVER.md`
