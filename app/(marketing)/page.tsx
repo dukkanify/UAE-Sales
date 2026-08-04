@@ -55,7 +55,7 @@ export default function HomePage() {
             variants={fadeUp}
             className="mt-6 max-w-xl text-base text-white/80 sm:text-lg"
           >
-            Professional consultation and training from Eager Pilots — structured
+            Professional consultation and training from ATPL PASS — structured
             programs, expert guidance, and a platform ready for your journey.
           </motion.p>
           <motion.div

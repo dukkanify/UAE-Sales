@@ -1,10 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Plane } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
+import { BrandLogo } from "@/components/brand/brand-logo";
 
 export const metadata: Metadata = {
   title: "Welcome",
@@ -15,15 +15,13 @@ export default function SplashPage() {
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-primary px-4">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(56,189,248,0.35),_transparent_55%)]" />
       <div className="relative z-10 flex max-w-md flex-col items-center text-center">
-        <span className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent text-accent-foreground shadow-medium">
-          <Plane className="h-8 w-8" />
-        </span>
+        <BrandLogo variant="dark" href={null} priority className="mb-6" />
         <h1 className="font-display text-4xl font-bold tracking-tight text-white">
           {siteConfig.name}
         </h1>
-        <p className="mt-3 text-sm text-white/70">{siteConfig.legalName}</p>
-        <p className="mt-6 text-base text-white/80">
-          Professional aviation education, consultation, and pilot training.
+        <p className="mt-3 text-sm text-white/70">{siteConfig.description}</p>
+        <p className="mt-4 text-sm text-white/60">
+          {siteConfig.locations.join(" · ")} · {siteConfig.socialHandle}
         </p>
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Button variant="accent" size="lg" asChild>

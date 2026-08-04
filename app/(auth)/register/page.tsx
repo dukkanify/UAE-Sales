@@ -14,7 +14,7 @@ import { routes } from "@/constants/routes";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Register for Eager Pilots with email OTP.",
+  description: "Register for ATPL PASS with email OTP.",
 };
 
 export default function RegisterPage() {
@@ -25,7 +25,7 @@ export default function RegisterPage() {
         <CardHeader className="space-y-1 text-center">
           <CardTitle>Create account</CardTitle>
           <CardDescription>
-            Start your aviation education journey with Eager Pilots.
+            Start your aviation education journey with ATPL PASS.
           </CardDescription>
         </CardHeader>
         <CardContent>

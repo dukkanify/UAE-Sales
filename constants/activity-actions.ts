@@ -5,6 +5,7 @@
 export const ACTIVITY_ACTIONS = {
   LOGIN: "auth.login",
   LOGOUT: "auth.logout",
+  LOGIN_FAILED: "auth.login_failed",
   PASSWORD_CHANGE: "auth.password_change",
   PASSWORD_RESET_REQUEST: "auth.password_reset_request",
   PASSWORD_RESET: "auth.password_reset",
@@ -17,6 +18,9 @@ export const ACTIVITY_ACTIONS = {
   USER_DELETED: "users.deleted",
   STATUS_CHANGE: "users.status_change",
   SESSION_REVOKED: "auth.session_revoked",
+  SETTINGS_UPDATE: "settings.update",
+  FEATURE_FLAG_CHANGE: "settings.feature_flag",
+  BRANDING_UPLOAD: "settings.branding_upload",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];
