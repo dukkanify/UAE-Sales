@@ -1,8 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" role="img" aria-label="ATPL PASS">
-  <rect x="0" y="8" width="64" height="64" rx="14" fill="#38BDF8"/>
-  <path d="M12 42L40 22L68 42L58 44L40 32L22 44L12 42Z" fill="#0B1F3A" transform="translate(-8 0)"/>
-  <path d="M30 36V54H34V36H30Z" fill="#FFFFFF"/>
-  <path d="M24 54H40V58H24V54Z" fill="#FFFFFF" fill-opacity="0.9"/>
-  <text x="80" y="36" font-family="Outfit, Arial, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF">ATPL PASS</text>
-  <text x="80" y="58" font-family="DM Sans, Arial, sans-serif" font-size="12" font-weight="500" fill="#BAE6FD" letter-spacing="0.08em">AVIATION EDUCATION</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 88" fill="none" role="img" aria-label="ATPL PASS">
+  <g transform="translate(4,14)">
+    <path d="M8 48C18 40 34 28 52 18C40 30 28 42 18 52L8 48Z" fill="#5BA3CC"/>
+    <path d="M10 36C24 26 42 14 62 6C48 20 34 34 22 44L10 36Z" fill="#5BA3CC"/>
+    <path d="M12 24C28 14 48 4 70 0C54 12 38 26 24 36L12 24Z" fill="#5BA3CC"/>
+    <path d="M14 22C30 12 50 2 72 -1C70 0 54 10 40 18C32 22 22 26 14 22Z" fill="#DD9B30"/>
+    <path d="M72 8C86 4 102 6 112 12V50C98 42 84 40 72 44V8Z" fill="none" stroke="#C4C3C7" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#C4C3C7" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M72 44V52" stroke="#C4C3C7" stroke-width="3" stroke-linecap="round"/>
+  </g>
+  <text x="128" y="42" font-family="Space Grotesk, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="0.04em">
+    <tspan fill="#FFFFFF">ATPL </tspan><tspan fill="#DD9B30">PASS</tspan>
+  </text>
+  <text x="128" y="64" font-family="IBM Plex Sans, Arial, sans-serif" font-size="9" font-weight="500" fill="#C4C3C7" letter-spacing="0.18em">UNLOCK YOUR PILOT LICENSE</text>
 </svg>
