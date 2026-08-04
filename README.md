@@ -6,14 +6,14 @@ Next.js App Router platform with role-based dashboards, LMS, live classes, payme
 
 ## Tech stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS 4 |
-| UI | Shadcn UI (New York), Framer Motion, Lucide |
-| Auth (current) | Email OTP + secure session cookies (RBAC) |
-| Data (current) | Local JSON stores under `.data/` |
-| Data (target) | Supabase PostgreSQL + Storage (`database/migrations/`) |
-| Deploy | Vercel + GitHub Actions CI |
+| Layer          | Technology                                             |
+| -------------- | ------------------------------------------------------ |
+| Frontend       | Next.js 15, React 19, TypeScript, Tailwind CSS 4       |
+| UI             | Shadcn UI (New York), Framer Motion, Lucide            |
+| Auth (current) | Email OTP + secure session cookies (RBAC)              |
+| Data (current) | Local JSON stores under `.data/`                       |
+| Data (target)  | Supabase PostgreSQL + Storage (`database/migrations/`) |
+| Deploy         | Vercel + GitHub Actions CI                             |
 
 ## Getting started
 
@@ -32,12 +32,15 @@ See `.env.example` and `.env.production.example`. Set a strong `AUTH_SECRET` bef
 ## Production ops
 
 ```bash
-npm run lint && npm run typecheck && npm run build
+npm run lint && npm run typecheck && npm run test && npm run build
 npm run backup
 npm run acceptance   # requires running server
+npm run uat          # full multi-role HTTP UAT
+npm run test:e2e     # Playwright
 ```
 
-Docs: `docs/PRODUCTION.md`, `docs/PRODUCTION_CHECKLIST.md`, `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/BACKUP_DISASTER_RECOVERY.md`.
+**Handover:** `docs/HANDOVER.md` · **Final checklist:** `docs/FINAL_ACCEPTANCE_CHECKLIST.md`  
+Also: `docs/PRODUCTION.md`, `docs/DEPLOYMENT.md`, `docs/ENVIRONMENT_SETUP.md`, `docs/SECURITY.md`, `docs/BACKUP_DISASTER_RECOVERY.md`, `docs/TRAINING.md`, `docs/WARRANTY_SUPPORT.md`.
 
 ## Project structure
 
@@ -62,13 +65,13 @@ assets/           Design assets
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Development server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript check |
+| Command             | Description             |
+| ------------------- | ----------------------- |
+| `npm run dev`       | Development server      |
+| `npm run build`     | Production build        |
+| `npm run start`     | Start production server |
+| `npm run lint`      | ESLint                  |
+| `npm run typecheck` | TypeScript check        |
 
 ## Database
 
