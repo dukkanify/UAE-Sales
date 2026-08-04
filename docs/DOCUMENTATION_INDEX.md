@@ -23,17 +23,18 @@ Master index for operational handover (Task 023).
 
 ## Technical
 
-| Doc                                         | Topic            |
-| ------------------------------------------- | ---------------- |
-| `ARCHITECTURE.md`                           | System overview  |
-| `ENVIRONMENT_SETUP.md`                      | Env / install    |
-| `DEPLOYMENT.md` / `PRODUCTION.md`           | Deploy           |
-| `API_OVERVIEW.md` / `MOBILE_API.md`         | APIs             |
-| `DATABASE_SCHEMA.md` / `database/README.md` | Schema           |
-| `SECURITY.md` / `SECURITY_REVIEW_022.md`    | Security         |
-| `BACKUP_DISASTER_RECOVERY.md`               | Backup / restore |
-| `MAINTENANCE.md` / `POST_LAUNCH_SUPPORT.md` | Ops              |
-| `TESTING.md` / `CODING_STANDARDS.md`        | Quality          |
+| Doc                                         | Topic               |
+| ------------------------------------------- | ------------------- |
+| `ARCHITECTURE.md`                           | System overview     |
+| `DEVELOPER_GUIDE.md`                        | Engineer onboarding |
+| `ENVIRONMENT_SETUP.md`                      | Env / install       |
+| `DEPLOYMENT.md` / `PRODUCTION.md`           | Deploy              |
+| `API_OVERVIEW.md` / `MOBILE_API.md`         | APIs                |
+| `DATABASE_SCHEMA.md` / `database/README.md` | Schema              |
+| `SECURITY.md` / `SECURITY_REVIEW_022.md`    | Security            |
+| `BACKUP_DISASTER_RECOVERY.md`               | Backup / restore    |
+| `MAINTENANCE.md` / `POST_LAUNCH_SUPPORT.md` | Ops                 |
+| `TESTING.md` / `CODING_STANDARDS.md`        | Quality             |
 
 ## Closure & enterprise
 
@@ -43,6 +44,7 @@ Master index for operational handover (Task 023).
 | `CREDENTIALS_REGISTER.md`      | Secrets inventory template |
 | `SOURCE_CODE_HANDOVER.md`      | Repo delivery              |
 | `ENTERPRISE_READINESS_022.md`  | Audit package              |
+| `ENTERPRISE_REFACTOR_024.md`   | Refactor / excellence pass |
 | `ROADMAP.md` / `ROADMAP_V2.md` | Future work                |
 | `RELEASE_NOTES.md`             | Versions                   |
 | `KNOWN_LIMITATIONS.md`         | Honest constraints         |

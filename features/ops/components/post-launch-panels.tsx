@@ -16,36 +16,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { OpsStatusBadge } from "@/features/ops/components/ops-status-badge";
 
 function statusBadge(status: string) {
-  const variant =
-    status === "pass" ||
-    status === "up" ||
-    status === "healthy" ||
-    status === "closed" ||
-    status === "verified" ||
-    status === "approved" ||
-    status === "done" ||
-    status === "stable" ||
-    status === "available"
-      ? "default"
-      : status === "warn" ||
-          status === "degraded" ||
-          status === "open" ||
-          status === "new" ||
-          status === "pending"
-        ? "warning"
-        : status === "fail" || status === "critical"
-          ? "destructive"
-          : "secondary";
-  return (
-    <Badge
-      variant={variant as "default" | "warning" | "destructive" | "secondary"}
-      className="capitalize"
-    >
-      {status.replaceAll("_", " ")}
-    </Badge>
-  );
+  return <OpsStatusBadge status={status} />;
 }
 
 type Props = {

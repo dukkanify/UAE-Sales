@@ -1,20 +1,20 @@
-# Release notes — ATPL PASS v1.7 (Task 023)
+# Release notes — ATPL PASS v1.8 (Task 024)
 
 ## Highlights
 
-- Official **project closure** and operational handover package
-- Documentation index, completion checklist, closure report, final acceptance form
-- Infrastructure handover + credentials register template (no secrets in git)
-- Administrator / instructor / support training packs
-- Version 2.0 roadmap recommendations
-- README updated for handover; removed tracked export artifact from `public/exports/`
+- Enterprise refactoring pass: DRY CSRF helpers, shared Ops status badge, dead-code cleanup
+- Dashboard Recharts charts lazy-loaded (`next/dynamic`) to reduce initial bundle
+- List APIs aligned on `parsePagination` / `paginate` helpers
+- Accessibility labels on AI assistant controls and language selector
+- Developer guide + refactor report; technical debt register expanded
 
 ## Notes
 
-No new business features. Closure completes the transition from delivery to long-term operation and warranty support.
+No new business features. Platform remains on JSON stores with SQL twins; cutover and multi-instance items stay in `TECHNICAL_DEBT.md`.
 
 ### Prior releases
 
+- **v1.7 (Task 023)** — Project closure / knowledge transfer
 - **v1.6 (Task 022)** — Enterprise audit + security hardening
 - **v1.5 (Task 021)** — Post-launch hypercare / KB / features
 - **v1.4 (Task 020)** — Final handover validation
