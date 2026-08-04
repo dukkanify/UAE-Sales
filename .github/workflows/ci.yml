@@ -27,16 +27,53 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Format check
+        run: npm run format:check
       - name: Lint
         run: npm run lint
       - name: Typecheck
         run: npm run typecheck
+      - name: Unit & integration tests
+        run: npm run test
       - name: Build
         run: npm run build
       - name: Audit (non-blocking summary)
         run: npm audit --omit=dev --audit-level=critical || true
       - name: Production checklist doc present
-        run: test -f docs/PRODUCTION_CHECKLIST.md && test -f docs/PRODUCTION.md
+        run: |
+          test -f docs/PRODUCTION_CHECKLIST.md
+          test -f docs/PRODUCTION.md
+          test -f docs/TESTING.md
+          test -f docs/CODING_STANDARDS.md
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_APP_NAME: ATPL PASS
+      NEXT_PUBLIC_APP_ENV: development
+      AUTH_SECRET: ci-auth-secret-at-least-24-chars
+      ENABLE_DEMO_OTP: "true"
+      DEMO_OTP_CODE: "123456"
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Playwright E2E
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
 
   preview-guard:
     if: github.event_name == 'pull_request'
@@ -47,3 +84,8 @@ jobs:
         run: |
           echo "PR from ${{ github.head_ref }}"
           test -n "${{ github.head_ref }}"
+          case "${{ github.head_ref }}" in
+            cursor/*) echo "Branch prefix OK" ;;
+            main) echo "main OK" ;;
+            *) echo "Prefer cursor/<name>-0987 feature branches" ;;
+          esac

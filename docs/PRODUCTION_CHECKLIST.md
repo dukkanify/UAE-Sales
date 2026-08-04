@@ -6,6 +6,8 @@ Use before promoting staging → production.
 
 - [ ] `npm run lint` — no errors
 - [ ] `npm run typecheck` — no errors
+- [ ] `npm run test` — Vitest green
+- [ ] `npm run format:check` — quality paths formatted
 - [ ] `npm run build` — succeeds
 - [ ] No unexpected browser console errors on critical paths
 - [ ] Responsive check: mobile / tablet / desktop

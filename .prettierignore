@@ -1,0 +1,12 @@
+.next
+out
+build
+node_modules
+coverage
+playwright-report
+test-results
+package-lock.json
+public/exports
+.data
+.backups
+*.min.js
