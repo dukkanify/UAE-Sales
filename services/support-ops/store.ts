@@ -1,5 +1,5 @@
 /**
- * Support / ops durable store (Task 017).
+ * Support / ops durable store (Tasks 017 / 021).
  */
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
@@ -9,9 +9,14 @@ import type {
   BackupVerificationReport,
   BugReport,
   ChangeRequest,
+  CustomerFeedback,
+  FeatureRequest,
+  HypercarePeriod,
   IncidentReport,
+  KnowledgeArticle,
   MaintenanceLog,
   OpsAlert,
+  OptimizationNote,
   ReleaseNote,
   RoadmapItem,
   SlaPolicy,
@@ -24,6 +29,7 @@ export interface SupportOpsDatabase {
   supportRequests: SupportRequest[];
   bugs: BugReport[];
   changeRequests: ChangeRequest[];
+  featureRequests: FeatureRequest[];
   releases: ReleaseNote[];
   maintenanceLogs: MaintenanceLog[];
   incidents: IncidentReport[];
@@ -31,12 +37,19 @@ export interface SupportOpsDatabase {
   healthLogs: SystemHealthLog[];
   alerts: OpsAlert[];
   backupReports: BackupVerificationReport[];
+  knowledgeArticles: KnowledgeArticle[];
+  feedback: CustomerFeedback[];
+  optimizationNotes: OptimizationNote[];
+  hypercare: HypercarePeriod;
   counters: {
     support: number;
     bug: number;
     cr: number;
     incident: number;
+    feature: number;
   };
+  /** 1 = Task 017 baseline; 2 = Task 021 post-launch modules */
+  seedVersion: number;
   seeded: boolean;
 }
 
@@ -52,12 +65,24 @@ export const DEFAULT_SLA: SlaPolicy = {
   updatedBy: null,
 };
 
+export const DEFAULT_HYPERCARE: HypercarePeriod = {
+  enabled: false,
+  label: "Post-launch hypercare",
+  startedAt: null,
+  endsAt: null,
+  notes: "",
+  watchModules: ["auth", "courses", "live_classes", "payments", "zoom", "email", "api"],
+  checkIns: [],
+  updatedAt: new Date(0).toISOString(),
+};
+
 function emptyDb(): SupportOpsDatabase {
   return {
     sla: { ...DEFAULT_SLA },
     supportRequests: [],
     bugs: [],
     changeRequests: [],
+    featureRequests: [],
     releases: [],
     maintenanceLogs: [],
     incidents: [],
@@ -65,7 +90,12 @@ function emptyDb(): SupportOpsDatabase {
     healthLogs: [],
     alerts: [],
     backupReports: [],
-    counters: { support: 0, bug: 0, cr: 0, incident: 0 },
+    knowledgeArticles: [],
+    feedback: [],
+    optimizationNotes: [],
+    hypercare: { ...DEFAULT_HYPERCARE, checkIns: [] },
+    counters: { support: 0, bug: 0, cr: 0, incident: 0, feature: 0 },
+    seedVersion: 0,
     seeded: false,
   };
 }
@@ -79,21 +109,45 @@ export function ensureSupportOpsStore(): SupportOpsDatabase {
   }
   try {
     const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<SupportOpsDatabase>;
+    const base = emptyDb();
     return {
-      ...emptyDb(),
+      ...base,
       ...raw,
       sla: { ...DEFAULT_SLA, ...(raw.sla ?? {}) },
-      counters: { ...emptyDb().counters, ...(raw.counters ?? {}) },
+      hypercare: {
+        ...DEFAULT_HYPERCARE,
+        ...(raw.hypercare ?? {}),
+        checkIns: raw.hypercare?.checkIns ?? [],
+        watchModules: raw.hypercare?.watchModules ?? DEFAULT_HYPERCARE.watchModules,
+      },
+      counters: { ...base.counters, ...(raw.counters ?? {}) },
       supportRequests: raw.supportRequests ?? [],
       bugs: raw.bugs ?? [],
       changeRequests: raw.changeRequests ?? [],
+      featureRequests: raw.featureRequests ?? [],
       releases: raw.releases ?? [],
       maintenanceLogs: raw.maintenanceLogs ?? [],
-      incidents: raw.incidents ?? [],
+      incidents: (raw.incidents ?? []).map((inc) => ({
+        ...inc,
+        affectedModule: inc.affectedModule ?? "general",
+        rootCause: inc.rootCause ?? null,
+        resolution: inc.resolution ?? null,
+        preventiveAction: inc.preventiveAction ?? null,
+      })),
       roadmapItems: raw.roadmapItems ?? [],
       healthLogs: raw.healthLogs ?? [],
       alerts: raw.alerts ?? [],
       backupReports: raw.backupReports ?? [],
+      knowledgeArticles: raw.knowledgeArticles ?? [],
+      feedback: raw.feedback ?? [],
+      optimizationNotes: (raw.optimizationNotes ?? []).map((n) => {
+        const legacy = n as OptimizationNote & { action?: string };
+        return {
+          ...n,
+          recommendedAction: legacy.recommendedAction ?? legacy.action ?? "",
+        };
+      }),
+      seedVersion: Number(raw.seedVersion ?? (raw.seeded ? 1 : 0)),
       seeded: Boolean(raw.seeded),
     };
   } catch {
@@ -110,7 +164,7 @@ export function writeSupportOpsStore(db: SupportOpsDatabase) {
 
 export function nextNumber(
   db: SupportOpsDatabase,
-  prefix: "SUP" | "BUG" | "CR" | "INC",
+  prefix: "SUP" | "BUG" | "CR" | "INC" | "FEAT",
   key: keyof SupportOpsDatabase["counters"],
 ) {
   db.counters[key] += 1;

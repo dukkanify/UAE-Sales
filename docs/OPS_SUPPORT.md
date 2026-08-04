@@ -11,13 +11,13 @@ Post-launch operations for ATPL PASS: monitoring, support, SLA, bugs, change req
 
 ### Views (`GET ?view=`)
 
-| View | Purpose |
-|------|---------|
-| `dashboard` | System health dashboard + alerts + backup summary |
-| `summary` | Open counts (support, bugs, CRs, incidents, alerts) |
-| `sla` | Configurable SLA policy |
-| `support` / `bugs` / `change-requests` / `releases` / `roadmap` / `incidents` / `alerts` | Lists |
-| `maintenance-logs` / `health-logs` / `backup-reports` | History |
+| View                                                                                     | Purpose                                             |
+| ---------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| `dashboard`                                                                              | System health dashboard + alerts + backup summary   |
+| `summary`                                                                                | Open counts (support, bugs, CRs, incidents, alerts) |
+| `sla`                                                                                    | Configurable SLA policy                             |
+| `support` / `bugs` / `change-requests` / `releases` / `roadmap` / `incidents` / `alerts` | Lists                                               |
+| `maintenance-logs` / `health-logs` / `backup-reports`                                    | History                                             |
 
 ### Actions (`POST` JSON `{ action }`)
 
@@ -36,10 +36,14 @@ Deep health snapshots are cached **5 seconds** in-process to keep dashboards res
 Public readiness: `GET /api/health?ready=1`  
 Public maintenance flag: `GET /api/public/maintenance`
 
+## Task 021 extensions
+
+See `docs/POST_LAUNCH_SUPPORT.md` for hypercare, feature requests, knowledge base, feedback, optimization notes, and the maintenance dashboard (`?view=maintenance-dashboard`).
+
 ## Support workflow
 
 Channels: ticket · email · admin report  
-Categories: technical · user · course · live_class · zoom · payment · general  
+Categories: technical · user · course · live_class · zoom · payment · general
 
 Existing communication tickets remain under `/super-admin/support`; Ops Center tracks formal support requests with SLA breach flags.
 
@@ -48,11 +52,11 @@ Existing communication tickets remain under `/super-admin/support`; Ops Center t
 Defaults (hours):
 
 | Priority | Response | Resolution |
-|----------|----------|------------|
-| Critical | 2 | 8 |
-| High | 8 | 24 |
-| Medium | 24 | 72 |
-| Low | 48 | 120 |
+| -------- | -------- | ---------- |
+| Critical | 2        | 8          |
+| High     | 8        | 24         |
+| Medium   | 24       | 72         |
+| Low      | 48       | 120        |
 
 Edit in Ops Center → **SLA** tab.
 
@@ -73,9 +77,9 @@ Versioned release notes (e.g. `1.0.0`, `1.1.0`). Mark deployed when production s
 
 ## Maintenance mode
 
-1. Ops Center → Maintenance, or Platform Settings → Maintenance toggle.  
-2. Middleware honors settings **and** `NEXT_PUBLIC_MAINTENANCE_MODE`.  
-3. Super Admins bypass the redirect so they can disable mode.  
+1. Ops Center → Maintenance, or Platform Settings → Maintenance toggle.
+2. Middleware honors settings **and** `NEXT_PUBLIC_MAINTENANCE_MODE`.
+3. Super Admins bypass the redirect so they can disable mode.
 4. Public page `/maintenance` shows status message, ETA, and contact details.
 
 ## Backup verification
@@ -88,8 +92,8 @@ Statuses: Planned · Approved · In development · Completed · Deferred.
 
 ## Related docs
 
-- `docs/SUPPORT.md` — triage & contacts  
-- `docs/ADMINISTRATOR_GUIDE.md` / `docs/ADMIN_MANUAL.md`  
-- `docs/BACKUP_DISASTER_RECOVERY.md`  
-- `docs/PRODUCTION_CHECKLIST.md`  
+- `docs/SUPPORT.md` — triage & contacts
+- `docs/ADMINISTRATOR_GUIDE.md` / `docs/ADMIN_MANUAL.md`
+- `docs/BACKUP_DISASTER_RECOVERY.md`
+- `docs/PRODUCTION_CHECKLIST.md`
 - `docs/ROADMAP.md` / `docs/RELEASE_NOTES.md`

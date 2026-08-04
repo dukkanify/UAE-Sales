@@ -1,35 +1,19 @@
 /**
- * Production support & continuous improvement types (Task 017).
+ * Production support & continuous improvement types (Tasks 017 / 021).
  */
 
 export type SupportPriority = "critical" | "high" | "medium" | "low";
 
 export type SupportCategory =
-  | "technical"
-  | "user"
-  | "course"
-  | "live_class"
-  | "zoom"
-  | "payment"
-  | "general";
+  "technical" | "user" | "course" | "live_class" | "zoom" | "payment" | "general";
 
 export type SupportChannel = "ticket" | "email" | "admin_report";
 
 export type SupportRequestStatus =
-  | "new"
-  | "acknowledged"
-  | "in_progress"
-  | "waiting_customer"
-  | "resolved"
-  | "closed";
+  "new" | "acknowledged" | "in_progress" | "waiting_customer" | "resolved" | "closed";
 
 export type BugStatus =
-  | "new"
-  | "confirmed"
-  | "in_progress"
-  | "ready_for_testing"
-  | "verified"
-  | "closed";
+  "new" | "confirmed" | "in_progress" | "ready_for_testing" | "verified" | "closed";
 
 export type ChangeRequestStatus =
   | "submitted"
@@ -40,19 +24,9 @@ export type ChangeRequestStatus =
   | "in_development"
   | "completed";
 
-export type DevelopmentStatus =
-  | "not_started"
-  | "planned"
-  | "in_progress"
-  | "blocked"
-  | "done";
+export type DevelopmentStatus = "not_started" | "planned" | "in_progress" | "blocked" | "done";
 
-export type RoadmapStatus =
-  | "planned"
-  | "approved"
-  | "in_development"
-  | "completed"
-  | "deferred";
+export type RoadmapStatus = "planned" | "approved" | "in_development" | "completed" | "deferred";
 
 export type IncidentSeverity = SupportPriority;
 export type IncidentStatus = "open" | "investigating" | "mitigated" | "resolved" | "closed";
@@ -162,11 +136,116 @@ export interface IncidentReport {
   summary: string;
   severity: IncidentSeverity;
   status: IncidentStatus;
+  affectedModule: string;
   affectedServices: string[];
+  rootCause: string | null;
+  resolution: string | null;
+  preventiveAction: string | null;
   startedAt: string;
   resolvedAt: string | null;
   postmortem: string | null;
   createdBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Feature request intake (Task 021) — distinct from internal change requests. */
+export type FeatureApprovalStatus = "pending" | "approved" | "rejected" | "deferred";
+
+export interface FeatureRequest {
+  id: string;
+  number: string;
+  title: string;
+  description: string;
+  businessValue: string;
+  priority: SupportPriority;
+  estimatedEffortHours: number | null;
+  estimatedCost: number | null;
+  currency: string;
+  approvalStatus: FeatureApprovalStatus;
+  developmentStatus: DevelopmentStatus;
+  requestedBy: string | null;
+  approvedBy: string | null;
+  targetVersion: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type KnowledgeAudience = "internal" | "admin" | "instructor" | "student" | "all";
+
+export type KnowledgeCategory =
+  | "faq"
+  | "troubleshooting"
+  | "admin_guide"
+  | "instructor_guide"
+  | "student_guide"
+  | "common_issues"
+  | "best_practices";
+
+export interface KnowledgeArticle {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  body: string;
+  category: KnowledgeCategory;
+  audience: KnowledgeAudience;
+  published: boolean;
+  tags: string[];
+  updatedBy: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FeedbackCategory =
+  "bug_report" | "feature_request" | "satisfaction" | "comment" | "improvement";
+
+export interface CustomerFeedback {
+  id: string;
+  category: FeedbackCategory;
+  rating: number | null;
+  title: string;
+  comment: string;
+  submitterEmail: string | null;
+  submitterRole: string | null;
+  linkedFeatureId: string | null;
+  linkedBugId: string | null;
+  status: "new" | "reviewed" | "actioned" | "archived";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type HypercareStability = "stable" | "degraded" | "critical";
+
+export interface HypercareCheckIn {
+  id: string;
+  at: string;
+  actorId: string | null;
+  summary: string;
+  stability: HypercareStability;
+  openCritical: number;
+  openHigh: number;
+  notes: string;
+}
+
+export interface HypercarePeriod {
+  enabled: boolean;
+  label: string;
+  startedAt: string | null;
+  endsAt: string | null;
+  notes: string;
+  watchModules: string[];
+  checkIns: HypercareCheckIn[];
+  updatedAt: string;
+}
+
+export interface OptimizationNote {
+  id: string;
+  area: "database" | "api" | "dashboard" | "search" | "analytics" | "storage" | "caching" | "jobs";
+  title: string;
+  finding: string;
+  recommendedAction: string;
+  status: "open" | "in_progress" | "done";
   createdAt: string;
   updatedAt: string;
 }
