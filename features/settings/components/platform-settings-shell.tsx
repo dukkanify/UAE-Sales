@@ -389,6 +389,74 @@ function PlatformSettingsShell() {
                   }
                 />
               </Field>
+              <Field label="Instagram URL">
+                <Input
+                  value={draft.general.socialLinks.instagram}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      general: {
+                        ...draft.general,
+                        socialLinks: {
+                          ...draft.general.socialLinks,
+                          instagram: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="X / Twitter URL">
+                <Input
+                  value={draft.general.socialLinks.twitter}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      general: {
+                        ...draft.general,
+                        socialLinks: {
+                          ...draft.general.socialLinks,
+                          twitter: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="LinkedIn URL">
+                <Input
+                  value={draft.general.socialLinks.linkedin}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      general: {
+                        ...draft.general,
+                        socialLinks: {
+                          ...draft.general.socialLinks,
+                          linkedin: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="YouTube URL">
+                <Input
+                  value={draft.general.socialLinks.youtube}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      general: {
+                        ...draft.general,
+                        socialLinks: {
+                          ...draft.general.socialLinks,
+                          youtube: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              </Field>
               <Field label="Platform status">
                 <Select
                   value={draft.general.platformStatus}

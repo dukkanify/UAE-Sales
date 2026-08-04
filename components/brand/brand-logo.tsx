@@ -6,6 +6,7 @@ import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
+import { useBrand } from "@/providers/brand-provider";
 
 interface BrandLogoProps {
   className?: string;
@@ -22,18 +23,20 @@ function BrandLogo({
   priority,
   showWordmark = false,
 }: BrandLogoProps) {
+  const brand = useBrand();
+  const name = brand.platformName || siteConfig.name;
   const src =
     variant === "mark"
-      ? siteConfig.brand.icon
+      ? brand.faviconUrl || siteConfig.brand.icon
       : variant === "dark"
-        ? siteConfig.brand.logoDark
-        : siteConfig.brand.logo;
+        ? brand.darkLogoUrl || siteConfig.brand.logoDark
+        : brand.logoUrl || siteConfig.brand.logo;
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
       <Image
         src={src}
-        alt={siteConfig.name}
+        alt={name}
         width={variant === "mark" ? 36 : 160}
         height={variant === "mark" ? 36 : 40}
         className={cn(
@@ -47,7 +50,7 @@ function BrandLogo({
       />
       {showWordmark && variant === "mark" ? (
         <span className="font-display text-lg font-semibold tracking-tight text-primary">
-          {siteConfig.name}
+          {name}
         </span>
       ) : null}
     </span>
@@ -55,7 +58,7 @@ function BrandLogo({
 
   if (href === null || href === "") return content;
   return (
-    <Link href={href} className="inline-flex items-center" aria-label={siteConfig.name}>
+    <Link href={href} className="inline-flex items-center" aria-label={name}>
       {content}
     </Link>
   );

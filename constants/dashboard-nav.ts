@@ -42,7 +42,9 @@ export type DashboardIcon =
   | "analytics"
   | "ai"
   | "ops"
-  | "api";
+  | "api"
+  | "assets"
+  | "media";
 
 export interface DashboardNavItem {
   label: string;
@@ -72,6 +74,8 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "AI Assistant", href: "/super-admin/ai", icon: "ai" },
   { label: "Reports", href: "/super-admin/reports", icon: "reports" },
   { label: "Platform Settings", href: "/super-admin/settings", icon: "settings" },
+  { label: "Asset Manager", href: "/super-admin/assets", icon: "assets" },
+  { label: "Media Library", href: "/super-admin/media-library", icon: "media" },
   { label: "Monitoring", href: "/super-admin/monitoring", icon: "monitoring" },
   { label: "Ops Center", href: "/super-admin/ops-center", icon: "ops" },
   { label: "API Platform", href: "/super-admin/api-platform", icon: "api" },
