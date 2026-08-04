@@ -28,7 +28,14 @@ export type DashboardIcon =
   | "certificates"
   | "wallet"
   | "activity"
-  | "monitoring";
+  | "monitoring"
+  | "favorites"
+  | "notes"
+  | "resources"
+  | "planner"
+  | "history"
+  | "search"
+  | "bookmark";
 
 export interface DashboardNavItem {
   label: string;
@@ -87,7 +94,13 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
 export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Dashboard", href: "/student/dashboard", icon: "dashboard" },
   { label: "My Courses", href: "/student/courses", icon: "courses" },
+  { label: "Resources", href: "/student/resources", icon: "resources" },
+  { label: "Notes", href: "/student/notes", icon: "notes" },
+  { label: "Favorites", href: "/student/favorites", icon: "favorites" },
+  { label: "Planner", href: "/student/planner", icon: "planner" },
   { label: "Calendar", href: "/student/calendar", icon: "calendar" },
+  { label: "History", href: "/student/history", icon: "history" },
+  { label: "Search", href: "/student/search", icon: "search" },
   { label: "Assignments", href: "/student/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/student/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/student/certificates", icon: "certificates" },

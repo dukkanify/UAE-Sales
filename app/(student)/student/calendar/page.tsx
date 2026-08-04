@@ -1,7 +1,7 @@
 "use client";
 
-import { LiveCalendarView } from "@/features/classes/components/live-calendar-view";
+import { LearningCalendarPageView } from "@/features/learning";
 
 export default function StudentCalendarPage() {
-  return <LiveCalendarView roleLabel="Student" />;
+  return <LearningCalendarPageView />;
 }
