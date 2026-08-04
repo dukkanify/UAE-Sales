@@ -79,7 +79,7 @@ function SuperAdminDashboardView({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <ChartCard title="Student growth" description="New student registrations over time">
-          <AreaTrendChart data={growth} />
+          <AreaTrendChart data={growth} gradientId="saGrowthFill" />
         </ChartCard>
         <ChartCard title="Revenue trend" description="Monthly platform revenue">
           <LineTrendChart data={revenue} />

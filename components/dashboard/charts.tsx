@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
   Area,
   AreaChart,
@@ -38,6 +39,12 @@ function ChartCard({
   children,
   heightClassName = "h-72",
 }: ChartCardProps) {
+  const [ready, setReady] = React.useState(false);
+
+  React.useEffect(() => {
+    setReady(true);
+  }, []);
+
   return (
     <Card className={cn(className)}>
       <CardHeader className="pb-2">
@@ -45,10 +52,14 @@ function ChartCard({
         {description ? <CardDescription>{description}</CardDescription> : null}
       </CardHeader>
       <CardContent>
-        <div className={cn("w-full", heightClassName)}>
-          <ResponsiveContainer width="100%" height="100%">
-            {children as React.ReactElement}
-          </ResponsiveContainer>
+        <div className={cn("w-full min-h-[18rem]", heightClassName)}>
+          {ready ? (
+            <ResponsiveContainer width="100%" height="100%" minHeight={288}>
+              {children as React.ReactElement}
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-full w-full animate-pulse rounded-lg bg-muted/40" />
+          )}
         </div>
       </CardContent>
     </Card>
@@ -61,11 +72,19 @@ interface SeriesPoint {
   secondary?: number;
 }
 
-function AreaTrendChart({ data, color = CHART_COLORS[1] }: { data: SeriesPoint[]; color?: string }) {
+function AreaTrendChart({
+  data,
+  color = CHART_COLORS[1],
+  gradientId = "areaFill",
+}: {
+  data: SeriesPoint[];
+  color?: string;
+  gradientId?: string;
+}) {
   return (
-    <AreaChart data={data}>
+    <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
       <defs>
-        <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="5%" stopColor={color} stopOpacity={0.35} />
           <stop offset="95%" stopColor={color} stopOpacity={0.02} />
         </linearGradient>
@@ -74,7 +93,13 @@ function AreaTrendChart({ data, color = CHART_COLORS[1] }: { data: SeriesPoint[]
       <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} />
       <YAxis tickLine={false} axisLine={false} fontSize={12} width={36} />
       <Tooltip />
-      <Area type="monotone" dataKey="value" stroke={color} fill="url(#areaFill)" strokeWidth={2} />
+      <Area
+        type="monotone"
+        dataKey="value"
+        stroke={color}
+        fill={`url(#${gradientId})`}
+        strokeWidth={2}
+      />
     </AreaChart>
   );
 }
@@ -87,7 +112,7 @@ function LineTrendChart({
   keys?: string[];
 }) {
   return (
-    <LineChart data={data}>
+    <LineChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
       <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} />
       <YAxis tickLine={false} axisLine={false} fontSize={12} width={36} />
@@ -109,7 +134,7 @@ function LineTrendChart({
 
 function BarsChart({ data }: { data: SeriesPoint[] }) {
   return (
-    <BarChart data={data}>
+    <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
       <XAxis dataKey="name" tickLine={false} axisLine={false} fontSize={12} />
       <YAxis tickLine={false} axisLine={false} fontSize={12} width={36} />
