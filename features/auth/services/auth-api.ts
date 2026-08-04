@@ -32,16 +32,23 @@ export async function authFetch<T>(
   const json = (await response.json().catch(() => null)) as {
     success?: boolean;
     data?: T;
-    error?: string;
+    error?: string | { message?: string; code?: string } | null;
   } | null;
 
   if (!json) {
     return { success: false, data: null, error: "Unexpected server response" };
   }
 
+  const err =
+    typeof json.error === "string"
+      ? json.error
+      : json.error && typeof json.error === "object"
+        ? json.error.message || json.error.code || "Request failed"
+        : null;
+
   return {
     success: Boolean(json.success),
     data: (json.data as T) ?? null,
-    error: json.error ?? null,
+    error: err,
   };
 }
