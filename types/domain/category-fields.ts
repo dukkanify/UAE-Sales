@@ -2,6 +2,7 @@ export type CategoryFieldType =
   | "text"
   | "number"
   | "select"
+  | "combobox"
   | "textarea"
   | "checkbox-group";
 
