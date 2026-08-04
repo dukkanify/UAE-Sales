@@ -4,7 +4,7 @@
 
 Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, AI assistant, mobile API, and production operations.
 
-**Project status:** Development complete — operational handover package under `docs/DOCUMENTATION_INDEX.md` and `docs/PROJECT_CLOSURE_REPORT.md`.
+**Project status:** **Version 1.0 GA** — final release & acceptance package under `docs/FINAL_RELEASE_025.md` and `docs/DOCUMENTATION_INDEX.md`.
 
 ## Tech stack
 
@@ -54,21 +54,24 @@ npm run test:e2e
 | `npm run lint`      | ESLint                  |
 | `npm run typecheck` | TypeScript check        |
 
-## Documentation (handover)
+## Documentation (Version 1.0 GA)
 
-| Doc                                | Purpose             |
-| ---------------------------------- | ------------------- |
-| `docs/DOCUMENTATION_INDEX.md`      | Master index        |
-| `docs/PROJECT_CLOSURE_REPORT.md`   | Closure report      |
-| `docs/HANDOVER.md`                 | Client handover     |
-| `docs/FINAL_PROJECT_ACCEPTANCE.md` | Formal acceptance   |
-| `docs/INFRASTRUCTURE_HANDOVER.md`  | Hosting map         |
-| `docs/SOURCE_CODE_HANDOVER.md`     | Repository delivery |
-| `docs/TRAINING.md`                 | Admin training      |
-| `docs/INSTRUCTOR_TRAINING.md`      | Instructor training |
-| `docs/SUPPORT_TRAINING.md`         | Support training    |
+| Doc                                | Purpose                |
+| ---------------------------------- | ---------------------- |
+| `docs/DOCUMENTATION_INDEX.md`      | Master index           |
+| `docs/FINAL_RELEASE_025.md`        | GA release package     |
+| `docs/CLIENT_ACCEPTANCE_025.md`    | Formal v1.0 acceptance |
+| `docs/PRODUCTION_READINESS_025.md` | Readiness verification |
+| `docs/OWNERSHIP_TRANSFER_025.md`   | Ownership transfer     |
+| `docs/WARRANTY_ACTIVATION_025.md`  | Warranty activation    |
+| `docs/SUCCESS_METRICS_90D.md`      | First-90-day KPIs      |
+| `docs/V2_BACKLOG.md`               | Version 2.0 backlog    |
+| `docs/PROJECT_CLOSURE_REPORT.md`   | Closure report         |
+| `docs/HANDOVER.md`                 | Client handover        |
+| `docs/SOURCE_CODE_HANDOVER.md`     | Repository delivery    |
+| `docs/TRAINING.md`                 | Admin training         |
 
-Also: `docs/DEPLOYMENT.md`, `docs/ENVIRONMENT_SETUP.md`, `docs/SECURITY.md`, `docs/BACKUP_DISASTER_RECOVERY.md`, `docs/WARRANTY_SUPPORT.md`, `docs/ROADMAP_V2.md`.
+Also: `DEPLOYMENT.md`, `SECURITY.md`, `BACKUP_DISASTER_RECOVERY.md`, `WARRANTY_SUPPORT.md`, `ROADMAP_V2.md`, `DEVELOPER_GUIDE.md`.
 
 ## Project structure
 
