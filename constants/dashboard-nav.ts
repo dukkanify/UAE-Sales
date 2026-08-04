@@ -44,7 +44,8 @@ export type DashboardIcon =
   | "ops"
   | "api"
   | "assets"
-  | "media";
+  | "media"
+  | "phase2";
 
 export interface DashboardNavItem {
   label: string;
@@ -76,6 +77,7 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Platform Settings", href: "/super-admin/settings", icon: "settings" },
   { label: "Asset Manager", href: "/super-admin/assets", icon: "assets" },
   { label: "Media Library", href: "/super-admin/media-library", icon: "media" },
+  { label: "Phase 2 Roadmap", href: "/super-admin/phase2", icon: "phase2" },
   { label: "Monitoring", href: "/super-admin/monitoring", icon: "monitoring" },
   { label: "Ops Center", href: "/super-admin/ops-center", icon: "ops" },
   { label: "API Platform", href: "/super-admin/api-platform", icon: "api" },

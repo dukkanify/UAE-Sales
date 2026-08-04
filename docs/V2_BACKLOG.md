@@ -1,48 +1,55 @@
-# Version 2.0 prioritized backlog — Task 025
+# Version 2.0 prioritized backlog — Phase 2 aligned
 
 **Product:** ATPL PASS  
-**Companion:** `docs/ROADMAP_V2.md` (strategic themes)  
+**Program:** `docs/PHASE2_ENTERPRISE_ROADMAP.md`  
 **Governance:** Ops Center feature requests (`FEAT-*`); out of warranty scope unless separately contracted.
 
 Priority: **P0** unlocks scale · **P1** growth · **P2** differentiation · **P3** explore
 
-| ID     | Initiative                          | Priority | Value                         | Dependencies                | Rough effort | Target window |
-| ------ | ----------------------------------- | -------- | ----------------------------- | --------------------------- | ------------ | ------------- |
-| V2-001 | Supabase Postgres + Storage cutover | P0       | HA, integrity, multi-instance | Migrations 001–017          | XL           | v1.8 / pre-v2 |
-| V2-002 | Redis rate limit + job workers      | P0       | Throughput / reliability      | Hosting Redis               | L            | v1.8          |
-| V2-003 | Live Stripe + Zoom + SMTP harden    | P0       | Revenue / classes / email     | Production secrets          | M            | Immediate     |
-| V2-004 | Native iOS application              | P1       | Mobile reach                  | Stable `/api/v1`, push      | XL           | v2.0          |
-| V2-005 | Native Android application          | P1       | Mobile reach                  | Same as iOS                 | XL           | v2.0          |
-| V2-006 | Enterprise SSO (SAML/OIDC)          | P1       | B2B / corporate               | Identity IdP                | L            | v2.0          |
-| V2-007 | Multi-tenant architecture           | P1       | White-label academies         | Data isolation, branding    | XL           | v2.0          |
-| V2-008 | Corporate training portal           | P1       | B2B cohorts                   | Multi-tenant, SSO           | L            | v2.1          |
-| V2-009 | Advanced learning paths             | P2       | Curriculum packaging          | LMS graph                   | L            | v2.1          |
-| V2-010 | AI proctoring                       | P2       | Exam integrity                | Quiz engine, media pipeline | XL           | v2.1          |
-| V2-011 | CRM integration                     | P2       | Pipeline → enrollment         | Webhooks, identity          | L            | v2.1          |
-| V2-012 | ERP integration                     | P2       | Finance / HR sync             | Stable finance APIs         | L            | v2.2          |
-| V2-013 | Multi-language platform (i18n)      | P2       | Regional expansion            | Content workflow            | L            | v2.1          |
-| V2-014 | Advanced BI / data warehouse        | P2       | Executive decisions           | Postgres events             | L            | v2.1          |
-| V2-015 | Marketing automation                | P3       | Retention / campaigns         | CRM, email ESP              | M            | v2.2          |
-| V2-016 | CSP enforce + full WCAG AA          | P1       | Security / a11y               | TD-005, TD-023              | M            | v1.9          |
+## Pre-Phase-2 prerequisites (v1 hardening)
 
-## Sequencing recommendation
+| ID     | Initiative                          | Priority | Impact                    | Recommendation         | Effort | Target    | Status |
+| ------ | ----------------------------------- | -------- | ------------------------- | ---------------------- | ------ | --------- | ------ |
+| V2-001 | Supabase Postgres + Storage cutover | P0       | HA / multi-instance       | Cut over before SaaS   | XL     | pre-2.0   | open   |
+| V2-002 | Redis rate limit + job workers      | P0       | Throughput                | Shared Redis + workers | L      | pre-2.0   | open   |
+| V2-003 | Live Stripe + Zoom + SMTP harden    | P0       | Revenue / classes / email | Production secrets     | M      | Immediate | open   |
+| V2-016 | CSP enforce + full WCAG AA          | P1       | Security / a11y           | TD-005, TD-023         | M      | v1.9      | open   |
 
-1. **Stabilize production** — V2-003 secrets, monitoring, backups.
-2. **Unlock scale** — V2-001, V2-002.
-3. **Mobile** — V2-004 / V2-005 on v1 API.
-4. **Enterprise** — V2-006 → V2-007 → V2-008.
-5. **Differentiation** — learning paths, proctoring, BI, CRM/ERP, i18n, marketing.
+## Phase 2 pillars
+
+| ID     | Pillar                    | Priority | Flag                  | Train | Effort | Spec  |
+| ------ | ------------------------- | -------- | --------------------- | ----- | ------ | ----- |
+| V2-004 | Native iOS + Android (RN) | P1       | `mobileApps`          | 2.1   | XL     | P2-01 |
+| V2-008 | Corporate training portal | P1       | `corporatePortal`     | 2.1   | L      | P2-02 |
+| V2-007 | Multi-tenant SaaS         | P1       | `multiTenant`         | 2.0   | XL     | P2-03 |
+| V2-010 | AI proctoring             | P2       | `aiProctoring`        | 2.2   | XL     | P2-04 |
+| V2-009 | Advanced learning paths   | P2       | `learningPaths`       | 2.1   | L      | P2-05 |
+| V2-011 | CRM integration           | P2       | `crmIntegration`      | 2.2   | L      | P2-06 |
+| V2-012 | ERP integration           | P2       | `erpIntegration`      | 2.3   | L      | P2-07 |
+| V2-015 | Marketing automation      | P3       | `marketingAutomation` | 2.2   | M      | P2-08 |
+| V2-006 | Enterprise SSO            | P1       | `enterpriseSso`       | 2.0   | L      | P2-09 |
+| V2-013 | Multi-language (i18n)     | P2       | `i18n`                | 2.2   | L      | P2-10 |
+| V2-017 | White label               | P1       | `whiteLabel`          | 2.0   | L      | P2-11 |
+| V2-014 | BI 2.0 predictive         | P2       | `biPredictive`        | 2.3   | L      | P2-12 |
+
+## Sequencing
+
+1. Stabilize production (V2-003) + scale (V2-001, V2-002)
+2. Train **2.0** — SSO, multi-tenant, white label
+3. Train **2.1** — mobile, corporate, learning paths
+4. Train **2.2** — proctoring, CRM, marketing, i18n
+5. Train **2.3** — ERP, predictive BI
 
 ## Intake
 
-1. Capture request in Ops Center (business impact, sponsor).
-2. Score value / effort / risk.
-3. Approve → roadmap release train → feature branch `cursor/<name>-0987`.
-4. Ship with CI green; record in `RELEASE_NOTES.md`.
+1. Capture request in Ops Center with business impact.
+2. Score value / effort / risk; map to `P2-xx`.
+3. Implement on `cursor/<name>-0987` with flag default off.
+4. Prove no v1 regressions (CI + UAT smoke).
 
 ## Client prioritization workshop
 
-Top 5 selected for next contracted phase:
+Top 5 for next contracted phase:
 
 1. ***
 2. ***
