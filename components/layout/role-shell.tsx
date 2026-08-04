@@ -18,8 +18,10 @@ import {
   History,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Menu,
   MessageSquare,
+  Headset,
   PanelLeftClose,
   PanelLeft,
   Search,
@@ -101,6 +103,9 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   history: History,
   search: Search,
   bookmark: Bookmark,
+  messages: MessageSquare,
+  support: Headset,
+  megaphone: Megaphone,
 };
 
 interface RoleShellProps {
