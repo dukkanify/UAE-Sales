@@ -134,6 +134,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     wallet: true,
     courses: true,
     calendar: true,
+    ai: true,
   },
   zoom: {
     enabled: true,

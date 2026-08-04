@@ -209,15 +209,18 @@ export function syncGoalHoursFromProgress(studentId: string): void {
 }
 
 export function suggestAiGoalPlaceholder(studentId: string): StudyGoal | null {
-  // Future AI recommendations hook — returns a suggested draft shape without persisting
-  void studentId;
   const now = new Date();
+  const hours =
+    readLearningDb().progress
+      .filter((p) => p.studentId === studentId)
+      .reduce((s, p) => s + (p.timeSpentSeconds ?? 0), 0) / 3600;
+  const target = Math.max(4, Math.min(12, Math.round(hours + 3) || 5));
   return {
     id: "ai-suggestion",
     studentId,
-    title: "Suggested: 5 hours of ATPL study this week",
+    title: `AI suggested: ${target} hours of focused study this week`,
     period: "weekly",
-    targetHours: 5,
+    targetHours: target,
     completedHours: 0,
     status: "active",
     startsAt: startOfWeek(now).toISOString(),

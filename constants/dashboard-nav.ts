@@ -39,7 +39,8 @@ export type DashboardIcon =
   | "messages"
   | "support"
   | "megaphone"
-  | "analytics";
+  | "analytics"
+  | "ai";
 
 export interface DashboardNavItem {
   label: string;
@@ -66,6 +67,7 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Payments", href: "/super-admin/payments", icon: "payments" },
   { label: "Instructor Wallets", href: "/super-admin/wallets", icon: "wallets" },
   { label: "Analytics", href: "/super-admin/analytics", icon: "analytics" },
+  { label: "AI Assistant", href: "/super-admin/ai", icon: "ai" },
   { label: "Reports", href: "/super-admin/reports", icon: "reports" },
   { label: "Platform Settings", href: "/super-admin/settings", icon: "settings" },
   { label: "Monitoring", href: "/super-admin/monitoring", icon: "monitoring" },
@@ -91,6 +93,7 @@ export const ADMIN_NAV: DashboardNavItem[] = [
   { label: "Payments", href: "/admin/payments", icon: "payments" },
   { label: "Wallets", href: "/admin/wallets", icon: "wallets" },
   { label: "Analytics", href: "/admin/analytics", icon: "analytics" },
+  { label: "AI Assistant", href: "/admin/ai", icon: "ai" },
   { label: "Reports", href: "/admin/reports", icon: "reports" },
   { label: "Notifications", href: "/admin/notifications", icon: "notifications" },
   { label: "Profile", href: "/admin/profile", icon: "profile" },
@@ -112,6 +115,7 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Support", href: "/instructor/support", icon: "support" },
   { label: "Wallet", href: "/instructor/wallet", icon: "wallet" },
   { label: "Analytics", href: "/instructor/analytics", icon: "analytics" },
+  { label: "AI Assistant", href: "/instructor/ai", icon: "ai" },
   { label: "Reports", href: "/instructor/reports", icon: "reports" },
   { label: "Notifications", href: "/instructor/notifications", icon: "notifications" },
   { label: "Profile", href: "/instructor/profile", icon: "profile" },
@@ -131,6 +135,7 @@ export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/student/quizzes", icon: "quizzes" },
   { label: "Progress", href: "/student/progress", icon: "activity" },
   { label: "Analytics", href: "/student/analytics", icon: "analytics" },
+  { label: "AI Assistant", href: "/student/ai", icon: "ai" },
   { label: "Certificates", href: "/student/certificates", icon: "certificates" },
   { label: "Transcript", href: "/student/transcript", icon: "reports" },
   { label: "Messages", href: "/student/messages", icon: "messages" },
