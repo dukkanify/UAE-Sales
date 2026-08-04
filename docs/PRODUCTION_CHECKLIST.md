@@ -61,16 +61,20 @@ Use before promoting staging → production.
 
 - [ ] `docs/PRODUCTION.md` reviewed
 - [ ] `docs/DEPLOYMENT.md` followed
+- [ ] `docs/ENVIRONMENT_SETUP.md` applied
 - [ ] `docs/BACKUP_DISASTER_RECOVERY.md` shared with ops
-- [ ] Admin manual available to operators
+- [ ] Admin manual + `docs/TRAINING.md` completed
 - [ ] `docs/QA_REPORT.md` / `docs/UAT_APPROVAL.md` signed
+- [ ] `docs/FINAL_ACCEPTANCE_CHECKLIST.md` signed
+- [ ] `docs/FINAL_SECURITY_AUDIT.md` reviewed
 - [ ] `docs/HANDOVER.md` filled (URLs + contacts)
+- [ ] `docs/WARRANTY_SUPPORT.md` contacts filled
 
 ## Post-launch checklist
 
 - [ ] No critical / high open bugs (`docs/BUG_TRACKER.md`)
 - [ ] No unexpected console errors on critical paths
-- [ ] No build / typecheck / lint errors on `main`
+- [ ] No build / typecheck / lint / Vitest errors on `main`
 - [ ] No database / store errors in monitoring
 - [ ] No permission escalation issues in UAT
 - [ ] No broken primary nav links for each role
@@ -80,8 +84,12 @@ Use before promoting staging → production.
 - [ ] Emails working (or documented mock limitation)
 - [ ] Zoom working (or documented stub limitation)
 - [ ] Payments working (mock or live Stripe)
+- [ ] Reports working
 - [ ] Analytics dashboards loading for allowed roles
+- [ ] AI assistant working for enabled roles
+- [ ] Mobile API v1 ready (`docs/MOBILE_API.md`)
+- [ ] Lighthouse / CWV spot-check on production URL (target 90+)
 
 ## Go / No-go
 
-**GO** only if all Security and Build quality boxes pass, backups exist, and UAT is approved.
+**GO** only if all Security and Build quality boxes pass, backups exist, documentation/training delivered, and UAT is approved (`docs/FINAL_ACCEPTANCE_CHECKLIST.md`).
