@@ -1,8 +1,8 @@
 # Aviation Education Platform (AEP)
 
-**Eager Pilots for Aviation Consultation and Training**
+**ATPL PASS — Professional ATPL training**
 
-Production-ready foundation for a scalable aviation education web platform.
+Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, and AI assistant. Production readiness guides live under `docs/PRODUCTION.md`.
 
 ## Tech stack
 
@@ -10,10 +10,10 @@ Production-ready foundation for a scalable aviation education web platform.
 |-------|------------|
 | Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS 4 |
 | UI | Shadcn UI (New York), Framer Motion, Lucide |
-| Backend | Supabase (Auth, PostgreSQL, Storage, Realtime) |
-| ORM | Prisma (optional) |
-| Auth | Supabase Auth — Email OTP |
-| Deploy | Vercel |
+| Auth (current) | Email OTP + secure session cookies (RBAC) |
+| Data (current) | Local JSON stores under `.data/` |
+| Data (target) | Supabase PostgreSQL + Storage (`database/migrations/`) |
+| Deploy | Vercel + GitHub Actions CI |
 
 ## Getting started
 
@@ -23,19 +23,21 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Demo OTP `123456` (disabled in production).
 
 ## Environment
 
-All secrets live in environment variables. See `.env.example` and `.env.production.example`.
+See `.env.example` and `.env.production.example`. Set a strong `AUTH_SECRET` before production.
 
-Required for full auth/storage:
+## Production ops
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY` (server only)
+```bash
+npm run lint && npm run typecheck && npm run build
+npm run backup
+npm run acceptance   # requires running server
+```
 
-Without Supabase credentials the UI foundation still runs; auth calls return a clear configuration error.
+Docs: `docs/PRODUCTION.md`, `docs/PRODUCTION_CHECKLIST.md`, `docs/SECURITY.md`, `docs/DEPLOYMENT.md`, `docs/BACKUP_DISASTER_RECOVERY.md`.
 
 ## Project structure
 
