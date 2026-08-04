@@ -8,6 +8,8 @@ import {
   listSettingsHistory,
   type CategoryPatch,
 } from "@/services/settings/settings-service";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
+import { writeOpsLog } from "@/services/ops/logging-service";
 
 export async function GET() {
   try {
@@ -26,6 +28,9 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const user = await requirePermission(PERMISSIONS.SYSTEM_SETTINGS);
     const body = (await request.json().catch(() => null)) as {
       patch?: CategoryPatch;
@@ -50,6 +55,14 @@ export async function PATCH(request: Request) {
       actorId: user.id,
       ipAddress: request.headers.get("x-forwarded-for"),
       userAgent: request.headers.get("user-agent"),
+    });
+
+    writeOpsLog({
+      level: "info",
+      category: "audit",
+      message: "Platform settings updated",
+      userId: user.id,
+      path: "/api/admin/settings",
     });
 
     // Redact password in response

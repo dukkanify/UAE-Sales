@@ -4,11 +4,13 @@ import path from "path";
 
 import { authErrorResponse, requirePermission } from "@/services/auth/guards";
 import { PERMISSIONS } from "@/constants/permissions";
-import { updatePlatformSettings } from "@/services/settings/settings-service";
-import { getPlatformSettings } from "@/services/settings/settings-service";
+import { updatePlatformSettings, getPlatformSettings } from "@/services/settings/settings-service";
 import { logActivity } from "@/services/auth/activity-log";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { generateId } from "@/lib/security/crypto";
+import { validateUpload, virusScanHook, UploadSecurityError } from "@/lib/security/upload";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
+import { writeOpsLog } from "@/services/ops/logging-service";
 
 const BRAND_KEYS = [
   "logoUrl",
@@ -28,6 +30,9 @@ type BrandKey = (typeof BRAND_KEYS)[number];
  */
 export async function POST(request: Request) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const user = await requirePermission(PERMISSIONS.SYSTEM_SETTINGS);
     const form = await request.formData();
     const file = form.get("file");
@@ -48,26 +53,27 @@ export async function POST(request: Request) {
 
     const settings = getPlatformSettings();
     const maxBytes = settings.security.maxUploadSizeMb * 1024 * 1024;
-    if (file.size > maxBytes) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: null,
-          error: `File exceeds ${settings.security.maxUploadSizeMb}MB limit`,
-        },
-        { status: 400 },
-      );
-    }
-
-    if (
-      settings.security.allowedFileTypes.length &&
-      !settings.security.allowedFileTypes.includes(file.type) &&
-      file.type !== ""
-    ) {
-      return NextResponse.json(
-        { success: false, data: null, error: `File type ${file.type} is not allowed` },
-        { status: 400 },
-      );
+    let safeName: string;
+    try {
+      const validated = validateUpload({
+        fileName: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+        maxBytes,
+        allowedMimeTypes: settings.security.allowedFileTypes.filter(
+          (t) => t !== "image/svg+xml",
+        ),
+        allowSvg: false,
+      });
+      safeName = validated.safeName;
+    } catch (error) {
+      if (error instanceof UploadSecurityError) {
+        return NextResponse.json(
+          { success: false, data: null, error: error.message },
+          { status: error.status },
+        );
+      }
+      throw error;
     }
 
     if (settings.storage.provider === "supabase") {
@@ -82,19 +88,18 @@ export async function POST(request: Request) {
       );
     }
 
-    const ext = path.extname(file.name) || ".bin";
-    const allowed = settings.storage.allowedExtensions;
-    if (allowed.length && !allowed.includes(ext.toLowerCase())) {
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const scan = await virusScanHook(buffer);
+    if (!scan.clean) {
       return NextResponse.json(
-        { success: false, data: null, error: `Extension ${ext} is not allowed` },
+        { success: false, data: null, error: "File failed security scan" },
         { status: 400 },
       );
     }
 
     const dir = path.join(process.cwd(), "public", "uploads", "branding");
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    const filename = `${key}-${generateId().slice(0, 12)}${ext.toLowerCase()}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
+    const filename = `${key}-${generateId().slice(0, 12)}-${safeName}`;
     writeFileSync(path.join(dir, filename), buffer);
     const publicUrl = `/uploads/branding/${filename}`;
 
@@ -111,6 +116,13 @@ export async function POST(request: Request) {
       entityType: "branding",
       entityId: key,
       metadata: { url: publicUrl, size: file.size, type: file.type },
+    });
+    writeOpsLog({
+      level: "info",
+      category: "security",
+      message: `Branding upload ${key}`,
+      userId: user.id,
+      path: publicUrl,
     });
 
     return NextResponse.json({
