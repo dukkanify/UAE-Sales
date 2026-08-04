@@ -1,5 +1,5 @@
 /**
- * Barrel export for UI primitives.
+ * Barrel export for UI primitives — ATPL PASS Design System.
  */
 
 export * from "./accordion";
@@ -7,12 +7,17 @@ export * from "./alert";
 export * from "./alert-dialog";
 export * from "./avatar";
 export * from "./badge";
+export * from "./banner";
 export * from "./button";
 export * from "./calendar";
 export * from "./card";
 export * from "./chart";
 export * from "./checkbox";
+export * from "./color-picker";
+export * from "./command";
 export * from "./confirmation-dialog";
+export * from "./context-menu";
+export * from "./currency-input";
 export * from "./date-picker";
 export * from "./dialog";
 export * from "./drawer";
@@ -20,16 +25,27 @@ export * from "./dropdown-menu";
 export * from "./file-upload";
 export * from "./input";
 export * from "./label";
+export * from "./multi-select";
+export * from "./otp-input";
 export * from "./pagination";
+export * from "./password-input";
+export * from "./phone-input";
 export * from "./popover";
 export * from "./progress";
+export * from "./radio-group";
 export * from "./scroll-area";
 export * from "./search-input";
 export * from "./select";
 export * from "./separator";
 export * from "./skeleton";
 export * from "./sonner";
+export * from "./spinner";
+export * from "./split-button";
+export * from "./switch";
 export * from "./table";
 export * from "./tabs";
+export * from "./tag";
 export * from "./textarea";
+export * from "./time-picker";
+export * from "./timeline";
 export * from "./tooltip";

@@ -54,7 +54,7 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-outfit), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-plus-jakarta), var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: 0 1px 3px 0 rgb(11 31 58 / 0.06), 0 1px 2px -1px rgb(11 31 58 / 0.06);
   --shadow-medium: 0 4px 12px -2px rgb(11 31 58 / 0.08), 0 2px 6px -2px rgb(11 31 58 / 0.05);
@@ -101,7 +101,7 @@
   --sidebar-accent: #163a62;
   --sidebar-accent-foreground: #ffffff;
 
-  --radius: 0.625rem;
+  --radius: 0.75rem; /* 12px — design system standard (12–16px) */
 }
 
 .dark {
@@ -177,5 +177,59 @@
 
   .container-app {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Typography utilities — design system hierarchy */
+  .text-display {
+    @apply font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl;
+  }
+  .text-h1 {
+    @apply font-display text-3xl font-semibold tracking-tight sm:text-4xl;
+  }
+  .text-h2 {
+    @apply font-display text-2xl font-semibold tracking-tight;
+  }
+  .text-h3 {
+    @apply font-display text-xl font-semibold;
+  }
+  .text-h4 {
+    @apply font-display text-lg font-semibold;
+  }
+  .text-body {
+    @apply font-sans text-base leading-relaxed;
+  }
+  .text-caption {
+    @apply font-sans text-xs text-muted-foreground;
+  }
+  .text-label {
+    @apply font-sans text-sm font-medium;
+  }
+
+  /* Motion helpers */
+  .animate-in-fade {
+    animation: ds-fade-in 0.25s ease-out both;
+  }
+  .animate-in-up {
+    animation: ds-slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes ds-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ds-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

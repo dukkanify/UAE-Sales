@@ -34,7 +34,7 @@ export const brandingConfig = {
     accent: theme.colors.accent.DEFAULT,
   },
   typography: {
-    display: "Outfit",
+    display: "Plus Jakarta Sans",
     body: "DM Sans",
   },
   pending: {

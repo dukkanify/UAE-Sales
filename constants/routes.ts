@@ -74,6 +74,11 @@ export const publicSystemRoutes = [
   "/access-denied",
   "/account-suspended",
   "/session-expired",
+  "/coming-soon",
+  "/offline",
+  "/401",
+  "/403",
+  "/design-system",
 ] as const;
 
 /** Map route prefix → required role */
