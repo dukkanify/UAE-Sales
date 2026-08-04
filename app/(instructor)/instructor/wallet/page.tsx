@@ -1,17 +1,7 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Wallet" };
+import { WalletDashboard } from "@/features/payments";
 
 export default function Page() {
-  return (
-    <ModulePlaceholder
-      title="Wallet"
-      description="Earnings and payout readiness for instructors."
-      role="instructor"
-      href="/instructor/wallet"
-      icon="Wallet"
-      emptyTitle="Wallet module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
-  );
+  return <WalletDashboard />;
 }
