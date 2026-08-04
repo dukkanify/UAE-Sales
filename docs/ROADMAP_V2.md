@@ -1,6 +1,6 @@
 # Version 2.0 roadmap recommendations — ATPL PASS
 
-Post-closure recommendations for major platform evolution. Near-term 1.1 items remain in `docs/ROADMAP.md` and Ops Center.
+Post-GA recommendations for major platform evolution. Prioritized backlog: **`docs/V2_BACKLOG.md`**. Near-term 1.1 items remain in `docs/ROADMAP.md` and Ops Center.
 
 ## Strategic themes
 
