@@ -21,6 +21,9 @@ export const ACTIVITY_ACTIONS = {
   SETTINGS_UPDATE: "settings.update",
   FEATURE_FLAG_CHANGE: "settings.feature_flag",
   BRANDING_UPLOAD: "settings.branding_upload",
+  LICENSE_CREATED: "settings.license_created",
+  LICENSE_UPLOAD: "settings.license_upload",
+  MEDIA_LIBRARY_UPLOAD: "media.library_upload",
   // Courses / LMS
   COURSE_CREATED: "courses.created",
   COURSE_UPDATED: "courses.updated",

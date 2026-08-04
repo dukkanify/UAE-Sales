@@ -43,6 +43,8 @@ import {
   UsersRound,
   Server,
   KeyRound,
+  Images,
+  Library,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -119,6 +121,8 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   megaphone: Megaphone,
   ops: Server,
   api: KeyRound,
+  assets: Images,
+  media: Library,
 };
 
 interface RoleShellProps {

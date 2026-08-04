@@ -32,6 +32,12 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
     general.socialLinks.twitter
       ? `<a href="${general.socialLinks.twitter}" style="color:${accent};text-decoration:none;margin:0 8px;">X</a>`
       : "",
+    general.socialLinks.linkedin
+      ? `<a href="${general.socialLinks.linkedin}" style="color:${accent};text-decoration:none;margin:0 8px;">LinkedIn</a>`
+      : "",
+    general.socialLinks.youtube
+      ? `<a href="${general.socialLinks.youtube}" style="color:${accent};text-decoration:none;margin:0 8px;">YouTube</a>`
+      : "",
     general.socialHandle
       ? `<span style="color:#94a3b8;margin:0 8px;">${general.socialHandle}</span>`
       : "",
