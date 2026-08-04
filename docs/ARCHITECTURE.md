@@ -44,3 +44,11 @@ Each business domain (courses, payments, AI, analytics, …) keeps:
 - `access.ts` — authorization errors
 - `*-service.ts` — use cases
 - `seed.ts` — demo data
+
+Route handlers stay thin. Prefer shared helpers:
+
+- Pagination: `parsePagination` / `paginate` (`lib/api/envelope.ts`)
+- Browser CSRF: `csrfHeaders` / `authFetch` (`features/auth/services/auth-api.ts`)
+- Dashboard charts: lazy exports from `components/dashboard`
+
+Task 024: `docs/ENTERPRISE_REFACTOR_024.md`. Onboarding: `docs/DEVELOPER_GUIDE.md`.

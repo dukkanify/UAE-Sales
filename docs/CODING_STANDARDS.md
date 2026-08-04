@@ -29,6 +29,14 @@
 - Server Components by default; `"use client"` only when needed
 - Prefer existing design-system / Radix primitives
 - Do not add `useMemo`/`useCallback` by default
+- Icon-only buttons need `aria-label`
+- Lazy-load heavy chart libraries via `@/components/dashboard` exports
+
+## Shared client helpers
+
+- CSRF / authenticated fetch: `@/features/auth/services/auth-api`
+- Ops status chips: `@/features/ops/components/ops-status-badge`
+- List query parsing (server): `parsePagination` in `@/lib/api/envelope`
 
 ## Git
 

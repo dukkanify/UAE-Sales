@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { authFetch } from "@/features/auth/services/auth-api";
+import { authFetch, csrfHeaders } from "@/features/auth/services/auth-api";
 
 type Health = {
   status: string;
@@ -65,16 +65,12 @@ function SystemLogsPage() {
   }, [load]);
 
   async function runBackup() {
-    const csrf = document.cookie
-      .split("; ")
-      .find((c) => c.startsWith("aep_csrf="))
-      ?.split("=")[1];
     const res = await fetch("/api/ops", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        ...(csrf ? { "x-csrf-token": decodeURIComponent(csrf) } : {}),
+        ...csrfHeaders(),
       },
       body: JSON.stringify({ action: "backup", retention: "daily" }),
     });
@@ -84,16 +80,12 @@ function SystemLogsPage() {
   }
 
   async function testRestore(backupId: string) {
-    const csrf = document.cookie
-      .split("; ")
-      .find((c) => c.startsWith("aep_csrf="))
-      ?.split("=")[1];
     await fetch("/api/ops", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        ...(csrf ? { "x-csrf-token": decodeURIComponent(csrf) } : {}),
+        ...csrfHeaders(),
       },
       body: JSON.stringify({ action: "test_restore", backupId }),
     });
@@ -191,7 +183,9 @@ function SystemLogsPage() {
                 <p className="font-medium">{b.id}</p>
                 <p className="text-xs text-muted-foreground">
                   {b.retention} · {new Date(b.createdAt).toLocaleString()} · {b.files.length} files
-                  {b.restoreTestedAt ? ` · tested ${new Date(b.restoreTestedAt).toLocaleString()}` : ""}
+                  {b.restoreTestedAt
+                    ? ` · tested ${new Date(b.restoreTestedAt).toLocaleString()}`
+                    : ""}
                 </p>
               </div>
               <Button size="sm" variant="outline" onClick={() => void testRestore(b.id)}>
@@ -200,7 +194,9 @@ function SystemLogsPage() {
             </div>
           ))}
           {!backups.length ? (
-            <p className="text-sm text-muted-foreground">No backups yet. Run a backup to start retention.</p>
+            <p className="text-sm text-muted-foreground">
+              No backups yet. Run a backup to start retention.
+            </p>
           ) : null}
         </CardContent>
       </Card>
@@ -242,9 +238,7 @@ function SystemLogsPage() {
                   </span>
                 </div>
                 <p className="mt-1">{log.message}</p>
-                {log.path ? (
-                  <p className="text-xs text-muted-foreground">{log.path}</p>
-                ) : null}
+                {log.path ? <p className="text-xs text-muted-foreground">{log.path}</p> : null}
               </div>
             ))}
             {!logs.length ? (

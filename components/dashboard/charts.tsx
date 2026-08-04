@@ -19,10 +19,11 @@ import {
   YAxis,
 } from "recharts";
 
-import { cn } from "@/lib/utils";
+import type { SeriesPoint } from "@/components/dashboard/chart-types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
-const CHART_COLORS = ["#0B1F3A", "#38BDF8", "#16A34A", "#EA580C", "#7C3AED", "#0EA5E9"];
+export const CHART_COLORS = ["#0B1F3A", "#38BDF8", "#16A34A", "#EA580C", "#7C3AED", "#0EA5E9"];
 
 interface ChartCardProps {
   title: string;
@@ -32,7 +33,7 @@ interface ChartCardProps {
   heightClassName?: string;
 }
 
-function ChartCard({
+export function ChartCard({
   title,
   description,
   className,
@@ -66,13 +67,7 @@ function ChartCard({
   );
 }
 
-interface SeriesPoint {
-  name: string;
-  value: number;
-  secondary?: number;
-}
-
-function AreaTrendChart({
+export function AreaTrendChart({
   data,
   color = CHART_COLORS[1],
   gradientId = "areaFill",
@@ -104,7 +99,7 @@ function AreaTrendChart({
   );
 }
 
-function LineTrendChart({
+export function LineTrendChart({
   data,
   keys = ["value"],
 }: {
@@ -132,7 +127,7 @@ function LineTrendChart({
   );
 }
 
-function BarsChart({ data }: { data: SeriesPoint[] }) {
+export function BarsChart({ data }: { data: SeriesPoint[] }) {
   return (
     <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
@@ -144,10 +139,17 @@ function BarsChart({ data }: { data: SeriesPoint[] }) {
   );
 }
 
-function DonutChart({ data }: { data: { name: string; value: number }[] }) {
+export function DonutChart({ data }: { data: { name: string; value: number }[] }) {
   return (
     <PieChart>
-      <Pie data={data} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90} paddingAngle={3}>
+      <Pie
+        data={data}
+        dataKey="value"
+        nameKey="name"
+        innerRadius={55}
+        outerRadius={90}
+        paddingAngle={3}
+      >
         {data.map((_, index) => (
           <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
         ))}
@@ -158,12 +160,4 @@ function DonutChart({ data }: { data: { name: string; value: number }[] }) {
   );
 }
 
-export {
-  ChartCard,
-  AreaTrendChart,
-  LineTrendChart,
-  BarsChart,
-  DonutChart,
-  CHART_COLORS,
-};
 export type { SeriesPoint };
