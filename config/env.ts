@@ -98,7 +98,26 @@ export function getServerEnv() {
     throw new Error("Invalid server environment configuration");
   }
 
-  return result.data;
+  const data = result.data;
+  const appEnv = process.env.NEXT_PUBLIC_APP_ENV ?? "development";
+  const weakSecret =
+    !process.env.AUTH_SECRET ||
+    data.AUTH_SECRET === "aep-dev-auth-secret-change-me" ||
+    data.AUTH_SECRET.length < 24;
+
+  if (appEnv === "production" && weakSecret) {
+    throw new Error(
+      "AUTH_SECRET must be set to a strong unique value (≥24 chars) in production",
+    );
+  }
+
+  if (appEnv === "production" && data.ENABLE_DEMO_OTP) {
+    console.warn(
+      "[security] ENABLE_DEMO_OTP is true in production — set ENABLE_DEMO_OTP=false before launch",
+    );
+  }
+
+  return data;
 }
 
 export function isSupabaseConfigured(): boolean {
