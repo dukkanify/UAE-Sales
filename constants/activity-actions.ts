@@ -129,6 +129,15 @@ export const ACTIVITY_ACTIONS = {
   ANALYTICS_REPORT_SCHEDULED: "analytics.report_scheduled",
   ANALYTICS_EXPORTED: "analytics.exported",
   ANALYTICS_DASHBOARD_UPDATED: "analytics.dashboard_updated",
+
+  // AI Learning Assistant
+  AI_CHAT: "ai.chat",
+  AI_CONVERSATION_CREATED: "ai.conversation_created",
+  AI_FEEDBACK: "ai.feedback",
+  AI_PLAN_GENERATED: "ai.plan_generated",
+  AI_PLAN_ACCEPTED: "ai.plan_accepted",
+  AI_RECOMMENDATION: "ai.recommendation",
+  AI_BLOCKED: "ai.blocked",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];

@@ -159,6 +159,7 @@ export interface FeatureFlags {
   wallet: boolean;
   courses: boolean;
   calendar: boolean;
+  ai: boolean;
 }
 
 export interface PlatformSettings {

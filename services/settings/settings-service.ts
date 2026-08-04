@@ -9,6 +9,7 @@ import {
   patchStoredSettings,
   readSettingsDb,
 } from "@/services/settings/store";
+import { DEFAULT_PLATFORM_SETTINGS } from "@/services/settings/defaults";
 import type {
   PlatformSettings,
   SettingsCategory,
@@ -98,7 +99,11 @@ export function listSettingsHistory(limit = 50) {
 }
 
 export function isFeatureEnabled(flag: keyof FeatureFlags): boolean {
-  return Boolean(getStoredSettings().features[flag]);
+  const features = getStoredSettings().features;
+  if (features[flag] === undefined) {
+    return Boolean(DEFAULT_PLATFORM_SETTINGS.features[flag]);
+  }
+  return Boolean(features[flag]);
 }
 
 export function isMaintenanceMode(): boolean {
