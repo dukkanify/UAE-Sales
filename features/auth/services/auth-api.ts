@@ -8,11 +8,17 @@ function getCsrfToken(): string | null {
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
+async function ensureBrowserCsrf(): Promise<string | null> {
+  if (getCsrfToken()) return getCsrfToken();
+  await fetch("/api/auth/me", { credentials: "include" });
+  return getCsrfToken();
+}
+
 export async function authFetch<T>(
   url: string,
   init?: RequestInit,
 ): Promise<{ success: boolean; data: T | null; error: string | null }> {
-  const csrf = getCsrfToken();
+  const csrf = await ensureBrowserCsrf();
   const headers = new Headers(init?.headers);
   headers.set("Content-Type", "application/json");
   if (csrf) headers.set("x-csrf-token", csrf);
