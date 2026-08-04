@@ -2,29 +2,28 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { ROLES } from "@/constants/roles";
-import {
-  getRequestContext,
-  requireAuth,
-  requirePermission,
-} from "@/services/auth/guards";
+import { getRequestContext, requireAuth, requirePermission } from "@/services/auth/guards";
 import { assertPermission } from "@/services/auth/permissions";
 import { createLiveClass, listLiveClasses } from "@/services/classes/class-service";
 import { classErrorResponse } from "@/app/api/classes/_utils";
+import { parsePagination } from "@/lib/api/envelope";
 import type { ClassFilters, LiveClassStatus } from "@/types/classes";
 
 export async function GET(request: Request) {
   try {
     const user = await requireAuth();
-    const { searchParams } = new URL(request.url);
+    const url = new URL(request.url);
+    const { searchParams } = url;
+    const p = parsePagination(url);
     const filters: ClassFilters = {
-      q: searchParams.get("q") ?? undefined,
+      q: p.q,
       courseId: searchParams.get("courseId") ?? undefined,
       instructorId: searchParams.get("instructorId") ?? undefined,
       status: (searchParams.get("status") as ClassFilters["status"]) ?? "all",
       from: searchParams.get("from") ?? undefined,
       to: searchParams.get("to") ?? undefined,
-      page: Number(searchParams.get("page") ?? 1),
-      pageSize: Number(searchParams.get("pageSize") ?? 20),
+      page: p.page,
+      pageSize: p.pageSize,
     };
 
     if (user.role === ROLES.SUPER_ADMIN || user.role === ROLES.ADMIN) {
@@ -79,9 +78,7 @@ export async function POST(request: Request) {
 
     const ctx = getRequestContext(request);
     const instructorId =
-      user.role === ROLES.INSTRUCTOR
-        ? user.id
-        : String(body.instructorId ?? user.id);
+      user.role === ROLES.INSTRUCTOR ? user.id : String(body.instructorId ?? user.id);
 
     const created = await createLiveClass({
       title: String(body.title ?? ""),
@@ -90,12 +87,10 @@ export async function POST(request: Request) {
       moduleId: (body.moduleId as string | null | undefined) ?? null,
       lessonId: (body.lessonId as string | null | undefined) ?? null,
       instructorId,
-      assistantInstructorId:
-        (body.assistantInstructorId as string | null | undefined) ?? null,
+      assistantInstructorId: (body.assistantInstructorId as string | null | undefined) ?? null,
       startsAt: String(body.startsAt ?? ""),
       endsAt: body.endsAt != null ? String(body.endsAt) : undefined,
-      durationMinutes:
-        body.durationMinutes != null ? Number(body.durationMinutes) : undefined,
+      durationMinutes: body.durationMinutes != null ? Number(body.durationMinutes) : undefined,
       timezone: body.timezone != null ? String(body.timezone) : undefined,
       maxStudents: body.maxStudents != null ? Number(body.maxStudents) : undefined,
       meetingType: body.meetingType as "meeting" | "webinar" | undefined,

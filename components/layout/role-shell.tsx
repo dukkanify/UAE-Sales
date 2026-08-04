@@ -69,7 +69,11 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 import { ROLE_LABELS, type Role } from "@/constants/roles";
 import { routes } from "@/constants/routes";
-import { DASHBOARD_NAV, type DashboardIcon, type DashboardNavItem } from "@/constants/dashboard-nav";
+import {
+  DASHBOARD_NAV,
+  type DashboardIcon,
+  type DashboardNavItem,
+} from "@/constants/dashboard-nav";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { BrandLogo } from "@/components/brand/brand-logo";
@@ -144,9 +148,14 @@ function RoleSidebar({
         className,
       )}
     >
-      <div className={cn("flex h-16 items-center gap-2.5 px-4", collapsed && "justify-center px-2")}>
+      <div
+        className={cn("flex h-16 items-center gap-2.5 px-4", collapsed && "justify-center px-2")}
+      >
         {collapsed ? (
-          <BrandLogo variant="mark" href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`} />
+          <BrandLogo
+            variant="mark"
+            href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`}
+          />
         ) : (
           <div className="min-w-0">
             <BrandLogo
@@ -195,7 +204,9 @@ function ProfileMenu() {
   const router = useRouter();
   const initials =
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() || "EP";
-  const profileHref = user ? `/${user.role === "super_admin" ? "super-admin" : user.role}/profile` : routes.login;
+  const profileHref = user
+    ? `/${user.role === "super_admin" ? "super-admin" : user.role}/profile`
+    : routes.login;
 
   return (
     <DropdownMenu>
@@ -243,9 +254,10 @@ function LanguageSelector() {
       size="sm"
       className="gap-1.5 text-muted-foreground"
       title="Platform language: English only"
+      aria-label={`Platform language: ${siteConfig.language} (English only)`}
       disabled
     >
-      <Globe className="h-4 w-4" />
+      <Globe className="h-4 w-4" aria-hidden />
       <span className="hidden sm:inline uppercase">{siteConfig.language}</span>
     </Button>
   );
@@ -296,7 +308,11 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
               onClick={() => setCollapsed((v) => !v)}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              {collapsed ? (
+                <PanelLeft className="h-4 w-4" />
+              ) : (
+                <PanelLeftClose className="h-4 w-4" />
+              )}
             </Button>
 
             <div className="hidden min-w-0 flex-1 md:block md:max-w-md">

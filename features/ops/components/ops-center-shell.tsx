@@ -25,8 +25,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { authFetch } from "@/features/auth/services/auth-api";
+import { authFetch, csrfHeaders } from "@/features/auth/services/auth-api";
 import { PostLaunchTabs } from "@/features/ops/components/post-launch-panels";
+import { OpsStatusBadge } from "@/features/ops/components/ops-status-badge";
 
 type Dashboard = {
   serverStatus: string;
@@ -88,45 +89,18 @@ type Summary = {
   optimizationOpen?: number;
 };
 
-function csrfHeader(): HeadersInit {
-  const csrf = document.cookie
-    .split("; ")
-    .find((c) => c.startsWith("aep_csrf="))
-    ?.split("=")[1];
-  return csrf ? { "x-csrf-token": decodeURIComponent(csrf) } : {};
-}
-
 async function postAction(body: Record<string, unknown>) {
   const res = await fetch("/api/support-ops", {
     method: "POST",
     credentials: "include",
-    headers: { "Content-Type": "application/json", ...csrfHeader() },
+    headers: { "Content-Type": "application/json", ...csrfHeaders() },
     body: JSON.stringify(body),
   });
   return (await res.json()) as { success: boolean; data?: unknown; error: string | null };
 }
 
 function statusBadge(status: string) {
-  const variant =
-    status === "pass" ||
-    status === "up" ||
-    status === "healthy" ||
-    status === "closed" ||
-    status === "verified"
-      ? "default"
-      : status === "warn" || status === "degraded" || status === "open" || status === "new"
-        ? "warning"
-        : status === "fail" || status === "critical"
-          ? "destructive"
-          : "secondary";
-  return (
-    <Badge
-      variant={variant as "default" | "warning" | "destructive" | "secondary"}
-      className="capitalize"
-    >
-      {status.replaceAll("_", " ")}
-    </Badge>
-  );
+  return <OpsStatusBadge status={status} />;
 }
 
 export function OpsCenterShell() {
