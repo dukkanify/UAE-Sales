@@ -1,10 +1,30 @@
-# Drop official logo masters here (AI, SVG, PDF, transparent PNG).
+# Brand source assets
 
-Referenced by `config/branding.ts` (`assets.sourceDir`).
+Official ATPL PASS brand guidelines PDF lives here for audit and regeneration of digital assets.
 
-After dropping files:
+## Files
 
-1. Export web-optimized SVG/PNG into `public/brand/` (`logo.svg`, `logo-dark.svg`, `icon.svg`, `favicon.svg`, `og.svg`) **or**
-2. Upload via Super Admin → Platform Settings → Branding / Asset Manager
+| File                             | Purpose                                                           |
+| -------------------------------- | ----------------------------------------------------------------- |
+| `ATPL_PASS_Brand_Guidelines.pdf` | Official brand book (logo, colours, typography, digital presence) |
 
-No application code changes are required for master file drops.
+## Official palette (from guidelines)
+
+| Token                           | Hex       | Role                                |
+| ------------------------------- | --------- | ----------------------------------- |
+| Aero Blue                       | `#2E7DAA` | Primary brand / CTAs                |
+| Altitude Orange / Success Amber | `#DD9B30` | Accent / PASS wordmark / highlights |
+| Academic Grey                   | `#7C7B80` | Secondary / muted UI                |
+
+## Typography
+
+| Role     | Brand font      | Web substitute               |
+| -------- | --------------- | ---------------------------- |
+| Headings | Stimulatio Flat | Space Grotesk                |
+| Body     | IBM Plex Sans   | IBM Plex Sans (Google Fonts) |
+
+Stimulatio Flat is proprietary — load licensed files under `public/fonts/` when available and set `brandingConfig.pending.typography = false`.
+
+## Regenerated digital assets
+
+SVG logos and icons under `public/brand/` were redrawn to match the PDF logo system (wing + open book, dual-colour wordmark) for crisp UI use. Prefer SVG over raster crops from the PDF for product chrome.

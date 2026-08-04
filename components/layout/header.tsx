@@ -21,9 +21,9 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-card/90 backdrop-blur-md">
-      <div className="container-app flex h-16 items-center justify-between gap-4">
-        <BrandLogo priority />
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B1A24]/85 text-white backdrop-blur-xl">
+      <div className="container-app flex h-[4.5rem] items-center justify-between gap-4">
+        <BrandLogo variant="dark" priority />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
@@ -33,10 +33,10 @@ function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-muted text-primary"
-                    : "text-muted-foreground hover:bg-muted hover:text-primary",
+                    ? "bg-white/10 text-white"
+                    : "text-white/65 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {item.label}
@@ -46,10 +46,14 @@ function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" asChild>
+          <Button
+            variant="ghost"
+            className="text-white/80 hover:bg-white/10 hover:text-white"
+            asChild
+          >
             <Link href={routes.login}>Sign in</Link>
           </Button>
-          <Button asChild>
+          <Button variant="accent" asChild>
             <Link href={routes.register}>Get started</Link>
           </Button>
         </div>
@@ -57,7 +61,7 @@ function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="text-white hover:bg-white/10 md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-nav"
@@ -75,23 +79,27 @@ function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border md:hidden"
+            className="overflow-hidden border-t border-white/10 md:hidden"
           >
             <nav className="container-app flex flex-col gap-1 py-4" aria-label="Mobile">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
                 >
                   {item.label}
                 </Link>
               ))}
-              <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3">
-                <Button variant="outline" asChild>
+              <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
+                <Button
+                  variant="outline"
+                  className="border-white/20 bg-transparent text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href={routes.login}>Sign in</Link>
                 </Button>
-                <Button asChild>
+                <Button variant="accent" asChild>
                   <Link href={routes.register}>Get started</Link>
                 </Button>
               </div>

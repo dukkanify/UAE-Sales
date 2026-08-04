@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { siteConfig } from "@/config/site";
+import { brandingConfig } from "@/config/branding";
 import { routes } from "@/constants/routes";
 import { Separator } from "@/components/ui/separator";
 import { BrandLogo } from "@/components/brand/brand-logo";
@@ -9,21 +10,22 @@ function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border bg-primary text-primary-foreground">
-      <div className="container-app py-12">
+    <footer className="border-t border-white/10 bg-[#0B1A24] text-white">
+      <div className="container-app py-14">
         <div className="grid gap-10 md:grid-cols-3">
-          <div className="space-y-3">
+          <div className="space-y-4">
             <BrandLogo variant="dark" href={routes.home} />
-            <p className="max-w-sm text-sm text-primary-foreground/70">
-              {siteConfig.description} Primary locations: {siteConfig.locations.join(" · ")}.
+            <p className="max-w-sm text-sm leading-relaxed text-white/60">
+              {brandingConfig.tagline}. {siteConfig.description} Primary locations:{" "}
+              {siteConfig.locations.join(" · ")}.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-accent">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               Platform
             </h3>
-            <ul className="space-y-2 text-sm text-primary-foreground/80">
+            <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <Link href={routes.home} className="hover:text-accent">
                   Home
@@ -48,10 +50,10 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-accent">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               Contact
             </h3>
-            <ul className="space-y-2 text-sm text-primary-foreground/80">
+            <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <a href={`mailto:${siteConfig.contactEmail}`} className="hover:text-accent">
                   {siteConfig.contactEmail}
@@ -72,9 +74,9 @@ function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8 bg-primary-foreground/15" />
+        <Separator className="my-8 bg-white/10" />
 
-        <p className="text-center text-xs text-primary-foreground/60">
+        <p className="text-center text-xs text-white/45">
           © {year} {siteConfig.name}. All rights reserved. English only.
         </p>
       </div>

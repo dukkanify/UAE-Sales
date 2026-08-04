@@ -13,6 +13,7 @@ import {
 import { routes } from "@/constants/routes";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { siteConfig } from "@/config/site";
+import { brandingConfig } from "@/config/branding";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -21,15 +22,19 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--accent)_0%,_transparent_50%)] opacity-[0.07]" />
-      <Card className="relative z-10 w-full max-w-md">
-        <CardHeader className="space-y-4 text-center">
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="hero-aviation absolute inset-0" />
+      <div className="absolute inset-0 bg-[#0B1A24]/55 backdrop-blur-[2px]" />
+      <Card className="relative z-10 w-full max-w-md border-border/60 shadow-medium">
+        <CardHeader className="space-y-5 text-center">
           <div className="flex justify-center">
             <BrandLogo href={routes.home} priority />
           </div>
-          <div className="space-y-1">
-            <CardTitle>Sign in</CardTitle>
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
+              {brandingConfig.tagline}
+            </p>
+            <CardTitle className="font-display text-2xl">Sign in</CardTitle>
             <CardDescription>
               Enter your email to receive a one-time verification code.
             </CardDescription>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 
 import { AppProviders } from "@/providers/app-providers";
 import { siteConfig } from "@/config/site";
@@ -7,15 +7,17 @@ import { APP_METADATA } from "@/constants/navigation";
 
 import "@/styles/globals.css";
 
-const dmSans = DM_Sans({
+const ibmPlex = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-ibm-plex",
   display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-plus-jakarta",
+  weight: ["500", "600", "700"],
+  variable: "--font-space-grotesk",
   display: "swap",
 });
 
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0B1F3A",
+  themeColor: "#2E7DAA",
   width: "device-width",
   initialScale: 1,
 };
@@ -79,7 +81,7 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
-      className={`${dmSans.variable} ${plusJakarta.variable}`}
+      className={`${ibmPlex.variable} ${spaceGrotesk.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen font-sans antialiased">

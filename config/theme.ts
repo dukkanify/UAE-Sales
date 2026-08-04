@@ -1,62 +1,66 @@
 /**
- * Design theme tokens — aviation professional palette.
- * CSS variables in styles/globals.css are the source of truth for Tailwind.
+ * Design theme tokens — official ATPL PASS brand guidelines.
+ * Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
  */
 
 export const theme = {
   colors: {
     primary: {
-      DEFAULT: "#0B1F3A",
+      DEFAULT: "#2E7DAA",
       foreground: "#FFFFFF",
-      50: "#E8EEF5",
-      100: "#C5D4E6",
-      200: "#9BB4D0",
-      300: "#6F94BA",
-      400: "#4A77A8",
-      500: "#1E4A7A",
-      600: "#163A62",
-      700: "#0F2B4A",
-      800: "#0B1F3A",
-      900: "#071426",
+      50: "#EAF3F8",
+      100: "#D0E5F0",
+      200: "#A8CEE3",
+      300: "#74B0D0",
+      400: "#4A94BC",
+      500: "#2E7DAA",
+      600: "#25648A",
+      700: "#1E4F6D",
+      800: "#163A50",
+      900: "#0B1A24",
     },
     accent: {
-      DEFAULT: "#38BDF8",
-      foreground: "#0B1F3A",
-      50: "#F0F9FF",
-      100: "#E0F2FE",
-      200: "#BAE6FD",
-      300: "#7DD3FC",
-      400: "#38BDF8",
-      500: "#0EA5E9",
-      600: "#0284C7",
+      DEFAULT: "#DD9B30",
+      foreground: "#0B1A24",
+      50: "#FBF5EA",
+      100: "#F5E6C8",
+      200: "#ECCF92",
+      300: "#E5B85C",
+      400: "#DD9B30",
+      500: "#C48422",
+      600: "#A36A1A",
+    },
+    academic: {
+      DEFAULT: "#7C7B80",
+      foreground: "#FFFFFF",
     },
     success: {
       DEFAULT: "#16A34A",
       foreground: "#FFFFFF",
     },
     warning: {
-      DEFAULT: "#EA580C",
-      foreground: "#FFFFFF",
+      DEFAULT: "#DD9B30",
+      foreground: "#0B1A24",
     },
     error: {
       DEFAULT: "#DC2626",
       foreground: "#FFFFFF",
     },
-    background: "#F3F4F6",
+    background: "#F5F7FA",
     card: "#FFFFFF",
-    border: "#E5E7EB",
-    muted: "#F9FAFB",
-    foreground: "#0B1F3A",
+    border: "#E2E6EC",
+    muted: "#EEF1F5",
+    foreground: "#0B1A24",
   },
   radius: {
     sm: "0.5rem",
-    md: "0.625rem",
-    lg: "0.75rem",
-    xl: "1rem",
+    md: "0.75rem",
+    lg: "1rem",
+    xl: "1.25rem",
   },
   shadow: {
-    soft: "0 1px 3px 0 rgb(11 31 58 / 0.06), 0 1px 2px -1px rgb(11 31 58 / 0.06)",
-    medium: "0 4px 12px -2px rgb(11 31 58 / 0.08), 0 2px 6px -2px rgb(11 31 58 / 0.05)",
+    soft: "0 1px 3px 0 rgb(11 26 36 / 0.05), 0 1px 2px -1px rgb(11 26 36 / 0.05)",
+    medium: "0 8px 24px -8px rgb(46 125 170 / 0.18), 0 4px 10px -4px rgb(11 26 36 / 0.08)",
   },
 } as const;
 
