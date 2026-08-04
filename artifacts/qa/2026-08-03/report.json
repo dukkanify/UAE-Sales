@@ -1,0 +1,506 @@
+{
+  "baseUrl": "http://127.0.0.1:3000",
+  "generatedAt": "2026-08-03T14:19:31.835Z",
+  "adminLogin": {
+    "ok": true,
+    "reason": "reached /admin via password API session cookie"
+  },
+  "findings": [],
+  "results": [
+    {
+      "route": "/",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1719,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/home.png"
+    },
+    {
+      "route": "/categories",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/categories",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1417,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=esMFuyqn7hRniUuJDQb5T' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=esMFuyqn7hRniUuJDQb5T' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/categories.png"
+    },
+    {
+      "route": "/categories/cars",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/categories/cars",
+      "title": "سيارات ومركبات | Sooqna | Sooqna",
+      "loadMs": 1440,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5WO04r5VKmZjWJge6zGff' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5WO04r5VKmZjWJge6zGff' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/categories__cars.png"
+    },
+    {
+      "route": "/search",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/search",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1393,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=vEA0Pv3F3bemfeu4qC8zn' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=vEA0Pv3F3bemfeu4qC8zn' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/search.png"
+    },
+    {
+      "route": "/featured",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/featured",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1383,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=s3JkYV5QOlayi1zpn1qqy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=s3JkYV5QOlayi1zpn1qqy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/featured.png"
+    },
+    {
+      "route": "/listings/mercedes-amg-g63-2024",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/listings/mercedes-amg-g63-2024",
+      "title": "مرسيدس-AMG G63 موديل 2024 — حالة وكالة | Sooqna | Sooqna",
+      "loadMs": 1450,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=X26j7SxO93hA1eDL6iFDq' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=X26j7SxO93hA1eDL6iFDq' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/listings__mercedes-amg-g63-2024.png"
+    },
+    {
+      "route": "/login",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/login",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1330,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=OJRCeXuvyQUfPDT30MIe9' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/login.png"
+    },
+    {
+      "route": "/register",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/register",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1333,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/register.png"
+    },
+    {
+      "route": "/escrow",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/escrow",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1323,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/escrow.png"
+    },
+    {
+      "route": "/wallet",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/wallet",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1326,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/wallet.png"
+    },
+    {
+      "route": "/support",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/support",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1319,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/support.png"
+    },
+    {
+      "route": "/disputes/new",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/disputes/new",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1315,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/disputes__new.png"
+    },
+    {
+      "route": "/listings/new",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/listings/new",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1318,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/listings__new.png"
+    },
+    {
+      "route": "/profile",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/profile",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1322,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/profile.png"
+    },
+    {
+      "route": "/dashboard/listings",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/dashboard/listings",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1328,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=rAuxRw4dBAReZchFQJxPZ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/dashboard__listings.png"
+    },
+    {
+      "route": "/chat",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/chat",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1324,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/chat.png"
+    },
+    {
+      "route": "/checkout",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/checkout",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1320,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=xeQXg_KzM8vuDSSWxbuNI' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/checkout.png"
+    },
+    {
+      "route": "/orders",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/orders",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1312,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/orders.png"
+    },
+    {
+      "route": "/admin",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/login?next=%2Fadmin",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1310,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin.png"
+    },
+    {
+      "route": "/",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1571,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/home.png"
+    },
+    {
+      "route": "/search",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/search",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1408,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/search.png"
+    },
+    {
+      "route": "/listings/mercedes-amg-g63-2024",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/listings/mercedes-amg-g63-2024",
+      "title": "مرسيدس-AMG G63 موديل 2024 — حالة وكالة | Sooqna | Sooqna",
+      "loadMs": 1455,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/listings__mercedes-amg-g63-2024.png"
+    },
+    {
+      "route": "/login",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/login",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1348,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=NWfc8BsyDa5yLYQk73ybH' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=NWfc8BsyDa5yLYQk73ybH' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/login.png"
+    },
+    {
+      "route": "/categories",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/categories",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1383,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=RGbFCRwtqNqjegXa9aufI' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/categories.png"
+    },
+    {
+      "route": "/admin",
+      "viewport": "mobile",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/login?next=%2Fadmin",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1312,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=zpYlboPzxUX9YSVrxvGQ2' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "mobile/admin.png"
+    },
+    {
+      "route": "/admin",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1290,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=SNliJe-R4sP57dVD5JfDd' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=SNliJe-R4sP57dVD5JfDd' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin.png"
+    },
+    {
+      "route": "/admin/analytics",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin/analytics",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1636,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=8wTC-9i-nijOztE1f7jrL' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=8wTC-9i-nijOztE1f7jrL' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin__analytics.png"
+    },
+    {
+      "route": "/admin/listings",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin/listings",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1634,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=QwAJu-DUY3FFjniSVKtVS' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=QwAJu-DUY3FFjniSVKtVS' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin__listings.png"
+    },
+    {
+      "route": "/admin/users",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin/users",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1612,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=KPWFGxkCRaN3hoYoH-tvy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=KPWFGxkCRaN3hoYoH-tvy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin__users.png"
+    },
+    {
+      "route": "/admin/orders",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin/orders",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1613,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=uD8AE8XXGrVCswCO1RYl2' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin__orders.png"
+    },
+    {
+      "route": "/admin/settings",
+      "viewport": "desktop",
+      "status": 200,
+      "finalUrl": "http://127.0.0.1:3000/admin/settings",
+      "title": "Sooqna | سوقنا",
+      "loadMs": 1619,
+      "ok": true,
+      "error": null,
+      "consoleErrors": [
+        "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=bSxShcL3RIPn77WdkqPNB' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+      ],
+      "pageErrors": [],
+      "failedRequests": [],
+      "screenshot": "desktop/admin__settings.png"
+    }
+  ]
+}
