@@ -103,6 +103,16 @@ export const ACTIVITY_ACTIONS = {
   CERTIFICATE_TEMPLATE_UPDATED: "certificates.template_updated",
   TRANSCRIPT_GENERATED: "reports.transcript_generated",
   REPORT_EXPORTED: "reports.exported",
+
+  MESSAGE_CONVERSATION_STARTED: "messaging.conversation_started",
+  MESSAGE_SENT: "messaging.message_sent",
+  COMMUNITY_CREATED: "community.created",
+  COMMUNITY_POST_CREATED: "community.post_created",
+  BLOG_POST_SAVED: "blog.post_saved",
+  ANNOUNCEMENT_PUBLISHED: "announcements.published",
+  SUPPORT_TICKET_CREATED: "support.ticket_created",
+  SUPPORT_TICKET_UPDATED: "support.ticket_updated",
+  MODERATION_ACTION: "moderation.action",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];

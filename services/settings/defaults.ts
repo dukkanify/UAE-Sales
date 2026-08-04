@@ -125,8 +125,8 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     englishOnly: true,
   },
   features: {
-    blog: false,
-    communities: false,
+    blog: true,
+    communities: true,
     certificates: true,
     payments: false,
     zoom: true,
