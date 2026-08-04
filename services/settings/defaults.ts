@@ -127,7 +127,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   features: {
     blog: false,
     communities: false,
-    certificates: false,
+    certificates: true,
     payments: false,
     zoom: true,
     advertisements: false,
