@@ -1,7 +1,6 @@
 /**
- * Default platform settings — ATPL PASS.
- * Pending brand guidelines: colors/typography marked pending so they can be
- * swapped via Super Admin without code changes once the client delivers them.
+ * Default platform settings — ATPL PASS (official brand guidelines applied).
+ * Typography still pending Stimulatio Flat licensed files (Space Grotesk substitute).
  */
 
 import type { PlatformSettings } from "@/types/settings";
@@ -39,18 +38,17 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     loginBackgroundUrl: "/images/hero-aviation.svg",
     loginIllustrationUrl: "/images/hero-aviation.svg",
     openGraphImageUrl: "/brand/og.svg",
-    // Interim aviation palette until official brand guidelines arrive
-    primaryColor: "#0B1F3A",
-    secondaryColor: "#1E4A7A",
-    accentColor: "#38BDF8",
-    typographyDisplay: "Plus Jakarta Sans",
-    typographyBody: "DM Sans",
+    primaryColor: "#2E7DAA",
+    secondaryColor: "#1E4F6D",
+    accentColor: "#DD9B30",
+    typographyDisplay: "Space Grotesk",
+    typographyBody: "IBM Plex Sans",
     footerInformation:
-      "ATPL PASS — Kuwait & Dubai. Professional Aviation Education Platform for ATPL Training.",
-    brandGuidelinesPending: true,
-    colorPalettePending: true,
+      "ATPL PASS — Kuwait & Dubai. Unlock Your Pilot License. Professional Aviation Education Platform for ATPL Training.",
+    brandGuidelinesPending: false,
+    colorPalettePending: false,
     typographyPending: true,
-    styleGuidePending: true,
+    styleGuidePending: false,
   },
   email: {
     provider: "smtp",

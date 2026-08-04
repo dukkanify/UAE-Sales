@@ -1,12 +1,10 @@
 .hero-aviation {
+  background-color: #0b1a24;
   background-image:
-    linear-gradient(
-      135deg,
-      rgba(11, 31, 58, 0.92) 0%,
-      rgba(11, 31, 58, 0.72) 45%,
-      rgba(14, 165, 233,.35) 100%
-    ),
-    url("/images/hero-aviation.svg");
+    radial-gradient(ellipse 80% 60% at 85% 15%, rgba(221, 155, 48, 0.22), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 10% 90%, rgba(46, 125, 170, 0.35), transparent 50%),
+    linear-gradient(145deg, #0b1a24 0%, #123044 48%, #1e4f6d 100%), url("/images/hero-aviation.svg");
   background-size: cover;
   background-position: center;
+  background-blend-mode: normal, normal, normal, soft-light;
 }

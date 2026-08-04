@@ -1,8 +1,5 @@
 /**
- * Centralized branding configuration.
- * Update pending fields here (or via Super Admin → Branding) when the client
- * delivers official brand guidelines, palette, typography, and style guide.
- * No architectural redesign required.
+ * Centralized branding configuration — official ATPL PASS guidelines.
  */
 
 import { siteConfig } from "@/config/site";
@@ -11,6 +8,7 @@ import { theme } from "@/config/theme";
 export const brandingConfig = {
   platformName: siteConfig.name,
   companyName: siteConfig.legalName,
+  tagline: "Unlock Your Pilot License",
   language: siteConfig.language,
   englishOnly: siteConfig.englishOnly,
   contactEmail: siteConfig.contactEmail,
@@ -24,24 +22,27 @@ export const brandingConfig = {
     icon: siteConfig.brand.icon,
     favicon: siteConfig.brand.favicon,
     openGraph: siteConfig.brand.openGraph,
-    /** Drop client AI/PDF/PNG masters into public/brand/source/ without code changes */
     sourceDir: "/brand/source",
+    guidelinesPdf: "/brand/source/ATPL_PASS_Brand_Guidelines.pdf",
   },
-  /** Interim tokens — replace when official palette arrives */
   colors: {
     primary: theme.colors.primary.DEFAULT,
-    secondary: theme.colors.primary[500],
     accent: theme.colors.accent.DEFAULT,
+    academic: theme.colors.academic.DEFAULT,
+    ink: "#0B1A24",
   },
   typography: {
-    display: "Plus Jakarta Sans",
-    body: "DM Sans",
+    /** Official: Stimulatio Flat — web substitute Space Grotesk */
+    display: "Space Grotesk",
+    /** Official secondary */
+    body: "IBM Plex Sans",
   },
   pending: {
-    brandGuidelines: true,
-    officialColorPalette: true,
+    brandGuidelines: false,
+    officialColorPalette: false,
+    /** Stimulatio Flat not on Google Fonts — Space Grotesk substituted */
     officialTypography: true,
-    brandStyleGuide: true,
+    brandStyleGuide: false,
   },
   metaDescription: siteConfig.description,
 } as const;
