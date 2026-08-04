@@ -123,6 +123,12 @@ export const ACTIVITY_ACTIONS = {
   PAYOUT_REQUESTED: "wallet.payout_requested",
   PAYOUT_PAID: "wallet.payout_paid",
   FINANCE_REPORT_EXPORTED: "finance.report_exported",
+
+  // Analytics / BI
+  ANALYTICS_REPORT_SAVED: "analytics.report_saved",
+  ANALYTICS_REPORT_SCHEDULED: "analytics.report_scheduled",
+  ANALYTICS_EXPORTED: "analytics.exported",
+  ANALYTICS_DASHBOARD_UPDATED: "analytics.dashboard_updated",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];
