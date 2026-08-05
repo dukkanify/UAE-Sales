@@ -121,6 +121,12 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
               onChange={(v) => void saveSettings({ enabled: v })}
             />
             <ToggleRow
+              label="Book before registration"
+              description="Guests can reserve on /book, then confirm by email OTP (account created automatically)."
+              checked={settings.allowGuestBooking}
+              onChange={(v) => void saveSettings({ allowGuestBooking: v })}
+            />
+            <ToggleRow
               label="Around the clock (24/7)"
               description="Offer slots every hour of the day."
               checked={settings.aroundTheClock}

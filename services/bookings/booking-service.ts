@@ -20,6 +20,7 @@ import type {
   BookingSlot,
   BookingStatus,
   BookingZoomSession,
+  PublicBookingCatalog,
 } from "@/types/bookings";
 import type { UserProfile } from "@/types";
 import {
@@ -29,7 +30,8 @@ import {
 
 const ACTIVE_BOOKING: BookingStatus[] = ["pending", "confirmed"];
 
-function displayName(userId: string): string {
+function displayName(userId: string | null | undefined): string {
+  if (!userId) return "Guest";
   const u = readAuthDb().users.find((x) => x.id === userId);
   if (!u) return "Unknown";
   return `${u.firstName} ${u.lastName}`.trim() || u.email;
@@ -38,7 +40,12 @@ function displayName(userId: string): string {
 function normalizeBooking(b: AppointmentBooking): AppointmentBooking {
   return {
     ...b,
+    studentId: b.studentId ?? null,
     zoom: b.zoom ?? null,
+    guestEmail: b.guestEmail ?? null,
+    guestFirstName: b.guestFirstName ?? null,
+    guestLastName: b.guestLastName ?? null,
+    guestVerified: Boolean(b.guestVerified),
   };
 }
 
@@ -330,6 +337,10 @@ export async function createBooking(input: {
     endsAt: match.endsAt,
     status,
     zoom: null,
+    guestEmail: null,
+    guestFirstName: null,
+    guestLastName: null,
+    guestVerified: true,
     createdAt: now,
     updatedAt: now,
     cancelledAt: null,
@@ -397,9 +408,10 @@ export function listAllBookings(): BookingListItem[] {
 
 function enrichBooking(b: AppointmentBooking): BookingListItem {
   const n = normalizeBooking(b);
+  const guestLabel = [n.guestFirstName, n.guestLastName].filter(Boolean).join(" ").trim();
   return {
     ...n,
-    studentName: displayName(n.studentId),
+    studentName: n.studentId ? displayName(n.studentId) : guestLabel || n.guestEmail || "Guest",
     instructorName: displayName(n.instructorId),
   };
 }
@@ -545,4 +557,186 @@ export async function getBookingJoinInfo(input: {
     canJoin,
     joinWindowLabel,
   };
+}
+
+export function getPublicBookingCatalog(): PublicBookingCatalog {
+  const settings = getBookingSettings();
+  return {
+    enabled: settings.enabled,
+    allowGuestBooking: settings.allowGuestBooking,
+    aroundTheClock: settings.aroundTheClock,
+    maxAdvanceDays: settings.maxAdvanceDays,
+    autoCreateZoom: settings.autoCreateZoom,
+    requireConfirmation: settings.requireConfirmation,
+    timezone: settings.timezone,
+    sessionTypes: settings.sessionTypes.filter((t) => t.active),
+    instructors: listBookableInstructors().map((i) => ({
+      id: i.id,
+      fullName: i.fullName || i.email,
+      firstName: i.firstName,
+      lastName: i.lastName,
+    })),
+  };
+}
+
+export async function createGuestBookingHold(input: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  instructorId: string;
+  sessionTypeId: string;
+  startsAt: string;
+  notes?: string;
+}): Promise<{ booking: AppointmentBooking; email: string }> {
+  const settings = getBookingSettings();
+  if (!settings.enabled) {
+    throw new BookingAccessError("Booking is currently closed", 403);
+  }
+  if (!settings.allowGuestBooking) {
+    throw new BookingAccessError("Guest booking is disabled — please sign in first", 403);
+  }
+
+  const email = input.email.trim().toLowerCase();
+  const firstName = input.firstName.trim();
+  const lastName = input.lastName.trim();
+  if (!email || !email.includes("@")) throw new BookingAccessError("Valid email required");
+  if (!firstName || !lastName) throw new BookingAccessError("First and last name required");
+
+  const existingUser = readAuthDb().users.find((u) => u.email === email);
+  if (existingUser && existingUser.role !== ROLES.STUDENT) {
+    throw new BookingAccessError("This email belongs to a staff account — sign in instead", 400);
+  }
+  if (
+    existingUser?.status === ACCOUNT_STATUS.SUSPENDED ||
+    existingUser?.status === ACCOUNT_STATUS.INACTIVE
+  ) {
+    throw new BookingAccessError("This account cannot book right now", 403);
+  }
+
+  const sessionType = settings.sessionTypes.find((t) => t.id === input.sessionTypeId && t.active);
+  if (!sessionType) throw new BookingAccessError("Session type not available", 404);
+
+  const instructors = listBookableInstructors();
+  if (!instructors.some((i) => i.id === input.instructorId)) {
+    throw new BookingAccessError("Instructor not available", 400);
+  }
+
+  const startsAt = parseISO(input.startsAt);
+  if (Number.isNaN(startsAt.getTime())) throw new BookingAccessError("Invalid startsAt");
+
+  const date = format(startsAt, "yyyy-MM-dd");
+  const slots = getAvailableSlots({
+    date,
+    instructorId: input.instructorId,
+    sessionTypeId: input.sessionTypeId,
+  });
+  const match = slots.find(
+    (s) => s.available && parseISO(s.startsAt).getTime() === startsAt.getTime(),
+  );
+  if (!match) throw new BookingAccessError("Selected slot is not available", 409);
+
+  const now = new Date().toISOString();
+  const booking: AppointmentBooking = {
+    id: generateId(),
+    studentId: existingUser?.id ?? null,
+    instructorId: input.instructorId,
+    sessionTypeId: sessionType.id,
+    sessionTypeName: sessionType.name,
+    title: `${sessionType.name} with ${displayName(input.instructorId)}`,
+    notes: (input.notes ?? "").trim().slice(0, 500),
+    startsAt: match.startsAt,
+    endsAt: match.endsAt,
+    status: "pending",
+    zoom: null,
+    guestEmail: email,
+    guestFirstName: firstName,
+    guestLastName: lastName,
+    guestVerified: false,
+    createdAt: now,
+    updatedAt: now,
+    cancelledAt: null,
+    cancelledBy: null,
+    cancelReason: null,
+  };
+
+  writeBookingsDb((db) => {
+    const clash = db.bookings.some(
+      (b) =>
+        b.instructorId === booking.instructorId &&
+        ACTIVE_BOOKING.includes(b.status) &&
+        overlaps(
+          parseISO(booking.startsAt),
+          parseISO(booking.endsAt),
+          parseISO(b.startsAt),
+          parseISO(b.endsAt),
+        ),
+    );
+    if (clash) throw new BookingAccessError("Selected slot was just taken", 409);
+    db.bookings.push(booking);
+  });
+
+  await logActivity({
+    actorId: existingUser?.id ?? null,
+    action: ACTIVITY_ACTIONS.BOOKING_CREATED,
+    entityType: "booking",
+    entityId: booking.id,
+    metadata: { guest: true, email },
+  });
+
+  return { booking: normalizeBooking(booking), email };
+}
+
+export async function finalizeGuestBooking(input: {
+  bookingId: string;
+  userId: string;
+}): Promise<AppointmentBooking> {
+  const settings = getBookingSettings();
+  let booking = readBookingsDb().bookings.find((b) => b.id === input.bookingId);
+  if (!booking) throw new BookingAccessError("Booking not found", 404);
+  booking = normalizeBooking(booking);
+
+  if (
+    booking.guestVerified &&
+    booking.studentId === input.userId &&
+    booking.status === "confirmed"
+  ) {
+    return booking;
+  }
+
+  const status: BookingStatus = settings.requireConfirmation ? "pending" : "confirmed";
+  let next = booking;
+
+  writeBookingsDb((d) => {
+    const idx = d.bookings.findIndex((b) => b.id === input.bookingId);
+    if (idx < 0) throw new BookingAccessError("Booking not found", 404);
+    next = {
+      ...normalizeBooking(d.bookings[idx]!),
+      studentId: input.userId,
+      guestVerified: true,
+      status,
+      updatedAt: new Date().toISOString(),
+    };
+    d.bookings[idx] = next;
+  });
+
+  if (status === "confirmed" && settings.autoCreateZoom && !next.zoom) {
+    const zoom = await provisionZoomForBooking(next, input.userId);
+    writeBookingsDb((d) => {
+      const idx = d.bookings.findIndex((b) => b.id === next.id);
+      if (idx >= 0) {
+        next = { ...d.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
+        d.bookings[idx] = next;
+      }
+    });
+  }
+
+  await logActivity({
+    actorId: input.userId,
+    action: ACTIVITY_ACTIONS.BOOKING_UPDATED,
+    entityType: "booking",
+    entityId: next.id,
+    metadata: { guestFinalized: true, status },
+  });
+
+  return normalizeBooking(next);
 }

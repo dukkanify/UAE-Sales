@@ -75,8 +75,8 @@ export default function HomePage() {
             className="mt-10 flex flex-wrap gap-3"
           >
             <Button size="lg" variant="accent" className="shadow-medium" asChild>
-              <Link href={routes.register}>
-                Prepare for takeoff
+              <Link href={routes.book}>
+                Book a Zoom session
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -168,7 +168,7 @@ export default function HomePage() {
               anywhere you train.
             </p>
             <Button variant="accent" className="mt-6" asChild>
-              <Link href={routes.register}>Create your account</Link>
+              <Link href={routes.book}>Book without registering first</Link>
             </Button>
           </div>
         </div>

@@ -33,6 +33,8 @@ export interface BookingZoomSession {
 export interface BookingSettings {
   /** Master switch — when false, students cannot create bookings */
   enabled: boolean;
+  /** Allow booking from public site before / without prior registration */
+  allowGuestBooking: boolean;
   /** Generate slots every hour of the day (00:00–23:00) */
   aroundTheClock: boolean;
   /** Used when aroundTheClock is false — local hours inclusive start */
@@ -66,7 +68,8 @@ export interface BookingSettings {
 
 export interface AppointmentBooking {
   id: string;
-  studentId: string;
+  /** Null until guest verifies OTP / account is linked */
+  studentId: string | null;
   instructorId: string;
   sessionTypeId: string;
   sessionTypeName: string;
@@ -76,6 +79,11 @@ export interface AppointmentBooking {
   endsAt: string;
   status: BookingStatus;
   zoom: BookingZoomSession | null;
+  /** Guest booking before registration */
+  guestEmail: string | null;
+  guestFirstName: string | null;
+  guestLastName: string | null;
+  guestVerified: boolean;
   createdAt: string;
   updatedAt: string;
   cancelledAt: string | null;
@@ -108,4 +116,21 @@ export interface BookingJoinPayload {
   isHost: boolean;
   canJoin: boolean;
   joinWindowLabel: string;
+}
+
+export interface PublicBookingCatalog {
+  enabled: boolean;
+  allowGuestBooking: boolean;
+  aroundTheClock: boolean;
+  maxAdvanceDays: number;
+  autoCreateZoom: boolean;
+  requireConfirmation: boolean;
+  timezone: string;
+  sessionTypes: BookingSessionType[];
+  instructors: Array<{
+    id: string;
+    fullName: string;
+    firstName: string | null;
+    lastName: string | null;
+  }>;
 }
