@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { PublicBookingStudio } from "@/features/bookings/components/public-booking-studio";
+import { BookStudioClient } from "./book-studio-client";
 
 export const metadata: Metadata = {
   title: "Book live Zoom",
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function PublicBookPage() {
   return (
     <div className="container-app">
-      <PublicBookingStudio />
+      <BookStudioClient />
     </div>
   );
 }
