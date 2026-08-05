@@ -16,8 +16,8 @@ import { siteConfig } from "@/config/site";
 import { brandingConfig } from "@/config/branding";
 
 export const metadata: Metadata = {
-  title: "Sign in",
-  description: `Sign in to ${siteConfig.name} with email OTP.`,
+  title: "Enter platform",
+  description: `Enter the ${siteConfig.name} aviation course platform with email OTP.`,
 };
 
 export default function LoginPage() {
@@ -34,9 +34,9 @@ export default function LoginPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
               {brandingConfig.tagline}
             </p>
-            <CardTitle className="font-display text-2xl">Sign in</CardTitle>
+            <CardTitle className="font-display text-2xl">Enter platform</CardTitle>
             <CardDescription>
-              Enter your email to receive a one-time verification code.
+              Use your email for a one-time code — then continue your ATPL course path.
             </CardDescription>
           </div>
         </CardHeader>
@@ -44,9 +44,9 @@ export default function LoginPage() {
           <LoginForm />
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
-          New here?{" "}
+          New pilot?{" "}
           <Link href={routes.register} className="ml-1 font-medium text-primary hover:underline">
-            Create an account
+            Create learner access
           </Link>
         </CardFooter>
       </Card>

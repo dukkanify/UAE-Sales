@@ -1,21 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" role="img" aria-label="Aviation sky backdrop">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" role="img" aria-label="ATPL PASS aviation learning platform sky">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0B1F3A"/>
-      <stop offset="0.45" stop-color="#163A62"/>
-      <stop offset="1" stop-color="#0EA5E9"/>
+      <stop stop-color="#050B10"/>
+      <stop offset="0.38" stop-color="#0B1A24"/>
+      <stop offset="0.72" stop-color="#123044"/>
+      <stop offset="1" stop-color="#2E7DAA"/>
     </linearGradient>
-    <linearGradient id="horizon" x1="0" y1="620" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#071426" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#0B1F3A" stop-opacity="0.2"/>
+    <linearGradient id="runway" x1="720" y1="520" x2="720" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DD9B30" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#DD9B30" stop-opacity="0"/>
     </linearGradient>
+    <linearGradient id="path" x1="180" y1="620" x2="1280" y2="280" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5BA3C9" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#5BA3C9" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#DD9B30" stop-opacity="0.8"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1120 210) rotate(90) scale(280 340)">
+      <stop stop-color="#2E7DAA" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#2E7DAA" stop-opacity="0"/>
+    </radialGradient>
   </defs>
   <rect width="1440" height="900" fill="url(#sky)"/>
-  <ellipse cx="1180" cy="180" rx="220" ry="90" fill="#38BDF8" fill-opacity="0.18"/>
-  <ellipse cx="320" cy="240" rx="160" ry="60" fill="#FFFFFF" fill-opacity="0.08"/>
-  <path d="M0 640C240 580 480 700 720 640C960 580 1200 700 1440 620V900H0V640Z" fill="url(#horizon)"/>
-  <path d="M220 520L420 470L980 430L1220 455L980 480L420 520L220 520Z" fill="#E8EEF5" fill-opacity="0.12"/>
-  <circle cx="1080" cy="210" r="8" fill="#FFFFFF" fill-opacity="0.7"/>
-  <circle cx="240" cy="160" r="4" fill="#FFFFFF" fill-opacity="0.55"/>
-  <circle cx="560" cy="120" r="3" fill="#FFFFFF" fill-opacity="0.45"/>
+  <ellipse cx="1120" cy="210" rx="280" ry="180" fill="url(#glow)"/>
+  <g opacity="0.22" stroke="#E8EEF5" stroke-width="1">
+    <path d="M80 180H1360"/>
+    <path d="M80 260H1360"/>
+    <path d="M80 340H1360"/>
+    <path d="M240 120V420"/>
+    <path d="M480 120V420"/>
+    <path d="M720 120V420"/>
+    <path d="M960 120V420"/>
+    <path d="M1200 120V420"/>
+  </g>
+  <path d="M160 680C360 620 520 700 720 560C920 420 1080 360 1320 300" stroke="url(#path)" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="1320" cy="300" r="6" fill="#DD9B30"/>
+  <circle cx="1320" cy="300" r="16" stroke="#DD9B30" stroke-opacity="0.45" stroke-width="1.5"/>
+  <path d="M520 900L720 540L920 900" fill="url(#runway)"/>
+  <g fill="#E8EEF5" fill-opacity="0.55">
+    <circle cx="220" cy="140" r="2.5"/>
+    <circle cx="410" cy="90" r="1.8"/>
+    <circle cx="640" cy="150" r="2"/>
+    <circle cx="880" cy="110" r="1.5"/>
+    <circle cx="1040" cy="170" r="2.2"/>
+  </g>
+  <path d="M980 455L1185 430L1260 445L1185 460L980 455Z" fill="#E8EEF5" fill-opacity="0.14"/>
+  <path d="M1185 430L1225 410L1235 432" fill="#5BA3C9" fill-opacity="0.35"/>
 </svg>

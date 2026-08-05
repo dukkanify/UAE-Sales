@@ -3,11 +3,10 @@ import type { Permission } from "@/constants/permissions";
 import type { Role } from "@/constants/roles";
 
 export const NAV_ITEMS = [
-  { label: "Home", href: "/" },
+  { label: "Platform", href: "/" },
+  { label: "Flightpath", href: "/#flightpath" },
+  { label: "Live", href: "/#live" },
   { label: "Book", href: "/book" },
-  { label: "Programs", href: "/#programs" },
-  { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
 ] as const;
 
 export const DASHBOARD_NAV_BY_ROLE: Record<
@@ -49,8 +48,9 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
 
 export const APP_METADATA = {
   title: {
-    default: "ATPL PASS | Aviation Education Platform",
+    default: "ATPL PASS | Aviation Course Platform",
     template: "%s | ATPL PASS",
   },
-  description: "Professional Aviation Education Platform for ATPL Training.",
+  description:
+    "The 2030 aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
 } as const;

@@ -1,26 +1,25 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Plane, ShieldCheck, Video } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
-import { brandingConfig } from "@/config/branding";
 import { routes } from "@/constants/routes";
 
-const programs = [
+const flightpath = [
   {
-    icon: BookOpen,
-    title: "Academic excellence",
-    body: "Structured courses and assessments grounded in ATPL theory — clear, rigorous, exam-ready.",
+    code: "01",
+    title: "Course engine",
+    body: "ATPL theory modules, lessons, and resources sequenced like a real training syllabus — not a content dump.",
   },
   {
-    icon: Plane,
-    title: "Live flight-path learning",
-    body: "Instructor-led Zoom sessions, calendars, and progress tracking that keep training on course.",
+    code: "02",
+    title: "Live Zoom lane",
+    body: "Book private instructor sessions when you need them. Confirm by email and join from your training lobby.",
   },
   {
-    icon: ShieldCheck,
-    title: "Trusted operations",
-    body: "Role-based access, secure sessions, and enterprise-ready controls for academies and cadets.",
+    code: "03",
+    title: "Mastery loop",
+    body: "Quizzes, progress, and certificates close the loop so every study hour moves you toward license readiness.",
   },
 ] as const;
 
@@ -29,26 +28,23 @@ export default function HomePage() {
     <>
       <section className="relative isolate min-h-[calc(100vh-4.5rem)] overflow-hidden">
         <div className="hero-aviation absolute inset-0" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-ink)] via-[var(--surface-ink)]/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-ink)] via-[var(--surface-ink)]/35 to-transparent" />
 
-        <div className="container-app relative z-10 flex min-h-[calc(100vh-4.5rem)] flex-col justify-center py-20">
-          <p className="animate-in-up mb-4 font-display text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="text-[#7eb8d6]">ATPL</span> <span className="text-accent">PASS</span>
+        <div className="container-app relative z-10 flex min-h-[calc(100vh-4.5rem)] flex-col justify-end pb-16 pt-24 sm:justify-center sm:pb-24">
+          <p className="animate-in-up font-display text-6xl font-bold tracking-tight sm:text-7xl lg:text-8xl">
+            <span className="text-[#8ec4df]">ATPL</span> <span className="text-accent">PASS</span>
           </p>
-          <p className="animate-in-up-delay-1 mb-6 font-sans text-xs font-semibold uppercase tracking-[0.3em] text-white/65">
-            {brandingConfig.tagline}
-          </p>
-          <h1 className="animate-in-up-delay-2 max-w-2xl font-display text-2xl font-semibold tracking-tight text-white sm:text-3xl lg:text-[2.5rem] lg:leading-tight">
-            Aviation training designed for the next decade of pilots
+          <h1 className="animate-in-up-delay-1 mt-6 max-w-3xl font-display text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-[1.15]">
+            The aviation course platform for pilots who train like it&apos;s 2030
           </h1>
-          <p className="animate-in-up-delay-3 mt-5 max-w-xl text-base leading-relaxed text-white/72 sm:text-lg">
-            Book Zoom coaching instantly, train with precision coursework, and stay exam-ready — one
-            modern platform for serious cadets.
+          <p className="animate-in-up-delay-2 mt-5 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
+            Structured ATPL coursework, live Zoom coaching, and exam mastery — one flight-training
+            OS, not a brochure site.
           </p>
-          <div className="animate-in-up-delay-4 mt-10 flex flex-wrap gap-3">
+          <div className="animate-in-up-delay-3 mt-10 flex flex-wrap gap-3">
             <Button size="lg" variant="accent" className="shadow-medium" asChild>
-              <Link href={routes.book}>
-                Book a Zoom session
+              <Link href={routes.login}>
+                Enter platform
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -58,33 +54,41 @@ export default function HomePage() {
               className="border-white/20 bg-white/5 text-white backdrop-blur-md hover:bg-white/12 hover:text-white"
               asChild
             >
-              <Link href={routes.login}>Sign in</Link>
+              <Link href={routes.book}>Book live Zoom</Link>
             </Button>
           </div>
         </div>
       </section>
 
-      <section id="programs" className="content-auto border-b border-border/70 py-24">
+      <section
+        id="flightpath"
+        className="platform-surface content-auto border-b border-border/60 py-24"
+      >
         <div className="container-app">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">
-            Programs
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-primary">
+            Flightpath
           </p>
           <h2 className="max-w-2xl font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Master your ATPL exams from anywhere
+            A training operating system — not a school website
           </h2>
-          <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">
-            A focused learning system for serious cadets — coursework, live Zoom classes,
-            assessments, and certification in one place.
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+            Every layer is built for course progress: learn, book live help, prove mastery, repeat.
           </p>
 
-          <div className="mt-14 grid gap-10 md:grid-cols-3">
-            {programs.map((item) => (
-              <div key={item.title} className="group">
-                <span className="inline-flex h-11 w-11 items-center justify-center text-primary transition-transform duration-300 group-hover:-translate-y-0.5">
-                  <item.icon className="h-6 w-6" strokeWidth={1.5} />
-                </span>
-                <h3 className="mt-5 font-display text-xl font-semibold">{item.title}</h3>
-                <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+          <div className="mt-16 grid gap-12 md:grid-cols-3 md:gap-10">
+            {flightpath.map((item, index) => (
+              <div
+                key={item.code}
+                className="platform-module"
+                style={{ animationDelay: `${0.12 + index * 0.08}s` }}
+              >
+                <p className="font-mono text-[11px] font-semibold tracking-[0.2em] text-accent">
+                  {item.code}
+                </p>
+                <h3 className="mt-4 font-display text-xl font-semibold tracking-tight">
+                  {item.title}
+                </h3>
+                <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
                   {item.body}
                 </p>
               </div>
@@ -93,72 +97,39 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="about" className="content-auto py-24">
-        <div className="container-app grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+      <section
+        id="live"
+        className="platform-band content-auto relative overflow-hidden py-24 text-white"
+      >
+        <div className="container-app relative z-10 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-              About
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">
+              Live altitude
             </p>
-            <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-              Precision. Clarity. Authority.
+            <h2 className="max-w-xl font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              Instructor Zoom when your study hits turbulence
             </h2>
-            <p className="mt-5 max-w-xl leading-relaxed text-muted-foreground">
-              {siteConfig.legalName} bridges theoretical mastery and practical readiness. Primary
-              locations: {siteConfig.locations.join(" and ")}. Training that reflects the discipline
-              of aviation itself.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65">
+              Reserve a private session first — ATPL PASS creates your learner account when you
+              confirm. Primary lanes: {siteConfig.locations.join(" · ")}.
             </p>
           </div>
-          <div className="relative overflow-hidden rounded-3xl bg-[var(--surface-ink)] p-8 text-white shadow-medium">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-80"
-              style={{
-                background:
-                  "radial-gradient(ellipse 70% 80% at 100% 0%, rgba(46,125,170,0.35), transparent 55%)",
-              }}
-            />
-            <div className="relative z-10">
-              <Video className="mb-4 h-6 w-6 text-accent" strokeWidth={1.5} />
-              <p className="font-display text-2xl font-semibold tracking-tight">
-                Book first. Register later.
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-white/65">
-                Reserve a private Zoom session in minutes — your account is created when you confirm
-                by email.
-              </p>
-              <Button variant="accent" className="mt-6" asChild>
-                <Link href={routes.book}>Start booking</Link>
-              </Button>
-            </div>
+          <div className="flex flex-wrap gap-3 lg:justify-end">
+            <Button size="lg" variant="accent" asChild>
+              <Link href={routes.book}>
+                Open booking studio
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+              asChild
+            >
+              <Link href={routes.login}>Continue learning</Link>
+            </Button>
           </div>
-        </div>
-      </section>
-
-      <section id="contact" className="content-auto border-t border-border/70 py-16">
-        <div className="container-app flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <div>
-            <h2 className="font-display text-2xl font-semibold">Talk to us</h2>
-            <p className="mt-2 text-muted-foreground">
-              <a
-                href={`mailto:${siteConfig.contactEmail}`}
-                className="font-medium text-primary underline decoration-accent/60 underline-offset-4 hover:decoration-accent"
-              >
-                {siteConfig.contactEmail}
-              </a>
-              <span className="mx-2 text-border">·</span>
-              <a
-                href={siteConfig.social.instagram}
-                target="_blank"
-                rel="noreferrer"
-                className="hover:text-primary"
-              >
-                {siteConfig.socialHandle}
-              </a>
-            </p>
-          </div>
-          <Button variant="outline" asChild>
-            <Link href={routes.login}>Sign in to dashboard</Link>
-          </Button>
         </div>
       </section>
     </>

@@ -208,17 +208,17 @@ function PublicBookingStudio() {
         <div className="booking-scan-line" />
         <div className="relative z-10">
           <p className="mb-3 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
-            <Radio className="h-3.5 w-3.5" /> Book before you register
+            <Radio className="h-3.5 w-3.5" /> Live lane · platform entry
           </p>
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-            Reserve your{" "}
+            Book coaching on the{" "}
             <span className="bg-gradient-to-r from-[#5BA3C9] to-accent bg-clip-text text-transparent">
-              Zoom session
+              training platform
             </span>
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-            Pick a time first — then confirm with your email. We create your student account
-            automatically. No registration form before booking.
+            Pick a Zoom slot first — confirm by email and your learner access is created
+            automatically. Course platform first, paperwork later.
           </p>
         </div>
       </div>

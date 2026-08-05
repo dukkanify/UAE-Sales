@@ -15,7 +15,9 @@ test.describe("public surfaces", () => {
 
   test("login page renders", async ({ page }) => {
     await page.goto("/login");
-    await expect(page.getByText("Sign in", { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("Enter platform", { exact: true })).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.getByRole("button", { name: /continue with email/i })).toBeVisible();
   });
 
