@@ -1,17 +1,20 @@
 /**
- * Next.js middleware — session refresh, maintenance mode, route protection.
+ * Next.js middleware — session gate, role routing, maintenance mode.
  */
 
 import { type NextRequest, NextResponse } from "next/server";
 
 import { publicEnv } from "@/config/env";
+import { ACCOUNT_STATUS } from "@/constants/account-status";
 import {
   authRoutes,
-  protectedRoutes,
+  protectedRoutePrefixes,
   publicSystemRoutes,
+  ROLE_ROUTE_GUARDS,
   routes,
 } from "@/constants/routes";
-import { createMiddlewareClient } from "@/lib/supabase/middleware";
+import { ROLE_DASHBOARD, type Role } from "@/constants/roles";
+import { SESSION_COOKIE, verifySessionJwt } from "@/lib/security/session-token";
 
 function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
   return prefixes.some(
@@ -19,10 +22,34 @@ function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
   );
 }
 
+async function readClaims(request: NextRequest): Promise<{
+  userId: string;
+  sessionId: string;
+  role: Role;
+  status: string;
+  profileComplete: boolean;
+} | null> {
+  const value = request.cookies.get(SESSION_COOKIE)?.value;
+  if (!value) return null;
+
+  const parts = value.split(".");
+  if (parts.length < 4) return null;
+  const jwt = parts.slice(0, 3).join(".");
+  const payload = await verifySessionJwt(jwt);
+  if (!payload) return null;
+
+  return {
+    userId: payload.uid,
+    sessionId: payload.sid,
+    role: payload.role as Role,
+    status: payload.status,
+    profileComplete: payload.pc,
+  };
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Maintenance mode gate
   if (
     publicEnv.NEXT_PUBLIC_MAINTENANCE_MODE &&
     pathname !== routes.maintenance &&
@@ -33,52 +60,81 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Skip auth logic for system pages & static assets
   if (
     matchesPrefix(pathname, publicSystemRoutes) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/health") ||
+    pathname.startsWith("/api/auth/") ||
     pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  const { supabase, response } = createMiddlewareClient(request);
-
-  // Foundation mode without Supabase: allow all routes except soft-guard dashboard
-  if (!supabase) {
-    if (matchesPrefix(pathname, protectedRoutes)) {
-      // Soft redirect to login when auth backend is not yet wired
-      // Uncomment strict redirect once Supabase is configured:
-      // const url = request.nextUrl.clone();
-      // url.pathname = routes.login;
-      // url.searchParams.set("next", pathname);
-      // return NextResponse.redirect(url);
-    }
-    return response;
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const isProtected = matchesPrefix(pathname, protectedRoutes);
+  const claims = await readClaims(request);
+  const isProtected = matchesPrefix(pathname, protectedRoutePrefixes);
   const isAuthRoute = matchesPrefix(pathname, authRoutes);
 
-  if (isProtected && !user) {
+  if (isProtected && !claims) {
     const url = request.nextUrl.clone();
     url.pathname = routes.login;
     url.searchParams.set("next", pathname);
     return NextResponse.redirect(url);
   }
 
-  if (isAuthRoute && user) {
+  if (claims?.status === ACCOUNT_STATUS.SUSPENDED && pathname !== routes.accountSuspended) {
     const url = request.nextUrl.clone();
-    url.pathname = routes.dashboard;
+    url.pathname = routes.accountSuspended;
     return NextResponse.redirect(url);
   }
 
-  return response;
+  if (
+    claims &&
+    !claims.profileComplete &&
+    pathname !== routes.completeProfile &&
+    isProtected
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = routes.completeProfile;
+    return NextResponse.redirect(url);
+  }
+
+  if (isAuthRoute && claims && claims.status !== ACCOUNT_STATUS.SUSPENDED) {
+    const url = request.nextUrl.clone();
+    url.pathname = claims.profileComplete
+      ? ROLE_DASHBOARD[claims.role]
+      : routes.completeProfile;
+    return NextResponse.redirect(url);
+  }
+
+  for (const [prefix, requiredRole] of Object.entries(ROLE_ROUTE_GUARDS)) {
+    if (pathname === prefix || pathname.startsWith(`${prefix}/`)) {
+      if (!claims) {
+        const url = request.nextUrl.clone();
+        url.pathname = routes.login;
+        return NextResponse.redirect(url);
+      }
+      if (claims.role !== requiredRole) {
+        if (!(requiredRole === "admin" && claims.role === "super_admin")) {
+          const url = request.nextUrl.clone();
+          url.pathname = routes.accessDenied;
+          return NextResponse.redirect(url);
+        }
+      }
+    }
+  }
+
+  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
+    if (!claims) {
+      const url = request.nextUrl.clone();
+      url.pathname = routes.login;
+      return NextResponse.redirect(url);
+    }
+    const url = request.nextUrl.clone();
+    url.pathname = ROLE_DASHBOARD[claims.role];
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {

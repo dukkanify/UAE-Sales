@@ -1,6 +1,8 @@
 /**
- * Application roles for RBAC foundation.
+ * Application roles for RBAC.
  */
+
+import { PERMISSIONS, ROLE_PERMISSIONS, type Permission } from "@/constants/permissions";
 
 export const ROLES = {
   STUDENT: "student",
@@ -24,3 +26,31 @@ export const ROLE_HIERARCHY: Record<Role, number> = {
   admin: 3,
   super_admin: 4,
 };
+
+/** Default dashboard path per role */
+export const ROLE_DASHBOARD: Record<Role, string> = {
+  student: "/student/dashboard",
+  instructor: "/instructor/dashboard",
+  admin: "/admin/dashboard",
+  super_admin: "/super-admin/dashboard",
+};
+
+/** Route prefix reserved for each role */
+export const ROLE_ROUTE_PREFIX: Record<Role, string> = {
+  student: "/student",
+  instructor: "/instructor",
+  admin: "/admin",
+  super_admin: "/super-admin",
+};
+
+export function getPermissionsForRole(role: Role): readonly Permission[] {
+  return ROLE_PERMISSIONS[role];
+}
+
+export function roleHasPermission(role: Role, permission: Permission): boolean {
+  if (role === ROLES.SUPER_ADMIN) return true;
+  return ROLE_PERMISSIONS[role].includes(permission);
+}
+
+export { PERMISSIONS };
+export type { Permission };
