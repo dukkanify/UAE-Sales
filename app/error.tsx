@@ -36,10 +36,23 @@ export default function Error({
           Something went wrong
         </h1>
         <p className="mt-4 text-base text-muted-foreground">
-          An unexpected error occurred. You can try again or return home.
+          {error.message || "An unexpected error occurred. You can try again or return home."}
         </p>
+        {error.digest ? (
+          <p className="mt-2 font-mono text-xs text-muted-foreground/70">Ref: {error.digest}</p>
+        ) : null}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Button onClick={reset}>Try again</Button>
+          <Button
+            onClick={() => {
+              reset();
+              if (typeof window !== "undefined") window.location.reload();
+            }}
+          >
+            Try again
+          </Button>
+          <Button variant="outline" asChild>
+            <a href={routes.book}>Open booking</a>
+          </Button>
           <Button variant="outline" asChild>
             <a href={routes.home}>Back to home</a>
           </Button>
