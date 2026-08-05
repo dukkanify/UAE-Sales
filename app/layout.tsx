@@ -1,59 +1,60 @@
-import type { Metadata } from "next";
-import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
-import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
-import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner";
-import { ToastProvider } from "@/shared/components/ToastProvider";
-import { BRAND } from "@/shared/constants/brand";
-import { getAppUrl } from "@/shared/constants/site";
-import { THEME_BOOT_SCRIPT } from "@/shared/theme/theme";
-import "./globals.css";
+import type { Metadata, Viewport } from "next";
+import { DM_Sans, Outfit } from "next/font/google";
 
-const ibmPlexArabic = IBM_Plex_Sans_Arabic({
-  subsets: ["arabic"],
-  display: "swap",
-  variable: "--font-ibm-plex-arabic",
-  weight: ["400", "700"],
-});
+import { AppProviders } from "@/providers/app-providers";
+import { siteConfig } from "@/config/site";
+import { APP_METADATA } from "@/constants/navigation";
 
-const inter = Inter({
+import "@/styles/globals.css";
+
+const dmSans = DM_Sans({
   subsets: ["latin"],
+  variable: "--font-dm-sans",
   display: "swap",
-  preload: false,
-  variable: "--font-inter",
-  weight: ["700"],
 });
 
-const siteUrl = getAppUrl();
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  description: BRAND.description,
-  metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: "/",
-  },
-  icons: {
-    apple: "/apple-icon",
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-  },
+  metadataBase: new URL(siteConfig.url),
+  title: APP_METADATA.title,
+  description: APP_METADATA.description,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.name }],
+  keywords: [
+    "aviation",
+    "pilot training",
+    "aviation education",
+    "flight consultation",
+    "Eager Pilots",
+  ],
   openGraph: {
-    description: BRAND.description,
-    images: [{ url: "/brand/og-image.svg", width: 1200, height: 630 }],
-    locale: "ar_AE",
-    siteName: BRAND.nameEn,
-    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
     type: "website",
-    url: siteUrl,
-  },
-  title: {
-    default: `${BRAND.nameEn} | ${BRAND.nameAr}`,
-    template: `%s | ${BRAND.nameEn}`,
+    locale: "en_US",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: APP_METADATA.title.default,
+    description: APP_METADATA.description,
   },
   twitter: {
     card: "summary_large_image",
-    description: BRAND.description,
-    images: ["/brand/og-image.svg"],
-    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
+    title: APP_METADATA.title.default,
+    description: APP_METADATA.description,
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0B1F3A",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -62,22 +63,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      className={`${ibmPlexArabic.variable} ${inter.variable}`}
-      data-scroll-behavior="smooth"
-      dir="rtl"
-      lang="ar"
-      suppressHydrationWarning
-    >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
-      </head>
-      <body className={ibmPlexArabic.className}>
-        <ToastProvider>
-          <BrandJsonLd />
-          <DeferredOfflineBanner />
-          {children}
-        </ToastProvider>
+    <html lang="en" dir="ltr" className={`${dmSans.variable} ${outfit.variable}`}>
+      <body className="min-h-screen font-sans antialiased">
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

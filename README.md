@@ -1,91 +1,93 @@
-# Sooqna Web
+# Aviation Education Platform (AEP)
 
-واجهة ويب عربية RTL لمنصة **سوقنا (Sooqna)** — سوق إماراتي موثوق، مبنية باستخدام Next.js وTypeScript وTailwind CSS.
+**Eager Pilots for Aviation Consultation and Training**
 
-## Current Status
+Production-ready foundation for a scalable aviation education web platform.
 
-**Closed Beta Ready** — `v0.1.0-beta`
+## Tech stack
 
-This release is frozen for closed beta testing. All critical demo flows pass (register, login, dynamic listings, search, chat, wallet). Payment completion, orders, and admin moderation remain placeholders — see [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md).
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS 4 |
+| UI | Shadcn UI (New York), Framer Motion, Lucide |
+| Backend | Supabase (Auth, PostgreSQL, Storage, Realtime) |
+| ORM | Prisma (optional) |
+| Auth | Supabase Auth — Email OTP |
+| Deploy | Vercel |
 
-| Document | Purpose |
-|----------|---------|
-| [CLOSED_BETA_PLAN.md](./CLOSED_BETA_PLAN.md) | Beta scope, test accounts, success criteria |
-| [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) | Placeholder surfaces and technical limits |
-| [BETA_FEEDBACK_FORM.md](./BETA_FEEDBACK_FORM.md) | Feedback questions for testers |
-| [FINAL_E2E_QA_REPORT.md](./FINAL_E2E_QA_REPORT.md) | Full QA flow matrix |
-
-## Setup
+## Getting started
 
 ```bash
+cp .env.example .env.local
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Open [http://localhost:3000](http://localhost:3000).
 
-No environment variables are required for the current mock-data flow. `NEXT_PUBLIC_API_BASE_URL` is referenced by `services/apiClient.ts` but is not wired to any page yet.
+## Environment
 
-### Production build
+All secrets live in environment variables. See `.env.example` and `.env.production.example`.
 
-```bash
-npm run lint
-npm run build
-npm run start
+Required for full auth/storage:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server only)
+
+Without Supabase credentials the UI foundation still runs; auth calls return a clear configuration error.
+
+## Project structure
+
+```
+app/              App Router pages & layouts
+components/       UI primitives + layout shells
+features/         Feature modules (auth foundation)
+services/         Auth, storage, Supabase service layer
+hooks/            Shared React hooks
+providers/        App-wide providers
+types/            Shared TypeScript types
+utils/            Validation, sanitization, RBAC, formatting
+constants/        Routes, roles, navigation
+config/           Env, site, theme
+styles/           Global CSS + design tokens
+lib/              Utilities + Supabase clients
+middleware/       Route protection helpers
+database/         SQL migrations + Prisma schema
+public/           Static assets
+assets/           Design assets
 ```
 
-## Demo Credentials
+## Scripts
 
-| Role | Email | Password | OTP | After login |
-|------|-------|----------|-----|-------------|
-| User | `user@sooqna.demo` | `User@123` | `123456` | `/profile` |
-| Business | `company@sooqna.demo` | `Company@123` | `123456` | `/dashboard/listings` |
-| Admin | `admin@sooqna.demo` | `Admin@123` | `123456` | `/admin` |
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | TypeScript check |
 
-New accounts can also be created via `/register`. Data is stored in the browser (`localStorage`) and does not sync across devices.
+## Database
 
-## What Works in Beta
+1. Create a Supabase project
+2. Run `database/migrations/001_initial_schema.sql` in the SQL editor
+3. Create storage bucket `aep-uploads`
+4. (Optional) `npx prisma generate --schema=database/prisma/schema.prisma`
 
-- Register and login (demo accounts + new local accounts)
-- Add and edit listings with dynamic category fields (cars, real estate, mobiles, electronics, jobs, services)
-- Search catalog and locally created listings
-- Listing detail pages with data-integrity specs (no fake fields on user listings)
-- Chat with sellers (demo and local listings)
-- Wallet and escrow overview (mock balances and transactions)
-- Profile editing (persists locally)
+## Scope of this foundation
 
-## Known Placeholders
+This milestone delivers architecture only — no business features yet:
 
-These routes exist but are **not fully functional** in `v0.1.0-beta`:
+- Theme & design system
+- Layout (header, footer, sidebar, breadcrumb)
+- System pages (404, 500, maintenance, unauthorized)
+- Full reusable UI kit
+- Auth structure (Email OTP)
+- Middleware & RBAC helpers
+- Database schema + RLS
+- SEO metadata, robots, sitemap
 
-| Surface | Route | Status |
-|---------|-------|--------|
-| Checkout completion | `/checkout` | Coming Soon — shows listing context only |
-| Order details | — | Not implemented |
-| Admin moderation | `/admin` | Coming Soon — no approve/reject actions |
-| Disputes form | `/disputes/new` | Coming Soon |
-| Notifications page | — | Mock panel on profile only; no `/notifications` route |
-| Mark order delivered | — | Not implemented |
+## License
 
-See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) for the full list.
-
-## Known Limitations
-
-- **No backend** — all catalog data is in-memory mocks; user listings and sessions use `localStorage`
-- **No cross-device sync** — data is per-browser only
-- **No real payments** — buy-now routes to a placeholder checkout page
-- **No automated tests** — validate via `npm run lint`, `npm run build`, and manual browser testing
-- **Admin actions are mock** — escrow and wallet show static demo data
-
-## Project Structure
-
-- `app` — Next.js App Router pages
-- `features` — domain features (home, listings, auth, chat, wallet…)
-- `shared` — UI components, layouts, brand constants
-- `services` — data layer and API stubs
-- `mock` — demo catalog and account data
-- `public/brand` — brand assets (logo, icon, OG image)
-
-## Brand
-
-See `BRAND_IDENTITY_GUIDE.md` and `BRAND_MIGRATION_REPORT.md`.
+UNLICENSED — proprietary.
