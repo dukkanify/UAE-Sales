@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Clock, Radio, Shield, Sparkles, Video } from "lucide-react";
 import { toast } from "sonner";
@@ -10,31 +10,40 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ensureBrowserCsrf } from "@/features/auth/services/auth-api";
+import {
+  formatSlotDateTime,
+  formatSlotTime,
+  resolveBookableDate,
+} from "@/features/bookings/lib/slot-utils";
 import { cn } from "@/lib/utils";
 import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
 
 type Step = "session" | "when" | "details" | "otp" | "done";
 
-function getCsrf(): string {
-  if (typeof document === "undefined") return "";
-  const match = document.cookie.match(/(?:^|; )aep_csrf=([^;]+)/);
-  return match?.[1] ? decodeURIComponent(match[1]) : "";
-}
-
 async function publicFetch<T>(url: string, init?: RequestInit) {
+  const csrf = await ensureBrowserCsrf();
   const res = await fetch(url, {
     ...init,
     headers: {
       "Content-Type": "application/json",
-      "x-csrf-token": getCsrf(),
+      ...(csrf ? { "x-csrf-token": csrf } : {}),
       ...(init?.headers ?? {}),
     },
     credentials: "include",
   });
-  return (await res.json()) as {
-    success: boolean;
-    data: T | null;
-    error: string | null;
+  const json = (await res.json().catch(() => null)) as {
+    success?: boolean;
+    data?: T | null;
+    error?: string | null;
+  } | null;
+  if (!json) {
+    return { success: false, data: null as T | null, error: "Unexpected server response" };
+  }
+  return {
+    success: Boolean(json.success),
+    data: (json.data as T | null) ?? null,
+    error: json.error ?? null,
   };
 }
 
@@ -57,14 +66,17 @@ function PublicBookingStudio() {
   const [loadingSlots, setLoadingSlots] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [redirectTo, setRedirectTo] = React.useState<string | null>(null);
+  const [slotHint, setSlotHint] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     void (async () => {
       const res = await publicFetch<PublicBookingCatalog>("/api/public/bookings");
       if (res.success && res.data) {
         setCatalog(res.data);
-        if (res.data.sessionTypes[0]) setSessionTypeId(res.data.sessionTypes[0].id);
-        if (res.data.instructors[0]) setInstructorId(res.data.instructors[0].id);
+        const types = res.data.sessionTypes ?? [];
+        const instructors = res.data.instructors ?? [];
+        if (types[0]) setSessionTypeId(types[0].id);
+        if (instructors[0]) setInstructorId(instructors[0].id);
       }
     })();
   }, []);
@@ -75,18 +87,35 @@ function PublicBookingStudio() {
     async function load() {
       setLoadingSlots(true);
       setSelectedSlot(null);
-      const res = await publicFetch<BookingSlot[]>(
-        `/api/public/bookings?date=${encodeURIComponent(date)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
-      );
+      setSlotHint(null);
+
+      const loadSlots = async (day: string) => {
+        const res = await publicFetch<BookingSlot[]>(
+          `/api/public/bookings?date=${encodeURIComponent(day)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
+        );
+        return res.data ?? [];
+      };
+
+      const resolved = await resolveBookableDate({
+        startDate: date,
+        maxAdvanceDays: catalog?.maxAdvanceDays ?? 30,
+        loadSlots,
+      });
       if (cancelled) return;
-      setSlots(res.data ?? []);
+      setSlots(resolved.slots);
+      if (resolved.date !== date) {
+        setDate(resolved.date);
+        setSlotHint("No open times left on the selected day — jumped to the next available date.");
+      } else if (!resolved.slots.some((s) => s.available)) {
+        setSlotHint("No open slots in the booking window. Try another instructor or session type.");
+      }
       setLoadingSlots(false);
     }
     void load();
     return () => {
       cancelled = true;
     };
-  }, [date, instructorId, sessionTypeId, step]);
+  }, [date, instructorId, sessionTypeId, step, catalog?.maxAdvanceDays]);
 
   const selectedType = catalog?.sessionTypes.find((t) => t.id === sessionTypeId);
   const selectedInstructor = catalog?.instructors.find((i) => i.id === instructorId);
@@ -200,7 +229,7 @@ function PublicBookingStudio() {
             >
               <h2 className="font-display text-2xl font-semibold">1 · Choose session</h2>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {catalog.sessionTypes.map((t) => (
+                {(catalog.sessionTypes ?? []).map((t) => (
                   <button
                     key={t.id}
                     type="button"
@@ -221,7 +250,7 @@ function PublicBookingStudio() {
               <div className="mt-8 space-y-3">
                 <Label>Instructor</Label>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {catalog.instructors.map((i) => (
+                  {(catalog.instructors ?? []).map((i) => (
                     <button
                       key={i.id}
                       type="button"
@@ -276,31 +305,39 @@ function PublicBookingStudio() {
                 <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   <Clock className="h-3.5 w-3.5" /> Available slots
                 </p>
+                {slotHint ? (
+                  <p className="mb-3 rounded-xl bg-accent/10 px-3 py-2 text-sm text-foreground/80">
+                    {slotHint}
+                  </p>
+                ) : null}
                 {loadingSlots ? (
                   <p className="text-sm text-muted-foreground">Loading…</p>
-                ) : (
+                ) : slots.some((s) => s.available) ? (
                   <div className="grid max-h-80 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-6">
-                    {slots.map((slot) => {
-                      const selected = selectedSlot === slot.startsAt;
-                      return (
-                        <button
-                          key={slot.startsAt}
-                          type="button"
-                          disabled={!slot.available}
-                          onClick={() => setSelectedSlot(slot.startsAt)}
-                          className={cn(
-                            "rounded-xl px-2 py-3 text-sm font-semibold transition",
-                            !slot.available &&
-                              "cursor-not-allowed bg-muted/30 text-muted-foreground/40 line-through",
-                            slot.available && !selected && "bg-muted/50 hover:bg-primary/15",
-                            selected && "bg-[#0B1A24] text-accent ring-2 ring-accent/40",
-                          )}
-                        >
-                          {format(parseISO(slot.startsAt), "HH:mm")}
-                        </button>
-                      );
-                    })}
+                    {slots
+                      .filter((slot) => slot.available)
+                      .map((slot) => {
+                        const selected = selectedSlot === slot.startsAt;
+                        return (
+                          <button
+                            key={slot.startsAt}
+                            type="button"
+                            onClick={() => setSelectedSlot(slot.startsAt)}
+                            className={cn(
+                              "rounded-xl px-2 py-3 text-sm font-semibold transition",
+                              !selected && "bg-muted/50 hover:bg-primary/15",
+                              selected && "bg-[#0B1A24] text-accent ring-2 ring-accent/40",
+                            )}
+                          >
+                            {formatSlotTime(slot.startsAt)}
+                          </button>
+                        );
+                      })}
                   </div>
+                ) : (
+                  <p className="rounded-xl border border-dashed border-border/70 px-4 py-8 text-center text-sm text-muted-foreground">
+                    No open times on this date. Choose another day above.
+                  </p>
                 )}
               </div>
               <div className="mt-8 flex justify-end">
@@ -341,7 +378,7 @@ function PublicBookingStudio() {
                   {selectedType?.name} · {selectedInstructor?.fullName}
                 </p>
                 <p className="mt-1 text-white/65">
-                  {selectedSlot ? new Date(selectedSlot).toLocaleString() : ""}
+                  {selectedSlot ? formatSlotDateTime(selectedSlot) : ""}
                 </p>
               </div>
 

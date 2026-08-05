@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { format, parseISO } from "date-fns";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -23,6 +23,11 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { bookingFetch, bookingJson } from "@/features/bookings/lib/api";
+import {
+  formatSlotDateTime,
+  formatSlotTime,
+  resolveBookableDate,
+} from "@/features/bookings/lib/slot-utils";
 import { cn } from "@/lib/utils";
 import type {
   AppointmentBooking,
@@ -48,6 +53,7 @@ function StudentBookingView() {
   const [loadingSlots, setLoadingSlots] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [created, setCreated] = React.useState<AppointmentBooking | null>(null);
+  const [slotHint, setSlotHint] = React.useState<string | null>(null);
 
   const loadBase = React.useCallback(async () => {
     const [settingsRes, metaRes, mineRes] = await Promise.all([
@@ -78,18 +84,35 @@ function StudentBookingView() {
     async function loadSlots() {
       setLoadingSlots(true);
       setSelectedSlot(null);
-      const res = await bookingFetch<BookingSlot[]>(
-        `/api/bookings/slots?date=${encodeURIComponent(date)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
-      );
+      setSlotHint(null);
+
+      const fetchDay = async (day: string) => {
+        const res = await bookingFetch<BookingSlot[]>(
+          `/api/bookings/slots?date=${encodeURIComponent(day)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
+        );
+        return res.data ?? [];
+      };
+
+      const resolved = await resolveBookableDate({
+        startDate: date,
+        maxAdvanceDays: settings?.maxAdvanceDays ?? 30,
+        loadSlots: fetchDay,
+      });
       if (cancelled) return;
-      setSlots(res.data ?? []);
+      setSlots(resolved.slots);
+      if (resolved.date !== date) {
+        setDate(resolved.date);
+        setSlotHint("No open times left on the selected day — jumped to the next available date.");
+      } else if (!resolved.slots.some((s) => s.available)) {
+        setSlotHint("No open slots in the booking window. Try another instructor or session.");
+      }
       setLoadingSlots(false);
     }
     void loadSlots();
     return () => {
       cancelled = true;
     };
-  }, [date, instructorId, sessionTypeId, step]);
+  }, [date, instructorId, sessionTypeId, step, settings?.maxAdvanceDays]);
 
   const activeTypes = settings?.sessionTypes.filter((t) => t.active) ?? [];
   const selectedType = activeTypes.find((t) => t.id === sessionTypeId);
@@ -349,36 +372,40 @@ function StudentBookingView() {
                   <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                     <Clock className="h-3.5 w-3.5" /> Available Zoom slots
                   </p>
+                  {slotHint ? (
+                    <p className="mb-3 rounded-xl bg-accent/10 px-3 py-2 text-sm text-foreground/80">
+                      {slotHint}
+                    </p>
+                  ) : null}
                   {loadingSlots ? (
                     <p className="text-sm text-muted-foreground">Loading airspace…</p>
-                  ) : (
+                  ) : slots.some((s) => s.available) ? (
                     <div className="grid max-h-80 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-6">
-                      {slots.map((slot) => {
-                        const label = format(parseISO(slot.startsAt), "HH:mm");
-                        const selected = selectedSlot === slot.startsAt;
-                        return (
-                          <button
-                            key={slot.startsAt}
-                            type="button"
-                            disabled={!slot.available}
-                            onClick={() => setSelectedSlot(slot.startsAt)}
-                            className={cn(
-                              "rounded-xl px-2 py-3 text-sm font-semibold transition-all",
-                              !slot.available &&
-                                "cursor-not-allowed bg-muted/30 text-muted-foreground/40 line-through",
-                              slot.available &&
-                                !selected &&
-                                "bg-muted/50 hover:bg-primary/15 hover:text-primary",
-                              selected &&
-                                "bg-[#0B1A24] text-accent shadow-medium ring-2 ring-accent/40",
-                            )}
-                            title={slot.reason}
-                          >
-                            {label}
-                          </button>
-                        );
-                      })}
+                      {slots
+                        .filter((slot) => slot.available)
+                        .map((slot) => {
+                          const selected = selectedSlot === slot.startsAt;
+                          return (
+                            <button
+                              key={slot.startsAt}
+                              type="button"
+                              onClick={() => setSelectedSlot(slot.startsAt)}
+                              className={cn(
+                                "rounded-xl px-2 py-3 text-sm font-semibold transition-all",
+                                !selected && "bg-muted/50 hover:bg-primary/15 hover:text-primary",
+                                selected &&
+                                  "bg-[#0B1A24] text-accent shadow-medium ring-2 ring-accent/40",
+                              )}
+                            >
+                              {formatSlotTime(slot.startsAt)}
+                            </button>
+                          );
+                        })}
                     </div>
+                  ) : (
+                    <p className="rounded-xl border border-dashed border-border/70 px-4 py-8 text-center text-sm text-muted-foreground">
+                      No open times on this date. Choose another day above.
+                    </p>
                   )}
                 </div>
 
@@ -427,7 +454,7 @@ function StudentBookingView() {
                   />
                   <Row
                     label="Starts"
-                    value={selectedSlot ? new Date(selectedSlot).toLocaleString() : "—"}
+                    value={selectedSlot ? formatSlotDateTime(selectedSlot) : "—"}
                   />
                   <Row label="Duration" value={`${selectedType?.durationMinutes ?? "—"} minutes`} />
                   <Row
