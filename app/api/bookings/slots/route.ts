@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { requirePermission } from "@/services/auth/guards";
-import { getAvailableSlots, listBookableInstructors } from "@/services/bookings/booking-service";
+import {
+  findNextAvailableSlots,
+  getAvailableSlots,
+  getBookingSettings,
+  listBookableInstructors,
+} from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 
 export async function GET(request: Request) {
@@ -12,6 +17,7 @@ export async function GET(request: Request) {
     const date = searchParams.get("date");
     const instructorId = searchParams.get("instructorId");
     const sessionTypeId = searchParams.get("sessionTypeId");
+    const findNext = searchParams.get("findNext") === "1";
 
     if (searchParams.get("meta") === "1") {
       return NextResponse.json({
@@ -30,6 +36,20 @@ export async function GET(request: Request) {
         },
         { status: 400 },
       );
+    }
+
+    if (findNext) {
+      const settings = getBookingSettings();
+      return NextResponse.json({
+        success: true,
+        data: findNextAvailableSlots({
+          startDate: date,
+          instructorId,
+          sessionTypeId,
+          maxDays: settings.maxAdvanceDays,
+        }),
+        error: null,
+      });
     }
 
     return NextResponse.json({
