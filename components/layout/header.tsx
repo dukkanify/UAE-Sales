@@ -4,7 +4,6 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
@@ -21,7 +20,7 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B1A24]/85 text-white backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-white/8 bg-[var(--surface-ink)]/80 text-white backdrop-blur-2xl">
       <div className="container-app flex h-[4.5rem] items-center justify-between gap-4">
         <BrandLogo variant="dark" priority />
 
@@ -33,10 +32,10 @@ function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
                   active
                     ? "bg-white/10 text-white"
-                    : "text-white/65 hover:bg-white/5 hover:text-white",
+                    : "text-white/60 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {item.label}
@@ -71,42 +70,33 @@ function Header() {
         </Button>
       </div>
 
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            id="mobile-nav"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="overflow-hidden border-t border-white/10 md:hidden"
-          >
-            <nav className="container-app flex flex-col gap-1 py-4" aria-label="Mobile">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
-                <Button
-                  variant="outline"
-                  className="border-white/20 bg-transparent text-white hover:bg-white/10"
-                  asChild
-                >
-                  <Link href={routes.login}>Sign in</Link>
-                </Button>
-                <Button variant="accent" asChild>
-                  <Link href={routes.book}>Book now</Link>
-                </Button>
-              </div>
-            </nav>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {open ? (
+        <div id="mobile-nav" className="animate-in-fade border-t border-white/10 md:hidden">
+          <nav className="container-app flex flex-col gap-1 py-4" aria-label="Mobile">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-xl px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
+              <Button
+                variant="outline"
+                className="border-white/20 bg-transparent text-white hover:bg-white/10"
+                asChild
+              >
+                <Link href={routes.login}>Sign in</Link>
+              </Button>
+              <Button variant="accent" asChild>
+                <Link href={routes.book}>Book now</Link>
+              </Button>
+            </div>
+          </nav>
+        </div>
+      ) : null}
     </header>
   );
 }
