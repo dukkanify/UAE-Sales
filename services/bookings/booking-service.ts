@@ -29,12 +29,57 @@ import {
 } from "@/services/classes/zoom-service";
 
 const ACTIVE_BOOKING: BookingStatus[] = ["pending", "confirmed"];
+const GUEST_HOLD_TTL_MS = 15 * 60_000;
 
-function displayName(userId: string | null | undefined): string {
+function buildUserNameMap(): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const u of readAuthDb().users) {
+    map.set(u.id, `${u.firstName} ${u.lastName}`.trim() || u.email);
+  }
+  return map;
+}
+
+function displayName(userId: string | null | undefined, names?: Map<string, string>): string {
   if (!userId) return "Guest";
+  if (names) return names.get(userId) ?? "Unknown";
   const u = readAuthDb().users.find((x) => x.id === userId);
   if (!u) return "Unknown";
   return `${u.firstName} ${u.lastName}`.trim() || u.email;
+}
+
+/** Cancel abandoned guest holds so slots free up quickly. */
+function purgeExpiredGuestHolds(): void {
+  const cutoff = Date.now() - GUEST_HOLD_TTL_MS;
+  const db = readBookingsDb();
+  const hasExpired = db.bookings.some(
+    (b) =>
+      b.status === "pending" &&
+      b.guestEmail &&
+      !b.guestVerified &&
+      Date.parse(b.createdAt) < cutoff,
+  );
+  if (!hasExpired) return;
+
+  const now = new Date().toISOString();
+  writeBookingsDb((draft) => {
+    draft.bookings = draft.bookings.map((b) => {
+      if (
+        b.status === "pending" &&
+        b.guestEmail &&
+        !b.guestVerified &&
+        Date.parse(b.createdAt) < cutoff
+      ) {
+        return {
+          ...b,
+          status: "cancelled" as const,
+          cancelledAt: now,
+          cancelReason: "Hold expired",
+          updatedAt: now,
+        };
+      }
+      return b;
+    });
+  });
 }
 
 function normalizeBooking(b: AppointmentBooking): AppointmentBooking {
@@ -175,7 +220,11 @@ export function getAvailableSlots(input: {
   date: string; // yyyy-MM-dd
   instructorId: string;
   sessionTypeId: string;
+  /** Skip hold purge when scanning many days in one request */
+  skipPurge?: boolean;
 }): BookingSlot[] {
+  if (!input.skipPurge) purgeExpiredGuestHolds();
+
   const settings = getBookingSettings();
   if (!settings.enabled) return [];
 
@@ -223,6 +272,39 @@ export function getAvailableSlots(input: {
     startHour,
     endHour,
   });
+}
+
+/** One server pass — next day with open slots (avoids N HTTP round-trips). */
+export function findNextAvailableSlots(input: {
+  startDate: string;
+  instructorId: string;
+  sessionTypeId: string;
+  maxDays?: number;
+}): { date: string; slots: BookingSlot[]; autoAdvanced: boolean } {
+  purgeExpiredGuestHolds();
+  const settings = getBookingSettings();
+  const max = Math.max(1, Math.min(input.maxDays ?? settings.maxAdvanceDays, 60));
+
+  for (let i = 0; i <= max; i += 1) {
+    const date = format(addDays(parseISO(`${input.startDate}T12:00:00`), i), "yyyy-MM-dd");
+    const slots = getAvailableSlots({
+      date,
+      instructorId: input.instructorId,
+      sessionTypeId: input.sessionTypeId,
+      skipPurge: true,
+    });
+    if (slots.some((s) => s.available)) {
+      return { date, slots, autoAdvanced: i > 0 };
+    }
+  }
+
+  const slots = getAvailableSlots({
+    date: input.startDate,
+    instructorId: input.instructorId,
+    sessionTypeId: input.sessionTypeId,
+    skipPurge: true,
+  });
+  return { date: input.startDate, slots, autoAdvanced: false };
 }
 
 function generateSlotsReliable(input: {
@@ -387,6 +469,7 @@ export async function createBooking(input: {
 
 export function listMyBookings(user: UserProfile): BookingListItem[] {
   const db = readBookingsDb();
+  const names = buildUserNameMap();
   let rows = db.bookings;
   if (user.role === ROLES.STUDENT) {
     rows = rows.filter((b) => b.studentId === user.id);
@@ -396,23 +479,27 @@ export function listMyBookings(user: UserProfile): BookingListItem[] {
   return rows
     .slice()
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-    .map(enrichBooking);
+    .map((b) => enrichBooking(b, names));
 }
 
 export function listAllBookings(): BookingListItem[] {
+  const names = buildUserNameMap();
   return readBookingsDb()
     .bookings.slice()
     .sort((a, b) => b.startsAt.localeCompare(a.startsAt))
-    .map(enrichBooking);
+    .map((b) => enrichBooking(b, names));
 }
 
-function enrichBooking(b: AppointmentBooking): BookingListItem {
+export function enrichBooking(b: AppointmentBooking, names?: Map<string, string>): BookingListItem {
   const n = normalizeBooking(b);
   const guestLabel = [n.guestFirstName, n.guestLastName].filter(Boolean).join(" ").trim();
+  const nameMap = names ?? buildUserNameMap();
   return {
     ...n,
-    studentName: n.studentId ? displayName(n.studentId) : guestLabel || n.guestEmail || "Guest",
-    instructorName: displayName(n.instructorId),
+    studentName: n.studentId
+      ? displayName(n.studentId, nameMap)
+      : guestLabel || n.guestEmail || "Guest",
+    instructorName: displayName(n.instructorId, nameMap),
   };
 }
 

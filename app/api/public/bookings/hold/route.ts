@@ -2,13 +2,15 @@ import { NextResponse } from "next/server";
 
 import { requestOtp } from "@/services/auth/auth-service";
 import { getRequestContext } from "@/services/auth/guards";
-import { ensureCsrfToken } from "@/lib/security/cookies";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 import { createGuestBookingHold } from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 
 export async function POST(request: Request) {
   try {
-    await ensureCsrfToken();
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const body = (await request.json().catch(() => null)) as {
       email?: string;
       firstName?: string;

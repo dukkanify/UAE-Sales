@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { requirePermission } from "@/services/auth/guards";
-import { updateBookingStatus } from "@/services/bookings/booking-service";
+import { enrichBooking, updateBookingStatus } from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 import { BOOKING_STATUSES, type BookingStatus } from "@/types/bookings";
 
@@ -26,13 +26,13 @@ export async function PATCH(request: Request, ctx: Ctx) {
       );
     }
 
-    const data = await updateBookingStatus({
+    const updated = await updateBookingStatus({
       user,
       id,
       status: body.status,
       cancelReason: body.cancelReason,
     });
-    return NextResponse.json({ success: true, data, error: null });
+    return NextResponse.json({ success: true, data: enrichBooking(updated), error: null });
   } catch (error) {
     return bookingErrorResponse(error);
   }

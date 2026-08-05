@@ -26,7 +26,8 @@ import { bookingFetch, bookingJson } from "@/features/bookings/lib/api";
 import {
   formatSlotDateTime,
   formatSlotTime,
-  resolveBookableDate,
+  maxBookableDate,
+  type ResolvedBookableDay,
 } from "@/features/bookings/lib/slot-utils";
 import { cn } from "@/lib/utils";
 import type {
@@ -80,27 +81,27 @@ function StudentBookingView() {
   }, [loadBase]);
 
   React.useEffect(() => {
-    if (!date || !instructorId || !sessionTypeId || step === "session") return;
+    if (step !== "when" || !date || !instructorId || !sessionTypeId) return;
     let cancelled = false;
     async function loadSlots() {
       setLoadingSlots(true);
       setSelectedSlot(null);
 
-      const fetchDay = async (day: string) => {
-        const res = await bookingFetch<BookingSlot[]>(
-          `/api/bookings/slots?date=${encodeURIComponent(day)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
-        );
-        return res.data ?? [];
-      };
-
-      const resolved = await resolveBookableDate({
-        startDate: date,
-        maxAdvanceDays: settings?.maxAdvanceDays ?? 30,
-        loadSlots: fetchDay,
-      });
+      const res = await bookingFetch<ResolvedBookableDay>(
+        `/api/bookings/slots?date=${encodeURIComponent(date)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}&findNext=1`,
+      );
       if (cancelled) return;
+
+      if (!res.success || !res.data) {
+        setSlots([]);
+        setSlotHint(res.error ?? "Could not load open slots.");
+        setLoadingSlots(false);
+        return;
+      }
+
+      const resolved = res.data;
       setSlots(resolved.slots);
-      if (resolved.date !== date) {
+      if (resolved.autoAdvanced && resolved.date !== date) {
         pendingAdvanceHintRef.current = true;
         setDate(resolved.date);
         setSlotHint("No open times left on the selected day — jumped to the next available date.");
@@ -118,7 +119,7 @@ function StudentBookingView() {
     return () => {
       cancelled = true;
     };
-  }, [date, instructorId, sessionTypeId, step, settings?.maxAdvanceDays]);
+  }, [date, instructorId, sessionTypeId, step]);
 
   const activeTypes = settings?.sessionTypes.filter((t) => t.active) ?? [];
   const selectedType = activeTypes.find((t) => t.id === sessionTypeId);
@@ -126,7 +127,11 @@ function StudentBookingView() {
   const upcoming = myBookings.filter((b) => b.status === "pending" || b.status === "confirmed");
 
   async function handleBook() {
-    if (!selectedSlot) return;
+    if (!selectedSlot) {
+      toast.error("Pick a time slot first");
+      setStep("when");
+      return;
+    }
     setSubmitting(true);
     const res = await bookingJson<AppointmentBooking>("/api/bookings", "POST", {
       instructorId,
@@ -142,11 +147,12 @@ function StudentBookingView() {
     setCreated(res.data);
     setStep("success");
     setNotes("");
-    await loadBase();
+    const mineRes = await bookingFetch<BookingListItem[]>("/api/bookings");
+    if (mineRes.success && mineRes.data) setMyBookings(mineRes.data);
   }
 
   async function cancelBooking(id: string) {
-    const res = await bookingJson("/api/bookings/" + id, "PATCH", {
+    const res = await bookingJson<BookingListItem>("/api/bookings/" + id, "PATCH", {
       status: "cancelled",
       cancelReason: "Cancelled by student",
     });
@@ -155,7 +161,12 @@ function StudentBookingView() {
       return;
     }
     toast.success("Booking cancelled");
-    await loadBase();
+    if (res.data) {
+      setMyBookings((prev) => prev.map((b) => (b.id === id ? res.data! : b)));
+    } else {
+      const mineRes = await bookingFetch<BookingListItem[]>("/api/bookings");
+      if (mineRes.success && mineRes.data) setMyBookings(mineRes.data);
+    }
   }
 
   if (!settings) {
@@ -370,6 +381,7 @@ function StudentBookingView() {
                     className="flex h-11 w-full max-w-xs rounded-xl border border-input bg-background px-3 text-sm"
                     value={date}
                     min={format(new Date(), "yyyy-MM-dd")}
+                    max={maxBookableDate(settings.maxAdvanceDays)}
                     onChange={(e) => setDate(e.target.value)}
                   />
                 </div>

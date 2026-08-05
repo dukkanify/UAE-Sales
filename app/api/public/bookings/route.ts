@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { getAvailableSlots, getPublicBookingCatalog } from "@/services/bookings/booking-service";
+import {
+  findNextAvailableSlots,
+  getAvailableSlots,
+  getPublicBookingCatalog,
+} from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 import { ensureCsrfToken } from "@/lib/security/cookies";
 
@@ -11,6 +15,7 @@ export async function GET(request: Request) {
     const date = searchParams.get("date");
     const instructorId = searchParams.get("instructorId");
     const sessionTypeId = searchParams.get("sessionTypeId");
+    const findNext = searchParams.get("findNext") === "1";
 
     if (!date && !instructorId && !sessionTypeId) {
       return NextResponse.json({
@@ -37,6 +42,19 @@ export async function GET(request: Request) {
         { success: false, data: null, error: "Public booking is unavailable" },
         { status: 403 },
       );
+    }
+
+    if (findNext) {
+      return NextResponse.json({
+        success: true,
+        data: findNextAvailableSlots({
+          startDate: date,
+          instructorId,
+          sessionTypeId,
+          maxDays: catalog.maxAdvanceDays,
+        }),
+        error: null,
+      });
     }
 
     return NextResponse.json({
