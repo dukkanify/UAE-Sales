@@ -20,6 +20,7 @@ export function defaultBookingSettings(): BookingSettings {
   const now = new Date().toISOString();
   return {
     enabled: true,
+    allowGuestBooking: true,
     aroundTheClock: true,
     dayStartHour: 8,
     dayEndHour: 22,

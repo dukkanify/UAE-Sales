@@ -54,7 +54,7 @@ function Header() {
             <Link href={routes.login}>Sign in</Link>
           </Button>
           <Button variant="accent" asChild>
-            <Link href={routes.register}>Get started</Link>
+            <Link href={routes.book}>Book now</Link>
           </Button>
         </div>
 
@@ -100,7 +100,7 @@ function Header() {
                   <Link href={routes.login}>Sign in</Link>
                 </Button>
                 <Button variant="accent" asChild>
-                  <Link href={routes.register}>Get started</Link>
+                  <Link href={routes.book}>Book now</Link>
                 </Button>
               </div>
             </nav>

@@ -197,6 +197,7 @@ export async function requestOtp(input: {
   rememberMe?: boolean;
   firstName?: string;
   lastName?: string;
+  bookingId?: string;
   ctx?: RequestContext;
 }): Promise<ApiResponse<{ email: string; demoOtp?: string; expiresInMinutes: number }>> {
   ensureSuperAdminSeeded();
@@ -211,11 +212,28 @@ export async function requestOtp(input: {
   const existing = findUserByEmail(email);
 
   if (input.purpose === "login" && !existing) {
-    return { success: false, data: null, error: "No account found for this email. Please register first." };
+    return {
+      success: false,
+      data: null,
+      error: "No account found for this email. Please register first.",
+    };
   }
 
   if (input.purpose === "register" && existing) {
-    return { success: false, data: null, error: "An account with this email already exists. Please sign in." };
+    return {
+      success: false,
+      data: null,
+      error: "An account with this email already exists. Please sign in.",
+    };
+  }
+
+  if (input.purpose === "booking") {
+    if (!input.bookingId) {
+      return { success: false, data: null, error: "bookingId required for booking verification" };
+    }
+    if (existing && existing.role !== ROLES.STUDENT) {
+      return { success: false, data: null, error: "Staff accounts cannot use guest booking OTP" };
+    }
   }
 
   if (existing && existing.status === ACCOUNT_STATUS.SUSPENDED) {
@@ -237,15 +255,14 @@ export async function requestOtp(input: {
     meta: {
       firstName: input.firstName ? sanitizeString(input.firstName) : null,
       lastName: input.lastName ? sanitizeString(input.lastName) : null,
+      bookingId: input.bookingId ?? null,
     },
     expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
     createdAt: nowIso(),
   };
 
   writeAuthDb((db) => {
-    db.otps = db.otps.filter(
-      (o) => !(o.email === email && o.purpose === input.purpose),
-    );
+    db.otps = db.otps.filter((o) => !(o.email === email && o.purpose === input.purpose));
     db.otps.push(challenge);
   });
 
@@ -293,9 +310,7 @@ export async function verifyOtp(input: {
   }
 
   const db = readAuthDb();
-  const challenge = db.otps.find(
-    (o) => o.email === email && o.purpose === input.purpose,
-  );
+  const challenge = db.otps.find((o) => o.email === email && o.purpose === input.purpose);
 
   if (!challenge) {
     return { success: false, data: null, error: "No active verification code. Request a new one." };
@@ -355,6 +370,95 @@ export async function verifyOtp(input: {
       entityId: created.id,
       ...input.ctx,
     });
+  } else if (input.purpose === "booking") {
+    const bookingId =
+      typeof challenge.meta.bookingId === "string" ? challenge.meta.bookingId : null;
+    if (!bookingId) {
+      return { success: false, data: null, error: "Booking reference missing from verification." };
+    }
+
+    if (!user) {
+      const created = createUser({
+        email,
+        firstName: (challenge.meta.firstName as string | null) ?? null,
+        lastName: (challenge.meta.lastName as string | null) ?? null,
+        role: ROLES.STUDENT,
+        status: ACCOUNT_STATUS.ACTIVE,
+      });
+      created.emailVerified = true;
+      created.profileComplete = Boolean(created.firstName && created.lastName);
+      writeAuthDb((d) => {
+        d.users.push(created);
+        d.otps = d.otps.filter((o) => o.id !== challenge.id);
+      });
+      user = created;
+      await logActivity({
+        actorId: created.id,
+        action: ACTIVITY_ACTIONS.USER_CREATED,
+        entityType: "user",
+        entityId: created.id,
+        metadata: { email, role: created.role, via: "guest_booking" },
+        ...input.ctx,
+      });
+    } else {
+      if (user.role !== ROLES.STUDENT) {
+        return {
+          success: false,
+          data: null,
+          error: "Only student accounts can complete guest bookings.",
+        };
+      }
+      if (!AUTHENTICATABLE_STATUSES.includes(user.status)) {
+        return {
+          success: false,
+          data: null,
+          error: "Account cannot sign in in its current status.",
+        };
+      }
+      writeAuthDb((d) => {
+        const u = d.users.find((x) => x.id === user!.id);
+        if (u) {
+          u.emailVerified = true;
+          if (u.status === ACCOUNT_STATUS.PENDING) u.status = ACCOUNT_STATUS.ACTIVE;
+          if (!u.firstName && challenge.meta.firstName) {
+            u.firstName = sanitizeString(String(challenge.meta.firstName));
+          }
+          if (!u.lastName && challenge.meta.lastName) {
+            u.lastName = sanitizeString(String(challenge.meta.lastName));
+          }
+          u.profileComplete = Boolean(u.firstName && u.lastName);
+          u.updatedAt = nowIso();
+        }
+        d.otps = d.otps.filter((o) => o.id !== challenge.id);
+      });
+      user = findUserById(user.id)!;
+    }
+
+    const { finalizeGuestBooking } = await import("@/services/bookings/booking-service");
+    const booking = await finalizeGuestBooking({ bookingId, userId: user.id });
+    const { profile } = await issueSession(user, true, input.ctx ?? {});
+
+    await logActivity({
+      actorId: profile.id,
+      action: ACTIVITY_ACTIONS.LOGIN,
+      entityType: "session",
+      entityId: profile.id,
+      metadata: { via: "guest_booking", bookingId },
+      ...input.ctx,
+    });
+
+    const redirectTo =
+      booking.status === "confirmed" ? `/bookings/join/${booking.id}` : "/student/bookings";
+
+    return {
+      success: true,
+      data: {
+        user: profile,
+        redirectTo,
+        requiresProfile: !profile.profileComplete,
+      },
+      error: null,
+    };
   } else if (input.purpose === "login" || input.purpose === "verify_email") {
     if (!user) {
       return { success: false, data: null, error: "Account not found." };
@@ -424,9 +528,7 @@ export async function verifyOtp(input: {
     ...input.ctx,
   });
 
-  const redirectTo = profile.profileComplete
-    ? ROLE_DASHBOARD[profile.role]
-    : "/complete-profile";
+  const redirectTo = profile.profileComplete ? ROLE_DASHBOARD[profile.role] : "/complete-profile";
 
   return {
     success: true,

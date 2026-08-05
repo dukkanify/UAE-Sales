@@ -9,4 +9,7 @@ export {
   updateBookingStatus,
   getBookingJoinInfo,
   ensureBookingZoom,
+  getPublicBookingCatalog,
+  createGuestBookingHold,
+  finalizeGuestBooking,
 } from "@/services/bookings/booking-service";

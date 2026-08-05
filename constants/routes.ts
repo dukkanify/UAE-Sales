@@ -5,6 +5,7 @@
 export const routes = {
   home: "/",
   splash: "/splash",
+  book: "/book",
 
   // Auth
   login: "/login",
