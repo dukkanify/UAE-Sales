@@ -31,9 +31,11 @@ function AuthProvider({
   const [user, setUser] = React.useState<UserProfile | null>(initialUser);
   const [permissions, setPermissions] = React.useState<Permission[]>(initialPermissions);
   const [isLoading, setIsLoading] = React.useState(!initialUser);
+  const hasResolvedRef = React.useRef(Boolean(initialUser));
 
   const refresh = React.useCallback(async () => {
-    setIsLoading(true);
+    // Avoid full-screen blocking on background revalidation
+    if (!hasResolvedRef.current) setIsLoading(true);
     try {
       const result = await authFetch<{
         user: UserProfile | null;
@@ -48,6 +50,7 @@ function AuthProvider({
         setPermissions([]);
       }
     } finally {
+      hasResolvedRef.current = true;
       setIsLoading(false);
     }
   }, []);

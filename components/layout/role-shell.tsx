@@ -1,9 +1,9 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
   Award,
@@ -81,8 +81,21 @@ import {
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { BrandLogo } from "@/components/brand/brand-logo";
-import { CommandPalette } from "@/components/navigation/command-palette";
-import { FloatingAiAssistant } from "@/features/ai";
+const CommandPalette = dynamic(
+  () =>
+    import("@/components/navigation/command-palette").then((m) => ({
+      default: m.CommandPalette,
+    })),
+  { ssr: false },
+);
+
+const FloatingAiAssistant = dynamic(
+  () =>
+    import("@/features/ai").then((m) => ({
+      default: m.FloatingAiAssistant,
+    })),
+  { ssr: false },
+);
 
 const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
@@ -189,11 +202,11 @@ function RoleSidebar({
                 href={item.href}
                 title={item.label}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   collapsed && "justify-center px-2",
                   active
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-soft"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
                 )}
               >
                 <Icon className="h-4 w-4 shrink-0" />
@@ -295,7 +308,7 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
           collapsed ? "lg:pl-[72px]" : "lg:pl-64",
         )}
       >
-        <header className="sticky top-0 z-20 border-b border-border bg-card/90 backdrop-blur-md">
+        <header className="sticky top-0 z-20 border-b border-border/70 bg-card/75 backdrop-blur-xl">
           <div className="flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-4 lg:px-6">
             <Sheet>
               <SheetTrigger asChild>
@@ -343,16 +356,9 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
         </header>
 
         <main className="flex-1 p-4 lg:p-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={role}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <div key={role} className="animate-in-fade">
+            {children}
+          </div>
         </main>
       </div>
       <FloatingAiAssistant />

@@ -9,9 +9,11 @@ import "@/styles/globals.css";
 
 const ibmPlex = IBM_Plex_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   variable: "--font-ibm-plex",
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const spaceGrotesk = Space_Grotesk({
@@ -19,6 +21,8 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
   variable: "--font-space-grotesk",
   display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -67,9 +71,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2E7DAA",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F3F6F9" },
+    { media: "(prefers-color-scheme: dark)", color: "#070F14" },
+  ],
   width: "device-width",
   initialScale: 1,
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -84,7 +92,7 @@ export default function RootLayout({
       className={`${ibmPlex.variable} ${spaceGrotesk.variable}`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen font-sans antialiased">
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
