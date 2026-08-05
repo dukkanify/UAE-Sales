@@ -67,6 +67,7 @@ function PublicBookingStudio() {
   const [submitting, setSubmitting] = React.useState(false);
   const [redirectTo, setRedirectTo] = React.useState<string | null>(null);
   const [slotHint, setSlotHint] = React.useState<string | null>(null);
+  const pendingAdvanceHintRef = React.useRef(false);
 
   React.useEffect(() => {
     void (async () => {
@@ -87,7 +88,6 @@ function PublicBookingStudio() {
     async function load() {
       setLoadingSlots(true);
       setSelectedSlot(null);
-      setSlotHint(null);
 
       const loadSlots = async (day: string) => {
         const res = await publicFetch<BookingSlot[]>(
@@ -104,10 +104,16 @@ function PublicBookingStudio() {
       if (cancelled) return;
       setSlots(resolved.slots);
       if (resolved.date !== date) {
+        pendingAdvanceHintRef.current = true;
         setDate(resolved.date);
+        setSlotHint("No open times left on the selected day — jumped to the next available date.");
+      } else if (pendingAdvanceHintRef.current) {
+        pendingAdvanceHintRef.current = false;
         setSlotHint("No open times left on the selected day — jumped to the next available date.");
       } else if (!resolved.slots.some((s) => s.available)) {
         setSlotHint("No open slots in the booking window. Try another instructor or session type.");
+      } else {
+        setSlotHint(null);
       }
       setLoadingSlots(false);
     }

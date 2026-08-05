@@ -54,6 +54,7 @@ function StudentBookingView() {
   const [submitting, setSubmitting] = React.useState(false);
   const [created, setCreated] = React.useState<AppointmentBooking | null>(null);
   const [slotHint, setSlotHint] = React.useState<string | null>(null);
+  const pendingAdvanceHintRef = React.useRef(false);
 
   const loadBase = React.useCallback(async () => {
     const [settingsRes, metaRes, mineRes] = await Promise.all([
@@ -84,7 +85,6 @@ function StudentBookingView() {
     async function loadSlots() {
       setLoadingSlots(true);
       setSelectedSlot(null);
-      setSlotHint(null);
 
       const fetchDay = async (day: string) => {
         const res = await bookingFetch<BookingSlot[]>(
@@ -101,10 +101,16 @@ function StudentBookingView() {
       if (cancelled) return;
       setSlots(resolved.slots);
       if (resolved.date !== date) {
+        pendingAdvanceHintRef.current = true;
         setDate(resolved.date);
+        setSlotHint("No open times left on the selected day — jumped to the next available date.");
+      } else if (pendingAdvanceHintRef.current) {
+        pendingAdvanceHintRef.current = false;
         setSlotHint("No open times left on the selected day — jumped to the next available date.");
       } else if (!resolved.slots.some((s) => s.available)) {
         setSlotHint("No open slots in the booking window. Try another instructor or session.");
+      } else {
+        setSlotHint(null);
       }
       setLoadingSlots(false);
     }
