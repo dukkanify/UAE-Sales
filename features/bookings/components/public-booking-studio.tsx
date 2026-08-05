@@ -54,7 +54,7 @@ async function publicFetch<T>(url: string, init?: RequestInit) {
 function PublicBookingStudio() {
   const router = useRouter();
   const [catalog, setCatalog] = React.useState<PublicBookingCatalog | null>(null);
-  const [step, setStep] = React.useState<Step>("session");
+  const [step, setStep] = React.useState<Step>("when");
   const [sessionTypeId, setSessionTypeId] = React.useState("");
   const [instructorId, setInstructorId] = React.useState("");
   const [date, setDate] = React.useState(() => format(new Date(), "yyyy-MM-dd"));
@@ -84,6 +84,8 @@ function PublicBookingStudio() {
         const instructors = res.data.instructors ?? [];
         if (types[0]) setSessionTypeId(types[0].id);
         if (instructors[0]) setInstructorId(instructors[0].id);
+        // Express path: land on schedule immediately
+        setStep("when");
       } else {
         setCatalogError(res.error ?? "Could not open booking studio");
       }
@@ -235,17 +237,16 @@ function PublicBookingStudio() {
         <div className="booking-scan-line" />
         <div className="relative z-10">
           <p className="mb-3 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
-            <Radio className="h-3.5 w-3.5" /> Live lane · platform entry
+            <Radio className="h-3.5 w-3.5" /> Fast Zoom booking
           </p>
           <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-            Book coaching on the{" "}
+            Pick a time → confirm email →{" "}
             <span className="bg-gradient-to-r from-[#5BA3C9] to-accent bg-clip-text text-transparent">
-              training platform
+              join Zoom
             </span>
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-            Pick a Zoom slot first — confirm by email and your learner access is created
-            automatically. Course platform first, paperwork later.
+            Three quick steps. No registration form first — your account opens when you confirm.
           </p>
         </div>
       </div>
@@ -316,15 +317,41 @@ function PublicBookingStudio() {
               exit={{ opacity: 0, x: -10 }}
               className="p-5 sm:p-8"
             >
-              <button
-                type="button"
-                className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground"
-                onClick={() => setStep("session")}
-              >
-                <ArrowLeft className="h-4 w-4" /> Back
-              </button>
-              <h2 className="font-display text-2xl font-semibold">2 · Pick date & time</h2>
-              <div className="mt-6 space-y-2">
+              <h2 className="font-display text-2xl font-semibold">1 · Pick a Zoom time</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Choose a slot — then confirm by email to open your Zoom lobby.
+              </p>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Session</Label>
+                  <select
+                    className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                    value={sessionTypeId}
+                    onChange={(e) => setSessionTypeId(e.target.value)}
+                  >
+                    {(catalog.sessionTypes ?? []).map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Instructor</Label>
+                  <select
+                    className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                    value={instructorId}
+                    onChange={(e) => setInstructorId(e.target.value)}
+                  >
+                    {(catalog.instructors ?? []).map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.fullName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
                 <Label>Date</Label>
                 <input
                   type="date"
@@ -381,7 +408,7 @@ function PublicBookingStudio() {
                   disabled={!selectedSlot}
                   onClick={() => setStep("details")}
                 >
-                  Continue <ArrowRight className="h-4 w-4" />
+                  Continue to confirm <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </motion.div>
@@ -402,9 +429,9 @@ function PublicBookingStudio() {
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
-              <h2 className="font-display text-2xl font-semibold">3 · Your details</h2>
+              <h2 className="font-display text-2xl font-semibold">2 · Your details</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                We&apos;ll create your account when you verify the code — no signup form first.
+                Confirm by email — we create your learner access and open Zoom.
               </p>
 
               <div className="mt-6 rounded-2xl bg-[#0B1A24] p-4 text-sm text-white">
@@ -472,7 +499,7 @@ function PublicBookingStudio() {
               exit={{ opacity: 0, x: -10 }}
               className="p-5 sm:p-8"
             >
-              <h2 className="font-display text-2xl font-semibold">4 · Confirm with code</h2>
+              <h2 className="font-display text-2xl font-semibold">3 · Enter code → Zoom</h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 Enter the code sent to <span className="font-medium text-foreground">{email}</span>
               </p>

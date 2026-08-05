@@ -74,6 +74,8 @@ function StudentBookingView() {
       if (firstInstructor) setInstructorId((prev) => prev || firstInstructor.id);
     }
     if (mineRes.success && mineRes.data) setMyBookings(mineRes.data);
+    // Express: jump straight to scheduling once defaults exist
+    setStep((prev) => (prev === "session" ? "when" : prev));
   }, []);
 
   React.useEffect(() => {
@@ -215,20 +217,10 @@ function StudentBookingView() {
               meeting credentials when confirmed.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              settings.aroundTheClock ? "24/7 slots" : "Timed slots",
-              settings.autoCreateZoom ? "Auto Zoom room" : "Manual Zoom",
-              settings.zoomWaitingRoom ? "Waiting room" : "Direct entry",
-            ].map((chip) => (
-              <span
-                key={chip}
-                className="rounded-full bg-white/5 px-3 py-1.5 text-[11px] font-medium text-white/75 ring-1 ring-white/10"
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
+          <Button variant="accent" size="lg" className="shrink-0" onClick={() => setStep("when")}>
+            Book Zoom now
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="relative z-10 mt-8 flex gap-2">
