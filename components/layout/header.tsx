@@ -20,22 +20,25 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[var(--surface-ink)]/80 text-white backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-white/8 bg-[var(--surface-ink)]/75 text-white backdrop-blur-2xl">
       <div className="container-app flex h-[4.5rem] items-center justify-between gap-4">
         <BrandLogo variant="dark" priority />
 
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-0.5 md:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href;
+            const active =
+              item.href === "/"
+                ? pathname === "/"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-lg px-3 py-2 text-sm font-medium tracking-wide transition-colors",
                   active
                     ? "bg-white/10 text-white"
-                    : "text-white/60 hover:bg-white/5 hover:text-white",
+                    : "text-white/55 hover:bg-white/5 hover:text-white",
                 )}
               >
                 {item.label}
@@ -50,10 +53,10 @@ function Header() {
             className="text-white/80 hover:bg-white/10 hover:text-white"
             asChild
           >
-            <Link href={routes.login}>Sign in</Link>
+            <Link href={routes.login}>Enter</Link>
           </Button>
           <Button variant="accent" asChild>
-            <Link href={routes.book}>Book now</Link>
+            <Link href={routes.book}>Book live</Link>
           </Button>
         </div>
 
@@ -88,10 +91,10 @@ function Header() {
                 className="border-white/20 bg-transparent text-white hover:bg-white/10"
                 asChild
               >
-                <Link href={routes.login}>Sign in</Link>
+                <Link href={routes.login}>Enter platform</Link>
               </Button>
               <Button variant="accent" asChild>
-                <Link href={routes.book}>Book now</Link>
+                <Link href={routes.book}>Book live</Link>
               </Button>
             </div>
           </nav>

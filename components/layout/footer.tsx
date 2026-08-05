@@ -12,48 +12,53 @@ function Footer() {
   return (
     <footer className="border-t border-white/8 bg-[var(--surface-ink)] text-white">
       <div className="container-app py-14">
-        <div className="grid gap-10 md:grid-cols-3">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div className="space-y-4">
             <BrandLogo variant="dark" href={routes.home} />
-            <p className="max-w-sm text-sm leading-relaxed text-white/55">
-              {brandingConfig.tagline}. {siteConfig.description} Primary locations:{" "}
+            <p className="max-w-md text-sm leading-relaxed text-white/50">
+              {brandingConfig.tagline}. {siteConfig.description} Training lanes:{" "}
               {siteConfig.locations.join(" · ")}.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
+            <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
               Platform
             </h3>
-            <ul className="space-y-2 text-sm text-white/65">
+            <ul className="space-y-2 text-sm text-white/60">
               <li>
-                <Link href={routes.home} className="transition hover:text-accent">
+                <Link href="/" className="transition hover:text-accent">
                   Home
                 </Link>
               </li>
               <li>
+                <Link href="/#flightpath" className="transition hover:text-accent">
+                  Flightpath
+                </Link>
+              </li>
+              <li>
+                <Link href="/#live" className="transition hover:text-accent">
+                  Live Zoom
+                </Link>
+              </li>
+              <li>
                 <Link href={routes.book} className="transition hover:text-accent">
-                  Book Zoom
+                  Book a session
                 </Link>
               </li>
               <li>
                 <Link href={routes.login} className="transition hover:text-accent">
-                  Sign in
-                </Link>
-              </li>
-              <li>
-                <Link href={routes.dashboard} className="transition hover:text-accent">
-                  Dashboard
+                  Enter platform
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-accent">
-              Contact
+            <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
+              Support
             </h3>
-            <ul className="space-y-2 text-sm text-white/65">
+            <ul className="space-y-2 text-sm text-white/60">
               <li>
                 <a
                   href={`mailto:${siteConfig.contactEmail}`}
@@ -77,8 +82,8 @@ function Footer() {
         </div>
 
         <Separator className="my-8 bg-white/10" />
-        <p className="text-xs text-white/40">
-          © {year} {siteConfig.name}. All rights reserved. English only.
+        <p className="text-xs text-white/35">
+          © {year} {siteConfig.name}. Aviation course platform. English only.
         </p>
       </div>
     </footer>

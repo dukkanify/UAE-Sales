@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 import { PublicBookingStudio } from "@/features/bookings/components/public-booking-studio";
 
 export const metadata: Metadata = {
-  title: "Book a Zoom session",
-  description: "Reserve your ATPL PASS Zoom appointment before registering — confirm by email OTP.",
+  title: "Book live Zoom",
+  description:
+    "Reserve live ATPL coaching on the ATPL PASS platform — confirm by email, account created on the spot.",
 };
 
 export default function PublicBookPage() {

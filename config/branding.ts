@@ -8,7 +8,7 @@ import { theme } from "@/config/theme";
 export const brandingConfig = {
   platformName: siteConfig.name,
   companyName: siteConfig.legalName,
-  tagline: "Unlock Your Pilot License",
+  tagline: "Aviation course platform · 2030",
   language: siteConfig.language,
   englishOnly: siteConfig.englishOnly,
   contactEmail: siteConfig.contactEmail,
