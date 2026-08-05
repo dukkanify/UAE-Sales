@@ -63,6 +63,11 @@ function InstructorBookingView() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="outline">{b.status}</Badge>
+                {b.status === "confirmed" ? (
+                  <Button size="sm" variant="accent" asChild>
+                    <a href={`/bookings/join/${b.id}`}>Join Zoom</a>
+                  </Button>
+                ) : null}
                 {b.status === "pending" || b.status === "confirmed" ? (
                   <Button
                     size="sm"

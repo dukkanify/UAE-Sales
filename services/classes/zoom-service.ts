@@ -19,9 +19,7 @@ function zoomCredsPresent(): boolean {
   try {
     const env = getServerEnv();
     return Boolean(
-      env.ZOOM_ACCOUNT_ID?.trim() &&
-        env.ZOOM_CLIENT_ID?.trim() &&
-        env.ZOOM_CLIENT_SECRET?.trim(),
+      env.ZOOM_ACCOUNT_ID?.trim() && env.ZOOM_CLIENT_ID?.trim() && env.ZOOM_CLIENT_SECRET?.trim(),
     );
   } catch {
     return false;
@@ -37,9 +35,7 @@ async function getZoomAccessToken(): Promise<string | null> {
     return cachedToken.accessToken;
   }
 
-  const basic = Buffer.from(`${env.ZOOM_CLIENT_ID}:${env.ZOOM_CLIENT_SECRET}`).toString(
-    "base64",
-  );
+  const basic = Buffer.from(`${env.ZOOM_CLIENT_ID}:${env.ZOOM_CLIENT_SECRET}`).toString("base64");
   const url = new URL("https://zoom.us/oauth/token");
   url.searchParams.set("grant_type", "account_credentials");
   url.searchParams.set("account_id", env.ZOOM_ACCOUNT_ID!);
@@ -66,7 +62,9 @@ function mockMeeting(
 ): Omit<ZoomMeetingRecord, "id" | "createdAt" | "updatedAt"> {
   const zoomMeetingId = String(Math.floor(100_000_000 + Math.random() * 899_999_999));
   const password = opts.passcode
-    ? generateToken(6).replace(/[^a-zA-Z0-9]/g, "").slice(0, 8) || "AtplPass1"
+    ? generateToken(6)
+        .replace(/[^a-zA-Z0-9]/g, "")
+        .slice(0, 8) || "AtplPass1"
     : "";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   return {
@@ -223,10 +221,9 @@ export async function updateMeetingForClass(input: {
   liveClass: LiveClass;
   actorId?: string | null;
 }): Promise<ZoomMeetingRecord | null> {
-  const existing = readClassesDb().zoomMeetings.find(
-    (z) => z.liveClassId === input.liveClass.id,
-  );
-  if (!existing) return createMeetingForClass({ liveClass: input.liveClass, actorId: input.actorId });
+  const existing = readClassesDb().zoomMeetings.find((z) => z.liveClassId === input.liveClass.id);
+  if (!existing)
+    return createMeetingForClass({ liveClass: input.liveClass, actorId: input.actorId });
 
   if (existing.providerMode === "zoom" && zoomCredsPresent()) {
     const token = await getZoomAccessToken();
@@ -279,9 +276,7 @@ export async function cancelMeetingForClass(input: {
   liveClassId: string;
   actorId?: string | null;
 }): Promise<void> {
-  const existing = readClassesDb().zoomMeetings.find(
-    (z) => z.liveClassId === input.liveClassId,
-  );
+  const existing = readClassesDb().zoomMeetings.find((z) => z.liveClassId === input.liveClassId);
   if (!existing) return;
 
   if (existing.providerMode === "zoom" && zoomCredsPresent()) {
@@ -323,4 +318,137 @@ export function getPublicJoinInfo(liveClassId: string, isHost: boolean) {
 
 export function refreshZoomCredentialsFlag(): boolean {
   return zoomCredsPresent();
+}
+
+/**
+ * Provision a Zoom (or mock) meeting not tied to a live class —
+ * used by 1:1 appointment bookings.
+ */
+export async function provisionStandaloneZoomMeeting(input: {
+  topic: string;
+  agenda?: string;
+  startsAt: string;
+  durationMinutes: number;
+  timezone: string;
+  mockJoinPath: string;
+  waitingRoom?: boolean;
+  passcode?: boolean;
+  actorId?: string | null;
+}): Promise<{
+  meetingNumber: string;
+  joinUrl: string;
+  startUrl: string;
+  password: string;
+  waitingRoom: boolean;
+  providerMode: "mock" | "zoom";
+}> {
+  const settings = getPlatformSettings();
+  const waitingRoom = input.waitingRoom ?? settings.zoom.defaultWaitingRoom;
+  const passcode = input.passcode ?? settings.zoom.defaultPasscode;
+
+  const synthetic: LiveClass = {
+    id: "standalone",
+    title: input.topic,
+    description: input.agenda ?? "",
+    courseId: null,
+    moduleId: null,
+    lessonId: null,
+    instructorId: "",
+    assistantInstructorId: null,
+    startsAt: input.startsAt,
+    endsAt: new Date(Date.parse(input.startsAt) + input.durationMinutes * 60_000).toISOString(),
+    durationMinutes: input.durationMinutes,
+    timezone: input.timezone,
+    maxStudents: 2,
+    meetingType: "meeting",
+    status: "scheduled",
+    zoomMeetingId: null,
+    recurringRuleId: null,
+    parentClassId: null,
+    cancelledAt: null,
+    cancelReason: null,
+    rescheduledFromId: null,
+    createdById: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    deletedAt: null,
+  };
+
+  let payload =
+    settings.zoom.enabled && zoomCredsPresent()
+      ? await createZoomApiMeeting(synthetic, {
+          waitingRoom,
+          passcode,
+          meetingType: "meeting",
+        })
+      : null;
+
+  if (!payload) {
+    const zoomMeetingId = String(Math.floor(100_000_000 + Math.random() * 899_999_999));
+    const password = passcode
+      ? generateToken(6)
+          .replace(/[^a-zA-Z0-9]/g, "")
+          .slice(0, 8) || "AtplPass1"
+      : "";
+    payload = {
+      liveClassId: "standalone",
+      zoomMeetingId,
+      zoomUuid: generateId(),
+      joinUrl: `https://zoom.us/j/${zoomMeetingId}`,
+      startUrl: `https://zoom.us/s/${zoomMeetingId}?zak=mock`,
+      password,
+      hostEmail: settings.zoom.accountEmail || null,
+      waitingRoom,
+      passcodeEnabled: passcode,
+      coHostEmails: [],
+      providerMode: "mock",
+      raw: {
+        mock: true,
+        topic: input.topic,
+        standalone: true,
+        lobbyPath: input.mockJoinPath,
+      },
+    };
+  } else if (payload.providerMode === "mock") {
+    // keep
+  }
+
+  await logActivity({
+    actorId: input.actorId ?? null,
+    action: ACTIVITY_ACTIONS.ZOOM_MEETING_CREATED,
+    entityType: "booking_zoom",
+    entityId: payload.zoomMeetingId,
+    metadata: { topic: input.topic, providerMode: payload.providerMode },
+  });
+
+  return {
+    meetingNumber: payload.zoomMeetingId,
+    joinUrl: payload.joinUrl,
+    startUrl: payload.startUrl,
+    password: payload.password,
+    waitingRoom: payload.waitingRoom,
+    providerMode: payload.providerMode,
+  };
+}
+
+export async function cancelStandaloneZoomMeeting(input: {
+  meetingNumber: string;
+  providerMode: "mock" | "zoom";
+  actorId?: string | null;
+}): Promise<void> {
+  if (input.providerMode === "zoom" && zoomCredsPresent()) {
+    const token = await getZoomAccessToken();
+    if (token) {
+      await fetch(`https://api.zoom.us/v2/meetings/${input.meetingNumber}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      }).catch((err) => console.error("Zoom booking cancel failed", err));
+    }
+  }
+  await logActivity({
+    actorId: input.actorId ?? null,
+    action: ACTIVITY_ACTIONS.ZOOM_MEETING_CANCELLED,
+    entityType: "booking_zoom",
+    entityId: input.meetingNumber,
+  });
 }

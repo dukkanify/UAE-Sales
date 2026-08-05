@@ -7,4 +7,6 @@ export {
   listAllBookings,
   listBookableInstructors,
   updateBookingStatus,
+  getBookingJoinInfo,
+  ensureBookingZoom,
 } from "@/services/bookings/booking-service";

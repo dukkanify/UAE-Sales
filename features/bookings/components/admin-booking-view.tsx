@@ -65,7 +65,7 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
     <div className="space-y-6">
       <PageHeader
         title="Bookings"
-        description="Control 24/7 client self-booking and manage appointments."
+        description="Control 24/7 Zoom self-booking and manage appointments."
         breadcrumbs={[{ label: roleLabel }, { label: "Bookings" }]}
         actions={
           <div className="inline-flex rounded-xl border border-border/70 bg-card p-1 shadow-soft">
@@ -131,6 +131,24 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
               description="New bookings stay pending until you confirm."
               checked={settings.requireConfirmation}
               onChange={(v) => void saveSettings({ requireConfirmation: v })}
+            />
+            <ToggleRow
+              label="Auto-create Zoom room"
+              description="Provision Zoom meeting IDs when a booking is confirmed."
+              checked={settings.autoCreateZoom}
+              onChange={(v) => void saveSettings({ autoCreateZoom: v })}
+            />
+            <ToggleRow
+              label="Zoom waiting room"
+              description="Hold participants until the host admits them."
+              checked={settings.zoomWaitingRoom}
+              onChange={(v) => void saveSettings({ zoomWaitingRoom: v })}
+            />
+            <ToggleRow
+              label="Zoom passcode"
+              description="Require a passcode for every booking meeting."
+              checked={settings.zoomPasscode}
+              onChange={(v) => void saveSettings({ zoomPasscode: v })}
             />
           </div>
 
@@ -260,13 +278,19 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="outline">{b.status}</Badge>
+                  {b.zoom ? <Badge variant="secondary">Zoom · {b.zoom.meetingNumber}</Badge> : null}
+                  {b.status === "confirmed" ? (
+                    <Button size="sm" variant="outline" asChild>
+                      <a href={`/bookings/join/${b.id}`}>Zoom lobby</a>
+                    </Button>
+                  ) : null}
                   {b.status === "pending" ? (
                     <Button
                       size="sm"
                       variant="accent"
                       onClick={() => void setStatus(b.id, "confirmed")}
                     >
-                      Confirm
+                      Confirm + Zoom
                     </Button>
                   ) : null}
                   {b.status === "confirmed" ? (

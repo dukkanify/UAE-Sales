@@ -1,5 +1,5 @@
 /**
- * Appointment booking types — 24/7 client self-booking with admin control.
+ * Appointment booking types — 24/7 Zoom self-booking with admin control.
  */
 
 export const BOOKING_STATUSES = [
@@ -18,6 +18,16 @@ export interface BookingSessionType {
   description: string;
   durationMinutes: number;
   active: boolean;
+}
+
+export interface BookingZoomSession {
+  meetingNumber: string;
+  joinUrl: string;
+  startUrl: string;
+  password: string;
+  waitingRoom: boolean;
+  providerMode: "mock" | "zoom";
+  provisionedAt: string;
 }
 
 export interface BookingSettings {
@@ -39,6 +49,12 @@ export interface BookingSettings {
   minNoticeMinutes: number;
   /** If true, new bookings stay pending until admin confirms */
   requireConfirmation: boolean;
+  /** Auto-create Zoom meeting when booking is confirmed */
+  autoCreateZoom: boolean;
+  /** Zoom waiting room for booking meetings */
+  zoomWaitingRoom: boolean;
+  /** Require Zoom passcode */
+  zoomPasscode: boolean;
   /** Empty = all active instructors bookable */
   instructorIds: string[];
   sessionTypes: BookingSessionType[];
@@ -59,6 +75,7 @@ export interface AppointmentBooking {
   startsAt: string;
   endsAt: string;
   status: BookingStatus;
+  zoom: BookingZoomSession | null;
   createdAt: string;
   updatedAt: string;
   cancelledAt: string | null;
@@ -76,4 +93,19 @@ export interface BookingSlot {
 export interface BookingListItem extends AppointmentBooking {
   studentName?: string;
   instructorName?: string;
+}
+
+export interface BookingJoinPayload {
+  booking: BookingListItem;
+  join: {
+    meetingNumber: string;
+    joinUrl: string;
+    startUrl: string | null;
+    password: string;
+    waitingRoom: boolean;
+    providerMode: "mock" | "zoom";
+  };
+  isHost: boolean;
+  canJoin: boolean;
+  joinWindowLabel: string;
 }
