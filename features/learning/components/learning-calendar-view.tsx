@@ -31,33 +31,38 @@ function LearningCalendarPageView() {
         description="Live classes, study plan, deadlines, and upcoming lessons."
         breadcrumbs={[{ label: "Student" }, { label: "Calendar" }]}
         actions={
-          <div className="inline-flex rounded-xl border border-border/70 bg-card p-1 shadow-soft">
-            <button
-              type="button"
-              onClick={() => setView("calendar")}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                view === "calendar"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <CalendarDays className="size-3.5" />
-              Calendar
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("agenda")}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
-                view === "agenda"
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <List className="size-3.5" />
-              Study agenda
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="accent" size="sm" asChild>
+              <Link href="/student/bookings">Book a session</Link>
+            </Button>
+            <div className="inline-flex rounded-xl border border-border/70 bg-card p-1 shadow-soft">
+              <button
+                type="button"
+                onClick={() => setView("calendar")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                  view === "calendar"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <CalendarDays className="size-3.5" />
+                Calendar
+              </button>
+              <button
+                type="button"
+                onClick={() => setView("agenda")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors",
+                  view === "agenda"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                <List className="size-3.5" />
+                Study agenda
+              </button>
+            </div>
           </div>
         }
       />
