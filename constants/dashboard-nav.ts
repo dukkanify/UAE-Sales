@@ -23,6 +23,7 @@ export type DashboardIcon =
   | "notifications"
   | "profile"
   | "calendar"
+  | "bookings"
   | "assignments"
   | "quizzes"
   | "certificates"
@@ -63,6 +64,7 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/super-admin/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/super-admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/super-admin/classes", icon: "classes" },
+  { label: "Bookings", href: "/super-admin/bookings", icon: "bookings" },
   { label: "Messages", href: "/super-admin/messages", icon: "messages" },
   { label: "Communities", href: "/super-admin/communities", icon: "communities" },
   { label: "Announcements", href: "/super-admin/announcements", icon: "megaphone" },
@@ -95,6 +97,7 @@ export const ADMIN_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/admin/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/admin/classes", icon: "classes" },
+  { label: "Bookings", href: "/admin/bookings", icon: "bookings" },
   { label: "Messages", href: "/admin/messages", icon: "messages" },
   { label: "Communities", href: "/admin/communities", icon: "communities" },
   { label: "Announcements", href: "/admin/announcements", icon: "megaphone" },
@@ -119,6 +122,7 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Quizzes", href: "/instructor/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/instructor/certificates", icon: "certificates" },
   { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
+  { label: "Bookings", href: "/instructor/bookings", icon: "bookings" },
   { label: "Live Classes", href: "/instructor/classes", icon: "classes" },
   { label: "Messages", href: "/instructor/messages", icon: "messages" },
   { label: "Community", href: "/instructor/community", icon: "communities" },
@@ -140,6 +144,7 @@ export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Favorites", href: "/student/favorites", icon: "favorites" },
   { label: "Planner", href: "/student/planner", icon: "planner" },
   { label: "Calendar", href: "/student/calendar", icon: "calendar" },
+  { label: "Book a session", href: "/student/bookings", icon: "bookings" },
   { label: "History", href: "/student/history", icon: "history" },
   { label: "Search", href: "/student/search", icon: "search" },
   { label: "Assignments", href: "/student/assignments", icon: "assignments" },

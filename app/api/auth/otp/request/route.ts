@@ -76,6 +76,41 @@ export async function POST(request: Request) {
     return NextResponse.json(result, { status: result.success ? 200 : 400 });
   }
 
+  if (purpose === "booking") {
+    const email =
+      typeof (body as { email?: string }).email === "string"
+        ? (body as { email: string }).email
+        : "";
+    const bookingId =
+      typeof (body as { bookingId?: string }).bookingId === "string"
+        ? (body as { bookingId: string }).bookingId
+        : "";
+    const firstName =
+      typeof (body as { firstName?: string }).firstName === "string"
+        ? (body as { firstName: string }).firstName
+        : undefined;
+    const lastName =
+      typeof (body as { lastName?: string }).lastName === "string"
+        ? (body as { lastName: string }).lastName
+        : undefined;
+    if (!email || !bookingId) {
+      return NextResponse.json(
+        { success: false, data: null, error: "email and bookingId required" },
+        { status: 400 },
+      );
+    }
+    const result = await requestOtp({
+      email,
+      purpose: "booking",
+      bookingId,
+      firstName,
+      lastName,
+      rememberMe: true,
+      ctx,
+    });
+    return NextResponse.json(result, { status: result.success ? 200 : 400 });
+  }
+
   return NextResponse.json(
     { success: false, data: null, error: "Invalid purpose" },
     { status: 400 },

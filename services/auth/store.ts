@@ -42,7 +42,7 @@ export interface StoredUser {
 export interface OtpChallenge {
   id: string;
   email: string;
-  purpose: "login" | "register" | "reset_password" | "verify_email";
+  purpose: "login" | "register" | "reset_password" | "verify_email" | "booking";
   codeHash: string;
   attempts: number;
   rememberMe: boolean;

@@ -4,6 +4,7 @@ import type { Role } from "@/constants/roles";
 
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
+  { label: "Book", href: "/book" },
   { label: "Programs", href: "/#programs" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },

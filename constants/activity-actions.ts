@@ -79,6 +79,10 @@ export const ACTIVITY_ACTIONS = {
   GOAL_CREATED: "learning.goal_created",
   GOAL_UPDATED: "learning.goal_updated",
   STUDY_SESSION_CREATED: "learning.study_session_created",
+  BOOKING_CREATED: "bookings.created",
+  BOOKING_UPDATED: "bookings.updated",
+  BOOKING_CANCELLED: "bookings.cancelled",
+  BOOKING_SETTINGS_UPDATED: "bookings.settings_updated",
   RESOURCE_DOWNLOADED: "learning.resource_downloaded",
   // Assessment / quizzes
   QUIZ_CREATED: "quizzes.created",

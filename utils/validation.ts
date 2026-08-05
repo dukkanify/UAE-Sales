@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-export const emailSchema = z
-  .string()
-  .trim()
-  .email("Please enter a valid email address")
-  .max(254);
+export const emailSchema = z.string().trim().email("Please enter a valid email address").max(254);
 
 export const otpSchema = z
   .string()
@@ -47,7 +43,7 @@ export const registerSchema = z.object({
 export const verifyOtpSchema = z.object({
   email: emailSchema,
   token: otpSchema,
-  purpose: z.enum(["login", "register", "reset_password", "verify_email"]),
+  purpose: z.enum(["login", "register", "reset_password", "verify_email", "booking"]),
 });
 
 export const forgotPasswordSchema = z.object({

@@ -87,6 +87,16 @@ export function ensureDemoUsersSeeded(): void {
       emailVerified: true,
       countryCode: "GB",
     },
+    {
+      email: "abdulaziz@atplpass.com",
+      role: ROLES.STUDENT,
+      firstName: "Abdulaziz",
+      lastName: "Alshoail",
+      status: ACCOUNT_STATUS.ACTIVE,
+      profileComplete: true,
+      emailVerified: true,
+      countryCode: "KW",
+    },
   ];
 
   writeAuthDb((d) => {
