@@ -3,13 +3,18 @@
 .hero-aviation {
   background-color: #070f14;
   background-image:
-    radial-gradient(ellipse 90% 55% at 86% 6%, rgba(46, 125, 170, 0.48), transparent 58%),
-    radial-gradient(ellipse 50% 40% at 6% 94%, rgba(221, 155, 48, 0.18), transparent 52%),
-    radial-gradient(ellipse 35% 28% at 48% 48%, rgba(255, 255, 255, 0.035), transparent 70%),
-    linear-gradient(165deg, #050b10 0%, #0b1a24 44%, #123044 100%), url("/images/hero-aviation.svg");
+    radial-gradient(ellipse 90% 55% at 86% 6%, rgba(46, 125, 170, 0.35), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 6% 94%, rgba(221, 155, 48, 0.12), transparent 52%),
+    linear-gradient(
+      180deg,
+      rgba(5, 11, 16, 0.12) 0%,
+      rgba(5, 11, 16, 0.5) 68%,
+      rgba(5, 11, 16, 0.9) 100%
+    ),
+    url("/images/hero-aviation.svg");
   background-size: cover;
   background-position: center;
-  background-blend-mode: normal, normal, normal, normal, soft-light;
+  background-blend-mode: normal, normal, multiply, normal;
 }
 
 .hero-aviation::before {
