@@ -38,8 +38,8 @@ const FALLBACK: RuntimeBrand = {
   socialHandle: siteConfig.socialHandle,
   socialLinks: { ...siteConfig.social },
   footerText: siteConfig.description,
-  primaryColor: "#0B1F3A",
-  accentColor: "#38BDF8",
+  primaryColor: "#2E7DAA",
+  accentColor: "#DD9B30",
   metaDescription: siteConfig.description,
 };
 
@@ -50,17 +50,33 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     let cancelled = false;
-    void fetch("/api/public/brand")
-      .then((r) => r.json())
-      .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
-        if (cancelled || !json.success || !json.data) return;
-        setBrand({ ...FALLBACK, ...json.data });
-      })
-      .catch(() => {
-        /* keep fallback */
-      });
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let idleId: number | undefined;
+
+    const load = () => {
+      void fetch("/api/public/brand")
+        .then((r) => r.json())
+        .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
+          if (cancelled || !json.success || !json.data) return;
+          setBrand({ ...FALLBACK, ...json.data });
+        })
+        .catch(() => {
+          /* keep fallback */
+        });
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(load, { timeout: 1500 });
+    } else {
+      timeoutId = setTimeout(load, 200);
+    }
+
     return () => {
       cancelled = true;
+      if (idleId !== undefined && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
     };
   }, []);
 

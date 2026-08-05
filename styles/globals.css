@@ -3,9 +3,9 @@
 @import "./booking.css";
 
 /* =============================================================================
-   ATPL PASS — Official Brand Design System
+   ATPL PASS — Design System 2030
    Aero Blue #2E7DAA | Altitude Orange #DD9B30 | Academic Grey #7C7B80
-   Display: Space Grotesk (Stimulatio Flat substitute) | Body: IBM Plex Sans
+   Display: Space Grotesk | Body: IBM Plex Sans
    ============================================================================= */
 
 @theme inline {
@@ -58,19 +58,17 @@
   --font-display:
     var(--font-space-grotesk), var(--font-ibm-plex), ui-sans-serif, system-ui, sans-serif;
 
-  --shadow-soft: 0 1px 3px 0 rgb(11 26 36 / 0.05), 0 1px 2px -1px rgb(11 26 36 / 0.05);
-  --shadow-medium: 0 8px 24px -8px rgb(46 125 170 / 0.18), 0 4px 10px -4px rgb(11 26 36 / 0.08);
+  --shadow-soft: 0 1px 2px 0 rgb(11 26 36 / 0.04), 0 1px 1px -1px rgb(11 26 36 / 0.03);
+  --shadow-medium: 0 12px 32px -12px rgb(46 125 170 / 0.22), 0 4px 12px -4px rgb(11 26 36 / 0.08);
 }
 
 :root {
-  /* Aero Blue */
   --primary: #2e7daa;
   --primary-foreground: #ffffff;
 
-  --secondary: #eef4f8;
+  --secondary: #e8f0f6;
   --secondary-foreground: #0b1a24;
 
-  /* Altitude Orange / Success Amber */
   --accent: #dd9b30;
   --accent-foreground: #0b1a24;
 
@@ -81,33 +79,34 @@
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
 
-  --background: #f5f7fa;
+  --background: #f3f6f9;
   --foreground: #0b1a24;
   --card: #ffffff;
   --card-foreground: #0b1a24;
   --popover: #ffffff;
   --popover-foreground: #0b1a24;
-  --muted: #eef1f5;
-  --muted-foreground: #7c7b80;
-  --border: #e2e6ec;
-  --input: #e2e6ec;
+  --muted: #e8eef4;
+  --muted-foreground: #6f6e74;
+  --border: #d8e0e8;
+  --input: #d8e0e8;
   --ring: #2e7daa;
 
-  --sidebar: #0b1a24;
+  --sidebar: #071018;
   --sidebar-foreground: #e8eef5;
-  --sidebar-border: #163040;
-  --sidebar-accent: #1e4f6d;
+  --sidebar-border: #142838;
+  --sidebar-accent: #1a4a66;
   --sidebar-accent-foreground: #ffffff;
 
-  --radius: 0.875rem;
+  --radius: 1rem;
+  --surface-ink: #070f14;
 }
 
 .dark {
-  --primary: #4a94bc;
-  --primary-foreground: #0b1a24;
-  --secondary: #152430;
+  --primary: #5ba3c9;
+  --primary-foreground: #061018;
+  --secondary: #12202b;
   --secondary-foreground: #e8eef5;
-  --accent: #dd9b30;
+  --accent: #e0a63f;
   --accent-foreground: #0b1a24;
   --success: #22c55e;
   --success-foreground: #052e16;
@@ -117,20 +116,21 @@
   --destructive-foreground: #fef2f2;
   --background: #070f14;
   --foreground: #e8eef5;
-  --card: #0f1a22;
+  --card: #0d171f;
   --card-foreground: #e8eef5;
-  --popover: #0f1a22;
+  --popover: #0d171f;
   --popover-foreground: #e8eef5;
-  --muted: #152430;
+  --muted: #12202b;
   --muted-foreground: #9a99a0;
-  --border: #1c2c38;
-  --input: #1c2c38;
-  --ring: #dd9b30;
+  --border: #1a2b38;
+  --input: #1a2b38;
+  --ring: #e0a63f;
   --sidebar: #050b10;
   --sidebar-foreground: #e8eef5;
-  --sidebar-border: #152430;
-  --sidebar-accent: #1e4f6d;
+  --sidebar-border: #12202b;
+  --sidebar-accent: #1a4a66;
   --sidebar-accent-foreground: #ffffff;
+  --surface-ink: #050b10;
 }
 
 @layer base {
@@ -140,10 +140,21 @@
 
   html {
     @apply scroll-smooth antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   body {
     @apply bg-background text-foreground font-sans;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 100% -20%, rgb(46 125 170 / 0.07), transparent 55%),
+      radial-gradient(ellipse 50% 40% at -10% 100%, rgb(221 155 48 / 0.05), transparent 50%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgb(46 125 170 / 0.12), transparent 55%),
+      radial-gradient(ellipse 45% 35% at 0% 100%, rgb(221 155 48 / 0.06), transparent 50%);
   }
 
   h1,
@@ -157,6 +168,10 @@
 
   :focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  ::selection {
+    background: rgb(46 125 170 / 0.22);
   }
 }
 
@@ -177,7 +192,19 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  /* Typography utilities — design system hierarchy */
+  .surface-glass {
+    @apply border border-white/10 bg-white/5 backdrop-blur-xl;
+  }
+
+  .surface-panel {
+    @apply rounded-2xl border border-border/70 bg-card/90 shadow-soft backdrop-blur-sm;
+  }
+
+  .content-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 480px;
+  }
+
   .text-display {
     @apply font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl;
   }
@@ -203,12 +230,23 @@
     @apply font-sans text-sm font-medium;
   }
 
-  /* Motion helpers */
   .animate-in-fade {
-    animation: ds-fade-in 0.25s ease-out both;
+    animation: ds-fade-in 0.35s ease-out both;
   }
   .animate-in-up {
-    animation: ds-slide-up 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: ds-slide-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .animate-in-up-delay-1 {
+    animation: ds-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  }
+  .animate-in-up-delay-2 {
+    animation: ds-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+  }
+  .animate-in-up-delay-3 {
+    animation: ds-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+  }
+  .animate-in-up-delay-4 {
+    animation: ds-slide-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
   }
 }
 
@@ -224,10 +262,27 @@
 @keyframes ds-slide-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-in-fade,
+  .animate-in-up,
+  .animate-in-up-delay-1,
+  .animate-in-up-delay-2,
+  .animate-in-up-delay-3,
+  .animate-in-up-delay-4 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

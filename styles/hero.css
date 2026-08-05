@@ -1,10 +1,32 @@
+/* ATPL PASS hero — modern 2030 atmospheric plane */
+
 .hero-aviation {
-  background-color: #0b1a24;
+  background-color: #070f14;
   background-image:
-    radial-gradient(ellipse 80% 60% at 85% 15%, rgba(221, 155, 48, 0.22), transparent 55%),
-    radial-gradient(ellipse 70% 50% at 10% 90%, rgba(46, 125, 170, 0.35), transparent 50%),
-    linear-gradient(145deg, #0b1a24 0%, #123044 48%, #1e4f6d 100%), url("/images/hero-aviation.svg");
+    radial-gradient(ellipse 85% 55% at 88% 8%, rgba(46, 125, 170, 0.42), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 8% 92%, rgba(221, 155, 48, 0.16), transparent 52%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255, 255, 255, 0.03), transparent 70%),
+    linear-gradient(165deg, #050b10 0%, #0b1a24 42%, #123044 100%), url("/images/hero-aviation.svg");
   background-size: cover;
   background-position: center;
-  background-blend-mode: normal, normal, normal, soft-light;
+  background-blend-mode: normal, normal, normal, normal, soft-light;
+}
+
+.hero-aviation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 40% 40%, black 10%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aviation::after {
+    opacity: 0.35;
+  }
 }
