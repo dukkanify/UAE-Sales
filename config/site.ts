@@ -9,7 +9,8 @@ export const siteConfig = {
   name: "ATPL PASS",
   shortName: "ATPL",
   legalName: "ATPL PASS",
-  description: "Professional Aviation Education Platform for ATPL Training.",
+  description:
+    "The 2030 aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
   url: publicEnv.NEXT_PUBLIC_APP_URL,
   locale: "en",
   direction: "ltr" as const,

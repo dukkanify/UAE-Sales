@@ -1,32 +1,114 @@
-/* ATPL PASS hero — modern 2030 atmospheric plane */
+/* ATPL PASS — platform sky / atmospheric plane */
 
 .hero-aviation {
   background-color: #070f14;
   background-image:
-    radial-gradient(ellipse 85% 55% at 88% 8%, rgba(46, 125, 170, 0.42), transparent 58%),
-    radial-gradient(ellipse 55% 45% at 8% 92%, rgba(221, 155, 48, 0.16), transparent 52%),
-    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(255, 255, 255, 0.03), transparent 70%),
-    linear-gradient(165deg, #050b10 0%, #0b1a24 42%, #123044 100%), url("/images/hero-aviation.svg");
+    radial-gradient(ellipse 90% 55% at 86% 6%, rgba(46, 125, 170, 0.48), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 6% 94%, rgba(221, 155, 48, 0.18), transparent 52%),
+    radial-gradient(ellipse 35% 28% at 48% 48%, rgba(255, 255, 255, 0.035), transparent 70%),
+    linear-gradient(165deg, #050b10 0%, #0b1a24 44%, #123044 100%), url("/images/hero-aviation.svg");
   background-size: cover;
   background-position: center;
   background-blend-mode: normal, normal, normal, normal, soft-light;
 }
 
-.hero-aviation::after {
+.hero-aviation::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(ellipse at 40% 40%, black 10%, transparent 70%);
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse at 42% 38%, black 8%, transparent 72%);
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.hero-aviation::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(221, 155, 48, 0.55), transparent);
+  animation: platform-scan 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   pointer-events: none;
   opacity: 0.7;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-aviation::after {
+.platform-surface {
+  background-color: #f3f6f9;
+  background-image:
+    radial-gradient(ellipse 70% 45% at 100% -10%, rgb(46 125 170 / 0.09), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 0% 110%, rgb(221 155 48 / 0.06), transparent 50%),
+    linear-gradient(180deg, #eef3f7 0%, #f3f6f9 40%, #f7f9fb 100%);
+}
+
+.platform-band {
+  background:
+    radial-gradient(ellipse 80% 60% at 90% 0%, rgba(46, 125, 170, 0.35), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 10% 100%, rgba(221, 155, 48, 0.12), transparent 50%),
+    linear-gradient(160deg, #070f14 0%, #0b1a24 55%, #122838 100%);
+}
+
+.platform-module {
+  position: relative;
+  padding-top: 1.5rem;
+}
+
+.platform-module::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform-origin: left center;
+  animation: platform-rail 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes platform-scan {
+  0% {
+    top: 12%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.75;
+  }
+  88% {
     opacity: 0.35;
+  }
+  100% {
+    top: 88%;
+    opacity: 0;
+  }
+}
+
+@keyframes platform-rail {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aviation::before {
+    opacity: 0.35;
+  }
+
+  .hero-aviation::after,
+  .platform-module::before {
+    animation: none !important;
+  }
+
+  .hero-aviation::after {
+    top: 40%;
+    opacity: 0.25;
   }
 }
