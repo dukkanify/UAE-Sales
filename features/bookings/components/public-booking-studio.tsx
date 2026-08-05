@@ -10,11 +10,12 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ensureBrowserCsrf } from "@/features/auth/services/auth-api";
+import { ensureBrowserCsrf, getCsrfToken } from "@/features/auth/services/auth-api";
 import {
   formatSlotDateTime,
   formatSlotTime,
-  resolveBookableDate,
+  maxBookableDate,
+  type ResolvedBookableDay,
 } from "@/features/bookings/lib/slot-utils";
 import { cn } from "@/lib/utils";
 import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
@@ -22,14 +23,17 @@ import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
 type Step = "session" | "when" | "details" | "otp" | "done";
 
 async function publicFetch<T>(url: string, init?: RequestInit) {
-  const csrf = await ensureBrowserCsrf();
+  const method = (init?.method ?? "GET").toUpperCase();
+  const headers = new Headers(init?.headers);
+  if (method !== "GET" && method !== "HEAD") {
+    if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+    const csrf = getCsrfToken() ?? (await ensureBrowserCsrf());
+    if (csrf) headers.set("x-csrf-token", csrf);
+  }
+
   const res = await fetch(url, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(csrf ? { "x-csrf-token": csrf } : {}),
-      ...(init?.headers ?? {}),
-    },
+    headers,
     credentials: "include",
   });
   const json = (await res.json().catch(() => null)) as {
@@ -67,6 +71,7 @@ function PublicBookingStudio() {
   const [submitting, setSubmitting] = React.useState(false);
   const [redirectTo, setRedirectTo] = React.useState<string | null>(null);
   const [slotHint, setSlotHint] = React.useState<string | null>(null);
+  const [catalogError, setCatalogError] = React.useState<string | null>(null);
   const pendingAdvanceHintRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -74,10 +79,13 @@ function PublicBookingStudio() {
       const res = await publicFetch<PublicBookingCatalog>("/api/public/bookings");
       if (res.success && res.data) {
         setCatalog(res.data);
+        setCatalogError(null);
         const types = res.data.sessionTypes ?? [];
         const instructors = res.data.instructors ?? [];
         if (types[0]) setSessionTypeId(types[0].id);
         if (instructors[0]) setInstructorId(instructors[0].id);
+      } else {
+        setCatalogError(res.error ?? "Could not open booking studio");
       }
     })();
   }, []);
@@ -89,21 +97,21 @@ function PublicBookingStudio() {
       setLoadingSlots(true);
       setSelectedSlot(null);
 
-      const loadSlots = async (day: string) => {
-        const res = await publicFetch<BookingSlot[]>(
-          `/api/public/bookings?date=${encodeURIComponent(day)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}`,
-        );
-        return res.data ?? [];
-      };
-
-      const resolved = await resolveBookableDate({
-        startDate: date,
-        maxAdvanceDays: catalog?.maxAdvanceDays ?? 30,
-        loadSlots,
-      });
+      const res = await publicFetch<ResolvedBookableDay>(
+        `/api/public/bookings?date=${encodeURIComponent(date)}&instructorId=${encodeURIComponent(instructorId)}&sessionTypeId=${encodeURIComponent(sessionTypeId)}&findNext=1`,
+      );
       if (cancelled) return;
+
+      if (!res.success || !res.data) {
+        setSlots([]);
+        setSlotHint(res.error ?? "Could not load open slots.");
+        setLoadingSlots(false);
+        return;
+      }
+
+      const resolved = res.data;
       setSlots(resolved.slots);
-      if (resolved.date !== date) {
+      if (resolved.autoAdvanced && resolved.date !== date) {
         pendingAdvanceHintRef.current = true;
         setDate(resolved.date);
         setSlotHint("No open times left on the selected day — jumped to the next available date.");
@@ -121,7 +129,7 @@ function PublicBookingStudio() {
     return () => {
       cancelled = true;
     };
-  }, [date, instructorId, sessionTypeId, step, catalog?.maxAdvanceDays]);
+  }, [date, instructorId, sessionTypeId, step]);
 
   const selectedType = catalog?.sessionTypes.find((t) => t.id === sessionTypeId);
   const selectedInstructor = catalog?.instructors.find((i) => i.id === instructorId);
@@ -182,8 +190,27 @@ function PublicBookingStudio() {
     return (
       <div className="booking-aurora relative min-h-[70vh] overflow-hidden rounded-3xl">
         <div className="booking-grid-fade absolute inset-0" />
-        <div className="relative z-10 flex min-h-[70vh] items-center justify-center text-white/70">
-          Opening booking studio…
+        <div className="relative z-10 flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center text-white/70">
+          <p>{catalogError ? catalogError : "Opening booking studio…"}</p>
+          {catalogError ? (
+            <Button
+              variant="accent"
+              onClick={() => {
+                setCatalogError(null);
+                void publicFetch<PublicBookingCatalog>("/api/public/bookings").then((res) => {
+                  if (res.success && res.data) {
+                    setCatalog(res.data);
+                    if (res.data.sessionTypes[0]) setSessionTypeId(res.data.sessionTypes[0].id);
+                    if (res.data.instructors[0]) setInstructorId(res.data.instructors[0].id);
+                  } else {
+                    setCatalogError(res.error ?? "Could not open booking studio");
+                  }
+                });
+              }}
+            >
+              Try again
+            </Button>
+          ) : null}
         </div>
       </div>
     );
@@ -304,6 +331,7 @@ function PublicBookingStudio() {
                   className="flex h-11 w-full max-w-xs rounded-xl border border-input bg-background px-3 text-sm"
                   value={date}
                   min={format(new Date(), "yyyy-MM-dd")}
+                  max={maxBookableDate(catalog.maxAdvanceDays)}
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
