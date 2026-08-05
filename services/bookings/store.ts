@@ -28,6 +28,9 @@ export function defaultBookingSettings(): BookingSettings {
     maxAdvanceDays: 30,
     minNoticeMinutes: 60,
     requireConfirmation: false,
+    autoCreateZoom: true,
+    zoomWaitingRoom: true,
+    zoomPasscode: true,
     instructorIds: [],
     sessionTypes: [
       {

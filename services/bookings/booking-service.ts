@@ -14,12 +14,18 @@ import { BookingAccessError } from "@/services/bookings/access";
 import { defaultBookingSettings, readBookingsDb, writeBookingsDb } from "@/services/bookings/store";
 import type {
   AppointmentBooking,
+  BookingJoinPayload,
   BookingListItem,
   BookingSettings,
   BookingSlot,
   BookingStatus,
+  BookingZoomSession,
 } from "@/types/bookings";
 import type { UserProfile } from "@/types";
+import {
+  cancelStandaloneZoomMeeting,
+  provisionStandaloneZoomMeeting,
+} from "@/services/classes/zoom-service";
 
 const ACTIVE_BOOKING: BookingStatus[] = ["pending", "confirmed"];
 
@@ -27,6 +33,71 @@ function displayName(userId: string): string {
   const u = readAuthDb().users.find((x) => x.id === userId);
   if (!u) return "Unknown";
   return `${u.firstName} ${u.lastName}`.trim() || u.email;
+}
+
+function normalizeBooking(b: AppointmentBooking): AppointmentBooking {
+  return {
+    ...b,
+    zoom: b.zoom ?? null,
+  };
+}
+
+async function provisionZoomForBooking(
+  booking: AppointmentBooking,
+  actorId: string,
+): Promise<BookingZoomSession> {
+  const settings = getBookingSettings();
+  const duration = Math.max(
+    15,
+    Math.round((Date.parse(booking.endsAt) - Date.parse(booking.startsAt)) / 60_000),
+  );
+  const meeting = await provisionStandaloneZoomMeeting({
+    topic: booking.title,
+    agenda: booking.notes || `${booking.sessionTypeName} appointment`,
+    startsAt: booking.startsAt,
+    durationMinutes: duration,
+    timezone: settings.timezone,
+    mockJoinPath: `/bookings/join/${booking.id}`,
+    waitingRoom: settings.zoomWaitingRoom,
+    passcode: settings.zoomPasscode,
+    actorId,
+  });
+  return {
+    meetingNumber: meeting.meetingNumber,
+    joinUrl: meeting.joinUrl,
+    startUrl: meeting.startUrl,
+    password: meeting.password,
+    waitingRoom: meeting.waitingRoom,
+    providerMode: meeting.providerMode,
+    provisionedAt: new Date().toISOString(),
+  };
+}
+
+export async function ensureBookingZoom(
+  bookingId: string,
+  actorId: string,
+): Promise<AppointmentBooking> {
+  const existing = readBookingsDb().bookings.find((b) => b.id === bookingId);
+  if (!existing) throw new BookingAccessError("Booking not found", 404);
+  if (existing.zoom) return normalizeBooking(existing);
+  if (existing.status !== "confirmed" && existing.status !== "pending") {
+    throw new BookingAccessError("Zoom is only available for active bookings", 400);
+  }
+
+  const settings = getBookingSettings();
+  if (!settings.autoCreateZoom && existing.status !== "confirmed") {
+    throw new BookingAccessError("Zoom not provisioned yet", 400);
+  }
+
+  const zoom = await provisionZoomForBooking(existing, actorId);
+  let next = existing;
+  writeBookingsDb((d) => {
+    const idx = d.bookings.findIndex((b) => b.id === bookingId);
+    if (idx < 0) return;
+    next = { ...d.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
+    d.bookings[idx] = next;
+  });
+  return normalizeBooking(next);
 }
 
 export function getBookingSettings(): BookingSettings {
@@ -246,7 +317,8 @@ export async function createBooking(input: {
   }
 
   const now = new Date().toISOString();
-  const booking: AppointmentBooking = {
+  const status: BookingStatus = settings.requireConfirmation ? "pending" : "confirmed";
+  let booking: AppointmentBooking = {
     id: generateId(),
     studentId: input.user.id,
     instructorId: input.instructorId,
@@ -256,7 +328,8 @@ export async function createBooking(input: {
     notes: (input.notes ?? "").trim().slice(0, 500),
     startsAt: match.startsAt,
     endsAt: match.endsAt,
-    status: settings.requireConfirmation ? "pending" : "confirmed",
+    status,
+    zoom: null,
     createdAt: now,
     updatedAt: now,
     cancelledAt: null,
@@ -265,7 +338,6 @@ export async function createBooking(input: {
   };
 
   writeBookingsDb((db) => {
-    // Re-check collision under write lock
     const clash = db.bookings.some(
       (b) =>
         b.instructorId === booking.instructorId &&
@@ -281,6 +353,17 @@ export async function createBooking(input: {
     db.bookings.push(booking);
   });
 
+  if (status === "confirmed" && settings.autoCreateZoom) {
+    const zoom = await provisionZoomForBooking(booking, input.user.id);
+    writeBookingsDb((db) => {
+      const idx = db.bookings.findIndex((b) => b.id === booking.id);
+      if (idx >= 0) {
+        booking = { ...db.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
+        db.bookings[idx] = booking;
+      }
+    });
+  }
+
   await logActivity({
     actorId: input.user.id,
     action: ACTIVITY_ACTIONS.BOOKING_CREATED,
@@ -288,7 +371,7 @@ export async function createBooking(input: {
     entityId: booking.id,
   });
 
-  return booking;
+  return normalizeBooking(booking);
 }
 
 export function listMyBookings(user: UserProfile): BookingListItem[] {
@@ -313,10 +396,11 @@ export function listAllBookings(): BookingListItem[] {
 }
 
 function enrichBooking(b: AppointmentBooking): BookingListItem {
+  const n = normalizeBooking(b);
   return {
-    ...b,
-    studentName: displayName(b.studentId),
-    instructorName: displayName(b.instructorId),
+    ...n,
+    studentName: displayName(n.studentId),
+    instructorName: displayName(n.instructorId),
   };
 }
 
@@ -348,11 +432,12 @@ export async function updateBookingStatus(input: {
   }
 
   const now = new Date().toISOString();
-  let next: AppointmentBooking = existing;
+  let next: AppointmentBooking = normalizeBooking(existing);
+  const settings = getBookingSettings();
 
   writeBookingsDb((d) => {
     const idx = d.bookings.findIndex((b) => b.id === input.id);
-    const current = idx >= 0 ? d.bookings[idx] : undefined;
+    const current = idx >= 0 ? normalizeBooking(d.bookings[idx]!) : undefined;
     if (!current) throw new BookingAccessError("Booking not found", 404);
     next = {
       ...current,
@@ -368,6 +453,25 @@ export async function updateBookingStatus(input: {
     d.bookings[idx] = next;
   });
 
+  if (input.status === "confirmed" && settings.autoCreateZoom && !next.zoom) {
+    const zoom = await provisionZoomForBooking(next, input.user.id);
+    writeBookingsDb((d) => {
+      const idx = d.bookings.findIndex((b) => b.id === next.id);
+      if (idx >= 0) {
+        next = { ...d.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
+        d.bookings[idx] = next;
+      }
+    });
+  }
+
+  if (input.status === "cancelled" && next.zoom) {
+    await cancelStandaloneZoomMeeting({
+      meetingNumber: next.zoom.meetingNumber,
+      providerMode: next.zoom.providerMode,
+      actorId: input.user.id,
+    });
+  }
+
   await logActivity({
     actorId: input.user.id,
     action:
@@ -378,5 +482,67 @@ export async function updateBookingStatus(input: {
     entityId: next.id,
   });
 
-  return next;
+  return normalizeBooking(next);
+}
+
+export async function getBookingJoinInfo(input: {
+  user: UserProfile;
+  bookingId: string;
+}): Promise<BookingJoinPayload> {
+  let booking = readBookingsDb().bookings.find((b) => b.id === input.bookingId);
+  if (!booking) throw new BookingAccessError("Booking not found", 404);
+  booking = normalizeBooking(booking);
+
+  const isAdmin = input.user.role === ROLES.ADMIN || input.user.role === ROLES.SUPER_ADMIN;
+  const isStudent = booking.studentId === input.user.id;
+  const isHost = booking.instructorId === input.user.id || isAdmin;
+
+  if (!isStudent && !isHost) {
+    throw new BookingAccessError("You are not invited to this Zoom session", 403);
+  }
+
+  if (booking.status === "cancelled") {
+    throw new BookingAccessError("This booking was cancelled", 410);
+  }
+
+  if (booking.status === "pending") {
+    throw new BookingAccessError("Booking awaits admin confirmation before Zoom opens", 403);
+  }
+
+  if (!booking.zoom) {
+    booking = await ensureBookingZoom(booking.id, input.user.id);
+  }
+
+  const zoom = booking.zoom;
+  if (!zoom) throw new BookingAccessError("Zoom session unavailable", 500);
+
+  const starts = Date.parse(booking.startsAt);
+  const ends = Date.parse(booking.endsAt);
+  const now = Date.now();
+  const openAt = starts - 15 * 60_000;
+  const withinWindow = now >= openAt && now <= ends + 30 * 60_000;
+  const canJoin = booking.status === "confirmed";
+  const joinWindowLabel =
+    now < openAt
+      ? "Lobby open — Zoom recommended from 15 minutes before start"
+      : now > ends + 30 * 60_000
+        ? "Scheduled window ended — host may still reopen"
+        : withinWindow
+          ? "Live window — enter Zoom now"
+          : "Zoom room ready";
+
+  return {
+    booking: enrichBooking(booking),
+    join: {
+      meetingNumber: zoom.meetingNumber,
+      joinUrl: zoom.joinUrl,
+      startUrl: isHost ? zoom.startUrl : null,
+      password: zoom.password,
+      waitingRoom: zoom.waitingRoom,
+      providerMode: zoom.providerMode,
+    },
+    isHost,
+    canJoin,
+    joinWindowLabel,
+  };
 }
