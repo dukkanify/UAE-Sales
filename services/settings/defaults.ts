@@ -44,7 +44,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     typographyDisplay: "Space Grotesk",
     typographyBody: "IBM Plex Sans",
     footerInformation:
-      "ATPL PASS — Kuwait & Dubai. Unlock Your Pilot License. Professional Aviation Education Platform for ATPL Training.",
+      "ATPL PASS — Kuwait & Dubai. Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
     brandGuidelinesPending: false,
     colorPalettePending: false,
     typographyPending: true,
