@@ -205,7 +205,7 @@ export default function HomePage() {
           <p className="landing-kicker mb-5 text-accent">Live altitude</p>
           <div className="grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
             <div>
-              <h2 className="max-w-[14ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05]">
+              <h2 className="max-w-[14ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05] text-white">
                 Clear the turbulence with a live instructor
               </h2>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-white/62 sm:text-lg">
