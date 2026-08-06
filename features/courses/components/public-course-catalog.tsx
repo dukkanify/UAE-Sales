@@ -4,13 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { ArrowUpRight, BookOpen, Clock3 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DIFFICULTY_LABELS } from "@/constants/courses";
 import { routes } from "@/constants/routes";
-import { cn } from "@/lib/utils";
 import type { CourseListItem } from "@/types/courses";
 
 function formatHours(minutes: number) {
@@ -68,10 +66,10 @@ function PublicCourseCatalog() {
 
   if (loading) {
     return (
-      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
-        <Skeleton className="h-72 rounded-3xl" />
-        <Skeleton className="h-72 rounded-3xl" />
-        <Skeleton className="h-72 rounded-3xl" />
+      <div className="grid gap-px bg-[rgb(18_36_51_/0.08)] sm:grid-cols-2 xl:grid-cols-3">
+        <Skeleton className="h-72 rounded-none" />
+        <Skeleton className="h-72 rounded-none" />
+        <Skeleton className="h-72 rounded-none" />
       </div>
     );
   }
@@ -97,56 +95,60 @@ function PublicCourseCatalog() {
   }
 
   return (
-    <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
-      {courses.map((course, index) => (
-        <article
-          key={course.id}
-          className={cn(
-            "group flex flex-col overflow-hidden rounded-3xl border border-border/60 bg-card/80 shadow-soft transition hover:-translate-y-0.5 hover:shadow-medium",
-          )}
-          style={{ animationDelay: `${index * 0.05}s` }}
-        >
-          <div
-            className="h-40 bg-cover bg-center"
-            style={{
-              backgroundImage: `url(${course.coverImageUrl || course.thumbnailUrl || "/images/hero-aviation.svg"})`,
-            }}
-          />
-          <div className="flex flex-1 flex-col p-6">
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline">{DIFFICULTY_LABELS[course.difficulty]}</Badge>
-              {course.categoryName ? (
-                <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-                  {course.categoryName}
-                </span>
-              ) : null}
-            </div>
-            <h2 className="mt-4 font-display text-xl font-semibold tracking-tight text-foreground">
-              {course.title}
-            </h2>
-            <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-              {course.shortDescription || course.fullDescription}
-            </p>
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-              <div className="min-w-0">
-                <p className="truncate text-xs font-medium text-foreground/80">
-                  {course.primaryInstructorName || "ATPL PASS faculty"}
-                </p>
-                <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock3 className="h-3.5 w-3.5" />
-                  {formatHours(course.estimatedDurationMinutes)}
-                </p>
+    <div className="grid gap-px bg-[rgb(18_36_51_/0.08)] sm:grid-cols-2 xl:grid-cols-3">
+      {courses.map((course, index) => {
+        const hasArt = Boolean(course.coverImageUrl || course.thumbnailUrl);
+        return (
+          <article
+            key={course.id}
+            className="course-lane"
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
+            <div
+              className="course-lane-cover"
+              data-tone={String(index % 4)}
+              style={
+                hasArt
+                  ? {
+                      backgroundImage: `linear-gradient(180deg, transparent 25%, rgba(3,8,12,0.55)), url(${course.coverImageUrl || course.thumbnailUrl})`,
+                    }
+                  : undefined
+              }
+            />
+            <div className="flex flex-1 flex-col px-5 pb-5 pt-4 sm:px-6">
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                <span>{DIFFICULTY_LABELS[course.difficulty]}</span>
+                {course.categoryName ? (
+                  <span className="text-primary/80">{course.categoryName}</span>
+                ) : null}
               </div>
-              <Button size="sm" variant="accent" asChild>
-                <Link href={`${routes.courses}/${course.id}`}>
-                  View course
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </Button>
+              <h2 className="mt-3 font-display text-xl font-semibold tracking-[-0.025em] text-foreground">
+                {course.title}
+              </h2>
+              <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {course.shortDescription || course.fullDescription}
+              </p>
+              <div className="mt-5 flex items-center justify-between gap-3 border-t border-[rgb(18_36_51_/0.1)] pt-4">
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-medium text-foreground/85">
+                    {course.primaryInstructorName || "ATPL PASS faculty"}
+                  </p>
+                  <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Clock3 className="h-3.5 w-3.5 text-primary/70" />
+                    {formatHours(course.estimatedDurationMinutes)}
+                  </p>
+                </div>
+                <Button size="sm" variant="accent" className="hero-cta-primary shrink-0" asChild>
+                  <Link href={`${routes.courses}/${course.id}`}>
+                    Open lane
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+              </div>
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        );
+      })}
     </div>
   );
 }
