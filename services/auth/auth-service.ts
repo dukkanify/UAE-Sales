@@ -31,6 +31,7 @@ import {
   type StoredUser,
 } from "@/services/auth/store";
 import { logActivity } from "@/services/auth/activity-log";
+import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 
@@ -53,7 +54,12 @@ function addDays(days: number): string {
 
 function demoOtpEnabled(): boolean {
   const env = getServerEnv();
-  return env.ENABLE_DEMO_OTP && process.env.NODE_ENV !== "production";
+  if (!env.ENABLE_DEMO_OTP) return false;
+  // `next start` / CI e2e set NODE_ENV=production; still allow demo OTP for
+  // non-production app environments or explicit FORCE_DEMO_OTP.
+  if (process.env.NODE_ENV !== "production") return true;
+  if (process.env.FORCE_DEMO_OTP === "true") return true;
+  return process.env.NEXT_PUBLIC_APP_ENV !== "production";
 }
 
 function createUser(partial: {
@@ -211,6 +217,8 @@ export async function requestOtp(input: {
   ctx?: RequestContext;
 }): Promise<ApiResponse<{ email: string; demoOtp?: string; expiresInMinutes: number }>> {
   ensureSuperAdminSeeded();
+  // CI / local demo: ensure student.one etc. exist before login OTP.
+  if (demoOtpEnabled()) ensureDemoUsersSeeded();
 
   const email = sanitizeEmail(input.email);
   const rl = rateLimit(`otp:${email}:${input.purpose}`, 5, 15 * 60_000);
