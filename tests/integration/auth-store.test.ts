@@ -4,7 +4,7 @@
 
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { findUserByEmail, readAuthDb, toUserProfile } from "@/services/auth/store";
 import { hasPermission } from "@/services/auth/permissions";
 import { PERMISSIONS } from "@/constants/permissions";
@@ -13,7 +13,7 @@ import { requestOtp } from "@/services/auth/auth-service";
 
 describe("auth ↔ database integration", () => {
   beforeAll(() => {
-    ensureSuperAdminSeeded();
+    ensureDemoUsersSeeded();
   });
 
   it("seeds demo users into auth store", () => {
