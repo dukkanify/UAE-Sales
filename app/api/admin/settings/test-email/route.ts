@@ -4,38 +4,62 @@ import { authErrorResponse, requirePermission } from "@/services/auth/guards";
 import { PERMISSIONS } from "@/constants/permissions";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 import { testEmailTemplate } from "@/services/settings/email-templates";
+import { isEmailDeliveryConfigured, sendEmail } from "@/services/email/mailer";
 
 /**
- * Test email endpoint — validates configuration shape and returns a rendered
- * branded template. Live SMTP send requires provider credentials to be set.
+ * Sends a branded test email via SMTP when configured, otherwise records it
+ * in the durable outbox so Super Admins can verify the notification path.
  */
 export async function POST(request: Request) {
   try {
     await requirePermission(PERMISSIONS.SYSTEM_EMAIL);
     const body = (await request.json().catch(() => null)) as { to?: string } | null;
     const settings = getPlatformSettings();
-    const to = body?.to || settings.general.supportEmail;
+    const to = (
+      body?.to ||
+      settings.general.supportEmail ||
+      settings.email.senderEmail ||
+      ""
+    ).trim();
     const template = testEmailTemplate();
+    const configured = isEmailDeliveryConfigured();
 
-    const configured =
-      settings.email.provider !== "smtp"
-        ? true
-        : Boolean(settings.email.smtpHost && settings.email.senderEmail);
+    if (!to) {
+      return NextResponse.json({
+        success: false,
+        data: null,
+        error: "Add a recipient or configure support/sender email in settings.",
+      });
+    }
+
+    const result = await sendEmail({
+      to,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+      meta: { kind: "test", system: true },
+    });
 
     return NextResponse.json({
-      success: true,
+      success: result.success,
       data: {
-        queued: configured,
-        delivered: false,
+        queued: result.success,
+        delivered: result.delivered,
+        mode: result.mode,
+        outboxId: result.outboxId,
         to,
         subject: template.subject,
         previewHtml: template.html,
-        message: configured
-          ? "Email template rendered. Connect a live SMTP/provider to deliver."
-          : "SMTP host or sender email is missing. Configure Email settings first.",
+        configured,
+        message: result.delivered
+          ? `Test email delivered to ${to} via SMTP.`
+          : result.mode === "outbox"
+            ? `Test email saved to outbox (${result.outboxId}). Configure SMTP in Email settings to deliver to real inboxes.`
+            : result.error || "Failed to send test email.",
         provider: settings.email.provider,
+        error: result.error,
       },
-      error: null,
+      error: result.success ? null : result.error,
     });
   } catch (error) {
     return authErrorResponse(error);
