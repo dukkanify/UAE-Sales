@@ -13,7 +13,9 @@ import { sanitizeEmail, sanitizeString } from "@/utils/sanitize";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
 
-function RegisterForm() {
+type RegisterRole = "student" | "instructor";
+
+function RegisterForm({ role = "student" }: { role?: RegisterRole }) {
   const router = useRouter();
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
@@ -28,6 +30,7 @@ function RegisterForm() {
       firstName: sanitizeString(firstName),
       lastName: sanitizeString(lastName),
       rememberMe,
+      role,
     });
 
     if (!parsed.success) {
@@ -101,14 +104,15 @@ function RegisterForm() {
         />
       </div>
       <label className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Checkbox
-          checked={rememberMe}
-          onCheckedChange={(v) => setRememberMe(v === true)}
-        />
+        <Checkbox checked={rememberMe} onCheckedChange={(v) => setRememberMe(v === true)} />
         Remember me
       </label>
       <Button type="submit" className="w-full" disabled={pending}>
-        {pending ? "Sending code..." : "Create account"}
+        {pending
+          ? "Sending code..."
+          : role === "instructor"
+            ? "Create instructor account"
+            : "Create account"}
       </Button>
     </form>
   );

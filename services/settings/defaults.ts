@@ -84,7 +84,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   },
   users: {
     defaultUserRole: "student",
-    instructorApprovalRequired: true,
+    instructorApprovalRequired: false,
     studentApprovalRequired: false,
     emailVerificationRequired: true,
     phoneVerificationRequired: false,

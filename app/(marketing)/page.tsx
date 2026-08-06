@@ -155,7 +155,7 @@ export default function HomePage() {
               className="hero-cta-secondary border-white/25 bg-white/[0.06] px-8 text-white hover:bg-white/12 hover:text-white"
               asChild
             >
-              <Link href={routes.book}>Book live Zoom</Link>
+              <Link href={routes.courses}>Browse courses</Link>
             </Button>
           </div>
         </div>

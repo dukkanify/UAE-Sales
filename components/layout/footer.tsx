@@ -45,8 +45,18 @@ function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href={routes.courses} className="transition hover:text-accent">
+                  Courses
+                </Link>
+              </li>
+              <li>
                 <Link href={routes.book} className="transition hover:text-accent">
                   Book a session
+                </Link>
+              </li>
+              <li>
+                <Link href={routes.registerInstructor} className="transition hover:text-accent">
+                  Teach with us
                 </Link>
               </li>
               <li>

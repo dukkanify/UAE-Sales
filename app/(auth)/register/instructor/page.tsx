@@ -16,11 +16,12 @@ import { siteConfig } from "@/config/site";
 import { brandingConfig } from "@/config/branding";
 
 export const metadata: Metadata = {
-  title: "Join platform",
-  description: `Join the ${siteConfig.name} aviation course platform with email OTP.`,
+  title: "Instructor registration",
+  description: `Register as an ATPL PASS instructor — teach courses and run live Zoom coaching on ${siteConfig.name}.`,
+  alternates: { canonical: routes.registerInstructor },
 };
 
-export default function RegisterPage() {
+export default function InstructorRegisterPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
       <div className="hero-aviation absolute inset-0" />
@@ -34,29 +35,27 @@ export default function RegisterPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
               {brandingConfig.tagline}
             </p>
-            <CardTitle className="font-display text-2xl">Join the platform</CardTitle>
+            <CardTitle className="font-display text-2xl">Teach on ATPL PASS</CardTitle>
             <CardDescription>
-              Get learner access to ATPL courses, live Zoom coaching, and exam tools.
+              Create your instructor account to manage assigned courses, students, and live Zoom
+              sessions.
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent>
-          <RegisterForm />
+          <RegisterForm role="instructor" />
         </CardContent>
         <CardFooter className="flex flex-col gap-2 text-center text-sm text-muted-foreground">
           <p>
-            Already on the platform?{" "}
+            Already registered?{" "}
             <Link href={routes.login} className="font-medium text-primary hover:underline">
               Enter
             </Link>
           </p>
           <p>
-            Want to teach?{" "}
-            <Link
-              href={routes.registerInstructor}
-              className="font-medium text-primary hover:underline"
-            >
-              Register as instructor
+            Looking for learner access?{" "}
+            <Link href={routes.register} className="font-medium text-primary hover:underline">
+              Join as student
             </Link>
           </p>
         </CardFooter>

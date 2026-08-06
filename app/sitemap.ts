@@ -10,6 +10,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: base, lastModified: now, changeFrequency: "weekly", priority: 1 },
     {
+      url: `${base}${routes.courses}`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${base}${routes.registerInstructor}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.55,
+    },
+    {
       url: `${base}${routes.book}`,
       lastModified: now,
       changeFrequency: "daily",

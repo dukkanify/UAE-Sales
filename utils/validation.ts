@@ -38,6 +38,8 @@ export const registerSchema = z.object({
   firstName: nameSchema,
   lastName: nameSchema,
   rememberMe: z.boolean().optional().default(false),
+  /** Account intent — students by default; instructors may require admin approval. */
+  role: z.enum(["student", "instructor"]).optional().default("student"),
 });
 
 export const verifyOtpSchema = z.object({
