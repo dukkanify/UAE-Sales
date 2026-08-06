@@ -29,10 +29,11 @@ describe("courses ↔ lessons catalog", () => {
   });
 
   it("exposes a rich published ATPL catalog for marketing", () => {
+    ensureCoursesSeeded();
     const groups = listPublishedCoursesGroupedByInstructor();
-    const titles = groups.flatMap((g) => g.courses.map((c) => c.title));
-    expect(titles.length).toBeGreaterThanOrEqual(6);
-    expect(titles.some((t) => /Air Law/i.test(t))).toBe(true);
-    expect(titles.some((t) => /Meteorology/i.test(t))).toBe(true);
+    const codes = groups.flatMap((g) => g.courses.map((c) => c.code));
+    expect(codes.length).toBeGreaterThanOrEqual(6);
+    expect(codes.some((c) => c.startsWith("ATPL-"))).toBe(true);
+    expect(codes).toEqual(expect.arrayContaining(["ATPL-010", "ATPL-050"]));
   });
 });

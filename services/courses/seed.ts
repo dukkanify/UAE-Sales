@@ -32,9 +32,6 @@ const PUBLIC_CATALOG_CODES = [
   "PPL-GS-01",
 ] as const;
 
-/** Skip repeated enrichment writes in-process (avoids clobbering concurrent course creates). */
-let catalogEnrichmentDone = false;
-
 function catalogNeedsEnrichment(
   db: ReturnType<typeof readCoursesDb>,
   instructorIds: Set<string>,
@@ -55,8 +52,6 @@ function catalogNeedsEnrichment(
 
 /** Upsert missing published demo courses on already-seeded stores. */
 function ensurePublishedCatalogEnrichment(): void {
-  if (catalogEnrichmentDone) return;
-
   const users = readAuthDb().users;
   const instructor =
     users.find((u) => u.role === ROLES.INSTRUCTOR) ??
@@ -65,10 +60,8 @@ function ensurePublishedCatalogEnrichment(): void {
   const ts = nowIso();
   const instructorIds = new Set(users.map((u) => u.id));
   const snapshot = readCoursesDb();
-  if (!catalogNeedsEnrichment(snapshot, instructorIds)) {
-    catalogEnrichmentDone = true;
-    return;
-  }
+  // Read-only fast path — avoid rewrite races that can drop concurrent creates.
+  if (!catalogNeedsEnrichment(snapshot, instructorIds)) return;
 
   writeCoursesDb((d) => {
     // Publish older seed drafts that belong in the public catalog.
@@ -239,7 +232,6 @@ function ensurePublishedCatalogEnrichment(): void {
 
     d.seeded = true;
   });
-  catalogEnrichmentDone = true;
 }
 
 export function ensureCoursesSeeded(): void {
