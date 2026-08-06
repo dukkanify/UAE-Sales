@@ -1,35 +1,35 @@
-# Add AviatorPass to Vercel
+# Vercel — AviatorPass
 
-The GitHub repo already receives Vercel preview deployments from linked projects
-(`uae-sales` / `sooqna`). To put **AviatorPass** on its own Vercel project:
+## Live
 
-## Option A — Dashboard (recommended)
+| Item               | Value                                                  |
+| ------------------ | ------------------------------------------------------ |
+| Project            | `dukkanify-technology-llcs-projects/aviatorpass`       |
+| Production URL     | https://aviatorpass.vercel.app                         |
+| Custom domains     | `dubai-test.blog`, `www.dubai-test.blog` (DNS pending) |
+| Git production tip | Branch **`aviatorpass`** (pushed from AviatorPass tip) |
 
-1. Open [vercel.com/new](https://vercel.com/new)
-2. Import **`dukkanify/UAE-Sales`** (or `AviatorPass` after rename)
-3. Project name: **`aviatorpass`**
-4. Framework: Next.js (auto)
-5. Root directory: `.` (repo root)
-6. Environment variables from `.env.staging.example`:
-   - `NEXT_PUBLIC_APP_URL`
-   - `NEXT_PUBLIC_APP_NAME=AviatorPass`
-   - `NEXT_PUBLIC_APP_ENV=staging`
-   - `NEXT_PUBLIC_AUTH_REDIRECT_URL`
-   - `AUTH_SECRET`
-   - `ENABLE_DEMO_OTP` / `DEMO_OTP_CODE` (staging only)
-7. Deploy
-8. Domains → add `dubai-test.blog` (see `docs/DOMAIN_DUBAI_TEST.md`)
+## Why the first deploy showed Sooqna
 
-## Option B — CLI (after `vercel login`)
+The Vercel project was linked to GitHub repo `UAE-Sales` with **Production Branch = `main`**.  
+`main` is still the marketplace (Sooqna). AviatorPass lives on feature tips / branch `aviatorpass`.
 
-```bash
-npx vercel link --yes --project aviatorpass
-npx vercel env pull .env.local   # optional
-npx vercel --prod
-```
+## What we fixed
 
-## Production branch note
+1. CLI deploy of the AviatorPass working tree → production alias `aviatorpass.vercel.app`
+2. Env vars: `NEXT_PUBLIC_APP_NAME=AviatorPass`, demo OTP, `AUTH_SECRET`, app URL
+3. Ignored build step: only git refs `aviatorpass` and `cursor/rename-aviatorpass-0987` build; **`main` (Sooqna) is skipped**
+4. Domains attached: `dubai-test.blog` + `www`
 
-`uae-sales.vercel.app` currently serves marketplace (Sooqna) from `main`.
-Point the new **aviatorpass** project Production Branch at the AviatorPass tip
-(e.g. `cursor/rename-aviatorpass-0987` or your release branch), not marketplace `main`.
+## Hostinger DNS (required for dubai-test.blog)
+
+| Type  | Name  | Value                  |
+| ----- | ----- | ---------------------- |
+| A     | `@`   | `76.76.21.21`          |
+| CNAME | `www` | `cname.vercel-dns.com` |
+
+Or switch nameservers to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`.
+
+## Dashboard tip
+
+Vercel → Project **aviatorpass** → Settings → Git → set **Production Branch** to `aviatorpass` (API cannot change this field; ignore-build already blocks `main`).
