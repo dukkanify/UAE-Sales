@@ -1,0 +1,351 @@
+/* ATPL PASS — premium single-page landing */
+
+.landing-root {
+  --landing-ink: #03080c;
+  --landing-ink-soft: #0a1620;
+  --landing-mist: #d7e6ef;
+  --landing-aero: #2e7daa;
+  --landing-aero-bright: #7ec0df;
+  --landing-gold: #dd9b30;
+  --landing-gold-bright: #f0c56a;
+}
+
+/* —— Hero —— */
+.hero-aviation {
+  background-color: var(--landing-ink);
+  background-image:
+    radial-gradient(ellipse 95% 65% at 82% -12%, rgba(46, 125, 170, 0.55), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 12% 100%, rgba(221, 155, 48, 0.18), transparent 55%),
+    radial-gradient(ellipse 35% 28% at 48% 48%, rgba(126, 192, 223, 0.08), transparent 70%),
+    linear-gradient(
+      188deg,
+      rgba(3, 8, 12, 0.05) 0%,
+      rgba(3, 8, 12, 0.28) 38%,
+      rgba(3, 8, 12, 0.72) 72%,
+      rgba(3, 8, 12, 0.97) 100%
+    ),
+    url("/images/hero-aviation.svg");
+  background-size: cover;
+  background-position: center top;
+  background-blend-mode: screen, normal, normal, multiply, normal;
+}
+
+.hero-aviation::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(215, 230, 239, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(215, 230, 239, 0.045) 1px, transparent 1px);
+  background-size: 108px 108px;
+  mask-image: radial-gradient(ellipse 68% 58% at 42% 32%, black 0%, transparent 78%);
+  pointer-events: none;
+  opacity: 0.9;
+  animation: hero-grid-drift 32s linear infinite;
+}
+
+.hero-aviation::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(126, 192, 223, 0.2) 18%,
+    rgba(240, 197, 106, 0.85) 50%,
+    rgba(126, 192, 223, 0.2) 82%,
+    transparent 100%
+  );
+  animation: platform-scan 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.hero-horizon {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 48%;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(46, 125, 170, 0.06) 35%,
+      rgba(221, 155, 48, 0.14) 100%
+    ),
+    radial-gradient(ellipse 90% 55% at 50% 100%, rgba(221, 155, 48, 0.28), transparent 72%);
+  animation: hero-horizon-breathe 10s ease-in-out infinite;
+}
+
+.hero-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 40%, transparent 30%, rgba(3, 8, 12, 0.45) 100%),
+    linear-gradient(
+      90deg,
+      rgba(3, 8, 12, 0.35) 0%,
+      transparent 28%,
+      transparent 72%,
+      rgba(3, 8, 12, 0.2) 100%
+    );
+}
+
+.hero-brand {
+  letter-spacing: -0.045em;
+  line-height: 0.88;
+  filter: drop-shadow(0 12px 48px rgba(46, 125, 170, 0.28));
+}
+
+.hero-brand-atpl {
+  background: linear-gradient(115deg, #e8f4fa 0%, #9fd0e8 38%, #5ba3c9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-brand-pass {
+  background: linear-gradient(115deg, #f7d78a 0%, #dd9b30 48%, #b8791c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-cta-primary {
+  box-shadow:
+    0 0 0 1px rgba(240, 197, 106, 0.25),
+    0 18px 40px -18px rgba(221, 155, 48, 0.55);
+}
+
+.hero-cta-secondary {
+  backdrop-filter: blur(16px);
+}
+
+/* —— Page continuity —— */
+.platform-surface {
+  background-color: #edf3f7;
+  background-image:
+    radial-gradient(ellipse 80% 55% at 100% -20%, rgb(46 125 170 / 0.12), transparent 58%),
+    radial-gradient(ellipse 45% 40% at -8% 110%, rgb(221 155 48 / 0.07), transparent 52%),
+    linear-gradient(180deg, #e4ecf2 0%, #edf3f7 42%, #f4f8fb 100%);
+}
+
+.platform-band {
+  background:
+    radial-gradient(ellipse 95% 75% at 88% -15%, rgba(46, 125, 170, 0.48), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 0% 115%, rgba(221, 155, 48, 0.16), transparent 52%),
+    linear-gradient(168deg, #03080c 0%, #0a1620 48%, #123044 100%);
+}
+
+.platform-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 88px 88px;
+  mask-image: linear-gradient(180deg, black, transparent 88%);
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* Flightpath spine */
+.flightpath-spine {
+  position: relative;
+}
+
+.flightpath-spine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0.55rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(46, 125, 170, 0.45) 12%,
+    rgba(221, 155, 48, 0.55) 88%,
+    transparent
+  );
+}
+
+@media (min-width: 768px) {
+  .flightpath-spine::before {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+.platform-module {
+  position: relative;
+  padding-top: 0;
+}
+
+.platform-module::before {
+  display: none;
+}
+
+.flightpath-node {
+  position: relative;
+  padding-inline-start: 2.25rem;
+}
+
+.flightpath-node::before {
+  content: "";
+  position: absolute;
+  top: 0.55rem;
+  left: 0.3rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--landing-aero), var(--landing-gold));
+  box-shadow: 0 0 0 4px rgba(46, 125, 170, 0.12);
+  animation: node-pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (min-width: 768px) {
+  .flightpath-node {
+    padding-inline-start: 0;
+  }
+
+  .flightpath-node::before {
+    left: calc(50% - 0.275rem);
+  }
+
+  .flightpath-node:nth-child(odd) {
+    padding-inline-end: calc(50% + 2.5rem);
+    text-align: end;
+  }
+
+  .flightpath-node:nth-child(even) {
+    padding-inline-start: calc(50% + 2.5rem);
+    text-align: start;
+  }
+}
+
+.flightpath-index {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.06em;
+  background: linear-gradient(135deg, rgba(46, 125, 170, 0.55), rgba(221, 155, 48, 0.45));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-kicker {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+}
+
+.landing-close {
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 120%, rgba(221, 155, 48, 0.18), transparent 55%),
+    linear-gradient(180deg, #0a1620 0%, #03080c 100%);
+}
+
+.landing-rule {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(46, 125, 170, 0.35),
+    rgba(221, 155, 48, 0.55),
+    transparent
+  );
+}
+
+@keyframes platform-scan {
+  0% {
+    top: 8%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  88% {
+    opacity: 0.28;
+  }
+  100% {
+    top: 92%;
+    opacity: 0;
+  }
+}
+
+@keyframes platform-rail {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes node-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hero-grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      108px 54px,
+      54px 108px;
+  }
+}
+
+@keyframes hero-horizon-breathe {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-aviation::before,
+  .hero-aviation::after,
+  .hero-horizon,
+  .flightpath-node::before {
+    animation: none !important;
+  }
+
+  .hero-aviation::before {
+    opacity: 0.4;
+  }
+
+  .hero-aviation::after {
+    top: 42%;
+    opacity: 0.3;
+  }
+
+  .hero-horizon {
+    opacity: 0.8;
+    transform: none;
+  }
+}

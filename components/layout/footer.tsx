@@ -10,35 +10,30 @@ function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden border-t border-white/10 bg-[var(--surface-ink)] text-white">
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[#03080c] text-white">
       <div
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0"
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 100% 0%, rgba(46,125,170,0.25), transparent 60%), radial-gradient(ellipse 40% 40% at 0% 100%, rgba(221,155,48,0.1), transparent 55%)",
+            "radial-gradient(ellipse 55% 60% at 100% 0%, rgba(46,125,170,0.22), transparent 60%), radial-gradient(ellipse 40% 45% at 0% 100%, rgba(221,155,48,0.1), transparent 55%)",
         }}
       />
-      <div className="container-app relative z-10 py-16">
-        <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
-          <div className="space-y-5">
+      <div className="container-app relative z-10 py-16 sm:py-20">
+        <div className="grid gap-14 md:grid-cols-[1.6fr_1fr_1fr]">
+          <div className="space-y-6">
             <BrandLogo variant="dark" href={routes.home} />
-            <p className="max-w-md text-sm leading-relaxed text-white/50">
-              Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.
+            <p className="max-w-md text-sm leading-relaxed text-white/45">
+              The aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.
               Training lanes: {siteStatic.locations.join(" · ")}.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">
-              Platform
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-accent">
+              Navigate
             </h3>
-            <ul className="space-y-2.5 text-sm text-white/60">
-              <li>
-                <Link href="/" className="transition hover:text-accent">
-                  Home
-                </Link>
-              </li>
+            <ul className="space-y-3 text-sm text-white/55">
               <li>
                 <Link href="/#flightpath" className="transition hover:text-accent">
                   Flightpath
@@ -63,10 +58,10 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">
-              Support
+            <h3 className="mb-5 text-[11px] font-semibold uppercase tracking-[0.3em] text-accent">
+              Contact
             </h3>
-            <ul className="space-y-2.5 text-sm text-white/60">
+            <ul className="space-y-3 text-sm text-white/55">
               <li>
                 <a
                   href={`mailto:${siteStatic.contactEmail}`}
@@ -89,11 +84,11 @@ function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-white/35">
-            © {year} {siteStatic.name}. Aviation course platform. English only.
+        <div className="mt-14 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-white/30">
+            © {year} {siteStatic.name}. English only.
           </p>
-          <p className="text-[11px] uppercase tracking-[0.2em] text-white/25">
+          <p className="text-[11px] font-medium uppercase tracking-[0.28em] text-white/20">
             Train · Book · Master
           </p>
         </div>
