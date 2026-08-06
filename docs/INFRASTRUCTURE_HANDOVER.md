@@ -4,31 +4,33 @@ Fill operator-specific IDs/URLs at go-live. Architecture detail: `docs/ARCHITECT
 
 ## Service map
 
-| Layer                   | Platform (recommended)         | Status            | Notes                   |
-| ----------------------- | ------------------------------ | ----------------- | ----------------------- |
-| Frontend hosting        | Vercel                         | Configure         | Next.js App Router      |
-| Backend / BFF           | Same Next.js deployment        | Included          | Route handlers          |
-| Database (target)       | Supabase Postgres              | Optional cutover  | Migrations `001`–`017`  |
-| Database (current demo) | `.data/*.json`                 | Local/single-node | Not multi-instance safe |
-| Object storage          | Supabase Storage `aep-uploads` | Optional          | Else `public/uploads`   |
-| SMTP / email            | ESP via settings + secrets     | Configure         | OTP + notifications     |
-| Zoom                    | Zoom Server-to-Server OAuth    | Configure         | Live classes            |
-| Payment gateway         | Stripe                         | Configure         | Mock until keys set     |
-| Domain                  | Client DNS → Vercel            | Configure         |                         |
-| SSL                     | Vercel automatic               | Configure         | HTTPS only              |
-| CDN                     | Vercel Edge                    | Included          | Static cache headers    |
-| Scheduled backups       | Cron / Ops UI                  | Configure         | `npm run backup*`       |
-| Queue / jobs            | In-app platform queue          | Limited           | Upgrade worker later    |
-| Monitoring              | Uptime + Ops Center            | Configure         | `/api/health?ready=1`   |
-| Logging                 | Ops + activity logs            | Included          | Super Admin UIs         |
+| Layer                   | Platform (recommended)         | Status                     | Notes                           |
+| ----------------------- | ------------------------------ | -------------------------- | ------------------------------- |
+| Frontend hosting        | Vercel                         | Configure                  | Next.js App Router              |
+| Backend / BFF           | Same Next.js deployment        | Included                   | Route handlers                  |
+| Database (target)       | Supabase Postgres              | Optional cutover           | Migrations `001`–`017`          |
+| Database (current demo) | `.data/*.json`                 | Local/single-node          | Not multi-instance safe         |
+| Object storage          | Supabase Storage `aep-uploads` | Optional                   | Else `public/uploads`           |
+| SMTP / email            | ESP via settings + secrets     | Configure                  | OTP + notifications             |
+| Zoom                    | Zoom Server-to-Server OAuth    | Configure                  | Live classes                    |
+| Payment gateway         | Stripe                         | Configure                  | Mock until keys set             |
+| Domain                  | Client DNS → Vercel            | Staging: `dubai-test.blog` | See `docs/DOMAIN_DUBAI_TEST.md` |
+| SSL                     | Vercel automatic               | Configure                  | HTTPS only                      |
+| CDN                     | Vercel Edge                    | Included                   | Static cache headers            |
+| Scheduled backups       | Cron / Ops UI                  | Configure                  | `npm run backup*`               |
+| Queue / jobs            | In-app platform queue          | Limited                    | Upgrade worker later            |
+| Monitoring              | Uptime + Ops Center            | Configure                  | `/api/health?ready=1`           |
+| Logging                 | Ops + activity logs            | Included                   | Super Admin UIs                 |
 
 ## DNS / SSL checklist
 
-1. Add custom domain in Vercel.
-2. Create DNS records as Vercel instructs (A/CNAME).
+Staging host: **`dubai-test.blog`** — step-by-step in `docs/DOMAIN_DUBAI_TEST.md`.
+
+1. Add custom domain in Vercel (`dubai-test.blog`, `www.dubai-test.blog`).
+2. Create DNS records as Vercel instructs (A/CNAME) in Hostinger.
 3. Wait for SSL issuance.
-4. Set `NEXT_PUBLIC_APP_URL` to canonical HTTPS URL.
-5. Verify `curl https://<host>/api/health?ready=1`.
+4. Set `NEXT_PUBLIC_APP_URL` to canonical HTTPS URL (`https://dubai-test.blog`).
+5. Verify `curl https://dubai-test.blog/api/health?ready=1`.
 
 ## Scheduled jobs
 

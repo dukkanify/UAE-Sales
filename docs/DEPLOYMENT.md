@@ -2,11 +2,11 @@
 
 ## Targets
 
-| Layer | Platform |
-|-------|----------|
-| Web app | Vercel |
-| Database / Auth / Storage (target) | Supabase |
-| Current demo data | `.data/*.json` on the Node filesystem (local/preview) |
+| Layer                              | Platform                                              |
+| ---------------------------------- | ----------------------------------------------------- |
+| Web app                            | Vercel                                                |
+| Database / Auth / Storage (target) | Supabase                                              |
+| Current demo data                  | `.data/*.json` on the Node filesystem (local/preview) |
 
 ## Prerequisites
 
@@ -29,6 +29,14 @@
 3. Build command: `npm run build`
 4. Output: Next default
 5. Confirm `vercel.json` headers apply
+
+## Custom domain (staging): dubai-test.blog
+
+Full checklist: `docs/DOMAIN_DUBAI_TEST.md`.
+
+1. Vercel → Settings → Domains → add `dubai-test.blog` (+ `www`)
+2. Hostinger DNS Zone: apex `A` → `76.76.21.21`, `www` `CNAME` → `cname.vercel-dns.com`
+3. Env: use `.env.staging.example` / set `NEXT_PUBLIC_APP_URL=https://dubai-test.blog`
 
 ## Supabase setup (when promoting off mocks)
 
