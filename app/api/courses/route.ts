@@ -2,13 +2,8 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { ROLES } from "@/constants/roles";
-import {
-  authErrorResponse,
-  getRequestContext,
-  requireAuth,
-  requirePermission,
-} from "@/services/auth/guards";
-import { assertPermission, PermissionError } from "@/services/auth/permissions";
+import { authErrorResponse, getRequestContext, requireAuth } from "@/services/auth/guards";
+import { assertPermission, hasPermission, PermissionError } from "@/services/auth/permissions";
 import { createCourse, listCourses } from "@/services/courses/course-service";
 import { courseErrorResponse } from "@/app/api/courses/_utils";
 import { parsePagination } from "@/lib/api/envelope";
@@ -56,7 +51,14 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requirePermission(PERMISSIONS.COURSES_MANAGE);
+    const user = await requireAuth();
+    const canManage = hasPermission(user.role, PERMISSIONS.COURSES_MANAGE);
+    const canOwn = hasPermission(user.role, PERMISSIONS.COURSES_OWN);
+
+    if (!canManage && !canOwn) {
+      throw new PermissionError("You do not have permission to perform this action", 403);
+    }
+
     const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
     if (!body) {
       return NextResponse.json(
@@ -64,7 +66,22 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
+
     const ctx = getRequestContext(request);
+    const requestedInstructorId = (body.primaryInstructorId as string | null | undefined) ?? null;
+
+    // Instructors may only create courses assigned to themselves.
+    const primaryInstructorId = canManage ? requestedInstructorId : user.id;
+
+    const status = canManage
+      ? body.status != null
+        ? String(body.status)
+        : "draft"
+      : body.status != null &&
+          ["draft", "published", "private", "scheduled"].includes(String(body.status))
+        ? String(body.status)
+        : "draft";
+
     const course = await createCourse({
       title: String(body.title ?? ""),
       shortDescription: body.shortDescription != null ? String(body.shortDescription) : undefined,
@@ -79,9 +96,9 @@ export async function POST(request: Request) {
       estimatedDurationMinutes:
         body.estimatedDurationMinutes != null ? Number(body.estimatedDurationMinutes) : undefined,
       enrollmentMode: body.enrollmentMode != null ? String(body.enrollmentMode) : undefined,
-      status: body.status != null ? String(body.status) : undefined,
+      status,
       scheduledPublishAt: (body.scheduledPublishAt as string | null | undefined) ?? null,
-      primaryInstructorId: (body.primaryInstructorId as string | null | undefined) ?? null,
+      primaryInstructorId,
       tags: Array.isArray(body.tags) ? body.tags.map(String) : undefined,
       actorId: user.id,
       ...ctx,

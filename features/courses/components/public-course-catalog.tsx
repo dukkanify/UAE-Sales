@@ -128,10 +128,15 @@ function PublicCourseCatalog() {
               {course.shortDescription || course.fullDescription}
             </p>
             <div className="mt-5 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-              <p className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Clock3 className="h-3.5 w-3.5" />
-                {formatHours(course.estimatedDurationMinutes)}
-              </p>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium text-foreground/80">
+                  {course.primaryInstructorName || "ATPL PASS faculty"}
+                </p>
+                <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Clock3 className="h-3.5 w-3.5" />
+                  {formatHours(course.estimatedDurationMinutes)}
+                </p>
+              </div>
               <Button size="sm" variant="accent" asChild>
                 <Link href={`${routes.courses}/${course.id}`}>
                   View course

@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
+import { HomeCoursesByInstructor } from "@/features/marketing/components/home-courses-by-instructor";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 
@@ -196,7 +197,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3 — Live */}
+      {/* 3 — Courses by instructor */}
+      <HomeCoursesByInstructor />
+
+      {/* 4 — Live */}
       <section
         id="live"
         className="platform-band content-auto relative overflow-hidden py-28 text-white sm:py-36"
@@ -238,7 +242,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 4 — Close */}
+      {/* 5 — Close */}
       <section className="landing-close relative overflow-hidden py-24 text-white sm:py-28">
         <div className="container-app relative z-10 text-center">
           <p className="landing-kicker mb-5 text-white/40">Ready for takeoff</p>

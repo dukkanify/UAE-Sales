@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
-import { getRequestContext, requirePermission } from "@/services/auth/guards";
+import { getRequestContext, requireAuth, requirePermission } from "@/services/auth/guards";
+import { hasPermission, PermissionError } from "@/services/auth/permissions";
 import {
   createCategory,
   getCategoryTree,
@@ -11,13 +12,18 @@ import { courseErrorResponse } from "@/app/api/courses/_utils";
 
 export async function GET(request: Request) {
   try {
-    await requirePermission(PERMISSIONS.COURSES_MANAGE);
+    const user = await requireAuth();
+    const canManage = hasPermission(user.role, PERMISSIONS.COURSES_MANAGE);
+    const canOwn = hasPermission(user.role, PERMISSIONS.COURSES_OWN);
+    if (!canManage && !canOwn) {
+      throw new PermissionError("You do not have permission to perform this action", 403);
+    }
+
     const { searchParams } = new URL(request.url);
     const tree = searchParams.get("tree") === "1";
-    const includeHidden = searchParams.get("includeHidden") === "1";
-    const data = tree
-      ? getCategoryTree({ includeHidden })
-      : listCategories({ includeHidden });
+    // Instructors only see visible categories; admins may include hidden.
+    const includeHidden = canManage && searchParams.get("includeHidden") === "1";
+    const data = tree ? getCategoryTree({ includeHidden }) : listCategories({ includeHidden });
     return NextResponse.json({ success: true, data, error: null });
   } catch (error) {
     return courseErrorResponse(error);

@@ -41,6 +41,8 @@ interface CourseFormDialogProps {
   categories: CourseCategory[];
   instructors: UserProfile[];
   onSaved: (course: CourseListItem) => void;
+  /** When set, locks primary instructor to this user (instructor self-serve create). */
+  lockedInstructorId?: string | null;
 }
 
 function CourseFormDialog({
@@ -50,7 +52,9 @@ function CourseFormDialog({
   categories,
   instructors,
   onSaved,
+  lockedInstructorId = null,
 }: CourseFormDialogProps) {
+  const lockInstructor = Boolean(lockedInstructorId);
   const [saving, setSaving] = React.useState(false);
   const [title, setTitle] = React.useState("");
   const [code, setCode] = React.useState("");
@@ -74,14 +78,10 @@ function CourseFormDialog({
     setDifficulty(course?.difficulty ?? "intermediate");
     setEnrollmentMode(course?.enrollmentMode ?? "manual");
     setStatus(course?.status ?? "draft");
-    setPrimaryInstructorId(course?.primaryInstructorId ?? "none");
-    setScheduledPublishAt(
-      course?.scheduledPublishAt
-        ? course.scheduledPublishAt.slice(0, 16)
-        : "",
-    );
+    setPrimaryInstructorId(lockedInstructorId ?? course?.primaryInstructorId ?? "none");
+    setScheduledPublishAt(course?.scheduledPublishAt ? course.scheduledPublishAt.slice(0, 16) : "");
     setEstimatedDurationMinutes(String(course?.estimatedDurationMinutes ?? 0));
-  }, [open, course]);
+  }, [open, course, lockedInstructorId]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,8 +95,11 @@ function CourseFormDialog({
       difficulty,
       enrollmentMode,
       status,
-      primaryInstructorId:
-        primaryInstructorId === "none" ? null : primaryInstructorId,
+      primaryInstructorId: lockInstructor
+        ? lockedInstructorId
+        : primaryInstructorId === "none"
+          ? null
+          : primaryInstructorId,
       scheduledPublishAt:
         status === "scheduled" && scheduledPublishAt
           ? new Date(scheduledPublishAt).toISOString()
@@ -131,7 +134,9 @@ function CourseFormDialog({
         <DialogHeader>
           <DialogTitle>{course ? "Edit course" : "Create course"}</DialogTitle>
           <DialogDescription>
-            Configure catalog details, visibility, and instructor assignment.
+            {lockInstructor
+              ? "Create a course under your instructor account. Publish when it is ready for students."
+              : "Configure catalog details, visibility, and instructor assignment."}
           </DialogDescription>
         </DialogHeader>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -240,25 +245,37 @@ function CourseFormDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
-              <Label>Primary instructor</Label>
-              <Select
-                value={primaryInstructorId}
-                onValueChange={setPrimaryInstructorId}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Assign instructor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Unassigned</SelectItem>
-                  {instructors.map((i) => (
-                    <SelectItem key={i.id} value={i.id}>
-                      {i.fullName || i.email}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {lockInstructor ? (
+              <div className="space-y-2">
+                <Label>Primary instructor</Label>
+                <Input
+                  value={
+                    instructors.find((i) => i.id === lockedInstructorId)?.fullName ||
+                    instructors.find((i) => i.id === lockedInstructorId)?.email ||
+                    "You"
+                  }
+                  disabled
+                  readOnly
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label>Primary instructor</Label>
+                <Select value={primaryInstructorId} onValueChange={setPrimaryInstructorId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Assign instructor" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Unassigned</SelectItem>
+                    {instructors.map((i) => (
+                      <SelectItem key={i.id} value={i.id}>
+                        {i.fullName || i.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             {status === "scheduled" ? (
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="publish-at">Future publish date</Label>

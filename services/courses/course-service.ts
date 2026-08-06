@@ -38,14 +38,10 @@ function userDisplayName(userId: string | null): string | null {
 
 function toListItem(course: Course): CourseListItem {
   const db = readCoursesDb();
-  const category = course.categoryId
-    ? db.categories.find((c) => c.id === course.categoryId)
-    : null;
+  const category = course.categoryId ? db.categories.find((c) => c.id === course.categoryId) : null;
   const modules = db.modules.filter((m) => m.courseId === course.id);
   const lessons = db.lessons.filter((l) => l.courseId === course.id);
-  const resources = db.resources.filter((r) =>
-    lessons.some((l) => l.id === r.lessonId),
-  );
+  const resources = db.resources.filter((r) => lessons.some((l) => l.id === r.lessonId));
   const enrollments = db.enrollments.filter((e) => e.courseId === course.id);
   return {
     ...course,
@@ -67,6 +63,49 @@ export function getCourseById(id: string, includeDeleted = false): Course | null
   if (!course) return null;
   if (course.deletedAt && !includeDeleted) return null;
   return course;
+}
+
+/** True when the user is primary instructor or assigned on the course. */
+export function instructorOwnsCourse(userId: string, courseId: string): boolean {
+  const course = getCourseById(courseId);
+  if (!course) return false;
+  if (course.primaryInstructorId === userId) return true;
+  return readCoursesDb().instructors.some((i) => i.courseId === courseId && i.userId === userId);
+}
+
+export type InstructorCourseGroup = {
+  instructorId: string | null;
+  instructorName: string;
+  courses: CourseListItem[];
+};
+
+/** Published catalog grouped by primary instructor for marketing home. */
+export function listPublishedCoursesGroupedByInstructor(pageSize = 100): InstructorCourseGroup[] {
+  const { data } = listCourses({
+    status: "published",
+    pageSize,
+    sortBy: "title",
+    sortDir: "asc",
+  });
+
+  const groups = new Map<string, InstructorCourseGroup>();
+  for (const course of data) {
+    const key = course.primaryInstructorId ?? "__unassigned__";
+    const current = groups.get(key);
+    if (current) {
+      current.courses.push(course);
+      continue;
+    }
+    groups.set(key, {
+      instructorId: course.primaryInstructorId,
+      instructorName: course.primaryInstructorName?.trim() || "ATPL PASS faculty",
+      courses: [course],
+    });
+  }
+
+  return Array.from(groups.values()).sort((a, b) =>
+    a.instructorName.localeCompare(b.instructorName),
+  );
 }
 
 export function getCourseDetail(id: string): CourseDetail | null {
@@ -106,9 +145,7 @@ export function listCourses(filters: CourseFilters = {}): {
   ensureCoursesSeeded();
   const page = filters.page ?? 1;
   const pageSize = filters.pageSize ?? DEFAULT_COURSE_PAGE_SIZE;
-  let rows = readCoursesDb().courses.filter((c) =>
-    filters.includeDeleted ? true : !c.deletedAt,
-  );
+  let rows = readCoursesDb().courses.filter((c) => (filters.includeDeleted ? true : !c.deletedAt));
 
   if (filters.q) {
     const q = filters.q.toLowerCase();
@@ -247,10 +284,7 @@ export async function createCourse(input: CreateCourseInput): Promise<CourseList
   const status = assertStatus(input.status ?? "draft");
   const difficulty = assertDifficulty(input.difficulty ?? "intermediate");
   const enrollmentMode = assertEnrollmentMode(input.enrollmentMode ?? "manual");
-  const scheduledPublishAt = assertScheduledPublish(
-    status,
-    input.scheduledPublishAt ?? null,
-  );
+  const scheduledPublishAt = assertScheduledPublish(status, input.scheduledPublishAt ?? null);
   assertInstructorExists(input.primaryInstructorId);
 
   if (input.categoryId) {
@@ -337,8 +371,7 @@ export async function updateCourse(input: {
 
   const title =
     input.patch.title !== undefined ? assertCourseTitle(input.patch.title) : existing.title;
-  const code =
-    input.patch.code !== undefined ? assertCourseCode(input.patch.code) : existing.code;
+  const code = input.patch.code !== undefined ? assertCourseCode(input.patch.code) : existing.code;
   assertUniqueCode(code, existing.id);
   const status =
     input.patch.status !== undefined ? assertStatus(input.patch.status) : existing.status;
@@ -379,16 +412,11 @@ export async function updateCourse(input: {
       input.patch.fullDescription !== undefined
         ? input.patch.fullDescription.trim()
         : existing.fullDescription,
-    categoryId:
-      input.patch.categoryId !== undefined ? input.patch.categoryId : existing.categoryId,
+    categoryId: input.patch.categoryId !== undefined ? input.patch.categoryId : existing.categoryId,
     thumbnailUrl:
-      input.patch.thumbnailUrl !== undefined
-        ? input.patch.thumbnailUrl
-        : existing.thumbnailUrl,
+      input.patch.thumbnailUrl !== undefined ? input.patch.thumbnailUrl : existing.thumbnailUrl,
     coverImageUrl:
-      input.patch.coverImageUrl !== undefined
-        ? input.patch.coverImageUrl
-        : existing.coverImageUrl,
+      input.patch.coverImageUrl !== undefined ? input.patch.coverImageUrl : existing.coverImageUrl,
     previewVideoUrl:
       input.patch.previewVideoUrl !== undefined
         ? input.patch.previewVideoUrl
@@ -407,11 +435,11 @@ export async function updateCourse(input: {
     updatedAt: now,
     publishedAt:
       status === "published"
-        ? existing.publishedAt ?? now
+        ? (existing.publishedAt ?? now)
         : status === "draft" || status === "private"
           ? existing.publishedAt
           : existing.publishedAt,
-    archivedAt: status === "archived" ? existing.archivedAt ?? now : null,
+    archivedAt: status === "archived" ? (existing.archivedAt ?? now) : null,
   };
 
   writeCoursesDb((d) => {
@@ -473,8 +501,7 @@ async function setStatus(
     ...existing,
     status,
     updatedAt: now,
-    publishedAt:
-      status === "published" ? existing.publishedAt ?? now : existing.publishedAt,
+    publishedAt: status === "published" ? (existing.publishedAt ?? now) : existing.publishedAt,
     archivedAt: status === "archived" ? now : existing.archivedAt,
     scheduledPublishAt: status === "scheduled" ? existing.scheduledPublishAt : null,
   };
@@ -702,11 +729,7 @@ export async function assignInstructor(input: {
     } else {
       d.instructors = d.instructors.filter(
         (i) =>
-          !(
-            i.courseId === input.courseId &&
-            i.userId === input.userId &&
-            i.role === "assistant"
-          ),
+          !(i.courseId === input.courseId && i.userId === input.userId && i.role === "assistant"),
       );
     }
     d.instructors.push(assignment);
