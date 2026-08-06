@@ -1,6 +1,6 @@
 # Final production release — Task 025
 
-**Product:** ATPL PASS — Aviation Education Platform (AEP)  
+**Product:** AviatorPass — Aviation Education Platform (AEP)  
 **Milestone:** Official **Version 1.0 GA** (production release & project close)  
 **Date:** 2026-08-04  
 **Branch tip:** `cursor/aep-final-release-0987`  
@@ -9,7 +9,7 @@
 
 ## 1. Executive summary
 
-ATPL PASS Version 1.0 is declared **ready for production release and client acceptance**. Development milestones Tasks 001–024 delivered the platform; Task 025 packages the **final release**, **acceptance**, **ownership transfer**, **warranty activation**, **90-day KPIs**, and **v2.0 backlog**.
+AviatorPass Version 1.0 is declared **ready for production release and client acceptance**. Development milestones Tasks 001–024 delivered the platform; Task 025 packages the **final release**, **acceptance**, **ownership transfer**, **warranty activation**, **90-day KPIs**, and **v2.0 backlog**.
 
 Residual scale/infra items (Supabase cutover, Redis rate limits, etc.) remain in `docs/TECHNICAL_DEBT.md` and are **not** blockers for GA when operated as a single-instance / controlled-load production deployment with known limitations acknowledged by the client.
 

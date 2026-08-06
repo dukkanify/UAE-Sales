@@ -1,4 +1,4 @@
-# Environment setup — ATPL PASS
+# Environment setup — AviatorPass
 
 ## Local development
 
@@ -16,7 +16,7 @@ Required for comfortable local auth:
 | `ENABLE_DEMO_OTP`      | `true` (local only)     |
 | `DEMO_OTP_CODE`        | `123456`                |
 | `NEXT_PUBLIC_APP_URL`  | `http://localhost:3000` |
-| `NEXT_PUBLIC_APP_NAME` | `ATPL PASS`             |
+| `NEXT_PUBLIC_APP_NAME` | `AviatorPass`           |
 | `NEXT_PUBLIC_APP_ENV`  | `development`           |
 
 Supabase vars may stay empty for JSON-store mode.

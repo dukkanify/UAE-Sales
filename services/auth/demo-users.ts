@@ -79,7 +79,7 @@ function backfillDemoStudentDetails(): void {
       emergencyContactName: null,
       emergencyContactPhone: null,
     },
-    "abdulaziz@atplpass.com": {
+    "abdulaziz@aviatorpass.com": {
       phone: "+96550012345",
       countryCode: "KW",
       nationality: "Kuwaiti",
@@ -204,7 +204,7 @@ function seedFreshDemoUsers(): void {
       city: "London",
     },
     {
-      email: "abdulaziz@atplpass.com",
+      email: "abdulaziz@aviatorpass.com",
       role: ROLES.STUDENT,
       firstName: "Abdulaziz",
       lastName: "Alshoail",

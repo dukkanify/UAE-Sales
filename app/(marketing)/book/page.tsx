@@ -9,30 +9,30 @@ import { BookStudioClient } from "./book-studio-client";
 export const metadata: Metadata = {
   title: "Book live Zoom ATPL coaching",
   description:
-    "Reserve a private live Zoom session with an ATPL PASS instructor. Confirm by email — your learner account is created when you book.",
+    "Reserve a private live Zoom session with an AviatorPass instructor. Confirm by email — your learner account is created when you book.",
   keywords: [
     "book ATPL Zoom",
     "live pilot coaching",
     "ATPL instructor session",
     "aviation mentoring",
-    "ATPL PASS booking",
+    "AviatorPass booking",
   ],
   alternates: {
     canonical: routes.book,
   },
   openGraph: {
-    title: "Book live Zoom | ATPL PASS",
+    title: "Book live Zoom | AviatorPass",
     description:
       "Reserve private ATPL coaching on Zoom. Confirm by email and join from your training lobby.",
     url: routes.book,
     type: "website",
     images: [
-      { url: siteConfig.brand.openGraph, width: 1200, height: 630, alt: "ATPL PASS booking" },
+      { url: siteConfig.brand.openGraph, width: 1200, height: 630, alt: "AviatorPass booking" },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Book live Zoom | ATPL PASS",
+    title: "Book live Zoom | AviatorPass",
     description:
       "Reserve private ATPL coaching on Zoom. Confirm by email and join from your training lobby.",
     images: [siteConfig.brand.openGraph],

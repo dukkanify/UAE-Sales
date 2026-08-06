@@ -10,12 +10,12 @@ import { routes } from "@/constants/routes";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "ATPL PASS | Aviation Course Platform for ATPL Theory & Live Zoom",
+    absolute: "AviatorPass | Aviation Course Platform for ATPL Theory & Live Zoom",
   },
   description:
-    "Train ATPL theory on ATPL PASS — structured courses, live Zoom coaching with instructors, quizzes, and exam mastery. Built for pilots in Kuwait and Dubai.",
+    "Train ATPL theory on AviatorPass — structured courses, live Zoom coaching with instructors, quizzes, and exam mastery. Built for pilots in Kuwait and Dubai.",
   keywords: [
-    "ATPL PASS",
+    "AviatorPass",
     "ATPL theory",
     "ATPL online course",
     "pilot training platform",
@@ -29,16 +29,16 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "ATPL PASS — Aviation course platform",
+    title: "AviatorPass — Aviation course platform",
     description:
       "Structured ATPL coursework, live Zoom coaching, and exam mastery in one training OS.",
     url: "/",
     type: "website",
-    images: [{ url: siteConfig.brand.openGraph, width: 1200, height: 630, alt: "ATPL PASS" }],
+    images: [{ url: siteConfig.brand.openGraph, width: 1200, height: 630, alt: "AviatorPass" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATPL PASS — Aviation course platform",
+    title: "AviatorPass — Aviation course platform",
     description:
       "Structured ATPL coursework, live Zoom coaching, and exam mastery in one training OS.",
     images: [siteConfig.brand.openGraph],
@@ -91,7 +91,7 @@ export default function HomePage() {
             },
             {
               "@type": "SoftwareApplication",
-              name: "ATPL PASS",
+              name: "AviatorPass",
               applicationCategory: "EducationalApplication",
               operatingSystem: "Web",
               url: siteConfig.url,
@@ -110,7 +110,7 @@ export default function HomePage() {
             },
             {
               "@type": "Course",
-              name: "ATPL Theory Training on ATPL PASS",
+              name: "ATPL Theory Training on AviatorPass",
               description:
                 "Airline Transport Pilot License theory coursework with live instructor Zoom coaching.",
               provider: { "@id": `${siteConfig.url}/#organization` },
@@ -129,9 +129,9 @@ export default function HomePage() {
         <div className="hero-vignette" aria-hidden />
 
         <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-end pb-20 pt-16 sm:justify-center sm:pb-28">
-          <p className="animate-in-up hero-brand font-display text-[clamp(4.5rem,15vw,10rem)] font-bold">
-            <span className="hero-brand-atpl">ATPL</span>{" "}
-            <span className="hero-brand-pass">PASS</span>
+          <p className="animate-in-up hero-brand font-display text-[clamp(3.25rem,11vw,7.5rem)] font-bold">
+            <span className="hero-brand-aviator">Aviator</span>
+            <span className="hero-brand-pass">Pass</span>
           </p>
 
           <h1 className="animate-in-up-delay-1 mt-8 max-w-[17ch] font-display text-[clamp(1.7rem,3.9vw,3.15rem)] font-semibold tracking-[-0.032em] text-white sm:leading-[1.06]">
@@ -213,8 +213,8 @@ export default function HomePage() {
                 Clear the turbulence with a live instructor
               </h2>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-white/62 sm:text-lg">
-                Reserve first. Confirm by email. ATPL PASS opens your learner account the moment you
-                book — then you join Zoom from the lobby.
+                Reserve first. Confirm by email. AviatorPass opens your learner account the moment
+                you book — then you join Zoom from the lobby.
               </p>
             </div>
             <Button
@@ -245,7 +245,7 @@ export default function HomePage() {
           <div className="mt-10 flex justify-center">
             <Button size="lg" variant="accent" className="hero-cta-primary px-10" asChild>
               <Link href={routes.login}>
-                Enter ATPL PASS
+                Enter AviatorPass
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </Button>

@@ -1,6 +1,6 @@
 # Phase 2 — Enterprise Expansion Roadmap (Version 2.0)
 
-**Product:** ATPL PASS — Aviation Education Platform  
+**Product:** AviatorPass — Aviation Education Platform  
 **Status:** Planned expansion beyond Version 1.0 GA  
 **Constraint:** All Phase 2 work must preserve v1.0 stability (additive, feature-flagged, non-breaking)  
 **Companion backlog:** `docs/V2_BACKLOG.md` · Architecture: `docs/ARCHITECTURE_V2.md`  
@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-Phase 2 transforms ATPL PASS from a single-academy v1.0 platform into an **enterprise SaaS education suite**: native mobile, corporate B2B, multi-tenant white-label, advanced assessment integrity, integrations, i18n, and predictive BI.
+Phase 2 transforms AviatorPass from a single-academy v1.0 platform into an **enterprise SaaS education suite**: native mobile, corporate B2B, multi-tenant white-label, advanced assessment integrity, integrations, i18n, and predictive BI.
 
 This package defines **what** will ship in Version 2.x, **in what order**, and **how** to extend without regressing v1.0.
 

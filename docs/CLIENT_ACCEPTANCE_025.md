@@ -1,6 +1,6 @@
-# Client acceptance — ATPL PASS Version 1.0 GA (Task 025)
+# Client acceptance — AviatorPass Version 1.0 GA (Task 025)
 
-**Product:** ATPL PASS — Aviation Education Platform  
+**Product:** AviatorPass — Aviation Education Platform  
 **Formal acceptance of Version 1.0 production release**
 
 This form supersedes Task 023 acceptance for **GA release**. Prior handover items remain referenced.

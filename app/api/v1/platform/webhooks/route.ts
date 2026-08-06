@@ -57,7 +57,7 @@ export const POST = withApiHandler(async (request) => {
   }
   if (action === "test") {
     const queued = dispatchWebhookEvent("integration.test", {
-      message: "ATPL PASS webhook test",
+      message: "AviatorPass webhook test",
       at: new Date().toISOString(),
     });
     await processQueue(5);

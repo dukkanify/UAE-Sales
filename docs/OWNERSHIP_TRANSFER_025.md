@@ -1,6 +1,6 @@
 # Ownership transfer — Task 025
 
-**Product:** ATPL PASS v1.0 GA  
+**Product:** AviatorPass v1.0 GA  
 **Prerequisite:** Contractual payment obligations fulfilled (client finance confirmation attached to acceptance).
 
 Transfer **only after** `CLIENT_ACCEPTANCE_025.md` is signed Accepted (or Accepted with limitations) and payment gate is clear.

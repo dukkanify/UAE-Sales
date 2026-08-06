@@ -1,5 +1,5 @@
 /**
- * Comprehensive UAT / QA smoke harness for ATPL PASS.
+ * Comprehensive UAT / QA smoke harness for AviatorPass.
  * Usage: node scripts/uat-smoke.mjs [baseUrl]
  *
  * Covers role workflows across auth, learning, classes, quizzes, certificates,

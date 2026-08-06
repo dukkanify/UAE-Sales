@@ -1,4 +1,4 @@
-# Instructor training — ATPL PASS
+# Instructor training — AviatorPass
 
 Suggested live session: **~60 minutes** on staging. Self-serve: `docs/INSTRUCTOR_GUIDE.md`.
 

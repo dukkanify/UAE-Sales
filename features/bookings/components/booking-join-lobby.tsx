@@ -184,7 +184,7 @@ function BookingJoinLobby({ bookingId }: BookingJoinLobbyProps) {
 
               <p className="mt-4 flex items-center gap-2 text-xs text-white/45">
                 <Shield className="h-3.5 w-3.5" />
-                Credentials are private to this booking. Do not share outside ATPL PASS.
+                Credentials are private to this booking. Do not share outside AviatorPass.
               </p>
             </div>
           </div>

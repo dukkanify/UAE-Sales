@@ -1,6 +1,6 @@
 # Final system validation — Task 020
 
-**Product:** ATPL PASS  
+**Product:** AviatorPass  
 **Date:** 2026-08-04  
 **Branch:** `cursor/aep-final-handover-0987`
 

@@ -1,7 +1,7 @@
 # Final security audit — Task 020
 
 **Date:** 2026-08-04  
-**Scope:** ATPL PASS application code + ops controls (pre-production)  
+**Scope:** AviatorPass application code + ops controls (pre-production)  
 **Branch:** `cursor/aep-final-handover-0987`
 
 ## Summary

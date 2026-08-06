@@ -1,4 +1,4 @@
-# Administrator training — ATPL PASS
+# Administrator training — AviatorPass
 
 Suggested live session: **~90 minutes**. Pair with hands-on walkthrough on staging.
 

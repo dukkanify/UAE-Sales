@@ -1,6 +1,6 @@
 # Final project acceptance — Task 023
 
-**Product:** ATPL PASS  
+**Product:** AviatorPass  
 **Note (Task 025):** For **Version 1.0 GA** signatures, use `docs/CLIENT_ACCEPTANCE_025.md`. This Task 023 form remains for historical handover records.
 
 ## Acceptance checklist

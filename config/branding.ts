@@ -1,5 +1,5 @@
 /**
- * Centralized branding configuration — official ATPL PASS guidelines.
+ * Centralized branding configuration — official AviatorPass guidelines.
  * Uses site-static (no Zod) so client layouts stay resilient under HMR.
  */
 
@@ -24,7 +24,7 @@ export const brandingConfig = {
     favicon: siteStatic.brand.favicon,
     openGraph: siteStatic.brand.openGraph,
     sourceDir: "/brand/source",
-    guidelinesPdf: "/brand/source/ATPL_PASS_Brand_Guidelines.pdf",
+    guidelinesPdf: "/brand/source/AVIATORPASS_Brand_Guidelines.pdf",
   },
   colors: {
     primary: theme.colors.primary.DEFAULT,

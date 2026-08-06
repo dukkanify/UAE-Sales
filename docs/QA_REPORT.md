@@ -1,6 +1,6 @@
 # QA Report — MASTER TASK 016
 
-**Product:** ATPL PASS (Aviation Education Platform)  
+**Product:** AviatorPass (Aviation Education Platform)  
 **Branch:** `cursor/aep-qa-launch-0987`  
 **Date:** 2026-08-04  
 **Harnesses:** `npm run uat`, `npm run acceptance`, `npm run test:e2e`

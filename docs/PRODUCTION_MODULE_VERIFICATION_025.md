@@ -1,7 +1,7 @@
 # Production module verification — Task 025
 
 **Date:** 2026-08-04  
-**Scope:** End-to-end module coherence for ATPL PASS v1.0 GA  
+**Scope:** End-to-end module coherence for AviatorPass v1.0 GA  
 **Method:** Prior UAT (`docs/UAT_APPROVAL.md`), acceptance harness, enterprise audit (022), refactor (024), plus checklist review. No feature changes in Task 025.
 
 Legend: ✅ Verified in codebase + prior automated UAT · ⚠️ Requires live credentials on production · ☐ Client confirms in live env

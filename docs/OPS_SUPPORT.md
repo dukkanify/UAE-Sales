@@ -1,6 +1,6 @@
 # Production support & continuous improvement — Task 017
 
-Post-launch operations for ATPL PASS: monitoring, support, SLA, bugs, change requests, releases, maintenance, health dashboard, backup verification, and roadmap.
+Post-launch operations for AviatorPass: monitoring, support, SLA, bugs, change requests, releases, maintenance, health dashboard, backup verification, and roadmap.
 
 ## Ops Center
 

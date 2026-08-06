@@ -1,4 +1,4 @@
-# Maintenance guide — ATPL PASS
+# Maintenance guide — AviatorPass
 
 ## Routine cadence
 

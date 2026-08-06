@@ -1,4 +1,4 @@
-# Support team training — ATPL PASS
+# Support team training — AviatorPass
 
 Suggested live session: **~45 minutes**. References: `docs/SUPPORT.md`, `docs/OPS_SUPPORT.md`, `docs/POST_LAUNCH_SUPPORT.md`, Ops Center Knowledge tab.
 

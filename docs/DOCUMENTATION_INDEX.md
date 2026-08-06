@@ -1,4 +1,4 @@
-# Documentation index — ATPL PASS
+# Documentation index — AviatorPass
 
 Master index for **Version 1.0 GA** (Task 025). Prior closure materials (Task 023) remain valid references.
 

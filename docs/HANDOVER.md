@@ -1,4 +1,4 @@
-# Client handover package — ATPL PASS
+# Client handover package — AviatorPass
 
 **Milestone:** Task 023 — Project completion, knowledge transfer & operational handover  
 **Branch tip:** `cursor/aep-project-closure-0987`  
@@ -6,7 +6,7 @@
 
 ## Delivery summary
 
-ATPL PASS development is **complete**. This package transfers ownership for long-term operation.
+AviatorPass development is **complete**. This package transfers ownership for long-term operation.
 
 Remaining client actions:
 

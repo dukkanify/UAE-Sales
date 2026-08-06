@@ -1,5 +1,5 @@
 /**
- * Branded HTML email templates for ATPL PASS.
+ * Branded HTML email templates for AviatorPass.
  * Uses platform settings for logo, colors, and footer.
  */
 
@@ -103,7 +103,7 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
 export function otpEmailTemplate(code: string, purpose: string) {
   return renderBrandedEmail({
     title: "Your verification code",
-    preheader: `Your ATPL PASS code is ${code}`,
+    preheader: `Your AviatorPass code is ${code}`,
     bodyHtml: `<p>Use this one-time code to ${purpose}:</p>
       <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#0B1F3A;">${code}</p>
       <p>This code expires shortly. If you did not request it, you can ignore this email.</p>`,
@@ -112,7 +112,7 @@ export function otpEmailTemplate(code: string, purpose: string) {
 
 export function testEmailTemplate() {
   return renderBrandedEmail({
-    title: "Test email from ATPL PASS",
+    title: "Test email from AviatorPass",
     preheader: "Your email configuration is working.",
     bodyHtml: `<p>This is a test message from the Super Admin email configuration panel.</p>
       <p>If you received this, outbound email settings are reachable from the platform.</p>`,

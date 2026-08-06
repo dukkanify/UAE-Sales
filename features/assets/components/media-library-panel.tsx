@@ -314,7 +314,7 @@ export function MediaLibraryPanel({ embedded = false }: { embedded?: boolean }) 
     <div className="space-y-6">
       <PageHeader
         title="Aviation media library"
-        description="Centralized categorized media for ATPL PASS."
+        description="Centralized categorized media for AviatorPass."
         breadcrumbs={[
           { label: "Super Admin", href: "/super-admin/dashboard" },
           { label: "Media library" },

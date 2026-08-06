@@ -9,10 +9,7 @@ import { ROLES } from "@/constants/roles";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { listCourses } from "@/services/courses/course-service";
 import { ensureDefaultModerationRules } from "@/services/communication/moderation-service";
-import {
-  readCommunicationDb,
-  writeCommunicationDb,
-} from "@/services/communication/store";
+import { readCommunicationDb, writeCommunicationDb } from "@/services/communication/store";
 import type {
   Announcement,
   BlogCategory,
@@ -134,15 +131,17 @@ export function ensureCommunicationSeeded(): void {
 
   const general: Community = {
     id: generateId(),
-    name: "ATPL PASS Lounge",
-    slug: "atpl-pass-lounge",
+    name: "AviatorPass Lounge",
+    slug: "aviatorpass-lounge",
     description: "General aviation learning community for all enrolled students.",
     kind: "general",
     courseId: null,
     instructorId: null,
     subject: null,
     batchLabel: null,
-    memberIds: users.filter((u) => u.role === ROLES.STUDENT || u.role === ROLES.INSTRUCTOR).map((u) => u.id),
+    memberIds: users
+      .filter((u) => u.role === ROLES.STUDENT || u.role === ROLES.INSTRUCTOR)
+      .map((u) => u.id),
     moderatorIds: [admin.id],
     coverUrl: null,
     isArchived: false,
@@ -190,7 +189,7 @@ export function ensureCommunicationSeeded(): void {
     status: "published",
     authorId: admin.id,
     authorName: adminP.fullName || admin.email,
-    seoTitle: "ATPL Air Law Study Plan | ATPL PASS",
+    seoTitle: "ATPL Air Law Study Plan | AviatorPass",
     seoDescription: "Enterprise study guidance for ATPL Air Law candidates.",
     scheduledAt: null,
     publishedAt: stamp,
@@ -202,7 +201,7 @@ export function ensureCommunicationSeeded(): void {
 
   const announcement: Announcement = {
     id: generateId(),
-    title: "Welcome to the ATPL PASS Communication Center",
+    title: "Welcome to the AviatorPass Communication Center",
     bodyHtml:
       "<p>Messaging, communities, announcements, and support tickets are now live inside the platform.</p>",
     target: "platform",

@@ -26,9 +26,7 @@ function BlogManagerView({ manage = false }: { manage?: boolean }) {
   const [error, setError] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
-    const url = manage
-      ? "/api/communication/blog"
-      : "/api/communication/blog?public=1";
+    const url = manage ? "/api/communication/blog" : "/api/communication/blog?public=1";
     const result = await commFetch<{ posts: BlogPost[]; categories: BlogCategory[] }>(url);
     setPosts(result.data?.posts ?? []);
     setCategories(result.data?.categories ?? []);
@@ -43,7 +41,10 @@ function BlogManagerView({ manage = false }: { manage?: boolean }) {
       title,
       excerpt,
       bodyHtml: bodyHtml.includes("<") ? bodyHtml : `<p>${bodyHtml}</p>`,
-      tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
+      tags: tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
       status,
       seoTitle: seoTitle || null,
       seoDescription: seoDescription || null,
@@ -62,7 +63,7 @@ function BlogManagerView({ manage = false }: { manage?: boolean }) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={manage ? "Blog studio" : "ATPL PASS Blog"}
+        title={manage ? "Blog studio" : "AviatorPass Blog"}
         description={
           manage
             ? "Draft, schedule, and publish articles with SEO metadata."

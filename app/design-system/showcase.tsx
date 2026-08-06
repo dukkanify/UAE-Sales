@@ -9,11 +9,7 @@ import { BrandLogo } from "@/components/brand/brand-logo";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { colorRoles, typographyScale } from "@/config/design-system";
 import { siteConfig } from "@/config/site";
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-} from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Banner } from "@/components/ui/banner";
@@ -89,38 +85,35 @@ function DesignSystemShowcase() {
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <Button
-              variant="outline"
-              onClick={() => toast.success("Toast system is ready")}
-            >
+            <Button variant="outline" onClick={() => toast.success("Toast system is ready")}>
               Test toast
             </Button>
           </div>
         </header>
 
         <nav className="flex flex-wrap gap-2" aria-label="Design system sections">
-          {[
-            "colors",
-            "typography",
-            "buttons",
-            "forms",
-            "feedback",
-            "data",
-            "empty",
-            "motion",
-          ].map((id) => (
-            <Button key={id} variant="secondary" size="sm" asChild>
-              <a href={`#${id}`} className="capitalize">
-                {id}
-              </a>
-            </Button>
-          ))}
+          {["colors", "typography", "buttons", "forms", "feedback", "data", "empty", "motion"].map(
+            (id) => (
+              <Button key={id} variant="secondary" size="sm" asChild>
+                <a href={`#${id}`} className="capitalize">
+                  {id}
+                </a>
+              </Button>
+            ),
+          )}
         </nav>
 
-        <Section id="colors" title="Color roles" description="Deep aviation blue, sky accent, semantic states.">
+        <Section
+          id="colors"
+          title="Color roles"
+          description="Deep aviation blue, sky accent, semantic states."
+        >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(colorRoles).map(([key, swatch]) => (
-              <div key={key} className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
+              <div
+                key={key}
+                className="overflow-hidden rounded-xl border border-border bg-card shadow-soft"
+              >
                 <div className="h-16" style={{ backgroundColor: swatch.value }} />
                 <div className="p-3">
                   <p className="text-label capitalize">{key}</p>
@@ -132,20 +125,28 @@ function DesignSystemShowcase() {
           </div>
         </Section>
 
-        <Section id="typography" title="Typography" description="Plus Jakarta Sans (display) + DM Sans (body). English LTR only.">
+        <Section
+          id="typography"
+          title="Typography"
+          description="Plus Jakarta Sans (display) + DM Sans (body). English LTR only."
+        >
           <Card>
             <CardContent className="space-y-4 pt-6">
               {Object.entries(typographyScale).map(([key, meta]) => (
                 <div key={key} className="border-b border-border pb-3 last:border-0">
                   <p className="text-caption mb-1">{meta.label}</p>
-                  <p className={meta.className}>The quick brown fox jumps over ATPL PASS</p>
+                  <p className={meta.className}>The quick brown fox jumps over AviatorPass</p>
                 </div>
               ))}
             </CardContent>
           </Card>
         </Section>
 
-        <Section id="buttons" title="Buttons" description="Primary, semantic, loading, groups, and split actions.">
+        <Section
+          id="buttons"
+          title="Buttons"
+          description="Primary, semantic, loading, groups, and split actions."
+        >
           <div className="flex flex-wrap gap-2">
             <Button>Primary</Button>
             <Button variant="secondary">Secondary</Button>
@@ -178,7 +179,11 @@ function DesignSystemShowcase() {
           </div>
         </Section>
 
-        <Section id="forms" title="Form controls" description="Inputs for auth, settings, and future modules.">
+        <Section
+          id="forms"
+          title="Form controls"
+          description="Inputs for auth, settings, and future modules."
+        >
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
@@ -266,9 +271,17 @@ function DesignSystemShowcase() {
           </div>
         </Section>
 
-        <Section id="feedback" title="Feedback" description="Alerts, banners, progress, skeletons, spinner.">
+        <Section
+          id="feedback"
+          title="Feedback"
+          description="Alerts, banners, progress, skeletons, spinner."
+        >
           <div className="space-y-3">
-            <Banner variant="info" title="Info banner" description="Non-blocking platform message." />
+            <Banner
+              variant="info"
+              title="Info banner"
+              description="Non-blocking platform message."
+            />
             <Banner variant="success" title="Success" description="Action completed." />
             <Banner variant="warning" title="Warning" description="Review before continuing." />
             <Banner variant="error" title="Error" description="Something needs attention." />
@@ -343,11 +356,17 @@ function DesignSystemShowcase() {
           </Tabs>
         </Section>
 
-        <Section id="motion" title="Motion" description="Framer Motion presets for pages and micro-interactions.">
+        <Section
+          id="motion"
+          title="Motion"
+          description="Framer Motion presets for pages and micro-interactions."
+        >
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Hover lift</CardTitle>
-              <CardDescription>Cards and interactive surfaces use subtle elevation.</CardDescription>
+              <CardDescription>
+                Cards and interactive surfaces use subtle elevation.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-3">
               {[1, 2, 3].map((n) => (
@@ -363,7 +382,8 @@ function DesignSystemShowcase() {
 
         <Separator />
         <p className="text-center text-caption pb-8">
-          ATPL PASS Design System · Light default · Dark + System themes ready · ⌘K command palette in dashboards
+          AviatorPass Design System · Light default · Dark + System themes ready · ⌘K command
+          palette in dashboards
         </p>
       </PageTransition>
     </PublicLayout>

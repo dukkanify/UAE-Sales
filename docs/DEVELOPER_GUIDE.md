@@ -1,4 +1,4 @@
-# Developer guide — ATPL PASS
+# Developer guide — AviatorPass
 
 Onboarding guide for engineers extending the Aviation Education Platform after enterprise refactoring (Task 024).
 

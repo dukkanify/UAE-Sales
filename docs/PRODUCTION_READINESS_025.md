@@ -1,6 +1,6 @@
 # Production readiness verification — Task 025
 
-**Product:** ATPL PASS v1.0 GA  
+**Product:** AviatorPass v1.0 GA  
 **Date:** 2026-08-04  
 **Branch:** `cursor/aep-final-release-0987`
 

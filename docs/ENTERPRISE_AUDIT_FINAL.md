@@ -1,6 +1,6 @@
-# FINAL ENTERPRISE AUDIT — ATPL PASS
+# FINAL ENTERPRISE AUDIT — AviatorPass
 
-**Product:** Aviation Education Platform (ATPL PASS)  
+**Product:** Aviation Education Platform (AviatorPass)  
 **Auditor stance:** Senior software architect — production gate review  
 **Date:** 2026-08-04  
 **Tip audited:** `cursor/aep-enterprise-audit-final-0987` (after Phase 2 roadmap)  

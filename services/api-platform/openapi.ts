@@ -130,11 +130,11 @@ export function buildOpenApiDocument() {
   return {
     openapi: "3.1.0",
     info: {
-      title: "ATPL PASS Mobile & Integrations API",
+      title: "AviatorPass Mobile & Integrations API",
       version: "1.0.0",
       description:
         "Versioned REST API (v1) for iOS/Android/React Native clients, public surfaces, webhooks, and integrations. Cookie session APIs remain under /api/* for the web app.",
-      contact: { name: "ATPL PASS Platform" },
+      contact: { name: "AviatorPass Platform" },
     },
     servers: [{ url: "/", description: "Same origin" }],
     tags: [
@@ -199,7 +199,11 @@ export function buildOpenApiDocument() {
       apiKey: "configurable per key (default 120 / minute)",
     },
     "x-version-history": [
-      { version: "v1", released: "2026-08-04", notes: "Task 018 initial mobile & integrations API" },
+      {
+        version: "v1",
+        released: "2026-08-04",
+        notes: "Task 018 initial mobile & integrations API",
+      },
     ],
   };
 }

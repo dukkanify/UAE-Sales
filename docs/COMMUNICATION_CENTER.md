@@ -1,6 +1,6 @@
 # Communication Center (Task 011)
 
-Enterprise messaging, communities, blog, announcements, support tickets, and moderation for ATPL PASS.
+Enterprise messaging, communities, blog, announcements, support tickets, and moderation for AviatorPass.
 
 ## Scope
 
@@ -26,46 +26,46 @@ Included:
 
 ## Services
 
-| Service | Path |
-|---------|------|
-| Messaging | `services/communication/messaging-service.ts` |
-| Community | `services/communication/community-service.ts` |
-| Blog | `services/communication/blog-service.ts` |
+| Service       | Path                                             |
+| ------------- | ------------------------------------------------ |
+| Messaging     | `services/communication/messaging-service.ts`    |
+| Community     | `services/communication/community-service.ts`    |
+| Blog          | `services/communication/blog-service.ts`         |
 | Announcements | `services/communication/announcement-service.ts` |
-| Support | `services/communication/support-service.ts` |
-| Moderation | `services/communication/moderation-service.ts` |
-| Search | `services/communication/search-service.ts` |
-| Attachments | `services/communication/attachment-service.ts` |
+| Support       | `services/communication/support-service.ts`      |
+| Moderation    | `services/communication/moderation-service.ts`   |
+| Search        | `services/communication/search-service.ts`       |
+| Attachments   | `services/communication/attachment-service.ts`   |
 
 ## Permissions
 
-| Permission | Who |
-|------------|-----|
-| `messaging.own` | All roles |
-| `messaging.manage` | Admin+ |
-| `community.access` | Students (+ staff) |
-| `communities.moderate` | Admin+ |
-| `blog.manage` | Admin+ |
-| `announcements.manage` | Admin, Instructor |
-| `announcements.view` | All |
-| `support.own` | Student, Instructor, Admin |
-| `support.manage` | Admin+ |
+| Permission             | Who                        |
+| ---------------------- | -------------------------- |
+| `messaging.own`        | All roles                  |
+| `messaging.manage`     | Admin+                     |
+| `community.access`     | Students (+ staff)         |
+| `communities.moderate` | Admin+                     |
+| `blog.manage`          | Admin+                     |
+| `announcements.manage` | Admin, Instructor          |
+| `announcements.view`   | All                        |
+| `support.own`          | Student, Instructor, Admin |
+| `support.manage`       | Admin+                     |
 
 ## API
 
-| Path | Purpose |
-|------|---------|
-| `/api/communication/conversations` | List / start DM or group |
+| Path                                   | Purpose                                         |
+| -------------------------------------- | ----------------------------------------------- |
+| `/api/communication/conversations`     | List / start DM or group                        |
 | `/api/communication/conversations/:id` | Thread, send, read, typing, mute/archive/delete |
-| `/api/communication/communities` | List / create / join |
-| `/api/communication/communities/:id` | Feed, post, comment, pin |
-| `/api/communication/blog` | Public/admin blog + comments |
-| `/api/communication/announcements` | List / publish |
-| `/api/communication/tickets` | Tickets, replies, stats |
-| `/api/communication/moderation` | Rules + logs |
-| `/api/communication/search` | Global search |
-| `/api/communication/upload` | Attachments |
-| `/api/communication/directory` | User directory for DMs |
+| `/api/communication/communities`       | List / create / join                            |
+| `/api/communication/communities/:id`   | Feed, post, comment, pin                        |
+| `/api/communication/blog`              | Public/admin blog + comments                    |
+| `/api/communication/announcements`     | List / publish                                  |
+| `/api/communication/tickets`           | Tickets, replies, stats                         |
+| `/api/communication/moderation`        | Rules + logs                                    |
+| `/api/communication/search`            | Global search                                   |
+| `/api/communication/upload`            | Attachments                                     |
+| `/api/communication/directory`         | User directory for DMs                          |
 
 ## UI
 

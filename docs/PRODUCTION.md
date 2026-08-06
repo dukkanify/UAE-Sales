@@ -1,6 +1,6 @@
 # Production readiness — Task 015
 
-This guide covers security, environments, monitoring, backups, CI/CD, and launch readiness for ATPL PASS (Next.js App Router).
+This guide covers security, environments, monitoring, backups, CI/CD, and launch readiness for AviatorPass (Next.js App Router).
 
 ## Architecture (runtime)
 

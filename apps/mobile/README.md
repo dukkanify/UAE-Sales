@@ -1,4 +1,4 @@
-# ATPL PASS Mobile (Phase 2)
+# AviatorPass Mobile (Phase 2)
 
 React Native applications for **iOS** and **Android** (student + instructor).
 

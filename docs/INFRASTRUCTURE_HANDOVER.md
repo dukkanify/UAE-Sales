@@ -1,4 +1,4 @@
-# Infrastructure handover — ATPL PASS
+# Infrastructure handover — AviatorPass
 
 Fill operator-specific IDs/URLs at go-live. Architecture detail: `docs/ARCHITECTURE.md`, `docs/DEPLOYMENT.md`.
 

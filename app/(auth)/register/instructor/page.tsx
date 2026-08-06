@@ -17,7 +17,7 @@ import { brandingConfig } from "@/config/branding";
 
 export const metadata: Metadata = {
   title: "Instructor registration",
-  description: `Register as an ATPL PASS instructor — teach courses and run live Zoom coaching on ${siteConfig.name}.`,
+  description: `Register as an AviatorPass instructor — teach courses and run live Zoom coaching on ${siteConfig.name}.`,
   alternates: { canonical: routes.registerInstructor },
 };
 
@@ -35,7 +35,7 @@ export default function InstructorRegisterPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
               {brandingConfig.tagline}
             </p>
-            <CardTitle className="font-display text-2xl">Teach on ATPL PASS</CardTitle>
+            <CardTitle className="font-display text-2xl">Teach on AviatorPass</CardTitle>
             <CardDescription>
               Create your instructor account to manage assigned courses, students, and live Zoom
               sessions.

@@ -1,5 +1,5 @@
 /**
- * Default platform settings — ATPL PASS (official brand guidelines applied).
+ * Default platform settings — AviatorPass (official brand guidelines applied).
  * Typography still pending Stimulatio Flat licensed files (Space Grotesk substitute).
  */
 
@@ -7,8 +7,8 @@ import type { PlatformSettings } from "@/types/settings";
 
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   general: {
-    platformName: "ATPL PASS",
-    companyName: "ATPL PASS",
+    platformName: "AviatorPass",
+    companyName: "AviatorPass",
     websiteUrl: "http://localhost:3000",
     contactEmail: "ME@ABDULAZIZALSHOAIL.COM",
     contactPhone: "",
@@ -44,7 +44,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     typographyDisplay: "Space Grotesk",
     typographyBody: "IBM Plex Sans",
     footerInformation:
-      "ATPL PASS — Kuwait & Dubai. Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
+      "AviatorPass — Kuwait & Dubai. Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
     brandGuidelinesPending: false,
     colorPalettePending: false,
     typographyPending: true,
@@ -57,7 +57,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     smtpUsername: "",
     smtpPassword: "",
     encryption: "tls",
-    senderName: "ATPL PASS",
+    senderName: "AviatorPass",
     senderEmail: "ME@ABDULAZIZALSHOAIL.COM",
     replyToEmail: "ME@ABDULAZIZALSHOAIL.COM",
   },
@@ -94,7 +94,7 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     rateLimitRequestsPerMinute: 60,
     ipBlockingEnabled: false,
     blockedIps: [],
-    trustedDomains: ["localhost", "atplpass.com"],
+    trustedDomains: ["localhost", "aviatorpass.com"],
     allowedFileTypes: ["image/png", "image/jpeg", "image/webp", "image/svg+xml", "application/pdf"],
     maxUploadSizeMb: 10,
     twoFactorAuthEnabled: false,

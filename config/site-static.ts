@@ -5,11 +5,11 @@
  */
 
 export const siteStatic = {
-  name: "ATPL PASS",
-  shortName: "ATPL",
-  legalName: "ATPL PASS",
+  name: "AviatorPass",
+  shortName: "Aviator",
+  legalName: "AviatorPass",
   description:
-    "ATPL PASS is the aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
+    "AviatorPass is the aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
   locale: "en",
   direction: "ltr" as const,
   contactEmail: "ME@ABDULAZIZALSHOAIL.COM",

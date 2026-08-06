@@ -110,18 +110,15 @@ export function generateAssistantReply(input: {
         `**Course recommendations**`,
         grounded,
         ``,
-        ...context.enrolledCourses.slice(0, 3).map(
-          (c, i) =>
-            `${i + 1}. Continue **${c.title}** — currently ${c.progress}% complete.`,
-        ),
+        ...context.enrolledCourses
+          .slice(0, 3)
+          .map((c, i) => `${i + 1}. Continue **${c.title}** — currently ${c.progress}% complete.`),
         context.enrolledCourses.length
           ? `After finishing your active path, explore related categories in the catalog.`
           : `Browse the catalog and enroll to unlock personalized recommendations.`,
       ].join("\n");
     case "practice_questions":
-      return formatQuestions(
-        buildPracticeQuestions(message, "medium", context),
-      );
+      return formatQuestions(buildPracticeQuestions(message, "medium", context));
     case "exam_prep":
       return [
         `**Exam preparation plan**`,
@@ -217,7 +214,7 @@ export function generateAssistantReply(input: {
       ].join("\n");
     default:
       return [
-        `I’m your ${persona} AI learning assistant for ATPL PASS.`,
+        `I’m your ${persona} AI learning assistant for AviatorPass.`,
         grounded,
         ``,
         `I can explain lessons, summarize content, generate practice questions, build study plans, draft instructor/admin writing, and search the platform — without replacing your instructor.`,
@@ -237,7 +234,8 @@ export function buildPracticeQuestions(
 ): AiGeneratedQuestion[] {
   const focus =
     context.enrolledCourses[0]?.title ??
-    (topic.match(/about (.+)$/i)?.[1] ?? "aviation fundamentals");
+    topic.match(/about (.+)$/i)?.[1] ??
+    "aviation fundamentals";
   const base = focus.slice(0, 48);
   return [
     {
@@ -285,7 +283,9 @@ function formatQuestions(qs: AiGeneratedQuestion[]) {
   return [
     `**Practice set** (${qs.length} items)`,
     ...qs.map((q, i) => {
-      const opts = q.options?.map((o, idx) => `   ${String.fromCharCode(65 + idx)}. ${o}`).join("\n");
+      const opts = q.options
+        ?.map((o, idx) => `   ${String.fromCharCode(65 + idx)}. ${o}`)
+        .join("\n");
       return [
         `${i + 1}. [${q.type} · ${q.difficulty}] ${q.prompt}`,
         opts ?? "",
