@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Copy, ExternalLink, Radio, Shield, Video } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -69,7 +69,7 @@ function BookingJoinLobby({ bookingId }: BookingJoinLobbyProps) {
       <div className="booking-aurora flex min-h-screen flex-col items-center justify-center px-4 text-center text-white">
         <div className="booking-grid-fade absolute inset-0" />
         <div className="relative z-10 max-w-md">
-          <BrandLogo variant="dark" />
+          <BrandLogo variant="dark" href={routes.home} />
           <h1 className="mt-8 font-display text-3xl font-semibold">Lobby locked</h1>
           <p className="mt-3 text-white/65">{error ?? "Session unavailable"}</p>
           <Button className="mt-8" variant="accent" asChild>

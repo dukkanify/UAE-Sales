@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { siteStatic } from "@/config/site-static";
 import { routes } from "@/constants/routes";

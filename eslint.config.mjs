@@ -23,6 +23,25 @@ const eslintConfig = [
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    // Only AppLink may import next/link — prevents undefined href from reaching Next Link.
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    ignores: ["components/ui/app-link.tsx"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "next/link",
+              message:
+                "Import Link from `@/components/ui/app-link` instead of `next/link` so undefined href cannot crash the app.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default eslintConfig;

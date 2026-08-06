@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 
@@ -38,9 +38,7 @@ function CategoryManager({ basePath, roleLabel }: CategoryManagerProps) {
 
   const load = React.useCallback(async () => {
     setLoading(true);
-    const result = await courseFetch<CourseCategory[]>(
-      "/api/courses/categories?includeHidden=1",
-    );
+    const result = await courseFetch<CourseCategory[]>("/api/courses/categories?includeHidden=1");
     setCategories(result.data ?? []);
     setLoading(false);
   }, []);

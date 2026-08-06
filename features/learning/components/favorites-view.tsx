@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Star } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -53,9 +53,7 @@ function FavoritesView() {
               <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
                 <div>
                   <CardTitle className="text-base">{item.label}</CardTitle>
-                  <p className="mt-1 text-xs uppercase text-muted-foreground">
-                    {item.targetType}
-                  </p>
+                  <p className="mt-1 text-xs uppercase text-muted-foreground">{item.targetType}</p>
                 </div>
                 <Button size="sm" variant="ghost" onClick={() => void remove(item.id)}>
                   Remove

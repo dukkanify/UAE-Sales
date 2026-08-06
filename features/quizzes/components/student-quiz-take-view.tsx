@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useParams, useRouter } from "next/navigation";
 import { Clock3 } from "lucide-react";
 
@@ -114,9 +114,7 @@ function StudentQuizTakeView() {
           questionId,
           response,
         })),
-        timeSpentSeconds: Math.floor(
-          (Date.now() - Date.parse(attempt.startedAt)) / 1000,
-        ),
+        timeSpentSeconds: Math.floor((Date.now() - Date.parse(attempt.startedAt)) / 1000),
         clientMeta: { path: window.location.pathname },
       });
     }, 15_000);
@@ -225,9 +223,7 @@ function StudentQuizTakeView() {
           <QuestionInput
             question={current}
             value={responses[current.id]}
-            onChange={(value) =>
-              setResponses((prev) => ({ ...prev, [current.id]: value }))
-            }
+            onChange={(value) => setResponses((prev) => ({ ...prev, [current.id]: value }))}
           />
         </CardContent>
       </Card>
@@ -261,10 +257,7 @@ function QuestionInput({
   value: unknown;
   onChange: (value: unknown) => void;
 }) {
-  if (
-    question.type === "multiple_choice_single" ||
-    question.type === "true_false"
-  ) {
+  if (question.type === "multiple_choice_single" || question.type === "true_false") {
     return (
       <div className="space-y-2">
         {question.options.map((opt) => (
@@ -300,9 +293,7 @@ function QuestionInput({
                 checked={checked}
                 onChange={() => {
                   onChange(
-                    checked
-                      ? selected.filter((id) => id !== opt.id)
-                      : [...selected, opt.id],
+                    checked ? selected.filter((id) => id !== opt.id) : [...selected, opt.id],
                   );
                 }}
               />
@@ -314,9 +305,7 @@ function QuestionInput({
     );
   }
   if (question.type === "ordering") {
-    const order = Array.isArray(value)
-      ? (value as string[])
-      : question.options.map((o) => o.id);
+    const order = Array.isArray(value) ? (value as string[]) : question.options.map((o) => o.id);
     return (
       <div className="space-y-2">
         <p className="text-xs text-muted-foreground">Enter option ids in order, comma-separated.</p>
@@ -350,9 +339,7 @@ function QuestionInput({
       />
     );
   }
-  return (
-    <Input value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} />
-  );
+  return <Input value={String(value ?? "")} onChange={(e) => onChange(e.target.value)} />;
 }
 
 export { StudentQuizTakeView };

@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { formatDate } from "@/utils/format";
 import type { KpiCard } from "@/types/analytics";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 interface MonitoringData {
   recentLogins: Array<{

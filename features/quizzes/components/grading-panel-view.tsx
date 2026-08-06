@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -88,10 +88,7 @@ function GradingPanelView({ basePath = "/instructor/quizzes" }: GradingPanelView
       <PageHeader
         title="Instructor grading"
         description="Manual review for essays and short answers, feedback, score adjustment, and final approval."
-        breadcrumbs={[
-          { label: "Quizzes", href: basePath },
-          { label: "Grading" },
-        ]}
+        breadcrumbs={[{ label: "Quizzes", href: basePath }, { label: "Grading" }]}
       />
 
       <div className="flex flex-wrap gap-3">
@@ -139,7 +136,12 @@ function GradingPanelView({ basePath = "/instructor/quizzes" }: GradingPanelView
         {selected ? (
           <div className="space-y-4">
             {selected.answers
-              .filter((a) => a.needsManualGrading || a.question?.type === "essay" || a.question?.type === "short_answer")
+              .filter(
+                (a) =>
+                  a.needsManualGrading ||
+                  a.question?.type === "essay" ||
+                  a.question?.type === "short_answer",
+              )
               .map((a) => (
                 <ManualAnswerCard
                   key={a.id}
@@ -182,7 +184,9 @@ function ManualAnswerCard({
   answer: QuizAnswer & { question: BankQuestion | null };
   onGrade: (score: number, feedback: string) => void;
 }) {
-  const [score, setScore] = React.useState(String(answer.manualScore ?? answer.question?.points ?? 0));
+  const [score, setScore] = React.useState(
+    String(answer.manualScore ?? answer.question?.points ?? 0),
+  );
   const [feedback, setFeedback] = React.useState(answer.feedback ?? "");
   return (
     <Card>
@@ -206,10 +210,7 @@ function ManualAnswerCard({
           onChange={(e) => setFeedback(e.target.value)}
           placeholder="Feedback"
         />
-        <Button
-          size="sm"
-          onClick={() => onGrade(Number(score) || 0, feedback)}
-        >
+        <Button size="sm" onClick={() => onGrade(Number(score) || 0, feedback)}>
           Save grade
         </Button>
       </CardContent>

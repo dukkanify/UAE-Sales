@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { BookOpen, Plus } from "lucide-react";
 import { toast } from "sonner";
 

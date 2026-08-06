@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Clock3, Mail, Phone, RefreshCw, Wrench } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,10 @@ export function MaintenanceStatusView({ status }: { status: MaintenanceStatus })
           {status.contactEmail ? (
             <p className="flex items-center justify-center gap-2">
               <Mail className="h-4 w-4" aria-hidden />
-              <a className="underline-offset-2 hover:underline" href={`mailto:${status.contactEmail}`}>
+              <a
+                className="underline-offset-2 hover:underline"
+                href={`mailto:${status.contactEmail}`}
+              >
                 {status.contactEmail}
               </a>
             </p>

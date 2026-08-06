@@ -5,8 +5,8 @@ import type { Role } from "@/constants/roles";
 export const NAV_ITEMS = [
   { label: "Platform", href: "/" },
   { label: "Courses", href: "/courses" },
-  { label: "Flightpath", href: "/#flightpath" },
-  { label: "Live", href: "/#live" },
+  { label: "Flightpath", href: { pathname: "/", hash: "flightpath" } },
+  { label: "Live", href: { pathname: "/", hash: "live" } },
   { label: "Book", href: "/book" },
 ] as const;
 

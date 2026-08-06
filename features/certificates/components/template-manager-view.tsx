@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
@@ -44,10 +44,7 @@ function TemplateManagerView({ basePath = "/admin/certificates" }: TemplateManag
       <PageHeader
         title="Certificate templates"
         description="Reusable layouts with branding, logo, colors, signature, and dynamic fields."
-        breadcrumbs={[
-          { label: "Certificates", href: basePath },
-          { label: "Templates" },
-        ]}
+        breadcrumbs={[{ label: "Certificates", href: basePath }, { label: "Templates" }]}
       />
 
       <Card>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { HelpCircle, PlayCircle } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -78,7 +78,8 @@ function StudentQuizCard({ quiz }: { quiz: QuizListItem }) {
         </p>
         {latest && latest.status !== "in_progress" ? (
           <Badge variant="secondary">
-            Last: {latest.percent ?? "—"}% · {latest.passed == null ? latest.gradeStatus : latest.passed ? "Pass" : "Fail"}
+            Last: {latest.percent ?? "—"}% ·{" "}
+            {latest.passed == null ? latest.gradeStatus : latest.passed ? "Pass" : "Fail"}
           </Badge>
         ) : null}
         <div className="flex flex-wrap gap-2">

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
@@ -10,6 +10,18 @@ import { routes } from "@/constants/routes";
 import { NAV_ITEMS } from "@/constants/navigation";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand/brand-logo";
+
+function navHrefKey(href: (typeof NAV_ITEMS)[number]["href"]): string {
+  if (typeof href === "string") return href;
+  const path = href.pathname ?? "/";
+  const hash = href.hash ? `#${href.hash.replace(/^#/, "")}` : "";
+  return `${path}${hash}`;
+}
+
+function navPathname(href: (typeof NAV_ITEMS)[number]["href"]): string {
+  if (typeof href === "string") return href.split("#")[0] || "/";
+  return href.pathname || "/";
+}
 
 function Header() {
   const pathname = usePathname();
@@ -38,17 +50,18 @@ function Header() {
       )}
     >
       <div className="container-app flex h-[4.75rem] items-center justify-between gap-4">
-        <BrandLogo variant="dark" priority />
+        <BrandLogo variant="dark" href={routes.home} priority />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
+            const itemPath = navPathname(item.href);
             const active =
-              item.href === "/"
-                ? pathname === "/"
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
+              itemPath === "/"
+                ? pathname === "/" && typeof item.href === "string"
+                : pathname === itemPath || pathname.startsWith(`${itemPath}/`);
             return (
               <Link
-                key={item.href}
+                key={navHrefKey(item.href)}
                 href={item.href}
                 className={cn(
                   "rounded-md px-3.5 py-2 text-[12px] font-semibold tracking-[0.16em] uppercase transition-colors",
@@ -97,7 +110,7 @@ function Header() {
           <nav className="container-app flex flex-col gap-1 py-4" aria-label="Mobile">
             {NAV_ITEMS.map((item) => (
               <Link
-                key={item.href}
+                key={navHrefKey(item.href)}
                 href={item.href}
                 className="rounded-xl px-3 py-2.5 text-sm font-medium text-white/85 hover:bg-white/10"
               >

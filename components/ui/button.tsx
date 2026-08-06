@@ -41,6 +41,15 @@ const buttonVariants = cva(
   },
 );
 
+/** Prevent `href={undefined}` (and similar) from Slot-merging onto Next.js Link. */
+function omitUndefinedProps<T extends Record<string, unknown>>(props: T): Partial<T> {
+  const next: Partial<T> = {};
+  for (const key of Object.keys(props) as Array<keyof T>) {
+    if (props[key] !== undefined) next[key] = props[key];
+  }
+  return next;
+}
+
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
@@ -49,9 +58,11 @@ export interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading, disabled, children, ...props }, ref) => {
+    const safeProps = omitUndefinedProps(props as Record<string, unknown>);
+
     if (asChild) {
       return (
-        <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
+        <Slot className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...safeProps}>
           {children}
         </Slot>
       );
@@ -63,7 +74,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         aria-busy={loading || undefined}
-        {...props}
+        {...safeProps}
       >
         {loading ? <Loader2 className="animate-spin" aria-hidden /> : null}
         {children}

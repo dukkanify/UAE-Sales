@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Award, Plus } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -73,7 +73,13 @@ function CertificateManageView({
               <Link href={`${basePath}/templates`}>Templates</Link>
             </Button>
             <Button asChild variant="outline" size="sm">
-              <Link href={roleLabel.includes("Instructor") ? "/instructor/reports" : `${basePath.replace("/certificates", "/reports")}`}>
+              <Link
+                href={
+                  roleLabel.includes("Instructor")
+                    ? "/instructor/reports"
+                    : `${basePath.replace("/certificates", "/reports")}`
+                }
+              >
                 Reports
               </Link>
             </Button>
@@ -116,9 +122,7 @@ function CertificateManageView({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">
-                  {CERTIFICATE_STATUS_LABELS[cert.status]}
-                </Badge>
+                <Badge variant="secondary">{CERTIFICATE_STATUS_LABELS[cert.status]}</Badge>
                 {cert.status === "pending_approval" ? (
                   <Button size="sm" onClick={() => void action(cert.id, "approve")}>
                     Approve

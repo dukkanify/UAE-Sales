@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import type { Metadata } from "next";
 
 import { RegisterForm } from "@/features/auth/components/register-form";
