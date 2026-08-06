@@ -27,20 +27,25 @@ export type RuntimeBrand = {
 };
 
 const FALLBACK: RuntimeBrand = {
-  platformName: siteConfig.name,
-  logoUrl: siteConfig.brand.logo,
-  darkLogoUrl: siteConfig.brand.logoDark,
-  faviconUrl: siteConfig.brand.favicon,
-  openGraphImageUrl: siteConfig.brand.openGraph,
-  contactEmail: siteConfig.contactEmail,
-  supportEmail: siteConfig.supportEmail,
-  locations: [...siteConfig.locations],
-  socialHandle: siteConfig.socialHandle,
-  socialLinks: { ...siteConfig.social },
-  footerText: siteConfig.description,
+  platformName: siteConfig?.name ?? "ATPL PASS",
+  logoUrl: siteConfig?.brand?.logo ?? "/brand/logo.svg",
+  darkLogoUrl: siteConfig?.brand?.logoDark ?? "/brand/logo-dark.svg",
+  faviconUrl: siteConfig?.brand?.favicon ?? "/brand/favicon.svg",
+  openGraphImageUrl: siteConfig?.brand?.openGraph ?? "/brand/og.svg",
+  contactEmail: siteConfig?.contactEmail ?? "ME@ABDULAZIZALSHOAIL.COM",
+  supportEmail: siteConfig?.supportEmail ?? "ME@ABDULAZIZALSHOAIL.COM",
+  locations: [...(siteConfig?.locations ?? ["Kuwait", "Dubai"])],
+  socialHandle: siteConfig?.socialHandle ?? "@ABDULAZIZ_ALSHOAIL",
+  socialLinks: {
+    instagram: siteConfig?.social?.instagram ?? "",
+    twitter: siteConfig?.social?.twitter ?? "",
+    linkedin: siteConfig?.social?.linkedin ?? "",
+    youtube: siteConfig?.social?.youtube ?? "",
+  },
+  footerText: siteConfig?.description ?? "ATPL PASS aviation course platform",
   primaryColor: "#2E7DAA",
   accentColor: "#DD9B30",
-  metaDescription: siteConfig.description,
+  metaDescription: siteConfig?.description ?? "ATPL PASS aviation course platform",
 };
 
 const BrandContext = React.createContext<RuntimeBrand>(FALLBACK);
@@ -58,7 +63,16 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .then((r) => r.json())
         .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
           if (cancelled || !json.success || !json.data) return;
-          setBrand({ ...FALLBACK, ...json.data });
+          const next = { ...FALLBACK, ...json.data };
+          // Never allow empty asset URLs to wipe fallbacks (HMR / partial API payloads).
+          setBrand({
+            ...next,
+            platformName: next.platformName || FALLBACK.platformName,
+            logoUrl: next.logoUrl || FALLBACK.logoUrl,
+            darkLogoUrl: next.darkLogoUrl || FALLBACK.darkLogoUrl,
+            faviconUrl: next.faviconUrl || FALLBACK.faviconUrl,
+            openGraphImageUrl: next.openGraphImageUrl || FALLBACK.openGraphImageUrl,
+          });
         })
         .catch(() => {
           /* keep fallback */

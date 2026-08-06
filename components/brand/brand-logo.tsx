@@ -16,6 +16,12 @@ interface BrandLogoProps {
   showWordmark?: boolean;
 }
 
+const FALLBACK_ASSETS = {
+  logo: "/brand/logo.svg",
+  logoDark: "/brand/logo-dark.svg",
+  icon: "/brand/icon.svg",
+} as const;
+
 function BrandLogo({
   className,
   href = routes.home,
@@ -24,13 +30,14 @@ function BrandLogo({
   showWordmark = false,
 }: BrandLogoProps) {
   const brand = useBrand();
-  const name = brand.platformName || siteConfig.name;
+  const assets = siteConfig?.brand ?? FALLBACK_ASSETS;
+  const name = brand?.platformName || siteConfig?.name || "ATPL PASS";
   const src =
     variant === "mark"
-      ? brand.faviconUrl || siteConfig.brand.icon
+      ? brand?.faviconUrl || assets.icon || FALLBACK_ASSETS.icon
       : variant === "dark"
-        ? brand.darkLogoUrl || siteConfig.brand.logoDark
-        : brand.logoUrl || siteConfig.brand.logo;
+        ? brand?.darkLogoUrl || assets.logoDark || FALLBACK_ASSETS.logoDark
+        : brand?.logoUrl || assets.logo || FALLBACK_ASSETS.logo;
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
