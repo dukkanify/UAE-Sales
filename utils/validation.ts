@@ -64,14 +64,44 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+export const requiredPhoneSchema = z.string().trim().min(7, "Enter a valid phone number").max(20);
+
+export const genderSchema = z
+  .enum(["male", "female", "other", "prefer_not_to_say"])
+  .or(z.literal(""));
+
 export const completeProfileSchema = z.object({
   firstName: nameSchema,
   lastName: nameSchema,
-  phone: phoneSchema,
-  countryCode: z.string().length(2).optional().or(z.literal("")),
-  nationality: z.string().max(80).optional().or(z.literal("")),
+  phone: requiredPhoneSchema,
+  countryCode: z.string().length(2, "Select your country"),
+  nationality: z.string().trim().min(2, "Enter your nationality").max(80),
+  dateOfBirth: z.string().max(32).optional().or(z.literal("")),
+  gender: genderSchema.optional(),
+  city: z.string().trim().max(80).optional().or(z.literal("")),
+  bio: z.string().trim().max(500).optional().or(z.literal("")),
+  emergencyContactName: z.string().trim().max(80).optional().or(z.literal("")),
+  emergencyContactPhone: z.string().trim().max(20).optional().or(z.literal("")),
   timezone: z.string().min(1).max(64).default("UTC"),
   language: z.string().min(2).max(10).default("en"),
+});
+
+/** Partial updates for an existing account (student or instructor). */
+export const updateProfileSchema = z.object({
+  firstName: nameSchema.optional(),
+  lastName: nameSchema.optional(),
+  phone: requiredPhoneSchema.optional().or(z.literal("")),
+  countryCode: z.string().length(2).optional().or(z.literal("")),
+  nationality: z.string().trim().max(80).optional().or(z.literal("")),
+  dateOfBirth: z.string().max(32).optional().or(z.literal("")),
+  gender: genderSchema.optional(),
+  city: z.string().trim().max(80).optional().or(z.literal("")),
+  bio: z.string().trim().max(500).optional().or(z.literal("")),
+  emergencyContactName: z.string().trim().max(80).optional().or(z.literal("")),
+  emergencyContactPhone: z.string().trim().max(20).optional().or(z.literal("")),
+  timezone: z.string().min(1).max(64).optional(),
+  language: z.string().min(2).max(10).optional(),
+  avatarUrl: z.string().url().optional().or(z.literal("")).or(z.null()),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
@@ -80,3 +110,4 @@ export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type CompleteProfileInput = z.infer<typeof completeProfileSchema>;
+export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

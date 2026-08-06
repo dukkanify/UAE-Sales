@@ -11,16 +11,12 @@ import {
   PlayCircle,
   Search,
   Star,
+  UserRound,
   Video,
 } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
-import {
-  StatCard,
-  ProgressWidget,
-  QuickActions,
-  RecentActivity,
-} from "@/components/dashboard";
+import { StatCard, ProgressWidget, QuickActions, RecentActivity } from "@/components/dashboard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -108,33 +104,21 @@ function LearningDashboardView() {
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Active courses" value={overview.activeCourses} icon={BookOpen} />
-            <StatCard
-              label="Completed courses"
-              value={overview.completedCourses}
-              icon={Star}
-            />
+            <StatCard label="Completed courses" value={overview.completedCourses} icon={Star} />
             <StatCard
               label="Upcoming live class"
               value={overview.upcomingLiveClass ? "Scheduled" : "None"}
               hint={overview.upcomingLiveClass ?? "No upcoming sessions"}
               icon={Video}
             />
-            <StatCard
-              label="Learning hours"
-              value={`${overview.learningHours}h`}
-              icon={Clock3}
-            />
+            <StatCard label="Learning hours" value={`${overview.learningHours}h`} icon={Clock3} />
             <StatCard
               label="Progress"
               value={`${Math.round(overview.progressPercent)}%`}
               icon={PlayCircle}
             />
             <StatCard label="Assignments" value={overview.assignments} icon={FolderOpen} />
-            <StatCard
-              label="Notifications"
-              value={overview.notifications}
-              icon={Bookmark}
-            />
+            <StatCard label="Notifications" value={overview.notifications} icon={Bookmark} />
             <StatCard
               label="Weekly goal"
               value={`${overview.weeklyGoalPercent}%`}
@@ -157,19 +141,37 @@ function LearningDashboardView() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             <RecentActivity items={activity} title="Recent activity" />
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Next live class</CardTitle>
-                <CardDescription>
-                  {overview.upcomingLiveClass ?? "Nothing scheduled yet"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline">
-                  <Link href="/student/calendar">Open calendar</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">My student account</CardTitle>
+                  <CardDescription>
+                    View and edit your personal details, contact info, and emergency contacts.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline">
+                    <Link href="/student/profile">
+                      <UserRound className="size-4" />
+                      Open my account
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Next live class</CardTitle>
+                  <CardDescription>
+                    {overview.upcomingLiveClass ?? "Nothing scheduled yet"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button asChild variant="outline">
+                    <Link href="/student/calendar">Open calendar</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           <QuickActions
@@ -181,6 +183,7 @@ function LearningDashboardView() {
                 icon: Video,
               },
               { label: "Open Calendar", href: "/student/calendar", icon: CalendarDays },
+              { label: "My Account", href: "/student/profile", icon: UserRound },
               { label: "View Resources", href: "/student/resources", icon: FolderOpen },
               { label: "Search", href: "/student/search", icon: Search },
             ]}

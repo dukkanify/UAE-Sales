@@ -14,6 +14,12 @@ export interface UserProfile {
   phone: string | null;
   countryCode: string | null;
   nationality: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  city: string | null;
+  bio: string | null;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
   avatarUrl: string | null;
   timezone: string;
   language: string;

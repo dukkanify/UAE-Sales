@@ -5,57 +5,65 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { completeProfileSchema } from "@/utils/validation";
 import { sanitizeString } from "@/utils/sanitize";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
-import { COUNTRIES } from "@/constants/countries";
 import { useAuth } from "@/providers/auth-provider";
+import {
+  StudentAccountFields,
+  type StudentAccountFieldValues,
+} from "@/features/profile/components/student-account-fields";
 import type { UserProfile } from "@/types";
+
+function emptyValues(user: UserProfile | null): StudentAccountFieldValues {
+  return {
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
+    phone: user?.phone ?? "",
+    countryCode: user?.countryCode ?? "",
+    nationality: user?.nationality ?? "",
+    dateOfBirth: user?.dateOfBirth ?? "",
+    gender: (user?.gender as StudentAccountFieldValues["gender"]) ?? "",
+    city: user?.city ?? "",
+    bio: user?.bio ?? "",
+    emergencyContactName: user?.emergencyContactName ?? "",
+    emergencyContactPhone: user?.emergencyContactPhone ?? "",
+    timezone: user?.timezone ?? "UTC",
+    language: user?.language ?? "en",
+  };
+}
 
 function CompleteProfileForm() {
   const router = useRouter();
   const { user, refresh, setUser } = useAuth();
-  const [firstName, setFirstName] = React.useState(user?.firstName ?? "");
-  const [lastName, setLastName] = React.useState(user?.lastName ?? "");
-  const [phone, setPhone] = React.useState(user?.phone ?? "");
-  const [countryCode, setCountryCode] = React.useState(user?.countryCode ?? "");
-  const [nationality, setNationality] = React.useState(user?.nationality ?? "");
-  const [timezone, setTimezone] = React.useState(user?.timezone ?? "UTC");
-  const [language, setLanguage] = React.useState(user?.language ?? "en");
+  const [values, setValues] = React.useState<StudentAccountFieldValues>(() => emptyValues(user));
   const [pending, setPending] = React.useState(false);
 
   React.useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName ?? "");
-      setLastName(user.lastName ?? "");
-      setPhone(user.phone ?? "");
-      setCountryCode(user.countryCode ?? "");
-      setNationality(user.nationality ?? "");
-      setTimezone(user.timezone ?? "UTC");
-      setLanguage(user.language ?? "en");
-    }
+    if (user) setValues(emptyValues(user));
   }, [user]);
+
+  const onChange = (patch: Partial<StudentAccountFieldValues>) => {
+    setValues((prev) => ({ ...prev, ...patch }));
+  };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = completeProfileSchema.safeParse({
-      firstName: sanitizeString(firstName),
-      lastName: sanitizeString(lastName),
-      phone: phone ? sanitizeString(phone) : "",
-      countryCode,
-      nationality,
-      timezone,
-      language,
+      firstName: sanitizeString(values.firstName),
+      lastName: sanitizeString(values.lastName),
+      phone: sanitizeString(values.phone),
+      countryCode: values.countryCode,
+      nationality: sanitizeString(values.nationality),
+      dateOfBirth: values.dateOfBirth || "",
+      gender: values.gender || "",
+      city: sanitizeString(values.city),
+      bio: sanitizeString(values.bio),
+      emergencyContactName: sanitizeString(values.emergencyContactName),
+      emergencyContactPhone: sanitizeString(values.emergencyContactPhone),
+      timezone: values.timezone,
+      language: values.language,
     });
 
     if (!parsed.success) {
@@ -77,7 +85,7 @@ function CompleteProfileForm() {
 
       setUser(result.data.user);
       await refresh();
-      toast.success("Profile completed");
+      toast.success("Student account ready");
       router.replace(result.data.redirectTo);
     } finally {
       setPending(false);
@@ -85,56 +93,14 @@ function CompleteProfileForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">First name</Label>
-          <Input id="firstName" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="lastName">Last name</Label>
-          <Input id="lastName" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
-        <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+971..." />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label>Country</Label>
-          <Select value={countryCode || undefined} onValueChange={setCountryCode}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent>
-              {COUNTRIES.map((c) => (
-                <SelectItem key={c.code} value={c.code}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="nationality">Nationality</Label>
-          <Input
-            id="nationality"
-            value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
-          />
-        </div>
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="timezone">Timezone</Label>
-          <Input id="timezone" value={timezone} onChange={(e) => setTimezone(e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="language">Language</Label>
-          <Input id="language" value={language} onChange={(e) => setLanguage(e.target.value)} />
-        </div>
-      </div>
+    <form onSubmit={onSubmit} className="space-y-6">
+      <StudentAccountFields
+        values={values}
+        onChange={onChange}
+        requireStudentBasics
+        emailReadonly={user?.email}
+        disabled={pending}
+      />
       <Button type="submit" className="w-full" disabled={pending}>
         {pending ? "Saving..." : "Save and continue"}
       </Button>
