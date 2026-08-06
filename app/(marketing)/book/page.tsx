@@ -75,9 +75,7 @@ export default function PublicBookPage() {
           },
         }}
       />
-      <div className="container-app">
-        <BookStudioClient />
-      </div>
+      <BookStudioClient />
     </>
   );
 }

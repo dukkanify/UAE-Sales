@@ -1,4 +1,37 @@
-/* Zoom booking experience — atmospheric motion & lobby chrome */
+/* Zoom booking experience — atmospheric motion & smart studio chrome */
+
+.booking-hero {
+  position: relative;
+  overflow: hidden;
+  background-color: #03080c;
+  background-image:
+    radial-gradient(ellipse 85% 70% at 92% -15%, rgba(46, 125, 170, 0.48), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 0% 110%, rgba(221, 155, 48, 0.18), transparent 52%),
+    linear-gradient(165deg, #03080c 0%, #0a1620 48%, #123044 100%);
+}
+
+.booking-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: linear-gradient(180deg, black, transparent 88%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.booking-hero::after {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(221, 155, 48, 0.5), transparent);
+  pointer-events: none;
+}
 
 .booking-aurora {
   background-color: #0b1a24;
@@ -63,4 +96,77 @@
   background: linear-gradient(to bottom, transparent, rgba(46, 125, 170, 0.12), transparent);
   animation: booking-scan 5s ease-in-out infinite;
   pointer-events: none;
+}
+
+@keyframes booking-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.booking-step-panel {
+  animation: booking-step-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.booking-slot {
+  border: 1px solid rgb(18 36 51 / 0.1);
+  background: rgb(255 255 255 / 0.72);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.booking-slot:hover {
+  border-color: rgb(46 125 170 / 0.35);
+  background: rgb(46 125 170 / 0.08);
+  transform: translateY(-1px);
+}
+
+.booking-slot[data-selected="true"] {
+  border-color: transparent;
+  background: var(--surface-ink);
+  color: #fff;
+  box-shadow: 0 14px 30px -18px rgba(11, 26, 36, 0.75);
+}
+
+.booking-slot[data-selected="true"] .booking-slot-meta {
+  color: rgb(255 255 255 / 0.55);
+}
+
+.booking-chip {
+  border: 1px solid rgb(18 36 51 / 0.12);
+  background: rgb(255 255 255 / 0.7);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.booking-chip:hover {
+  border-color: rgb(46 125 170 / 0.3);
+}
+
+.booking-chip[data-selected="true"] {
+  border-color: transparent;
+  background: var(--surface-ink);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .booking-scan-line,
+  .booking-pulse::before,
+  .booking-step-panel {
+    animation: none !important;
+  }
+
+  .booking-slot:hover {
+    transform: none;
+  }
 }

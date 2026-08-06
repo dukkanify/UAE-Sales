@@ -64,9 +64,9 @@ function Header() {
                 key={navHrefKey(item.href)}
                 href={item.href}
                 className={cn(
-                  "rounded-md px-3.5 py-2 text-[12px] font-semibold tracking-[0.16em] uppercase transition-colors",
+                  "relative rounded-md px-3.5 py-2 text-[12px] font-semibold tracking-[0.16em] uppercase transition-colors",
                   active
-                    ? "bg-white/10 text-white"
+                    ? "bg-white/10 text-white after:absolute after:inset-x-3 after:-bottom-0.5 after:h-px after:bg-accent"
                     : "text-white/50 hover:bg-white/5 hover:text-white",
                 )}
               >
