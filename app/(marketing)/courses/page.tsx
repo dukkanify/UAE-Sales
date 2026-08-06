@@ -33,12 +33,15 @@ export default function PublicCoursesPage() {
         }}
       />
 
-      <section className="catalog-page-hero text-white">
+      <section className="catalog-page-hero">
         <div className="container-app relative z-10 py-16 sm:py-24">
-          <p className="landing-kicker text-accent">Course catalog</p>
-          <h1 className="mt-5 max-w-[16ch] font-display text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05]">
-            ATPL courses built for license-ready pilots
+          <p className="landing-kicker text-accent">AviatorPass courses</p>
+          <h1 className="mt-5 max-w-[14ch] font-display text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05] text-white">
+            AviatorPass
           </h1>
+          <p className="mt-4 max-w-[22ch] font-display text-[clamp(1.35rem,2.8vw,2rem)] font-semibold tracking-[-0.03em] leading-snug text-white/90">
+            ATPL courses built for license-ready pilots
+          </p>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
             Explore published programs on {siteConfig.name}. Each lane sits under its instructor —
             enter the platform to enroll, or book live Zoom when you need coaching.
@@ -55,7 +58,7 @@ export default function PublicCoursesPage() {
               className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
               asChild
             >
-              <Link href={routes.registerInstructor}>Teach on AviatorPass</Link>
+              <Link href={routes.book}>Book live Zoom</Link>
             </Button>
           </div>
         </div>
