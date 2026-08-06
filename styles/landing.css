@@ -3,7 +3,9 @@
 .landing-root {
   --landing-ink: #03080c;
   --landing-ink-soft: #0a1620;
+  --landing-ink-mid: #122433;
   --landing-mist: #d7e6ef;
+  --landing-mist-deep: #c5d8e6;
   --landing-aero: #2e7daa;
   --landing-aero-bright: #7ec0df;
   --landing-gold: #dd9b30;
@@ -14,15 +16,15 @@
 .hero-aviation {
   background-color: var(--landing-ink);
   background-image:
-    radial-gradient(ellipse 95% 65% at 82% -12%, rgba(46, 125, 170, 0.55), transparent 58%),
-    radial-gradient(ellipse 50% 40% at 12% 100%, rgba(221, 155, 48, 0.18), transparent 55%),
-    radial-gradient(ellipse 35% 28% at 48% 48%, rgba(126, 192, 223, 0.08), transparent 70%),
+    radial-gradient(ellipse 110% 70% at 88% -8%, rgba(46, 125, 170, 0.62), transparent 56%),
+    radial-gradient(ellipse 55% 42% at 8% 108%, rgba(221, 155, 48, 0.22), transparent 58%),
+    radial-gradient(ellipse 40% 32% at 42% 52%, rgba(126, 192, 223, 0.1), transparent 72%),
     linear-gradient(
       188deg,
-      rgba(3, 8, 12, 0.05) 0%,
-      rgba(3, 8, 12, 0.28) 38%,
-      rgba(3, 8, 12, 0.72) 72%,
-      rgba(3, 8, 12, 0.97) 100%
+      rgba(3, 8, 12, 0.02) 0%,
+      rgba(3, 8, 12, 0.22) 36%,
+      rgba(3, 8, 12, 0.7) 70%,
+      rgba(3, 8, 12, 0.98) 100%
     ),
     url("/images/hero-aviation.svg");
   background-size: cover;
@@ -35,13 +37,13 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(215, 230, 239, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(215, 230, 239, 0.045) 1px, transparent 1px);
-  background-size: 108px 108px;
-  mask-image: radial-gradient(ellipse 68% 58% at 42% 32%, black 0%, transparent 78%);
+    linear-gradient(rgba(215, 230, 239, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(215, 230, 239, 0.05) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(ellipse 72% 60% at 40% 28%, black 0%, transparent 78%);
   pointer-events: none;
-  opacity: 0.9;
-  animation: hero-grid-drift 32s linear infinite;
+  opacity: 0.95;
+  animation: hero-grid-drift 36s linear infinite;
 }
 
 .hero-aviation::after {
@@ -53,31 +55,31 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(126, 192, 223, 0.2) 18%,
-    rgba(240, 197, 106, 0.85) 50%,
-    rgba(126, 192, 223, 0.2) 82%,
+    rgba(126, 192, 223, 0.22) 18%,
+    rgba(240, 197, 106, 0.9) 50%,
+    rgba(126, 192, 223, 0.22) 82%,
     transparent 100%
   );
-  animation: platform-scan 9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: platform-scan 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   pointer-events: none;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .hero-horizon {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: 48%;
+  height: 52%;
   pointer-events: none;
   background:
     linear-gradient(
       180deg,
       transparent 0%,
-      rgba(46, 125, 170, 0.06) 35%,
-      rgba(221, 155, 48, 0.14) 100%
+      rgba(46, 125, 170, 0.08) 32%,
+      rgba(221, 155, 48, 0.16) 100%
     ),
-    radial-gradient(ellipse 90% 55% at 50% 100%, rgba(221, 155, 48, 0.28), transparent 72%);
-  animation: hero-horizon-breathe 10s ease-in-out infinite;
+    radial-gradient(ellipse 95% 58% at 50% 100%, rgba(221, 155, 48, 0.32), transparent 70%);
+  animation: hero-horizon-breathe 11s ease-in-out infinite;
 }
 
 .hero-vignette {
@@ -85,31 +87,31 @@
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 40%, transparent 30%, rgba(3, 8, 12, 0.45) 100%),
+    radial-gradient(ellipse 68% 52% at 48% 38%, transparent 28%, rgba(3, 8, 12, 0.5) 100%),
     linear-gradient(
       90deg,
-      rgba(3, 8, 12, 0.35) 0%,
-      transparent 28%,
-      transparent 72%,
-      rgba(3, 8, 12, 0.2) 100%
+      rgba(3, 8, 12, 0.4) 0%,
+      transparent 26%,
+      transparent 74%,
+      rgba(3, 8, 12, 0.28) 100%
     );
 }
 
 .hero-brand {
-  letter-spacing: -0.045em;
-  line-height: 0.88;
-  filter: drop-shadow(0 12px 48px rgba(46, 125, 170, 0.28));
+  letter-spacing: -0.048em;
+  line-height: 0.86;
+  filter: drop-shadow(0 14px 52px rgba(46, 125, 170, 0.32));
 }
 
 .hero-brand-atpl {
-  background: linear-gradient(115deg, #e8f4fa 0%, #9fd0e8 38%, #5ba3c9 100%);
+  background: linear-gradient(115deg, #f2f9fc 0%, #a8d6eb 36%, #4f9bc4 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .hero-brand-pass {
-  background: linear-gradient(115deg, #f7d78a 0%, #dd9b30 48%, #b8791c 100%);
+  background: linear-gradient(115deg, #ffe4a8 0%, #dd9b30 46%, #a86a14 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -117,8 +119,18 @@
 
 .hero-cta-primary {
   box-shadow:
-    0 0 0 1px rgba(240, 197, 106, 0.25),
-    0 18px 40px -18px rgba(221, 155, 48, 0.55);
+    0 0 0 1px rgba(240, 197, 106, 0.28),
+    0 20px 44px -18px rgba(221, 155, 48, 0.6);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.hero-cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgba(240, 197, 106, 0.4),
+    0 24px 48px -16px rgba(221, 155, 48, 0.7);
 }
 
 .hero-cta-secondary {
@@ -129,15 +141,24 @@
 .platform-surface {
   background-color: #edf3f7;
   background-image:
-    radial-gradient(ellipse 80% 55% at 100% -20%, rgb(46 125 170 / 0.12), transparent 58%),
-    radial-gradient(ellipse 45% 40% at -8% 110%, rgb(221 155 48 / 0.07), transparent 52%),
-    linear-gradient(180deg, #e4ecf2 0%, #edf3f7 42%, #f4f8fb 100%);
+    radial-gradient(ellipse 80% 55% at 100% -20%, rgb(46 125 170 / 0.13), transparent 58%),
+    radial-gradient(ellipse 45% 40% at -8% 110%, rgb(221 155 48 / 0.08), transparent 52%),
+    linear-gradient(180deg, #e2ebf2 0%, #edf3f7 42%, #f5f9fc 100%);
+}
+
+/* Cooler mid-altitude sheet for course lanes */
+.platform-altitude {
+  background-color: #e8eef4;
+  background-image:
+    radial-gradient(ellipse 70% 50% at 0% -10%, rgb(18 36 51 / 0.08), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgb(46 125 170 / 0.1), transparent 50%),
+    linear-gradient(180deg, #dfe8f0 0%, #e8eef4 45%, #eef3f7 100%);
 }
 
 .platform-band {
   background:
-    radial-gradient(ellipse 95% 75% at 88% -15%, rgba(46, 125, 170, 0.48), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 0% 115%, rgba(221, 155, 48, 0.16), transparent 52%),
+    radial-gradient(ellipse 95% 75% at 88% -15%, rgba(46, 125, 170, 0.5), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 0% 115%, rgba(221, 155, 48, 0.18), transparent 52%),
     linear-gradient(168deg, #03080c 0%, #0a1620 48%, #123044 100%);
 }
 
@@ -146,12 +167,22 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 88px 88px;
   mask-image: linear-gradient(180deg, black, transparent 88%);
   pointer-events: none;
   opacity: 0.55;
+}
+
+.platform-band::after {
+  content: "";
+  position: absolute;
+  inset-inline: 10%;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(221, 155, 48, 0.45), transparent);
+  pointer-events: none;
 }
 
 /* Flightpath spine */
@@ -169,8 +200,8 @@
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(46, 125, 170, 0.45) 12%,
-    rgba(221, 155, 48, 0.55) 88%,
+    rgba(46, 125, 170, 0.5) 12%,
+    rgba(221, 155, 48, 0.6) 88%,
     transparent
   );
 }
@@ -205,7 +236,7 @@
   height: 0.55rem;
   border-radius: 9999px;
   background: linear-gradient(135deg, var(--landing-aero), var(--landing-gold));
-  box-shadow: 0 0 0 4px rgba(46, 125, 170, 0.12);
+  box-shadow: 0 0 0 4px rgba(46, 125, 170, 0.14);
   animation: node-pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -232,7 +263,7 @@
 .flightpath-index {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.06em;
-  background: linear-gradient(135deg, rgba(46, 125, 170, 0.55), rgba(221, 155, 48, 0.45));
+  background: linear-gradient(135deg, rgba(46, 125, 170, 0.6), rgba(221, 155, 48, 0.5));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -247,7 +278,8 @@
 
 .landing-close {
   background:
-    radial-gradient(ellipse 70% 80% at 50% 120%, rgba(221, 155, 48, 0.18), transparent 55%),
+    radial-gradient(ellipse 80% 70% at 50% 120%, rgba(221, 155, 48, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(46, 125, 170, 0.12), transparent 55%),
     linear-gradient(180deg, #0a1620 0%, #03080c 100%);
 }
 
@@ -261,6 +293,118 @@
     rgba(221, 155, 48, 0.55),
     transparent
   );
+}
+
+/* —— Course lanes (interaction containers, not SaaS cards) —— */
+.course-lane {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-block: 1px solid rgb(18 36 51 / 0.1);
+  background: rgb(255 255 255 / 0.42);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.course-lane:hover {
+  background: rgb(255 255 255 / 0.72);
+  border-color: rgb(46 125 170 / 0.28);
+  transform: translateY(-3px);
+}
+
+.course-lane::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--landing-aero), var(--landing-gold));
+  opacity: 0.85;
+}
+
+.course-lane-cover {
+  position: relative;
+  height: 9.5rem;
+  overflow: hidden;
+  background-color: var(--landing-ink-mid);
+  background-size: cover;
+  background-position: center;
+}
+
+.course-lane-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 20%, rgba(3, 8, 12, 0.55) 100%),
+    linear-gradient(90deg, rgba(46, 125, 170, 0.18), transparent 55%);
+  pointer-events: none;
+}
+
+.course-lane-cover[data-tone="0"] {
+  background-image:
+    radial-gradient(ellipse 80% 70% at 80% 20%, rgba(46, 125, 170, 0.55), transparent 60%),
+    linear-gradient(155deg, #0a1620, #1a4a66);
+}
+
+.course-lane-cover[data-tone="1"] {
+  background-image:
+    radial-gradient(ellipse 70% 60% at 20% 80%, rgba(221, 155, 48, 0.4), transparent 55%),
+    linear-gradient(155deg, #0c1a24, #2a3d28);
+}
+
+.course-lane-cover[data-tone="2"] {
+  background-image:
+    radial-gradient(ellipse 75% 65% at 70% 70%, rgba(126, 192, 223, 0.35), transparent 55%),
+    linear-gradient(155deg, #081218, #123044);
+}
+
+.course-lane-cover[data-tone="3"] {
+  background-image:
+    radial-gradient(ellipse 65% 55% at 40% 30%, rgba(221, 155, 48, 0.28), transparent 55%),
+    linear-gradient(155deg, #061018, #1c3550);
+}
+
+.course-instructor-rail {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.85rem 1.1rem;
+  border-bottom: 1px solid rgb(18 36 51 / 0.12);
+}
+
+.course-instructor-name {
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.catalog-page-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 70% at 90% -20%, rgba(46, 125, 170, 0.45), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 0% 100%, rgba(221, 155, 48, 0.14), transparent 50%),
+    linear-gradient(165deg, #03080c 0%, #0a1620 50%, #123044 100%);
+}
+
+.catalog-page-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: linear-gradient(180deg, black, transparent 85%);
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 @keyframes platform-scan {
@@ -310,28 +454,45 @@
   }
   to {
     background-position:
-      108px 54px,
-      54px 108px;
+      120px 60px,
+      60px 120px;
   }
 }
 
 @keyframes hero-horizon-breathe {
   0%,
   100% {
-    opacity: 0.7;
+    opacity: 0.72;
     transform: translateY(0);
   }
   50% {
     opacity: 1;
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
+}
+
+@keyframes lane-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.course-lane {
+  animation: lane-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-aviation::before,
   .hero-aviation::after,
   .hero-horizon,
-  .flightpath-node::before {
+  .flightpath-node::before,
+  .course-lane,
+  .hero-cta-primary {
     animation: none !important;
   }
 
@@ -346,6 +507,11 @@
 
   .hero-horizon {
     opacity: 0.8;
+    transform: none;
+  }
+
+  .course-lane:hover,
+  .hero-cta-primary:hover {
     transform: none;
   }
 }

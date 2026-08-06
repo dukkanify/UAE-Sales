@@ -40,13 +40,18 @@ function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/#courses" className="transition hover:text-accent">
+                  Courses
+                </Link>
+              </li>
+              <li>
                 <Link href="/#live" className="transition hover:text-accent">
                   Live Zoom
                 </Link>
               </li>
               <li>
                 <Link href={routes.courses} className="transition hover:text-accent">
-                  Courses
+                  Full catalog
                 </Link>
               </li>
               <li>

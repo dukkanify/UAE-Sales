@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 import { PublicCourseCatalog } from "@/features/courses/components/public-course-catalog";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function PublicCoursesPage() {
   return (
-    <div className="platform-surface">
+    <div className="platform-altitude landing-root">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -32,21 +33,22 @@ export default function PublicCoursesPage() {
         }}
       />
 
-      <section className="border-b border-border/50 bg-[var(--surface-ink)] text-white">
-        <div className="container-app py-16 sm:py-20">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-accent">
-            Course catalog
-          </p>
-          <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl">
+      <section className="catalog-page-hero text-white">
+        <div className="container-app relative z-10 py-16 sm:py-24">
+          <p className="landing-kicker text-accent">Course catalog</p>
+          <h1 className="mt-5 max-w-[16ch] font-display text-[clamp(2.25rem,5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05]">
             ATPL courses built for license-ready pilots
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
-            Explore published programs on {siteConfig.name}. Enter the platform to enroll, or book
-            live Zoom coaching when you need an instructor.
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/65 sm:text-lg">
+            Explore published programs on {siteConfig.name}. Each lane sits under its instructor —
+            enter the platform to enroll, or book live Zoom when you need coaching.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button variant="accent" asChild>
-              <Link href={routes.register}>Join as student</Link>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Button variant="accent" className="hero-cta-primary" asChild>
+              <Link href={routes.register}>
+                Join as student
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
             </Button>
             <Button
               variant="outline"

@@ -122,19 +122,19 @@ export default function HomePage() {
         }}
       />
 
-      {/* 1 — Hero: one composition under transparent nav */}
+      {/* 1 — Hero: brand-first full-bleed composition */}
       <section className="relative isolate -mt-[4.75rem] min-h-[100svh] overflow-hidden pt-[4.75rem]">
         <div className="hero-aviation absolute inset-0" />
         <div className="hero-horizon" aria-hidden />
         <div className="hero-vignette" aria-hidden />
 
         <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-end pb-20 pt-16 sm:justify-center sm:pb-28">
-          <p className="animate-in-up hero-brand font-display text-[clamp(4.25rem,14vw,9.5rem)] font-bold">
+          <p className="animate-in-up hero-brand font-display text-[clamp(4.5rem,15vw,10rem)] font-bold">
             <span className="hero-brand-atpl">ATPL</span>{" "}
             <span className="hero-brand-pass">PASS</span>
           </p>
 
-          <h1 className="animate-in-up-delay-1 mt-7 max-w-[18ch] font-display text-[clamp(1.65rem,3.8vw,3rem)] font-semibold tracking-[-0.03em] text-white sm:leading-[1.08]">
+          <h1 className="animate-in-up-delay-1 mt-8 max-w-[17ch] font-display text-[clamp(1.7rem,3.9vw,3.15rem)] font-semibold tracking-[-0.032em] text-white sm:leading-[1.06]">
             Train like the cockpit is already yours
           </h1>
 
@@ -143,7 +143,7 @@ export default function HomePage() {
             for {siteConfig.locations.join(" & ")}.
           </p>
 
-          <div className="animate-in-up-delay-3 mt-11 flex flex-wrap items-center gap-3">
+          <div className="animate-in-up-delay-3 mt-12 flex flex-wrap items-center gap-3">
             <Button size="lg" variant="accent" className="hero-cta-primary px-9" asChild>
               <Link href={routes.login}>
                 Enter platform
@@ -156,7 +156,7 @@ export default function HomePage() {
               className="hero-cta-secondary border-white/25 bg-white/[0.06] px-8 text-white hover:bg-white/12 hover:text-white"
               asChild
             >
-              <Link href={routes.courses}>Browse courses</Link>
+              <Link href="/#courses">Browse courses</Link>
             </Button>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function HomePage() {
       <section id="flightpath" className="platform-surface content-auto py-28 sm:py-36">
         <div className="container-app">
           <p className="landing-kicker mb-5 text-primary">Flightpath</p>
-          <h2 className="max-w-[16ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] text-foreground leading-[1.05]">
+          <h2 className="max-w-[15ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] text-foreground leading-[1.05]">
             Three altitudes. One training OS.
           </h2>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
@@ -200,16 +200,16 @@ export default function HomePage() {
       {/* 3 — Courses by instructor */}
       <HomeCoursesByInstructor />
 
-      {/* 4 — Live */}
+      {/* 4 — Live: one job = book */}
       <section
         id="live"
         className="platform-band content-auto relative overflow-hidden py-28 text-white sm:py-36"
       >
         <div className="container-app relative z-10">
           <p className="landing-kicker mb-5 text-accent">Live altitude</p>
-          <div className="grid gap-12 lg:grid-cols-[1.35fr_0.65fr] lg:items-end">
+          <div className="grid gap-10 lg:grid-cols-[1.4fr_0.6fr] lg:items-end">
             <div>
-              <h2 className="max-w-[14ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05] text-white">
+              <h2 className="max-w-[13ch] font-display text-[clamp(2rem,4.5vw,3.75rem)] font-semibold tracking-[-0.035em] leading-[1.05] text-white">
                 Clear the turbulence with a live instructor
               </h2>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-white/62 sm:text-lg">
@@ -217,55 +217,37 @@ export default function HomePage() {
                 book — then you join Zoom from the lobby.
               </p>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch">
-              <Button
-                size="lg"
-                variant="accent"
-                className="hero-cta-primary justify-center"
-                asChild
-              >
-                <Link href={routes.book}>
-                  Open booking studio
-                  <ArrowUpRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="justify-center border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
-                asChild
-              >
-                <Link href={routes.login}>Continue learning</Link>
-              </Button>
-            </div>
+            <Button
+              size="lg"
+              variant="accent"
+              className="hero-cta-primary w-full justify-center sm:w-auto lg:w-full"
+              asChild
+            >
+              <Link href={routes.book}>
+                Open booking studio
+                <ArrowUpRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* 5 — Close */}
+      {/* 5 — Close: one job = enter */}
       <section className="landing-close relative overflow-hidden py-24 text-white sm:py-28">
         <div className="container-app relative z-10 text-center">
           <p className="landing-kicker mb-5 text-white/40">Ready for takeoff</p>
-          <h2 className="mx-auto max-w-[18ch] font-display text-[clamp(1.85rem,4vw,3.25rem)] font-semibold tracking-[-0.035em] leading-[1.08] text-white">
+          <h2 className="mx-auto max-w-[16ch] font-display text-[clamp(1.9rem,4.2vw,3.4rem)] font-semibold tracking-[-0.035em] leading-[1.06] text-white">
             Your next ATPL hour starts on the platform
           </h2>
           <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/55">
             English-only. Built for serious pilots — not another course catalog.
           </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Button size="lg" variant="accent" className="hero-cta-primary px-9" asChild>
+          <div className="mt-10 flex justify-center">
+            <Button size="lg" variant="accent" className="hero-cta-primary px-10" asChild>
               <Link href={routes.login}>
                 Enter ATPL PASS
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white/20 bg-transparent px-8 text-white hover:bg-white/10 hover:text-white"
-              asChild
-            >
-              <Link href={routes.book}>Book a session</Link>
             </Button>
           </div>
         </div>
