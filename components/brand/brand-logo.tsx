@@ -5,7 +5,6 @@ import Link from "next/link";
 import { siteStatic } from "@/config/site-static";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
-import { useBrand } from "@/providers/brand-provider";
 
 interface BrandLogoProps {
   className?: string;
@@ -16,8 +15,8 @@ interface BrandLogoProps {
 }
 
 /**
- * Brand mark — native <img> for local SVGs (avoids next/image webpack factory
- * crashes). Uses site-static only — never pulls Zod via @/config/site.
+ * Static brand mark — no BrandProvider/useBrand on the critical layout path.
+ * Runtime brand API still powers other surfaces via BrandProvider.
  */
 function BrandLogo({
   className,
@@ -26,14 +25,13 @@ function BrandLogo({
   priority = false,
   showWordmark = false,
 }: BrandLogoProps) {
-  const brand = useBrand();
-  const name = brand.platformName || siteStatic.name;
+  const name = siteStatic.name;
   const src =
     variant === "mark"
-      ? brand.faviconUrl || siteStatic.brand.icon
+      ? siteStatic.brand.icon
       : variant === "dark"
-        ? brand.darkLogoUrl || siteStatic.brand.logoDark
-        : brand.logoUrl || siteStatic.brand.logo;
+        ? siteStatic.brand.logoDark
+        : siteStatic.brand.logo;
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>

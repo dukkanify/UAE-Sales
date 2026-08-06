@@ -5,7 +5,11 @@ interface MarketingShellProps {
   children: React.ReactNode;
 }
 
-/** Server shell composing client Header/Footer — keeps layout out of Zod client graph. */
+/**
+ * Server-only marketing chrome.
+ * Do NOT import this from Client Components (see PublicLayout) — that causes
+ * webpack "Cannot read properties of undefined (reading 'call')".
+ */
 function MarketingShell({ children }: MarketingShellProps) {
   return (
     <div className="platform-surface flex min-h-screen flex-col">

@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  // Dev webpack filesystem cache has been corrupting client/server module
+  // factories ("reading 'call'" on MarketingLayout). Prefer memory-only in dev.
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = { type: "memory" };
+    }
+    return config;
+  },
   compiler: {
     removeConsole: isProd ? { exclude: ["error", "warn"] } : false,
   },

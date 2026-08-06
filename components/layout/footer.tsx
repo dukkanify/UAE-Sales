@@ -3,9 +3,7 @@
 import Link from "next/link";
 
 import { siteStatic } from "@/config/site-static";
-import { brandingConfig } from "@/config/branding";
 import { routes } from "@/constants/routes";
-import { Separator } from "@/components/ui/separator";
 import { BrandLogo } from "@/components/brand/brand-logo";
 
 function Footer() {
@@ -18,7 +16,7 @@ function Footer() {
           <div className="space-y-4">
             <BrandLogo variant="dark" href={routes.home} />
             <p className="max-w-md text-sm leading-relaxed text-white/50">
-              {brandingConfig.tagline}. {siteStatic.description} Training lanes:{" "}
+              Aviation course platform · 2030. {siteStatic.description} Training lanes:{" "}
               {siteStatic.locations.join(" · ")}.
             </p>
           </div>
@@ -83,7 +81,7 @@ function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8 bg-white/10" />
+        <div className="my-8 h-px w-full bg-white/10" />
         <p className="text-xs text-white/35">
           © {year} {siteStatic.name}. Aviation course platform. English only.
         </p>
