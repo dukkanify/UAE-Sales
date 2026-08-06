@@ -44,9 +44,9 @@ export default function LoginPage() {
           <LoginForm />
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
-          New pilot?{" "}
+          New to AviatorPass?{" "}
           <Link href={routes.register} className="ml-1 font-medium text-primary hover:underline">
-            Create learner access
+            Join as student or instructor
           </Link>
         </CardFooter>
       </Card>

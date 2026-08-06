@@ -1,5 +1,6 @@
 export { LoginForm } from "./login-form";
 export { RegisterForm } from "./register-form";
+export { RegisterShell } from "./register-shell";
 export { VerifyOtpForm } from "./verify-otp-form";
 export { ForgotPasswordForm } from "./forgot-password-form";
 export { ResetPasswordForm } from "./reset-password-form";
