@@ -681,12 +681,21 @@ function PlatformSettingsShell() {
                 variant="outline"
                 size="sm"
                 onClick={async () => {
-                  const result = await authFetch<{ message: string; queued: boolean }>(
-                    "/api/admin/settings/test-email",
-                    { method: "POST", body: JSON.stringify({}) },
-                  );
-                  if (result.success) toast.success(result.data?.message ?? "Test queued");
-                  else toast.error(result.error ?? "Test failed");
+                  const result = await authFetch<{
+                    message: string;
+                    queued: boolean;
+                    delivered?: boolean;
+                    mode?: string;
+                    outboxId?: string;
+                  }>("/api/admin/settings/test-email", {
+                    method: "POST",
+                    body: JSON.stringify({}),
+                  });
+                  if (result.success) {
+                    toast.success(result.data?.message ?? "Test email processed");
+                  } else {
+                    toast.error(result.error ?? "Test failed");
+                  }
                 }}
               >
                 <Send className="h-4 w-4" />

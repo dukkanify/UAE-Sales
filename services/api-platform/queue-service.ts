@@ -4,10 +4,7 @@
 
 import { generateId } from "@/lib/security/crypto";
 import { ensureApiPlatformSeeded } from "@/services/api-platform/seed";
-import {
-  ensureApiPlatformStore,
-  writeApiPlatformStore,
-} from "@/services/api-platform/store";
+import { ensureApiPlatformStore, writeApiPlatformStore } from "@/services/api-platform/store";
 import type { JobType, QueueJob } from "@/types/api-platform";
 
 export function enqueueJob(input: {
@@ -64,16 +61,34 @@ export function getQueueStatus() {
 async function runJob(job: QueueJob): Promise<Record<string, unknown>> {
   switch (job.type) {
     case "webhook": {
-      const { processWebhookDelivery } = await import(
-        "@/services/api-platform/webhook-service"
-      );
+      const { processWebhookDelivery } = await import("@/services/api-platform/webhook-service");
       const deliveryId = String(job.payload.deliveryId ?? "");
       const result = await processWebhookDelivery(deliveryId);
       if (!result.ok) throw new Error(result.error || "webhook failed");
       return result as unknown as Record<string, unknown>;
     }
-    case "email":
-      return { sent: true, to: job.payload.to ?? null, mocked: true };
+    case "email": {
+      const { sendEmail } = await import("@/services/email/mailer");
+      const to = String(job.payload.to ?? "");
+      const subject = String(job.payload.subject ?? "AviatorPass notification");
+      const html = String(job.payload.html ?? job.payload.body ?? "");
+      const text = String(job.payload.text ?? html.replace(/<[^>]+>/g, " "));
+      const result = await sendEmail({
+        to,
+        subject,
+        html,
+        text,
+        meta: { kind: "queue", jobId: job.id },
+      });
+      if (!result.success) throw new Error(result.error || "email send failed");
+      return {
+        sent: true,
+        delivered: result.delivered,
+        mode: result.mode,
+        outboxId: result.outboxId,
+        to,
+      };
+    }
     case "notification":
       return { delivered: true, mocked: true };
     case "report":

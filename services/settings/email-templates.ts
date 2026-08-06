@@ -118,3 +118,19 @@ export function testEmailTemplate() {
       <p>If you received this, outbound email settings are reachable from the platform.</p>`,
   });
 }
+
+export function classReminderEmailTemplate(input: {
+  title: string;
+  startsAt: string;
+  label: string;
+}) {
+  const when = new Date(input.startsAt).toLocaleString();
+  return renderBrandedEmail({
+    title: input.label,
+    preheader: `${input.title} · ${when}`,
+    bodyHtml: `<p><strong>${input.label}</strong></p>
+      <p>${input.title}</p>
+      <p>Starts: ${when}</p>
+      <p>Open AviatorPass to join your live Zoom session when it is time.</p>`,
+  });
+}

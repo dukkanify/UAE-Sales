@@ -6,7 +6,10 @@ import { generateId } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { DEFAULT_REMINDER_OFFSETS_MINUTES } from "@/constants/classes";
 import { logActivity } from "@/services/auth/activity-log";
+import { findUserById } from "@/services/auth/store";
+import { sendEmail } from "@/services/email/mailer";
 import { createNotification } from "@/services/notifications/notification-service";
+import { classReminderEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 import { readClassesDb, writeClassesDb } from "@/services/classes/store";
 import type { ReminderKind, ReminderQueueItem } from "@/types/classes";
@@ -136,14 +139,50 @@ export async function processDueReminders(nowIso = new Date().toISOString()): Pr
             ? "Class starts in 2 hours"
             : "Class starts in 24 hours";
 
-    await createNotification({
-      userId: item.userId,
-      title: label,
-      body: `${cls.title} · ${new Date(cls.startsAt).toLocaleString()}`,
-      type: `class.reminder.${item.kind}`,
-      channel: item.channel === "email" ? "email" : "in_app",
-      data: { liveClassId: cls.id, kind: item.kind },
-    });
+    if (item.channel === "email") {
+      const user = findUserById(item.userId);
+      if (!user?.email) {
+        writeClassesDb((d) => {
+          const idx = d.reminders.findIndex((r) => r.id === item.id);
+          if (idx >= 0) d.reminders[idx] = { ...d.reminders[idx]!, status: "cancelled" };
+        });
+        continue;
+      }
+      const template = classReminderEmailTemplate({
+        title: cls.title,
+        startsAt: cls.startsAt,
+        label,
+      });
+      const mail = await sendEmail({
+        to: user.email,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+        meta: { kind: "class_reminder", liveClassId: cls.id, reminderId: item.id },
+      });
+      if (!mail.success) {
+        writeClassesDb((d) => {
+          const idx = d.reminders.findIndex((r) => r.id === item.id);
+          if (idx >= 0) {
+            d.reminders[idx] = {
+              ...d.reminders[idx]!,
+              status: "pending",
+              payload: { ...d.reminders[idx]!.payload, lastError: mail.error },
+            };
+          }
+        });
+        continue;
+      }
+    } else {
+      await createNotification({
+        userId: item.userId,
+        title: label,
+        body: `${cls.title} · ${new Date(cls.startsAt).toLocaleString()}`,
+        type: `class.reminder.${item.kind}`,
+        channel: "in_app",
+        data: { liveClassId: cls.id, kind: item.kind },
+      });
+    }
 
     writeClassesDb((d) => {
       const idx = d.reminders.findIndex((r) => r.id === item.id);

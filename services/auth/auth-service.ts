@@ -33,6 +33,8 @@ import {
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { sendEmail } from "@/services/email/mailer";
+import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 
 export interface RequestContext {
@@ -215,7 +217,14 @@ export async function requestOtp(input: {
   bookingId?: string;
   role?: Role;
   ctx?: RequestContext;
-}): Promise<ApiResponse<{ email: string; demoOtp?: string; expiresInMinutes: number }>> {
+}): Promise<
+  ApiResponse<{
+    email: string;
+    demoOtp?: string;
+    expiresInMinutes: number;
+    emailDelivery?: "smtp" | "outbox" | "failed";
+  }>
+> {
   ensureSuperAdminSeeded();
   // CI / local demo: ensure student.one etc. exist before login OTP.
   if (demoOtpEnabled()) ensureDemoUsersSeeded();
@@ -288,13 +297,30 @@ export async function requestOtp(input: {
     db.otps.push(challenge);
   });
 
+  const purposeLabel =
+    input.purpose === "register"
+      ? "create your account"
+      : input.purpose === "reset_password"
+        ? "reset your password"
+        : input.purpose === "booking"
+          ? "confirm your booking"
+          : "sign in";
+  const template = otpEmailTemplate(code, purposeLabel);
+  const mail = await sendEmail({
+    to: email,
+    subject: template.subject,
+    html: template.html,
+    text: template.text,
+    meta: { kind: "otp", purpose: input.purpose },
+  });
+
   if (input.purpose === "reset_password") {
     await logActivity({
       actorId: existing?.id ?? null,
       action: ACTIVITY_ACTIONS.PASSWORD_RESET_REQUEST,
       entityType: "user",
       entityId: existing?.id ?? email,
-      metadata: { email },
+      metadata: { email, emailMode: mail.mode, emailOutboxId: mail.outboxId },
       ...input.ctx,
     });
   }
@@ -304,6 +330,7 @@ export async function requestOtp(input: {
     data: {
       email,
       expiresInMinutes: env.AUTH_OTP_EXPIRY_MINUTES,
+      emailDelivery: mail.mode,
       ...(demoOtpEnabled() ? { demoOtp: code } : {}),
     },
     error: null,
