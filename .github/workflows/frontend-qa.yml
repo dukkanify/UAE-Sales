@@ -1,0 +1,111 @@
+name: Frontend QA
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - qa/playwright-setup
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-qa:
+    name: Playwright and Lighthouse QA
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      BASE_URL: ${{ secrets.BASE_URL || 'https://sooqna.site' }}
+      QA_ADMIN_EMAIL: ${{ secrets.QA_ADMIN_EMAIL }}
+      QA_ADMIN_PASSWORD: ${{ secrets.QA_ADMIN_PASSWORD }}
+      CI: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install project dependencies
+        run: npm install
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        id: playwright
+        continue-on-error: true
+        run: npx playwright test
+
+      - name: Install Lighthouse CI
+        run: npm install --no-save @lhci/cli@0.14.x
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        continue-on-error: true
+        run: npx lhci autorun --config=./lighthouserc.json
+
+      - name: Generate unified QA report
+        if: always()
+        run: node scripts/generate-qa-report.mjs
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: playwright-report/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload screenshots videos traces and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-artifacts
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload unified QA report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unified-qa-report
+          path: qa-report/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce QA result
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.playwright.outcome }}" != "success" ]; then
+            echo "Playwright QA failed. Review uploaded artifacts."
+            exit 1
+          fi
+          if [ "${{ steps.lighthouse.outcome }}" != "success" ]; then
+            echo "Lighthouse accessibility assertions failed. Review uploaded reports."
+            exit 1
+          fi
