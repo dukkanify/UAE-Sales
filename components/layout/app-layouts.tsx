@@ -5,21 +5,26 @@ import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { motion as motionTokens } from "@/config/design-system";
-import { MarketingShell } from "@/components/layout/marketing-shell";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 
-/** Public marketing pages — header + footer */
+/** Public marketing pages — header + footer (client-safe; no Server Component imports). */
 function PublicLayout({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <MarketingShell>
-      <motion.div
-        className={cn(className)}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={motionTokens.page}
-      >
-        {children}
-      </motion.div>
-    </MarketingShell>
+    <div className="platform-surface flex min-h-screen flex-col">
+      <Header />
+      <main className="flex-1">
+        <motion.div
+          className={cn(className)}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={motionTokens.page}
+        >
+          {children}
+        </motion.div>
+      </main>
+      <Footer />
+    </div>
   );
 }
 
@@ -42,11 +47,7 @@ function AuthLayout({ children, className }: { children: React.ReactNode; classN
 
 /** Minimal chrome — no header/footer */
 function BlankLayout({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={cn("min-h-screen bg-background", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("min-h-screen bg-background", className)}>{children}</div>;
 }
 
 /** Full-bleed system status pages */
