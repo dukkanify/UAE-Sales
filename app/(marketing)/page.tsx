@@ -242,7 +242,7 @@ export default function HomePage() {
       <section className="landing-close relative overflow-hidden py-24 text-white sm:py-28">
         <div className="container-app relative z-10 text-center">
           <p className="landing-kicker mb-5 text-white/40">Ready for takeoff</p>
-          <h2 className="mx-auto max-w-[18ch] font-display text-[clamp(1.85rem,4vw,3.25rem)] font-semibold tracking-[-0.035em] leading-[1.08]">
+          <h2 className="mx-auto max-w-[18ch] font-display text-[clamp(1.85rem,4vw,3.25rem)] font-semibold tracking-[-0.035em] leading-[1.08] text-white">
             Your next ATPL hour starts on the platform
           </h2>
           <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/55">
