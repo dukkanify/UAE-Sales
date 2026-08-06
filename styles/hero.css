@@ -1,20 +1,22 @@
-/* ATPL PASS — platform sky / atmospheric plane */
+/* ATPL PASS — atmospheric flight deck / platform sky */
 
 .hero-aviation {
-  background-color: #070f14;
+  background-color: #050b10;
   background-image:
-    radial-gradient(ellipse 90% 55% at 86% 6%, rgba(46, 125, 170, 0.35), transparent 58%),
-    radial-gradient(ellipse 50% 40% at 6% 94%, rgba(221, 155, 48, 0.12), transparent 52%),
+    radial-gradient(ellipse 100% 70% at 78% -8%, rgba(46, 125, 170, 0.48), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 8% 100%, rgba(221, 155, 48, 0.16), transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 55%, rgba(91, 163, 201, 0.08), transparent 70%),
     linear-gradient(
-      180deg,
-      rgba(5, 11, 16, 0.12) 0%,
-      rgba(5, 11, 16, 0.5) 68%,
-      rgba(5, 11, 16, 0.9) 100%
+      185deg,
+      rgba(5, 11, 16, 0.05) 0%,
+      rgba(5, 11, 16, 0.35) 42%,
+      rgba(5, 11, 16, 0.78) 78%,
+      rgba(5, 11, 16, 0.96) 100%
     ),
     url("/images/hero-aviation.svg");
   background-size: cover;
-  background-position: center;
-  background-blend-mode: normal, normal, multiply, normal;
+  background-position: center top;
+  background-blend-mode: screen, normal, normal, multiply, normal;
 }
 
 .hero-aviation::before {
@@ -22,12 +24,13 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 72px 72px;
-  mask-image: radial-gradient(ellipse at 42% 38%, black 8%, transparent 72%);
+    linear-gradient(rgba(232, 238, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232, 238, 245, 0.04) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: radial-gradient(ellipse 70% 60% at 45% 35%, black 0%, transparent 75%);
   pointer-events: none;
-  opacity: 0.65;
+  opacity: 0.85;
+  animation: hero-grid-drift 28s linear infinite;
 }
 
 .hero-aviation::after {
@@ -36,30 +39,89 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(221, 155, 48, 0.55), transparent);
-  animation: platform-scan 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(91, 163, 201, 0.15) 20%,
+    rgba(221, 155, 48, 0.7) 50%,
+    rgba(91, 163, 201, 0.15) 80%,
+    transparent 100%
+  );
+  animation: platform-scan 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.85;
+}
+
+.hero-horizon {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 18%;
+  height: 40%;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(46, 125, 170, 0.08) 40%,
+      rgba(221, 155, 48, 0.12) 100%
+    ),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(221, 155, 48, 0.22), transparent 70%);
+  animation: hero-horizon-breathe 9s ease-in-out infinite;
+}
+
+.hero-brand {
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  text-shadow: 0 0 80px rgba(46, 125, 170, 0.35);
+}
+
+.hero-brand-atpl {
+  color: #9fd0e8;
+  background: linear-gradient(120deg, #c5e4f3 0%, #8ec4df 45%, #5ba3c9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero-brand-pass {
+  color: #dd9b30;
+  background: linear-gradient(120deg, #f0c56a 0%, #dd9b30 55%, #c48422 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .platform-surface {
-  background-color: #f3f6f9;
+  background-color: #eef3f7;
   background-image:
-    radial-gradient(ellipse 70% 45% at 100% -10%, rgb(46 125 170 / 0.09), transparent 55%),
-    radial-gradient(ellipse 45% 35% at 0% 110%, rgb(221 155 48 / 0.06), transparent 50%),
-    linear-gradient(180deg, #eef3f7 0%, #f3f6f9 40%, #f7f9fb 100%);
+    radial-gradient(ellipse 75% 50% at 100% -15%, rgb(46 125 170 / 0.11), transparent 55%),
+    radial-gradient(ellipse 50% 40% at -5% 105%, rgb(221 155 48 / 0.07), transparent 50%),
+    linear-gradient(180deg, #e8eef4 0%, #eef3f7 45%, #f5f8fb 100%);
 }
 
 .platform-band {
   background:
-    radial-gradient(ellipse 80% 60% at 90% 0%, rgba(46, 125, 170, 0.35), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 10% 100%, rgba(221, 155, 48, 0.12), transparent 50%),
-    linear-gradient(160deg, #070f14 0%, #0b1a24 55%, #122838 100%);
+    radial-gradient(ellipse 90% 70% at 85% -10%, rgba(46, 125, 170, 0.42), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 5% 110%, rgba(221, 155, 48, 0.14), transparent 50%),
+    linear-gradient(165deg, #050b10 0%, #0b1a24 50%, #122838 100%);
+}
+
+.platform-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: linear-gradient(180deg, black, transparent 85%);
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 .platform-module {
   position: relative;
-  padding-top: 1.5rem;
+  padding-top: 1.75rem;
 }
 
 .platform-module::before {
@@ -67,26 +129,33 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 2rem;
+  width: 2.5rem;
   height: 2px;
   background: linear-gradient(90deg, var(--primary), var(--accent));
   transform-origin: left center;
   animation: platform-rail 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.flightpath-index {
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(135deg, rgba(46, 125, 170, 0.12), rgba(221, 155, 48, 0.08));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
 @keyframes platform-scan {
   0% {
-    top: 12%;
+    top: 10%;
     opacity: 0;
   }
-  12% {
-    opacity: 0.75;
+  10% {
+    opacity: 0.85;
   }
-  88% {
-    opacity: 0.35;
+  90% {
+    opacity: 0.3;
   }
   100% {
-    top: 88%;
+    top: 90%;
     opacity: 0;
   }
 }
@@ -102,18 +171,50 @@
   }
 }
 
+@keyframes hero-grid-drift {
+  from {
+    background-position:
+      0 0,
+      0 0;
+  }
+  to {
+    background-position:
+      96px 48px,
+      48px 96px;
+  }
+}
+
+@keyframes hero-horizon-breathe {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-aviation::before {
-    opacity: 0.35;
+    opacity: 0.4;
+    animation: none !important;
   }
 
   .hero-aviation::after,
-  .platform-module::before {
+  .platform-module::before,
+  .hero-horizon {
     animation: none !important;
   }
 
   .hero-aviation::after {
-    top: 40%;
-    opacity: 0.25;
+    top: 42%;
+    opacity: 0.3;
+  }
+
+  .hero-horizon {
+    opacity: 0.75;
+    transform: none;
   }
 }

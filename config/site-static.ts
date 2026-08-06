@@ -9,7 +9,7 @@ export const siteStatic = {
   shortName: "ATPL",
   legalName: "ATPL PASS",
   description:
-    "The 2030 aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
+    "ATPL PASS is the aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
   locale: "en",
   direction: "ltr" as const,
   contactEmail: "ME@ABDULAZIZALSHOAIL.COM",

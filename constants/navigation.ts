@@ -52,5 +52,5 @@ export const APP_METADATA = {
     template: "%s | ATPL PASS",
   },
   description:
-    "The 2030 aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
+    "ATPL PASS is the 2030 aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery — for pilots training in Kuwait and Dubai.",
 } as const;
