@@ -5,7 +5,10 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { ensureCoursesSeeded } from "@/services/courses/seed";
-import { listCourses } from "@/services/courses/course-service";
+import {
+  listCourses,
+  listPublishedCoursesGroupedByInstructor,
+} from "@/services/courses/course-service";
 
 describe("courses ↔ lessons catalog", () => {
   beforeAll(() => {
@@ -23,5 +26,13 @@ describe("courses ↔ lessons catalog", () => {
   it("filters published courses for public/mobile catalog", () => {
     const published = listCourses({ status: "published", pageSize: 50 });
     expect(published.data.every((c) => c.status === "published")).toBe(true);
+  });
+
+  it("exposes a rich published ATPL catalog for marketing", () => {
+    const groups = listPublishedCoursesGroupedByInstructor();
+    const titles = groups.flatMap((g) => g.courses.map((c) => c.title));
+    expect(titles.length).toBeGreaterThanOrEqual(6);
+    expect(titles.some((t) => /Air Law/i.test(t))).toBe(true);
+    expect(titles.some((t) => /Meteorology/i.test(t))).toBe(true);
   });
 });

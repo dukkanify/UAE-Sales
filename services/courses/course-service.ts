@@ -79,17 +79,25 @@ export type InstructorCourseGroup = {
   courses: CourseListItem[];
 };
 
+/** Demo/integration fixtures that should not appear on marketing surfaces. */
+export function isPublicCatalogFixture(course: Pick<Course, "code" | "title">): boolean {
+  const code = (course.code || "").toUpperCase();
+  if (code.startsWith("INS-TEST-") || code.startsWith("HOME-")) return true;
+  return /instructor owned/i.test(course.title || "");
+}
+
 /** Published catalog grouped by primary instructor for marketing home. */
 export function listPublishedCoursesGroupedByInstructor(pageSize = 100): InstructorCourseGroup[] {
   const { data } = listCourses({
     status: "published",
-    pageSize,
+    pageSize: Math.max(pageSize, 200),
     sortBy: "title",
     sortDir: "asc",
   });
 
   const groups = new Map<string, InstructorCourseGroup>();
   for (const course of data) {
+    if (isPublicCatalogFixture(course)) continue;
     const key = course.primaryInstructorId ?? "__unassigned__";
     const current = groups.get(key);
     if (current) {

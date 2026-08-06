@@ -28,6 +28,7 @@ describe("courses by instructor", () => {
       expect(group.instructorName.length).toBeGreaterThan(0);
       expect(group.courses.length).toBeGreaterThan(0);
       expect(group.courses.every((c) => c.status === "published")).toBe(true);
+      expect(group.courses.every((c) => !c.code.startsWith("INS-TEST-"))).toBe(true);
       if (group.instructorId) {
         expect(
           group.courses.every(
