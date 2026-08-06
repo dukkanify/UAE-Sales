@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
 import { siteConfig } from "@/config/site";
@@ -22,11 +21,16 @@ const FALLBACK_ASSETS = {
   icon: "/brand/icon.svg",
 } as const;
 
+/**
+ * Brand mark — uses native <img> (local SVGs) to avoid next/image webpack
+ * module-factory crashes ("Cannot read properties of undefined (reading 'call')")
+ * that show up in Footer/Header after HMR / RSC boundary splits.
+ */
 function BrandLogo({
   className,
   href = routes.home,
   variant = "full",
-  priority,
+  priority = false,
   showWordmark = false,
 }: BrandLogoProps) {
   const brand = useBrand();
@@ -41,7 +45,8 @@ function BrandLogo({
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG; next/image webpack factory can be undefined under HMR */}
+      <img
         src={src}
         alt={name}
         width={variant === "mark" ? 36 : 160}
@@ -52,8 +57,9 @@ function BrandLogo({
           variant === "full" && "h-8 w-auto max-w-[160px]",
           variant === "dark" && "h-8 w-auto max-w-[160px]",
         )}
-        priority={priority}
-        unoptimized
+        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
       />
       {showWordmark && variant === "mark" ? (
         <span className="font-display text-lg font-semibold tracking-tight text-primary">
