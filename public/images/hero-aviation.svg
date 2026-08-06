@@ -1,48 +1,72 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none" role="img" aria-label="ATPL PASS aviation learning platform sky">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" fill="none" role="img" aria-label="ATPL PASS night flight deck sky">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#050B10"/>
-      <stop offset="0.38" stop-color="#0B1A24"/>
-      <stop offset="0.72" stop-color="#123044"/>
-      <stop offset="1" stop-color="#2E7DAA"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#03080C"/>
+      <stop offset="0.28" stop-color="#07141C"/>
+      <stop offset="0.62" stop-color="#0C2433"/>
+      <stop offset="1" stop-color="#1A5F82"/>
     </linearGradient>
-    <linearGradient id="runway" x1="720" y1="520" x2="720" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#DD9B30" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="#DD9B30" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="path" x1="180" y1="620" x2="1280" y2="280" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#5BA3C9" stop-opacity="0"/>
-      <stop offset="0.35" stop-color="#5BA3C9" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#DD9B30" stop-opacity="0.8"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1120 210) rotate(90) scale(280 340)">
-      <stop stop-color="#2E7DAA" stop-opacity="0.45"/>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1280 220) rotate(90) scale(340 280)">
+      <stop stop-color="#5BA3C9" stop-opacity="0.55"/>
+      <stop offset="0.55" stop-color="#2E7DAA" stop-opacity="0.18"/>
       <stop offset="1" stop-color="#2E7DAA" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="trail" x1="120" y1="760" x2="1420" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5BA3C9" stop-opacity="0"/>
+      <stop offset="0.25" stop-color="#5BA3C9" stop-opacity="0.35"/>
+      <stop offset="0.7" stop-color="#DD9B30" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#F0C56A" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="runway" x1="800" y1="560" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DD9B30" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#DD9B30" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="wing" x1="980" y1="300" x2="1380" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8EEF5" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#E8EEF5" stop-opacity="0"/>
+    </linearGradient>
   </defs>
-  <rect width="1440" height="900" fill="url(#sky)"/>
-  <ellipse cx="1120" cy="210" rx="280" ry="180" fill="url(#glow)"/>
-  <g opacity="0.22" stroke="#E8EEF5" stroke-width="1">
-    <path d="M80 180H1360"/>
-    <path d="M80 260H1360"/>
-    <path d="M80 340H1360"/>
-    <path d="M240 120V420"/>
-    <path d="M480 120V420"/>
-    <path d="M720 120V420"/>
-    <path d="M960 120V420"/>
-    <path d="M1200 120V420"/>
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <ellipse cx="1280" cy="220" rx="360" ry="240" fill="url(#sun)"/>
+  <!-- constellation -->
+  <g fill="#E8EEF5">
+    <circle cx="180" cy="120" r="1.8" opacity="0.7"/>
+    <circle cx="260" cy="90" r="1.2" opacity="0.45"/>
+    <circle cx="340" cy="150" r="2" opacity="0.55"/>
+    <circle cx="420" cy="70" r="1.4" opacity="0.4"/>
+    <circle cx="520" cy="130" r="1.6" opacity="0.5"/>
+    <circle cx="640" cy="95" r="1.1" opacity="0.35"/>
+    <circle cx="760" cy="60" r="1.8" opacity="0.45"/>
+    <circle cx="880" cy="110" r="1.3" opacity="0.4"/>
+    <circle cx="150" cy="280" r="1.2" opacity="0.35"/>
+    <circle cx="300" cy="240" r="1.5" opacity="0.4"/>
   </g>
-  <path d="M160 680C360 620 520 700 720 560C920 420 1080 360 1320 300" stroke="url(#path)" stroke-width="2.5" stroke-linecap="round"/>
-  <circle cx="1320" cy="300" r="6" fill="#DD9B30"/>
-  <circle cx="1320" cy="300" r="16" stroke="#DD9B30" stroke-opacity="0.45" stroke-width="1.5"/>
-  <path d="M520 900L720 540L920 900" fill="url(#runway)"/>
-  <g fill="#E8EEF5" fill-opacity="0.55">
-    <circle cx="220" cy="140" r="2.5"/>
-    <circle cx="410" cy="90" r="1.8"/>
-    <circle cx="640" cy="150" r="2"/>
-    <circle cx="880" cy="110" r="1.5"/>
-    <circle cx="1040" cy="170" r="2.2"/>
+  <!-- instrument lattice -->
+  <g opacity="0.14" stroke="#E8EEF5" stroke-width="1">
+    <path d="M60 160H1540"/>
+    <path d="M60 240H1540"/>
+    <path d="M60 320H1540"/>
+    <path d="M60 400H1540"/>
+    <path d="M200 80V440"/>
+    <path d="M400 80V440"/>
+    <path d="M600 80V440"/>
+    <path d="M800 80V440"/>
+    <path d="M1000 80V440"/>
+    <path d="M1200 80V440"/>
+    <path d="M1400 80V440"/>
   </g>
-  <path d="M980 455L1185 430L1260 445L1185 460L980 455Z" fill="#E8EEF5" fill-opacity="0.14"/>
-  <path d="M1185 430L1225 410L1235 432" fill="#5BA3C9" fill-opacity="0.35"/>
+  <!-- flight path -->
+  <path d="M100 820C280 760 420 800 560 680C720 540 900 460 1120 360C1240 300 1340 270 1460 250" stroke="url(#trail)" stroke-width="2.75" stroke-linecap="round"/>
+  <circle cx="1460" cy="250" r="5" fill="#F0C56A"/>
+  <circle cx="1460" cy="250" r="18" stroke="#DD9B30" stroke-opacity="0.5" stroke-width="1.5"/>
+  <circle cx="1460" cy="250" r="32" stroke="#DD9B30" stroke-opacity="0.2" stroke-width="1"/>
+  <!-- abstract aircraft silhouette -->
+  <g opacity="0.9">
+    <path d="M1180 340L1460 250L1390 390Z" fill="url(#wing)"/>
+    <path d="M1320 285L1460 250L1415 320" fill="#E8EEF5" fill-opacity="0.28"/>
+    <path d="M1388 268L1460 250" stroke="#F0C56A" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- runway perspective -->
+  <path d="M520 1000L800 560L1080 1000" fill="url(#runway)"/>
+  <path d="M800 560L800 1000" stroke="#E8EEF5" stroke-opacity="0.18" stroke-width="1.5" stroke-dasharray="10 14"/>
 </svg>
