@@ -19,7 +19,8 @@ function SystemPage({
   actionHref,
   actionLabel = "Back to home",
 }: SystemPageProps) {
-  const href = safeHref(actionHref, routes.home);
+  // Omitted/undefined actionHref → home silently (default params miss explicit undefined).
+  const href = safeHref(actionHref ?? routes.home, routes.home);
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
