@@ -97,9 +97,10 @@ function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
     id: "zoom",
     label: "Zoom API",
     status: settings.zoom?.credentialsConfigured || process.env.ZOOM_CLIENT_ID ? "pass" : "warn",
-    detail: settings.zoom?.credentialsConfigured || process.env.ZOOM_CLIENT_ID
-      ? "Configured"
-      : "Mock mode — credentials not set",
+    detail:
+      settings.zoom?.credentialsConfigured || process.env.ZOOM_CLIENT_ID
+        ? "Configured"
+        : "Mock mode — credentials not set",
   });
 
   checks.push({
@@ -165,11 +166,7 @@ function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
         id: "secrets",
         label: "Auth secret",
         status:
-          publicEnv.NEXT_PUBLIC_APP_ENV === "production" && weak
-            ? "fail"
-            : weak
-              ? "warn"
-              : "pass",
+          publicEnv.NEXT_PUBLIC_APP_ENV === "production" && weak ? "fail" : weak ? "warn" : "pass",
         detail: weak ? "Using weak/default AUTH_SECRET" : "AUTH_SECRET present",
       });
     } catch {
@@ -188,7 +185,7 @@ function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
 
   return {
     status,
-    service: "aep-web",
+    service: "aviatorpass",
     env: publicEnv.NEXT_PUBLIC_APP_ENV,
     checks,
     timestamp: new Date().toISOString(),
@@ -243,8 +240,7 @@ export function getProductionChecklist(): Array<{
       id: "demo_otp",
       label: "Demo OTP disabled in production",
       status:
-        publicEnv.NEXT_PUBLIC_APP_ENV === "production" &&
-        process.env.ENABLE_DEMO_OTP !== "false"
+        publicEnv.NEXT_PUBLIC_APP_ENV === "production" && process.env.ENABLE_DEMO_OTP !== "false"
           ? "fail"
           : "pass",
       detail:

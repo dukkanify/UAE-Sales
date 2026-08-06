@@ -8,12 +8,12 @@ Point **Hostinger DNS** at the **Vercel** project that serves AviatorPass so we 
 | ---------------------- | --------------------------------------------------------------- |
 | Domain registrar / DNS | Hostinger (`aurora.dns-parking.com` / `nebula.dns-parking.com`) |
 | Live content today     | Hostinger parked page                                           |
-| App hosting            | Vercel (`uae-sales` + `sooqna` projects linked to this repo)    |
+| App hosting            | Vercel (AviatorPass project linked to this repo)                |
 | Canonical staging URL  | `https://dubai-test.blog`                                       |
 
 ## 1) Add domain in Vercel
 
-1. Open the **AviatorPass / UAE-Sales** Vercel project → **Settings → Domains**.
+1. Open the **AviatorPass** Vercel project → **Settings → Domains**.
 2. Add:
    - `dubai-test.blog`
    - `www.dubai-test.blog` (redirect → apex, or reverse)
