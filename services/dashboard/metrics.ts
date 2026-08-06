@@ -26,6 +26,7 @@ import { getFinanceDashboard } from "@/services/payments/report-service";
 import { listWallets } from "@/services/payments/wallet-service";
 import { buildExecutiveAnalytics } from "@/services/analytics/aggregator";
 import { ensureAnalyticsSeeded } from "@/services/analytics/seed";
+import { listInstructorStudents } from "@/services/courses/instructor-students";
 import type { UserProfile } from "@/types";
 
 export { ensureDemoUsersSeeded };
@@ -199,18 +200,30 @@ export function listUsersByRole(role?: Role) {
   return users.map(toUserProfile);
 }
 
-export function getInstructorOverview() {
+export function getInstructorOverview(instructorUserId?: string | null) {
   const overview = getPlatformOverview();
   ensureCoursesSeeded();
   ensureClassesSeeded();
-  const mine = listCoursesForMetrics({ role: "instructor" });
-  const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR);
+  const users = readAuthDb().users;
+  const instructor =
+    (instructorUserId ? users.find((u) => u.id === instructorUserId) : null) ??
+    users.find((u) => u.role === ROLES.INSTRUCTOR);
+  const mine = listCoursesForMetrics({
+    role: "instructor",
+    instructorId: instructor?.id ?? null,
+  });
   const classStats = getClassStats(instructor?.id);
+  const students = instructor?.id
+    ? listInstructorStudents(instructor.id).reduce((set, row) => {
+        set.add(row.studentId);
+        return set;
+      }, new Set<string>()).size
+    : overview.totalStudents;
   return {
     myCourses: mine,
     todaysClasses: classStats.today,
     upcomingClasses: classStats.upcoming,
-    students: overview.totalStudents,
+    students,
     assignments: 7,
     quizzes: 3,
     earnings: 2400,
@@ -256,15 +269,25 @@ export function getStudentOverview() {
   };
 }
 
-function listCoursesForMetrics(opts: { role: "instructor" | "student" }): number {
+function listCoursesForMetrics(opts: {
+  role: "instructor" | "student";
+  instructorId?: string | null;
+}): number {
   const db = readCoursesDb();
   const users = readAuthDb().users;
   if (opts.role === "instructor") {
-    const instructor = users.find((u) => u.role === ROLES.INSTRUCTOR);
+    const instructor =
+      (opts.instructorId ? users.find((u) => u.id === opts.instructorId) : null) ??
+      users.find((u) => u.role === ROLES.INSTRUCTOR);
     if (!instructor) return 0;
     const ids = new Set(
       db.instructors.filter((i) => i.userId === instructor.id).map((i) => i.courseId),
     );
+    for (const course of db.courses) {
+      if (!course.deletedAt && course.primaryInstructorId === instructor.id) {
+        ids.add(course.id);
+      }
+    }
     return db.courses.filter((c) => !c.deletedAt && ids.has(c.id)).length;
   }
   const student = users.find((u) => u.role === ROLES.STUDENT && u.status === ACCOUNT_STATUS.ACTIVE);

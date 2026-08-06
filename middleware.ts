@@ -121,6 +121,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Instructors awaiting admin approval cannot enter the teaching console yet.
+  if (
+    claims?.role === "instructor" &&
+    claims.status === ACCOUNT_STATUS.PENDING &&
+    (pathname === "/instructor" || pathname.startsWith("/instructor/")) &&
+    pathname !== routes.instructorPending
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = routes.instructorPending;
+    return NextResponse.redirect(url);
+  }
+
   if (claims && !claims.profileComplete && pathname !== routes.completeProfile && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = routes.completeProfile;

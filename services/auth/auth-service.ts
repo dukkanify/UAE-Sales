@@ -31,6 +31,7 @@ import {
 } from "@/services/auth/store";
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { getPlatformSettings } from "@/services/settings/settings-service";
 
 export interface RequestContext {
   ipAddress?: string | null;
@@ -198,6 +199,7 @@ export async function requestOtp(input: {
   firstName?: string;
   lastName?: string;
   bookingId?: string;
+  role?: Role;
   ctx?: RequestContext;
 }): Promise<ApiResponse<{ email: string; demoOtp?: string; expiresInMinutes: number }>> {
   ensureSuperAdminSeeded();
@@ -256,6 +258,10 @@ export async function requestOtp(input: {
       firstName: input.firstName ? sanitizeString(input.firstName) : null,
       lastName: input.lastName ? sanitizeString(input.lastName) : null,
       bookingId: input.bookingId ?? null,
+      role:
+        input.purpose === "register" && input.role === ROLES.INSTRUCTOR
+          ? ROLES.INSTRUCTOR
+          : ROLES.STUDENT,
     },
     expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
     createdAt: nowIso(),
@@ -338,18 +344,22 @@ export async function verifyOtp(input: {
   let user = findUserByEmail(email);
 
   if (input.purpose === "register") {
+    const intendedRole =
+      challenge.meta.role === ROLES.INSTRUCTOR ? ROLES.INSTRUCTOR : ROLES.STUDENT;
+    const approvalRequired = Boolean(getPlatformSettings().users.instructorApprovalRequired);
+    const status =
+      intendedRole === ROLES.INSTRUCTOR && approvalRequired
+        ? ACCOUNT_STATUS.PENDING
+        : ACCOUNT_STATUS.ACTIVE;
     const created = createUser({
       email,
       firstName: (challenge.meta.firstName as string | null) ?? null,
       lastName: (challenge.meta.lastName as string | null) ?? null,
-      role: ROLES.STUDENT,
-      status: ACCOUNT_STATUS.ACTIVE,
+      role: intendedRole,
+      status,
     });
     created.emailVerified = true;
     created.profileComplete = Boolean(created.firstName && created.lastName);
-    if (created.profileComplete) {
-      created.status = ACCOUNT_STATUS.ACTIVE;
-    }
     writeAuthDb((d) => {
       d.users.push(created);
       d.otps = d.otps.filter((o) => o.id !== challenge.id);
@@ -360,7 +370,7 @@ export async function verifyOtp(input: {
       action: ACTIVITY_ACTIONS.USER_CREATED,
       entityType: "user",
       entityId: created.id,
-      metadata: { email, role: created.role },
+      metadata: { email, role: created.role, status: created.status },
       ...input.ctx,
     });
     await logActivity({
@@ -470,7 +480,10 @@ export async function verifyOtp(input: {
       const u = d.users.find((x) => x.id === user!.id);
       if (u) {
         u.emailVerified = true;
-        if (u.status === ACCOUNT_STATUS.PENDING) u.status = ACCOUNT_STATUS.ACTIVE;
+        // Students pending email verify become active; instructors awaiting admin stay pending.
+        if (u.status === ACCOUNT_STATUS.PENDING && u.role !== ROLES.INSTRUCTOR) {
+          u.status = ACCOUNT_STATUS.ACTIVE;
+        }
         u.updatedAt = nowIso();
       }
       d.otps = d.otps.filter((o) => o.id !== challenge.id);
@@ -528,7 +541,12 @@ export async function verifyOtp(input: {
     ...input.ctx,
   });
 
-  const redirectTo = profile.profileComplete ? ROLE_DASHBOARD[profile.role] : "/complete-profile";
+  const redirectTo =
+    profile.role === ROLES.INSTRUCTOR && profile.status === ACCOUNT_STATUS.PENDING
+      ? "/instructor-pending"
+      : profile.profileComplete
+        ? ROLE_DASHBOARD[profile.role]
+        : "/complete-profile";
 
   return {
     success: true,

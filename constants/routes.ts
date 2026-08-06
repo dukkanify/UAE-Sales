@@ -6,6 +6,9 @@ export const routes = {
   home: "/",
   splash: "/splash",
   book: "/book",
+  courses: "/courses",
+  registerInstructor: "/register/instructor",
+  instructorPending: "/instructor-pending",
 
   // Auth
   login: "/login",
@@ -67,6 +70,7 @@ export const authRoutes = [
   "/forgot-password",
   "/reset-password",
   "/splash",
+  "/instructor-pending",
 ] as const;
 
 /** Public system pages (no auth required) */
@@ -81,6 +85,7 @@ export const publicSystemRoutes = [
   "/401",
   "/403",
   "/design-system",
+  "/instructor-pending",
 ] as const;
 
 /** Map route prefix → required role */

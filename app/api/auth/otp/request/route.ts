@@ -55,6 +55,7 @@ export async function POST(request: Request) {
       rememberMe: parsed.data.rememberMe,
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
+      role: parsed.data.role,
       ctx,
     });
     return NextResponse.json(result, { status: result.success ? 200 : 400 });
