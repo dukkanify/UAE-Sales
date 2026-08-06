@@ -4,20 +4,109 @@
  */
 
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
-import { readAuthDb, writeAuthDb, type StoredUser } from "@/services/auth/store";
+import {
+  isStudentProfileComplete,
+  readAuthDb,
+  writeAuthDb,
+  type StoredUser,
+} from "@/services/auth/store";
 import { ROLES, type Role } from "@/constants/roles";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { generateId } from "@/lib/security/crypto";
 
+type DemoUser = Partial<StoredUser> & {
+  email: string;
+  role: Role;
+  firstName: string;
+  lastName: string;
+};
+
 export function ensureDemoUsersSeeded(): void {
   ensureSuperAdminSeeded();
   const db = readAuthDb();
-  if (db.users.length > 1) return;
+  if (db.users.length <= 1) {
+    seedFreshDemoUsers();
+  }
+  backfillDemoStudentDetails();
+}
 
+function backfillDemoStudentDetails(): void {
+  const enrich: Record<
+    string,
+    Pick<
+      StoredUser,
+      | "phone"
+      | "nationality"
+      | "dateOfBirth"
+      | "gender"
+      | "city"
+      | "bio"
+      | "emergencyContactName"
+      | "emergencyContactPhone"
+      | "countryCode"
+    >
+  > = {
+    "student.one@eagerpilots.com": {
+      phone: "+201001112233",
+      countryCode: "EG",
+      nationality: "Egyptian",
+      dateOfBirth: "1998-04-12",
+      gender: "male",
+      city: "Cairo",
+      bio: "ATPL theory candidate focusing on meteorology and navigation.",
+      emergencyContactName: "Hassan Khalil",
+      emergencyContactPhone: "+201009998877",
+    },
+    "student.two@eagerpilots.com": {
+      phone: "+966501234567",
+      countryCode: "SA",
+      nationality: "Saudi",
+      dateOfBirth: "1999-11-03",
+      gender: "female",
+      city: "Riyadh",
+      bio: "Working through Performance and Mass & Balance modules.",
+      emergencyContactName: "Noura Nasser",
+      emergencyContactPhone: "+966509876543",
+    },
+    "student.four@eagerpilots.com": {
+      phone: "+447700900123",
+      countryCode: "GB",
+      nationality: "British",
+      dateOfBirth: "1997-07-21",
+      gender: "female",
+      city: "London",
+      bio: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+    },
+    "abdulaziz@atplpass.com": {
+      phone: "+96550012345",
+      countryCode: "KW",
+      nationality: "Kuwaiti",
+      dateOfBirth: "1996-01-18",
+      gender: "male",
+      city: "Kuwait City",
+      bio: "Full ATPL ground school track.",
+      emergencyContactName: "Family contact",
+      emergencyContactPhone: "+96550098765",
+    },
+  };
+
+  writeAuthDb((d) => {
+    for (const user of d.users) {
+      const patch = enrich[user.email];
+      if (!patch) continue;
+      if (user.phone && user.nationality) continue;
+      Object.assign(user, patch);
+      user.profileComplete = isStudentProfileComplete(user);
+      user.updatedAt = new Date().toISOString();
+    }
+  });
+}
+
+function seedFreshDemoUsers(): void {
   const now = new Date().toISOString();
-  const demo: Array<
-    Partial<StoredUser> & { email: string; role: Role; firstName: string; lastName: string }
-  > = [
+  const demo: DemoUser[] = [
     {
       email: "admin@eagerpilots.com",
       role: ROLES.ADMIN,
@@ -36,6 +125,9 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "AE",
+      phone: "+971501112233",
+      nationality: "British",
+      city: "Dubai",
     },
     {
       email: "instructor.two@eagerpilots.com",
@@ -46,6 +138,9 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "AE",
+      phone: "+971509998877",
+      nationality: "Emirati",
+      city: "Abu Dhabi",
     },
     {
       email: "student.one@eagerpilots.com",
@@ -56,6 +151,14 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "EG",
+      phone: "+201001112233",
+      nationality: "Egyptian",
+      dateOfBirth: "1998-04-12",
+      gender: "male",
+      city: "Cairo",
+      bio: "ATPL theory candidate focusing on meteorology and navigation.",
+      emergencyContactName: "Hassan Khalil",
+      emergencyContactPhone: "+201009998877",
     },
     {
       email: "student.two@eagerpilots.com",
@@ -66,6 +169,14 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "SA",
+      phone: "+966501234567",
+      nationality: "Saudi",
+      dateOfBirth: "1999-11-03",
+      gender: "female",
+      city: "Riyadh",
+      bio: "Working through Performance and Mass & Balance modules.",
+      emergencyContactName: "Noura Nasser",
+      emergencyContactPhone: "+966509876543",
     },
     {
       email: "student.three@eagerpilots.com",
@@ -86,6 +197,11 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "GB",
+      phone: "+447700900123",
+      nationality: "British",
+      dateOfBirth: "1997-07-21",
+      gender: "female",
+      city: "London",
     },
     {
       email: "abdulaziz@atplpass.com",
@@ -96,6 +212,14 @@ export function ensureDemoUsersSeeded(): void {
       profileComplete: true,
       emailVerified: true,
       countryCode: "KW",
+      phone: "+96550012345",
+      nationality: "Kuwaiti",
+      dateOfBirth: "1996-01-18",
+      gender: "male",
+      city: "Kuwait City",
+      bio: "Full ATPL ground school track.",
+      emergencyContactName: "Family contact",
+      emergencyContactPhone: "+96550098765",
     },
   ];
 
@@ -107,9 +231,15 @@ export function ensureDemoUsersSeeded(): void {
         email: row.email,
         firstName: row.firstName,
         lastName: row.lastName,
-        phone: null,
+        phone: row.phone ?? null,
         countryCode: row.countryCode ?? null,
-        nationality: null,
+        nationality: row.nationality ?? null,
+        dateOfBirth: row.dateOfBirth ?? null,
+        gender: row.gender ?? null,
+        city: row.city ?? null,
+        bio: row.bio ?? null,
+        emergencyContactName: row.emergencyContactName ?? null,
+        emergencyContactPhone: row.emergencyContactPhone ?? null,
         avatarUrl: null,
         timezone: "UTC",
         language: "en",

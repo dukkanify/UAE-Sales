@@ -23,6 +23,7 @@ import { sanitizeEmail, sanitizeString } from "@/utils/sanitize";
 import {
   findUserByEmail,
   findUserById,
+  isStudentProfileComplete,
   readAuthDb,
   toUserProfile,
   writeAuthDb,
@@ -71,6 +72,12 @@ function createUser(partial: {
     phone: null,
     countryCode: null,
     nationality: null,
+    dateOfBirth: null,
+    gender: null,
+    city: null,
+    bio: null,
+    emergencyContactName: null,
+    emergencyContactPhone: null,
     avatarUrl: null,
     timezone: "UTC",
     language: "en",
@@ -113,6 +120,7 @@ async function issueSession(
 
     const target = db.users.find((u) => u.id === user.id);
     if (target) {
+      target.profileComplete = isStudentProfileComplete(target);
       target.lastLoginAt = nowIso();
       target.updatedAt = nowIso();
     }
@@ -359,7 +367,7 @@ export async function verifyOtp(input: {
       status,
     });
     created.emailVerified = true;
-    created.profileComplete = Boolean(created.firstName && created.lastName);
+    created.profileComplete = isStudentProfileComplete(created);
     writeAuthDb((d) => {
       d.users.push(created);
       d.otps = d.otps.filter((o) => o.id !== challenge.id);
@@ -396,7 +404,7 @@ export async function verifyOtp(input: {
         status: ACCOUNT_STATUS.ACTIVE,
       });
       created.emailVerified = true;
-      created.profileComplete = Boolean(created.firstName && created.lastName);
+      created.profileComplete = isStudentProfileComplete(created);
       writeAuthDb((d) => {
         d.users.push(created);
         d.otps = d.otps.filter((o) => o.id !== challenge.id);
@@ -436,7 +444,7 @@ export async function verifyOtp(input: {
           if (!u.lastName && challenge.meta.lastName) {
             u.lastName = sanitizeString(String(challenge.meta.lastName));
           }
-          u.profileComplete = Boolean(u.firstName && u.lastName);
+          u.profileComplete = isStudentProfileComplete(u);
           u.updatedAt = nowIso();
         }
         d.otps = d.otps.filter((o) => o.id !== challenge.id);
@@ -617,6 +625,12 @@ export async function completeProfile(input: {
   phone?: string;
   countryCode?: string;
   nationality?: string;
+  dateOfBirth?: string;
+  gender?: string;
+  city?: string;
+  bio?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
   timezone?: string;
   language?: string;
   ctx?: RequestContext;
@@ -632,16 +646,39 @@ export async function completeProfile(input: {
     u.firstName = sanitizeString(input.firstName);
     u.lastName = sanitizeString(input.lastName);
     u.phone = input.phone ? sanitizeString(input.phone) : u.phone;
-    u.countryCode = input.countryCode ?? u.countryCode;
-    u.nationality = input.nationality ?? u.nationality;
+    u.countryCode = input.countryCode || u.countryCode;
+    u.nationality = input.nationality ? sanitizeString(input.nationality) : u.nationality;
+    u.dateOfBirth = input.dateOfBirth ? sanitizeString(input.dateOfBirth) : u.dateOfBirth;
+    u.gender = input.gender ? sanitizeString(input.gender) : u.gender;
+    u.city = input.city ? sanitizeString(input.city) : u.city;
+    u.bio = input.bio ? sanitizeString(input.bio) : u.bio;
+    u.emergencyContactName = input.emergencyContactName
+      ? sanitizeString(input.emergencyContactName)
+      : u.emergencyContactName;
+    u.emergencyContactPhone = input.emergencyContactPhone
+      ? sanitizeString(input.emergencyContactPhone)
+      : u.emergencyContactPhone;
     u.timezone = input.timezone ?? u.timezone;
     u.language = input.language ?? u.language;
-    u.profileComplete = Boolean(u.firstName && u.lastName);
-    u.status = ACCOUNT_STATUS.ACTIVE;
+    u.profileComplete = isStudentProfileComplete(u);
+    if (u.role === ROLES.STUDENT && !u.profileComplete) {
+      /* keep incomplete until required fields are filled */
+    } else if (u.status === ACCOUNT_STATUS.PENDING && u.role !== ROLES.INSTRUCTOR) {
+      u.status = ACCOUNT_STATUS.ACTIVE;
+    }
     u.updatedAt = nowIso();
   });
 
-  const profile = toUserProfile(findUserById(input.userId)!);
+  const fresh = findUserById(input.userId)!;
+  if (fresh.role === ROLES.STUDENT && !fresh.profileComplete) {
+    return {
+      success: false,
+      data: null,
+      error: "Please complete name, phone, country, and nationality to continue.",
+    };
+  }
+
+  const profile = toUserProfile(fresh);
 
   // Refresh JWT claims so middleware sees profileComplete
   const parsed = await readSessionCookie();
@@ -687,6 +724,12 @@ export async function updateProfile(
     phone: string;
     countryCode: string;
     nationality: string;
+    dateOfBirth: string;
+    gender: string;
+    city: string;
+    bio: string;
+    emergencyContactName: string;
+    emergencyContactPhone: string;
     avatarUrl: string;
     timezone: string;
     language: string;
@@ -703,15 +746,51 @@ export async function updateProfile(
     if (!u) return;
     if (patch.firstName !== undefined) u.firstName = sanitizeString(patch.firstName);
     if (patch.lastName !== undefined) u.lastName = sanitizeString(patch.lastName);
-    if (patch.phone !== undefined) u.phone = sanitizeString(patch.phone);
-    if (patch.countryCode !== undefined) u.countryCode = patch.countryCode;
-    if (patch.nationality !== undefined) u.nationality = patch.nationality;
+    if (patch.phone !== undefined) u.phone = patch.phone ? sanitizeString(patch.phone) : null;
+    if (patch.countryCode !== undefined) u.countryCode = patch.countryCode || null;
+    if (patch.nationality !== undefined) {
+      u.nationality = patch.nationality ? sanitizeString(patch.nationality) : null;
+    }
+    if (patch.dateOfBirth !== undefined) {
+      u.dateOfBirth = patch.dateOfBirth ? sanitizeString(patch.dateOfBirth) : null;
+    }
+    if (patch.gender !== undefined) u.gender = patch.gender ? sanitizeString(patch.gender) : null;
+    if (patch.city !== undefined) u.city = patch.city ? sanitizeString(patch.city) : null;
+    if (patch.bio !== undefined) u.bio = patch.bio ? sanitizeString(patch.bio) : null;
+    if (patch.emergencyContactName !== undefined) {
+      u.emergencyContactName = patch.emergencyContactName
+        ? sanitizeString(patch.emergencyContactName)
+        : null;
+    }
+    if (patch.emergencyContactPhone !== undefined) {
+      u.emergencyContactPhone = patch.emergencyContactPhone
+        ? sanitizeString(patch.emergencyContactPhone)
+        : null;
+    }
     if (patch.avatarUrl !== undefined) u.avatarUrl = patch.avatarUrl;
     if (patch.timezone !== undefined) u.timezone = patch.timezone;
     if (patch.language !== undefined) u.language = patch.language;
-    u.profileComplete = Boolean(u.firstName && u.lastName);
+    u.profileComplete = isStudentProfileComplete(u);
     u.updatedAt = nowIso();
   });
+
+  const profile = toUserProfile(findUserById(userId)!);
+
+  const parsed = await readSessionCookie();
+  if (parsed) {
+    const env = getServerEnv();
+    await setSessionCookies(
+      parsed.payload.sid,
+      parsed.rawToken,
+      {
+        userId: profile.id,
+        role: profile.role,
+        status: profile.status,
+        profileComplete: profile.profileComplete,
+      },
+      env.AUTH_SESSION_DAYS * 86_400,
+    );
+  }
 
   await logActivity({
     actorId: userId,
@@ -724,7 +803,7 @@ export async function updateProfile(
 
   return {
     success: true,
-    data: { user: toUserProfile(findUserById(userId)!) },
+    data: { user: profile },
     error: null,
   };
 }

@@ -45,6 +45,7 @@ export const routes = {
       forgotPassword: "/api/auth/forgot-password",
       resetPassword: "/api/auth/reset-password",
       completeProfile: "/api/auth/complete-profile",
+      profile: "/api/auth/profile",
     },
     notifications: "/api/notifications",
     activityLogs: "/api/admin/activity-logs",

@@ -25,6 +25,12 @@ export interface StoredUser {
   phone: string | null;
   countryCode: string | null;
   nationality: string | null;
+  dateOfBirth: string | null;
+  gender: string | null;
+  city: string | null;
+  bio: string | null;
+  emergencyContactName: string | null;
+  emergencyContactPhone: string | null;
   avatarUrl: string | null;
   timezone: string;
   language: string;
@@ -85,12 +91,33 @@ function ensureStore(): AuthDatabase {
   }
   try {
     const raw = readFileSync(DATA_FILE, "utf8");
-    return { ...emptyDb(), ...JSON.parse(raw) } as AuthDatabase;
+    const parsed = { ...emptyDb(), ...JSON.parse(raw) } as AuthDatabase;
+    parsed.users = (parsed.users ?? []).map(normalizeStoredUser);
+    return parsed;
   } catch {
     const db = emptyDb();
     writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
     return db;
   }
+}
+
+/** Backfill fields added after early auth JSON snapshots. */
+function normalizeStoredUser(user: StoredUser): StoredUser {
+  return {
+    ...user,
+    phone: user.phone ?? null,
+    countryCode: user.countryCode ?? null,
+    nationality: user.nationality ?? null,
+    dateOfBirth: user.dateOfBirth ?? null,
+    gender: user.gender ?? null,
+    city: user.city ?? null,
+    bio: user.bio ?? null,
+    emergencyContactName: user.emergencyContactName ?? null,
+    emergencyContactPhone: user.emergencyContactPhone ?? null,
+    avatarUrl: user.avatarUrl ?? null,
+    timezone: user.timezone || "UTC",
+    language: user.language || "en",
+  };
 }
 
 function saveStore(db: AuthDatabase): void {
@@ -119,12 +146,18 @@ export function toUserProfile(user: StoredUser): UserProfile {
     firstName: user.firstName,
     lastName: user.lastName,
     fullName,
-    phone: user.phone,
-    countryCode: user.countryCode,
-    nationality: user.nationality,
-    avatarUrl: user.avatarUrl,
-    timezone: user.timezone,
-    language: user.language,
+    phone: user.phone ?? null,
+    countryCode: user.countryCode ?? null,
+    nationality: user.nationality ?? null,
+    dateOfBirth: user.dateOfBirth ?? null,
+    gender: user.gender ?? null,
+    city: user.city ?? null,
+    bio: user.bio ?? null,
+    emergencyContactName: user.emergencyContactName ?? null,
+    emergencyContactPhone: user.emergencyContactPhone ?? null,
+    avatarUrl: user.avatarUrl ?? null,
+    timezone: user.timezone || "UTC",
+    language: user.language || "en",
     role: user.role,
     status: user.status,
     emailVerified: user.emailVerified,
@@ -133,6 +166,27 @@ export function toUserProfile(user: StoredUser): UserProfile {
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
   };
+}
+
+/** Student accounts need contact + identity basics before the learning console. */
+export function isStudentProfileComplete(
+  user: Pick<
+    StoredUser,
+    "firstName" | "lastName" | "phone" | "countryCode" | "nationality" | "role"
+  >,
+): boolean {
+  if (user.role !== "student") {
+    return Boolean(user.firstName && user.lastName);
+  }
+  return Boolean(
+    user.firstName &&
+    user.lastName &&
+    user.phone &&
+    user.phone.trim().length >= 7 &&
+    user.countryCode &&
+    user.nationality &&
+    user.nationality.trim().length >= 2,
+  );
 }
 
 export function findUserByEmail(email: string): StoredUser | null {
