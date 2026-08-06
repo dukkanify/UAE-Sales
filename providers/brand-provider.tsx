@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 
 export type RuntimeBrand = {
   platformName: string;
@@ -27,25 +27,20 @@ export type RuntimeBrand = {
 };
 
 const FALLBACK: RuntimeBrand = {
-  platformName: siteConfig?.name ?? "ATPL PASS",
-  logoUrl: siteConfig?.brand?.logo ?? "/brand/logo.svg",
-  darkLogoUrl: siteConfig?.brand?.logoDark ?? "/brand/logo-dark.svg",
-  faviconUrl: siteConfig?.brand?.favicon ?? "/brand/favicon.svg",
-  openGraphImageUrl: siteConfig?.brand?.openGraph ?? "/brand/og.svg",
-  contactEmail: siteConfig?.contactEmail ?? "ME@ABDULAZIZALSHOAIL.COM",
-  supportEmail: siteConfig?.supportEmail ?? "ME@ABDULAZIZALSHOAIL.COM",
-  locations: [...(siteConfig?.locations ?? ["Kuwait", "Dubai"])],
-  socialHandle: siteConfig?.socialHandle ?? "@ABDULAZIZ_ALSHOAIL",
-  socialLinks: {
-    instagram: siteConfig?.social?.instagram ?? "",
-    twitter: siteConfig?.social?.twitter ?? "",
-    linkedin: siteConfig?.social?.linkedin ?? "",
-    youtube: siteConfig?.social?.youtube ?? "",
-  },
-  footerText: siteConfig?.description ?? "ATPL PASS aviation course platform",
+  platformName: siteStatic.name,
+  logoUrl: siteStatic.brand.logo,
+  darkLogoUrl: siteStatic.brand.logoDark,
+  faviconUrl: siteStatic.brand.favicon,
+  openGraphImageUrl: siteStatic.brand.openGraph,
+  contactEmail: siteStatic.contactEmail,
+  supportEmail: siteStatic.supportEmail,
+  locations: [...siteStatic.locations],
+  socialHandle: siteStatic.socialHandle,
+  socialLinks: { ...siteStatic.social },
+  footerText: siteStatic.description,
   primaryColor: "#2E7DAA",
   accentColor: "#DD9B30",
-  metaDescription: siteConfig?.description ?? "ATPL PASS aviation course platform",
+  metaDescription: siteStatic.description,
 };
 
 const BrandContext = React.createContext<RuntimeBrand>(FALLBACK);
@@ -64,7 +59,6 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
           if (cancelled || !json.success || !json.data) return;
           const next = { ...FALLBACK, ...json.data };
-          // Never allow empty asset URLs to wipe fallbacks (HMR / partial API payloads).
           setBrand({
             ...next,
             platformName: next.platformName || FALLBACK.platformName,

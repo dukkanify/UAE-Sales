@@ -17,9 +17,7 @@ import { ROLE_DASHBOARD, type Role } from "@/constants/roles";
 import { SESSION_COOKIE, verifySessionJwt } from "@/lib/security/session-token";
 
 function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
-  return prefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
+  return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
 async function readClaims(request: NextRequest): Promise<{
@@ -66,6 +64,21 @@ async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Browsers / autocomplete sometimes hit /BOOK — canonicalize known public paths.
+  if (pathname !== pathname.toLowerCase()) {
+    const lower = pathname.toLowerCase();
+    if (
+      lower === "/book" ||
+      lower === "/login" ||
+      lower === "/register" ||
+      lower === "/verify-otp"
+    ) {
+      const url = request.nextUrl.clone();
+      url.pathname = lower;
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (
     matchesPrefix(pathname, publicSystemRoutes) ||
     pathname.startsWith("/_next") ||
@@ -108,12 +121,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (
-    claims &&
-    !claims.profileComplete &&
-    pathname !== routes.completeProfile &&
-    isProtected
-  ) {
+  if (claims && !claims.profileComplete && pathname !== routes.completeProfile && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = routes.completeProfile;
     return NextResponse.redirect(url);
@@ -121,9 +129,7 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthRoute && claims && claims.status !== ACCOUNT_STATUS.SUSPENDED) {
     const url = request.nextUrl.clone();
-    url.pathname = claims.profileComplete
-      ? ROLE_DASHBOARD[claims.role]
-      : routes.completeProfile;
+    url.pathname = claims.profileComplete ? ROLE_DASHBOARD[claims.role] : routes.completeProfile;
     return NextResponse.redirect(url);
   }
 
