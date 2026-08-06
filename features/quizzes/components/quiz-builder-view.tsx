@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -89,10 +89,7 @@ function QuizBuilderView({ basePath = "/instructor/quizzes" }: QuizBuilderViewPr
       <PageHeader
         title="Quiz builder"
         description="Configure settings, attach bank questions, and preview the student experience."
-        breadcrumbs={[
-          { label: "Quizzes", href: basePath },
-          { label: q.title },
-        ]}
+        breadcrumbs={[{ label: "Quizzes", href: basePath }, { label: q.title }]}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
@@ -130,9 +127,7 @@ function QuizBuilderView({ basePath = "/instructor/quizzes" }: QuizBuilderViewPr
           <CardContent className="space-y-3">
             <Input
               value={q.title}
-              onChange={(e) =>
-                setDetail({ ...detail, quiz: { ...q, title: e.target.value } })
-              }
+              onChange={(e) => setDetail({ ...detail, quiz: { ...q, title: e.target.value } })}
               aria-label="Title"
             />
             <Textarea
@@ -245,9 +240,7 @@ function QuizBuilderView({ basePath = "/instructor/quizzes" }: QuizBuilderViewPr
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">
-              Questions ({selected.length} selected)
-            </CardTitle>
+            <CardTitle className="text-base">Questions ({selected.length} selected)</CardTitle>
           </CardHeader>
           <CardContent className="max-h-[70vh] space-y-2 overflow-y-auto">
             {bank.map((item) => {
@@ -270,8 +263,7 @@ function QuizBuilderView({ basePath = "/instructor/quizzes" }: QuizBuilderViewPr
                   <div className="min-w-0">
                     <p className="text-sm font-medium leading-snug">{item.stem}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {QUESTION_TYPE_LABELS[item.type]} · {item.points} pts ·{" "}
-                      {item.difficulty}
+                      {QUESTION_TYPE_LABELS[item.type]} · {item.points} pts · {item.difficulty}
                     </p>
                   </div>
                 </label>

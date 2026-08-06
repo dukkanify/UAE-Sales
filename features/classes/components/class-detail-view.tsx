@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowLeft, ExternalLink, Radio } from "lucide-react";
 import { toast } from "sonner";
 
@@ -34,17 +34,18 @@ interface ClassDetailViewProps {
 
 function ClassDetailView({ classId, basePath, roleLabel }: ClassDetailViewProps) {
   const [detail, setDetail] = React.useState<
-    (LiveClassListItem & {
-      zoom: {
-        zoomMeetingId: string;
-        joinUrl: string;
-        password: string;
-        waitingRoom: boolean;
-        providerMode: string;
-      } | null;
-      participants: Array<{ userId: string; role: string }>;
-      recordings: Array<{ id: string; title: string; url: string }>;
-    }) | null
+    | (LiveClassListItem & {
+        zoom: {
+          zoomMeetingId: string;
+          joinUrl: string;
+          password: string;
+          waitingRoom: boolean;
+          providerMode: string;
+        } | null;
+        participants: Array<{ userId: string; role: string }>;
+        recordings: Array<{ id: string; title: string; url: string }>;
+      })
+    | null
   >(null);
   const [attendance, setAttendance] = React.useState<AttendanceWithStudent[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -131,16 +132,14 @@ function ClassDetailView({ classId, basePath, roleLabel }: ClassDetailViewProps)
           </CardHeader>
           <CardContent className="grid gap-2 text-sm sm:grid-cols-2">
             <p>
-              <span className="text-muted-foreground">Course:</span>{" "}
-              {detail.courseCode ?? "—"}
+              <span className="text-muted-foreground">Course:</span> {detail.courseCode ?? "—"}
             </p>
             <p>
               <span className="text-muted-foreground">Instructor:</span>{" "}
               {detail.instructorName ?? "—"}
             </p>
             <p>
-              <span className="text-muted-foreground">Duration:</span> {detail.durationMinutes}{" "}
-              min
+              <span className="text-muted-foreground">Duration:</span> {detail.durationMinutes} min
             </p>
             <p>
               <span className="text-muted-foreground">Timezone:</span> {detail.timezone}
@@ -168,8 +167,7 @@ function ClassDetailView({ classId, basePath, roleLabel }: ClassDetailViewProps)
                   {detail.zoom.password || "—"}
                 </p>
                 <p>
-                  <span className="text-muted-foreground">Mode:</span>{" "}
-                  {detail.zoom.providerMode}
+                  <span className="text-muted-foreground">Mode:</span> {detail.zoom.providerMode}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Waiting room:</span>{" "}
@@ -213,9 +211,7 @@ function ClassDetailView({ classId, basePath, roleLabel }: ClassDetailViewProps)
                         className="flex flex-col gap-2 rounded-xl border border-border/70 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div>
-                          <p className="font-medium">
-                            {row?.studentName ?? p.userId.slice(0, 8)}
-                          </p>
+                          <p className="font-medium">{row?.studentName ?? p.userId.slice(0, 8)}</p>
                           <p className="text-xs text-muted-foreground">
                             {row
                               ? `${ATTENDANCE_STATUS_LABELS[row.status]} · ${row.attendancePercent}%`

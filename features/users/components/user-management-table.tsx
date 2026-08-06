@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { MoreHorizontal, Users } from "lucide-react";
 
 import type { Role, UserProfile } from "@/types";
@@ -78,8 +78,7 @@ function UserManagementTable({
     };
   }, [roleFilter]);
 
-  const filtered =
-    statusFilter === "all" ? users : users.filter((u) => u.status === statusFilter);
+  const filtered = statusFilter === "all" ? users : users.filter((u) => u.status === statusFilter);
 
   const columns: DataTableColumn<UserProfile>[] = [
     {
@@ -117,8 +116,7 @@ function UserManagementTable({
     {
       id: "lastLoginAt",
       header: "Last login",
-      cell: (row) =>
-        row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleDateString() : "Never",
+      cell: (row) => (row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleDateString() : "Never"),
     },
     {
       id: "actions",

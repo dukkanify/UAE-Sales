@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ExternalLink, Radio, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,10 +37,10 @@ function JoinClassClient({ classId }: JoinClassClientProps) {
     let cancelled = false;
     async function load() {
       setLoading(true);
-      const result = await classFetch<NonNullable<typeof data>>(
-        `/api/classes/${classId}/join`,
-        { method: "POST", body: "{}" },
-      );
+      const result = await classFetch<NonNullable<typeof data>>(`/api/classes/${classId}/join`, {
+        method: "POST",
+        body: "{}",
+      });
       if (cancelled) return;
       if (!result.success || !result.data) {
         setError(result.error ?? "Unable to join");
@@ -74,7 +74,7 @@ function JoinClassClient({ classId }: JoinClassClientProps) {
   if (error || !data) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center gap-4 p-6 text-center">
-        <BrandLogo />
+        <BrandLogo href="/login" />
         <h1 className="font-display text-2xl font-semibold">Unable to join</h1>
         <p className="text-sm text-muted-foreground">{error ?? "Class not available"}</p>
         <Button asChild variant="outline">
@@ -89,7 +89,7 @@ function JoinClassClient({ classId }: JoinClassClientProps) {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-lg flex-col justify-center gap-6 p-6">
-      <BrandLogo />
+      <BrandLogo href="/" />
       <Card>
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
@@ -110,7 +110,11 @@ function JoinClassClient({ classId }: JoinClassClientProps) {
               <div className="rounded-xl border border-border/70 p-3 text-sm">
                 <p>
                   <span className="text-muted-foreground">Meeting ID:</span>{" "}
-                  <button type="button" className="font-medium" onClick={() => copy(join.zoomMeetingId)}>
+                  <button
+                    type="button"
+                    className="font-medium"
+                    onClick={() => copy(join.zoomMeetingId)}
+                  >
                     {join.zoomMeetingId}
                   </button>
                 </p>

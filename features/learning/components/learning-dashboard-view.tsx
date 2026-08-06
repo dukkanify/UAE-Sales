@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import {
   Bookmark,
   BookOpen,
@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { learningFetch } from "@/features/learning/lib/api";
+import { safePath } from "@/lib/links/safe-href";
 import type { LearningDashboardOverview, LearningHistoryEvent } from "@/types/learning";
 
 function LearningDashboardView() {
@@ -50,7 +51,10 @@ function LearningDashboardView() {
   }, []);
 
   const resumeHref = overview?.resume
-    ? `/student/courses/${overview.resume.courseId}/lessons/${overview.resume.lessonId}`
+    ? safePath(
+        ["student", "courses", overview.resume.courseId, "lessons", overview.resume.lessonId],
+        "/student/courses",
+      )
     : "/student/courses";
 
   const activity = (overview?.recentActivity ?? []).map((e: LearningHistoryEvent) => ({

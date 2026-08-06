@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Download } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";

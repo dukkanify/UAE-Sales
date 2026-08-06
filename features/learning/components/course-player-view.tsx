@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useRouter } from "next/navigation";
 import {
   Bookmark,
@@ -23,11 +23,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { learningFetch, learningJson } from "@/features/learning/lib/api";
 import type { Lesson, LessonResource } from "@/types/courses";
-import type {
-  CourseLearningState,
-  LessonProgressRecord,
-  StudentNote,
-} from "@/types/learning";
+import type { CourseLearningState, LessonProgressRecord, StudentNote } from "@/types/learning";
 
 type PlayerPayload = {
   course: {

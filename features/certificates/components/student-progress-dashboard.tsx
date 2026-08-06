@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -9,10 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { certFetch } from "@/features/certificates/lib/api";
-import type {
-  ProgressTimelineEvent,
-  StudentProgressSnapshot,
-} from "@/types/certificates";
+import type { ProgressTimelineEvent, StudentProgressSnapshot } from "@/types/certificates";
 
 function StudentProgressDashboard() {
   const [snap, setSnap] = React.useState<StudentProgressSnapshot | null>(null);

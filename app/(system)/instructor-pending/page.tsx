@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import type { Metadata } from "next";
 
 import { BrandLogo } from "@/components/brand/brand-logo";

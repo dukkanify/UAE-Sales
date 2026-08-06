@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import {
   Archive,
   BookOpen,
@@ -58,14 +58,13 @@ import {
 import { courseFetch } from "@/features/courses/lib/api";
 import { CourseFormDialog } from "@/features/courses/components/course-form-dialog";
 import { CourseStatsWidgets } from "@/features/courses/components/course-stats-widgets";
-import type {
-  CourseCategory,
-  CourseListItem,
-  CourseStats,
-} from "@/types/courses";
+import type { CourseCategory, CourseListItem, CourseStats } from "@/types/courses";
 import type { UserProfile } from "@/types";
 
-const statusVariant: Record<string, "success" | "warning" | "secondary" | "outline" | "destructive"> = {
+const statusVariant: Record<
+  string,
+  "success" | "warning" | "secondary" | "outline" | "destructive"
+> = {
   published: "success",
   draft: "secondary",
   private: "outline",
@@ -175,10 +174,7 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
       sortable: true,
       cell: (row) => (
         <div>
-          <Link
-            href={`${basePath}/${row.id}`}
-            className="font-medium text-primary hover:underline"
-          >
+          <Link href={`${basePath}/${row.id}`} className="font-medium text-primary hover:underline">
             {row.title}
           </Link>
           <p className="text-xs text-muted-foreground">{row.code}</p>
@@ -257,10 +253,7 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
               <Copy className="mr-2 h-4 w-4" /> Duplicate
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => setDeleteId(row.id)}
-            >
+            <DropdownMenuItem className="text-destructive" onClick={() => setDeleteId(row.id)}>
               <Trash2 className="mr-2 h-4 w-4" /> Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -416,9 +409,7 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
                 <Button
                   size="sm"
                   variant="secondary"
-                  onClick={() =>
-                    setSelected(courses.map((c) => c.id))
-                  }
+                  onClick={() => setSelected(courses.map((c) => c.id))}
                 >
                   Select all ({courses.length})
                 </Button>

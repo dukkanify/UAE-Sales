@@ -1,14 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import {
-  Copy,
-  MoreHorizontal,
-  Plus,
-  Trash2,
-  Video,
-} from "lucide-react";
+import Link from "@/components/ui/app-link";
+import { Copy, MoreHorizontal, Plus, Trash2, Video } from "lucide-react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -51,7 +45,10 @@ import type { LiveClassListItem } from "@/types/classes";
 import type { CourseListItem } from "@/types/courses";
 import type { UserProfile } from "@/types";
 
-const statusVariant: Record<string, "success" | "warning" | "secondary" | "outline" | "destructive" | "accent"> = {
+const statusVariant: Record<
+  string,
+  "success" | "warning" | "secondary" | "outline" | "destructive" | "accent"
+> = {
   scheduled: "outline",
   upcoming: "accent",
   live: "success",
@@ -68,11 +65,7 @@ interface ClassManagementViewProps {
   lockInstructorId?: string | null;
 }
 
-function ClassManagementView({
-  basePath,
-  roleLabel,
-  lockInstructorId,
-}: ClassManagementViewProps) {
+function ClassManagementView({ basePath, roleLabel, lockInstructorId }: ClassManagementViewProps) {
   const [rows, setRows] = React.useState<LiveClassListItem[]>([]);
   const [stats, setStats] = React.useState<{
     today: number;

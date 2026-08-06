@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowUpRight } from "lucide-react";
 
 import { PublicCourseCatalog } from "@/features/courses/components/public-course-catalog";
