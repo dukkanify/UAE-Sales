@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
@@ -40,12 +40,11 @@ function Sidebar({ className }: SidebarProps) {
               item.href === routes.dashboard
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
-            const Icon =
-              item.label.toLowerCase().includes("profile")
-                ? User
-                : item.label.toLowerCase().includes("setting")
-                  ? Settings
-                  : LayoutDashboard;
+            const Icon = item.label.toLowerCase().includes("profile")
+              ? User
+              : item.label.toLowerCase().includes("setting")
+                ? Settings
+                : LayoutDashboard;
 
             return (
               <Link

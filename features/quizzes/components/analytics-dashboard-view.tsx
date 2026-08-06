@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,9 +13,7 @@ interface AnalyticsDashboardViewProps {
   basePath?: string;
 }
 
-function AnalyticsDashboardView({
-  basePath = "/instructor/quizzes",
-}: AnalyticsDashboardViewProps) {
+function AnalyticsDashboardView({ basePath = "/instructor/quizzes" }: AnalyticsDashboardViewProps) {
   const [quizzes, setQuizzes] = React.useState<QuizListItem[]>([]);
   const [quizId, setQuizId] = React.useState("");
   const [stats, setStats] = React.useState<AssessmentAnalyticsSnapshot | null>(null);
@@ -44,10 +42,7 @@ function AnalyticsDashboardView({
       <PageHeader
         title="Assessment analytics"
         description="Average scores, pass rates, timing, and frequently missed questions."
-        breadcrumbs={[
-          { label: "Quizzes", href: basePath },
-          { label: "Analytics" },
-        ]}
+        breadcrumbs={[{ label: "Quizzes", href: basePath }, { label: "Analytics" }]}
         actions={
           <Button asChild variant="outline" size="sm">
             <Link href={basePath}>Back</Link>

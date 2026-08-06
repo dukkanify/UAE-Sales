@@ -19,9 +19,18 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined
     : {
-        command: process.env.CI ? "npm run start" : "npm run dev",
+        // Bind explicitly so CI/local custom PLAYWRIGHT_PORT works with `next start`.
+        command: process.env.CI ? `npx next start -p ${PORT}` : `npm run dev -- -p ${PORT}`,
         url: `${BASE}/api/health`,
         reuseExistingServer: !process.env.CI,
         timeout: 180_000,
+        env: {
+          ...process.env,
+          PORT: String(PORT),
+          ENABLE_DEMO_OTP: process.env.ENABLE_DEMO_OTP ?? "true",
+          FORCE_DEMO_OTP: process.env.FORCE_DEMO_OTP ?? "true",
+          DEMO_OTP_CODE: process.env.DEMO_OTP_CODE ?? "123456",
+          NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV ?? "development",
+        },
       },
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { useParams } from "next/navigation";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -63,9 +63,7 @@ function CertificateViewer() {
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               Certificate of Completion
             </p>
-            <h2 className="font-display text-4xl font-semibold tracking-tight">
-              {c.studentName}
-            </h2>
+            <h2 className="font-display text-4xl font-semibold tracking-tight">{c.studentName}</h2>
             <p className="text-muted-foreground">has successfully completed</p>
             <h3 className="font-display text-2xl">{c.courseName}</h3>
             <p className="text-sm">
@@ -81,11 +79,7 @@ function CertificateViewer() {
           </CardHeader>
           <CardContent className="space-y-3 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={data.qrDataUrl}
-              alt="Verification QR code"
-              className="mx-auto h-40 w-40"
-            />
+            <img src={data.qrDataUrl} alt="Verification QR code" className="mx-auto h-40 w-40" />
             <p className="font-mono text-xs">{c.verificationCode}</p>
             <p className="break-all text-[10px] text-muted-foreground">
               Sig {c.digitalSignature.slice(0, 32)}…

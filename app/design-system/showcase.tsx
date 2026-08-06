@@ -76,7 +76,7 @@ function DesignSystemShowcase() {
       <PageTransition className="container-app space-y-16 py-12">
         <header className="flex flex-col gap-6 border-b border-border pb-10 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-4">
-            <BrandLogo />
+            <BrandLogo href="/" />
             <h1 className="text-display text-primary">Design System</h1>
             <p className="max-w-2xl text-body text-muted-foreground">
               Production UI foundation for {siteConfig.name}. Tokens, layouts, forms, feedback,

@@ -1,15 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import {
-  Archive,
-  BarChart3,
-  Copy,
-  HelpCircle,
-  Plus,
-  Search,
-} from "lucide-react";
+import Link from "@/components/ui/app-link";
+import { Archive, BarChart3, Copy, HelpCircle, Plus, Search } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -60,11 +53,7 @@ function InstructorQuizzesView({
       setRows([]);
     } else {
       const payload = list.data as unknown as { data?: QuizListItem[] } | QuizListItem[] | null;
-      setRows(
-        Array.isArray(payload)
-          ? payload
-          : payload?.data ?? [],
-      );
+      setRows(Array.isArray(payload) ? payload : (payload?.data ?? []));
       setError(null);
     }
     if (stats.success && stats.data) setOverview(stats.data);
@@ -195,8 +184,7 @@ function InstructorQuizzesView({
               <CardContent className="space-y-3">
                 <p className="text-xs text-muted-foreground">
                   {quiz.questionLinks} questions · {quiz.attemptsCount} attempts · pass{" "}
-                  {quiz.passingScore}%
-                  {quiz.courseTitle ? ` · ${quiz.courseTitle}` : ""}
+                  {quiz.passingScore}%{quiz.courseTitle ? ` · ${quiz.courseTitle}` : ""}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Button asChild size="sm">

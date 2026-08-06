@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Bookmark, PlayCircle, Search, Star } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DIFFICULTY_LABELS } from "@/constants/courses";
 import { learningFetch, learningJson } from "@/features/learning/lib/api";
+import { safePath } from "@/lib/links/safe-href";
 import type { CourseLearningState } from "@/types/learning";
 import type { CourseListItem } from "@/types/courses";
 
@@ -48,9 +49,8 @@ function MyCoursesView() {
   async function toggleFavorite(course: CourseRow) {
     const existing = course.learning?.favorited;
     if (existing) {
-      const favs = await learningFetch<Array<{ id: string; targetId: string }>>(
-        "/api/learning/favorites",
-      );
+      const favs =
+        await learningFetch<Array<{ id: string; targetId: string }>>("/api/learning/favorites");
       const row = favs.data?.find((f) => f.targetId === course.id);
       if (row) await learningJson(`/api/learning/favorites/${row.id}`, "DELETE");
     } else {
@@ -123,8 +123,8 @@ function MyCoursesView() {
             const pct = Math.round(course.learning?.progressPercent ?? 0);
             const resumeId = course.learning?.lastLessonId;
             const href = resumeId
-              ? `/student/courses/${course.id}/lessons/${resumeId}`
-              : `/student/courses/${course.id}`;
+              ? safePath(["student", "courses", course.id, "lessons", resumeId], "/student/courses")
+              : safePath(["student", "courses", course.id], "/student/courses");
             return (
               <Card key={course.id} className="flex flex-col overflow-hidden">
                 <CardHeader>
@@ -160,21 +160,13 @@ function MyCoursesView() {
                         Continue
                       </Link>
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => void toggleFavorite(course)}
-                    >
+                    <Button size="sm" variant="outline" onClick={() => void toggleFavorite(course)}>
                       <Star
                         className={`size-4 ${course.learning?.favorited ? "fill-current" : ""}`}
                       />
                       Favorite
                     </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => void bookmarkCourse(course)}
-                    >
+                    <Button size="sm" variant="ghost" onClick={() => void bookmarkCourse(course)}>
                       <Bookmark className="size-4" />
                       Bookmark
                     </Button>

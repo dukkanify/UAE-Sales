@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { BookOpen } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -9,10 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  COURSE_STATUS_LABELS,
-  DIFFICULTY_LABELS,
-} from "@/constants/courses";
+import { COURSE_STATUS_LABELS, DIFFICULTY_LABELS } from "@/constants/courses";
 import { courseFetch } from "@/features/courses/lib/api";
 import type { CourseListItem } from "@/types/courses";
 

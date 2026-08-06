@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,10 +79,7 @@ function LoginForm() {
       </div>
 
       <label className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Checkbox
-          checked={rememberMe}
-          onCheckedChange={(v) => setRememberMe(v === true)}
-        />
+        <Checkbox checked={rememberMe} onCheckedChange={(v) => setRememberMe(v === true)} />
         Remember me for 30 days
       </label>
 

@@ -14,7 +14,7 @@ import {
   Video,
   X,
 } from "lucide-react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";

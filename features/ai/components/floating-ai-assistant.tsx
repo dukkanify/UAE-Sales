@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Bot, History, Loader2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

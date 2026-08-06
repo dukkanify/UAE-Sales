@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Award, Download, ExternalLink, ShieldCheck } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -65,17 +65,15 @@ function StudentCertificatesView() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <CardTitle className="font-display text-xl">{cert.courseName}</CardTitle>
-                    <CardDescription className="mt-1">
-                      {cert.certificateNumber}
-                    </CardDescription>
+                    <CardDescription className="mt-1">{cert.certificateNumber}</CardDescription>
                   </div>
-                  <Badge variant="secondary">
-                    {CERTIFICATE_STATUS_LABELS[cert.status]}
-                  </Badge>
+                  <Badge variant="secondary">{CERTIFICATE_STATUS_LABELS[cert.status]}</Badge>
                 </div>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
-                <p>Issued {cert.issueDate ?? "—"} · Instructor {cert.instructorName}</p>
+                <p>
+                  Issued {cert.issueDate ?? "—"} · Instructor {cert.instructorName}
+                </p>
                 <p className="font-mono text-xs text-muted-foreground">
                   Verify: {cert.verificationCode}
                 </p>

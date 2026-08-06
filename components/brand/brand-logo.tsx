@@ -1,13 +1,15 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 
 import { siteStatic } from "@/config/site-static";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
+import { safeHref } from "@/lib/links/safe-href";
 
 interface BrandLogoProps {
   className?: string;
+  /** `null` disables linking; omit/`undefined` defaults to home. */
   href?: string | null;
   variant?: "full" | "mark" | "dark";
   priority?: boolean;
@@ -20,7 +22,7 @@ interface BrandLogoProps {
  */
 function BrandLogo({
   className,
-  href = routes.home,
+  href,
   variant = "full",
   priority = false,
   showWordmark = false,
@@ -32,6 +34,16 @@ function BrandLogo({
       : variant === "dark"
         ? siteStatic.brand.logoDark
         : siteStatic.brand.logo;
+
+  // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
+  // (JS default params do NOT apply when the caller passes `href={undefined}`).
+  // Only invalid non-empty values go through safeHref (which warns in dev).
+  const disableLink = href === null || href === "";
+  const resolvedHref = disableLink
+    ? null
+    : href === undefined
+      ? routes.home
+      : safeHref(href, routes.home);
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
@@ -59,9 +71,9 @@ function BrandLogo({
     </span>
   );
 
-  if (href === null || href === "") return content;
+  if (!resolvedHref) return content;
   return (
-    <Link href={href} className="inline-flex items-center" aria-label={name}>
+    <Link href={resolvedHref} className="inline-flex items-center" aria-label={name}>
       {content}
     </Link>
   );

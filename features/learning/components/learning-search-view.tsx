@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Search } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -98,9 +98,7 @@ function LearningSearchView() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">
-                Resources ({data.resources.length})
-              </CardTitle>
+              <CardTitle className="text-base">Resources ({data.resources.length})</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {data.resources.map((r) => (
@@ -121,7 +119,9 @@ function LearningSearchView() {
           </Card>
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">Start typing to search your learning library.</p>
+        <p className="text-sm text-muted-foreground">
+          Start typing to search your learning library.
+        </p>
       )}
     </div>
   );

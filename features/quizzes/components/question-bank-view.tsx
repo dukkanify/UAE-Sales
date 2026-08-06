@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Download, Plus, Search, Upload } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
@@ -46,7 +46,10 @@ function QuestionBankView({ basePath = "/instructor/quizzes" }: QuestionBankView
   }, [load]);
 
   async function createQuestion() {
-    const labels = optionsText.split("|").map((s) => s.trim()).filter(Boolean);
+    const labels = optionsText
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const options = labels.map((label, i) => ({
       id: String.fromCharCode(97 + i),
       label,
@@ -79,10 +82,7 @@ function QuestionBankView({ basePath = "/instructor/quizzes" }: QuestionBankView
       <PageHeader
         title="Question bank"
         description="Reusable questions with categories, tags, search, and CSV / PILOT100-ready import."
-        breadcrumbs={[
-          { label: "Quizzes", href: basePath },
-          { label: "Question bank" },
-        ]}
+        breadcrumbs={[{ label: "Quizzes", href: basePath }, { label: "Question bank" }]}
         actions={
           <Button
             variant="outline"
@@ -197,9 +197,7 @@ function QuestionBankView({ basePath = "/instructor/quizzes" }: QuestionBankView
               </div>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{QUESTION_TYPE_LABELS[item.type]}</Badge>
-                <Badge variant="outline">
-                  {QUESTION_DIFFICULTY_LABELS[item.difficulty]}
-                </Badge>
+                <Badge variant="outline">{QUESTION_DIFFICULTY_LABELS[item.difficulty]}</Badge>
                 <Badge variant="outline">{item.points} pts</Badge>
                 <Button
                   size="sm"

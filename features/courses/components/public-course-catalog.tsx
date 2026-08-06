@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { ArrowUpRight, BookOpen, Clock3 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DIFFICULTY_LABELS } from "@/constants/courses";
 import { routes } from "@/constants/routes";
+import { safePath } from "@/lib/links/safe-href";
 import type { CourseListItem } from "@/types/courses";
 
 function formatHours(minutes: number) {
@@ -139,7 +140,7 @@ function PublicCourseCatalog() {
                   </p>
                 </div>
                 <Button size="sm" variant="accent" className="hero-cta-primary shrink-0" asChild>
-                  <Link href={`${routes.courses}/${course.id}`}>
+                  <Link href={safePath(["courses", course.id], routes.courses)}>
                     Open lane
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </Link>

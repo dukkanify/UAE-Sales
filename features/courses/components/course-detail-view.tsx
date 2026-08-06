@@ -1,14 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { toast } from "sonner";
-import {
-  ArrowLeft,
-  Plus,
-  Trash2,
-  UserPlus,
-} from "lucide-react";
+import { ArrowLeft, Plus, Trash2, UserPlus } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -288,8 +283,7 @@ function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewPro
               {course.primaryInstructorName ?? "Unassigned"}
             </p>
             <p>
-              <span className="text-muted-foreground">Category:</span>{" "}
-              {course.categoryName ?? "—"}
+              <span className="text-muted-foreground">Category:</span> {course.categoryName ?? "—"}
             </p>
             <p>
               <span className="text-muted-foreground">Modules / lessons:</span>{" "}
@@ -400,8 +394,8 @@ function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewPro
                             ) : null}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {lesson.estimatedStudyMinutes} min study ·{" "}
-                            {lesson.resources.length} resources
+                            {lesson.estimatedStudyMinutes} min study · {lesson.resources.length}{" "}
+                            resources
                           </p>
                         </div>
                         <Button
@@ -534,10 +528,7 @@ function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewPro
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {lesson.resources.map((r) => (
-                      <div
-                        key={r.id}
-                        className="flex items-center justify-between gap-2 text-sm"
-                      >
+                      <div key={r.id} className="flex items-center justify-between gap-2 text-sm">
                         <a
                           href={r.url}
                           target="_blank"

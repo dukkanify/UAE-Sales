@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 

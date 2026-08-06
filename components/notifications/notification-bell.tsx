@@ -1,15 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import Link from "@/components/ui/app-link";
 import { Bell, CheckCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { authFetch } from "@/features/auth/services/auth-api";
@@ -30,9 +26,9 @@ function NotificationBell() {
     : routes.login;
 
   const load = React.useCallback(async () => {
-    const result = await authFetch<
-      PaginatedResponse<NotificationRecord> & { unreadCount: number }
-    >(routes.api.notifications);
+    const result = await authFetch<PaginatedResponse<NotificationRecord> & { unreadCount: number }>(
+      routes.api.notifications,
+    );
     if (result.success && result.data) {
       setItems(result.data.data);
       setUnread(result.data.unreadCount);
