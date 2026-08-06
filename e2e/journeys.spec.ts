@@ -35,7 +35,7 @@ test.describe("student journey (OTP demo)", () => {
       data: { email: "student.one@eagerpilots.com", purpose: "login" },
     });
     const otpJson = await otpReq.json();
-    expect(otpJson.success).toBeTruthy();
+    expect(otpJson.success, JSON.stringify(otpJson)).toBeTruthy();
 
     const verify = await request.post("/api/v1/auth/otp/verify", {
       data: {
@@ -45,8 +45,8 @@ test.describe("student journey (OTP demo)", () => {
       },
     });
     const tokens = await verify.json();
-    expect(tokens.success).toBeTruthy();
-    expect(tokens.data.accessToken).toBeTruthy();
+    expect(tokens.success, JSON.stringify(tokens)).toBeTruthy();
+    expect(tokens.data?.accessToken).toBeTruthy();
 
     const me = await request.get("/api/v1/me", {
       headers: { Authorization: `Bearer ${tokens.data.accessToken}` },
