@@ -1,72 +1,108 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" fill="none" role="img" aria-label="ATPL PASS night flight deck sky">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" fill="none" role="img" aria-label="ATPL PASS night flight over Gulf skyline">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="1600" y2="1000" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#03080C"/>
-      <stop offset="0.28" stop-color="#07141C"/>
-      <stop offset="0.62" stop-color="#0C2433"/>
+      <stop stop-color="#02060A"/>
+      <stop offset="0.22" stop-color="#07141C"/>
+      <stop offset="0.55" stop-color="#0C2433"/>
+      <stop offset="0.82" stop-color="#154860"/>
       <stop offset="1" stop-color="#1A5F82"/>
     </linearGradient>
-    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1280 220) rotate(90) scale(340 280)">
-      <stop stop-color="#5BA3C9" stop-opacity="0.55"/>
-      <stop offset="0.55" stop-color="#2E7DAA" stop-opacity="0.18"/>
+    <radialGradient id="sun" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1320 200) rotate(90) scale(380 300)">
+      <stop stop-color="#7EC0DF" stop-opacity="0.5"/>
+      <stop offset="0.45" stop-color="#2E7DAA" stop-opacity="0.22"/>
       <stop offset="1" stop-color="#2E7DAA" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="trail" x1="120" y1="760" x2="1420" y2="240" gradientUnits="userSpaceOnUse">
+    <linearGradient id="trail" x1="80" y1="780" x2="1480" y2="220" gradientUnits="userSpaceOnUse">
       <stop stop-color="#5BA3C9" stop-opacity="0"/>
-      <stop offset="0.25" stop-color="#5BA3C9" stop-opacity="0.35"/>
-      <stop offset="0.7" stop-color="#DD9B30" stop-opacity="0.85"/>
-      <stop offset="1" stop-color="#F0C56A" stop-opacity="0.95"/>
+      <stop offset="0.22" stop-color="#5BA3C9" stop-opacity="0.4"/>
+      <stop offset="0.68" stop-color="#DD9B30" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#F0C56A" stop-opacity="1"/>
     </linearGradient>
-    <linearGradient id="runway" x1="800" y1="560" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#DD9B30" stop-opacity="0.28"/>
+    <linearGradient id="runway" x1="800" y1="540" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DD9B30" stop-opacity="0.32"/>
       <stop offset="1" stop-color="#DD9B30" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="wing" x1="980" y1="300" x2="1380" y2="420" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#E8EEF5" stop-opacity="0.12"/>
+    <linearGradient id="wing" x1="1000" y1="280" x2="1420" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8EEF5" stop-opacity="0.16"/>
       <stop offset="1" stop-color="#E8EEF5" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="city" x1="800" y1="760" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A1620" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#0A1620" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#03080C" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="200" y1="820" x2="1400" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DD9B30" stop-opacity="0"/>
+      <stop offset="0.35" stop-color="#DD9B30" stop-opacity="0.35"/>
+      <stop offset="0.55" stop-color="#F0C56A" stop-opacity="0.45"/>
+      <stop offset="0.75" stop-color="#2E7DAA" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#2E7DAA" stop-opacity="0"/>
     </linearGradient>
   </defs>
   <rect width="1600" height="1000" fill="url(#sky)"/>
-  <ellipse cx="1280" cy="220" rx="360" ry="240" fill="url(#sun)"/>
+  <ellipse cx="1320" cy="200" rx="400" ry="260" fill="url(#sun)"/>
   <!-- constellation -->
   <g fill="#E8EEF5">
-    <circle cx="180" cy="120" r="1.8" opacity="0.7"/>
-    <circle cx="260" cy="90" r="1.2" opacity="0.45"/>
-    <circle cx="340" cy="150" r="2" opacity="0.55"/>
-    <circle cx="420" cy="70" r="1.4" opacity="0.4"/>
-    <circle cx="520" cy="130" r="1.6" opacity="0.5"/>
-    <circle cx="640" cy="95" r="1.1" opacity="0.35"/>
-    <circle cx="760" cy="60" r="1.8" opacity="0.45"/>
-    <circle cx="880" cy="110" r="1.3" opacity="0.4"/>
-    <circle cx="150" cy="280" r="1.2" opacity="0.35"/>
-    <circle cx="300" cy="240" r="1.5" opacity="0.4"/>
+    <circle cx="160" cy="100" r="1.8" opacity="0.75"/>
+    <circle cx="240" cy="70" r="1.2" opacity="0.45"/>
+    <circle cx="320" cy="140" r="2.1" opacity="0.6"/>
+    <circle cx="410" cy="55" r="1.4" opacity="0.4"/>
+    <circle cx="500" cy="120" r="1.7" opacity="0.55"/>
+    <circle cx="620" cy="85" r="1.1" opacity="0.35"/>
+    <circle cx="740" cy="48" r="1.9" opacity="0.5"/>
+    <circle cx="860" cy="100" r="1.3" opacity="0.42"/>
+    <circle cx="980" cy="62" r="1.5" opacity="0.38"/>
+    <circle cx="1080" cy="130" r="1.2" opacity="0.32"/>
+    <circle cx="140" cy="260" r="1.2" opacity="0.35"/>
+    <circle cx="290" cy="220" r="1.6" opacity="0.42"/>
+    <circle cx="450" cy="200" r="1.1" opacity="0.3"/>
   </g>
   <!-- instrument lattice -->
-  <g opacity="0.14" stroke="#E8EEF5" stroke-width="1">
-    <path d="M60 160H1540"/>
-    <path d="M60 240H1540"/>
-    <path d="M60 320H1540"/>
-    <path d="M60 400H1540"/>
-    <path d="M200 80V440"/>
-    <path d="M400 80V440"/>
-    <path d="M600 80V440"/>
-    <path d="M800 80V440"/>
-    <path d="M1000 80V440"/>
-    <path d="M1200 80V440"/>
-    <path d="M1400 80V440"/>
+  <g opacity="0.12" stroke="#E8EEF5" stroke-width="1">
+    <path d="M40 140H1560"/>
+    <path d="M40 220H1560"/>
+    <path d="M40 300H1560"/>
+    <path d="M40 380H1560"/>
+    <path d="M180 60V420"/>
+    <path d="M380 60V420"/>
+    <path d="M580 60V420"/>
+    <path d="M780 60V420"/>
+    <path d="M980 60V420"/>
+    <path d="M1180 60V420"/>
+    <path d="M1380 60V420"/>
   </g>
   <!-- flight path -->
-  <path d="M100 820C280 760 420 800 560 680C720 540 900 460 1120 360C1240 300 1340 270 1460 250" stroke="url(#trail)" stroke-width="2.75" stroke-linecap="round"/>
-  <circle cx="1460" cy="250" r="5" fill="#F0C56A"/>
-  <circle cx="1460" cy="250" r="18" stroke="#DD9B30" stroke-opacity="0.5" stroke-width="1.5"/>
-  <circle cx="1460" cy="250" r="32" stroke="#DD9B30" stroke-opacity="0.2" stroke-width="1"/>
-  <!-- abstract aircraft silhouette -->
-  <g opacity="0.9">
-    <path d="M1180 340L1460 250L1390 390Z" fill="url(#wing)"/>
-    <path d="M1320 285L1460 250L1415 320" fill="#E8EEF5" fill-opacity="0.28"/>
-    <path d="M1388 268L1460 250" stroke="#F0C56A" stroke-width="2" stroke-linecap="round"/>
+  <path d="M70 840C260 770 410 810 560 680C730 530 920 440 1150 340C1280 280 1380 245 1490 228" stroke="url(#trail)" stroke-width="2.9" stroke-linecap="round"/>
+  <circle cx="1490" cy="228" r="5.5" fill="#F0C56A"/>
+  <circle cx="1490" cy="228" r="20" stroke="#DD9B30" stroke-opacity="0.55" stroke-width="1.5"/>
+  <circle cx="1490" cy="228" r="36" stroke="#DD9B30" stroke-opacity="0.22" stroke-width="1"/>
+  <!-- aircraft silhouette -->
+  <g opacity="0.95">
+    <path d="M1200 330L1490 228L1410 390Z" fill="url(#wing)"/>
+    <path d="M1340 275L1490 228L1440 320" fill="#E8EEF5" fill-opacity="0.3"/>
+    <path d="M1410 258L1490 228" stroke="#F0C56A" stroke-width="2.2" stroke-linecap="round"/>
   </g>
   <!-- runway perspective -->
-  <path d="M520 1000L800 560L1080 1000" fill="url(#runway)"/>
-  <path d="M800 560L800 1000" stroke="#E8EEF5" stroke-opacity="0.18" stroke-width="1.5" stroke-dasharray="10 14"/>
+  <path d="M500 1000L800 540L1100 1000" fill="url(#runway)"/>
+  <path d="M800 540L800 1000" stroke="#E8EEF5" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="10 14"/>
+  <!-- Gulf skyline glow + silhouette -->
+  <ellipse cx="800" cy="860" rx="620" ry="48" fill="url(#glow)"/>
+  <g fill="#050d14" opacity="0.92">
+    <rect x="220" y="868" width="28" height="132"/>
+    <rect x="258" y="840" width="42" height="160"/>
+    <rect x="310" y="880" width="22" height="120"/>
+    <rect x="480" y="820" width="36" height="180"/>
+    <rect x="526" y="790" width="58" height="210"/>
+    <rect x="596" y="850" width="30" height="150"/>
+    <rect x="720" y="760" width="48" height="240"/>
+    <rect x="780" y="700" width="72" height="300"/>
+    <rect x="862" y="780" width="40" height="220"/>
+    <rect x="980" y="810" width="34" height="190"/>
+    <rect x="1024" y="770" width="64" height="230"/>
+    <rect x="1100" y="845" width="26" height="155"/>
+    <rect x="1240" y="855" width="38" height="145"/>
+    <rect x="1290" y="830" width="52" height="170"/>
+    <rect x="1354" y="870" width="24" height="130"/>
+  </g>
+  <rect width="1600" height="1000" fill="url(#city)"/>
 </svg>
