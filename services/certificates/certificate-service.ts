@@ -12,18 +12,11 @@ import { logActivity } from "@/services/auth/activity-log";
 import { readAuthDb, toUserProfile } from "@/services/auth/store";
 import { getCourseById } from "@/services/courses/course-service";
 import { getCourseLearningState } from "@/services/learning/progress-service";
-import {
-  assertCanManageCertificates,
-  CertificateError,
-} from "@/services/certificates/access";
+import { assertCanManageCertificates, CertificateError } from "@/services/certificates/access";
 import { getDefaultTemplate, getTemplateById } from "@/services/certificates/template-service";
 import { readCertificatesDb, writeCertificatesDb } from "@/services/certificates/store";
 import { getPublicBrandConfig } from "@/services/settings/settings-service";
-import type {
-  Certificate,
-  CertificateIssueMode,
-  CertificateStatus,
-} from "@/types/certificates";
+import type { Certificate, CertificateIssueMode, CertificateStatus } from "@/types/certificates";
 import type { UserProfile } from "@/types";
 
 function nowIso() {
@@ -67,9 +60,7 @@ export function getCertificateById(id: string): Certificate | null {
   return readCertificatesDb().certificates.find((c) => c.id === id) ?? null;
 }
 
-export function findCertificateByVerification(
-  query: string,
-): Certificate | null {
+export function findCertificateByVerification(query: string): Certificate | null {
   const q = query.trim().toUpperCase();
   return (
     readCertificatesDb().certificates.find(
@@ -109,11 +100,10 @@ export async function createCertificate(input: {
   if (!course) throw new CertificateError("Course not found", 404);
 
   const template =
-    (input.templateId ? getTemplateById(input.templateId) : null) ??
-    getDefaultTemplate();
+    (input.templateId ? getTemplateById(input.templateId) : null) ?? getDefaultTemplate();
   if (!template) throw new CertificateError("No certificate template configured");
 
-  let instructorName = "ATPL PASS Faculty";
+  let instructorName = "AviatorPass Faculty";
   const instructorId: string | null = course.primaryInstructorId;
   if (instructorId) {
     const instructor = readAuthDb().users.find((u) => u.id === instructorId);
@@ -216,10 +206,7 @@ export async function maybeAutoIssueCertificate(input: {
   });
 }
 
-export async function approveCertificate(
-  user: UserProfile,
-  id: string,
-): Promise<Certificate> {
+export async function approveCertificate(user: UserProfile, id: string): Promise<Certificate> {
   assertCanManageCertificates(user);
   const existing = getCertificateById(id);
   if (!existing) throw new CertificateError("Certificate not found", 404);

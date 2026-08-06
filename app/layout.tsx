@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   publisher: siteConfig.name,
   category: "education",
   keywords: [
-    "ATPL PASS",
+    "AviatorPass",
     "ATPL training",
     "ATPL theory",
     "aviation education",

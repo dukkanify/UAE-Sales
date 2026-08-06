@@ -11,13 +11,7 @@ import { listCourses } from "@/services/courses/course-service";
 import { majorToMinor } from "@/services/payments/money";
 import { ensureWallet } from "@/services/payments/wallet-service";
 import { readPaymentsDb, writePaymentsDb } from "@/services/payments/store";
-import type {
-  CatalogProduct,
-  Coupon,
-  Invoice,
-  Order,
-  PaymentRecord,
-} from "@/types/payments";
+import type { CatalogProduct, Coupon, Invoice, Order, PaymentRecord } from "@/types/payments";
 
 export function ensurePaymentsSeeded(): void {
   ensureDemoUsersSeeded();
@@ -77,7 +71,7 @@ export function ensurePaymentsSeeded(): void {
     },
     {
       id: generateId(),
-      name: "ATPL PASS Premium Membership",
+      name: "AviatorPass Premium Membership",
       description: "Monthly premium membership",
       pricingModel: "subscription_monthly",
       courseId: null,
@@ -330,8 +324,6 @@ export function ensurePaymentsSeeded(): void {
   });
 
   // Ensure second instructor wallet exists empty
-  const instructor2 = users.find(
-    (u) => u.role === ROLES.INSTRUCTOR && u.id !== instructor.id,
-  );
+  const instructor2 = users.find((u) => u.role === ROLES.INSTRUCTOR && u.id !== instructor.id);
   if (instructor2) ensureWallet(instructor2.id);
 }

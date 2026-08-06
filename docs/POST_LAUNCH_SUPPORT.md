@@ -1,6 +1,6 @@
 # Post-launch support & Version 1.1 roadmap — Task 021
 
-ATPL PASS operates as an enterprise SaaS product with structured hypercare, support, SLA, incidents, feature intake, versioning, knowledge base, feedback, and continuous optimization — without major architecture changes.
+AviatorPass operates as an enterprise SaaS product with structured hypercare, support, SLA, incidents, feature intake, versioning, knowledge base, feedback, and continuous optimization — without major architecture changes.
 
 ## Ops Center
 

@@ -1,6 +1,6 @@
 # Project completion checklist — Task 023
 
-**Product:** ATPL PASS (Aviation Education Platform)  
+**Product:** AviatorPass (Aviation Education Platform)  
 **Date:** 2026-08-04  
 **Branch tip:** `cursor/aep-project-closure-0987`
 

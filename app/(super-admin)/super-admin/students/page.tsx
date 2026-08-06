@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <UserManagementTable
       title="Students"
-      description="Learners enrolled across ATPL PASS programs."
+      description="Learners enrolled across AviatorPass programs."
       roleFilter={"student" as Role | null}
       emptyTitle="No students yet"
       emptyAction={{ label: "Add student", href: "/super-admin/students" }}

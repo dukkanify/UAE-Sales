@@ -11,11 +11,11 @@ import { routes } from "@/constants/routes";
 export const metadata: Metadata = {
   title: "ATPL courses",
   description:
-    "Browse published ATPL PASS courses — theory modules, flight operations, and exam-ready training programs.",
+    "Browse published AviatorPass courses — theory modules, flight operations, and exam-ready training programs.",
   alternates: { canonical: routes.courses },
   openGraph: {
-    title: "ATPL courses | ATPL PASS",
-    description: "Published aviation courses on the ATPL PASS training platform.",
+    title: "ATPL courses | AviatorPass",
+    description: "Published aviation courses on the AviatorPass training platform.",
     url: routes.courses,
   },
 };
@@ -27,7 +27,7 @@ export default function PublicCoursesPage() {
         data={{
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "ATPL PASS Courses",
+          name: "AviatorPass Courses",
           url: `${siteConfig.url}${routes.courses}`,
           isPartOf: { "@type": "WebSite", name: siteConfig.name, url: siteConfig.url },
         }}
@@ -55,7 +55,7 @@ export default function PublicCoursesPage() {
               className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
               asChild
             >
-              <Link href={routes.registerInstructor}>Teach on ATPL PASS</Link>
+              <Link href={routes.registerInstructor}>Teach on AviatorPass</Link>
             </Button>
           </div>
         </div>

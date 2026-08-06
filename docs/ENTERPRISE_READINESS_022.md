@@ -1,6 +1,6 @@
 # Enterprise readiness report — Task 022
 
-**Product:** ATPL PASS (Aviation Education Platform)  
+**Product:** AviatorPass (Aviation Education Platform)  
 **Date:** 2026-08-04  
 **Branch:** `cursor/aep-enterprise-audit-0987`  
 **Scope:** Architecture, code quality, security, performance, dependencies, documentation, scalability, technical debt  
@@ -8,7 +8,7 @@
 
 ## Executive verdict
 
-ATPL PASS is a **modular, feature-complete training platform** with enterprise _intent_ (RBAC, Ops Center, Mobile API v1, SQL twins, CI quality gates). It is **ready for single-node / carefully operated production** once env hardening and Supabase cutover are completed.
+AviatorPass is a **modular, feature-complete training platform** with enterprise _intent_ (RBAC, Ops Center, Mobile API v1, SQL twins, CI quality gates). It is **ready for single-node / carefully operated production** once env hardening and Supabase cutover are completed.
 
 It is **not yet multi-instance HA enterprise** while JSON `.data/` remains the system of record.
 

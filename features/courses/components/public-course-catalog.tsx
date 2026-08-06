@@ -131,7 +131,7 @@ function PublicCourseCatalog() {
               <div className="mt-5 flex items-center justify-between gap-3 border-t border-[rgb(18_36_51_/0.1)] pt-4">
                 <div className="min-w-0">
                   <p className="truncate text-xs font-medium text-foreground/85">
-                    {course.primaryInstructorName || "ATPL PASS faculty"}
+                    {course.primaryInstructorName || "AviatorPass faculty"}
                   </p>
                   <p className="mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                     <Clock3 className="h-3.5 w-3.5 text-primary/70" />

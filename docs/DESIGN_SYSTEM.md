@@ -1,4 +1,4 @@
-# ATPL PASS Design System
+# AviatorPass Design System
 
 Enterprise UI foundation for the Aviation Education Platform.
 
@@ -12,16 +12,16 @@ Enterprise UI foundation for the Aviation Education Platform.
 
 ## Tokens
 
-| Token | Value |
-|-------|--------|
-| Primary | `#0B1F3A` Deep Aviation Blue |
-| Accent | `#38BDF8` Sky Blue |
-| Success / Warning / Danger | Green / Orange / Red |
-| Background | `#F3F4F6` Light Gray |
-| Cards | White |
-| Radius | 12–16px (`--radius: 0.75rem`) |
-| Display font | Plus Jakarta Sans |
-| Body font | DM Sans |
+| Token                      | Value                         |
+| -------------------------- | ----------------------------- |
+| Primary                    | `#0B1F3A` Deep Aviation Blue  |
+| Accent                     | `#38BDF8` Sky Blue            |
+| Success / Warning / Danger | Green / Orange / Red          |
+| Background                 | `#F3F4F6` Light Gray          |
+| Cards                      | White                         |
+| Radius                     | 12–16px (`--radius: 0.75rem`) |
+| Display font               | Plus Jakarta Sans             |
+| Body font                  | DM Sans                       |
 
 Source files:
 
@@ -31,13 +31,13 @@ Source files:
 
 ## Layouts
 
-| Layout | Path | Use |
-|--------|------|-----|
-| Public | `PublicLayout` | Marketing |
-| Auth | `AuthLayout` | Login / register / OTP |
-| Dashboard | `RoleShell` | Role dashboards |
-| Blank | `BlankLayout` | Minimal chrome |
-| System | `SystemLayout` | Status pages |
+| Layout    | Path           | Use                    |
+| --------- | -------------- | ---------------------- |
+| Public    | `PublicLayout` | Marketing              |
+| Auth      | `AuthLayout`   | Login / register / OTP |
+| Dashboard | `RoleShell`    | Role dashboards        |
+| Blank     | `BlankLayout`  | Minimal chrome         |
+| System    | `SystemLayout` | Status pages           |
 
 ## Navigation
 
@@ -69,16 +69,16 @@ Interactive catalog: [`/design-system`](/design-system)
 
 ## Error & empty pages
 
-| Route | Purpose |
-|-------|---------|
-| `/` 404 via `app/not-found.tsx` | Not found |
-| `/401` | Sign in required |
-| `/403` | Forbidden |
-| `app/error.tsx` | 500 |
-| `/maintenance` | Maintenance |
-| `/coming-soon` | Coming soon |
-| `/offline` | No internet |
-| Preset empty states | courses, students, notifications, calendar, messages, community, reports |
+| Route                           | Purpose                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------ |
+| `/` 404 via `app/not-found.tsx` | Not found                                                                |
+| `/401`                          | Sign in required                                                         |
+| `/403`                          | Forbidden                                                                |
+| `app/error.tsx`                 | 500                                                                      |
+| `/maintenance`                  | Maintenance                                                              |
+| `/coming-soon`                  | Coming soon                                                              |
+| `/offline`                      | No internet                                                              |
+| Preset empty states             | courses, students, notifications, calendar, messages, community, reports |
 
 ## Accessibility
 

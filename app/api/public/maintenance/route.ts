@@ -19,11 +19,11 @@ export async function GET() {
       success: true,
       data: {
         enabled: process.env.NEXT_PUBLIC_MAINTENANCE_MODE === "true",
-        statusMessage: "ATPL PASS is undergoing scheduled maintenance.",
+        statusMessage: "AviatorPass is undergoing scheduled maintenance.",
         estimatedReturnAt: null,
         contactEmail: "",
         contactPhone: "",
-        platformName: "ATPL PASS",
+        platformName: "AviatorPass",
       },
       error: null,
     });

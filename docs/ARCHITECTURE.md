@@ -2,7 +2,7 @@
 
 ## Overview
 
-ATPL PASS is a Next.js App Router application with role-based dashboards for students, instructors, admins, and super admins.
+AviatorPass is a Next.js App Router application with role-based dashboards for students, instructors, admins, and super admins.
 
 ```
 app/                     Route groups + API routes

@@ -1,6 +1,6 @@
 # Certificates, Academic Progress & Reports (Task 010)
 
-Enterprise certification, progress tracking, transcripts, and reporting for ATPL PASS.
+Enterprise certification, progress tracking, transcripts, and reporting for AviatorPass.
 
 ## Scope
 
@@ -23,36 +23,36 @@ Included:
 
 ## Services
 
-| Service | Path |
-|---------|------|
-| Certificate | `services/certificates/certificate-service.ts` |
-| Templates | `services/certificates/template-service.ts` |
+| Service      | Path                                            |
+| ------------ | ----------------------------------------------- |
+| Certificate  | `services/certificates/certificate-service.ts`  |
+| Templates    | `services/certificates/template-service.ts`     |
 | Verification | `services/certificates/verification-service.ts` |
-| Progress | `services/certificates/progress-service.ts` |
-| Transcript | `services/certificates/transcript-service.ts` |
-| Reporting | `services/certificates/reporting-service.ts` |
-| Export | `services/certificates/export-service.ts` |
+| Progress     | `services/certificates/progress-service.ts`     |
+| Transcript   | `services/certificates/transcript-service.ts`   |
+| Reporting    | `services/certificates/reporting-service.ts`    |
+| Export       | `services/certificates/export-service.ts`       |
 
 ## Permissions
 
-| Action | Permission |
-|--------|------------|
+| Action                                  | Permission            |
+| --------------------------------------- | --------------------- |
 | Manage / issue certificates & templates | `certificates.manage` |
-| View own certificates / transcript | `certificates.own` |
-| Instructor reports | `reports.own` |
-| Admin / executive reports | `reports.view` |
+| View own certificates / transcript      | `certificates.own`    |
+| Instructor reports                      | `reports.own`         |
+| Admin / executive reports               | `reports.view`        |
 
 ## API
 
-| Path | Purpose |
-|------|---------|
-| `GET/POST /api/certificates` | List / issue |
-| `GET/POST /api/certificates/:id` | Detail/QR · approve/revoke/reissue · `?print=1` HTML |
-| `GET/POST /api/certificates/verify` | **Public** verification |
-| `GET/POST /api/certificates/templates` | Template CRUD |
-| `GET /api/reports/progress` | Snapshot / academic / timeline |
-| `GET /api/reports/transcript` | JSON / CSV / printable HTML |
-| `GET /api/reports/overview` | Instructor / admin / executive (+ CSV) |
+| Path                                   | Purpose                                              |
+| -------------------------------------- | ---------------------------------------------------- |
+| `GET/POST /api/certificates`           | List / issue                                         |
+| `GET/POST /api/certificates/:id`       | Detail/QR · approve/revoke/reissue · `?print=1` HTML |
+| `GET/POST /api/certificates/verify`    | **Public** verification                              |
+| `GET/POST /api/certificates/templates` | Template CRUD                                        |
+| `GET /api/reports/progress`            | Snapshot / academic / timeline                       |
+| `GET /api/reports/transcript`          | JSON / CSV / printable HTML                          |
+| `GET /api/reports/overview`            | Instructor / admin / executive (+ CSV)               |
 
 ## UI
 

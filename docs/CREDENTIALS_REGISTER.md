@@ -1,4 +1,4 @@
-# Credentials register (template) — ATPL PASS
+# Credentials register (template) — AviatorPass
 
 > **NEVER store real passwords, API secrets, or private keys in the repository.**  
 > Fill this register in a **password manager** or sealed client vault. Share only over agreed secure channels after contractual payment milestones.

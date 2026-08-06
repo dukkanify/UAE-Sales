@@ -1,6 +1,6 @@
 # Final acceptance checklist — Task 020
 
-**Product:** ATPL PASS (Aviation Education Platform)  
+**Product:** AviatorPass (Aviation Education Platform)  
 **Milestone:** Final optimization, production deployment prep & handover  
 **Date:** 2026-08-04  
 **Branch tip:** `cursor/aep-final-handover-0987`
@@ -103,7 +103,7 @@ Use this as the go-live gate. Sign only after client UAT approval and production
 
 | Field                 | Value                                                 |
 | --------------------- | ----------------------------------------------------- |
-| Product               | ATPL PASS                                             |
+| Product               | AviatorPass                                           |
 | Environment           | ________________                                      |
 | Client representative | ________________                                      |
 | Date                  | ________________                                      |

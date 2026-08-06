@@ -4,16 +4,10 @@
 
 import { generateId } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
-import {
-  CERTIFICATE_TEMPLATE_FIELDS,
-  DEFAULT_CERTIFICATE_BODY,
-} from "@/constants/certificates";
+import { CERTIFICATE_TEMPLATE_FIELDS, DEFAULT_CERTIFICATE_BODY } from "@/constants/certificates";
 import { logActivity } from "@/services/auth/activity-log";
 import { getPublicBrandConfig } from "@/services/settings/settings-service";
-import {
-  assertCanManageCertificates,
-  CertificateError,
-} from "@/services/certificates/access";
+import { assertCanManageCertificates, CertificateError } from "@/services/certificates/access";
 import { readCertificatesDb, writeCertificatesDb } from "@/services/certificates/store";
 import type { CertificateTemplate } from "@/types/certificates";
 import type { UserProfile } from "@/types";
@@ -63,7 +57,7 @@ export async function createTemplate(input: {
     backgroundUrl: input.backgroundUrl ?? null,
     primaryColor: input.primaryColor ?? brand.primaryColor ?? "#0B1F33",
     accentColor: input.accentColor ?? brand.accentColor ?? "#C5A46E",
-    signatureName: input.signatureName ?? "ATPL PASS Academic Board",
+    signatureName: input.signatureName ?? "AviatorPass Academic Board",
     signatureTitle: input.signatureTitle ?? "Director of Training",
     signatureImageUrl: input.signatureImageUrl ?? null,
     bodyHtml: input.bodyHtml ?? DEFAULT_CERTIFICATE_BODY,
@@ -90,9 +84,7 @@ export async function createTemplate(input: {
 export async function updateTemplate(input: {
   user: UserProfile;
   id: string;
-  patch: Partial<
-    Omit<CertificateTemplate, "id" | "createdAt" | "fields" | "archivedAt">
-  >;
+  patch: Partial<Omit<CertificateTemplate, "id" | "createdAt" | "fields" | "archivedAt">>;
 }): Promise<CertificateTemplate> {
   assertCanManageCertificates(input.user);
   const existing = getTemplateById(input.id);
@@ -104,9 +96,7 @@ export async function updateTemplate(input: {
   };
   writeCertificatesDb((d) => {
     if (next.isDefault) {
-      d.templates = d.templates.map((t) =>
-        t.id === next.id ? next : { ...t, isDefault: false },
-      );
+      d.templates = d.templates.map((t) => (t.id === next.id ? next : { ...t, isDefault: false }));
     } else {
       const idx = d.templates.findIndex((t) => t.id === input.id);
       if (idx >= 0) d.templates[idx] = next;

@@ -1,5 +1,5 @@
 /**
- * ATPL PASS Design System — tokens & documentation constants.
+ * AviatorPass Design System — tokens & documentation constants.
  * Update colors/typography here when official brand guidelines arrive.
  * No business logic.
  */

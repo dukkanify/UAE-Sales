@@ -49,9 +49,9 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
 
 export const APP_METADATA = {
   title: {
-    default: "ATPL PASS | Aviation Course Platform",
-    template: "%s | ATPL PASS",
+    default: "AviatorPass | Aviation Course Platform",
+    template: "%s | AviatorPass",
   },
   description:
-    "ATPL PASS is the 2030 aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery — for pilots training in Kuwait and Dubai.",
+    "AviatorPass is the 2030 aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery — for pilots training in Kuwait and Dubai.",
 } as const;

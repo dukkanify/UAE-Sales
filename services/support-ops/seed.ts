@@ -13,7 +13,7 @@ function applyV1Seed(db: ReturnType<typeof ensureSupportOpsStore>, iso: (h: numb
       id: generateId(),
       version: "1.0.0",
       title: "Initial production release",
-      summary: "ATPL PASS public launch with full learning, payments, and ops stack.",
+      summary: "AviatorPass public launch with full learning, payments, and ops stack.",
       highlights: [
         "Role-based dashboards",
         "Live classes & quizzes",
@@ -132,7 +132,7 @@ function applyV1Seed(db: ReturnType<typeof ensureSupportOpsStore>, iso: (h: numb
       id: generateId(),
       number: "CR-0001",
       description: "Add multi-school white-label branding packs",
-      businessImpact: "Enables partner academies under ATPL PASS.",
+      businessImpact: "Enables partner academies under AviatorPass.",
       estimatedTimeHours: 80,
       estimatedCost: 12000,
       currency: "USD",

@@ -1,6 +1,6 @@
 # Version 2.0 prioritized backlog — Phase 2 aligned
 
-**Product:** ATPL PASS  
+**Product:** AviatorPass  
 **Program:** `docs/PHASE2_ENTERPRISE_ROADMAP.md`  
 **Governance:** Ops Center feature requests (`FEAT-*`); out of warranty scope unless separately contracted.
 

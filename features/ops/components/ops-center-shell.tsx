@@ -585,7 +585,7 @@ export function OpsCenterShell() {
                       action: "create_release",
                       version: releaseVersion,
                       title: `Release ${releaseVersion}`,
-                      summary: `ATPL PASS ${releaseVersion}`,
+                      summary: `AviatorPass ${releaseVersion}`,
                       highlights: [],
                       fixes: [],
                     }).then(() => setReleaseVersion(""));

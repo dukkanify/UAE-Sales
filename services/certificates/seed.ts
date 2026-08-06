@@ -25,14 +25,14 @@ export function ensureCertificatesSeeded(): void {
   const stamp = new Date().toISOString();
   const template: CertificateTemplate = {
     id: generateId(),
-    name: "ATPL PASS Classic",
+    name: "AviatorPass Classic",
     description: "Default landscape certificate with brand colors and QR verification.",
     isDefault: true,
     logoUrl: brand.logoUrl,
     backgroundUrl: null,
     primaryColor: brand.primaryColor || "#0B1F33",
     accentColor: brand.accentColor || "#C5A46E",
-    signatureName: "ATPL PASS Academic Board",
+    signatureName: "AviatorPass Academic Board",
     signatureTitle: "Director of Training",
     signatureImageUrl: null,
     bodyHtml: DEFAULT_CERTIFICATE_BODY,
@@ -42,9 +42,7 @@ export function ensureCertificatesSeeded(): void {
     archivedAt: null,
   };
 
-  const student = readAuthDb().users.find(
-    (u) => u.role === ROLES.STUDENT && u.status === "active",
-  );
+  const student = readAuthDb().users.find((u) => u.role === ROLES.STUDENT && u.status === "active");
   const course = listCourses({ pageSize: 20, status: "published" }).data[0];
   const certificates: Certificate[] = [];
 
@@ -64,7 +62,9 @@ export function ensureCertificatesSeeded(): void {
         courseId: course.id,
         courseName: course.title,
         instructorId: instructor?.id ?? null,
-        instructorName: instructor ? toUserProfile(instructor).fullName || instructor.email : "Faculty",
+        instructorName: instructor
+          ? toUserProfile(instructor).fullName || instructor.email
+          : "Faculty",
         templateId: template.id,
         status: "issued",
         issueMode: "automatic",

@@ -1,5 +1,5 @@
 /**
- * Barrel export for UI primitives — ATPL PASS Design System.
+ * Barrel export for UI primitives — AviatorPass Design System.
  */
 
 export * from "./accordion";

@@ -1,13 +1,13 @@
-# Project closure report — ATPL PASS
+# Project closure report — AviatorPass
 
 **Document type:** Official project closure  
 **Date:** 2026-08-04  
 **Closure tip:** `cursor/aep-project-closure-0987`  
-**Product:** ATPL PASS — Aviation Education Platform (AEP)
+**Product:** AviatorPass — Aviation Education Platform (AEP)
 
 ## 1. Project summary
 
-ATPL PASS is a professional ATPL training platform delivered as a Next.js App Router application with role-based dashboards, LMS, live classes, assessments, certificates, communication, payments, analytics, AI assistance, mobile API, and production operations tooling.
+AviatorPass is a professional ATPL training platform delivered as a Next.js App Router application with role-based dashboards, LMS, live classes, assessments, certificates, communication, payments, analytics, AI assistance, mobile API, and production operations tooling.
 
 Development progressed through structured milestones (foundation → LMS → live classes → learning → quizzes → certificates → communication → payments → analytics → AI → production ops → QA → mobile API → quality gates → handover → post-launch ops → enterprise audit → **closure**).
 

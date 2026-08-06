@@ -1,6 +1,6 @@
 # Assessment System — Quiz Engine & Question Bank (Task 009)
 
-Enterprise assessment module for ATPL PASS.
+Enterprise assessment module for AviatorPass.
 
 ## Scope
 
@@ -24,38 +24,38 @@ Included:
 
 ## Services
 
-| Service | Path |
-|---------|------|
-| Quiz | `services/quizzes/quiz-service.ts` |
+| Service       | Path                                        |
+| ------------- | ------------------------------------------- |
+| Quiz          | `services/quizzes/quiz-service.ts`          |
 | Question Bank | `services/quizzes/question-bank-service.ts` |
-| Attempts | `services/quizzes/attempt-service.ts` |
-| Grading | `services/quizzes/grading-service.ts` |
-| Analytics | `services/quizzes/analytics-service.ts` |
-| Import | `services/quizzes/import-service.ts` |
+| Attempts      | `services/quizzes/attempt-service.ts`       |
+| Grading       | `services/quizzes/grading-service.ts`       |
+| Analytics     | `services/quizzes/analytics-service.ts`     |
+| Import        | `services/quizzes/import-service.ts`        |
 
 ## Permissions
 
-| Action | Permission |
-|--------|------------|
+| Action                                      | Permission                                        |
+| ------------------------------------------- | ------------------------------------------------- |
 | Manage quizzes / bank / grading / analytics | `quizzes.manage` (instructor, admin, super_admin) |
-| Take quizzes / view own attempts | `quizzes.own` (student) |
+| Take quizzes / view own attempts            | `quizzes.own` (student)                           |
 
 Students must be enrolled in the linked course when `courseId` is set.
 
 ## API
 
-| Path | Purpose |
-|------|---------|
-| `GET/POST /api/quizzes` | List / create |
-| `GET/PATCH/DELETE /api/quizzes/:id` | Detail / update / soft delete |
-| `POST /api/quizzes/:id/actions` | publish, unpublish, archive, duplicate, set_questions |
-| `GET/POST /api/quizzes/bank` | Question bank list / create |
-| `GET/PATCH/DELETE /api/quizzes/bank/:id` | Question CRUD |
-| `GET/POST /api/quizzes/bank/import` | Export / CSV·JSON·PILOT100 import |
-| `POST /api/quizzes/:id/attempts` | Start / resume attempt |
-| `GET/PATCH /api/quizzes/attempts/:attemptId` | Load / autosave / submit |
-| `GET/POST /api/quizzes/grading` | Instructor grading |
-| `GET /api/quizzes/analytics` | Overview or per-quiz analytics |
+| Path                                         | Purpose                                               |
+| -------------------------------------------- | ----------------------------------------------------- |
+| `GET/POST /api/quizzes`                      | List / create                                         |
+| `GET/PATCH/DELETE /api/quizzes/:id`          | Detail / update / soft delete                         |
+| `POST /api/quizzes/:id/actions`              | publish, unpublish, archive, duplicate, set_questions |
+| `GET/POST /api/quizzes/bank`                 | Question bank list / create                           |
+| `GET/PATCH/DELETE /api/quizzes/bank/:id`     | Question CRUD                                         |
+| `GET/POST /api/quizzes/bank/import`          | Export / CSV·JSON·PILOT100 import                     |
+| `POST /api/quizzes/:id/attempts`             | Start / resume attempt                                |
+| `GET/PATCH /api/quizzes/attempts/:attemptId` | Load / autosave / submit                              |
+| `GET/POST /api/quizzes/grading`              | Instructor grading                                    |
+| `GET /api/quizzes/analytics`                 | Overview or per-quiz analytics                        |
 
 ## UI
 

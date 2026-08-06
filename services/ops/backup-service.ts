@@ -109,7 +109,7 @@ export function createBackup(input?: {
   // Config snapshot (no secrets)
   const configSnap = {
     appEnv: process.env.NEXT_PUBLIC_APP_ENV ?? "development",
-    appName: process.env.NEXT_PUBLIC_APP_NAME ?? "ATPL PASS",
+    appName: process.env.NEXT_PUBLIC_APP_NAME ?? "AviatorPass",
     supabaseConfigured: Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL),
     zoomConfigured: Boolean(process.env.ZOOM_CLIENT_ID),
     stripeConfigured: Boolean(process.env.STRIPE_SECRET_KEY),
@@ -193,7 +193,10 @@ export function testRestore(backupId: string): {
 }
 
 /** Restore data JSON from a backup (destructive to .data). Uploads optional. */
-export function restoreBackup(backupId: string, opts?: { includeUploads?: boolean }): {
+export function restoreBackup(
+  backupId: string,
+  opts?: { includeUploads?: boolean },
+): {
   ok: boolean;
   restored: string[];
 } {

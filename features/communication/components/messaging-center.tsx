@@ -1,15 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Archive,
-  BellOff,
-  MessageSquare,
-  Search,
-  Send,
-  Trash2,
-  Users,
-} from "lucide-react";
+import { Archive, BellOff, MessageSquare, Search, Send, Trash2, Users } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -131,7 +123,7 @@ function MessagingCenter({ basePath }: { basePath: string }) {
     <div className="space-y-6">
       <PageHeader
         title="Messaging center"
-        description="Secure private and group conversations inside ATPL PASS."
+        description="Secure private and group conversations inside AviatorPass."
         breadcrumbs={[{ label: "Communication" }, { label: "Messages" }]}
         actions={
           <Button asChild variant="outline" size="sm">
@@ -221,7 +213,9 @@ function MessagingCenter({ basePath }: { basePath: string }) {
                       {typing.map((t) => t.userName).join(", ")} typing…
                     </p>
                   ) : (
-                    <p className="text-xs text-muted-foreground">Delivered · read receipts enabled</p>
+                    <p className="text-xs text-muted-foreground">
+                      Delivered · read receipts enabled
+                    </p>
                   )}
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -273,7 +267,10 @@ function MessagingCenter({ basePath }: { basePath: string }) {
 
               <div className="flex-1 space-y-3 overflow-auto p-4">
                 {messages.map((m) => (
-                  <div key={m.id} className="rounded-lg border border-border/70 bg-background px-3 py-2">
+                  <div
+                    key={m.id}
+                    className="rounded-lg border border-border/70 bg-background px-3 py-2"
+                  >
                     <div className="mb-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
                       <span className="font-medium text-foreground">{m.senderName}</span>
                       <span>

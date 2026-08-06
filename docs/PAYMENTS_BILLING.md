@@ -1,6 +1,6 @@
 # Payments, Billing, Invoices & Instructor Wallets (Task 012)
 
-Enterprise financial infrastructure for ATPL PASS.
+Enterprise financial infrastructure for AviatorPass.
 
 ## Scope
 
@@ -28,28 +28,28 @@ Platform collects payments centrally; instructor share is credited to internal w
 
 ## Services
 
-| Service | Path |
-|---------|------|
-| Gateway | `services/payments/gateway.ts` |
-| Catalog / coupons | `services/payments/catalog-service.ts` |
+| Service           | Path                                    |
+| ----------------- | --------------------------------------- |
+| Gateway           | `services/payments/gateway.ts`          |
+| Catalog / coupons | `services/payments/catalog-service.ts`  |
 | Checkout / orders | `services/payments/checkout-service.ts` |
-| Invoices | `services/payments/invoice-service.ts` |
-| Wallet | `services/payments/wallet-service.ts` |
-| Payouts | `services/payments/payout-service.ts` |
-| Refunds | `services/payments/refund-service.ts` |
-| Reports | `services/payments/report-service.ts` |
+| Invoices          | `services/payments/invoice-service.ts`  |
+| Wallet            | `services/payments/wallet-service.ts`   |
+| Payouts           | `services/payments/payout-service.ts`   |
+| Refunds           | `services/payments/refund-service.ts`   |
+| Reports           | `services/payments/report-service.ts`   |
 
 ## API
 
-| Path | Purpose |
-|------|---------|
-| `/api/payments/catalog` | Products, coupons, settings |
-| `/api/payments/orders` | Checkout, pay, retry, cancel, ledger |
-| `/api/payments/invoices` | List / printable HTML |
-| `/api/payments/wallet` | Wallet, transactions, payouts |
-| `/api/payments/refunds` | Request / review |
-| `/api/payments/reports` | Dashboard + CSV |
-| `/api/payments/webhooks` | Provider webhooks |
+| Path                     | Purpose                              |
+| ------------------------ | ------------------------------------ |
+| `/api/payments/catalog`  | Products, coupons, settings          |
+| `/api/payments/orders`   | Checkout, pay, retry, cancel, ledger |
+| `/api/payments/invoices` | List / printable HTML                |
+| `/api/payments/wallet`   | Wallet, transactions, payouts        |
+| `/api/payments/refunds`  | Request / review                     |
+| `/api/payments/reports`  | Dashboard + CSV                      |
+| `/api/payments/webhooks` | Provider webhooks                    |
 
 ## Permissions
 

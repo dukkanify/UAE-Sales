@@ -2,11 +2,7 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { requirePermission } from "@/services/auth/guards";
-import {
-  createNote,
-  exportNotesMarkdown,
-  listNotes,
-} from "@/services/learning/notes-service";
+import { createNote, exportNotesMarkdown, listNotes } from "@/services/learning/notes-service";
 import { learningErrorResponse } from "@/app/api/learning/_utils";
 
 export async function GET(request: Request) {
@@ -19,7 +15,7 @@ export async function GET(request: Request) {
         status: 200,
         headers: {
           "Content-Type": "text/markdown; charset=utf-8",
-          "Content-Disposition": 'attachment; filename="atpl-pass-notes.md"',
+          "Content-Disposition": 'attachment; filename="aviatorpass-notes.md"',
         },
       });
     }

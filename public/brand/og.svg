@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label="ATPL PASS">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none" role="img" aria-label="AviatorPass">
   <rect width="1200" height="630" fill="#0B1A24"/>
   <circle cx="980" cy="80" r="220" fill="#2E7DAA" fill-opacity="0.18"/>
   <circle cx="160" cy="560" r="260" fill="#DD9B30" fill-opacity="0.12"/>
@@ -10,8 +10,8 @@
     <path d="M72 8C86 4 102 6 112 12V50C98 42 84 40 72 44V8Z" fill="none" stroke="#9A99A0" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#9A99A0" stroke-width="3.5" stroke-linejoin="round"/>
   </g>
-  <text x="420" y="300" font-family="Space Grotesk, Arial, sans-serif" font-size="72" font-weight="700" letter-spacing="0.04em">
-    <tspan fill="#FFFFFF">ATPL </tspan><tspan fill="#DD9B30">PASS</tspan>
+  <text x="420" y="300" font-family="Space Grotesk, Arial, sans-serif" font-size="64" font-weight="700" letter-spacing="-0.01em">
+    <tspan fill="#FFFFFF">Aviator</tspan><tspan fill="#DD9B30">Pass</tspan>
   </text>
   <text x="420" y="360" font-family="IBM Plex Sans, Arial, sans-serif" font-size="22" font-weight="500" fill="#9A99A0" letter-spacing="0.22em">UNLOCK YOUR PILOT LICENSE</text>
   <text x="420" y="420" font-family="IBM Plex Sans, Arial, sans-serif" font-size="24" fill="#C8D9E6">Professional Aviation Education Platform</text>

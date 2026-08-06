@@ -35,8 +35,8 @@ CREATE INDEX IF NOT EXISTS idx_profiles_deleted_at
 
 -- Feature flags / extended platform settings seeds
 INSERT INTO public.settings (key, value, category, description) VALUES
-  ('platform.name', '"ATPL PASS"', 'general', 'Platform display name'),
-  ('platform.company_name', '"ATPL PASS"', 'general', 'Legal company name'),
+  ('platform.name', '"AviatorPass"', 'general', 'Platform display name'),
+  ('platform.company_name', '"AviatorPass"', 'general', 'Legal company name'),
   ('platform.contact_email', '"ME@ABDULAZIZALSHOAIL.COM"', 'general', 'Primary contact email'),
   ('platform.support_email', '"ME@ABDULAZIZALSHOAIL.COM"', 'general', 'Support email'),
   ('platform.locations', '["Kuwait","Dubai"]', 'general', 'Primary locations'),

@@ -51,7 +51,7 @@ Earlier Task 016 baseline: UAT 28/28 (expanded checks added in later tasks).
 
 | Field              | Value                                                 |
 | ------------------ | ----------------------------------------------------- |
-| Product            | ATPL PASS                                             |
+| Product            | AviatorPass                                           |
 | Environment tested | Local / staging (set URL here)                        |
 | Tester             | ________________                                      |
 | Date               | ________________                                      |
