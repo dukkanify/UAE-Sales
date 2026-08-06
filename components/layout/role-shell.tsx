@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -275,11 +275,11 @@ function LanguageSelector() {
       size="sm"
       className="gap-1.5 text-muted-foreground"
       title="Platform language: English only"
-      aria-label={`Platform language: ${siteConfig.language} (English only)`}
+      aria-label={`Platform language: ${siteStatic.language} (English only)`}
       disabled
     >
       <Globe className="h-4 w-4" aria-hidden />
-      <span className="hidden sm:inline uppercase">{siteConfig.language}</span>
+      <span className="hidden sm:inline uppercase">{siteStatic.language}</span>
     </Button>
   );
 }

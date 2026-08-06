@@ -1,5 +1,3 @@
-"use client";
-
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
@@ -7,6 +5,7 @@ interface MarketingShellProps {
   children: React.ReactNode;
 }
 
+/** Server shell composing client Header/Footer — keeps layout out of Zod client graph. */
 function MarketingShell({ children }: MarketingShellProps) {
   return (
     <div className="platform-surface flex min-h-screen flex-col">

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
 import { useBrand } from "@/providers/brand-provider";
@@ -15,16 +15,9 @@ interface BrandLogoProps {
   showWordmark?: boolean;
 }
 
-const FALLBACK_ASSETS = {
-  logo: "/brand/logo.svg",
-  logoDark: "/brand/logo-dark.svg",
-  icon: "/brand/icon.svg",
-} as const;
-
 /**
- * Brand mark — uses native <img> (local SVGs) to avoid next/image webpack
- * module-factory crashes ("Cannot read properties of undefined (reading 'call')")
- * that show up in Footer/Header after HMR / RSC boundary splits.
+ * Brand mark — native <img> for local SVGs (avoids next/image webpack factory
+ * crashes). Uses site-static only — never pulls Zod via @/config/site.
  */
 function BrandLogo({
   className,
@@ -34,18 +27,17 @@ function BrandLogo({
   showWordmark = false,
 }: BrandLogoProps) {
   const brand = useBrand();
-  const assets = siteConfig?.brand ?? FALLBACK_ASSETS;
-  const name = brand?.platformName || siteConfig?.name || "ATPL PASS";
+  const name = brand.platformName || siteStatic.name;
   const src =
     variant === "mark"
-      ? brand?.faviconUrl || assets.icon || FALLBACK_ASSETS.icon
+      ? brand.faviconUrl || siteStatic.brand.icon
       : variant === "dark"
-        ? brand?.darkLogoUrl || assets.logoDark || FALLBACK_ASSETS.logoDark
-        : brand?.logoUrl || assets.logo || FALLBACK_ASSETS.logo;
+        ? brand.darkLogoUrl || siteStatic.brand.logoDark
+        : brand.logoUrl || siteStatic.brand.logo;
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG; next/image webpack factory can be undefined under HMR */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
       <img
         src={src}
         alt={name}

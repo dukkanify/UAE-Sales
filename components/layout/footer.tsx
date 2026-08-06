@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 import { brandingConfig } from "@/config/branding";
 import { routes } from "@/constants/routes";
 import { Separator } from "@/components/ui/separator";
@@ -18,8 +18,8 @@ function Footer() {
           <div className="space-y-4">
             <BrandLogo variant="dark" href={routes.home} />
             <p className="max-w-md text-sm leading-relaxed text-white/50">
-              {brandingConfig.tagline}. {siteConfig.description} Training lanes:{" "}
-              {siteConfig.locations.join(" · ")}.
+              {brandingConfig.tagline}. {siteStatic.description} Training lanes:{" "}
+              {siteStatic.locations.join(" · ")}.
             </p>
           </div>
 
@@ -63,20 +63,20 @@ function Footer() {
             <ul className="space-y-2 text-sm text-white/60">
               <li>
                 <a
-                  href={`mailto:${siteConfig.contactEmail}`}
+                  href={`mailto:${siteStatic.contactEmail}`}
                   className="transition hover:text-accent"
                 >
-                  {siteConfig.contactEmail}
+                  {siteStatic.contactEmail}
                 </a>
               </li>
               <li>
                 <a
-                  href={siteConfig.social.instagram}
+                  href={siteStatic.social.instagram}
                   target="_blank"
                   rel="noreferrer"
                   className="transition hover:text-accent"
                 >
-                  {siteConfig.socialHandle}
+                  {siteStatic.socialHandle}
                 </a>
               </li>
             </ul>
@@ -85,7 +85,7 @@ function Footer() {
 
         <Separator className="my-8 bg-white/10" />
         <p className="text-xs text-white/35">
-          © {year} {siteConfig.name}. Aviation course platform. English only.
+          © {year} {siteStatic.name}. Aviation course platform. English only.
         </p>
       </div>
     </footer>
