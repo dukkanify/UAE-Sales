@@ -1,6 +1,6 @@
 # Success metrics — first 90 days (Task 025)
 
-**Product:** ATPL PASS v1.0 GA  
+**Product:** AviatorPass v1.0 GA  
 **Purpose:** Executive KPIs for hypercare and early operations. Track via Analytics / Ops Center dashboards and agreed export cadence.
 
 ## KPI register

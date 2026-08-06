@@ -1,6 +1,6 @@
 /**
  * Platform settings — typed configuration categories.
- * Defaults reflect ATPL PASS company information.
+ * Defaults reflect AviatorPass company information.
  * Pending brand guidelines (palette/typography) can be updated here without code rewrites.
  */
 

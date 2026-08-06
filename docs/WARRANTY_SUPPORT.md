@@ -1,6 +1,6 @@
 # Warranty & support preparation — Task 020
 
-Post-launch support phase for ATPL PASS after client acceptance.
+Post-launch support phase for AviatorPass after client acceptance.
 
 ## Support contacts
 

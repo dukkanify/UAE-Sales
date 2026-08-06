@@ -1,4 +1,4 @@
-# Coding standards — ATPL PASS
+# Coding standards — AviatorPass
 
 ## Principles
 

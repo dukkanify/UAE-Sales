@@ -1,12 +1,12 @@
 # Brand source assets
 
-Official ATPL PASS brand guidelines PDF lives here for audit and regeneration of digital assets.
+Official AviatorPass brand guidelines PDF lives here for audit and regeneration of digital assets.
 
 ## Files
 
-| File                             | Purpose                                                           |
-| -------------------------------- | ----------------------------------------------------------------- |
-| `ATPL_PASS_Brand_Guidelines.pdf` | Official brand book (logo, colours, typography, digital presence) |
+| File                               | Purpose                                                           |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| `AVIATORPASS_Brand_Guidelines.pdf` | Official brand book (logo, colours, typography, digital presence) |
 
 ## Official palette (from guidelines)
 

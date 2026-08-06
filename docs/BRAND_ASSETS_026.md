@@ -1,6 +1,6 @@
 # Brand assets & client resources — Task 026
 
-**Product:** ATPL PASS  
+**Product:** AviatorPass  
 **Branch tip:** `cursor/aep-brand-assets-0987`  
 **Policy:** Integrate official branding and prepare for pending brand guidelines — **no architecture redesign**.
 
@@ -8,7 +8,7 @@
 
 | Field            | Value                                                       |
 | ---------------- | ----------------------------------------------------------- |
-| Platform name    | ATPL PASS                                                   |
+| Platform name    | AviatorPass                                                 |
 | Language         | English only                                                |
 | Official email   | ME@ABDULAZIZALSHOAIL.COM                                    |
 | Locations        | Kuwait · Dubai                                              |
@@ -66,4 +66,4 @@ Unified panel: `/super-admin/assets` — brand logos overview, media library, li
 
 ## SEO
 
-Root `app/layout.tsx` metadata uses ATPL PASS + English + OG image from `siteConfig` / brand assets. Favicon from `/brand/favicon.svg` (replaceable via settings upload).
+Root `app/layout.tsx` metadata uses AviatorPass + English + OG image from `siteConfig` / brand assets. Favicon from `/brand/favicon.svg` (replaceable via settings upload).

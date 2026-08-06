@@ -1,6 +1,6 @@
 # Testing strategy — Task 019
 
-Automated quality infrastructure for ATPL PASS. **No new business features.**
+Automated quality infrastructure for AviatorPass. **No new business features.**
 
 ## Commands
 

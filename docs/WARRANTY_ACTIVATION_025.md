@@ -1,6 +1,6 @@
 # Warranty & support activation — Task 025
 
-**Product:** ATPL PASS Version 1.0 GA  
+**Product:** AviatorPass Version 1.0 GA  
 **Policy reference:** `docs/WARRANTY_SUPPORT.md`
 
 ## Activation record

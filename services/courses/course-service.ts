@@ -98,7 +98,7 @@ export function listPublishedCoursesGroupedByInstructor(pageSize = 100): Instruc
     }
     groups.set(key, {
       instructorId: course.primaryInstructorId,
-      instructorName: course.primaryInstructorName?.trim() || "ATPL PASS faculty",
+      instructorName: course.primaryInstructorName?.trim() || "AviatorPass faculty",
       courses: [course],
     });
   }

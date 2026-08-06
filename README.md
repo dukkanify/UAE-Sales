@@ -1,6 +1,6 @@
 # Aviation Education Platform (AEP)
 
-**ATPL PASS — Professional ATPL training**
+**AviatorPass — Professional ATPL training**
 
 Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, AI assistant, mobile API, and production operations.
 

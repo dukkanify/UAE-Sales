@@ -124,7 +124,7 @@ export function AssetManagerShell() {
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
               <p>
-                <strong>Platform:</strong> {general?.platformName ?? "ATPL PASS"}
+                <strong>Platform:</strong> {general?.platformName ?? "AviatorPass"}
               </p>
               <p>
                 <strong>Support:</strong> {general?.supportEmail}

@@ -543,7 +543,7 @@ export async function POST(request: Request) {
         const enabled = Boolean(body.enabled);
         const statusMessage = String(
           body.statusMessage ??
-            "ATPL PASS is undergoing scheduled maintenance. Please check again shortly.",
+            "AviatorPass is undergoing scheduled maintenance. Please check again shortly.",
         );
         const estimatedReturnAt =
           body.estimatedReturnAt != null ? String(body.estimatedReturnAt) : null;

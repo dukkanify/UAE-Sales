@@ -64,7 +64,7 @@ function mockMeeting(
   const password = opts.passcode
     ? generateToken(6)
         .replace(/[^a-zA-Z0-9]/g, "")
-        .slice(0, 8) || "AtplPass1"
+        .slice(0, 8) || "AviatorPass1"
     : "";
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   return {
@@ -388,7 +388,7 @@ export async function provisionStandaloneZoomMeeting(input: {
     const password = passcode
       ? generateToken(6)
           .replace(/[^a-zA-Z0-9]/g, "")
-          .slice(0, 8) || "AtplPass1"
+          .slice(0, 8) || "AviatorPass1"
       : "";
     payload = {
       liveClassId: "standalone",

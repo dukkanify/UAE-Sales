@@ -1,4 +1,4 @@
-# Known limitations — ATPL PASS v1.6
+# Known limitations — AviatorPass v1.6
 
 Honest constraints for go-live and support. Full audit: `docs/ENTERPRISE_READINESS_022.md`.
 

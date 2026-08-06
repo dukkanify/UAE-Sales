@@ -50,7 +50,7 @@ Stored as tenant branding settings (extends v1 platform branding).
 
 ## Billing
 
-- Platform billing (academy → ATPL PASS) separate from student checkout
+- Platform billing (academy → AviatorPass) separate from student checkout
 - Stripe Connect or invoice-based enterprise contracts
 - Independent Stripe customer per tenant
 

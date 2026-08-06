@@ -1,4 +1,4 @@
-/* ATPL PASS — premium single-page landing */
+/* AviatorPass — premium single-page landing */
 
 .landing-root {
   --landing-ink: #03080c;
@@ -103,7 +103,7 @@
   filter: drop-shadow(0 14px 52px rgba(46, 125, 170, 0.32));
 }
 
-.hero-brand-atpl {
+.hero-brand-aviator {
   background: linear-gradient(115deg, #f2f9fc 0%, #a8d6eb 36%, #4f9bc4 100%);
   -webkit-background-clip: text;
   background-clip: text;

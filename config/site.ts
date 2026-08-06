@@ -1,5 +1,5 @@
 /**
- * Application-wide site configuration — ATPL PASS defaults.
+ * Application-wide site configuration — AviatorPass defaults.
  * Runtime overrides live in platform settings (Super Admin).
  *
  * Prefer `@/config/site-static` inside Client Components so the browser

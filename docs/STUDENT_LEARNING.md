@@ -1,6 +1,6 @@
 # Student Learning Journey (Task 008)
 
-Premium student learning experience for ATPL PASS — dashboard, course/lesson player, progress, notes, bookmarks, favorites, resources, calendar, planner, and search.
+Premium student learning experience for AviatorPass — dashboard, course/lesson player, progress, notes, bookmarks, favorites, resources, calendar, planner, and search.
 
 ## Runtime store
 
@@ -9,15 +9,15 @@ Premium student learning experience for ATPL PASS — dashboard, course/lesson p
 
 ## Services (modular)
 
-| Service | Path | Responsibility |
-|---------|------|----------------|
-| Learning | `services/learning/learning-service.ts` | Dashboard, my courses, resources, search, calendar, offline cache |
-| Progress | `services/learning/progress-service.ts` | Touch/complete lessons, course state, overall progress |
-| Notes | `services/learning/notes-service.ts` | Private CRUD + Markdown export |
-| Bookmarks / Favorites | `services/learning/bookmark-service.ts` | Sync-ready bookmarks & favorites |
-| Planner | `services/learning/planner-service.ts` | Study sessions, goals, AI suggestion hook |
-| History | `services/learning/history-service.ts` | Learning activity trail |
-| Access | `services/learning/access.ts` | Enrollment-only course/lesson access |
+| Service               | Path                                    | Responsibility                                                    |
+| --------------------- | --------------------------------------- | ----------------------------------------------------------------- |
+| Learning              | `services/learning/learning-service.ts` | Dashboard, my courses, resources, search, calendar, offline cache |
+| Progress              | `services/learning/progress-service.ts` | Touch/complete lessons, course state, overall progress            |
+| Notes                 | `services/learning/notes-service.ts`    | Private CRUD + Markdown export                                    |
+| Bookmarks / Favorites | `services/learning/bookmark-service.ts` | Sync-ready bookmarks & favorites                                  |
+| Planner               | `services/learning/planner-service.ts`  | Study sessions, goals, AI suggestion hook                         |
+| History               | `services/learning/history-service.ts`  | Learning activity trail                                           |
+| Access                | `services/learning/access.ts`           | Enrollment-only course/lesson access                              |
 
 ## API (`/api/learning/*`)
 

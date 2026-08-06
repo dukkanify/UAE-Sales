@@ -438,7 +438,7 @@ function maintenancePublicStatus() {
     statusMessage:
       latest?.statusMessage ||
       settings.general.footerText ||
-      "ATPL PASS is undergoing scheduled maintenance. Please check again shortly.",
+      "AviatorPass is undergoing scheduled maintenance. Please check again shortly.",
     estimatedReturnAt: latest?.estimatedReturnAt ?? null,
     contactEmail:
       latest?.contactEmail || settings.general.supportEmail || settings.general.contactEmail,

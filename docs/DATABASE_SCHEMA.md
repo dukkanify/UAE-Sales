@@ -1,4 +1,4 @@
-# Database schema overview — ATPL PASS
+# Database schema overview — AviatorPass
 
 ## Runtime today
 

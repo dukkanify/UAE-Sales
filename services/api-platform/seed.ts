@@ -3,10 +3,7 @@
  */
 
 import { generateId, generateToken, hashValue } from "@/lib/security/crypto";
-import {
-  ensureApiPlatformStore,
-  writeApiPlatformStore,
-} from "@/services/api-platform/store";
+import { ensureApiPlatformStore, writeApiPlatformStore } from "@/services/api-platform/store";
 import type { IntegrationSetting } from "@/types/api-platform";
 
 const INTEGRATIONS: Array<Omit<IntegrationSetting, "id" | "updatedAt">> = [
@@ -108,7 +105,7 @@ export function ensureApiPlatformSeeded() {
   db.oauthClients = [
     {
       id: generateId(),
-      name: "ATPL PASS Mobile (placeholder)",
+      name: "AviatorPass Mobile (placeholder)",
       clientId: "aep_mobile_dev",
       clientSecretHash: hashValue(clientSecret),
       redirectUris: ["aep://oauth/callback", "http://localhost:8081/oauth"],

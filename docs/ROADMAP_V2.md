@@ -1,4 +1,4 @@
-# Version 2.0 roadmap recommendations — ATPL PASS
+# Version 2.0 roadmap recommendations — AviatorPass
 
 **Authoritative Phase 2 program:** `docs/PHASE2_ENTERPRISE_ROADMAP.md`  
 **Architecture:** `docs/ARCHITECTURE_V2.md`  

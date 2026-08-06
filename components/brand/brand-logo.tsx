@@ -39,13 +39,13 @@ function BrandLogo({
       <img
         src={src}
         alt={name}
-        width={variant === "mark" ? 36 : 160}
+        width={variant === "mark" ? 36 : 200}
         height={variant === "mark" ? 36 : 40}
         className={cn(
           "h-9 w-auto object-contain",
           variant === "mark" && "h-9 w-9",
-          variant === "full" && "h-8 w-auto max-w-[160px]",
-          variant === "dark" && "h-8 w-auto max-w-[160px]",
+          variant === "full" && "h-8 w-auto max-w-[200px]",
+          variant === "dark" && "h-8 w-auto max-w-[200px]",
         )}
         decoding="async"
         loading={priority ? "eager" : "lazy"}

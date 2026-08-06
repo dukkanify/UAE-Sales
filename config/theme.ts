@@ -1,5 +1,5 @@
 /**
- * Design theme tokens — official ATPL PASS brand guidelines.
+ * Design theme tokens — official AviatorPass brand guidelines.
  * Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
  */
 
