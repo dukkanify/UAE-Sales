@@ -32,18 +32,45 @@ const PUBLIC_CATALOG_CODES = [
   "PPL-GS-01",
 ] as const;
 
+/** Skip repeated enrichment writes in-process (avoids clobbering concurrent course creates). */
+let catalogEnrichmentDone = false;
+
+function catalogNeedsEnrichment(
+  db: ReturnType<typeof readCoursesDb>,
+  instructorIds: Set<string>,
+): boolean {
+  const codes = new Set(db.courses.map((c) => c.code));
+  for (const code of PUBLIC_CATALOG_CODES) {
+    if (!codes.has(code)) return true;
+  }
+  for (const course of db.courses) {
+    if (!PUBLIC_CATALOG_CODES.includes(course.code as (typeof PUBLIC_CATALOG_CODES)[number])) {
+      continue;
+    }
+    if (course.status !== "published" || !course.publishedAt) return true;
+    if (!course.primaryInstructorId || !instructorIds.has(course.primaryInstructorId)) return true;
+  }
+  return false;
+}
+
 /** Upsert missing published demo courses on already-seeded stores. */
 function ensurePublishedCatalogEnrichment(): void {
+  if (catalogEnrichmentDone) return;
+
   const users = readAuthDb().users;
   const instructor =
     users.find((u) => u.role === ROLES.INSTRUCTOR) ??
     users.find((u) => u.role === ROLES.SUPER_ADMIN);
   const actor = users.find((u) => u.role === ROLES.SUPER_ADMIN)?.id ?? null;
   const ts = nowIso();
+  const instructorIds = new Set(users.map((u) => u.id));
+  const snapshot = readCoursesDb();
+  if (!catalogNeedsEnrichment(snapshot, instructorIds)) {
+    catalogEnrichmentDone = true;
+    return;
+  }
 
   writeCoursesDb((d) => {
-    const instructorIds = new Set(users.map((u) => u.id));
-
     // Publish older seed drafts that belong in the public catalog.
     for (const course of d.courses) {
       if (!PUBLIC_CATALOG_CODES.includes(course.code as (typeof PUBLIC_CATALOG_CODES)[number])) {
@@ -212,6 +239,7 @@ function ensurePublishedCatalogEnrichment(): void {
 
     d.seeded = true;
   });
+  catalogEnrichmentDone = true;
 }
 
 export function ensureCoursesSeeded(): void {
