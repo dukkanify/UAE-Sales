@@ -112,6 +112,22 @@ function ensurePublishedCatalogEnrichment(): void {
       difficulty: Course["difficulty"];
     }> = [
       {
+        title: "ATPL 010 — Air Law",
+        code: "ATPL-010",
+        short: "International and national aviation law for ATPL candidates.",
+        full: "Comprehensive coverage of ICAO annexes, EASA regulations, licensing, rules of the air, and aerodrome operations.",
+        categoryId: theory?.id ?? null,
+        difficulty: "advanced",
+      },
+      {
+        title: "ATPL 031 — Mass & Balance",
+        code: "ATPL-031",
+        short: "Aircraft loading, CG, and performance implications.",
+        full: "Mass & balance theory, documentation, and practical loading scenarios for multi-engine aircraft.",
+        categoryId: ops?.id ?? null,
+        difficulty: "intermediate",
+      },
+      {
         title: "ATPL 050 — Meteorology",
         code: "ATPL-050",
         short: "Atmosphere, weather hazards, and operational meteorology.",
