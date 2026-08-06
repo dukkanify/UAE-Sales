@@ -4,7 +4,7 @@
 
 | Item                       | Value                                                  |
 | -------------------------- | ------------------------------------------------------ |
-| Product                    | AviatorPass / AEP (`aep-web`)                          |
+| Product                    | AviatorPass (`aviatorpass`)                            |
 | Branch tip (v1.0 GA)       | `cursor/aep-final-release-0987`                        |
 | Prior closure tip          | `cursor/aep-project-closure-0987`                      |
 | Preferred merge base chain | Tasks 016→025 feature tips → `main` per client process |

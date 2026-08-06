@@ -1,7 +1,7 @@
 {
-  "name": "aep-web",
+  "name": "aviatorpass",
   "version": "0.1.0",
-  "description": "Aviation Education Platform (AEP) — AviatorPass professional ATPL training.",
+  "description": "AviatorPass — professional ATPL aviation training platform.",
   "private": true,
   "scripts": {
     "dev": "next dev",
