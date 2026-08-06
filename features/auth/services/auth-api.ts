@@ -2,23 +2,9 @@
  * Browser client for auth API calls.
  */
 
-export function getCsrfToken(): string | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(/(?:^|; )aep_csrf=([^;]*)/);
-  return match?.[1] ? decodeURIComponent(match[1]) : null;
-}
+import { ensureBrowserCsrf } from "@/lib/security/browser-csrf";
 
-export async function ensureBrowserCsrf(): Promise<string | null> {
-  if (getCsrfToken()) return getCsrfToken();
-  await fetch("/api/auth/me", { credentials: "include" });
-  return getCsrfToken();
-}
-
-/** Headers for raw `fetch` mutations (FormData uploads, Ops POST, etc.). */
-export function csrfHeaders(): HeadersInit {
-  const csrf = getCsrfToken();
-  return csrf ? { "x-csrf-token": csrf } : {};
-}
+export { csrfHeaders, ensureBrowserCsrf, getCsrfToken } from "@/lib/security/browser-csrf";
 
 export async function authFetch<T>(
   url: string,

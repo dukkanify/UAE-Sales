@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 
 export type RuntimeBrand = {
   platformName: string;
@@ -27,20 +27,20 @@ export type RuntimeBrand = {
 };
 
 const FALLBACK: RuntimeBrand = {
-  platformName: siteConfig.name,
-  logoUrl: siteConfig.brand.logo,
-  darkLogoUrl: siteConfig.brand.logoDark,
-  faviconUrl: siteConfig.brand.favicon,
-  openGraphImageUrl: siteConfig.brand.openGraph,
-  contactEmail: siteConfig.contactEmail,
-  supportEmail: siteConfig.supportEmail,
-  locations: [...siteConfig.locations],
-  socialHandle: siteConfig.socialHandle,
-  socialLinks: { ...siteConfig.social },
-  footerText: siteConfig.description,
+  platformName: siteStatic.name,
+  logoUrl: siteStatic.brand.logo,
+  darkLogoUrl: siteStatic.brand.logoDark,
+  faviconUrl: siteStatic.brand.favicon,
+  openGraphImageUrl: siteStatic.brand.openGraph,
+  contactEmail: siteStatic.contactEmail,
+  supportEmail: siteStatic.supportEmail,
+  locations: [...siteStatic.locations],
+  socialHandle: siteStatic.socialHandle,
+  socialLinks: { ...siteStatic.social },
+  footerText: siteStatic.description,
   primaryColor: "#2E7DAA",
   accentColor: "#DD9B30",
-  metaDescription: siteConfig.description,
+  metaDescription: siteStatic.description,
 };
 
 const BrandContext = React.createContext<RuntimeBrand>(FALLBACK);
@@ -58,7 +58,15 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .then((r) => r.json())
         .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
           if (cancelled || !json.success || !json.data) return;
-          setBrand({ ...FALLBACK, ...json.data });
+          const next = { ...FALLBACK, ...json.data };
+          setBrand({
+            ...next,
+            platformName: next.platformName || FALLBACK.platformName,
+            logoUrl: next.logoUrl || FALLBACK.logoUrl,
+            darkLogoUrl: next.darkLogoUrl || FALLBACK.darkLogoUrl,
+            faviconUrl: next.faviconUrl || FALLBACK.faviconUrl,
+            openGraphImageUrl: next.openGraphImageUrl || FALLBACK.openGraphImageUrl,
+          });
         })
         .catch(() => {
           /* keep fallback */

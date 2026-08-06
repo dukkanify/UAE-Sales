@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -260,16 +259,9 @@ function StudentBookingView() {
 
       <div className="grid gap-6 xl:grid-cols-[1.35fr_0.85fr]">
         <div className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-medium">
-          <AnimatePresence mode="wait">
+          <>
             {step === "session" ? (
-              <motion.div
-                key="session"
-                initial={{ opacity: 0, x: 16 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ duration: 0.3 }}
-                className="p-5 sm:p-8"
-              >
+              <div className="p-5 sm:p-8">
                 <h2 className="font-display text-2xl font-semibold">Choose your mission</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Session type and instructor for your Zoom room.
@@ -341,17 +333,11 @@ function StudentBookingView() {
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             ) : null}
 
             {step === "when" ? (
-              <motion.div
-                key="when"
-                initial={{ opacity: 0, x: 16 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                className="p-5 sm:p-8"
-              >
+              <div className="p-5 sm:p-8">
                 <button
                   type="button"
                   className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -433,17 +419,11 @@ function StudentBookingView() {
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             ) : null}
 
             {step === "confirm" ? (
-              <motion.div
-                key="confirm"
-                initial={{ opacity: 0, x: 16 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                className="p-5 sm:p-8"
-              >
+              <div className="p-5 sm:p-8">
                 <button
                   type="button"
                   className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -500,16 +480,11 @@ function StudentBookingView() {
                     {submitting ? "Creating Zoom room…" : "Confirm & reserve Zoom"}
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             ) : null}
 
             {step === "success" && created ? (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-5 sm:p-8"
-              >
+              <div className="p-5 sm:p-8">
                 <div className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center">
                   <span className="booking-pulse absolute inset-0 rounded-full" />
                   <span className="relative flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground">
@@ -566,9 +541,9 @@ function StudentBookingView() {
                     Book another
                   </Button>
                 </div>
-              </motion.div>
+              </div>
             ) : null}
-          </AnimatePresence>
+          </>
         </div>
 
         <aside className="space-y-4">

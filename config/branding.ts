@@ -1,27 +1,28 @@
 /**
  * Centralized branding configuration — official ATPL PASS guidelines.
+ * Uses site-static (no Zod) so client layouts stay resilient under HMR.
  */
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 import { theme } from "@/config/theme";
 
 export const brandingConfig = {
-  platformName: siteConfig.name,
-  companyName: siteConfig.legalName,
+  platformName: siteStatic.name,
+  companyName: siteStatic.legalName,
   tagline: "Aviation course platform · 2030",
-  language: siteConfig.language,
-  englishOnly: siteConfig.englishOnly,
-  contactEmail: siteConfig.contactEmail,
-  supportEmail: siteConfig.supportEmail,
-  locations: [...siteConfig.locations],
-  socialHandle: siteConfig.socialHandle,
-  social: { ...siteConfig.social },
+  language: siteStatic.language,
+  englishOnly: siteStatic.englishOnly,
+  contactEmail: siteStatic.contactEmail,
+  supportEmail: siteStatic.supportEmail,
+  locations: [...siteStatic.locations],
+  socialHandle: siteStatic.socialHandle,
+  social: { ...siteStatic.social },
   assets: {
-    logo: siteConfig.brand.logo,
-    logoDark: siteConfig.brand.logoDark,
-    icon: siteConfig.brand.icon,
-    favicon: siteConfig.brand.favicon,
-    openGraph: siteConfig.brand.openGraph,
+    logo: siteStatic.brand.logo,
+    logoDark: siteStatic.brand.logoDark,
+    icon: siteStatic.brand.icon,
+    favicon: siteStatic.brand.favicon,
+    openGraph: siteStatic.brand.openGraph,
     sourceDir: "/brand/source",
     guidelinesPdf: "/brand/source/ATPL_PASS_Brand_Guidelines.pdf",
   },
@@ -44,7 +45,7 @@ export const brandingConfig = {
     officialTypography: true,
     brandStyleGuide: false,
   },
-  metaDescription: siteConfig.description,
+  metaDescription: siteStatic.description,
 } as const;
 
 export type BrandingConfig = typeof brandingConfig;

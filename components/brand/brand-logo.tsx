@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 
-import { siteConfig } from "@/config/site";
+import { siteStatic } from "@/config/site-static";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
-import { useBrand } from "@/providers/brand-provider";
 
 interface BrandLogoProps {
   className?: string;
@@ -16,25 +14,29 @@ interface BrandLogoProps {
   showWordmark?: boolean;
 }
 
+/**
+ * Static brand mark — no BrandProvider/useBrand on the critical layout path.
+ * Runtime brand API still powers other surfaces via BrandProvider.
+ */
 function BrandLogo({
   className,
   href = routes.home,
   variant = "full",
-  priority,
+  priority = false,
   showWordmark = false,
 }: BrandLogoProps) {
-  const brand = useBrand();
-  const name = brand.platformName || siteConfig.name;
+  const name = siteStatic.name;
   const src =
     variant === "mark"
-      ? brand.faviconUrl || siteConfig.brand.icon
+      ? siteStatic.brand.icon
       : variant === "dark"
-        ? brand.darkLogoUrl || siteConfig.brand.logoDark
-        : brand.logoUrl || siteConfig.brand.logo;
+        ? siteStatic.brand.logoDark
+        : siteStatic.brand.logo;
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
+      <img
         src={src}
         alt={name}
         width={variant === "mark" ? 36 : 160}
@@ -45,8 +47,9 @@ function BrandLogo({
           variant === "full" && "h-8 w-auto max-w-[160px]",
           variant === "dark" && "h-8 w-auto max-w-[160px]",
         )}
-        priority={priority}
-        unoptimized
+        decoding="async"
+        loading={priority ? "eager" : "lazy"}
+        fetchPriority={priority ? "high" : "auto"}
       />
       {showWordmark && variant === "mark" ? (
         <span className="font-display text-lg font-semibold tracking-tight text-primary">
