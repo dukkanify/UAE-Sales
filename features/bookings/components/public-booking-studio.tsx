@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { format } from "date-fns";
-import { ArrowLeft, ArrowRight, Check, Clock, Radio, Shield, Video } from "lucide-react";
+import { addDays, format, parseISO } from "date-fns";
+import { ArrowLeft, ArrowRight, Check, Clock3, Shield, Sparkles, Video } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,13 @@ import { cn } from "@/lib/utils";
 import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
 
 type Step = "when" | "details" | "otp" | "done";
+
+const STEPS: Array<{ id: Step; label: string; short: string }> = [
+  { id: "when", label: "When", short: "Time" },
+  { id: "details", label: "Details", short: "You" },
+  { id: "otp", label: "Confirm", short: "Code" },
+  { id: "done", label: "Ready", short: "Zoom" },
+];
 
 async function publicFetch<T>(url: string, init?: RequestInit) {
   const method = (init?.method ?? "GET").toUpperCase();
@@ -48,6 +55,30 @@ async function publicFetch<T>(url: string, init?: RequestInit) {
     data: (json.data as T | null) ?? null,
     error: json.error ?? null,
   };
+}
+
+function periodForHour(hour: number): "Morning" | "Afternoon" | "Evening" {
+  if (hour < 12) return "Morning";
+  if (hour < 17) return "Afternoon";
+  return "Evening";
+}
+
+function groupOpenSlots(slots: BookingSlot[]) {
+  const groups: Array<{ label: "Morning" | "Afternoon" | "Evening"; slots: BookingSlot[] }> = [
+    { label: "Morning", slots: [] },
+    { label: "Afternoon", slots: [] },
+    { label: "Evening", slots: [] },
+  ];
+  for (const slot of slots.filter((s) => s.available)) {
+    const hour = new Date(slot.startsAt).getHours();
+    const label = periodForHour(hour);
+    groups.find((g) => g.label === label)?.slots.push(slot);
+  }
+  return groups.filter((g) => g.slots.length > 0);
+}
+
+function stepIndex(step: Step) {
+  return STEPS.findIndex((s) => s.id === step);
 }
 
 function PublicBookingStudio() {
@@ -132,7 +163,20 @@ function PublicBookingStudio() {
 
   const selectedType = catalog?.sessionTypes?.find((t) => t.id === sessionTypeId);
   const selectedInstructor = catalog?.instructors?.find((i) => i.id === instructorId);
-  const openSlots = slots.filter((s) => s.available);
+  const groupedSlots = React.useMemo(() => groupOpenSlots(slots), [slots]);
+  const openCount = groupedSlots.reduce((n, g) => n + g.slots.length, 0);
+  const activeStep = stepIndex(step);
+  const dateChips = React.useMemo(() => {
+    const start = new Date();
+    return Array.from({ length: 5 }, (_, i) => {
+      const d = addDays(start, i);
+      return {
+        value: format(d, "yyyy-MM-dd"),
+        day: format(d, "EEE"),
+        label: format(d, "d MMM"),
+      };
+    });
+  }, []);
 
   async function holdAndSendOtp() {
     if (!selectedSlot) return;
@@ -186,12 +230,16 @@ function PublicBookingStudio() {
 
   if (!catalog) {
     return (
-      <div className="booking-aurora relative min-h-[70vh] overflow-hidden rounded-3xl">
-        <div className="booking-grid-fade absolute inset-0" />
+      <div className="booking-hero relative min-h-[70vh]">
         <div className="relative z-10 flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center text-white/75">
-          <p>{catalogError ?? "Opening booking studio…"}</p>
+          <p className="landing-kicker text-accent">AviatorPass</p>
+          <p>{catalogError ?? "Opening live booking…"}</p>
           {catalogError ? (
-            <Button variant="accent" onClick={() => void loadCatalog()}>
+            <Button
+              variant="accent"
+              className="hero-cta-primary"
+              onClick={() => void loadCatalog()}
+            >
               Try again
             </Button>
           ) : null}
@@ -202,9 +250,11 @@ function PublicBookingStudio() {
 
   if (!catalog.enabled || !catalog.allowGuestBooking) {
     return (
-      <div className="booking-aurora relative overflow-hidden rounded-3xl px-6 py-20 text-center text-white">
+      <div className="booking-hero relative px-6 py-24 text-center text-white">
         <Video className="relative z-10 mx-auto mb-4 h-10 w-10 text-accent" />
-        <h1 className="relative z-10 font-display text-3xl font-semibold">Booking unavailable</h1>
+        <h1 className="relative z-10 font-display text-3xl font-semibold text-white">
+          Booking unavailable
+        </h1>
         <p className="relative z-10 mx-auto mt-3 max-w-md text-white/65">
           Public booking is paused. Enter the platform if you already have an account.
         </p>
@@ -213,264 +263,381 @@ function PublicBookingStudio() {
   }
 
   return (
-    <div className="space-y-6 py-10">
-      <div className="booking-aurora relative overflow-hidden rounded-3xl px-5 py-8 text-white sm:px-8 sm:py-10">
-        <div className="booking-grid-fade absolute inset-0" />
-        <div className="booking-scan-line" />
-        <div className="relative z-10">
-          <p className="mb-3 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-accent">
-            <Radio className="h-3.5 w-3.5" /> Fast Zoom booking
-          </p>
-          <h1 className="font-display text-3xl font-bold tracking-tight sm:text-5xl">
-            Pick a time → confirm email →{" "}
-            <span className="bg-gradient-to-r from-[#5BA3C9] to-accent bg-clip-text text-transparent">
-              join Zoom
-            </span>
+    <div className="platform-altitude landing-root">
+      <section className="booking-hero text-white">
+        <div className="container-app relative z-10 py-14 sm:py-20">
+          <p className="landing-kicker text-accent">AviatorPass live</p>
+          <h1 className="mt-5 max-w-[12ch] font-display text-[clamp(2.4rem,5.5vw,4rem)] font-semibold tracking-[-0.04em] leading-[1.02] text-white">
+            AviatorPass
           </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-            Three quick steps. No registration form first — your account opens when you confirm.
+          <p className="mt-4 max-w-[22ch] font-display text-[clamp(1.25rem,2.6vw,1.85rem)] font-semibold tracking-[-0.03em] leading-snug text-white/92">
+            Book live Zoom coaching in three smart steps
           </p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
+            Pick a lane, confirm by email, join Zoom — your learner account opens when you confirm.
+            No signup form first.
+          </p>
+          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/45">
+            <span className="inline-flex items-center gap-1.5 text-accent/90">
+              <Sparkles className="h-3.5 w-3.5" />
+              Instant hold
+            </span>
+            <span>Email OTP</span>
+            <span>Zoom lobby</span>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <div className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-medium">
-        {step === "when" ? (
-          <div className="p-5 sm:p-8">
-            <h2 className="font-display text-2xl font-semibold">1 · Pick a Zoom time</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Choose a slot — then confirm by email to open your Zoom lobby.
-            </p>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="session-type">Session</Label>
-                <select
-                  id="session-type"
-                  className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-                  value={sessionTypeId}
-                  onChange={(e) => setSessionTypeId(e.target.value)}
+      <section className="container-app py-10 sm:py-14">
+        <ol className="mb-8 grid grid-cols-4 gap-2 sm:gap-3" aria-label="Booking progress">
+          {STEPS.map((item, index) => {
+            const done = index < activeStep || step === "done";
+            const current = item.id === step;
+            return (
+              <li
+                key={item.id}
+                className={cn(
+                  "rounded-2xl border px-3 py-3 transition sm:px-4",
+                  current
+                    ? "border-[rgb(18_36_51_/0.16)] bg-[var(--surface-ink)] text-white shadow-[0_16px_40px_-28px_rgba(11,26,36,0.85)]"
+                    : done
+                      ? "border-accent/30 bg-accent/10 text-foreground"
+                      : "border-[rgb(18_36_51_/0.08)] bg-white/55 text-muted-foreground",
+                )}
+              >
+                <p
+                  className={cn(
+                    "text-[10px] font-semibold uppercase tracking-[0.2em]",
+                    current ? "text-accent" : "text-inherit opacity-70",
+                  )}
                 >
+                  0{index + 1}
+                </p>
+                <p className="mt-1 text-sm font-semibold tracking-tight">
+                  <span className="sm:hidden">{item.short}</span>
+                  <span className="hidden sm:inline">{item.label}</span>
+                </p>
+              </li>
+            );
+          })}
+        </ol>
+
+        <div className="overflow-hidden rounded-[1.75rem] border border-[rgb(18_36_51_/0.08)] bg-white/80 shadow-[0_30px_80px_-48px_rgba(11,26,36,0.55)] backdrop-blur-sm">
+          {step === "when" ? (
+            <div className="booking-step-panel p-5 sm:p-8 lg:p-10">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl">
+                    Choose your Zoom window
+                  </h2>
+                  <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                    Select session, instructor, and an open time. We only show bookable slots.
+                  </p>
+                </div>
+                <p className="shrink-0 text-sm tabular-nums text-muted-foreground">
+                  {loadingSlots
+                    ? "Scanning…"
+                    : `${openCount} open slot${openCount === 1 ? "" : "s"}`}
+                </p>
+              </div>
+
+              <div className="mt-8 space-y-3">
+                <Label>Session</Label>
+                <div className="flex flex-wrap gap-2">
                   {(catalog.sessionTypes ?? []).map((t) => (
-                    <option key={t.id} value={t.id}>
+                    <button
+                      key={t.id}
+                      type="button"
+                      data-selected={sessionTypeId === t.id}
+                      className="booking-chip rounded-xl px-4 py-2.5 text-sm font-semibold"
+                      onClick={() => setSessionTypeId(t.id)}
+                    >
                       {t.name}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="instructor">Instructor</Label>
-                <select
-                  id="instructor"
-                  className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-                  value={instructorId}
-                  onChange={(e) => setInstructorId(e.target.value)}
+
+              <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+                <div className="space-y-3">
+                  <Label htmlFor="instructor">Instructor</Label>
+                  <select
+                    id="instructor"
+                    className="flex h-12 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                    value={instructorId}
+                    onChange={(e) => setInstructorId(e.target.value)}
+                  >
+                    {(catalog.instructors ?? []).map((i) => (
+                      <option key={i.id} value={i.id}>
+                        {i.fullName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-3">
+                  <Label htmlFor="book-date">Date</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {dateChips.map((chip) => (
+                      <button
+                        key={chip.value}
+                        type="button"
+                        data-selected={date === chip.value}
+                        className="booking-chip min-w-[4.5rem] rounded-xl px-3 py-2 text-left"
+                        onClick={() => setDate(chip.value)}
+                      >
+                        <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] opacity-70">
+                          {chip.day}
+                        </span>
+                        <span className="text-sm font-semibold">{chip.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <input
+                    id="book-date"
+                    type="date"
+                    className="flex h-11 w-full max-w-xs rounded-xl border border-input bg-background px-3 text-sm"
+                    value={date}
+                    min={format(new Date(), "yyyy-MM-dd")}
+                    max={maxBookableDate(catalog.maxAdvanceDays ?? 30)}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    <Clock3 className="h-3.5 w-3.5 text-primary/70" />
+                    Open times
+                    {date ? (
+                      <span className="normal-case tracking-normal text-foreground/70">
+                        · {format(parseISO(date), "EEE d MMM")}
+                      </span>
+                    ) : null}
+                  </p>
+                </div>
+
+                {slotHint ? (
+                  <p className="mb-4 rounded-xl border border-accent/25 bg-accent/10 px-3.5 py-2.5 text-sm text-foreground/85">
+                    {slotHint}
+                  </p>
+                ) : null}
+
+                {loadingSlots ? (
+                  <p className="text-sm text-muted-foreground">Loading open times…</p>
+                ) : openCount > 0 ? (
+                  <div className="space-y-6">
+                    {groupedSlots.map((group) => (
+                      <div key={group.label}>
+                        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+                          {group.label}
+                          <span className="ml-2 font-medium normal-case tracking-normal text-muted-foreground">
+                            {group.slots.length}
+                          </span>
+                        </p>
+                        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                          {group.slots.map((slot) => {
+                            const selected = selectedSlot === slot.startsAt;
+                            return (
+                              <button
+                                key={slot.startsAt}
+                                type="button"
+                                data-selected={selected}
+                                className="booking-slot rounded-xl px-2 py-3 text-sm font-semibold"
+                                onClick={() => setSelectedSlot(slot.startsAt)}
+                              >
+                                {formatSlotTime(slot.startsAt)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-xl border border-dashed border-border/70 px-4 py-10 text-center text-sm text-muted-foreground">
+                    No open times on this date. Choose another day above.
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-10 flex flex-col-reverse items-stretch justify-between gap-3 border-t border-[rgb(18_36_51_/0.08)] pt-6 sm:flex-row sm:items-center">
+                <p className="text-sm text-muted-foreground">
+                  {selectedSlot
+                    ? `Selected · ${formatSlotDateTime(selectedSlot)}`
+                    : "Select a time to continue"}
+                </p>
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="hero-cta-primary"
+                  disabled={!selectedSlot}
+                  onClick={() => setStep("details")}
                 >
-                  {(catalog.instructors ?? []).map((i) => (
-                    <option key={i.id} value={i.id}>
-                      {i.fullName}
-                    </option>
-                  ))}
-                </select>
+                  Continue
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="book-date">Date</Label>
-              <input
-                id="book-date"
-                type="date"
-                className="flex h-11 w-full max-w-xs rounded-xl border border-input bg-background px-3 text-sm"
-                value={date}
-                min={format(new Date(), "yyyy-MM-dd")}
-                max={maxBookableDate(catalog.maxAdvanceDays ?? 30)}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-            <div className="mt-6">
-              <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                <Clock className="h-3.5 w-3.5" /> Available slots
+          ) : null}
+
+          {step === "details" ? (
+            <div className="booking-step-panel p-5 sm:p-8 lg:p-10">
+              <button
+                type="button"
+                className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition hover:text-foreground"
+                onClick={() => setStep("when")}
+              >
+                <ArrowLeft className="h-4 w-4" /> Back to times
+              </button>
+              <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
+                Your details
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Confirm by email — we create learner access and prepare your Zoom lobby.
               </p>
-              {slotHint ? (
-                <p className="mb-3 rounded-xl bg-accent/10 px-3 py-2 text-sm text-foreground/80">
-                  {slotHint}
+
+              <div className="mt-6 rounded-2xl bg-[var(--surface-ink)] p-5 text-white">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-accent">
+                  Hold summary
+                </p>
+                <p className="mt-2 font-display text-xl font-semibold tracking-tight">
+                  {selectedType?.name}
+                </p>
+                <p className="mt-1 text-sm text-white/65">
+                  {selectedInstructor?.fullName}
+                  {selectedSlot ? ` · ${formatSlotDateTime(selectedSlot)}` : ""}
+                </p>
+              </div>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="first-name">First name</Label>
+                  <input
+                    id="first-name"
+                    className="flex h-12 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    autoComplete="given-name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="last-name">Last name</Label>
+                  <input
+                    id="last-name"
+                    className="flex h-12 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    autoComplete="family-name"
+                  />
+                </div>
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <input
+                  id="email"
+                  type="email"
+                  className="flex h-12 w-full rounded-xl border border-input bg-background px-3 text-sm"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                />
+              </div>
+              <div className="mt-4 space-y-2">
+                <Label htmlFor="notes">Notes (optional)</Label>
+                <Textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Topics to cover, exam date, weak areas…"
+                />
+              </div>
+              <div className="mt-8 flex justify-end">
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="hero-cta-primary"
+                  disabled={
+                    submitting || !firstName.trim() || !lastName.trim() || !email.includes("@")
+                  }
+                  onClick={() => void holdAndSendOtp()}
+                >
+                  {submitting ? "Reserving…" : "Reserve & send code"}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          {step === "otp" ? (
+            <div className="booking-step-panel p-5 sm:p-8 lg:p-10">
+              <h2 className="font-display text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">
+                Enter code → Zoom
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+                Code sent to <span className="font-medium text-foreground">{email}</span>
+              </p>
+              {demoOtp ? (
+                <p className="mt-4 rounded-xl border border-accent/25 bg-accent/12 px-3.5 py-2.5 text-sm">
+                  Demo OTP: <span className="font-mono font-semibold">{demoOtp}</span>
                 </p>
               ) : null}
-              {loadingSlots ? (
-                <p className="text-sm text-muted-foreground">Loading open times…</p>
-              ) : openSlots.length > 0 ? (
-                <div className="grid max-h-80 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-4 md:grid-cols-6">
-                  {openSlots.map((slot) => {
-                    const selected = selectedSlot === slot.startsAt;
-                    return (
-                      <button
-                        key={slot.startsAt}
-                        type="button"
-                        onClick={() => setSelectedSlot(slot.startsAt)}
-                        className={cn(
-                          "rounded-xl px-2 py-3 text-sm font-semibold transition",
-                          !selected && "bg-muted/50 hover:bg-primary/15",
-                          selected && "bg-[#0B1A24] text-accent ring-2 ring-accent/40",
-                        )}
-                      >
-                        {formatSlotTime(slot.startsAt)}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="rounded-xl border border-dashed border-border/70 px-4 py-8 text-center text-sm text-muted-foreground">
-                  No open times on this date. Choose another day above.
-                </p>
-              )}
-            </div>
-            <div className="mt-8 flex justify-end">
-              <Button
-                variant="accent"
-                size="lg"
-                disabled={!selectedSlot}
-                onClick={() => setStep("details")}
-              >
-                Continue to confirm <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {step === "details" ? (
-          <div className="p-5 sm:p-8">
-            <button
-              type="button"
-              className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground"
-              onClick={() => setStep("when")}
-            >
-              <ArrowLeft className="h-4 w-4" /> Back
-            </button>
-            <h2 className="font-display text-2xl font-semibold">2 · Your details</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Confirm by email — we create your learner access and open Zoom.
-            </p>
-            <div className="mt-6 rounded-2xl bg-[#0B1A24] p-4 text-sm text-white">
-              <p className="font-medium">
-                {selectedType?.name} · {selectedInstructor?.fullName}
-              </p>
-              <p className="mt-1 text-white/65">
-                {selectedSlot ? formatSlotDateTime(selectedSlot) : ""}
-              </p>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="first-name">First name</Label>
+              <div className="mt-6 space-y-2">
+                <Label htmlFor="otp">Verification code</Label>
                 <input
-                  id="first-name"
-                  className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  autoComplete="given-name"
+                  id="otp"
+                  className="flex h-14 w-full max-w-sm rounded-xl border border-input bg-background px-3 text-center font-mono text-xl tracking-[0.4em]"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.trim())}
+                  maxLength={8}
+                  placeholder="••••••"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="last-name">Last name</Label>
-                <input
-                  id="last-name"
-                  className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  autoComplete="family-name"
-                />
+              <p className="mt-4 inline-flex items-center gap-2 text-xs text-muted-foreground">
+                <Shield className="h-3.5 w-3.5 text-primary/70" />
+                Confirming creates your student account and unlocks Zoom.
+              </p>
+              <div className="mt-8 flex justify-end">
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="hero-cta-primary"
+                  disabled={submitting || otp.length < 4}
+                  onClick={() => void verifyAndFinish()}
+                >
+                  {submitting ? "Confirming…" : "Confirm booking"}
+                </Button>
               </div>
             </div>
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <input
-                id="email"
-                type="email"
-                className="flex h-11 w-full rounded-xl border border-input bg-background px-3 text-sm"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-              />
-            </div>
-            <div className="mt-4 space-y-2">
-              <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
-            <div className="mt-8 flex justify-end">
-              <Button
-                variant="accent"
-                size="lg"
-                disabled={
-                  submitting || !firstName.trim() || !lastName.trim() || !email.includes("@")
-                }
-                onClick={() => void holdAndSendOtp()}
-              >
-                {submitting ? "Reserving…" : "Reserve & send code"}
-              </Button>
-            </div>
-          </div>
-        ) : null}
+          ) : null}
 
-        {step === "otp" ? (
-          <div className="p-5 sm:p-8">
-            <h2 className="font-display text-2xl font-semibold">3 · Enter code → Zoom</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Enter the code sent to <span className="font-medium text-foreground">{email}</span>
-            </p>
-            {demoOtp ? (
-              <p className="mt-3 rounded-xl bg-accent/15 px-3 py-2 text-sm text-accent-foreground">
-                Demo OTP: <span className="font-mono font-semibold">{demoOtp}</span>
+          {step === "done" ? (
+            <div className="booking-step-panel p-8 text-center sm:p-14">
+              <span className="booking-pulse relative mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground">
+                <Check className="h-7 w-7" />
+              </span>
+              <h2 className="font-display text-3xl font-semibold tracking-[-0.03em]">
+                You&apos;re booked
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Account created and Zoom room prepared. Opening your lobby…
               </p>
-            ) : null}
-            <div className="mt-6 space-y-2">
-              <Label htmlFor="otp">Verification code</Label>
-              <input
-                id="otp"
-                className="flex h-12 w-full max-w-xs rounded-xl border border-input bg-background px-3 text-center font-mono text-lg tracking-[0.35em]"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.trim())}
-                maxLength={8}
-                placeholder="••••••"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-              />
+              {redirectTo ? (
+                <Button
+                  className="hero-cta-primary mt-8"
+                  variant="accent"
+                  onClick={() => router.push(redirectTo)}
+                >
+                  Open Zoom lobby
+                </Button>
+              ) : null}
             </div>
-            <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-              <Shield className="h-3.5 w-3.5" />
-              Confirming creates your student account and unlocks Zoom.
-            </p>
-            <div className="mt-8 flex justify-end">
-              <Button
-                variant="accent"
-                size="lg"
-                disabled={submitting || otp.length < 4}
-                onClick={() => void verifyAndFinish()}
-              >
-                {submitting ? "Confirming…" : "Confirm booking"}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {step === "done" ? (
-          <div className="p-8 text-center sm:p-12">
-            <span className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-accent text-accent-foreground">
-              <Check className="h-7 w-7" />
-            </span>
-            <h2 className="font-display text-2xl font-semibold">You&apos;re booked</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-              Account created and Zoom room prepared. Redirecting…
-            </p>
-            {redirectTo ? (
-              <Button className="mt-6" variant="accent" onClick={() => router.push(redirectTo)}>
-                Open Zoom lobby
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      </section>
     </div>
   );
 }
