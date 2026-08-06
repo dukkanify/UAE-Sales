@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ensureBrowserCsrf, getCsrfToken } from "@/features/auth/services/auth-api";
+import { ensureBrowserCsrf, getCsrfToken } from "@/lib/security/browser-csrf";
 import {
   formatSlotDateTime,
   formatSlotTime,
