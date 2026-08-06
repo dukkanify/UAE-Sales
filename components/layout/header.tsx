@@ -20,11 +20,11 @@ function Header() {
   }, [pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[var(--surface-ink)]/75 text-white backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[var(--surface-ink)]/70 text-white shadow-[0_1px_0_0_rgba(221,155,48,0.12)] backdrop-blur-2xl">
       <div className="container-app flex h-[4.5rem] items-center justify-between gap-4">
         <BrandLogo variant="dark" priority />
 
-        <nav className="hidden items-center gap-0.5 md:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {NAV_ITEMS.map((item) => {
             const active =
               item.href === "/"
@@ -35,7 +35,7 @@ function Header() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-lg px-3 py-2 text-sm font-medium tracking-wide transition-colors",
+                  "rounded-md px-3.5 py-2 text-[13px] font-medium tracking-[0.04em] uppercase transition-colors",
                   active
                     ? "bg-white/10 text-white"
                     : "text-white/55 hover:bg-white/5 hover:text-white",

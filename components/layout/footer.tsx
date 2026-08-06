@@ -10,22 +10,30 @@ function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-white/8 bg-[var(--surface-ink)] text-white">
-      <div className="container-app py-14">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
-          <div className="space-y-4">
+    <footer className="relative overflow-hidden border-t border-white/10 bg-[var(--surface-ink)] text-white">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-40"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 100% 0%, rgba(46,125,170,0.25), transparent 60%), radial-gradient(ellipse 40% 40% at 0% 100%, rgba(221,155,48,0.1), transparent 55%)",
+        }}
+      />
+      <div className="container-app relative z-10 py-16">
+        <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div className="space-y-5">
             <BrandLogo variant="dark" href={routes.home} />
             <p className="max-w-md text-sm leading-relaxed text-white/50">
-              Aviation course platform · 2030. {siteStatic.description} Training lanes:{" "}
-              {siteStatic.locations.join(" · ")}.
+              Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.
+              Training lanes: {siteStatic.locations.join(" · ")}.
             </p>
           </div>
 
           <div>
-            <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
+            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">
               Platform
             </h3>
-            <ul className="space-y-2 text-sm text-white/60">
+            <ul className="space-y-2.5 text-sm text-white/60">
               <li>
                 <Link href="/" className="transition hover:text-accent">
                   Home
@@ -55,10 +63,10 @@ function Footer() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-accent">
+            <h3 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.28em] text-accent">
               Support
             </h3>
-            <ul className="space-y-2 text-sm text-white/60">
+            <ul className="space-y-2.5 text-sm text-white/60">
               <li>
                 <a
                   href={`mailto:${siteStatic.contactEmail}`}
@@ -81,10 +89,14 @@ function Footer() {
           </div>
         </div>
 
-        <div className="my-8 h-px w-full bg-white/10" />
-        <p className="text-xs text-white/35">
-          © {year} {siteStatic.name}. Aviation course platform. English only.
-        </p>
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-white/35">
+            © {year} {siteStatic.name}. Aviation course platform. English only.
+          </p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-white/25">
+            Train · Book · Master
+          </p>
+        </div>
       </div>
     </footer>
   );

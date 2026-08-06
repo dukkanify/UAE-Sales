@@ -31,11 +31,17 @@ export const metadata: Metadata = {
   description: APP_METADATA.description,
   applicationName: siteConfig.name,
   authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "education",
   keywords: [
     "ATPL PASS",
     "ATPL training",
+    "ATPL theory",
     "aviation education",
     "pilot training",
+    "airline transport pilot license",
+    "Zoom instructor coaching",
     "Kuwait",
     "Dubai",
   ],
@@ -59,6 +65,7 @@ export const metadata: Metadata = {
     apple: [{ url: siteConfig.brand.icon }],
   },
   alternates: {
+    canonical: "/",
     languages: { en: "/" },
   },
   other: {
@@ -67,6 +74,13 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 };
 
