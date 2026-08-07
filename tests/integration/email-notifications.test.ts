@@ -10,7 +10,7 @@ import { findUserByEmail } from "@/services/auth/store";
 import { requestOtp } from "@/services/auth/auth-service";
 import { processDueReminders } from "@/services/classes/reminder-service";
 import { writeClassesDb } from "@/services/classes/store";
-import { getLatestOutboundTo, listOutboundEmails } from "@/services/email/outbox";
+import { getLatestOutboundTo, getOutboundById, listOutboundEmails } from "@/services/email/outbox";
 import { sendEmail } from "@/services/email/mailer";
 import { generateId } from "@/lib/security/crypto";
 import { testEmailTemplate } from "@/services/settings/email-templates";
@@ -59,12 +59,16 @@ describe("email notifications", () => {
     expect(req.success).toBe(true);
     expect(req.data?.emailDelivery).toBe("outbox");
     expect(req.data?.demoOtp).toBe("123456");
+    expect(req.data?.emailOutboxId).toBeTruthy();
 
-    const latest = getLatestOutboundTo(email);
-    expect(latest).toBeTruthy();
-    expect(latest!.subject).toMatch(/verification code/i);
-    expect(latest!.text).toContain("123456");
-    expect(beforeIds.has(latest!.id)).toBe(false);
+    // Prefer id lookup — parallel Vitest workers can race the shared disk file,
+    // but the in-process store keeps the record we just wrote.
+    const recorded = getOutboundById(req.data!.emailOutboxId!);
+    expect(recorded).toBeTruthy();
+    expect(recorded!.to.toLowerCase()).toBe(email);
+    expect(recorded!.subject).toMatch(/verification code/i);
+    expect(recorded!.text).toContain("123456");
+    expect(beforeIds.has(recorded!.id)).toBe(false);
   });
 
   it("sends test email into outbox with system meta", async () => {
@@ -79,8 +83,12 @@ describe("email notifications", () => {
     expect(result.success).toBe(true);
     expect(result.mode).toBe("outbox");
     expect(result.delivered).toBe(false);
-    const latest = getLatestOutboundTo("ops@aviatorpass.test");
-    expect(latest?.subject).toMatch(/Test email/i);
+    expect(result.outboxId).toBeTruthy();
+    expect(result.record.subject).toMatch(/Test email/i);
+
+    const recorded = getOutboundById(result.outboxId);
+    expect(recorded?.subject).toMatch(/Test email/i);
+    expect(recorded?.meta?.kind).toBe("test");
   });
 
   it("delivers class reminder emails through the outbox", async () => {
@@ -141,9 +149,16 @@ describe("email notifications", () => {
     const sent = await processDueReminders(new Date().toISOString());
     expect(sent).toBeGreaterThanOrEqual(1);
 
-    const latest = getLatestOutboundTo(student!.email);
-    expect(latest).toBeTruthy();
-    expect(latest!.meta?.kind).toBe("class_reminder");
-    expect(latest!.subject).toMatch(/2 hours|Class starts/i);
+    const reminderMail =
+      listOutboundEmails(100).find(
+        (m) =>
+          m.to.toLowerCase() === student!.email.toLowerCase() &&
+          m.meta?.kind === "class_reminder" &&
+          m.meta?.liveClassId === classId,
+      ) ?? getLatestOutboundTo(student!.email);
+
+    expect(reminderMail).toBeTruthy();
+    expect(reminderMail!.meta?.kind).toBe("class_reminder");
+    expect(reminderMail!.subject).toMatch(/2 hours|Class starts/i);
   });
 });
