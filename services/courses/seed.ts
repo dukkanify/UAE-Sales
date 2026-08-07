@@ -32,6 +32,256 @@ const PUBLIC_CATALOG_CODES = [
   "PPL-GS-01",
 ] as const;
 
+const SYLLABUS_BY_CODE: Record<
+  string,
+  Array<{
+    title: string;
+    description: string;
+    lessons: Array<{ title: string; description: string }>;
+  }>
+> = {
+  "ATPL-010": [
+    {
+      title: "Regulatory foundations",
+      description: "ICAO framework, licensing rules, and the structure of aviation law.",
+      lessons: [
+        {
+          title: "ICAO annexes & international agreements",
+          description: "How global standards shape national regulations.",
+        },
+        {
+          title: "Licensing, ratings, and privileges",
+          description: "What ATPL privileges require and how they are maintained.",
+        },
+      ],
+    },
+    {
+      title: "Operations & aerodromes",
+      description: "Rules of the air, aerodrome operations, and compliance in daily flying.",
+      lessons: [
+        {
+          title: "Rules of the air",
+          description: "Right of way, interception, and VFR/IFR obligations.",
+        },
+        {
+          title: "Aerodrome operations & airspace",
+          description: "Ground movement, ATC interfaces, and special procedures.",
+        },
+      ],
+    },
+  ],
+  "ATPL-031": [
+    {
+      title: "Mass concepts",
+      description: "Aircraft mass definitions, limits, and documentation.",
+      lessons: [
+        {
+          title: "Mass definitions & structural limits",
+          description: "Basic empty mass through take-off and landing limits.",
+        },
+        {
+          title: "Load sheets & operational documents",
+          description: "How mass data is captured and checked before departure.",
+        },
+      ],
+    },
+    {
+      title: "Balance & CG",
+      description: "Centre of gravity theory and practical loading scenarios.",
+      lessons: [
+        {
+          title: "CG envelopes & stability",
+          description: "Why CG position matters for control and performance.",
+        },
+        {
+          title: "Practical multi-engine loading",
+          description: "Worked examples for transport-category loading.",
+        },
+      ],
+    },
+  ],
+  "ATPL-050": [
+    {
+      title: "Atmosphere & weather systems",
+      description: "Pressure, fronts, and the weather that drives flight planning.",
+      lessons: [
+        {
+          title: "Atmospheric structure & pressure systems",
+          description: "Layers, ISA, and synoptic pressure patterns.",
+        },
+        {
+          title: "Fronts, clouds, and precipitation",
+          description: "Identifying systems that affect route and altitude choice.",
+        },
+      ],
+    },
+    {
+      title: "Hazards & products",
+      description: "Icing, thunderstorms, and interpreting aviation weather products.",
+      lessons: [
+        {
+          title: "Icing, thunderstorms, and turbulence",
+          description: "Recognising and avoiding hazardous weather.",
+        },
+        {
+          title: "METARs, TAFs, and charts",
+          description: "Reading operational weather products with confidence.",
+        },
+      ],
+    },
+  ],
+  "ATPL-061": [
+    {
+      title: "Earth & charts",
+      description: "Geometry of the Earth and aeronautical chart projections.",
+      lessons: [
+        {
+          title: "Lat/long, great circles, and rhumb lines",
+          description: "Core navigation geometry for ATPL candidates.",
+        },
+        {
+          title: "Chart projections & scale",
+          description: "Mercator, Lambert, and practical chart use.",
+        },
+      ],
+    },
+    {
+      title: "Practical navigation",
+      description: "Magnetic variation, directions, and in-flight navigation technique.",
+      lessons: [
+        {
+          title: "Direction, variation, and deviation",
+          description: "Converting between true, magnetic, and compass.",
+        },
+        {
+          title: "Dead reckoning & position lines",
+          description: "Building a navigation solution without GNSS.",
+        },
+      ],
+    },
+  ],
+  "ATPL-062": [
+    {
+      title: "Ground-based aids",
+      description: "VOR, DME, ILS, and classic radio navigation.",
+      lessons: [
+        {
+          title: "VOR / DME fundamentals",
+          description: "Radial tracking and distance measuring principles.",
+        },
+        {
+          title: "ILS approach geometry",
+          description: "Localiser, glide path, and approach design basics.",
+        },
+      ],
+    },
+    {
+      title: "GNSS & modern procedures",
+      description: "Satellite navigation and RNAV/RNP operations.",
+      lessons: [
+        {
+          title: "GNSS principles & integrity",
+          description: "How satellite systems support IFR navigation.",
+        },
+        {
+          title: "RNAV / RNP procedures",
+          description: "Flying modern instrument procedures with confidence.",
+        },
+      ],
+    },
+  ],
+  "ATPL-070": [
+    {
+      title: "Normal operations",
+      description: "Airline SOPs and specialised operational environments.",
+      lessons: [
+        {
+          title: "SOP structure & crew coordination",
+          description: "How procedures keep multi-crew operations safe.",
+        },
+        {
+          title: "Special airports & RVSM",
+          description: "Operating in constrained and high-altitude environments.",
+        },
+      ],
+    },
+    {
+      title: "Abnormals & emergencies",
+      description: "Non-normal checklists and decision making under pressure.",
+      lessons: [
+        {
+          title: "Abnormal checklist discipline",
+          description: "Priorities when systems degrade in flight.",
+        },
+        {
+          title: "Emergency scenarios & diversion",
+          description: "Building a safe plan when the flight cannot continue normally.",
+        },
+      ],
+    },
+  ],
+  "ATPL-081": [
+    {
+      title: "Lift, drag, and performance",
+      description: "Forces in flight and what they mean for jet performance.",
+      lessons: [
+        {
+          title: "Lift and drag polar",
+          description: "How wing design shapes climb, cruise, and approach.",
+        },
+        {
+          title: "High-speed flight effects",
+          description: "Compressibility, Mach effects, and buffet boundaries.",
+        },
+      ],
+    },
+    {
+      title: "Stability & control",
+      description: "Aircraft stability modes and control in transport jets.",
+      lessons: [
+        {
+          title: "Static & dynamic stability",
+          description: "Why the aircraft returns — or does not — after a disturbance.",
+        },
+        {
+          title: "Control surfaces & handling qualities",
+          description: "How pilots manage attitude and path in jet aircraft.",
+        },
+      ],
+    },
+  ],
+  "PPL-GS-01": [
+    {
+      title: "Flying fundamentals",
+      description: "Principles of flight and basic meteorology for private pilots.",
+      lessons: [
+        {
+          title: "Four forces & basic aerodynamics",
+          description: "Lift, weight, thrust, and drag in simple terms.",
+        },
+        {
+          title: "Weather basics for VFR",
+          description: "Clouds, wind, and visibility that matter to PPL flying.",
+        },
+      ],
+    },
+    {
+      title: "Human performance",
+      description: "Physiology and decision making for safe private flying.",
+      lessons: [
+        {
+          title: "Human factors & limitations",
+          description: "Fatigue, vision, and spatial awareness.",
+        },
+        {
+          title: "Aeronautical decision making",
+          description: "Simple frameworks for go / no-go choices.",
+        },
+      ],
+    },
+  ],
+};
+
 function catalogNeedsEnrichment(
   db: ReturnType<typeof readCoursesDb>,
   instructorIds: Set<string>,
@@ -46,6 +296,20 @@ function catalogNeedsEnrichment(
     }
     if (course.status !== "published" || !course.publishedAt) return true;
     if (!course.primaryInstructorId || !instructorIds.has(course.primaryInstructorId)) return true;
+
+    const syllabus = SYLLABUS_BY_CODE[course.code];
+    if (!syllabus) continue;
+    const modules = db.modules
+      .filter((m) => m.courseId === course.id)
+      .sort((a, b) => a.order - b.order);
+    for (let i = 0; i < Math.min(modules.length, syllabus.length); i += 1) {
+      const mod = modules[i]!;
+      if (/^module\s*\d+$/i.test(mod.title.trim())) return true;
+      const lessons = db.lessons
+        .filter((l) => l.moduleId === mod.id)
+        .sort((a, b) => a.order - b.order);
+      if (lessons.some((l) => /^lesson\s*\d+(\.\d+)?$/i.test(l.title.trim()))) return true;
+    }
   }
   return false;
 }
@@ -91,6 +355,36 @@ function ensurePublishedCatalogEnrichment(): void {
         }
       }
       if (touched) course.updatedAt = ts;
+    }
+
+    // Upgrade generic Module/Lesson titles on catalog courses.
+    for (const course of d.courses) {
+      const syllabus = SYLLABUS_BY_CODE[course.code];
+      if (!syllabus) continue;
+      const modules = d.modules
+        .filter((m) => m.courseId === course.id)
+        .sort((a, b) => a.order - b.order);
+      modules.forEach((mod, index) => {
+        const def = syllabus[index];
+        if (!def) return;
+        if (/^module\s*\d+$/i.test(mod.title.trim()) || !mod.description) {
+          mod.title = def.title;
+          mod.description = def.description;
+          mod.updatedAt = ts;
+        }
+        const lessons = d.lessons
+          .filter((l) => l.moduleId === mod.id)
+          .sort((a, b) => a.order - b.order);
+        lessons.forEach((lesson, lessonIndex) => {
+          const lessonDef = def.lessons[lessonIndex];
+          if (!lessonDef) return;
+          if (/^lesson\s*\d+(\.\d+)?$/i.test(lesson.title.trim()) || !lesson.description) {
+            lesson.title = lessonDef.title;
+            lesson.description = lessonDef.description;
+            lesson.updatedAt = ts;
+          }
+        });
+      });
     }
 
     const existingCodes = new Set(d.courses.map((c) => c.code));
@@ -215,34 +509,45 @@ function ensurePublishedCatalogEnrichment(): void {
           assignedAt: ts,
         });
       }
-      const moduleId = generateId();
-      d.modules.push({
-        id: moduleId,
-        courseId,
-        title: "Module 1",
-        description: `Core content for ${def.code}`,
-        order: 1,
-        estimatedDurationMinutes: 480,
-        status: "published",
-        visible: true,
-        createdAt: ts,
-        updatedAt: ts,
-      });
-      d.lessons.push({
-        id: generateId(),
-        courseId,
-        moduleId,
-        title: "Lesson 1.1",
-        description: `Opening lesson for ${def.code}`,
-        contentHtml: `<p>Welcome to <strong>${def.title}</strong>.</p>`,
-        videoUrl: null,
-        durationMinutes: 45,
-        estimatedStudyMinutes: 90,
-        order: 1,
-        previewAvailable: true,
-        status: "published",
-        createdAt: ts,
-        updatedAt: ts,
+      const syllabus = SYLLABUS_BY_CODE[def.code] ?? [
+        {
+          title: "Module 1",
+          description: `Core content for ${def.code}`,
+          lessons: [{ title: "Lesson 1.1", description: `Opening lesson for ${def.code}` }],
+        },
+      ];
+      syllabus.forEach((modDef, modIndex) => {
+        const moduleId = generateId();
+        d.modules.push({
+          id: moduleId,
+          courseId,
+          title: modDef.title,
+          description: modDef.description,
+          order: modIndex + 1,
+          estimatedDurationMinutes: 480,
+          status: "published",
+          visible: true,
+          createdAt: ts,
+          updatedAt: ts,
+        });
+        modDef.lessons.forEach((lessonDef, lessonIndex) => {
+          d.lessons.push({
+            id: generateId(),
+            courseId,
+            moduleId,
+            title: lessonDef.title,
+            description: lessonDef.description,
+            contentHtml: `<p>${lessonDef.description}</p>`,
+            videoUrl: null,
+            durationMinutes: 45,
+            estimatedStudyMinutes: 90,
+            order: lessonIndex + 1,
+            previewAvailable: modIndex === 0 && lessonIndex === 0,
+            status: "published",
+            createdAt: ts,
+            updatedAt: ts,
+          });
+        });
       });
     }
 
