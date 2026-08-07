@@ -69,8 +69,10 @@ export async function middleware(request: NextRequest) {
     const lower = pathname.toLowerCase();
     if (
       lower === "/book" ||
+      lower === "/courses" ||
       lower === "/login" ||
       lower === "/register" ||
+      lower === "/register/instructor" ||
       lower === "/verify-otp"
     ) {
       const url = request.nextUrl.clone();

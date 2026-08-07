@@ -2,9 +2,9 @@
  * Booking durable store (.data/aep-bookings.json).
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type { AppointmentBooking, BookingSettings } from "@/types/bookings";
 
 export interface BookingsDatabase {
@@ -13,8 +13,7 @@ export interface BookingsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-bookings.json");
+const DATA_FILE = path.join(dataDir(), "aep-bookings.json");
 
 export function defaultBookingSettings(): BookingSettings {
   const now = new Date().toISOString();
@@ -71,24 +70,12 @@ function emptyDb(): BookingsDatabase {
 }
 
 export function ensureBookingsStore(): BookingsDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<BookingsDatabase>;
-    return {
-      settings: { ...defaultBookingSettings(), ...(raw.settings ?? {}) },
-      bookings: raw.bookings ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<BookingsDatabase>>(DATA_FILE, emptyDb);
+  return {
+    settings: { ...defaultBookingSettings(), ...(raw.settings ?? {}) },
+    bookings: raw.bookings ?? [],
+    seeded: Boolean(raw.seeded),
+  };
 }
 
 export function readBookingsDb(): BookingsDatabase {
@@ -98,6 +85,6 @@ export function readBookingsDb(): BookingsDatabase {
 export function writeBookingsDb(mutator: (db: BookingsDatabase) => void): BookingsDatabase {
   const db = ensureBookingsStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
   return db;
 }

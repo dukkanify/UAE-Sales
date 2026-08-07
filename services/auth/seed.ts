@@ -22,7 +22,15 @@ export function ensureSuperAdminSeeded(): void {
     return;
   }
 
-  const env = getServerEnv();
+  let env: ReturnType<typeof getServerEnv>;
+  try {
+    env = getServerEnv();
+  } catch (error) {
+    // Never 500 marketing SSR because env validation failed during seed.
+    console.error("[auth-seed] getServerEnv failed", error);
+    seededInProcess = true;
+    return;
+  }
   const email = env.SUPER_ADMIN_EMAIL.toLowerCase();
   const existing = findUserByEmail(email);
 
