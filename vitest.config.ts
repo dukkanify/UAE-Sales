@@ -10,6 +10,9 @@ export default defineConfig({
     globals: false,
     include: ["tests/unit/**/*.{test,spec}.ts", "tests/integration/**/*.{test,spec}.ts"],
     exclude: ["node_modules", ".next", "e2e"],
+    // Shared `.data/*.json` stores are process-local; keep integration files
+    // from racing each other across Vitest workers on CI.
+    fileParallelism: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],
@@ -19,6 +22,7 @@ export default defineConfig({
     setupFiles: ["./tests/setup.ts"],
     testTimeout: 15000,
   },
+
   resolve: {
     alias: {
       "@": root,

@@ -1,10 +1,12 @@
 /**
  * Durable email outbox — every outbound message is recorded for audit / local preview.
+ * Uses the shared JSON store so reads stay consistent in-process even when parallel
+ * Vitest workers race on the underlying `.data` file.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import { generateId } from "@/lib/security/crypto";
 
 export type EmailDeliveryMode = "smtp" | "outbox" | "failed";
@@ -28,26 +30,20 @@ interface OutboxDb {
   messages: OutboundEmailRecord[];
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-email-outbox.json");
+const DATA_FILE = path.join(dataDir(), "aep-email-outbox.json");
+
+function emptyOutbox(): OutboxDb {
+  return { messages: [] };
+}
 
 function readOutbox(): OutboxDb {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const empty: OutboxDb = { messages: [] };
-    writeFileSync(DATA_FILE, JSON.stringify(empty, null, 2), "utf8");
-    return empty;
-  }
-  try {
-    return JSON.parse(readFileSync(DATA_FILE, "utf8")) as OutboxDb;
-  } catch {
-    return { messages: [] };
-  }
+  const db = readJsonFile<OutboxDb>(DATA_FILE, emptyOutbox);
+  if (!Array.isArray(db.messages)) return emptyOutbox();
+  return db;
 }
 
 function writeOutbox(db: OutboxDb) {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
 }
 
 export function recordOutboundEmail(
@@ -59,15 +55,19 @@ export function recordOutboundEmail(
     createdAt: new Date().toISOString(),
   };
   const db = readOutbox();
-  db.messages.unshift(record);
-  // Keep last 500 for local/demo inspection
-  db.messages = db.messages.slice(0, 500);
+  // Deduplicate by id in case a stale disk snapshot is merged later.
+  db.messages = [record, ...db.messages.filter((m) => m.id !== record.id)].slice(0, 500);
   writeOutbox(db);
   return record;
 }
 
 export function listOutboundEmails(limit = 50): OutboundEmailRecord[] {
   return readOutbox().messages.slice(0, limit);
+}
+
+export function getOutboundById(id: string): OutboundEmailRecord | null {
+  if (!id) return null;
+  return readOutbox().messages.find((m) => m.id === id) ?? null;
 }
 
 export function getLatestOutboundTo(email: string): OutboundEmailRecord | null {
