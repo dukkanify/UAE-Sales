@@ -1,21 +1,16 @@
 /**
  * Centralized application / error / security / API logging.
+ * Uses the shared JSON store so serverless/read-only hosts keep serving from memory.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import { generateId } from "@/lib/security/crypto";
 
 export type OpsLogLevel = "debug" | "info" | "warn" | "error";
 export type OpsLogCategory =
-  | "application"
-  | "error"
-  | "security"
-  | "audit"
-  | "api"
-  | "job"
-  | "backup";
+  "application" | "error" | "security" | "audit" | "api" | "job" | "backup";
 
 export interface OpsLogEntry {
   id: string;
@@ -32,29 +27,21 @@ interface OpsLogDatabase {
   entries: OpsLogEntry[];
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-ops-logs.json");
+const DATA_FILE = path.join(dataDir(), "aep-ops-logs.json");
 const MAX_ENTRIES = 5000;
 
-function ensureDb(): OpsLogDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db: OpsLogDatabase = { entries: [] };
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as OpsLogDatabase;
-    return { entries: raw.entries ?? [] };
-  } catch {
-    const db: OpsLogDatabase = { entries: [] };
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+function emptyDb(): OpsLogDatabase {
+  return { entries: [] };
+}
+
+function readDb(): OpsLogDatabase {
+  const db = readJsonFile<OpsLogDatabase>(DATA_FILE, emptyDb);
+  if (!Array.isArray(db.entries)) return emptyDb();
+  return db;
 }
 
 function writeDb(db: OpsLogDatabase) {
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
 }
 
 export function writeOpsLog(input: {
@@ -75,7 +62,7 @@ export function writeOpsLog(input: {
     userId: input.userId ?? null,
     createdAt: new Date().toISOString(),
   };
-  const db = ensureDb();
+  const db = readDb();
   db.entries.unshift(entry);
   if (db.entries.length > MAX_ENTRIES) db.entries = db.entries.slice(0, MAX_ENTRIES);
   writeDb(db);
@@ -93,7 +80,7 @@ export function listOpsLogs(filters?: {
   q?: string;
   limit?: number;
 }): OpsLogEntry[] {
-  let rows = ensureDb().entries;
+  let rows = readDb().entries;
   if (filters?.category && filters.category !== "all") {
     rows = rows.filter((r) => r.category === filters.category);
   }

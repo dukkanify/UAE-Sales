@@ -68,11 +68,12 @@ function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
       detail: existsSync(dataDir) ? `${files} JSON stores readable` : "Missing .data directory",
     });
   } catch {
+    // Serverless / read-only hosts still serve via in-memory JSON fallback.
     checks.push({
       id: "database",
       label: "Data store",
-      status: "fail",
-      detail: "Data directory not writable",
+      status: "warn",
+      detail: "Data directory not writable — using in-memory store",
     });
   }
 
@@ -125,36 +126,65 @@ function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
   });
 
   if (deep) {
-    const mon = getActivityMonitoring();
-    checks.push({
-      id: "sessions",
-      label: "Online sessions",
-      status: "pass",
-      detail: `${mon.onlineUsers} online · ${mon.failedLoginAttempts24h} failed logins (24h)`,
-    });
-    const backups = listBackups();
-    checks.push({
-      id: "backups",
-      label: "Backups",
-      status: backups.length ? "pass" : "warn",
-      detail: backups.length
-        ? `Latest ${backups[0]!.createdAt}`
-        : "No backups yet — run ops backup",
-    });
-    const errors = listOpsLogs({ category: "error", limit: 50 });
-    checks.push({
-      id: "error_rate",
-      label: "Recent errors",
-      status: errors.length > 20 ? "fail" : errors.length > 5 ? "warn" : "pass",
-      detail: `${errors.length} error logs in buffer`,
-    });
-    const security = listOpsLogs({ category: "security", limit: 20 });
-    checks.push({
-      id: "security_events",
-      label: "Security events",
-      status: security.length > 10 ? "warn" : "pass",
-      detail: `${security.length} recent security log entries`,
-    });
+    try {
+      const mon = getActivityMonitoring();
+      checks.push({
+        id: "sessions",
+        label: "Online sessions",
+        status: "pass",
+        detail: `${mon.onlineUsers} online · ${mon.failedLoginAttempts24h} failed logins (24h)`,
+      });
+    } catch (error) {
+      checks.push({
+        id: "sessions",
+        label: "Online sessions",
+        status: "warn",
+        detail: error instanceof Error ? error.message : "Sessions check unavailable",
+      });
+    }
+
+    try {
+      const backups = listBackups();
+      checks.push({
+        id: "backups",
+        label: "Backups",
+        status: backups.length ? "pass" : "warn",
+        detail: backups.length
+          ? `Latest ${backups[0]!.createdAt}`
+          : "No backups yet — run ops backup",
+      });
+    } catch (error) {
+      checks.push({
+        id: "backups",
+        label: "Backups",
+        status: "warn",
+        detail: error instanceof Error ? error.message : "Backup listing unavailable",
+      });
+    }
+
+    try {
+      const errors = listOpsLogs({ category: "error", limit: 50 });
+      checks.push({
+        id: "error_rate",
+        label: "Recent errors",
+        status: errors.length > 20 ? "fail" : errors.length > 5 ? "warn" : "pass",
+        detail: `${errors.length} error logs in buffer`,
+      });
+      const security = listOpsLogs({ category: "security", limit: 20 });
+      checks.push({
+        id: "security_events",
+        label: "Security events",
+        status: security.length > 10 ? "warn" : "pass",
+        detail: `${security.length} recent security log entries`,
+      });
+    } catch (error) {
+      checks.push({
+        id: "error_rate",
+        label: "Recent errors",
+        status: "warn",
+        detail: error instanceof Error ? error.message : "Ops logs unavailable",
+      });
+    }
 
     try {
       const env = getServerEnv();

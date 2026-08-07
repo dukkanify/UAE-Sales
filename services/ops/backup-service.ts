@@ -35,7 +35,11 @@ const BACKUP_ROOT = path.join(ROOT, ".backups");
 const UPLOADS_DIR = path.join(ROOT, "public", "uploads");
 
 function ensureDirs() {
-  if (!existsSync(BACKUP_ROOT)) mkdirSync(BACKUP_ROOT, { recursive: true });
+  try {
+    if (!existsSync(BACKUP_ROOT)) mkdirSync(BACKUP_ROOT, { recursive: true });
+  } catch {
+    // Read-only hosts (Vercel) — list/create callers handle missing dirs.
+  }
 }
 
 function hashFile(filePath: string): string {
@@ -44,17 +48,21 @@ function hashFile(filePath: string): string {
 }
 
 export function listBackups(): BackupManifest[] {
-  ensureDirs();
-  if (!existsSync(BACKUP_ROOT)) return [];
-  return readdirSync(BACKUP_ROOT)
-    .filter((d) => existsSync(path.join(BACKUP_ROOT, d, "manifest.json")))
-    .map((d) => {
-      const raw = JSON.parse(
-        readFileSync(path.join(BACKUP_ROOT, d, "manifest.json"), "utf8"),
-      ) as BackupManifest;
-      return raw;
-    })
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  try {
+    ensureDirs();
+    if (!existsSync(BACKUP_ROOT)) return [];
+    return readdirSync(BACKUP_ROOT)
+      .filter((d) => existsSync(path.join(BACKUP_ROOT, d, "manifest.json")))
+      .map((d) => {
+        const raw = JSON.parse(
+          readFileSync(path.join(BACKUP_ROOT, d, "manifest.json"), "utf8"),
+        ) as BackupManifest;
+        return raw;
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  } catch {
+    return [];
+  }
 }
 
 export function createBackup(input?: {
