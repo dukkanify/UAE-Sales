@@ -14,7 +14,12 @@ export async function GET(request: Request) {
     const snapshot = getHealthSnapshot({ deep: deep || ready });
 
     if (ready) {
-      const failed = snapshot.checks.some((c) => c.status === "fail");
+      // Readiness = can the process serve traffic. Soft ops signals (error buffer,
+      // security noise, backups) stay on deep health but must not flap uptime probes.
+      const readinessIgnored = new Set(["error_rate", "security_events", "backups"]);
+      const failed = snapshot.checks.some(
+        (c) => c.status === "fail" && !readinessIgnored.has(c.id),
+      );
       return NextResponse.json(
         {
           ready: !failed,
