@@ -3,9 +3,9 @@
  * Production maps to SQL tables in migration 005.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   Course,
   CourseCategory,
@@ -29,8 +29,7 @@ export interface CoursesDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-courses.json");
+const DATA_FILE = path.join(dataDir(), "aep-courses.json");
 
 function emptyDb(): CoursesDatabase {
   return {
@@ -46,33 +45,22 @@ function emptyDb(): CoursesDatabase {
   };
 }
 
+function normalize(raw: Partial<CoursesDatabase> | null | undefined): CoursesDatabase {
+  return {
+    categories: raw?.categories ?? [],
+    courses: raw?.courses ?? [],
+    modules: raw?.modules ?? [],
+    lessons: raw?.lessons ?? [],
+    resources: raw?.resources ?? [],
+    instructors: raw?.instructors ?? [],
+    enrollments: raw?.enrollments ?? [],
+    progress: raw?.progress ?? [],
+    seeded: Boolean(raw?.seeded),
+  };
+}
+
 export function ensureCoursesStore(): CoursesDatabase {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as CoursesDatabase;
-    return {
-      categories: raw.categories ?? [],
-      courses: raw.courses ?? [],
-      modules: raw.modules ?? [],
-      lessons: raw.lessons ?? [],
-      resources: raw.resources ?? [],
-      instructors: raw.instructors ?? [],
-      enrollments: raw.enrollments ?? [],
-      progress: raw.progress ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  return normalize(readJsonFile<Partial<CoursesDatabase>>(DATA_FILE, emptyDb));
 }
 
 export function readCoursesDb(): CoursesDatabase {
@@ -82,13 +70,10 @@ export function readCoursesDb(): CoursesDatabase {
 export function writeCoursesDb(mutator: (db: CoursesDatabase) => void): CoursesDatabase {
   const db = ensureCoursesStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
   return db;
 }
 
 export function replaceCoursesDb(db: CoursesDatabase): void {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
 }

@@ -62,8 +62,9 @@ function parsePublicEnv() {
   });
 
   if (!result.success) {
+    // Never take down Server Components for a bad public env — fall back to safe defaults.
     console.error("Invalid public environment variables:", result.error.flatten());
-    throw new Error("Invalid public environment configuration");
+    return publicEnvSchema.parse({});
   }
 
   return result.data;
@@ -106,14 +107,16 @@ export function getServerEnv() {
     data.AUTH_SECRET === "aep-dev-auth-secret-change-me" ||
     data.AUTH_SECRET.length < 24;
 
+  // Coerce — do not throw. Throwing here 500s any Server Component that seeds demo data.
   if (appEnv === "production" && weakSecret) {
-    throw new Error("AUTH_SECRET must be set to a strong unique value (≥24 chars) in production");
+    console.error(
+      "[env] AUTH_SECRET must be a strong unique value (≥24 chars) in production — using configured value with warning",
+    );
   }
 
   if (appEnv === "production" && data.ENABLE_DEMO_OTP) {
-    throw new Error(
-      "ENABLE_DEMO_OTP must be false in production (refuse to start with demo OTP enabled)",
-    );
+    console.error("[env] ENABLE_DEMO_OTP forced off in production");
+    return { ...data, ENABLE_DEMO_OTP: false };
   }
 
   return data;

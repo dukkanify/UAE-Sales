@@ -82,7 +82,12 @@ function CatalogCourseCard({
 
 /** Server-rendered public catalog — no client fetch, always shows published lanes. */
 function PublicCourseCatalog() {
-  const groups = listPublishedCoursesGroupedByInstructor(100);
+  let groups: ReturnType<typeof listPublishedCoursesGroupedByInstructor> = [];
+  try {
+    groups = listPublishedCoursesGroupedByInstructor(100);
+  } catch (error) {
+    console.error("[public-course-catalog]", error);
+  }
   const total = groups.reduce((sum, g) => sum + g.courses.length, 0);
 
   if (total === 0) {

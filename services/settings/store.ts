@@ -3,9 +3,9 @@
  * Mirrors auth store pattern; production maps to public.settings via Supabase.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type { PlatformSettings, SettingChangeRecord } from "@/types/settings";
 import { DEFAULT_PLATFORM_SETTINGS } from "@/services/settings/defaults";
 import { generateId } from "@/lib/security/crypto";
@@ -16,8 +16,7 @@ interface SettingsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-settings.json");
+const DATA_FILE = path.join(dataDir(), "aep-settings.json");
 
 function deepMerge<T extends Record<string, unknown>>(base: T, patch: Partial<T>): T {
   const out = { ...base };
@@ -54,27 +53,16 @@ function emptyDb(): SettingsDatabase {
 }
 
 function ensureStore(): SettingsDatabase {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as SettingsDatabase;
-    // Merge defaults so new keys appear after upgrades
-    raw.settings = deepMerge(
-      DEFAULT_PLATFORM_SETTINGS as unknown as Record<string, unknown>,
-      raw.settings as unknown as Record<string, unknown>,
-    ) as unknown as PlatformSettings;
-    return raw;
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<SettingsDatabase>>(DATA_FILE, emptyDb);
+  const settings = deepMerge(
+    DEFAULT_PLATFORM_SETTINGS as unknown as Record<string, unknown>,
+    (raw.settings ?? emptyDb().settings) as unknown as Record<string, unknown>,
+  ) as unknown as PlatformSettings;
+  return {
+    settings,
+    history: raw.history ?? [],
+    seeded: Boolean(raw.seeded ?? true),
+  };
 }
 
 export function readSettingsDb(): SettingsDatabase {
@@ -84,7 +72,7 @@ export function readSettingsDb(): SettingsDatabase {
 export function writeSettingsDb(mutator: (db: SettingsDatabase) => void): SettingsDatabase {
   const db = ensureStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
   return db;
 }
 

@@ -51,7 +51,7 @@ function Header() {
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="container-app flex h-[4.5rem] items-center justify-between gap-3 sm:h-[4.85rem]">
+      <div className="container-app relative flex h-[4.5rem] items-center justify-between gap-3 sm:h-[4.85rem]">
         <div className="relative z-10 min-w-0 shrink-0">
           <BrandLogo
             variant="dark"

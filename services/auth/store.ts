@@ -4,9 +4,9 @@
  * Production should use Supabase Auth + PostgreSQL tables from database/migrations.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   ActivityLogRecord,
   AuditLogRecord,
@@ -67,8 +67,7 @@ interface AuthDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-auth.json");
+const DATA_FILE = path.join(dataDir(), "aep-auth.json");
 
 const emptyDb = (): AuthDatabase => ({
   users: [],
@@ -81,24 +80,18 @@ const emptyDb = (): AuthDatabase => ({
 });
 
 function ensureStore(): AuthDatabase {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = readFileSync(DATA_FILE, "utf8");
-    const parsed = { ...emptyDb(), ...JSON.parse(raw) } as AuthDatabase;
-    parsed.users = (parsed.users ?? []).map(normalizeStoredUser);
-    return parsed;
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const parsed = {
+    ...emptyDb(),
+    ...readJsonFile<Partial<AuthDatabase>>(DATA_FILE, emptyDb),
+  } as AuthDatabase;
+  parsed.users = (parsed.users ?? []).map(normalizeStoredUser);
+  parsed.sessions = parsed.sessions ?? [];
+  parsed.otps = parsed.otps ?? [];
+  parsed.notifications = parsed.notifications ?? [];
+  parsed.activityLogs = parsed.activityLogs ?? [];
+  parsed.auditLogs = parsed.auditLogs ?? [];
+  parsed.seeded = Boolean(parsed.seeded);
+  return parsed;
 }
 
 /** Backfill fields added after early auth JSON snapshots. */
@@ -121,10 +114,7 @@ function normalizeStoredUser(user: StoredUser): StoredUser {
 }
 
 function saveStore(db: AuthDatabase): void {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true });
-  }
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(DATA_FILE, db);
 }
 
 export function readAuthDb(): AuthDatabase {

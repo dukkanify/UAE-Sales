@@ -71,7 +71,12 @@ function HomeCourseCard({
 }
 
 function HomeCoursesByInstructor() {
-  const groups = listPublishedCoursesGroupedByInstructor(48);
+  let groups: ReturnType<typeof listPublishedCoursesGroupedByInstructor> = [];
+  try {
+    groups = listPublishedCoursesGroupedByInstructor(48);
+  } catch (error) {
+    console.error("[home-courses]", error);
+  }
 
   return (
     <section id="courses" className="platform-altitude content-auto py-28 sm:py-36">
