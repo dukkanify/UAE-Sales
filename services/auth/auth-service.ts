@@ -223,6 +223,7 @@ export async function requestOtp(input: {
     demoOtp?: string;
     expiresInMinutes: number;
     emailDelivery?: "smtp" | "outbox" | "failed";
+    emailOutboxId?: string;
   }>
 > {
   ensureSuperAdminSeeded();
@@ -331,6 +332,7 @@ export async function requestOtp(input: {
       email,
       expiresInMinutes: env.AUTH_OTP_EXPIRY_MINUTES,
       emailDelivery: mail.mode,
+      emailOutboxId: mail.outboxId,
       ...(demoOtpEnabled() ? { demoOtp: code } : {}),
     },
     error: null,
