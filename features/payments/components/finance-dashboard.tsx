@@ -37,19 +37,36 @@ function FinanceDashboard() {
   const [dash, setDash] = React.useState<FinanceDash | null>(null);
   const [coupons, setCoupons] = React.useState<Coupon[]>([]);
   const [refunds, setRefunds] = React.useState<RefundRequest[]>([]);
+  const [rules, setRules] = React.useState<
+    Array<{
+      id: string;
+      countryCode: string;
+      countryName: string;
+      allowInstallments: boolean;
+      bnplProviders: string[];
+      active: boolean;
+    }>
+  >([]);
+  const [plans, setPlans] = React.useState<
+    Array<{ plan: { id: string; productName: string; status: string; countryCode: string } }>
+  >([]);
   const [code, setCode] = React.useState("SAVE15");
   const [value, setValue] = React.useState("15");
   const [error, setError] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
-    const [d, c, r] = await Promise.all([
+    const [d, c, r, regional, inst] = await Promise.all([
       payFetch<FinanceDash>("/api/payments/reports"),
       payFetch<Coupon[]>("/api/payments/catalog?view=coupons"),
       payFetch<RefundRequest[]>("/api/payments/refunds"),
+      payFetch<{ rules: typeof rules }>("/api/payments/regional-rules?view=all"),
+      payFetch<typeof plans>("/api/payments/installments"),
     ]);
     setDash(d.data);
     setCoupons(c.data ?? []);
     setRefunds(r.data ?? []);
+    setRules(regional.data?.rules ?? []);
+    setPlans(inst.data ?? []);
   }, []);
 
   React.useEffect(() => {
@@ -104,6 +121,83 @@ function FinanceDashboard() {
       />
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Regional payment rules</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {rules.map((rule) => (
+              <div key={rule.id} className="rounded border border-border px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">
+                    {rule.countryName} ({rule.countryCode})
+                  </span>
+                  <Badge variant={rule.active ? "success" : "secondary"}>
+                    {rule.active ? "Active" : "Off"}
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Installments: {rule.allowInstallments ? "yes" : "no"} · BNPL:{" "}
+                  {rule.bnplProviders.length
+                    ? rule.bnplProviders
+                        .map((p) => (p === "tabby" ? "Tabby (تالي)" : "Tamara"))
+                        .join(", ")
+                    : "—"}
+                </p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Installment plans</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {plans.length === 0 ? (
+              <p className="text-muted-foreground">No installment plans yet.</p>
+            ) : (
+              plans.slice(0, 8).map(({ plan }) => (
+                <div
+                  key={plan.id}
+                  className="flex items-center justify-between gap-2 rounded border border-border px-3 py-2"
+                >
+                  <span>
+                    {plan.productName} · {plan.countryCode}
+                  </span>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary">{plan.status}</Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() =>
+                        void payJson("/api/payments/installments", "POST", {
+                          action: plan.status === "suspended" ? "resume" : "suspend",
+                          planId: plan.id,
+                        }).then(() => load())
+                      }
+                    >
+                      {plan.status === "suspended" ? "Resume" : "Suspend"}
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                void payJson("/api/payments/installments", "POST", {
+                  action: "process_reminders",
+                }).then(() => load())
+              }
+            >
+              Process reminders / overdue
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
       {dash ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -114,9 +208,7 @@ function FinanceDashboard() {
           ].map(([label, value]) => (
             <Card key={String(label)}>
               <CardContent className="p-4">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {label}
-                </p>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
                 <p className="font-display text-2xl">
                   {typeof value === "number" && String(label).includes("Pending")
                     ? value

@@ -4,11 +4,7 @@
  */
 
 import { generateId, generateToken } from "@/lib/security/crypto";
-import type {
-  PaymentMethodBrand,
-  PaymentProvider,
-  PaymentRecord,
-} from "@/types/payments";
+import type { PaymentMethodBrand, PaymentProvider, PaymentRecord } from "@/types/payments";
 import { readPaymentsDb } from "@/services/payments/store";
 import { PaymentError } from "@/services/payments/access";
 
@@ -42,7 +38,10 @@ export interface GatewayChargeResult {
 export interface PaymentGateway {
   readonly provider: PaymentProvider;
   createPayment(input: GatewayChargeInput): Promise<GatewayChargeResult>;
-  confirmWebhook(payload: string, signature: string | null): Promise<{
+  confirmWebhook(
+    payload: string,
+    signature: string | null,
+  ): Promise<{
     providerPaymentId: string;
     status: PaymentRecord["status"];
     raw: Record<string, unknown>;
@@ -74,16 +73,27 @@ class MockGateway implements PaymentGateway {
     }
 
     const providerPaymentId = `mock_pay_${generateId().slice(0, 12)}`;
+    const provider: PaymentProvider =
+      input.methodBrand === "tamara" || input.methodBrand === "tabby" ? input.methodBrand : "mock";
     return {
-      provider: "mock",
+      provider,
       providerPaymentId,
       status: "succeeded",
       clientSecret: `mock_secret_${generateToken(8)}`,
-      checkoutUrl: null,
+      checkoutUrl:
+        provider === "tamara" || provider === "tabby"
+          ? `https://checkout.mock.${provider}.example/${providerPaymentId}`
+          : null,
       methodBrand: input.methodBrand,
-      paymentMethodSummary: `${input.methodBrand.toUpperCase()} ${maskToken(input.paymentToken ?? "4242")}`,
+      paymentMethodSummary:
+        input.methodBrand === "tabby"
+          ? "Tabby (تالي) · mock BNPL"
+          : input.methodBrand === "tamara"
+            ? "Tamara · mock BNPL"
+            : `${input.methodBrand.toUpperCase()} ${maskToken(input.paymentToken ?? "4242")}`,
       rawProviderPayload: {
         simulated: true,
+        provider,
         orderId: input.orderId,
         amount: input.amount,
         currency: input.currency,

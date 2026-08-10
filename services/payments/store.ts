@@ -9,6 +9,9 @@ import type {
   CatalogProduct,
   Coupon,
   CouponUsage,
+  InstallmentPlan,
+  InstallmentReminderLog,
+  InstallmentScheduleItem,
   InstructorWallet,
   Invoice,
   Order,
@@ -16,11 +19,16 @@ import type {
   PaymentSettings,
   PayoutRequest,
   RefundRequest,
+  RegionalPaymentRule,
+  StudentKycDocument,
   Subscription,
   TransactionLog,
   WalletTransaction,
 } from "@/types/payments";
 import {
+  DEFAULT_INSTALLMENT_REMINDER_OFFSETS_DAYS,
+  DEFAULT_PAYMENT_AGREEMENT_TEXT,
+  DEFAULT_PAYMENT_AGREEMENT_VERSION,
   DEFAULT_PAYMENT_CURRENCY,
   DEFAULT_PLATFORM_FEE_PERCENT,
   DEFAULT_TAX_RATE_PERCENT,
@@ -40,6 +48,11 @@ export interface PaymentsDatabase {
   payouts: PayoutRequest[];
   refunds: RefundRequest[];
   transactionLogs: TransactionLog[];
+  regionalRules: RegionalPaymentRule[];
+  installmentPlans: InstallmentPlan[];
+  installmentSchedule: InstallmentScheduleItem[];
+  installmentReminders: InstallmentReminderLog[];
+  kycDocuments: StudentKycDocument[];
   seeded: boolean;
 }
 
@@ -58,6 +71,12 @@ function defaultSettings(): PaymentSettings {
     allowAmex: true,
     stripePublishableKeyConfigured: Boolean(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY),
     stripeWebhookSecretConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
+    installmentReminderOffsetsDays: [...DEFAULT_INSTALLMENT_REMINDER_OFFSETS_DAYS],
+    installmentGraceDays: 3,
+    autoSuspendOnOverdue: true,
+    agreementVersion: DEFAULT_PAYMENT_AGREEMENT_VERSION,
+    agreementText: DEFAULT_PAYMENT_AGREEMENT_TEXT,
+    defaultInstallmentCount: 4,
   };
 }
 
@@ -76,6 +95,11 @@ function emptyDb(): PaymentsDatabase {
     payouts: [],
     refunds: [],
     transactionLogs: [],
+    regionalRules: [],
+    installmentPlans: [],
+    installmentSchedule: [],
+    installmentReminders: [],
+    kycDocuments: [],
     seeded: false,
   };
 }
@@ -105,6 +129,11 @@ export function ensurePaymentsStore(): PaymentsDatabase {
       payouts: raw.payouts ?? [],
       refunds: raw.refunds ?? [],
       transactionLogs: raw.transactionLogs ?? [],
+      regionalRules: raw.regionalRules ?? [],
+      installmentPlans: raw.installmentPlans ?? [],
+      installmentSchedule: raw.installmentSchedule ?? [],
+      installmentReminders: raw.installmentReminders ?? [],
+      kycDocuments: raw.kycDocuments ?? [],
       seeded: Boolean(raw.seeded),
     };
   } catch {
@@ -118,9 +147,7 @@ export function readPaymentsDb(): PaymentsDatabase {
   return ensurePaymentsStore();
 }
 
-export function writePaymentsDb(
-  mutator: (db: PaymentsDatabase) => void,
-): PaymentsDatabase {
+export function writePaymentsDb(mutator: (db: PaymentsDatabase) => void): PaymentsDatabase {
   const db = ensurePaymentsStore();
   mutator(db);
   writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
