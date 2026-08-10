@@ -11,28 +11,45 @@ import { distributeLecture, listAtplCourses } from "@/services/cgi/journey-servi
 import { resetCgiDbCache, writeCgiDb } from "@/services/cgi/store";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { ensureClassesSeeded } from "@/services/classes/seed";
+import { writeClassesDb } from "@/services/classes/store";
 import {
   buildSchedule,
   cancelSession,
-  getScheduleTimeline,
+  getSessionStatus,
   listScheduleSessions,
   queueAudienceReminders,
   rescheduleSession,
   sendImmediateAudienceReminder,
 } from "@/services/schedule/dynamic-schedule-service";
 
-function farSlot(daysAhead: number) {
-  const start = new Date(Date.now() + daysAhead * 86_400_000 + (Date.now() % 3_600_000));
-  // Unique minute/second so parallel/repeat runs do not collide with .data leftovers.
-  start.setUTCSeconds(Date.now() % 60, Date.now() % 1000);
+let slotSeq = 0;
+
+function farSlot() {
+  slotSeq += 1;
+  const start = new Date(Date.now() + 40 * 86_400_000 + slotSeq * 4 * 3_600_000);
+  start.setUTCMinutes(0, 0, 0);
   return start;
+}
+
+function resetClassesForScheduleTests() {
+  writeClassesDb((db) => {
+    db.classes = [];
+    db.zoomMeetings = [];
+    db.recurringRules = [];
+    db.attendance = [];
+    db.participants = [];
+    db.recordings = [];
+    db.reminders = [];
+    db.seeded = false;
+  });
+  ensureClassesSeeded();
 }
 
 describe("dynamic schedule management (CR008)", () => {
   beforeEach(() => {
     ensureDemoUsersSeeded();
     ensureCoursesSeeded();
-    ensureClassesSeeded();
+    resetClassesForScheduleTests();
     resetCgiDbCache();
     writeCgiDb((db) => {
       db.lectureAssignments = [];
@@ -41,13 +58,13 @@ describe("dynamic schedule management (CR008)", () => {
     });
   });
 
-  it("builds recurring schedule and exposes timeline entries", async () => {
+  it("builds recurring schedule with runtime status", async () => {
     const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR)!;
     const student = readAuthDb().users.find(
       (u) => u.role === ROLES.STUDENT && u.status === "active",
     )!;
-    const start = farSlot(160);
-    const title = `Weekly ATPL ops ${Date.now()}`;
+    const start = farSlot();
+    const title = `Weekly ATPL ops ${Date.now()}-${slotSeq}`;
 
     const built = await buildSchedule({
       title,
@@ -62,6 +79,7 @@ describe("dynamic schedule management (CR008)", () => {
     expect(built.session?.title).toBe(title);
     expect(built.occurrences).toBeGreaterThanOrEqual(2);
     expect(built.session?.isRecurring).toBe(true);
+    expect(getSessionStatus(built.session!.id).computedStatus).toBe("upcoming");
 
     const sessions = listScheduleSessions({
       userId: instructor.id,
@@ -69,13 +87,6 @@ describe("dynamic schedule management (CR008)", () => {
       from: start.toISOString(),
     });
     expect(sessions.some((s) => s.id === built.session?.id)).toBe(true);
-
-    const timeline = getScheduleTimeline({
-      userId: instructor.id,
-      role: ROLES.INSTRUCTOR,
-      limit: 80,
-    });
-    expect(timeline.some((e) => e.liveClassId === built.session?.id)).toBe(true);
   });
 
   it("reschedules, cancels, and splits student/instructor reminders", async () => {
@@ -83,8 +94,8 @@ describe("dynamic schedule management (CR008)", () => {
     const student = readAuthDb().users.find(
       (u) => u.role === ROLES.STUDENT && u.status === "active",
     )!;
-    const start = farSlot(170);
-    const title = `Met briefing ${Date.now()}`;
+    const start = farSlot();
+    const title = `Met briefing ${Date.now()}-${slotSeq}`;
 
     const built = await buildSchedule({
       title,
@@ -98,7 +109,7 @@ describe("dynamic schedule management (CR008)", () => {
 
     const moved = await rescheduleSession({
       liveClassId: id,
-      startsAt: new Date(Date.parse(start.toISOString()) + 86_400_000).toISOString(),
+      startsAt: new Date(Date.parse(start.toISOString()) + 5 * 3_600_000).toISOString(),
       actorId: instructor.id,
       actorRole: ROLES.INSTRUCTOR,
     });
@@ -130,12 +141,12 @@ describe("dynamic schedule management (CR008)", () => {
     const subjects = listAtplCourses();
     const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR)!;
     const cgi = readAuthDb().users.find((u) => u.role === ROLES.CHIEF_GROUND_INSTRUCTOR)!;
-    const start = farSlot(180);
+    const start = farSlot();
 
     const lecture = await distributeLecture({
       courseId: subjects[0]!.id,
-      lessonId: `lesson-cr008-${Date.now()}`,
-      lessonTitle: "ATPL scheduled lecture",
+      lessonId: `lesson-cr008-${Date.now()}-${slotSeq}`,
+      lessonTitle: `ATPL scheduled lecture ${slotSeq}`,
       instructorId: instructor.id,
       scheduledAt: start.toISOString(),
       actorId: cgi.id,

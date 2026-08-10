@@ -259,9 +259,15 @@ export function getScheduleTimeline(options: {
   instructorId?: string;
   studentId?: string;
   source?: ScheduleSource | "all";
+  from?: string;
+  to?: string;
   limit?: number;
 }): TimelineEvent[] {
-  const sessions = listScheduleSessions({ ...options, limit: 200 });
+  const sessions = listScheduleSessions({
+    ...options,
+    // Pull a wide session window; event fan-out (reminders/attendance) is capped below.
+    limit: Math.max(options.limit ?? 80, 300),
+  });
   const events: TimelineEvent[] = [];
 
   for (const s of sessions) {
@@ -373,7 +379,11 @@ export function getScheduleOverview(options: {
   return {
     nextSession: getNextSession(options),
     upcoming,
-    timeline: getScheduleTimeline({ ...options, limit: 40 }),
+    timeline: getScheduleTimeline({
+      ...options,
+      from: new Date(Date.now() - 7 * 86_400_000).toISOString(),
+      limit: 40,
+    }),
     stats: {
       upcoming: all.filter((s) => s.computedStatus === "upcoming").length,
       liveNow: all.filter((s) => s.computedStatus === "live_now").length,

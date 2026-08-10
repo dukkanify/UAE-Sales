@@ -102,6 +102,8 @@ export async function GET(request: Request) {
           instructorId,
           studentId,
           source,
+          from: searchParams.get("from") ?? undefined,
+          to: searchParams.get("to") ?? undefined,
           limit: Number(searchParams.get("limit") ?? 80) || 80,
         }),
         error: null,
