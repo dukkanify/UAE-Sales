@@ -5,7 +5,6 @@
 import { generateId } from "@/lib/security/crypto";
 import { ROLES } from "@/constants/roles";
 import { findUserById, readAuthDb } from "@/services/auth/store";
-import { assignInstructor } from "@/services/courses/course-service";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb } from "@/services/courses/store";
 import {
@@ -291,10 +290,13 @@ export async function changeSubjectInstructor(input: {
   const course = listAtplCourses().find((c) => c.id === input.courseId);
   if (!course) throw new CgiError("ATPL subject not found", 404);
 
-  await assignInstructor({
+  // CR005 — route through Assignment Engine (reassign + conflict-aware moves).
+  const { reassignInstructorEngine } = await import("@/services/assignment/engine");
+  await reassignInstructorEngine({
     courseId: input.courseId,
-    userId: input.instructorId,
-    role: "primary",
+    instructorId: input.instructorId,
+    studentId: input.studentId,
+    moveFutureClasses: true,
     actorId: input.actorId,
     ipAddress: input.ipAddress,
     userAgent: input.userAgent,
