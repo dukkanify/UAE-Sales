@@ -15,6 +15,7 @@ import { readCoursesDb } from "@/services/courses/store";
 import { createLiveClass, listLiveClasses } from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
 import { readClassesDb, writeClassesDb } from "@/services/classes/store";
+import { dispatchEmailEvent } from "@/services/email/automation-service";
 import {
   AssignmentError,
   ensureDefaultAvailability,
@@ -526,6 +527,21 @@ export async function scheduleAssignmentSession(input: {
     }
   });
   bumpQueuePositions(request.instructorId);
+
+  const alertUserIds = [request.instructorId, request.studentId].filter((id): id is string =>
+    Boolean(id),
+  );
+  await dispatchEmailEvent({
+    event: "assignment",
+    userIds: alertUserIds,
+    data: {
+      title: request.lessonTitle,
+      detail: "ATPL assignment engine scheduled a live session with Zoom.",
+      when: new Date(preferred).toLocaleString(),
+    },
+    actorId: input.actorId,
+    meta: { assignmentRequestId: request.id, liveClassId: created.id },
+  });
 
   return {
     request: getRequest(request.id)!,

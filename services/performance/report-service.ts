@@ -11,6 +11,7 @@ import { getLiveClass } from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
 import { readClassesDb } from "@/services/classes/store";
 import { getCourseById } from "@/services/courses/course-service";
+import { dispatchEmailEvent } from "@/services/email/automation-service";
 import { sendEmail } from "@/services/email/mailer";
 import { createNotification } from "@/services/notifications/notification-service";
 import { performanceReportEmailTemplate } from "@/services/settings/email-templates";
@@ -177,6 +178,19 @@ export async function createPerformanceReport(
 
   if (input.sendEmail !== false) {
     report = await emailPerformanceReport(report.id);
+    if (homework) {
+      await dispatchEmailEvent({
+        event: "homework",
+        userIds: [input.studentId],
+        data: {
+          title: liveClass.title,
+          detail: homework,
+          when: new Date(liveClass.startsAt).toLocaleString(),
+        },
+        actorId: input.actorId,
+        meta: { reportId: report.id, liveClassId: liveClass.id },
+      });
+    }
   }
 
   await createNotification({

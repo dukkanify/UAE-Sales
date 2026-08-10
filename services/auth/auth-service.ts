@@ -34,6 +34,7 @@ import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import { maxAllowedSessions, revokeExcessSessions } from "@/services/auth/session-service";
+import { emailRegistrationWelcome } from "@/services/email/automation-service";
 import { sendEmail } from "@/services/email/mailer";
 import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
@@ -473,6 +474,7 @@ export async function verifyOtp(input: {
       entityId: created.id,
       ...input.ctx,
     });
+    await emailRegistrationWelcome({ userId: created.id, actorId: created.id });
   } else if (input.purpose === "booking") {
     const bookingId =
       typeof challenge.meta.bookingId === "string" ? challenge.meta.bookingId : null;
