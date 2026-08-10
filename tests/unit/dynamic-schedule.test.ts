@@ -22,8 +22,9 @@ import {
 } from "@/services/schedule/dynamic-schedule-service";
 
 function farSlot(daysAhead: number) {
-  const start = new Date(Date.now() + daysAhead * 86_400_000);
-  start.setUTCHours(10, 0, 0, 0);
+  const start = new Date(Date.now() + daysAhead * 86_400_000 + (Date.now() % 3_600_000));
+  // Unique minute/second so parallel/repeat runs do not collide with .data leftovers.
+  start.setUTCSeconds(Date.now() % 60, Date.now() % 1000);
   return start;
 }
 
