@@ -4,7 +4,8 @@
 
 export type AtplSubjectDistributionStatus = "locked" | "available" | "in_progress" | "completed";
 
-export type AtplLectureDistributionStatus = "planned" | "assigned" | "scheduled" | "delivered";
+export type AtplLectureDistributionStatus =
+  "planned" | "assigned" | "scheduled" | "delivered" | "cancelled";
 
 export interface AtplJourneySettings {
   /** Default first ATPL subject course id when not overridden per student. */
