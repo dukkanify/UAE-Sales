@@ -154,8 +154,13 @@ describe("instructor assignment engine (CR005)", () => {
     expect(scheduled.liveClassId).toBeTruthy();
     expect(scheduled.zoomMeetingId || scheduled.request.zoomMeetingId).toBeTruthy();
 
-    const cal = getInstructorCalendar(other.id);
-    expect(cal.events.some((e) => e.type === "live_class")).toBe(true);
+    const cal = getInstructorCalendar(other.id, {
+      from: new Date().toISOString(),
+      to: new Date(Date.now() + 200 * 86_400_000).toISOString(),
+    });
+    expect(
+      cal.events.some((e) => e.type === "live_class" && e.liveClassId === scheduled.liveClassId),
+    ).toBe(true);
 
     await reassignInstructorEngine({
       courseId: course.id,

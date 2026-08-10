@@ -13,7 +13,11 @@ import {
 } from "@/services/courses/enrollment-service";
 import { ensurePaymentsSeeded } from "@/services/payments/seed";
 import { readPaymentsDb } from "@/services/payments/store";
-import { rescheduleLiveClass, canManageClass } from "@/services/classes/class-service";
+import {
+  createLiveClass,
+  rescheduleLiveClass,
+  canManageClass,
+} from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
 import { readClassesDb } from "@/services/classes/store";
 import { readCgiDb, writeCgiDb } from "@/services/cgi/store";
@@ -321,7 +325,7 @@ export async function changeSubjectInstructor(input: {
   return listAtplCourses().find((c) => c.id === input.courseId)!;
 }
 
-export function distributeLecture(input: {
+export async function distributeLecture(input: {
   courseId: string;
   lessonId: string;
   lessonTitle: string;
@@ -330,7 +334,9 @@ export function distributeLecture(input: {
   scheduledAt?: string | null;
   notes?: string | null;
   actorId: string;
-}): AtplLectureAssignment {
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}): Promise<AtplLectureAssignment> {
   const instructor = findUserById(input.instructorId);
   if (!instructor || instructor.role !== ROLES.INSTRUCTOR) {
     throw new CgiError("Instructor not found", 404);
@@ -340,6 +346,26 @@ export function distributeLecture(input: {
   }
 
   const stamp = nowIso();
+  let liveClassId: string | null = null;
+
+  // When a schedule time is provided, create the Live Class (Zoom + reminders).
+  if (input.scheduledAt) {
+    const created = await createLiveClass({
+      title: input.lessonTitle.trim() || "ATPL Lecture",
+      description: input.notes ?? "",
+      courseId: input.courseId,
+      lessonId: input.lessonId,
+      instructorId: input.instructorId,
+      startsAt: input.scheduledAt,
+      durationMinutes: 60,
+      enrollStudentIds: input.studentId ? [input.studentId] : undefined,
+      actorId: input.actorId,
+      ipAddress: input.ipAddress,
+      userAgent: input.userAgent,
+    });
+    liveClassId = created?.id ?? null;
+  }
+
   const row: AtplLectureAssignment = {
     id: generateId(),
     courseId: input.courseId,
@@ -349,7 +375,7 @@ export function distributeLecture(input: {
     studentId: input.studentId ?? null,
     status: input.scheduledAt ? "scheduled" : "assigned",
     scheduledAt: input.scheduledAt ?? null,
-    liveClassId: null,
+    liveClassId,
     notes: input.notes ?? null,
     assignedById: input.actorId,
     createdAt: stamp,

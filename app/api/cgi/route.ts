@@ -204,7 +204,7 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({
         success: true,
-        data: distributeLecture({
+        data: await distributeLecture({
           courseId: body.courseId,
           lessonId: body.lessonId,
           lessonTitle: body.lessonTitle ?? "Lecture",
@@ -213,6 +213,7 @@ export async function POST(request: Request) {
           scheduledAt: body.scheduledAt,
           notes: body.notes,
           actorId: user.id,
+          ...ctx,
         }),
         error: null,
       });

@@ -104,7 +104,7 @@ describe("chief ground instructor (CR004)", () => {
       actorId: cgi.id,
     });
 
-    const lecture = distributeLecture({
+    const lecture = await distributeLecture({
       courseId: subjects[0]!.id,
       lessonId: "lesson-demo",
       lessonTitle: "Met briefing",
@@ -114,5 +114,6 @@ describe("chief ground instructor (CR004)", () => {
     });
     expect(lecture.status).toBe("assigned");
     expect(lecture.lessonTitle).toBe("Met briefing");
+    expect(lecture.liveClassId).toBeNull();
   });
 });
