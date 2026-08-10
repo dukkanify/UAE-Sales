@@ -159,3 +159,43 @@ export function installmentReminderEmailTemplate(input: {
       <p>Pay from your AviatorPass billing center to keep course access active.</p>`,
   });
 }
+
+/** CR006 — post-lecture student evaluation / performance report. */
+export function performanceReportEmailTemplate(input: {
+  studentName: string;
+  classTitle: string;
+  courseCode: string | null;
+  instructorName: string | null;
+  todaysTopic: string;
+  nextTopic: string;
+  homework: string;
+  performanceLabel: string;
+  questionBank: string;
+  comments: string;
+}) {
+  const courseLine = input.courseCode ? ` (${input.courseCode})` : "";
+  const commentsBlock = input.comments
+    ? `<p><strong>Comments</strong><br/>${escapeHtml(input.comments)}</p>`
+    : "";
+  return renderBrandedEmail({
+    title: "Performance report",
+    preheader: `${input.classTitle} · ${input.performanceLabel}`,
+    bodyHtml: `<p>Hello ${escapeHtml(input.studentName)},</p>
+      <p>Your instructor${input.instructorName ? ` (${escapeHtml(input.instructorName)})` : ""} submitted a performance report after <strong>${escapeHtml(input.classTitle)}</strong>${escapeHtml(courseLine)}.</p>
+      <p><strong>Today's Topic</strong><br/>${escapeHtml(input.todaysTopic)}</p>
+      <p><strong>Next Topic</strong><br/>${escapeHtml(input.nextTopic)}</p>
+      <p><strong>Homework</strong><br/>${escapeHtml(input.homework)}</p>
+      <p><strong>Performance</strong><br/>${escapeHtml(input.performanceLabel)}</p>
+      <p><strong>Question Bank</strong><br/>${escapeHtml(input.questionBank)}</p>
+      ${commentsBlock}
+      <p>Open AviatorPass → Progress / Performance reports to review this in your account.</p>`,
+  });
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
