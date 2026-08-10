@@ -181,6 +181,14 @@ export interface FeatureFlags {
   courses: boolean;
   calendar: boolean;
   ai: boolean;
+  /** CR010 — Super Admin Automation Center domain masters */
+  mockExams: boolean;
+  cgi: boolean;
+  schedule: boolean;
+  installments: boolean;
+  emailAutomation: boolean;
+  messaging: boolean;
+  reports: boolean;
   /** Phase 2 — default off until contracted delivery */
   mobileApps: boolean;
   corporatePortal: boolean;

@@ -13,6 +13,13 @@ export const FEATURE_FLAG_KEYS = [
   "courses",
   "calendar",
   "ai",
+  "mockExams",
+  "cgi",
+  "schedule",
+  "installments",
+  "emailAutomation",
+  "messaging",
+  "reports",
 ] as const;
 
 export type FeatureFlagKey = (typeof FEATURE_FLAG_KEYS)[number];
