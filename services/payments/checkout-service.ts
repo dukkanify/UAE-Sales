@@ -611,6 +611,10 @@ async function completePaidOrder(order: Order, payment: PaymentRecord, actorId: 
     body: `${order.orderNumber} paid — ${formatMinor(order.totalAmount, order.currency)}.`,
     type: "payment.succeeded",
     data: { orderId: order.id, invoiceId: invoice.id },
+    amountLabel: formatMinor(order.totalAmount, order.currency),
+    reference: order.orderNumber,
+    // Invoice + receipt emails are sent from issueInvoiceForOrder.
+    email: false,
   });
 
   await logActivity({

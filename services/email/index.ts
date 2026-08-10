@@ -10,3 +10,14 @@ export {
   recordOutboundEmail,
   type OutboundEmailRecord,
 } from "@/services/email/outbox";
+export {
+  dispatchEmailEvent,
+  dispatchRoleAlert,
+  getEmailAutomationOverview,
+  configureAutomationEvent,
+  emailRegistrationWelcome,
+  emailPaymentUpdate,
+  emailScheduleLifecycle,
+  EmailAutomationError,
+  EMAIL_AUTOMATION_CATALOG,
+} from "@/services/email/automation-service";

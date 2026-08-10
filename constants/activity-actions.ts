@@ -137,6 +137,9 @@ export const ACTIVITY_ACTIONS = {
   ANALYTICS_EXPORTED: "analytics.exported",
   ANALYTICS_DASHBOARD_UPDATED: "analytics.dashboard_updated",
 
+  // Email automation (CR009)
+  EMAIL_AUTOMATION_DISPATCHED: "email.automation_dispatched",
+  EMAIL_AUTOMATION_CONFIGURED: "email.automation_configured",
   // AI Learning Assistant
   AI_CHAT: "ai.chat",
   AI_CONVERSATION_CREATED: "ai.conversation_created",
