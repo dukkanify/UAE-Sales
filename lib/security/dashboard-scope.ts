@@ -3,8 +3,9 @@ import { ROLES, type Role } from "@/constants/roles";
 const ROLE_RANK: Record<string, number> = {
   [ROLES.STUDENT]: 0,
   [ROLES.INSTRUCTOR]: 1,
-  [ROLES.ADMIN]: 2,
-  [ROLES.SUPER_ADMIN]: 3,
+  [ROLES.CHIEF_GROUND_INSTRUCTOR]: 2,
+  [ROLES.ADMIN]: 3,
+  [ROLES.SUPER_ADMIN]: 4,
 };
 
 /** Client may request a dashboard scope only at or below their own role. */

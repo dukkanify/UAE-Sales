@@ -71,7 +71,7 @@ import {
   SheetTitle,
 } from "@/components/layout/mobile-sidebar-sheet";
 import { useAuth } from "@/providers/auth-provider";
-import { ROLE_LABELS, type Role } from "@/constants/roles";
+import { ROLE_LABELS, rolePathSegment, type Role } from "@/constants/roles";
 import { routes } from "@/constants/routes";
 import {
   DASHBOARD_NAV,
@@ -173,15 +173,12 @@ function RoleSidebar({
         className={cn("flex h-16 items-center gap-2.5 px-4", collapsed && "justify-center px-2")}
       >
         {collapsed ? (
-          <BrandLogo
-            variant="mark"
-            href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`}
-          />
+          <BrandLogo variant="mark" href={`/${rolePathSegment(role)}/dashboard`} />
         ) : (
           <div className="min-w-0">
             <BrandLogo
               variant="full"
-              href={`/${role === "super_admin" ? "super-admin" : role}/dashboard`}
+              href={`/${rolePathSegment(role)}/dashboard`}
               className="max-w-[140px]"
             />
             <p className="mt-0.5 truncate text-[11px] text-sidebar-foreground/55">
@@ -225,9 +222,7 @@ function ProfileMenu() {
   const router = useRouter();
   const initials =
     `${user?.firstName?.[0] ?? ""}${user?.lastName?.[0] ?? ""}`.toUpperCase() || "EP";
-  const profileHref = user
-    ? `/${user.role === "super_admin" ? "super-admin" : user.role}/profile`
-    : routes.login;
+  const profileHref = user ? `/${rolePathSegment(user.role)}/profile` : routes.login;
 
   return (
     <DropdownMenu>

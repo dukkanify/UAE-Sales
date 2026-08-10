@@ -28,7 +28,9 @@ const UNSAFE_PATTERNS = [
 
 export function resolvePersona(user: UserProfile): AiAssistantPersona {
   if (user.role === ROLES.STUDENT) return "student";
-  if (user.role === ROLES.INSTRUCTOR) return "instructor";
+  if (user.role === ROLES.INSTRUCTOR || user.role === ROLES.CHIEF_GROUND_INSTRUCTOR) {
+    return "instructor";
+  }
   return "admin";
 }
 
@@ -37,6 +39,7 @@ export function canUseAi(user: UserProfile): boolean {
     hasPermission(user.role, PERMISSIONS.AI_CHAT) ||
     user.role === ROLES.SUPER_ADMIN ||
     user.role === ROLES.ADMIN ||
+    user.role === ROLES.CHIEF_GROUND_INSTRUCTOR ||
     user.role === ROLES.INSTRUCTOR ||
     user.role === ROLES.STUDENT
   );
@@ -53,6 +56,7 @@ export function canUseAdminInsights(user: UserProfile): boolean {
 export function canUseInstructorTools(user: UserProfile): boolean {
   return (
     user.role === ROLES.INSTRUCTOR ||
+    user.role === ROLES.CHIEF_GROUND_INSTRUCTOR ||
     user.role === ROLES.ADMIN ||
     user.role === ROLES.SUPER_ADMIN ||
     hasPermission(user.role, PERMISSIONS.AI_TOOLS)

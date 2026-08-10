@@ -137,6 +137,19 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Profile", href: "/instructor/profile", icon: "profile" },
 ];
 
+export const CGI_NAV: DashboardNavItem[] = [
+  { label: "Dashboard", href: "/cgi/dashboard", icon: "dashboard" },
+  { label: "ATPL Journey", href: "/cgi/atpl", icon: "courses" },
+  { label: "Subjects", href: "/cgi/subjects", icon: "lessons" },
+  { label: "Lectures", href: "/cgi/lectures", icon: "calendar" },
+  { label: "Instructors", href: "/cgi/instructors", icon: "instructors" },
+  { label: "Students", href: "/cgi/students", icon: "students" },
+  { label: "Schedule", href: "/cgi/schedule", icon: "classes" },
+  { label: "Messages", href: "/cgi/messages", icon: "messages" },
+  { label: "Notifications", href: "/cgi/notifications", icon: "notifications" },
+  { label: "Profile", href: "/cgi/profile", icon: "profile" },
+];
+
 export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Dashboard", href: "/student/dashboard", icon: "dashboard" },
   { label: "My Courses", href: "/student/courses", icon: "courses" },
@@ -169,6 +182,7 @@ export const STUDENT_NAV: DashboardNavItem[] = [
 export const DASHBOARD_NAV: Record<Role, DashboardNavItem[]> = {
   super_admin: SUPER_ADMIN_NAV,
   admin: ADMIN_NAV,
+  chief_ground_instructor: CGI_NAV,
   instructor: INSTRUCTOR_NAV,
   student: STUDENT_NAV,
 };

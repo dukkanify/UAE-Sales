@@ -16,6 +16,7 @@ datasource db {
 enum UserRole {
   student
   instructor
+  chief_ground_instructor
   admin
   super_admin
 

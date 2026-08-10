@@ -2,13 +2,13 @@
 
 ## Overview
 
-AviatorPass is a Next.js App Router application with role-based dashboards for students, instructors, admins, and super admins.
+AviatorPass is a Next.js App Router application with role-based dashboards for students, instructors, **Chief Ground Instructors**, admins, and super admins.
 
 ```
 app/                     Route groups + API routes
-  (student|instructor|admin|super-admin)/
-  api/{auth,courses,classes,learning,quizzes,certificates,
-       communication,payments,analytics,ai,ops,admin}/
+  (student|instructor|cgi|admin|super-admin)/
+    api/{auth,courses,classes,learning,quizzes,certificates,
+       communication,payments,analytics,ai,ops,admin,cgi}/
 components/              Shared UI, dashboard, layout
 features/                Domain UI modules + client API helpers
 services/                Server domain logic + JSON stores
@@ -21,6 +21,18 @@ scripts/                 Backup + acceptance harness
 .data/                   Runtime JSON databases (gitignored)
 .backups/                Backup archives (gitignored)
 ```
+
+## Roles (CR004)
+
+| Role                    | Prefix         | Notes                                                                                                                   |
+| ----------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| student                 | `/student`     | Learner console                                                                                                         |
+| instructor              | `/instructor`  | Teaching console                                                                                                        |
+| chief_ground_instructor | `/cgi`         | ATPL journey: distribute subjects/lectures, change instructor, reschedule, first subject, follow students & instructors |
+| admin                   | `/admin`       | Operations                                                                                                              |
+| super_admin             | `/super-admin` | Full platform                                                                                                           |
+
+CGI demo account: `cgi@eagerpilots.com`.
 
 ## Request path
 
