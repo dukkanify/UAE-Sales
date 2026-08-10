@@ -84,3 +84,16 @@ export function writeAssignmentDb(mutator: (db: AssignmentDatabase) => void): As
 export function resetAssignmentDbCache(): void {
   cache = null;
 }
+
+export function updateAssignmentEngineSettings(
+  patch: Partial<AssignmentEngineSettings>,
+): AssignmentEngineSettings {
+  writeAssignmentDb((db) => {
+    db.settings = {
+      ...db.settings,
+      ...patch,
+      updatedAt: new Date().toISOString(),
+    };
+  });
+  return readAssignmentDb().settings;
+}

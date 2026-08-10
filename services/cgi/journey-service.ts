@@ -108,6 +108,34 @@ export function setDefaultFirstSubject(input: {
   return getJourneySettings();
 }
 
+/** CR010 — patch CGI journey settings from Automation Center. */
+export function updateJourneySettings(input: {
+  patch: Partial<{ defaultFirstSubjectCourseId: string | null; packageSku: string }>;
+  actorId: string;
+}): ReturnType<typeof getJourneySettings> {
+  if (
+    input.patch.defaultFirstSubjectCourseId !== undefined &&
+    input.patch.defaultFirstSubjectCourseId
+  ) {
+    return setDefaultFirstSubject({
+      courseId: input.patch.defaultFirstSubjectCourseId,
+      actorId: input.actorId,
+    });
+  }
+  writeCgiDb((db) => {
+    if (input.patch.packageSku !== undefined) {
+      db.settings.packageSku = String(input.patch.packageSku).trim() || db.settings.packageSku;
+    }
+    if (input.patch.defaultFirstSubjectCourseId === null) {
+      db.settings.defaultFirstSubjectCourseId = null;
+    }
+    db.settings.updatedAt = nowIso();
+    db.settings.updatedById = input.actorId;
+  });
+  audit("cgi.settings.update", input.actorId, "settings", "journey", "Automation Center patch");
+  return getJourneySettings();
+}
+
 /** Ensure a student has an ordered ATPL subject distribution (seeded from package courses). */
 export function ensureStudentSubjectPlan(
   studentId: string,
