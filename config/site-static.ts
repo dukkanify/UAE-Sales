@@ -6,10 +6,12 @@
 
 export const siteStatic = {
   name: "AviatorPass",
-  shortName: "Aviator",
+  shortName: "AviatorPass",
   legalName: "AviatorPass",
   description:
-    "AviatorPass is the aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
+    "AviatorPass — your aviation journey starts here. ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
+  tagline: "YOUR AVIATION JOURNEY STARTS HERE",
+  secondaryTagline: "UNLOCK YOUR PILOT LICENSE",
   locale: "en",
   direction: "ltr" as const,
   contactEmail: "ME@ABDULAZIZALSHOAIL.COM",
@@ -25,6 +27,7 @@ export const siteStatic = {
   brand: {
     logo: "/brand/logo.svg",
     logoDark: "/brand/logo-dark.svg",
+    logoStacked: "/brand/logo-stacked.svg",
     icon: "/brand/icon.svg",
     favicon: "/brand/favicon.svg",
     openGraph: "/brand/og.svg",

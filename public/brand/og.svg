@@ -10,9 +10,9 @@
     <path d="M72 8C86 4 102 6 112 12V50C98 42 84 40 72 44V8Z" fill="none" stroke="#9A99A0" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#9A99A0" stroke-width="3.5" stroke-linejoin="round"/>
   </g>
-  <text x="420" y="300" font-family="Space Grotesk, Arial, sans-serif" font-size="64" font-weight="700" letter-spacing="-0.01em">
-    <tspan fill="#FFFFFF">Aviator</tspan><tspan fill="#DD9B30">Pass</tspan>
+  <text x="420" y="290" font-family="Space Grotesk, Arial Black, Arial, sans-serif" font-size="56" font-weight="700" letter-spacing="0.02em">
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="14" fill="#DD9B30">PASS</tspan>
   </text>
-  <text x="420" y="360" font-family="IBM Plex Sans, Arial, sans-serif" font-size="22" font-weight="500" fill="#9A99A0" letter-spacing="0.22em">UNLOCK YOUR PILOT LICENSE</text>
-  <text x="420" y="420" font-family="IBM Plex Sans, Arial, sans-serif" font-size="24" fill="#C8D9E6">Professional Aviation Education Platform</text>
+  <text x="420" y="350" font-family="IBM Plex Sans, Arial, sans-serif" font-size="20" font-weight="500" fill="#9A99A0" letter-spacing="0.18em">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="420" y="410" font-family="IBM Plex Sans, Arial, sans-serif" font-size="24" fill="#C8D9E6">Professional aviation education · Kuwait &amp; Dubai</text>
 </svg>

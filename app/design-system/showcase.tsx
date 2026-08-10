@@ -66,7 +66,7 @@ function DesignSystemShowcase() {
   const [otp, setOtp] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [dial, setDial] = React.useState("+965");
-  const [color, setColor] = React.useState("#0B1F3A");
+  const [color, setColor] = React.useState("#2E7DAA");
   const [currency, setCurrency] = React.useState("120");
   const [multi, setMulti] = React.useState<string[]>(["ppl"]);
   const [time, setTime] = React.useState("09:30");
@@ -106,7 +106,7 @@ function DesignSystemShowcase() {
         <Section
           id="colors"
           title="Color roles"
-          description="Deep aviation blue, sky accent, semantic states."
+          description="Aero Blue, Altitude Orange, Academic Grey, and semantic states."
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(colorRoles).map(([key, swatch]) => (
@@ -128,7 +128,7 @@ function DesignSystemShowcase() {
         <Section
           id="typography"
           title="Typography"
-          description="Plus Jakarta Sans (display) + DM Sans (body). English LTR only."
+          description="Stimulatio Flat / Space Grotesk (display) + IBM Plex Sans (body). English LTR only."
         >
           <Card>
             <CardContent className="space-y-4 pt-6">

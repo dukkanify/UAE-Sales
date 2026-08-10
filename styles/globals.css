@@ -3,10 +3,10 @@
 @import "./booking.css";
 
 /* =============================================================================
-   AviatorPass — Aviation Course Platform 2030
+   AviatorPass — Official Brand Guidelines
    Aero Blue #2E7DAA | Altitude Orange #DD9B30 | Academic Grey #7C7B80
-   Display: Space Grotesk | Body: IBM Plex Sans
-   Product OS surfaces — not a brochure academy site
+   Display: Stimulatio Flat (Space Grotesk web substitute) | Body: IBM Plex Sans
+   Tagline: YOUR AVIATION JOURNEY STARTS HERE
    ============================================================================= */
 
 @theme inline {
@@ -30,6 +30,9 @@
 
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+
+  --color-academic: var(--academic);
+  --color-academic-foreground: var(--academic-foreground);
 
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -87,7 +90,9 @@
   --popover: #ffffff;
   --popover-foreground: #0b1a24;
   --muted: #e8eef4;
-  --muted-foreground: #6f6e74;
+  --muted-foreground: #7c7b80;
+  --academic: #7c7b80;
+  --academic-foreground: #ffffff;
   --border: #d8e0e8;
   --input: #d8e0e8;
   --ring: #2e7daa;
@@ -123,6 +128,8 @@
   --popover-foreground: #e8eef5;
   --muted: #12202b;
   --muted-foreground: #9a99a0;
+  --academic: #9a99a0;
+  --academic-foreground: #0b1a24;
   --border: #1a2b38;
   --input: #1a2b38;
   --ring: #e0a63f;

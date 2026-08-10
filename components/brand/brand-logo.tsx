@@ -11,7 +11,7 @@ interface BrandLogoProps {
   className?: string;
   /** `null` disables linking; omit/`undefined` defaults to home. */
   href?: string | null;
-  variant?: "full" | "mark" | "dark";
+  variant?: "full" | "mark" | "dark" | "stacked";
   priority?: boolean;
   showWordmark?: boolean;
 }
@@ -19,6 +19,7 @@ interface BrandLogoProps {
 /**
  * Static brand mark — no BrandProvider/useBrand on the critical layout path.
  * Runtime brand API still powers other surfaces via BrandProvider.
+ * Lockups follow official guidelines: horizontal (full/dark) and stacked.
  */
 function BrandLogo({
   className,
@@ -33,7 +34,9 @@ function BrandLogo({
       ? siteStatic.brand.icon
       : variant === "dark"
         ? siteStatic.brand.logoDark
-        : siteStatic.brand.logo;
+        : variant === "stacked"
+          ? siteStatic.brand.logoStacked
+          : siteStatic.brand.logo;
 
   // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
   // (JS default params do NOT apply when the caller passes `href={undefined}`).
@@ -51,13 +54,14 @@ function BrandLogo({
       <img
         src={src}
         alt={name}
-        width={variant === "mark" ? 36 : 200}
-        height={variant === "mark" ? 36 : 40}
+        width={variant === "mark" ? 36 : variant === "stacked" ? 120 : 220}
+        height={variant === "mark" ? 36 : variant === "stacked" ? 110 : 44}
         className={cn(
           "h-9 w-auto object-contain",
           variant === "mark" && "h-9 w-9",
-          variant === "full" && "h-8 w-auto max-w-[200px]",
-          variant === "dark" && "h-8 w-auto max-w-[200px]",
+          variant === "full" && "h-8 w-auto max-w-[220px]",
+          variant === "dark" && "h-8 w-auto max-w-[220px]",
+          variant === "stacked" && "h-20 w-auto max-w-[140px]",
         )}
         decoding="async"
         loading={priority ? "eager" : "lazy"}

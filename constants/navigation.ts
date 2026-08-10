@@ -54,9 +54,9 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
 
 export const APP_METADATA = {
   title: {
-    default: "AviatorPass | Aviation Course Platform",
+    default: "AviatorPass | Your Aviation Journey Starts Here",
     template: "%s | AviatorPass",
   },
   description:
-    "AviatorPass is the 2030 aviation course platform for ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery — for pilots training in Kuwait and Dubai.",
+    "YOUR AVIATION JOURNEY STARTS HERE. AviatorPass delivers ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery for pilots in Kuwait and Dubai.",
 } as const;
