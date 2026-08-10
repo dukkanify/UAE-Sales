@@ -621,6 +621,10 @@ export async function rescheduleLiveClass(input: {
     }
   });
 
+  const priorStudents = readClassesDb()
+    .participants.filter((p) => p.liveClassId === existing.id && p.role === "participant")
+    .map((p) => p.userId);
+
   const created = await createLiveClass({
     title: existing.title,
     description: existing.description,
@@ -636,6 +640,7 @@ export async function rescheduleLiveClass(input: {
     maxStudents: existing.maxStudents,
     meetingType: existing.meetingType,
     status: "scheduled",
+    enrollStudentIds: priorStudents,
     actorId: input.actorId,
     ipAddress: input.ipAddress,
     userAgent: input.userAgent,
