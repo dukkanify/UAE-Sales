@@ -31,6 +31,7 @@ import {
   expandOccurrences,
 } from "@/services/classes/schedule-service";
 import { queueClassReminders, cancelClassReminders } from "@/services/classes/reminder-service";
+import { emailScheduleLifecycle } from "@/services/email/automation-service";
 import {
   ClassValidationError,
   assertInstructorId,
@@ -401,6 +402,15 @@ export async function createLiveClass(
       "class.created",
       { liveClassId: cls.id },
     );
+    await emailScheduleLifecycle({
+      event: "schedule",
+      userIds: [...participantIds],
+      title: cls.title,
+      when: new Date(cls.startsAt).toLocaleString(),
+      detail: "A Zoom meeting has been prepared for this session.",
+      liveClassId: cls.id,
+      actorId: input.actorId,
+    });
   }
 
   await logActivity({
@@ -562,6 +572,14 @@ export async function cancelLiveClass(input: {
     "class.cancelled",
     { liveClassId: input.id },
   );
+  await emailScheduleLifecycle({
+    event: "cancel",
+    userIds: participantIds,
+    title: existing.title,
+    detail: input.reason?.trim() || "This live class was cancelled by the instructor or admin.",
+    liveClassId: input.id,
+    actorId: input.actorId,
+  });
 
   await logActivity({
     actorId: input.actorId,
@@ -680,6 +698,15 @@ export async function rescheduleLiveClass(input: {
     "class.rescheduled",
     { liveClassId: created?.id, fromId: existing.id },
   );
+  await emailScheduleLifecycle({
+    event: "reschedule",
+    userIds: participantIds,
+    title: existing.title,
+    when: new Date(startsAt).toLocaleString(),
+    detail: "Please use the updated calendar entry and Zoom link.",
+    liveClassId: created?.id ?? existing.id,
+    actorId: input.actorId,
+  });
 
   return created;
 }

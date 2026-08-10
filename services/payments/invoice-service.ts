@@ -6,6 +6,7 @@ import { generateId } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { logActivity } from "@/services/auth/activity-log";
 import { formatMinor } from "@/services/payments/money";
+import { dispatchEmailEvent } from "@/services/email/automation-service";
 import { notifyPayment } from "@/services/payments/notify";
 import { readPaymentsDb, writePaymentsDb } from "@/services/payments/store";
 import type { Invoice, Order, PaymentRecord } from "@/types/payments";
@@ -31,10 +32,7 @@ export function listInvoices(filters?: { studentId?: string }) {
   return rows.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function issueInvoiceForOrder(
-  order: Order,
-  payment: PaymentRecord,
-): Promise<Invoice> {
+export async function issueInvoiceForOrder(order: Order, payment: PaymentRecord): Promise<Invoice> {
   const existing = readPaymentsDb().invoices.find((i) => i.orderId === order.id);
   if (existing) return existing;
 
@@ -87,11 +85,39 @@ export async function issueInvoiceForOrder(
     });
   });
 
+  const amountLabel = formatMinor(invoice.totalAmount, invoice.currency);
   await notifyPayment(order.studentId, {
     title: "Invoice generated",
-    body: `${invoice.invoiceNumber} for ${formatMinor(invoice.totalAmount, invoice.currency)} is ready.`,
+    body: `${invoice.invoiceNumber} for ${amountLabel} is ready.`,
     type: "invoice.generated",
     data: { invoiceId: invoice.id, orderId: order.id },
+    amountLabel,
+    reference: invoice.invoiceNumber,
+    email: false,
+  });
+
+  await dispatchEmailEvent({
+    event: "invoice",
+    userIds: [order.studentId],
+    data: {
+      reference: invoice.invoiceNumber,
+      amountLabel,
+      detail: `Order ${order.orderNumber} — thank you for your payment.`,
+    },
+    actorId: order.studentId,
+    meta: { invoiceId: invoice.id, orderId: order.id },
+  });
+
+  await dispatchEmailEvent({
+    event: "receipt",
+    userIds: [order.studentId],
+    data: {
+      reference: order.orderNumber,
+      amountLabel,
+      detail: `Paid via ${payment.paymentMethodSummary}. Invoice ${invoice.invoiceNumber}.`,
+    },
+    actorId: order.studentId,
+    meta: { invoiceId: invoice.id, orderId: order.id, paymentId: payment.id },
   });
 
   await logActivity({

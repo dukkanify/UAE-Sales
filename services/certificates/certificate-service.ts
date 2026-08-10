@@ -15,6 +15,7 @@ import { getCourseLearningState } from "@/services/learning/progress-service";
 import { assertCanManageCertificates, CertificateError } from "@/services/certificates/access";
 import { getDefaultTemplate, getTemplateById } from "@/services/certificates/template-service";
 import { readCertificatesDb, writeCertificatesDb } from "@/services/certificates/store";
+import { dispatchEmailEvent } from "@/services/email/automation-service";
 import { getPublicBrandConfig } from "@/services/settings/settings-service";
 import type { Certificate, CertificateIssueMode, CertificateStatus } from "@/types/certificates";
 import type { UserProfile } from "@/types";
@@ -175,6 +176,20 @@ export async function createCertificate(input: {
     entityId: certificate.id,
     metadata: { courseId: input.courseId, studentId: input.studentId },
   });
+
+  if (autoApprove) {
+    await dispatchEmailEvent({
+      event: "certificate",
+      userIds: [input.studentId],
+      data: {
+        title: course.title,
+        reference: `${certificate.certificateNumber} · ${certificate.verificationCode}`,
+        detail: "Your certificate has been issued and is ready to download.",
+      },
+      actorId: input.user.id,
+      meta: { certificateId: certificate.id, courseId: input.courseId },
+    });
+  }
 
   return certificate;
 }
