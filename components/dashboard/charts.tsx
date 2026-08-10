@@ -23,7 +23,7 @@ import type { SeriesPoint } from "@/components/dashboard/chart-types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export const CHART_COLORS = ["#0B1F3A", "#38BDF8", "#16A34A", "#EA580C", "#7C3AED", "#0EA5E9"];
+export const CHART_COLORS = ["#2E7DAA", "#DD9B30", "#7C7B80", "#16A34A", "#1E4F6D", "#C48422"];
 
 interface ChartCardProps {
   title: string;

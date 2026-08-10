@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 88" fill="none" role="img" aria-label="AviatorPass">
-  <g transform="translate(4,14)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 96" fill="none" role="img" aria-label="AviatorPass">
+  <g transform="translate(4,16)">
     <path d="M8 48C18 40 34 28 52 18C40 30 28 42 18 52L8 48Z" fill="#5BA3CC"/>
     <path d="M10 36C24 26 42 14 62 6C48 20 34 34 22 44L10 36Z" fill="#5BA3CC"/>
     <path d="M12 24C28 14 48 4 70 0C54 12 38 26 24 36L12 24Z" fill="#5BA3CC"/>
@@ -8,8 +8,8 @@
     <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#C4C3C7" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M72 44V52" stroke="#C4C3C7" stroke-width="3" stroke-linecap="round"/>
   </g>
-  <text x="128" y="42" font-family="Space Grotesk, Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="-0.01em">
-    <tspan fill="#FFFFFF">Aviator</tspan><tspan fill="#DD9B30">Pass</tspan>
+  <text x="128" y="44" font-family="Space Grotesk, Arial Black, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="0.02em">
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="8" fill="#DD9B30">PASS</tspan>
   </text>
-  <text x="128" y="64" font-family="IBM Plex Sans, Arial, sans-serif" font-size="9" font-weight="500" fill="#C4C3C7" letter-spacing="0.18em">AVIATION COURSE PLATFORM</text>
+  <text x="128" y="68" font-family="IBM Plex Sans, Arial, sans-serif" font-size="8.5" font-weight="500" fill="#C4C3C7" letter-spacing="0.16em">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>

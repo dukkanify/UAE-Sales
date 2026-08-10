@@ -10,10 +10,10 @@ import { routes } from "@/constants/routes";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "AviatorPass | Aviation Course Platform for ATPL Theory & Live Zoom",
+    absolute: "AviatorPass | Your Aviation Journey Starts Here",
   },
   description:
-    "Train ATPL theory on AviatorPass — structured courses, live Zoom coaching with instructors, quizzes, and exam mastery. Built for pilots in Kuwait and Dubai.",
+    "YOUR AVIATION JOURNEY STARTS HERE. Train ATPL theory on AviatorPass — structured courses, live Zoom coaching, quizzes, and exam mastery for pilots in Kuwait and Dubai.",
   keywords: [
     "AviatorPass",
     "ATPL theory",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "AviatorPass — Aviation course platform",
+    title: "AviatorPass — Your Aviation Journey Starts Here",
     description:
       "Structured ATPL coursework, live Zoom coaching, and exam mastery in one training OS.",
     url: "/",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AviatorPass — Aviation course platform",
+    title: "AviatorPass — Your Aviation Journey Starts Here",
     description:
       "Structured ATPL coursework, live Zoom coaching, and exam mastery in one training OS.",
     images: [siteConfig.brand.openGraph],
@@ -129,18 +129,22 @@ export default function HomePage() {
         <div className="hero-vignette" aria-hidden />
 
         <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-end pb-20 pt-16 sm:justify-center sm:pb-28">
-          <p className="animate-in-up hero-brand font-display text-[clamp(3.25rem,11vw,7.5rem)] font-bold">
-            <span className="hero-brand-aviator">Aviator</span>
-            <span className="hero-brand-pass">Pass</span>
+          <p className="animate-in-up hero-brand font-display text-[clamp(2.75rem,10vw,6.5rem)] font-bold tracking-[0.02em]">
+            <span className="hero-brand-aviator">AVIATOR</span>
+            <span className="hero-brand-pass"> PASS</span>
           </p>
 
-          <h1 className="animate-in-up-delay-1 mt-8 max-w-[17ch] font-display text-[clamp(1.7rem,3.9vw,3.15rem)] font-semibold tracking-[-0.032em] text-white sm:leading-[1.06]">
-            Train like the cockpit is already yours
+          <p className="animate-in-up-delay-1 mt-4 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-white/70 sm:text-xs">
+            Your aviation journey starts here
+          </p>
+
+          <h1 className="animate-in-up-delay-1 mt-8 max-w-[18ch] font-display text-[clamp(1.7rem,3.9vw,3.15rem)] font-semibold tracking-[-0.032em] text-white sm:leading-[1.06]">
+            Elevate aviation training to global standards of precision
           </h1>
 
           <p className="animate-in-up-delay-2 mt-5 max-w-lg text-[1.05rem] leading-relaxed text-white/68 sm:text-lg">
-            ATPL theory, live Zoom coaching, and exam mastery — one aviation course platform built
-            for {siteConfig.locations.join(" & ")}.
+            ATPL theory, live Zoom coaching, and exam mastery — built for pilots in{" "}
+            {siteConfig.locations.join(" & ")}.
           </p>
 
           <div className="animate-in-up-delay-3 mt-12 flex flex-wrap items-center gap-3">

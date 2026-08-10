@@ -1,6 +1,7 @@
 /**
- * Default platform settings — AviatorPass (official brand guidelines applied).
- * Typography still pending Stimulatio Flat licensed files (Space Grotesk substitute).
+ * Default platform settings — AviatorPass official brand guidelines.
+ * Palette: Aero Blue / Altitude Orange / Academic Grey.
+ * Typography: Stimulatio Flat pending licensed files (Space Grotesk substitute) + IBM Plex Sans.
  */
 
 import type { PlatformSettings } from "@/types/settings";
@@ -39,12 +40,12 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     loginIllustrationUrl: "/images/hero-aviation.svg",
     openGraphImageUrl: "/brand/og.svg",
     primaryColor: "#2E7DAA",
-    secondaryColor: "#1E4F6D",
+    secondaryColor: "#7C7B80",
     accentColor: "#DD9B30",
     typographyDisplay: "Space Grotesk",
     typographyBody: "IBM Plex Sans",
     footerInformation:
-      "AviatorPass — Kuwait & Dubai. Aviation course platform for ATPL theory, live Zoom coaching, and exam mastery.",
+      "AviatorPass — YOUR AVIATION JOURNEY STARTS HERE. Kuwait & Dubai ATPL theory, live Zoom coaching, and exam mastery.",
     brandGuidelinesPending: false,
     colorPalettePending: false,
     typographyPending: true,

@@ -58,9 +58,7 @@ export function renderAnalyticsPrintHtml(
   assertScopeAccess(user, scope);
   const data = getScopePayload(user, scope, filters);
   const kpis = (data as { kpis?: Array<{ label: string; value: string | number }> }).kpis ?? [];
-  const rows = kpis
-    .map((k) => `<tr><td>${k.label}</td><td>${k.value}</td></tr>`)
-    .join("");
+  const rows = kpis.map((k) => `<tr><td>${k.label}</td><td>${k.value}</td></tr>`).join("");
   writeAnalyticsDb((db) => {
     db.reportHistory.unshift({
       id: generateId(),
@@ -81,7 +79,7 @@ export function renderAnalyticsPrintHtml(
     metadata: { format: "pdf" },
   });
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${scope} report</title>
-<style>body{font-family:DM Sans,system-ui,sans-serif;padding:32px;color:#0B1F3A}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}h1{font-family:Plus Jakarta Sans,sans-serif}</style>
+<style>body{font-family:IBM Plex Sans,system-ui,sans-serif;padding:32px;color:#0B1A24}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}h1{font-family:Space Grotesk,Arial,sans-serif;color:#2E7DAA}</style>
 </head><body><h1>${scope.toUpperCase()} Report</h1><p>Generated ${new Date().toLocaleString()}</p>
 <table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>
 <script>window.onload=()=>setTimeout(()=>window.print(),200)</script></body></html>`;

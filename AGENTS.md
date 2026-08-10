@@ -15,4 +15,14 @@ Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `type
 - Validate changes via `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, and `npm run uat` / `npm run test:e2e` when a server is available.
 - Closure / handover docs: `docs/DOCUMENTATION_INDEX.md`, `docs/PROJECT_CLOSURE_REPORT.md`.
 
-**AviatorPass** — English LTR — aviation theme (deep blue / sky blue / light gray). Official brand guidelines pending; update via `config/branding.ts` or Super Admin branding settings.
+### Brand (official guidelines)
+
+**AviatorPass** — English LTR — tagline **YOUR AVIATION JOURNEY STARTS HERE**.
+
+| Token           | Hex       | Role              |
+| --------------- | --------- | ----------------- |
+| Aero Blue       | `#2E7DAA` | Primary           |
+| Altitude Orange | `#DD9B30` | Accent / PASS     |
+| Academic Grey   | `#7C7B80` | Secondary / muted |
+
+Typography: **Stimulatio Flat** (headings; Space Grotesk web substitute until licensed files land) + **IBM Plex Sans** (body). Logos under `public/brand/`; guidelines PDF at `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`. Update via `config/branding.ts` or Super Admin branding settings.
