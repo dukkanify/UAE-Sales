@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
 import { ROLES } from "@/constants/roles";
-import { getRequestContext, requirePermission } from "@/services/auth/guards";
-import { PermissionError } from "@/services/auth/permissions";
+import { getRequestContext, requireAuth, requirePermission } from "@/services/auth/guards";
+import { hasPermission, PermissionError } from "@/services/auth/permissions";
 import {
   archiveCourse,
   assignInstructor,
@@ -23,7 +23,7 @@ function assertSuperAdminPublishing(role: string) {
 
 export async function POST(request: Request, { params }: Params) {
   try {
-    const user = await requirePermission(PERMISSIONS.COURSES_MANAGE);
+    const user = await requireAuth();
     const { id } = await params;
     const body = (await request.json().catch(() => ({}))) as {
       action?: string;
@@ -32,6 +32,34 @@ export async function POST(request: Request, { params }: Params) {
     };
     const ctx = getRequestContext(request);
     const action = body.action;
+
+    if (action === "assign_instructor") {
+      if (
+        !hasPermission(user.role, PERMISSIONS.COURSES_MANAGE) &&
+        !hasPermission(user.role, PERMISSIONS.INSTRUCTORS_ASSIGN)
+      ) {
+        throw new PermissionError("You do not have permission to assign instructors", 403);
+      }
+      if (!body.userId) {
+        return NextResponse.json(
+          { success: false, data: null, error: "userId required" },
+          { status: 400 },
+        );
+      }
+      return NextResponse.json({
+        success: true,
+        data: await assignInstructor({
+          courseId: id,
+          userId: body.userId,
+          role: body.role ?? "primary",
+          actorId: user.id,
+          ...ctx,
+        }),
+        error: null,
+      });
+    }
+
+    await requirePermission(PERMISSIONS.COURSES_MANAGE);
 
     if (action === "publish") {
       assertSuperAdminPublishing(user.role);
@@ -61,25 +89,6 @@ export async function POST(request: Request, { params }: Params) {
       return NextResponse.json({
         success: true,
         data: await duplicateCourse(id, user.id, ctx),
-        error: null,
-      });
-    }
-    if (action === "assign_instructor") {
-      if (!body.userId) {
-        return NextResponse.json(
-          { success: false, data: null, error: "userId required" },
-          { status: 400 },
-        );
-      }
-      return NextResponse.json({
-        success: true,
-        data: await assignInstructor({
-          courseId: id,
-          userId: body.userId,
-          role: body.role ?? "primary",
-          actorId: user.id,
-          ...ctx,
-        }),
         error: null,
       });
     }

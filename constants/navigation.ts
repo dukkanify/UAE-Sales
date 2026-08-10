@@ -26,6 +26,11 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
     },
     { label: "Profile", href: "/instructor/profile", permission: PERMISSIONS.PROFILE_OWN },
   ],
+  chief_ground_instructor: [
+    { label: "Dashboard", href: "/cgi/dashboard", permission: PERMISSIONS.DASHBOARD_CGI },
+    { label: "ATPL Journey", href: "/cgi/atpl", permission: PERMISSIONS.ATPL_FIRST_SUBJECT },
+    { label: "Profile", href: "/cgi/profile", permission: PERMISSIONS.PROFILE_OWN },
+  ],
   admin: [
     { label: "Dashboard", href: "/admin/dashboard", permission: PERMISSIONS.DASHBOARD_ADMIN },
     { label: "Users", href: "/admin/users", permission: PERMISSIONS.STUDENTS_MANAGE },

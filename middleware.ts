@@ -155,7 +155,10 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url);
       }
       if (claims.role !== requiredRole) {
-        if (!(requiredRole === "admin" && claims.role === "super_admin")) {
+        const elevatedAdmin = requiredRole === "admin" && claims.role === "super_admin";
+        const elevatedInstructor =
+          requiredRole === "instructor" && claims.role === "chief_ground_instructor";
+        if (!elevatedAdmin && !elevatedInstructor) {
           const url = request.nextUrl.clone();
           url.pathname = routes.accessDenied;
           return NextResponse.redirect(url);

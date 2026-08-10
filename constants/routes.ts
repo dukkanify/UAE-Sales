@@ -29,6 +29,7 @@ export const routes = {
   // Role dashboards
   studentDashboard: "/student/dashboard",
   instructorDashboard: "/instructor/dashboard",
+  cgiDashboard: "/cgi/dashboard",
   adminDashboard: "/admin/dashboard",
   superAdminDashboard: "/super-admin/dashboard",
 
@@ -57,6 +58,7 @@ export const routes = {
 export const protectedRoutePrefixes = [
   "/student",
   "/instructor",
+  "/cgi",
   "/admin",
   "/super-admin",
   "/dashboard",
@@ -94,6 +96,7 @@ export const publicSystemRoutes = [
 export const ROLE_ROUTE_GUARDS: Record<string, string> = {
   "/student": "student",
   "/instructor": "instructor",
+  "/cgi": "chief_ground_instructor",
   "/admin": "admin",
   "/super-admin": "super_admin",
 };
