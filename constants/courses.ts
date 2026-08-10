@@ -4,10 +4,12 @@
 
 import type {
   ContentStatus,
+  CourseDeliveryType,
   CourseStatus,
   DifficultyLevel,
   EnrollmentMode,
   EnrollmentStatus,
+  PublicCourseDeliveryFilter,
   ResourceType,
 } from "@/types/courses";
 
@@ -27,6 +29,25 @@ export const COURSE_STATUS_LABELS: Record<CourseStatus, string> = {
   archived: "Archived",
 };
 
+export const COURSE_DELIVERY_TYPES: CourseDeliveryType[] = ["recorded", "live"];
+
+export const COURSE_DELIVERY_LABELS: Record<CourseDeliveryType, string> = {
+  recorded: "Recorded",
+  live: "Live",
+};
+
+export const PUBLIC_COURSE_DELIVERY_FILTERS: PublicCourseDeliveryFilter[] = [
+  "all",
+  "recorded",
+  "live",
+];
+
+export const PUBLIC_COURSE_DELIVERY_FILTER_LABELS: Record<PublicCourseDeliveryFilter, string> = {
+  all: "Recorded + Live",
+  recorded: "Recorded only",
+  live: "Live only",
+};
+
 export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
   "beginner",
   "intermediate",
@@ -41,12 +62,7 @@ export const DIFFICULTY_LABELS: Record<DifficultyLevel, string> = {
   expert: "Expert",
 };
 
-export const ENROLLMENT_MODES: EnrollmentMode[] = [
-  "open",
-  "private",
-  "invitation",
-  "manual",
-];
+export const ENROLLMENT_MODES: EnrollmentMode[] = ["open", "private", "invitation", "manual"];
 
 export const ENROLLMENT_MODE_LABELS: Record<EnrollmentMode, string> = {
   open: "Open enrollment",
@@ -103,9 +119,7 @@ export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   video: "Video",
 };
 
-export const COURSE_LANGUAGES = [
-  { value: "en", label: "English" },
-] as const;
+export const COURSE_LANGUAGES = [{ value: "en", label: "English" }] as const;
 
 /** Soft-delete retention note — records kept with deletedAt set */
 export const COURSE_SOFT_DELETE = true;

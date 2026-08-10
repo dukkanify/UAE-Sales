@@ -23,8 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  COURSE_STATUSES,
-  COURSE_STATUS_LABELS,
   DIFFICULTY_LABELS,
   DIFFICULTY_LEVELS,
   ENROLLMENT_MODE_LABELS,
@@ -63,9 +61,7 @@ function CourseFormDialog({
   const [categoryId, setCategoryId] = React.useState<string>("none");
   const [difficulty, setDifficulty] = React.useState("intermediate");
   const [enrollmentMode, setEnrollmentMode] = React.useState("manual");
-  const [status, setStatus] = React.useState("draft");
   const [primaryInstructorId, setPrimaryInstructorId] = React.useState<string>("none");
-  const [scheduledPublishAt, setScheduledPublishAt] = React.useState("");
   const [estimatedDurationMinutes, setEstimatedDurationMinutes] = React.useState("0");
 
   React.useEffect(() => {
@@ -77,9 +73,7 @@ function CourseFormDialog({
     setCategoryId(course?.categoryId ?? "none");
     setDifficulty(course?.difficulty ?? "intermediate");
     setEnrollmentMode(course?.enrollmentMode ?? "manual");
-    setStatus(course?.status ?? "draft");
     setPrimaryInstructorId(lockedInstructorId ?? course?.primaryInstructorId ?? "none");
-    setScheduledPublishAt(course?.scheduledPublishAt ? course.scheduledPublishAt.slice(0, 16) : "");
     setEstimatedDurationMinutes(String(course?.estimatedDurationMinutes ?? 0));
   }, [open, course, lockedInstructorId]);
 
@@ -94,16 +88,11 @@ function CourseFormDialog({
       categoryId: categoryId === "none" ? null : categoryId,
       difficulty,
       enrollmentMode,
-      status,
       primaryInstructorId: lockInstructor
         ? lockedInstructorId
         : primaryInstructorId === "none"
           ? null
           : primaryInstructorId,
-      scheduledPublishAt:
-        status === "scheduled" && scheduledPublishAt
-          ? new Date(scheduledPublishAt).toISOString()
-          : null,
       estimatedDurationMinutes: Number(estimatedDurationMinutes) || 0,
       language: "en",
     };
@@ -123,7 +112,7 @@ function CourseFormDialog({
       toast.error(result.error ?? "Unable to save course");
       return;
     }
-    toast.success(course ? "Course updated" : "Course created");
+    toast.success(course ? "Course updated" : "Course created as draft");
     onSaved(result.data);
     onOpenChange(false);
   }
@@ -135,8 +124,8 @@ function CourseFormDialog({
           <DialogTitle>{course ? "Edit course" : "Create course"}</DialogTitle>
           <DialogDescription>
             {lockInstructor
-              ? "Create a course under your instructor account. Publish when it is ready for students."
-              : "Configure catalog details, visibility, and instructor assignment."}
+              ? "Create a course under your instructor account. Super Admin controls publishing and catalog visibility."
+              : "Configure catalog details and instructor assignment. Publishing & visibility are managed by Super Admin."}
           </DialogDescription>
         </DialogHeader>
         <form className="space-y-4" onSubmit={handleSubmit}>
@@ -216,7 +205,7 @@ function CourseFormDialog({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Enrollment</Label>
+              <Label>Enrollment mode</Label>
               <Select value={enrollmentMode} onValueChange={setEnrollmentMode}>
                 <SelectTrigger>
                   <SelectValue />
@@ -225,21 +214,6 @@ function CourseFormDialog({
                   {ENROLLMENT_MODES.map((m) => (
                     <SelectItem key={m} value={m}>
                       {ENROLLMENT_MODE_LABELS[m]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {COURSE_STATUSES.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {COURSE_STATUS_LABELS[s]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -276,18 +250,6 @@ function CourseFormDialog({
                 </Select>
               </div>
             )}
-            {status === "scheduled" ? (
-              <div className="space-y-2 sm:col-span-2">
-                <Label htmlFor="publish-at">Future publish date</Label>
-                <Input
-                  id="publish-at"
-                  type="datetime-local"
-                  value={scheduledPublishAt}
-                  onChange={(e) => setScheduledPublishAt(e.target.value)}
-                  required
-                />
-              </div>
-            ) : null}
             <div className="space-y-2">
               <Label htmlFor="duration">Estimated duration (minutes)</Label>
               <Input

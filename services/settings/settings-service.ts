@@ -20,6 +20,7 @@ import type {
   LocalizationSettings,
   FeatureFlags,
   ZoomIntegrationSettings,
+  CourseCatalogSettings,
 } from "@/types/settings";
 
 export type CategoryPatch = {
@@ -34,6 +35,7 @@ export type CategoryPatch = {
   localization?: Partial<LocalizationSettings>;
   features?: Partial<FeatureFlags>;
   zoom?: Partial<ZoomIntegrationSettings>;
+  courses?: Partial<CourseCatalogSettings>;
 };
 
 export function getPlatformSettings(): PlatformSettings {

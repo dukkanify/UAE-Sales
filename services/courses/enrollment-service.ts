@@ -10,6 +10,7 @@ import { ROLES } from "@/constants/roles";
 import { logActivity } from "@/services/auth/activity-log";
 import { readAuthDb } from "@/services/auth/store";
 import { getCourseById } from "@/services/courses/course-service";
+import { canAcceptEnrollment } from "@/services/courses/publishing";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb, writeCoursesDb } from "@/services/courses/store";
 import { CourseValidationError } from "@/services/courses/validation";
@@ -62,7 +63,12 @@ export async function enrollStudent(input: {
   userAgent?: string | null;
 }): Promise<EnrollmentWithStudent> {
   ensureCoursesSeeded();
-  if (!getCourseById(input.courseId)) throw new CourseValidationError("Course not found");
+  const course = getCourseById(input.courseId);
+  if (!course) throw new CourseValidationError("Course not found");
+  const enrollmentGate = canAcceptEnrollment(course);
+  if (!enrollmentGate.ok) {
+    throw new CourseValidationError(enrollmentGate.reason);
+  }
   assertStudent(input.studentId);
 
   const existing = readCoursesDb().enrollments.find(
@@ -167,8 +173,7 @@ export async function updateEnrollmentStatus(input: {
     ...existing,
     status: input.status,
     updatedAt: now,
-    approvedAt:
-      input.status === "approved" ? existing.approvedAt ?? now : existing.approvedAt,
+    approvedAt: input.status === "approved" ? (existing.approvedAt ?? now) : existing.approvedAt,
     completedAt: input.status === "completed" ? now : existing.completedAt,
     droppedAt: input.status === "dropped" ? now : existing.droppedAt,
     suspendedAt: input.status === "suspended" ? now : existing.suspendedAt,
@@ -256,9 +261,7 @@ export async function transferEnrollment(input: {
 }
 
 /** Progress foundation — compute summary from stored lesson progress rows. */
-export function getProgressSummary(
-  enrollmentId: string,
-): CourseProgressSummary | null {
+export function getProgressSummary(enrollmentId: string): CourseProgressSummary | null {
   ensureCoursesSeeded();
   const enrollment = readCoursesDb().enrollments.find((e) => e.id === enrollmentId);
   if (!enrollment) return null;
@@ -302,9 +305,7 @@ export function upsertLessonProgress(
   ensureCoursesSeeded();
   const now = new Date().toISOString();
   const existing = readCoursesDb().progress.find(
-    (p) =>
-      p.enrollmentId === input.enrollmentId &&
-      p.lessonId === input.lessonId,
+    (p) => p.enrollmentId === input.enrollmentId && p.lessonId === input.lessonId,
   );
   if (existing) {
     const next: LessonProgress = {

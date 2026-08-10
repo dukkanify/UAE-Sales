@@ -18,14 +18,22 @@ import { DIFFICULTY_LABELS } from "@/constants/courses";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 import { cn } from "@/lib/utils";
-import { getCourseDetail } from "@/services/courses/course-service";
+import { applyDueScheduledPublishes, getCourseDetail } from "@/services/courses/course-service";
+import { isCoursePubliclyListed } from "@/services/courses/publishing";
 
 type PageProps = { params: Promise<{ id: string }> };
 
+function resolvePublicCourse(id: string) {
+  applyDueScheduledPublishes();
+  const course = getCourseDetail(id);
+  if (!course || !isCoursePubliclyListed(course)) return null;
+  return course;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const course = getCourseDetail(id);
-  if (!course || course.status !== "published") {
+  const course = resolvePublicCourse(id);
+  if (!course) {
     return { title: "Course not found" };
   }
   return {
@@ -37,8 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function PublicCourseDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const course = getCourseDetail(id);
-  if (!course || course.status !== "published") notFound();
+  const course = resolvePublicCourse(id);
+  if (!course) notFound();
 
   const hours = Math.max(1, Math.round(course.estimatedDurationMinutes / 60));
   const lessonTotal =

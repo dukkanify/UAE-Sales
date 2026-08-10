@@ -45,10 +45,27 @@ function emptyDb(): CoursesDatabase {
   };
 }
 
+function normalizeCourse(course: Course): Course {
+  const deliveryType =
+    course.deliveryType === "live" || course.deliveryType === "recorded"
+      ? course.deliveryType
+      : "recorded";
+  const enrollmentOpen =
+    typeof course.enrollmentOpen === "boolean"
+      ? course.enrollmentOpen
+      : course.enrollmentMode === "open";
+  return {
+    ...course,
+    deliveryType,
+    enrollmentOpen,
+    hidden: Boolean(course.hidden),
+  };
+}
+
 function normalize(raw: Partial<CoursesDatabase> | null | undefined): CoursesDatabase {
   return {
     categories: raw?.categories ?? [],
-    courses: raw?.courses ?? [],
+    courses: (raw?.courses ?? []).map((c) => normalizeCourse(c as Course)),
     modules: raw?.modules ?? [],
     lessons: raw?.lessons ?? [],
     resources: raw?.resources ?? [],

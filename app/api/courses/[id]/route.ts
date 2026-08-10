@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
+import { ROLES } from "@/constants/roles";
 import { getRequestContext, requireAuth } from "@/services/auth/guards";
 import { hasPermission, PermissionError } from "@/services/auth/permissions";
 import {
@@ -22,6 +23,21 @@ function assertCanMutateCourse(userId: string, role: Role, courseId: string) {
   if (!instructorOwnsCourse(userId, courseId)) {
     throw new PermissionError("You can only manage your own courses", 403);
   }
+}
+
+/** Strip publishing/visibility fields unless actor is Super Admin (CR001). */
+function stripPublishingFields(
+  body: Record<string, unknown>,
+  isSuperAdmin: boolean,
+): Record<string, unknown> {
+  if (isSuperAdmin) return body;
+  const patch = { ...body };
+  delete patch.status;
+  delete patch.scheduledPublishAt;
+  delete patch.deliveryType;
+  delete patch.enrollmentOpen;
+  delete patch.hidden;
+  return patch;
 }
 
 export async function GET(_request: Request, { params }: Params) {
@@ -65,7 +81,8 @@ export async function PATCH(request: Request, { params }: Params) {
     }
 
     const canManage = hasPermission(user.role, PERMISSIONS.COURSES_MANAGE);
-    const patch = { ...body };
+    const isSuperAdmin = user.role === ROLES.SUPER_ADMIN;
+    const patch = stripPublishingFields({ ...body }, isSuperAdmin);
     if (!canManage) {
       // Instructors cannot reassign ownership away from themselves.
       patch.primaryInstructorId = user.id;
