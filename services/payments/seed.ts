@@ -9,6 +9,7 @@ import { ROLES } from "@/constants/roles";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { listCourses } from "@/services/courses/course-service";
 import { majorToMinor } from "@/services/payments/money";
+import { defaultRegionalPaymentRules } from "@/services/payments/regional-rules-service";
 import { ensureWallet } from "@/services/payments/wallet-service";
 import { readPaymentsDb, writePaymentsDb } from "@/services/payments/store";
 import type { CatalogProduct, Coupon, Invoice, Order, PaymentRecord } from "@/types/payments";
@@ -17,7 +18,10 @@ export function ensurePaymentsSeeded(): void {
   ensureDemoUsersSeeded();
   ensureCoursesSeeded();
   const db = readPaymentsDb();
-  if (db.seeded && db.products.length > 0) return;
+  if (db.seeded && db.products.length > 0) {
+    ensureAtplPackageAndRegionalRules();
+    return;
+  }
 
   const users = readAuthDb().users;
   const student = users.find((u) => u.role === ROLES.STUDENT && u.status === "active");
@@ -114,6 +118,31 @@ export function ensurePaymentsSeeded(): void {
       isFree: false,
       active: true,
       metadata: {},
+      createdAt: stamp,
+      updatedAt: stamp,
+    },
+    {
+      id: generateId(),
+      name: "ATPL Theory Package",
+      description:
+        "Full ATPL theory package with full payment, installments, or Tamara / Tabby (تالي) by country.",
+      pricingModel: "package",
+      courseId: courses.find((c) => c.code === "ATPL-010")?.id ?? courses[0]!.id,
+      instructorId: instructor.id,
+      priceAmount: majorToMinor(480, currency),
+      compareAtAmount: majorToMinor(560, currency),
+      currency,
+      isFree: false,
+      active: true,
+      metadata: {
+        sku: "ATPL-PACKAGE",
+        courseIds: courses
+          .filter((c) => c.code.startsWith("ATPL-"))
+          .map((c) => c.id)
+          .slice(0, 7),
+        supportsInstallments: true,
+        supportsBnpl: true,
+      },
       createdAt: stamp,
       updatedAt: stamp,
     },
@@ -276,6 +305,7 @@ export function ensurePaymentsSeeded(): void {
     d.orders = [order];
     d.payments = [payment];
     d.invoices = [invoice];
+    d.regionalRules = defaultRegionalPaymentRules(currency);
     d.transactionLogs = [
       {
         id: generateId(),
@@ -326,4 +356,46 @@ export function ensurePaymentsSeeded(): void {
   // Ensure second instructor wallet exists empty
   const instructor2 = users.find((u) => u.role === ROLES.INSTRUCTOR && u.id !== instructor.id);
   if (instructor2) ensureWallet(instructor2.id);
+}
+
+/** Backfill ATPL package + regional BNPL rules on already-seeded payment DBs. */
+function ensureAtplPackageAndRegionalRules(): void {
+  ensureCoursesSeeded();
+  const courses = listCourses({ pageSize: 50, status: "published" }).data;
+  const users = readAuthDb().users;
+  const instructor = users.find((u) => u.role === ROLES.INSTRUCTOR);
+  writePaymentsDb((d) => {
+    if (d.regionalRules.length === 0) {
+      d.regionalRules = defaultRegionalPaymentRules(d.settings.currency);
+    }
+    const hasAtpl = d.products.some((p) => p.metadata?.sku === "ATPL-PACKAGE");
+    if (hasAtpl || !instructor) return;
+    const stamp = new Date().toISOString();
+    const currency = d.settings.currency;
+    d.products.push({
+      id: generateId(),
+      name: "ATPL Theory Package",
+      description:
+        "Full ATPL theory package with full payment, installments, or Tamara / Tabby (تالي) by country.",
+      pricingModel: "package",
+      courseId: courses.find((c) => c.code === "ATPL-010")?.id ?? courses[0]?.id ?? null,
+      instructorId: instructor.id,
+      priceAmount: majorToMinor(480, currency),
+      compareAtAmount: majorToMinor(560, currency),
+      currency,
+      isFree: false,
+      active: true,
+      metadata: {
+        sku: "ATPL-PACKAGE",
+        courseIds: courses
+          .filter((c) => c.code.startsWith("ATPL-"))
+          .map((c) => c.id)
+          .slice(0, 7),
+        supportsInstallments: true,
+        supportsBnpl: true,
+      },
+      createdAt: stamp,
+      updatedAt: stamp,
+    });
+  });
 }

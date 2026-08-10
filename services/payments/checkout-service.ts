@@ -6,19 +6,24 @@ import { generateId, generateToken } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { ORDER_EXPIRY_MINUTES } from "@/constants/payments";
 import { logActivity } from "@/services/auth/activity-log";
-import {
-  assertCanCheckout,
-  assertOwnOrder,
-  PaymentError,
-} from "@/services/payments/access";
+import { assertCanCheckout, assertOwnOrder, PaymentError } from "@/services/payments/access";
 import { getProduct, validateCoupon } from "@/services/payments/catalog-service";
 import { getPaymentGateway } from "@/services/payments/gateway";
+import {
+  createInstallmentPlanForOrder,
+  getInstallmentPlan,
+  grantPackageAccess,
+  listScheduleForPlan,
+  markInstallmentPaid,
+  resumePackageService,
+} from "@/services/payments/installment-service";
 import { issueInvoiceForOrder } from "@/services/payments/invoice-service";
 import { calcTax, formatMinor } from "@/services/payments/money";
 import { notifyPayment } from "@/services/payments/notify";
 import { readPaymentsDb, writePaymentsDb } from "@/services/payments/store";
 import { creditInstructorEarnings } from "@/services/payments/wallet-service";
 import type {
+  CheckoutPaymentMode,
   Order,
   OrderItem,
   PaymentMethodBrand,
@@ -220,11 +225,28 @@ export async function payOrder(input: {
   methodBrand: PaymentMethodBrand;
   paymentToken?: string;
   simulateFailure?: boolean;
+  paymentMode?: CheckoutPaymentMode;
+  installmentCount?: number;
+  agreementAccepted?: boolean;
+  passportDocumentId?: string | null;
+  scheduleItemId?: string;
 }): Promise<{ order: Order; payment: PaymentRecord }> {
   assertCanCheckout(input.user);
   const order = getOrder(input.orderId);
   if (!order) throw new PaymentError("Order not found", 404);
   assertOwnOrder(input.user, order.studentId);
+
+  // Subsequent installment payment against an existing plan.
+  if (input.scheduleItemId) {
+    return payScheduleItem({
+      user: input.user,
+      orderId: order.id,
+      scheduleItemId: input.scheduleItemId,
+      methodBrand: input.methodBrand,
+      paymentToken: input.paymentToken,
+      simulateFailure: input.simulateFailure,
+    });
+  }
 
   if (order.status === "paid") {
     const payment = order.paymentId ? getPayment(order.paymentId) : null;
@@ -241,7 +263,95 @@ export async function payOrder(input: {
     paymentToken: input.paymentToken,
     simulateFailure: input.simulateFailure,
     user: input.user,
+    paymentMode: input.paymentMode ?? "full",
+    installmentCount: input.installmentCount,
+    agreementAccepted: Boolean(input.agreementAccepted),
+    passportDocumentId: input.passportDocumentId ?? null,
   });
+}
+
+async function payScheduleItem(input: {
+  user: UserProfile;
+  orderId: string;
+  scheduleItemId: string;
+  methodBrand: PaymentMethodBrand;
+  paymentToken?: string;
+  simulateFailure?: boolean;
+}): Promise<{ order: Order; payment: PaymentRecord }> {
+  const order = getOrder(input.orderId);
+  if (!order) throw new PaymentError("Order not found", 404);
+  const planId = String(order.metadata.installmentPlanId ?? "");
+  const plan = planId ? getInstallmentPlan(planId) : null;
+  if (!plan) throw new PaymentError("Installment plan not found for order", 404);
+  const item = listScheduleForPlan(plan.id).find((s) => s.id === input.scheduleItemId);
+  if (!item) throw new PaymentError("Installment schedule item not found", 404);
+  if (item.status === "paid") throw new PaymentError("Installment already paid");
+
+  const gateway = getPaymentGateway();
+  const charge = await gateway.createPayment({
+    orderId: order.id,
+    amount: item.amount,
+    currency: order.currency,
+    customerEmail: order.billingEmail,
+    customerName: order.billingName,
+    methodBrand: input.methodBrand,
+    paymentToken: input.paymentToken,
+    idempotencyKey: `${order.idempotencyKey}-inst-${item.sequence}`,
+    simulateFailure: input.simulateFailure,
+  });
+
+  const stamp = nowIso();
+  const payment: PaymentRecord = {
+    id: generateId(),
+    orderId: order.id,
+    provider: charge.provider,
+    providerPaymentId: charge.providerPaymentId,
+    status: charge.status,
+    methodBrand: charge.methodBrand,
+    paymentMethodSummary: charge.paymentMethodSummary,
+    amount: item.amount,
+    currency: order.currency,
+    clientSecret: charge.clientSecret,
+    checkoutUrl: charge.checkoutUrl,
+    webhookVerified:
+      charge.provider === "mock" || charge.provider === "tamara" || charge.provider === "tabby",
+    failureCode: charge.failureCode,
+    failureMessage: charge.failureMessage,
+    rawProviderPayload: { ...charge.rawProviderPayload, scheduleItemId: item.id },
+    createdAt: stamp,
+    updatedAt: stamp,
+  };
+
+  writePaymentsDb((db) => {
+    db.payments.unshift(payment);
+    db.transactionLogs.unshift({
+      id: generateId(),
+      kind: "payment",
+      referenceId: payment.id,
+      actorId: input.user.id,
+      studentId: order.studentId,
+      instructorId: order.items[0]?.instructorId ?? null,
+      amount: item.amount,
+      currency: order.currency,
+      description: `Installment #${item.sequence} ${charge.status} for ${order.orderNumber}`,
+      metadata: { scheduleItemId: item.id, planId: plan.id },
+      createdAt: stamp,
+    });
+  });
+
+  if (charge.status !== "succeeded") {
+    throw new PaymentError(charge.failureMessage ?? "Installment payment failed");
+  }
+
+  await markInstallmentPaid({
+    planId: plan.id,
+    scheduleItemId: item.id,
+    paymentId: payment.id,
+    actorId: input.user.id,
+  });
+  await resumePackageService({ planId: plan.id, actorId: input.user.id });
+
+  return { order: getOrder(order.id)!, payment };
 }
 
 async function finalizeSuccessfulPayment(input: {
@@ -250,18 +360,63 @@ async function finalizeSuccessfulPayment(input: {
   paymentToken?: string;
   simulateFailure?: boolean;
   user: UserProfile;
+  paymentMode?: CheckoutPaymentMode;
+  installmentCount?: number;
+  agreementAccepted?: boolean;
+  passportDocumentId?: string | null;
 }): Promise<{ order: Order; payment: PaymentRecord }> {
   const order = getOrder(input.orderId);
   if (!order) throw new PaymentError("Order not found", 404);
 
+  const mode = input.paymentMode ?? "full";
+  const settings = readPaymentsDb().settings;
+  const count = Math.max(1, input.installmentCount ?? settings.defaultInstallmentCount);
+
+  let planId: string | null = null;
+  let firstScheduleId: string | null = null;
+  let amountToCharge = order.totalAmount;
+
+  const existingPlanId = order.metadata.installmentPlanId
+    ? String(order.metadata.installmentPlanId)
+    : null;
+  if (existingPlanId && getInstallmentPlan(existingPlanId)) {
+    planId = existingPlanId;
+    const schedule = listScheduleForPlan(existingPlanId);
+    firstScheduleId =
+      schedule.find((s) => s.status === "due" || s.status === "upcoming" || s.status === "overdue")
+        ?.id ??
+      schedule[0]?.id ??
+      null;
+    amountToCharge =
+      mode === "installments"
+        ? (schedule.find((s) => s.id === firstScheduleId)?.amount ?? order.totalAmount)
+        : order.totalAmount;
+  } else {
+    const plan = await createInstallmentPlanForOrder({
+      order,
+      user: input.user,
+      mode,
+      installmentCount:
+        mode === "installments" ? count : mode === "tamara" || mode === "tabby" ? 4 : 1,
+      agreementAccepted: mode === "full" ? true : Boolean(input.agreementAccepted),
+      passportDocumentId: mode === "full" ? null : (input.passportDocumentId ?? null),
+      actorId: input.user.id,
+    });
+    planId = plan.id;
+    const schedule = listScheduleForPlan(plan.id);
+    firstScheduleId = schedule[0]?.id ?? null;
+    amountToCharge =
+      mode === "installments" ? (schedule[0]?.amount ?? order.totalAmount) : order.totalAmount;
+  }
+
   const gateway = getPaymentGateway();
   const charge = await gateway.createPayment({
     orderId: order.id,
-    amount: order.totalAmount,
+    amount: amountToCharge,
     currency: order.currency,
     customerEmail: order.billingEmail,
     customerName: order.billingName,
-    methodBrand: input.methodBrand,
+    methodBrand: mode === "tamara" ? "tamara" : mode === "tabby" ? "tabby" : input.methodBrand,
     paymentToken: input.paymentToken,
     idempotencyKey: order.idempotencyKey,
     simulateFailure: input.simulateFailure,
@@ -276,14 +431,19 @@ async function finalizeSuccessfulPayment(input: {
     status: charge.status,
     methodBrand: charge.methodBrand,
     paymentMethodSummary: charge.paymentMethodSummary,
-    amount: order.totalAmount,
+    amount: amountToCharge,
     currency: order.currency,
     clientSecret: charge.clientSecret,
     checkoutUrl: charge.checkoutUrl,
-    webhookVerified: charge.provider === "mock",
+    webhookVerified:
+      charge.provider === "mock" || charge.provider === "tamara" || charge.provider === "tabby",
     failureCode: charge.failureCode,
     failureMessage: charge.failureMessage,
-    rawProviderPayload: charge.rawProviderPayload,
+    rawProviderPayload: {
+      ...charge.rawProviderPayload,
+      paymentMode: mode,
+      installmentPlanId: planId,
+    },
     createdAt: stamp,
     updatedAt: stamp,
   };
@@ -294,14 +454,26 @@ async function finalizeSuccessfulPayment(input: {
     if (!o) return;
     o.paymentId = payment.id;
     o.updatedAt = stamp;
+    o.metadata = {
+      ...o.metadata,
+      paymentMode: mode,
+      installmentPlanId: planId,
+    };
     if (charge.status === "failed") {
       o.status = "failed";
       o.failureReason = charge.failureMessage;
     } else if (charge.status === "succeeded" || order.totalAmount === 0) {
-      o.status = "paid";
-      o.paidAt = stamp;
-      o.failureReason = null;
-      if (o.couponId) {
+      if (mode === "installments") {
+        o.status = "pending";
+        o.paidAt = null;
+        o.failureReason = null;
+        o.metadata = { ...o.metadata, firstInstallmentPaidAt: stamp };
+      } else {
+        o.status = "paid";
+        o.paidAt = stamp;
+        o.failureReason = null;
+      }
+      if (o.couponId && mode !== "installments") {
         const coupon = db.coupons.find((c) => c.id === o.couponId);
         if (coupon) {
           coupon.usedCount += 1;
@@ -327,10 +499,10 @@ async function finalizeSuccessfulPayment(input: {
       actorId: input.user.id,
       studentId: order.studentId,
       instructorId: order.items[0]?.instructorId ?? null,
-      amount: order.totalAmount,
+      amount: amountToCharge,
       currency: order.currency,
       description: `Payment ${charge.status} for ${order.orderNumber}`,
-      metadata: { provider: charge.provider, method: charge.methodBrand },
+      metadata: { provider: charge.provider, method: charge.methodBrand, mode },
       createdAt: stamp,
     });
   });
@@ -338,7 +510,7 @@ async function finalizeSuccessfulPayment(input: {
   let updated = getOrder(order.id)!;
   const savedPayment = getPayment(payment.id)!;
 
-  if (updated.status === "failed") {
+  if (charge.status === "failed") {
     await notifyPayment(updated.studentId, {
       title: "Payment failed",
       body: updated.failureReason ?? "Your payment could not be processed.",
@@ -354,8 +526,39 @@ async function finalizeSuccessfulPayment(input: {
     return { order: updated, payment: savedPayment };
   }
 
-  if (updated.status === "paid") {
-    await completePaidOrder(updated, savedPayment, input.user.id);
+  if (charge.status === "succeeded" || order.totalAmount === 0) {
+    if (planId && firstScheduleId) {
+      if (mode === "tamara" || mode === "tabby" || mode === "full") {
+        for (const item of listScheduleForPlan(planId)) {
+          await markInstallmentPaid({
+            planId,
+            scheduleItemId: item.id,
+            paymentId: payment.id,
+            actorId: input.user.id,
+          });
+        }
+      } else {
+        await markInstallmentPaid({
+          planId,
+          scheduleItemId: firstScheduleId,
+          paymentId: payment.id,
+          actorId: input.user.id,
+        });
+      }
+    }
+
+    if (updated.status === "paid") {
+      await completePaidOrder(updated, savedPayment, input.user.id);
+    } else if (mode === "installments" && planId) {
+      const unlocked = getInstallmentPlan(planId);
+      if (unlocked) await grantPackageAccess(unlocked, input.user.id);
+      await notifyPayment(updated.studentId, {
+        title: "First installment received",
+        body: `${updated.orderNumber} — access unlocked. Remaining installments stay on your billing schedule.`,
+        type: "payment.installment",
+        data: { orderId: updated.id, planId },
+      });
+    }
     updated = getOrder(order.id)!;
   }
 
@@ -397,6 +600,12 @@ async function completePaidOrder(order: Order, payment: PaymentRecord, actorId: 
     if (o) o.invoiceId = invoice.id;
   });
 
+  const planId = order.metadata.installmentPlanId ? String(order.metadata.installmentPlanId) : null;
+  if (planId) {
+    const plan = getInstallmentPlan(planId);
+    if (plan) await grantPackageAccess(plan, actorId);
+  }
+
   await notifyPayment(order.studentId, {
     title: "Payment successful",
     body: `${order.orderNumber} paid — ${formatMinor(order.totalAmount, order.currency)}.`,
@@ -413,11 +622,7 @@ async function completePaidOrder(order: Order, payment: PaymentRecord, actorId: 
   });
 }
 
-function createSubscriptionFromItem(
-  order: Order,
-  model: PricingModel,
-  item: OrderItem,
-) {
+function createSubscriptionFromItem(order: Order, model: PricingModel, item: OrderItem) {
   const stamp = nowIso();
   const days = model === "subscription_annual" ? 365 : 30;
   const sub: Subscription = {
@@ -496,10 +701,7 @@ export function cancelOrder(user: UserProfile, orderId: string): Order {
   return getOrder(orderId)!;
 }
 
-export async function handleProviderWebhook(input: {
-  payload: string;
-  signature: string | null;
-}) {
+export async function handleProviderWebhook(input: { payload: string; signature: string | null }) {
   const gateway = getPaymentGateway();
   const result = await gateway.confirmWebhook(input.payload, input.signature);
   const payment = readPaymentsDb().payments.find(

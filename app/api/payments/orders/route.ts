@@ -96,6 +96,11 @@ export async function POST(request: Request) {
       methodBrand?: PaymentMethodBrand;
       paymentToken?: string;
       simulateFailure?: boolean;
+      paymentMode?: "full" | "installments" | "tamara" | "tabby";
+      installmentCount?: number;
+      agreementAccepted?: boolean;
+      passportDocumentId?: string | null;
+      scheduleItemId?: string;
     } | null;
 
     if (body?.action === "checkout") {
@@ -104,7 +109,7 @@ export async function POST(request: Request) {
         productId: body.productId ?? "",
         billingName: body.billingName ?? user.fullName ?? user.email,
         billingEmail: body.billingEmail ?? user.email,
-        billingCountry: body.billingCountry,
+        billingCountry: body.billingCountry ?? user.countryCode ?? undefined,
         billingAddress: body.billingAddress,
         couponCode: body.couponCode,
         idempotencyKey: body.idempotencyKey,
@@ -119,6 +124,11 @@ export async function POST(request: Request) {
         methodBrand: body.methodBrand ?? "visa",
         paymentToken: body.paymentToken,
         simulateFailure: body.simulateFailure,
+        paymentMode: body.paymentMode,
+        installmentCount: body.installmentCount,
+        agreementAccepted: body.agreementAccepted,
+        passportDocumentId: body.passportDocumentId,
+        scheduleItemId: body.scheduleItemId,
       });
       return NextResponse.json({ success: true, data: result, error: null });
     }

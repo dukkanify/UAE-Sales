@@ -61,13 +61,17 @@ export async function enrollStudent(input: {
   actorId: string | null;
   ipAddress?: string | null;
   userAgent?: string | null;
+  /** Paid / admin package enrollment — ignore public enrollment window. */
+  bypassEnrollmentGate?: boolean;
 }): Promise<EnrollmentWithStudent> {
   ensureCoursesSeeded();
   const course = getCourseById(input.courseId);
   if (!course) throw new CourseValidationError("Course not found");
-  const enrollmentGate = canAcceptEnrollment(course);
-  if (!enrollmentGate.ok) {
-    throw new CourseValidationError(enrollmentGate.reason);
+  if (!input.bypassEnrollmentGate) {
+    const enrollmentGate = canAcceptEnrollment(course);
+    if (!enrollmentGate.ok) {
+      throw new CourseValidationError(enrollmentGate.reason);
+    }
   }
   assertStudent(input.studentId);
 

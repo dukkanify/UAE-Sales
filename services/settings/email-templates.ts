@@ -134,3 +134,28 @@ export function classReminderEmailTemplate(input: {
       <p>Open AviatorPass to join your live Zoom session when it is time.</p>`,
   });
 }
+
+export function installmentReminderEmailTemplate(input: {
+  productName: string;
+  amountLabel: string;
+  dueLabel: string;
+  kind: "due_soon" | "due_today" | "overdue";
+  sequence: number;
+  totalCount: number;
+}) {
+  const title =
+    input.kind === "overdue"
+      ? "Installment overdue"
+      : input.kind === "due_today"
+        ? "Installment due today"
+        : "Upcoming installment reminder";
+  return renderBrandedEmail({
+    title,
+    preheader: `${input.productName} · ${input.amountLabel}`,
+    bodyHtml: `<p><strong>${title}</strong></p>
+      <p>${input.productName}</p>
+      <p>Installment ${input.sequence} of ${input.totalCount}: <strong>${input.amountLabel}</strong></p>
+      <p>Due date: ${input.dueLabel}</p>
+      <p>Pay from your AviatorPass billing center to keep course access active.</p>`,
+  });
+}
