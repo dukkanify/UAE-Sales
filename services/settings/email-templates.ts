@@ -54,12 +54,12 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>${payload.title}</title>
 </head>
-<body style="margin:0;padding:0;background:#F3F4F6;font-family:'DM Sans',Arial,sans-serif;color:${primary};">
+<body style="margin:0;padding:0;background:#F3F6F9;font-family:'IBM Plex Sans',Arial,sans-serif;color:${primary};">
   <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${payload.preheader ?? ""}</div>
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F4F6;padding:32px 16px;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F6F9;padding:32px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E5E7EB;">
+        <table role="presentation" width="560" cellspacing="0" cellpadding="0" style="background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #D8E0E8;">
           <tr>
             <td style="background:${primary};padding:24px 32px;">
               <img src="${logo}" alt="${general.platformName}" height="40" style="display:block;height:40px;width:auto;" />
@@ -67,13 +67,14 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
           </tr>
           <tr>
             <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-family:Outfit,Arial,sans-serif;font-size:22px;color:${primary};">${payload.title}</h1>
-              <div style="font-size:15px;line-height:1.6;color:#334155;">${payload.bodyHtml}</div>
+              <h1 style="margin:0 0 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:22px;color:${primary};">${payload.title}</h1>
+              <div style="font-size:15px;line-height:1.6;color:#0B1A24;">${payload.bodyHtml}</div>
             </td>
           </tr>
           <tr>
-            <td style="padding:20px 32px;background:#0B1F3A;color:#E2E8F0;font-size:12px;line-height:1.6;">
+            <td style="padding:20px 32px;background:#0B1A24;color:#E2E8F0;font-size:12px;line-height:1.6;">
               <strong style="color:#fff;">${general.companyName}</strong><br/>
+              YOUR AVIATION JOURNEY STARTS HERE<br/>
               ${general.footerText}<br/>
               ${locations}<br/>
               <a href="mailto:${general.supportEmail}" style="color:${accent};">${general.supportEmail}</a>
@@ -105,7 +106,7 @@ export function otpEmailTemplate(code: string, purpose: string) {
     title: "Your verification code",
     preheader: `Your AviatorPass code is ${code}`,
     bodyHtml: `<p>Use this one-time code to ${purpose}:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#0B1F3A;">${code}</p>
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#2E7DAA;">${code}</p>
       <p>This code expires shortly. If you did not request it, you can ignore this email.</p>`,
   });
 }

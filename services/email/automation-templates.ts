@@ -154,7 +154,7 @@ export function renderAutomationTemplate(
           ${amount ? `<p>Amount: <strong>${amount}</strong></p>` : ""}
           ${reference ? `<p>Order: ${reference}</p>` : ""}
           <p>${detail}</p>
-          <p>Thank you for training with Eager Pilots.</p>`,
+          <p>Thank you for training with AviatorPass.</p>`,
       };
       break;
     case "admin_alert":

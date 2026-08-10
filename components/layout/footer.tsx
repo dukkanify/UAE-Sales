@@ -4,6 +4,7 @@ import Link from "@/components/ui/app-link";
 import { ArrowUpRight, Instagram, Mail } from "lucide-react";
 
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { brandingConfig } from "@/config/branding";
 import { siteStatic } from "@/config/site-static";
 import { routes } from "@/constants/routes";
 
@@ -31,7 +32,7 @@ function Footer() {
           <div className="site-footer-brand">
             <BrandLogo variant="dark" href={routes.home} />
             <p className="site-footer-tagline">
-              ATPL theory, live Zoom coaching, and exam mastery — training lanes in{" "}
+              {brandingConfig.tagline}. ATPL theory, live Zoom coaching, and exam mastery —{" "}
               {siteStatic.locations.join(" · ")}.
             </p>
             <Link href={routes.book} className="site-footer-cta">

@@ -1,6 +1,7 @@
 /**
- * Centralized branding configuration — official AviatorPass guidelines.
- * Uses site-static (no Zod) so client layouts stay resilient under HMR.
+ * Centralized branding configuration — official AviatorPass brand guidelines.
+ * Palette: Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
+ * Typography: Stimulatio Flat (display, Space Grotesk web substitute) + IBM Plex Sans
  */
 
 import { siteStatic } from "@/config/site-static";
@@ -9,7 +10,8 @@ import { theme } from "@/config/theme";
 export const brandingConfig = {
   platformName: siteStatic.name,
   companyName: siteStatic.legalName,
-  tagline: "Aviation course platform · 2030",
+  tagline: "YOUR AVIATION JOURNEY STARTS HERE",
+  secondaryTagline: "UNLOCK YOUR PILOT LICENSE",
   language: siteStatic.language,
   englishOnly: siteStatic.englishOnly,
   contactEmail: siteStatic.contactEmail,
@@ -20,6 +22,7 @@ export const brandingConfig = {
   assets: {
     logo: siteStatic.brand.logo,
     logoDark: siteStatic.brand.logoDark,
+    logoStacked: siteStatic.brand.logoStacked,
     icon: siteStatic.brand.icon,
     favicon: siteStatic.brand.favicon,
     openGraph: siteStatic.brand.openGraph,
@@ -27,14 +30,18 @@ export const brandingConfig = {
     guidelinesPdf: "/brand/source/AVIATORPASS_Brand_Guidelines.pdf",
   },
   colors: {
+    /** Aero Blue — primary */
     primary: theme.colors.primary.DEFAULT,
+    /** Altitude Orange / Success Amber — accent */
     accent: theme.colors.accent.DEFAULT,
+    /** Academic Grey — secondary / muted */
     academic: theme.colors.academic.DEFAULT,
     ink: "#0B1A24",
   },
   typography: {
-    /** Official: Stimulatio Flat — web substitute Space Grotesk */
+    /** Official: Stimulatio Flat — Space Grotesk until licensed files land in public/fonts/ */
     display: "Space Grotesk",
+    displayOfficial: "Stimulatio Flat",
     /** Official secondary */
     body: "IBM Plex Sans",
   },

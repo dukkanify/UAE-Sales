@@ -1,7 +1,6 @@
 /**
- * AviatorPass Design System — tokens & documentation constants.
- * Update colors/typography here when official brand guidelines arrive.
- * No business logic.
+ * AviatorPass Design System — official brand guidelines tokens.
+ * Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
  */
 
 export const breakpoints = {
@@ -15,7 +14,7 @@ export const breakpoints = {
 export const typographyScale = {
   display: {
     className: "font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl",
-    label: "Display",
+    label: "Display (Stimulatio Flat / Space Grotesk)",
   },
   h1: {
     className: "font-display text-3xl font-semibold tracking-tight sm:text-4xl",
@@ -35,7 +34,7 @@ export const typographyScale = {
   },
   body: {
     className: "font-sans text-base leading-relaxed",
-    label: "Body",
+    label: "Body (IBM Plex Sans)",
   },
   caption: {
     className: "font-sans text-xs text-muted-foreground",
@@ -52,13 +51,13 @@ export const typographyScale = {
 } as const;
 
 export const colorRoles = {
-  primary: { name: "Deep Aviation Blue", value: "#0B1F3A" },
-  secondary: { name: "White", value: "#FFFFFF" },
-  accent: { name: "Sky Blue", value: "#38BDF8" },
+  primary: { name: "Aero Blue", value: "#2E7DAA" },
+  secondary: { name: "Academic Grey", value: "#7C7B80" },
+  accent: { name: "Altitude Orange", value: "#DD9B30" },
   success: { name: "Green", value: "#16A34A" },
-  warning: { name: "Orange", value: "#EA580C" },
+  warning: { name: "Altitude Orange", value: "#DD9B30" },
   danger: { name: "Red", value: "#DC2626" },
-  background: { name: "Light Gray", value: "#F3F4F6" },
+  background: { name: "Sky Mist", value: "#F3F6F9" },
   card: { name: "White", value: "#FFFFFF" },
 } as const;
 

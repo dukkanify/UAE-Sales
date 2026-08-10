@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 96" fill="none" role="img" aria-label="AviatorPass">
-  <!-- Official horizontal lockup — Aero Blue / Altitude Orange / Academic Grey -->
-  <g transform="translate(4,16)">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 200" fill="none" role="img" aria-label="AviatorPass">
+  <!-- Official stacked lockup for narrow / mobile spaces -->
+  <g transform="translate(48,12) scale(1.05)">
     <path d="M8 48C18 40 34 28 52 18C40 30 28 42 18 52L8 48Z" fill="#2E7DAA"/>
     <path d="M10 36C24 26 42 14 62 6C48 20 34 34 22 44L10 36Z" fill="#2E7DAA"/>
     <path d="M12 24C28 14 48 4 70 0C54 12 38 26 24 36L12 24Z" fill="#2E7DAA"/>
@@ -9,8 +9,8 @@
     <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#7C7B80" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M72 44V52" stroke="#7C7B80" stroke-width="3" stroke-linecap="round"/>
   </g>
-  <text x="128" y="44" font-family="Space Grotesk, Arial Black, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="0.02em">
-    <tspan fill="#2E7DAA">AVIATOR</tspan><tspan dx="8" fill="#DD9B30">PASS</tspan>
+  <text x="110" y="120" text-anchor="middle" font-family="Space Grotesk, Arial Black, Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="0.04em">
+    <tspan fill="#2E7DAA">AVIATOR</tspan><tspan dx="6" fill="#DD9B30">PASS</tspan>
   </text>
-  <text x="128" y="68" font-family="IBM Plex Sans, Arial, sans-serif" font-size="8.5" font-weight="500" fill="#7C7B80" letter-spacing="0.16em">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="110" y="148" text-anchor="middle" font-family="IBM Plex Sans, Arial, sans-serif" font-size="8" font-weight="500" fill="#7C7B80" letter-spacing="0.14em">UNLOCK YOUR PILOT LICENSE</text>
 </svg>
