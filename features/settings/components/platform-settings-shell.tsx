@@ -1212,6 +1212,125 @@ function PlatformSettingsShell() {
               setDraft({ ...draft, security: { ...draft.security, twoFactorAuthEnabled: v } })
             }
           />
+          <div className="mt-6 space-y-3 rounded-lg border border-border p-4">
+            <div>
+              <p className="text-sm font-semibold">Account protection & DRM (CR002)</p>
+              <p className="text-xs text-muted-foreground">
+                Applies to recorded course playback and student session sharing controls.
+              </p>
+            </div>
+            <ToggleRow
+              label="Single-device login"
+              description="Limit active sessions so accounts cannot stay open on two devices."
+              checked={draft.security.singleDeviceLogin}
+              onCheckedChange={(v) =>
+                setDraft({ ...draft, security: { ...draft.security, singleDeviceLogin: v } })
+              }
+            />
+            <ToggleRow
+              label="Prevent account sharing"
+              description="New sign-ins revoke older sessions for the same account."
+              checked={draft.security.preventAccountSharing}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, preventAccountSharing: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Device fingerprinting"
+              description="Store a browser fingerprint with each session."
+              checked={draft.security.deviceFingerprintingEnabled}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, deviceFingerprintingEnabled: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Student-only device lock"
+              description="Apply single-device / sharing rules to students only."
+              checked={draft.security.studentOnlyDeviceLock}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, studentOnlyDeviceLock: v },
+                })
+              }
+            />
+            <Field label="Max concurrent sessions (1 = single device, 0 = unlimited)">
+              <Input
+                type="number"
+                min={0}
+                max={10}
+                value={draft.security.maxConcurrentSessions}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    security: {
+                      ...draft.security,
+                      maxConcurrentSessions: Math.max(0, Number(e.target.value) || 0),
+                    },
+                  })
+                }
+              />
+            </Field>
+            <ToggleRow
+              label="Student name watermark"
+              description="Overlay the learner identity on recorded lesson content."
+              checked={draft.security.contentWatermarkEnabled}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, contentWatermarkEnabled: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Disable right-click on lessons"
+              checked={draft.security.disableRightClickOnLearning}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, disableRightClickOnLearning: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Block screenshot / save shortcuts"
+              checked={draft.security.blockScreenshotShortcuts}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, blockScreenshotShortcuts: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Deter screen recording"
+              description="Pause and obscure the player when the tab is hidden."
+              checked={draft.security.deterScreenRecording}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, deterScreenRecording: v },
+                })
+              }
+            />
+            <ToggleRow
+              label="Video download protection"
+              description="Disable download / PiP / remote playback on HTML5 lesson video."
+              checked={draft.security.videoDownloadProtection}
+              onCheckedChange={(v) =>
+                setDraft({
+                  ...draft,
+                  security: { ...draft.security, videoDownloadProtection: v },
+                })
+              }
+            />
+          </div>
         </TabsContent>
 
         <TabsContent value="storage" className="mt-6">

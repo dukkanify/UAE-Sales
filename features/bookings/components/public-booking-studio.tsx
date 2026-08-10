@@ -11,6 +11,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ensureBrowserCsrf, getCsrfToken } from "@/lib/security/browser-csrf";
 import {
+  collectDeviceFingerprint,
+  describeDeviceFromUserAgent,
+} from "@/lib/security/device-fingerprint";
+import {
   formatSlotDateTime,
   formatSlotTime,
   maxBookableDate,
@@ -208,12 +212,17 @@ function PublicBookingStudio() {
 
   async function verifyAndFinish() {
     setSubmitting(true);
+    const deviceFingerprint = await collectDeviceFingerprint();
+    const deviceLabel =
+      typeof navigator !== "undefined" ? describeDeviceFromUserAgent(navigator.userAgent) : null;
     const res = await publicFetch<{ redirectTo: string }>("/api/auth/otp/verify", {
       method: "POST",
       body: JSON.stringify({
         email,
         token: otp,
         purpose: "booking",
+        deviceFingerprint,
+        deviceLabel,
       }),
     });
     setSubmitting(false);

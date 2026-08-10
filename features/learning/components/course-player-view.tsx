@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "@/components/ui/app-link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import {
   Bookmark,
   CheckCircle2,
@@ -22,13 +23,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { learningFetch, learningJson } from "@/features/learning/lib/api";
+import { ContentProtectionShell } from "@/features/learning/components/content-protection";
 import type { Lesson, LessonResource } from "@/types/courses";
 import type { CourseLearningState, LessonProgressRecord, StudentNote } from "@/types/learning";
+import type { ContentProtectionConfig } from "@/types";
 
 type PlayerPayload = {
   course: {
     id: string;
     title: string;
+    deliveryType?: "recorded" | "live";
     modules: Array<{
       id: string;
       title: string;
@@ -53,6 +57,7 @@ type PlayerPayload = {
     prev: { id: string; title: string; moduleId: string } | null;
     next: { id: string; title: string; moduleId: string } | null;
   };
+  protection: ContentProtectionConfig;
 };
 
 interface CoursePlayerViewProps {
@@ -173,6 +178,14 @@ function CoursePlayerView({ courseId, lessonId }: CoursePlayerViewProps) {
   }
 
   const pct = Math.round(data.learning.progressPercent);
+  const protection = data.protection ?? {
+    watermarkEnabled: false,
+    watermarkText: "",
+    disableRightClick: false,
+    blockScreenshotShortcuts: false,
+    deterScreenRecording: false,
+    videoDownloadProtection: false,
+  };
 
   return (
     <div className="space-y-4">
@@ -187,6 +200,7 @@ function CoursePlayerView({ courseId, lessonId }: CoursePlayerViewProps) {
           <p className="mt-1 text-sm text-muted-foreground">
             ~{data.lesson.estimatedStudyMinutes || data.lesson.durationMinutes || 15} min ·{" "}
             {data.module.title}
+            {data.course.deliveryType === "recorded" ? " · Protected recorded lesson" : ""}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -197,9 +211,11 @@ function CoursePlayerView({ courseId, lessonId }: CoursePlayerViewProps) {
             <Bookmark className="size-4" />
             Bookmark
           </Button>
-          <Button variant="outline" size="sm" onClick={() => void cacheOffline()}>
-            Offline ready
-          </Button>
+          {!protection.videoDownloadProtection ? (
+            <Button variant="outline" size="sm" onClick={() => void cacheOffline()}>
+              Offline ready
+            </Button>
+          ) : null}
           <Button
             size="sm"
             variant={data.progress?.completed ? "success" : "default"}
@@ -256,40 +272,60 @@ function CoursePlayerView({ courseId, lessonId }: CoursePlayerViewProps) {
         </aside>
 
         <section className="min-w-0 space-y-4">
-          {data.lesson.videoUrl ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-black">
-              <video
-                ref={videoRef}
-                className="aspect-video w-full"
-                controls
-                preload="metadata"
-                poster={undefined}
-                src={data.lesson.videoUrl}
-                onLoadedMetadata={(e) => {
-                  const start = data.progress?.resumePosition ?? 0;
-                  if (start > 5) e.currentTarget.currentTime = start;
-                }}
-              />
-            </div>
-          ) : (
-            <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
-              No video for this lesson — study the content below.
-            </div>
-          )}
-
-          {data.lesson.contentHtml ? (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Lesson content</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div
-                  className="prose prose-sm max-w-none dark:prose-invert"
-                  dangerouslySetInnerHTML={{ __html: data.lesson.contentHtml }}
+          <ContentProtectionShell protection={protection}>
+            {data.lesson.videoUrl ? (
+              <div className="overflow-hidden rounded-2xl border border-border bg-black">
+                <video
+                  ref={videoRef}
+                  className="aspect-video w-full"
+                  controls
+                  controlsList={
+                    protection.videoDownloadProtection
+                      ? "nodownload noplaybackrate noremoteplayback"
+                      : undefined
+                  }
+                  disablePictureInPicture={protection.videoDownloadProtection}
+                  disableRemotePlayback={protection.videoDownloadProtection}
+                  onContextMenu={
+                    protection.disableRightClick ? (e) => e.preventDefault() : undefined
+                  }
+                  preload="metadata"
+                  poster={undefined}
+                  src={data.lesson.videoUrl}
+                  onLoadedMetadata={(e) => {
+                    const start = data.progress?.resumePosition ?? 0;
+                    if (start > 5) e.currentTarget.currentTime = start;
+                  }}
                 />
-              </CardContent>
-            </Card>
-          ) : null}
+              </div>
+            ) : (
+              <div className="flex aspect-video items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
+                No video for this lesson — study the content below.
+              </div>
+            )}
+
+            {data.lesson.contentHtml ? (
+              <Card className="mt-4">
+                <CardHeader>
+                  <CardTitle className="text-base">Lesson content</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div
+                    className="prose prose-sm max-w-none dark:prose-invert"
+                    dangerouslySetInnerHTML={{ __html: data.lesson.contentHtml }}
+                    onCopy={
+                      protection.disableRightClick
+                        ? (e) => {
+                            e.preventDefault();
+                            toast.message("Copying lesson content is restricted.");
+                          }
+                        : undefined
+                    }
+                  />
+                </CardContent>
+              </Card>
+            ) : null}
+          </ContentProtectionShell>
 
           {data.lesson.resources?.length ? (
             <Card>

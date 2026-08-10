@@ -85,13 +85,22 @@ function ensureStore(): AuthDatabase {
     ...readJsonFile<Partial<AuthDatabase>>(DATA_FILE, emptyDb),
   } as AuthDatabase;
   parsed.users = (parsed.users ?? []).map(normalizeStoredUser);
-  parsed.sessions = parsed.sessions ?? [];
+  parsed.sessions = (parsed.sessions ?? []).map(normalizeSession);
   parsed.otps = parsed.otps ?? [];
   parsed.notifications = parsed.notifications ?? [];
   parsed.activityLogs = parsed.activityLogs ?? [];
   parsed.auditLogs = parsed.auditLogs ?? [];
   parsed.seeded = Boolean(parsed.seeded);
   return parsed;
+}
+
+/** Backfill fields added after early auth JSON snapshots. */
+function normalizeSession(session: SessionRecord): SessionRecord {
+  return {
+    ...session,
+    deviceFingerprint: session.deviceFingerprint ?? null,
+    deviceLabel: session.deviceLabel ?? null,
+  };
 }
 
 /** Backfill fields added after early auth JSON snapshots. */
