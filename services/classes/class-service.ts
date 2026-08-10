@@ -133,17 +133,14 @@ export function listLiveClasses(filters: ClassFilters = {}): {
   if (filters.q) {
     const q = filters.q.toLowerCase();
     rows = rows.filter(
-      (c) =>
-        c.title.toLowerCase().includes(q) ||
-        c.description.toLowerCase().includes(q),
+      (c) => c.title.toLowerCase().includes(q) || c.description.toLowerCase().includes(q),
     );
   }
   if (filters.courseId) rows = rows.filter((c) => c.courseId === filters.courseId);
   if (filters.instructorId) {
     rows = rows.filter(
       (c) =>
-        c.instructorId === filters.instructorId ||
-        c.assistantInstructorId === filters.instructorId,
+        c.instructorId === filters.instructorId || c.assistantInstructorId === filters.instructorId,
     );
   }
   if (filters.from) {
@@ -191,11 +188,8 @@ export function getClassStats(instructorId?: string): ClassStats {
 
   const attendance = readClassesDb().attendance;
   const marked = attendance.filter((a) => a.status !== "unknown");
-  const presentish = attendance.filter((a) =>
-    ["present", "late"].includes(a.status),
-  ).length;
-  const attendanceRate =
-    marked.length === 0 ? 0 : Math.round((presentish / marked.length) * 100);
+  const presentish = attendance.filter((a) => ["present", "late"].includes(a.status)).length;
+  const attendanceRate = marked.length === 0 ? 0 : Math.round((presentish / marked.length) * 100);
 
   return {
     today: items.filter((c) => {
@@ -204,25 +198,18 @@ export function getClassStats(instructorId?: string): ClassStats {
     }).length,
     upcoming: items.filter((c) => c.computedStatus === "upcoming").length,
     liveNow: items.filter((c) => c.computedStatus === "live_now").length,
-    completed: items.filter(
-      (c) => c.status === "completed" || c.computedStatus === "completed",
-    ).length,
+    completed: items.filter((c) => c.status === "completed" || c.computedStatus === "completed")
+      .length,
     cancelled: items.filter((c) => c.status === "cancelled").length,
     attendanceRate,
-    recentlyUpdated: [...items]
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-      .slice(0, 5),
+    recentlyUpdated: [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 5),
   };
 }
 
 function assertInstructorUser(userId: string) {
   const u = readAuthDb().users.find((x) => x.id === userId);
   if (!u) throw new ClassValidationError("Instructor not found");
-  if (
-    u.role !== ROLES.INSTRUCTOR &&
-    u.role !== ROLES.ADMIN &&
-    u.role !== ROLES.SUPER_ADMIN
-  ) {
+  if (u.role !== ROLES.INSTRUCTOR && u.role !== ROLES.ADMIN && u.role !== ROLES.SUPER_ADMIN) {
     throw new ClassValidationError("Assigned instructor must be an instructor or admin");
   }
 }
@@ -397,11 +384,7 @@ export async function createLiveClass(
         .filter((e) => e.status === "approved")
         .forEach((e) => participantIds.add(e.studentId));
     }
-    addParticipants(
-      cls.id,
-      [instructorId],
-      "host",
-    );
+    addParticipants(cls.id, [instructorId], "host");
     if (input.assistantInstructorId) {
       addParticipants(cls.id, [input.assistantInstructorId], "cohost");
     }
@@ -485,15 +468,10 @@ export async function updateLiveClass(input: {
     ...existing,
     title: input.patch.title !== undefined ? assertTitle(input.patch.title) : existing.title,
     description:
-      input.patch.description !== undefined
-        ? input.patch.description.trim()
-        : existing.description,
-    courseId:
-      input.patch.courseId !== undefined ? input.patch.courseId : existing.courseId,
-    moduleId:
-      input.patch.moduleId !== undefined ? input.patch.moduleId : existing.moduleId,
-    lessonId:
-      input.patch.lessonId !== undefined ? input.patch.lessonId : existing.lessonId,
+      input.patch.description !== undefined ? input.patch.description.trim() : existing.description,
+    courseId: input.patch.courseId !== undefined ? input.patch.courseId : existing.courseId,
+    moduleId: input.patch.moduleId !== undefined ? input.patch.moduleId : existing.moduleId,
+    lessonId: input.patch.lessonId !== undefined ? input.patch.lessonId : existing.lessonId,
     instructorId,
     assistantInstructorId:
       input.patch.assistantInstructorId !== undefined
@@ -803,7 +781,13 @@ export function getJoinInfoForUser(liveClassId: string, userId: string) {
 }
 
 export function canManageClass(userId: string, role: string, liveClassId: string): boolean {
-  if (role === ROLES.SUPER_ADMIN || role === ROLES.ADMIN) return true;
+  if (
+    role === ROLES.SUPER_ADMIN ||
+    role === ROLES.ADMIN ||
+    role === ROLES.CHIEF_GROUND_INSTRUCTOR
+  ) {
+    return true;
+  }
   const cls = getLiveClass(liveClassId);
   if (!cls) return false;
   if (role === ROLES.INSTRUCTOR) {

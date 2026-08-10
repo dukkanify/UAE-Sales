@@ -27,6 +27,7 @@ export function ensureDemoUsersSeeded(): void {
   if (db.users.length <= 1) {
     seedFreshDemoUsers();
   }
+  ensureCgiDemoUser();
   backfillDemoStudentDetails();
 }
 
@@ -115,6 +116,20 @@ function seedFreshDemoUsers(): void {
       status: ACCOUNT_STATUS.ACTIVE,
       profileComplete: true,
       emailVerified: true,
+    },
+    {
+      email: "cgi@eagerpilots.com",
+      role: ROLES.CHIEF_GROUND_INSTRUCTOR,
+      firstName: "Nadia",
+      lastName: "Al Fahad",
+      status: ACCOUNT_STATUS.ACTIVE,
+      profileComplete: true,
+      emailVerified: true,
+      countryCode: "KW",
+      phone: "+96550011122",
+      nationality: "Kuwaiti",
+      city: "Kuwait City",
+      bio: "Chief Ground Instructor for the ATPL theory journey.",
     },
     {
       email: "instructor.one@eagerpilots.com",
@@ -254,5 +269,41 @@ function seedFreshDemoUsers(): void {
         updatedAt: now,
       });
     }
+  });
+}
+
+/** Backfill CGI demo account on existing databases. */
+function ensureCgiDemoUser(): void {
+  const email = "cgi@eagerpilots.com";
+  writeAuthDb((d) => {
+    if (d.users.some((u) => u.email === email)) return;
+    const now = new Date().toISOString();
+    d.users.push({
+      id: generateId(),
+      email,
+      firstName: "Nadia",
+      lastName: "Al Fahad",
+      phone: "+96550011122",
+      countryCode: "KW",
+      nationality: "Kuwaiti",
+      dateOfBirth: null,
+      gender: null,
+      city: "Kuwait City",
+      bio: "Chief Ground Instructor for the ATPL theory journey.",
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+      avatarUrl: null,
+      timezone: "UTC",
+      language: "en",
+      role: ROLES.CHIEF_GROUND_INSTRUCTOR,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      profileComplete: true,
+      passwordHash: null,
+      passwordSalt: null,
+      lastLoginAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
   });
 }
