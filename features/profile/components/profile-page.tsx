@@ -19,6 +19,7 @@ import {
   StudentAccountFields,
   type StudentAccountFieldValues,
 } from "@/features/profile/components/student-account-fields";
+import { SessionManagementCard } from "@/features/profile/components/session-management-card";
 import type { UserProfile } from "@/types";
 
 interface ProfilePageViewProps {
@@ -137,6 +138,8 @@ function ProfilePageView({ roleLabel }: ProfilePageViewProps) {
           </div>
         </CardHeader>
       </Card>
+
+      <SessionManagementCard />
 
       <Card>
         <CardHeader>

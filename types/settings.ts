@@ -129,6 +129,26 @@ export interface SecuritySettings {
   maxUploadSizeMb: number;
   twoFactorAuthEnabled: boolean;
   twoFactorAuthReady: boolean;
+  /** CR002 — Account protection & DRM for recorded courses */
+  singleDeviceLogin: boolean;
+  /** When true, new login revokes other active sessions (anti account-sharing) */
+  preventAccountSharing: boolean;
+  /** Collect and store device fingerprints on login */
+  deviceFingerprintingEnabled: boolean;
+  /** Max concurrent sessions per user (1 = single device). 0 = unlimited */
+  maxConcurrentSessions: number;
+  /** Apply single-device / sharing rules to students only (recommended) */
+  studentOnlyDeviceLock: boolean;
+  /** Overlay student name/email watermark on lesson player */
+  contentWatermarkEnabled: boolean;
+  /** Block context menu on learning player */
+  disableRightClickOnLearning: boolean;
+  /** Block common PrintScreen / save shortcuts on learning pages */
+  blockScreenshotShortcuts: boolean;
+  /** Blur/pause player when tab is hidden (screen-recording deterrent) */
+  deterScreenRecording: boolean;
+  /** Harden HTML5 video (no download / no PiP / no remote playback) */
+  videoDownloadProtection: boolean;
 }
 
 export interface StorageSettings {

@@ -12,6 +12,10 @@ import { sanitizeEmail } from "@/utils/sanitize";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
 import { useAuth } from "@/providers/auth-provider";
+import {
+  collectDeviceFingerprint,
+  describeDeviceFromUserAgent,
+} from "@/lib/security/device-fingerprint";
 import type { UserProfile } from "@/types";
 
 function VerifyOtpForm() {
@@ -22,10 +26,7 @@ function VerifyOtpForm() {
   const [token, setToken] = React.useState("");
   const [pending, setPending] = React.useState(false);
   const purpose = (searchParams.get("purpose") ?? "login") as
-    | "login"
-    | "register"
-    | "reset_password"
-    | "verify_email";
+    "login" | "register" | "reset_password" | "verify_email";
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +43,21 @@ function VerifyOtpForm() {
 
     setPending(true);
     try {
+      const deviceFingerprint = await collectDeviceFingerprint();
+      const deviceLabel =
+        typeof navigator !== "undefined" ? describeDeviceFromUserAgent(navigator.userAgent) : null;
+
       const result = await authFetch<{
         user: UserProfile;
         redirectTo: string;
         requiresProfile: boolean;
       }>(routes.api.auth.verifyOtp, {
         method: "POST",
-        body: JSON.stringify(parsed.data),
+        body: JSON.stringify({
+          ...parsed.data,
+          deviceFingerprint,
+          deviceLabel,
+        }),
       });
 
       if (!result.success || !result.data) {

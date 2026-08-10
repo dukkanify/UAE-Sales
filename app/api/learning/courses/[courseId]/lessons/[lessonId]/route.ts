@@ -11,6 +11,7 @@ import {
 } from "@/services/learning/progress-service";
 import { listNotes } from "@/services/learning/notes-service";
 import { listBookmarks } from "@/services/learning/bookmark-service";
+import { getContentProtectionConfig } from "@/services/auth/session-service";
 import { learningErrorResponse } from "@/app/api/learning/_utils";
 
 type Ctx = { params: Promise<{ courseId: string; lessonId: string }> };
@@ -50,6 +51,7 @@ export async function GET(_request: Request, context: Ctx) {
           id: detail.id,
           title: detail.title,
           slug: detail.code,
+          deliveryType: detail.deliveryType,
           modules: detail.modules.map((m) => ({
             id: m.id,
             title: m.title,
@@ -71,6 +73,10 @@ export async function GET(_request: Request, context: Ctx) {
         notes,
         bookmarks,
         adjacent: getAdjacentLessons(courseId, lessonId),
+        protection: getContentProtectionConfig({
+          fullName: user.fullName,
+          email: user.email,
+        }),
       },
       error: null,
     });

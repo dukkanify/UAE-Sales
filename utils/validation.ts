@@ -46,6 +46,8 @@ export const verifyOtpSchema = z.object({
   email: emailSchema,
   token: otpSchema,
   purpose: z.enum(["login", "register", "reset_password", "verify_email", "booking"]),
+  deviceFingerprint: z.string().min(8).max(128).optional().nullable(),
+  deviceLabel: z.string().max(120).optional().nullable(),
 });
 
 export const forgotPasswordSchema = z.object({

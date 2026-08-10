@@ -45,11 +45,39 @@ export interface SessionRecord {
   tokenHash: string;
   userAgent: string | null;
   ipAddress: string | null;
+  /** Stable browser/device fingerprint hash (CR002) */
+  deviceFingerprint: string | null;
+  /** Short human label derived from user agent */
+  deviceLabel: string | null;
   rememberMe: boolean;
   expiresAt: string;
   revokedAt: string | null;
   createdAt: string;
   lastActiveAt: string;
+}
+
+/** Safe session row for session management UI (no token hashes). */
+export interface SessionListItem {
+  id: string;
+  deviceLabel: string | null;
+  userAgent: string | null;
+  ipAddress: string | null;
+  deviceFingerprint: string | null;
+  rememberMe: boolean;
+  current: boolean;
+  createdAt: string;
+  lastActiveAt: string;
+  expiresAt: string;
+}
+
+/** Client DRM / content protection flags for recorded lessons (CR002). */
+export interface ContentProtectionConfig {
+  watermarkEnabled: boolean;
+  watermarkText: string;
+  disableRightClick: boolean;
+  blockScreenshotShortcuts: boolean;
+  deterScreenRecording: boolean;
+  videoDownloadProtection: boolean;
 }
 
 export interface NotificationRecord {

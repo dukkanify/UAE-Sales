@@ -33,13 +33,17 @@ import {
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { maxAllowedSessions, revokeExcessSessions } from "@/services/auth/session-service";
 import { sendEmail } from "@/services/email/mailer";
 import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
+import { describeDeviceFromUserAgent } from "@/lib/security/device-fingerprint";
 
 export interface RequestContext {
   ipAddress?: string | null;
   userAgent?: string | null;
+  deviceFingerprint?: string | null;
+  deviceLabel?: string | null;
 }
 
 function nowIso(): string {
@@ -107,10 +111,25 @@ async function issueSession(
   ctx: RequestContext,
 ): Promise<{ profile: UserProfile; expiresAt: string }> {
   const env = getServerEnv();
-  const days = rememberMe ? env.AUTH_REMEMBER_ME_DAYS : env.AUTH_SESSION_DAYS;
+  const settings = getPlatformSettings();
+  const days = rememberMe
+    ? Math.max(1, Math.ceil(settings.authentication.rememberMeDays || env.AUTH_REMEMBER_ME_DAYS))
+    : Math.max(
+        1,
+        Math.ceil(
+          (settings.authentication.sessionTimeoutMinutes || env.AUTH_SESSION_DAYS * 24 * 60) /
+            (60 * 24),
+        ),
+      );
   const token = generateToken(32);
   const sessionId = generateId();
   const expiresAt = addDays(days);
+  const fingerprintEnabled = settings.security.deviceFingerprintingEnabled;
+  const deviceFingerprint =
+    fingerprintEnabled && ctx.deviceFingerprint
+      ? String(ctx.deviceFingerprint).slice(0, 128)
+      : null;
+  const deviceLabel = ctx.deviceLabel?.trim() || describeDeviceFromUserAgent(ctx.userAgent) || null;
 
   writeAuthDb((db) => {
     db.sessions.push({
@@ -119,6 +138,8 @@ async function issueSession(
       tokenHash: hashSessionToken(token),
       userAgent: ctx.userAgent ?? null,
       ipAddress: ctx.ipAddress ?? null,
+      deviceFingerprint,
+      deviceLabel,
       rememberMe,
       expiresAt,
       revokedAt: null,
@@ -133,6 +154,31 @@ async function issueSession(
       target.updatedAt = nowIso();
     }
   });
+
+  const keep = maxAllowedSessions(user.role);
+  if (keep > 0) {
+    const revoked = revokeExcessSessions({
+      userId: user.id,
+      keepSessionId: sessionId,
+      keep,
+      actorId: user.id,
+    });
+    if (revoked > 0) {
+      await logActivity({
+        actorId: user.id,
+        action: ACTIVITY_ACTIONS.SESSION_REVOKED,
+        entityType: "session",
+        entityId: sessionId,
+        metadata: {
+          reason: "single_device_or_max_sessions",
+          revoked,
+          deviceFingerprint: deviceFingerprint ? deviceFingerprint.slice(0, 8) : null,
+        },
+        ipAddress: ctx.ipAddress,
+        userAgent: ctx.userAgent,
+      });
+    }
+  }
 
   const fresh = findUserById(user.id)!;
   await setSessionCookies(
@@ -343,6 +389,8 @@ export async function verifyOtp(input: {
   email: string;
   token: string;
   purpose: OtpChallenge["purpose"];
+  deviceFingerprint?: string | null;
+  deviceLabel?: string | null;
   ctx?: RequestContext;
 }): Promise<
   ApiResponse<{
@@ -491,7 +539,11 @@ export async function verifyOtp(input: {
 
     const { finalizeGuestBooking } = await import("@/services/bookings/booking-service");
     const booking = await finalizeGuestBooking({ bookingId, userId: user.id });
-    const { profile } = await issueSession(user, true, input.ctx ?? {});
+    const { profile } = await issueSession(user, true, {
+      ...(input.ctx ?? {}),
+      deviceFingerprint: input.deviceFingerprint ?? input.ctx?.deviceFingerprint ?? null,
+      deviceLabel: input.deviceLabel ?? input.ctx?.deviceLabel ?? null,
+    });
 
     await logActivity({
       actorId: profile.id,
@@ -575,14 +627,23 @@ export async function verifyOtp(input: {
     };
   }
 
-  const { profile } = await issueSession(user, challenge.rememberMe, input.ctx ?? {});
+  const { profile } = await issueSession(user, challenge.rememberMe, {
+    ...(input.ctx ?? {}),
+    deviceFingerprint: input.deviceFingerprint ?? input.ctx?.deviceFingerprint ?? null,
+    deviceLabel: input.deviceLabel ?? input.ctx?.deviceLabel ?? null,
+  });
 
   await logActivity({
     actorId: profile.id,
     action: ACTIVITY_ACTIONS.LOGIN,
     entityType: "session",
     entityId: profile.id,
-    metadata: { rememberMe: challenge.rememberMe },
+    metadata: {
+      rememberMe: challenge.rememberMe,
+      deviceFingerprint: input.deviceFingerprint
+        ? String(input.deviceFingerprint).slice(0, 8)
+        : null,
+    },
     ...input.ctx,
   });
 
