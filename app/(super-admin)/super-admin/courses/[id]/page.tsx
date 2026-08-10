@@ -15,6 +15,7 @@ export default function SuperAdminCourseDetailPage({
       courseId={id}
       basePath="/super-admin/courses"
       roleLabel="Super Admin"
+      canManagePublishing
     />
   );
 }

@@ -15,7 +15,8 @@ export type SettingsCategory =
   | "storage"
   | "localization"
   | "features"
-  | "zoom";
+  | "zoom"
+  | "courses";
 
 export interface GeneralSettings {
   platformName: string;
@@ -175,6 +176,12 @@ export interface FeatureFlags {
   biPredictive: boolean;
 }
 
+/** Super Admin course catalog visibility defaults */
+export interface CourseCatalogSettings {
+  /** Public catalog shows all, recorded only, or live only */
+  publicDeliveryFilter: "all" | "recorded" | "live";
+}
+
 export interface PlatformSettings {
   general: GeneralSettings;
   branding: BrandingSettings;
@@ -187,6 +194,7 @@ export interface PlatformSettings {
   localization: LocalizationSettings;
   features: FeatureFlags;
   zoom: ZoomIntegrationSettings;
+  courses: CourseCatalogSettings;
   updatedAt: string;
   updatedBy: string | null;
 }
@@ -216,4 +224,9 @@ export const SETTINGS_CATEGORIES: {
   { id: "localization", label: "Localization", description: "Language, timezone, and formats" },
   { id: "features", label: "Feature flags", description: "Enable or disable platform modules" },
   { id: "zoom", label: "Zoom", description: "Live class meeting defaults (credentials via env)" },
+  {
+    id: "courses",
+    label: "Courses catalog",
+    description: "Public delivery filter and catalog visibility defaults",
+  },
 ];

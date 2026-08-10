@@ -7,7 +7,13 @@ import { assertPermission, hasPermission, PermissionError } from "@/services/aut
 import { createCourse, listCourses } from "@/services/courses/course-service";
 import { courseErrorResponse } from "@/app/api/courses/_utils";
 import { parsePagination } from "@/lib/api/envelope";
-import type { CourseFilters, CourseStatus, DifficultyLevel, EnrollmentMode } from "@/types/courses";
+import type {
+  CourseDeliveryType,
+  CourseFilters,
+  CourseStatus,
+  DifficultyLevel,
+  EnrollmentMode,
+} from "@/types/courses";
 
 export async function GET(request: Request) {
   try {
@@ -15,6 +21,9 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const { searchParams } = url;
     const p = parsePagination(url, { pageSize: 12 });
+    const deliveryTypeParam = searchParams.get("deliveryType");
+    const enrollmentOpenParam = searchParams.get("enrollmentOpen");
+    const hiddenParam = searchParams.get("hidden");
     const filters: CourseFilters = {
       q: p.q,
       instructorId: searchParams.get("instructorId") ?? undefined,
@@ -23,6 +32,28 @@ export async function GET(request: Request) {
       difficulty: (searchParams.get("difficulty") as DifficultyLevel | "all" | null) ?? "all",
       enrollmentMode:
         (searchParams.get("enrollmentMode") as EnrollmentMode | "all" | null) ?? "all",
+      deliveryType:
+        deliveryTypeParam === "recorded" || deliveryTypeParam === "live"
+          ? (deliveryTypeParam as CourseDeliveryType)
+          : deliveryTypeParam === "all"
+            ? "all"
+            : undefined,
+      enrollmentOpen:
+        enrollmentOpenParam === "true"
+          ? true
+          : enrollmentOpenParam === "false"
+            ? false
+            : enrollmentOpenParam === "all"
+              ? "all"
+              : undefined,
+      hidden:
+        hiddenParam === "true"
+          ? true
+          : hiddenParam === "false"
+            ? false
+            : hiddenParam === "all"
+              ? "all"
+              : undefined,
       code: searchParams.get("code") ?? undefined,
       publishedFrom: searchParams.get("publishedFrom") ?? undefined,
       publishedTo: searchParams.get("publishedTo") ?? undefined,
@@ -54,6 +85,7 @@ export async function POST(request: Request) {
     const user = await requireAuth();
     const canManage = hasPermission(user.role, PERMISSIONS.COURSES_MANAGE);
     const canOwn = hasPermission(user.role, PERMISSIONS.COURSES_OWN);
+    const isSuperAdmin = user.role === ROLES.SUPER_ADMIN;
 
     if (!canManage && !canOwn) {
       throw new PermissionError("You do not have permission to perform this action", 403);
@@ -73,14 +105,8 @@ export async function POST(request: Request) {
     // Instructors may only create courses assigned to themselves.
     const primaryInstructorId = canManage ? requestedInstructorId : user.id;
 
-    const status = canManage
-      ? body.status != null
-        ? String(body.status)
-        : "draft"
-      : body.status != null &&
-          ["draft", "published", "private", "scheduled"].includes(String(body.status))
-        ? String(body.status)
-        : "draft";
+    // Publishing fields are Super Admin only (CR001).
+    const status = isSuperAdmin ? (body.status != null ? String(body.status) : "draft") : "draft";
 
     const course = await createCourse({
       title: String(body.title ?? ""),
@@ -96,8 +122,15 @@ export async function POST(request: Request) {
       estimatedDurationMinutes:
         body.estimatedDurationMinutes != null ? Number(body.estimatedDurationMinutes) : undefined,
       enrollmentMode: body.enrollmentMode != null ? String(body.enrollmentMode) : undefined,
+      deliveryType:
+        isSuperAdmin && body.deliveryType != null ? String(body.deliveryType) : "recorded",
+      enrollmentOpen:
+        isSuperAdmin && typeof body.enrollmentOpen === "boolean" ? body.enrollmentOpen : undefined,
+      hidden: isSuperAdmin && typeof body.hidden === "boolean" ? body.hidden : false,
       status,
-      scheduledPublishAt: (body.scheduledPublishAt as string | null | undefined) ?? null,
+      scheduledPublishAt: isSuperAdmin
+        ? ((body.scheduledPublishAt as string | null | undefined) ?? null)
+        : null,
       primaryInstructorId,
       tags: Array.isArray(body.tags) ? body.tags.map(String) : undefined,
       actorId: user.id,

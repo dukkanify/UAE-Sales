@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { PERMISSIONS } from "@/constants/permissions";
+import { ROLES } from "@/constants/roles";
 import { getRequestContext, requirePermission } from "@/services/auth/guards";
+import { PermissionError } from "@/services/auth/permissions";
 import {
   archiveCourse,
   assignInstructor,
@@ -12,6 +14,12 @@ import {
 import { courseErrorResponse } from "@/app/api/courses/_utils";
 
 type Params = { params: Promise<{ id: string }> };
+
+function assertSuperAdminPublishing(role: string) {
+  if (role !== ROLES.SUPER_ADMIN) {
+    throw new PermissionError("Only Super Admin can publish, unpublish, or archive courses", 403);
+  }
+}
 
 export async function POST(request: Request, { params }: Params) {
   try {
@@ -26,6 +34,7 @@ export async function POST(request: Request, { params }: Params) {
     const action = body.action;
 
     if (action === "publish") {
+      assertSuperAdminPublishing(user.role);
       return NextResponse.json({
         success: true,
         data: await publishCourse(id, user.id, ctx),
@@ -33,6 +42,7 @@ export async function POST(request: Request, { params }: Params) {
       });
     }
     if (action === "unpublish") {
+      assertSuperAdminPublishing(user.role);
       return NextResponse.json({
         success: true,
         data: await unpublishCourse(id, user.id, ctx),
@@ -40,6 +50,7 @@ export async function POST(request: Request, { params }: Params) {
       });
     }
     if (action === "archive") {
+      assertSuperAdminPublishing(user.role);
       return NextResponse.json({
         success: true,
         data: await archiveCourse(id, user.id, ctx),

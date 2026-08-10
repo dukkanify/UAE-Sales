@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  COURSE_DELIVERY_LABELS,
   COURSE_STATUS_LABELS,
   DIFFICULTY_LABELS,
   ENROLLMENT_MODE_LABELS,
@@ -40,9 +41,16 @@ interface CourseDetailViewProps {
   courseId: string;
   basePath: string;
   roleLabel: string;
+  /** Super Admin only — publish controls (CR001). */
+  canManagePublishing?: boolean;
 }
 
-function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewProps) {
+function CourseDetailView({
+  courseId,
+  basePath,
+  roleLabel,
+  canManagePublishing = false,
+}: CourseDetailViewProps) {
   const [course, setCourse] = React.useState<CourseDetail | null>(null);
   const [enrollments, setEnrollments] = React.useState<EnrollmentWithStudent[]>([]);
   const [students, setStudents] = React.useState<UserProfile[]>([]);
@@ -249,9 +257,16 @@ function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewPro
             <Button variant="outline" onClick={() => setEditOpen(true)}>
               Edit details
             </Button>
-            <Button variant="outline" onClick={() => void courseAction("publish")}>
-              Publish
-            </Button>
+            {canManagePublishing ? (
+              <>
+                <Button variant="outline" asChild>
+                  <Link href="/super-admin/courses/publishing">Publishing</Link>
+                </Button>
+                <Button variant="outline" onClick={() => void courseAction("publish")}>
+                  Publish
+                </Button>
+              </>
+            ) : null}
             <Button variant="outline" onClick={() => void courseAction("duplicate")}>
               Duplicate
             </Button>
@@ -275,8 +290,20 @@ function CourseDetailView({ courseId, basePath, roleLabel }: CourseDetailViewPro
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>
-              <span className="text-muted-foreground">Enrollment:</span>{" "}
+              <span className="text-muted-foreground">Enrollment mode:</span>{" "}
               {ENROLLMENT_MODE_LABELS[course.enrollmentMode]}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Enrollment:</span>{" "}
+              {course.enrollmentOpen ? "Open" : "Closed"}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Delivery:</span>{" "}
+              {COURSE_DELIVERY_LABELS[course.deliveryType ?? "recorded"]}
+            </p>
+            <p>
+              <span className="text-muted-foreground">Visibility:</span>{" "}
+              {course.hidden ? "Hidden" : "Listed when published"}
             </p>
             <p>
               <span className="text-muted-foreground">Instructor:</span>{" "}

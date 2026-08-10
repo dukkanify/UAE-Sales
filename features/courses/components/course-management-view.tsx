@@ -75,9 +75,15 @@ const statusVariant: Record<
 interface CourseManagementViewProps {
   basePath: string;
   roleLabel: string;
+  /** Super Admin only — publish / unpublish / archive / bulk publish (CR001). */
+  canManagePublishing?: boolean;
 }
 
-function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps) {
+function CourseManagementView({
+  basePath,
+  roleLabel,
+  canManagePublishing = false,
+}: CourseManagementViewProps) {
   const [courses, setCourses] = React.useState<CourseListItem[]>([]);
   const [stats, setStats] = React.useState<CourseStats | null>(null);
   const [categories, setCategories] = React.useState<CourseCategory[]>([]);
@@ -240,15 +246,19 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
             >
               Edit details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => void runAction(row.id, "publish")}>
-              <Upload className="mr-2 h-4 w-4" /> Publish
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => void runAction(row.id, "unpublish")}>
-              Unpublish
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => void runAction(row.id, "archive")}>
-              <Archive className="mr-2 h-4 w-4" /> Archive
-            </DropdownMenuItem>
+            {canManagePublishing ? (
+              <>
+                <DropdownMenuItem onClick={() => void runAction(row.id, "publish")}>
+                  <Upload className="mr-2 h-4 w-4" /> Publish
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void runAction(row.id, "unpublish")}>
+                  Unpublish
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => void runAction(row.id, "archive")}>
+                  <Archive className="mr-2 h-4 w-4" /> Archive
+                </DropdownMenuItem>
+              </>
+            ) : null}
             <DropdownMenuItem onClick={() => void runAction(row.id, "duplicate")}>
               <Copy className="mr-2 h-4 w-4" /> Duplicate
             </DropdownMenuItem>
@@ -270,6 +280,11 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
         breadcrumbs={[{ label: roleLabel }, { label: "Courses" }]}
         actions={
           <div className="flex flex-wrap gap-2">
+            {canManagePublishing ? (
+              <Button variant="outline" asChild>
+                <Link href="/super-admin/courses/publishing">Publishing & visibility</Link>
+              </Button>
+            ) : null}
             <Button variant="outline" asChild>
               <Link href={`${basePath}/categories`}>Categories</Link>
             </Button>
@@ -366,12 +381,16 @@ function CourseManagementView({ basePath, roleLabel }: CourseManagementViewProps
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant="outline" onClick={() => void runBulk("publish")}>
-              Bulk publish
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => void runBulk("archive")}>
-              Bulk archive
-            </Button>
+            {canManagePublishing ? (
+              <>
+                <Button size="sm" variant="outline" onClick={() => void runBulk("publish")}>
+                  Bulk publish
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => void runBulk("archive")}>
+                  Bulk archive
+                </Button>
+              </>
+            ) : null}
             <Button size="sm" variant="outline" onClick={() => void runBulk("delete")}>
               Bulk delete
             </Button>

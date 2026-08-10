@@ -3,6 +3,7 @@
  */
 
 import {
+  COURSE_DELIVERY_TYPES,
   COURSE_STATUSES,
   DIFFICULTY_LEVELS,
   ENROLLMENT_MODES,
@@ -10,6 +11,7 @@ import {
   MAX_COURSE_TITLE_LENGTH,
 } from "@/constants/courses";
 import type {
+  CourseDeliveryType,
   CourseStatus,
   DifficultyLevel,
   EnrollmentMode,
@@ -72,6 +74,21 @@ export function assertEnrollmentMode(value: unknown): EnrollmentMode {
     throw new CourseValidationError("Invalid enrollment mode");
   }
   return value as EnrollmentMode;
+}
+
+export function assertDeliveryType(value: unknown): CourseDeliveryType {
+  if (typeof value !== "string" || !COURSE_DELIVERY_TYPES.includes(value as CourseDeliveryType)) {
+    throw new CourseValidationError("Invalid delivery type");
+  }
+  return value as CourseDeliveryType;
+}
+
+export function assertBooleanFlag(label: string, value: unknown, fallback: boolean): boolean {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value !== "boolean") {
+    throw new CourseValidationError(`${label} must be a boolean`);
+  }
+  return value;
 }
 
 export function assertScheduledPublish(

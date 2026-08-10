@@ -2,20 +2,27 @@ import { withApiHandler } from "@/lib/api/with-handler";
 import { ok, parsePagination } from "@/lib/api/envelope";
 import { requirePublicOrAuth } from "@/lib/api/auth";
 import { cacheWrap } from "@/services/api-platform/cache-service";
-import { isPublicCatalogFixture, listCourses } from "@/services/courses/course-service";
+import {
+  applyDueScheduledPublishes,
+  isPublicCatalogFixture,
+  listCourses,
+} from "@/services/courses/course-service";
+import { getPublicDeliveryFilter, isCoursePubliclyListed } from "@/services/courses/publishing";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 
 export const GET = withApiHandler(async (request) => {
   await requirePublicOrAuth(request);
   ensureCoursesSeeded();
+  applyDueScheduledPublishes();
   const url = new URL(request.url);
   const p = parsePagination(url);
+  const deliveryFilter = getPublicDeliveryFilter();
   const data = cacheWrap(
-    `v1:public:courses:${p.page}:${p.pageSize}:${p.q ?? ""}:${p.sortBy ?? ""}:${p.sortDir}`,
+    `v1:public:courses:${p.page}:${p.pageSize}:${p.q ?? ""}:${p.sortBy ?? ""}:${p.sortDir}:${deliveryFilter}`,
     30,
     ["courses", "public"],
     () => {
-      // Pull a wide published page, drop fixtures, then paginate for the public catalog.
+      // Pull a wide published page, apply visibility rules, then paginate.
       const published = listCourses({
         q: p.q,
         status: "published",
@@ -24,7 +31,9 @@ export const GET = withApiHandler(async (request) => {
         sortBy: (p.sortBy as "updatedAt" | "title" | "createdAt") ?? "updatedAt",
         sortDir: p.sortDir,
       });
-      const filtered = published.data.filter((c) => !isPublicCatalogFixture(c));
+      const filtered = published.data.filter(
+        (c) => !isPublicCatalogFixture(c) && isCoursePubliclyListed(c, { deliveryFilter }),
+      );
       const start = (p.page - 1) * p.pageSize;
       const slice = filtered.slice(start, start + p.pageSize);
       return {

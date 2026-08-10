@@ -148,6 +148,9 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     defaultMeetingType: "meeting",
     credentialsConfigured: false,
   },
+  courses: {
+    publicDeliveryFilter: "all",
+  },
   updatedAt: new Date(0).toISOString(),
   updatedBy: null,
 };

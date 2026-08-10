@@ -11,13 +11,16 @@ import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb, writeCoursesDb } from "@/services/courses/store";
 import {
   CourseValidationError,
+  assertBooleanFlag,
   assertCourseCode,
   assertCourseTitle,
+  assertDeliveryType,
   assertDifficulty,
   assertEnrollmentMode,
   assertScheduledPublish,
   assertStatus,
 } from "@/services/courses/validation";
+import { getPublicDeliveryFilter, isCoursePubliclyListed } from "@/services/courses/publishing";
 import type {
   BulkCourseAction,
   Course,
@@ -79,6 +82,31 @@ export type InstructorCourseGroup = {
   courses: CourseListItem[];
 };
 
+/** Promote scheduled courses whose publish time has passed. */
+export function applyDueScheduledPublishes(): number {
+  ensureCoursesSeeded();
+  const now = Date.now();
+  let changed = 0;
+  writeCoursesDb((d) => {
+    for (let i = 0; i < d.courses.length; i += 1) {
+      const course = d.courses[i]!;
+      if (course.deletedAt || course.status !== "scheduled" || !course.scheduledPublishAt) continue;
+      const at = Date.parse(course.scheduledPublishAt);
+      if (Number.isNaN(at) || at > now) continue;
+      if (!course.primaryInstructorId) continue;
+      d.courses[i] = {
+        ...course,
+        status: "published",
+        publishedAt: course.publishedAt ?? new Date(at).toISOString(),
+        scheduledPublishAt: null,
+        updatedAt: new Date().toISOString(),
+      };
+      changed += 1;
+    }
+  });
+  return changed;
+}
+
 /** Demo/integration fixtures that should not appear on marketing surfaces. */
 export function isPublicCatalogFixture(course: Pick<Course, "code" | "title">): boolean {
   const code = (course.code || "").toUpperCase();
@@ -88,6 +116,8 @@ export function isPublicCatalogFixture(course: Pick<Course, "code" | "title">): 
 
 /** Published catalog grouped by primary instructor for marketing home. */
 export function listPublishedCoursesGroupedByInstructor(pageSize = 100): InstructorCourseGroup[] {
+  applyDueScheduledPublishes();
+  const deliveryFilter = getPublicDeliveryFilter();
   const { data } = listCourses({
     status: "published",
     pageSize: Math.max(pageSize, 200),
@@ -98,6 +128,13 @@ export function listPublishedCoursesGroupedByInstructor(pageSize = 100): Instruc
   const groups = new Map<string, InstructorCourseGroup>();
   for (const course of data) {
     if (isPublicCatalogFixture(course)) continue;
+    if (
+      !isCoursePubliclyListed(course, {
+        deliveryFilter,
+      })
+    ) {
+      continue;
+    }
     const key = course.primaryInstructorId ?? "__unassigned__";
     const current = groups.get(key);
     if (current) {
@@ -189,6 +226,15 @@ export function listCourses(filters: CourseFilters = {}): {
   if (filters.enrollmentMode && filters.enrollmentMode !== "all") {
     rows = rows.filter((c) => c.enrollmentMode === filters.enrollmentMode);
   }
+  if (filters.deliveryType && filters.deliveryType !== "all") {
+    rows = rows.filter((c) => c.deliveryType === filters.deliveryType);
+  }
+  if (filters.enrollmentOpen !== undefined && filters.enrollmentOpen !== "all") {
+    rows = rows.filter((c) => c.enrollmentOpen === filters.enrollmentOpen);
+  }
+  if (filters.hidden !== undefined && filters.hidden !== "all") {
+    rows = rows.filter((c) => c.hidden === filters.hidden);
+  }
   if (filters.publishedFrom) {
     const from = Date.parse(filters.publishedFrom);
     rows = rows.filter((c) => c.publishedAt && Date.parse(c.publishedAt) >= from);
@@ -275,6 +321,9 @@ export type CreateCourseInput = {
   language?: string;
   estimatedDurationMinutes?: number;
   enrollmentMode?: string;
+  deliveryType?: string;
+  enrollmentOpen?: boolean;
+  hidden?: boolean;
   status?: string;
   scheduledPublishAt?: string | null;
   primaryInstructorId?: string | null;
@@ -292,6 +341,13 @@ export async function createCourse(input: CreateCourseInput): Promise<CourseList
   const status = assertStatus(input.status ?? "draft");
   const difficulty = assertDifficulty(input.difficulty ?? "intermediate");
   const enrollmentMode = assertEnrollmentMode(input.enrollmentMode ?? "manual");
+  const deliveryType = assertDeliveryType(input.deliveryType ?? "recorded");
+  const enrollmentOpen = assertBooleanFlag(
+    "enrollmentOpen",
+    input.enrollmentOpen,
+    enrollmentMode === "open",
+  );
+  const hidden = assertBooleanFlag("hidden", input.hidden, false);
   const scheduledPublishAt = assertScheduledPublish(status, input.scheduledPublishAt ?? null);
   assertInstructorExists(input.primaryInstructorId);
 
@@ -319,6 +375,9 @@ export async function createCourse(input: CreateCourseInput): Promise<CourseList
     language: input.language?.trim() || "en",
     estimatedDurationMinutes: Math.max(0, Number(input.estimatedDurationMinutes) || 0),
     enrollmentMode,
+    deliveryType,
+    enrollmentOpen,
+    hidden,
     status,
     scheduledPublishAt,
     primaryInstructorId: input.primaryInstructorId ?? null,
@@ -391,6 +450,18 @@ export async function updateCourse(input: {
     input.patch.enrollmentMode !== undefined
       ? assertEnrollmentMode(input.patch.enrollmentMode)
       : existing.enrollmentMode;
+  const deliveryType =
+    input.patch.deliveryType !== undefined
+      ? assertDeliveryType(input.patch.deliveryType)
+      : existing.deliveryType;
+  const enrollmentOpen =
+    input.patch.enrollmentOpen !== undefined
+      ? assertBooleanFlag("enrollmentOpen", input.patch.enrollmentOpen, existing.enrollmentOpen)
+      : existing.enrollmentOpen;
+  const hidden =
+    input.patch.hidden !== undefined
+      ? assertBooleanFlag("hidden", input.patch.hidden, existing.hidden)
+      : existing.hidden;
   const scheduledPublishAt = assertScheduledPublish(
     status,
     input.patch.scheduledPublishAt !== undefined
@@ -403,7 +474,7 @@ export async function updateCourse(input: {
       : existing.primaryInstructorId;
   assertInstructorExists(primaryInstructorId);
 
-  if (status === "published" && !primaryInstructorId) {
+  if ((status === "published" || status === "private") && !primaryInstructorId) {
     throw new CourseValidationError("Published courses require a primary instructor");
   }
 
@@ -436,6 +507,9 @@ export async function updateCourse(input: {
         ? Math.max(0, Number(input.patch.estimatedDurationMinutes) || 0)
         : existing.estimatedDurationMinutes,
     enrollmentMode,
+    deliveryType,
+    enrollmentOpen,
+    hidden,
     status,
     scheduledPublishAt,
     primaryInstructorId,
@@ -489,6 +563,76 @@ export async function updateCourse(input: {
   });
 
   return toListItem(next);
+}
+
+export type UpdateCoursePublishingInput = {
+  status?: string;
+  deliveryType?: string;
+  enrollmentOpen?: boolean;
+  hidden?: boolean;
+  scheduledPublishAt?: string | null;
+};
+
+/**
+ * Super Admin–only publishing & visibility controls (CR001).
+ * Draft / Published / Private / Scheduled / Archived, recorded/live,
+ * enrollment open/closed, hide from catalog, and schedule publish.
+ */
+export async function updateCoursePublishing(input: {
+  id: string;
+  patch: UpdateCoursePublishingInput;
+  actorId: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}): Promise<CourseListItem> {
+  const existing = getCourseById(input.id);
+  if (!existing) throw new CourseValidationError("Course not found");
+
+  const status =
+    input.patch.status !== undefined ? assertStatus(input.patch.status) : existing.status;
+  const deliveryType =
+    input.patch.deliveryType !== undefined
+      ? assertDeliveryType(input.patch.deliveryType)
+      : existing.deliveryType;
+  const enrollmentOpen =
+    input.patch.enrollmentOpen !== undefined
+      ? assertBooleanFlag("enrollmentOpen", input.patch.enrollmentOpen, existing.enrollmentOpen)
+      : existing.enrollmentOpen;
+  const hidden =
+    input.patch.hidden !== undefined
+      ? assertBooleanFlag("hidden", input.patch.hidden, existing.hidden)
+      : existing.hidden;
+  const scheduledPublishAt = assertScheduledPublish(
+    status,
+    input.patch.scheduledPublishAt !== undefined
+      ? input.patch.scheduledPublishAt
+      : status === "scheduled"
+        ? existing.scheduledPublishAt
+        : input.patch.status !== undefined
+          ? null
+          : existing.scheduledPublishAt,
+  );
+
+  if (
+    (status === "published" || status === "private" || status === "scheduled") &&
+    !existing.primaryInstructorId
+  ) {
+    throw new CourseValidationError("Published courses require a primary instructor");
+  }
+
+  return updateCourse({
+    id: input.id,
+    patch: {
+      status,
+      deliveryType,
+      enrollmentOpen,
+      hidden,
+      scheduledPublishAt,
+    },
+    actorId: input.actorId,
+    ipAddress: input.ipAddress,
+    userAgent: input.userAgent,
+  });
 }
 
 async function setStatus(

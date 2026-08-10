@@ -9,25 +9,18 @@ export type DifficultyLevel = "beginner" | "intermediate" | "advanced" | "expert
 
 export type EnrollmentMode = "open" | "private" | "invitation" | "manual";
 
+/** Recorded self-paced lane vs live Zoom coaching lane */
+export type CourseDeliveryType = "recorded" | "live";
+
+/** Public catalog filter — Super Admin can show one delivery type only */
+export type PublicCourseDeliveryFilter = "all" | "recorded" | "live";
+
 export type EnrollmentStatus =
-  | "pending"
-  | "approved"
-  | "rejected"
-  | "completed"
-  | "dropped"
-  | "suspended";
+  "pending" | "approved" | "rejected" | "completed" | "dropped" | "suspended";
 
 export type ContentStatus = "draft" | "published" | "hidden";
 
-export type ResourceType =
-  | "pdf"
-  | "ppt"
-  | "doc"
-  | "image"
-  | "audio"
-  | "link"
-  | "zip"
-  | "video";
+export type ResourceType = "pdf" | "ppt" | "doc" | "image" | "audio" | "link" | "zip" | "video";
 
 export type InstructorRole = "primary" | "assistant";
 
@@ -112,6 +105,12 @@ export interface Course {
   language: string;
   estimatedDurationMinutes: number;
   enrollmentMode: EnrollmentMode;
+  /** Recorded (self-paced) or Live (Zoom coaching) */
+  deliveryType: CourseDeliveryType;
+  /** When false, new enrollments are blocked */
+  enrollmentOpen: boolean;
+  /** When true, course is hidden from all public surfaces even if published */
+  hidden: boolean;
   status: CourseStatus;
   scheduledPublishAt: string | null;
   primaryInstructorId: string | null;
@@ -216,6 +215,9 @@ export interface CourseFilters {
   status?: CourseStatus | "all";
   difficulty?: DifficultyLevel | "all";
   enrollmentMode?: EnrollmentMode | "all";
+  deliveryType?: CourseDeliveryType | "all";
+  enrollmentOpen?: boolean | "all";
+  hidden?: boolean | "all";
   code?: string;
   publishedFrom?: string;
   publishedTo?: string;
@@ -227,9 +229,4 @@ export interface CourseFilters {
 }
 
 export type BulkCourseAction =
-  | "publish"
-  | "archive"
-  | "delete"
-  | "assign_instructor"
-  | "change_category"
-  | "export";
+  "publish" | "archive" | "delete" | "assign_instructor" | "change_category" | "export";
