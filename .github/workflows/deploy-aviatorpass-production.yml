@@ -13,56 +13,77 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: Production – aviatorpass
-    env:
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      NEXT_PUBLIC_APP_NAME: AviatorPass
-      NEXT_PUBLIC_APP_ENV: production
     steps:
+      - name: Prefer Deploy Hook (instant production rebuild of aviatorpass tip)
+        id: hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.VERCEL_AVIATORPASS_DEPLOY_HOOK }}
+          FALLBACK_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          HOOK="${DEPLOY_HOOK_URL:-$FALLBACK_HOOK_URL}"
+          if [ -z "$HOOK" ]; then
+            echo "hook=missing" >> "$GITHUB_OUTPUT"
+            echo "No deploy hook secret configured."
+            exit 0
+          fi
+          response="$(curl --silent --show-error --write-out '\n%{http_code}' -X POST "$HOOK")"
+          body="$(printf '%s' "$response" | sed '$d')"
+          status="$(printf '%s' "$response" | tail -n 1)"
+          echo "Deploy Hook HTTP $status"
+          echo "$body"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "::error::Deploy Hook failed with HTTP $status"
+            exit 1
+          fi
+          echo "hook=ok" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
+        if: steps.hook.outputs.hook != 'ok'
+
       - uses: actions/setup-node@v4
+        if: steps.hook.outputs.hook != 'ok'
         with:
           node-version: "22"
           cache: npm
-      - name: Require Vercel credentials
+
+      - name: Deploy with Vercel token
+        if: steps.hook.outputs.hook != 'ok'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::Missing secrets.VERCEL_TOKEN — cannot promote to production from Actions."
+            echo "::error::Missing VERCEL_AVIATORPASS_DEPLOY_HOOK (preferred) or VERCEL_TOKEN. Cannot promote AviatorPass to production without Vercel credentials."
             exit 1
           fi
-          if [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "::warning::VERCEL_ORG_ID / VERCEL_PROJECT_ID missing — attempting scope-based deploy."
-          fi
-      - run: npm ci
-      - name: Install Vercel CLI
-        run: npm install -g vercel@41.7.8
-      - name: Pull production env
-        run: |
+          npm install -g vercel@41.7.8
+          npm ci
           if [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
             vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           else
-            mkdir -p .vercel
-            printf '%s\n' '{"projectId":"","orgId":""}' > .vercel/project.json
-            vercel link --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects --project aviatorpass || true
-            vercel pull --yes --environment=production --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects
+            vercel link --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects --project aviatorpass
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           fi
-      - name: Build
-        run: vercel build --prod --token="$VERCEL_TOKEN"
-      - name: Deploy production
-        id: deploy
-        run: |
+          vercel build --prod --token="$VERCEL_TOKEN"
           url="$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects)"
-          echo "url=$url" >> "$GITHUB_OUTPUT"
           echo "Deployed: $url"
+
       - name: Smoke production aliases
+        if: always()
         run: |
           set -e
+          sleep 15
           for host in https://aviatorpass.vercel.app https://dubai-test.blog; do
-            echo "Checking $host"
-            code=$(curl -sS -o /tmp/body.html -w '%{http_code}' --max-time 30 "$host/" || echo fail)
+            echo "==== $host ===="
+            code=$(curl -sS -o /tmp/body.html -w '%{http_code}' --max-time 45 "$host/" || echo fail)
             echo "HTTP $code"
             rg -o '/brand/logo[^"'\'' ]+' /tmp/body.html | sort -u || true
-            curl -sS --max-time 30 "$host/api/health" | head -c 400 || true
+            curl -sS --max-time 30 "$host/api/public/brand" | head -c 500 || true
+            echo
+            curl -sS --max-time 30 "$host/api/health" | head -c 300 || true
             echo
           done
+          if ! rg -q 'logo(-dark)?\.png' /tmp/body.html; then
+            echo "::warning::Production aliases still serve non-PNG logos — Promote may still be required in Vercel if Production Branch is not aviatorpass."
+          fi

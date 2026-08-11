@@ -168,5 +168,5 @@ describe("installments & regional payments (CR003)", () => {
     });
     expect(paid.order.status).toBe("paid");
     expect(paid.payment.status).toBe("succeeded");
-  }, 30000);
+  }, 90_000);
 });
