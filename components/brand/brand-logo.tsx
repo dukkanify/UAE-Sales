@@ -6,6 +6,7 @@ import { siteStatic } from "@/config/site-static";
 import { cn } from "@/lib/utils";
 import { routes } from "@/constants/routes";
 import { safeHref } from "@/lib/links/safe-href";
+import { useBrand } from "@/providers/brand-provider";
 
 interface BrandLogoProps {
   className?: string;
@@ -17,9 +18,8 @@ interface BrandLogoProps {
 }
 
 /**
- * Static brand mark — no BrandProvider/useBrand on the critical layout path.
- * Runtime brand API still powers other surfaces via BrandProvider.
- * Lockups follow official guidelines: horizontal (full/dark) and stacked.
+ * Option A lockup (Horizon Blue & Sun Gold).
+ * Prefers runtime branding settings when available; falls back to siteStatic PNGs.
  */
 function BrandLogo({
   className,
@@ -28,15 +28,17 @@ function BrandLogo({
   priority = false,
   showWordmark = false,
 }: BrandLogoProps) {
-  const name = siteStatic.name;
+  const brand = useBrand();
+  const name = brand.platformName || siteStatic.name;
+
   const src =
     variant === "mark"
       ? siteStatic.brand.icon
       : variant === "dark"
-        ? siteStatic.brand.logoDark
+        ? brand.darkLogoUrl || siteStatic.brand.logoDark
         : variant === "stacked"
           ? siteStatic.brand.logoStacked
-          : siteStatic.brand.logo;
+          : brand.logoUrl || siteStatic.brand.logo;
 
   // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
   // (JS default params do NOT apply when the caller passes `href={undefined}`).
@@ -54,14 +56,14 @@ function BrandLogo({
       <img
         src={src}
         alt={name}
-        width={variant === "mark" ? 40 : variant === "stacked" ? 140 : 240}
-        height={variant === "mark" ? 40 : variant === "stacked" ? 130 : 52}
+        width={variant === "mark" ? 44 : variant === "stacked" ? 160 : 280}
+        height={variant === "mark" ? 44 : variant === "stacked" ? 150 : 56}
         className={cn(
-          "h-10 w-auto object-contain",
-          variant === "mark" && "h-10 w-10",
-          variant === "full" && "h-9 w-auto max-w-[240px] sm:h-10",
-          variant === "dark" && "h-9 w-auto max-w-[240px] sm:h-10",
-          variant === "stacked" && "h-24 w-auto max-w-[160px]",
+          "h-11 w-auto object-contain object-left",
+          variant === "mark" && "h-11 w-11",
+          variant === "full" && "h-10 w-auto max-w-[280px] sm:h-11",
+          variant === "dark" && "h-10 w-auto max-w-[280px] sm:h-11",
+          variant === "stacked" && "h-28 w-auto max-w-[180px]",
         )}
         decoding="async"
         loading={priority ? "eager" : "lazy"}
@@ -69,7 +71,7 @@ function BrandLogo({
       />
       {showWordmark && variant === "mark" ? (
         <span className="font-display text-lg font-semibold tracking-tight text-primary">
-          {name}
+          <span className="text-primary">AVIATOR</span> <span className="text-accent">PASS</span>
         </span>
       ) : null}
     </span>

@@ -52,12 +52,51 @@ function emptyDb(): SettingsDatabase {
   };
 }
 
+/** Upgrade persisted brand asset paths from legacy SVG masters to Option A PNGs. */
+function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
+  const branding = { ...settings.branding };
+  const target = {
+    logoUrl: DEFAULT_PLATFORM_SETTINGS.branding.logoUrl,
+    darkLogoUrl: DEFAULT_PLATFORM_SETTINGS.branding.darkLogoUrl,
+    openGraphImageUrl: DEFAULT_PLATFORM_SETTINGS.branding.openGraphImageUrl,
+  };
+  let changed = false;
+  for (const key of Object.keys(target) as (keyof typeof target)[]) {
+    const current = branding[key];
+    if (
+      !current ||
+      current.endsWith(".svg") ||
+      current === "/brand/logo.png" ||
+      current === "/brand/logo-dark.png" ||
+      current === "/brand/og.png"
+    ) {
+      branding[key] = target[key];
+      changed = true;
+    }
+  }
+  if (!branding.primaryColor || branding.primaryColor.toUpperCase() === "#0B1F33") {
+    branding.primaryColor = DEFAULT_PLATFORM_SETTINGS.branding.primaryColor;
+    changed = true;
+  }
+  if (!branding.accentColor) {
+    branding.accentColor = DEFAULT_PLATFORM_SETTINGS.branding.accentColor;
+    changed = true;
+  }
+  if (!branding.secondaryColor) {
+    branding.secondaryColor = DEFAULT_PLATFORM_SETTINGS.branding.secondaryColor;
+    changed = true;
+  }
+  return changed ? { ...settings, branding } : settings;
+}
+
 function ensureStore(): SettingsDatabase {
   const raw = readJsonFile<Partial<SettingsDatabase>>(DATA_FILE, emptyDb);
-  const settings = deepMerge(
-    DEFAULT_PLATFORM_SETTINGS as unknown as Record<string, unknown>,
-    (raw.settings ?? emptyDb().settings) as unknown as Record<string, unknown>,
-  ) as unknown as PlatformSettings;
+  const settings = migrateBrandingAssets(
+    deepMerge(
+      DEFAULT_PLATFORM_SETTINGS as unknown as Record<string, unknown>,
+      (raw.settings ?? emptyDb().settings) as unknown as Record<string, unknown>,
+    ) as unknown as PlatformSettings,
+  );
   return {
     settings,
     history: raw.history ?? [],
