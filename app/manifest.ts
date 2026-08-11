@@ -14,7 +14,7 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "en",
     icons: [
       {
-        src: "/brand/icon.svg",
+        src: "/brand/icon.png",
         sizes: "any",
         type: "image/svg+xml",
       },

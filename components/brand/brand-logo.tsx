@@ -50,18 +50,18 @@ function BrandLogo({
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- static brand SVG */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- static brand PNG/SVG lockup */}
       <img
         src={src}
         alt={name}
-        width={variant === "mark" ? 36 : variant === "stacked" ? 120 : 220}
-        height={variant === "mark" ? 36 : variant === "stacked" ? 110 : 44}
+        width={variant === "mark" ? 40 : variant === "stacked" ? 140 : 240}
+        height={variant === "mark" ? 40 : variant === "stacked" ? 130 : 52}
         className={cn(
-          "h-9 w-auto object-contain",
-          variant === "mark" && "h-9 w-9",
-          variant === "full" && "h-8 w-auto max-w-[220px]",
-          variant === "dark" && "h-8 w-auto max-w-[220px]",
-          variant === "stacked" && "h-20 w-auto max-w-[140px]",
+          "h-10 w-auto object-contain",
+          variant === "mark" && "h-10 w-10",
+          variant === "full" && "h-9 w-auto max-w-[240px] sm:h-10",
+          variant === "dark" && "h-9 w-auto max-w-[240px] sm:h-10",
+          variant === "stacked" && "h-24 w-auto max-w-[160px]",
         )}
         decoding="async"
         loading={priority ? "eager" : "lazy"}

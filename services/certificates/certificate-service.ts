@@ -374,7 +374,7 @@ export async function renderCertificateHtml(certificateId: string): Promise<{
     color: { dark: template.primaryColor, light: "#ffffff" },
   });
 
-  const logo = template.logoUrl || brand.logoUrl || "/brand/logo.svg";
+  const logo = template.logoUrl || brand.logoUrl || "/brand/logo.png";
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>

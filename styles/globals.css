@@ -3,8 +3,9 @@
 @import "./booking.css";
 
 /* =============================================================================
-   AviatorPass — Official Brand Guidelines
-   Aero Blue #2E7DAA | Altitude Orange #DD9B30 | Academic Grey #7C7B80
+   AviatorPass — Option A: Horizon Blue & Sun Gold
+   Horizon Blue / Aero Blue #2E7DAA | Sun Gold / Altitude Orange #DD9B30
+   Academic Grey #7C7B80 | Support: Cloud · Sky Mist · Navy Ink · Sand Glow
    Display: Stimulatio Flat (Space Grotesk web substitute) | Body: IBM Plex Sans
    Tagline: YOUR AVIATION JOURNEY STARTS HERE
    ============================================================================= */
@@ -67,35 +68,47 @@
 }
 
 :root {
-  --primary: #2e7daa;
+  /* Option A core */
+  --horizon-blue: #2e7daa;
+  --sun-gold: #dd9b30;
+  --academic-grey: #7c7b80;
+  /* Supporting (non-clashing companions) */
+  --cloud: #f7fafc;
+  --sky-mist: #e8f3f8;
+  --navy-ink: #0f2a3d;
+  --sand-glow: #f8f1e4;
+  --sun-soft: #f3e0b8;
+  --mist-grey: #d5dce3;
+
+  --primary: var(--horizon-blue);
   --primary-foreground: #ffffff;
 
-  --secondary: #e8f0f6;
+  --secondary: var(--sky-mist);
   --secondary-foreground: #0b1a24;
 
-  --accent: #dd9b30;
+  --accent: var(--sun-gold);
   --accent-foreground: #0b1a24;
 
-  --success: #16a34a;
+  --success: #2f8f5b;
   --success-foreground: #ffffff;
-  --warning: #dd9b30;
+  --warning: var(--sun-gold);
   --warning-foreground: #0b1a24;
-  --destructive: #dc2626;
+  --destructive: #c23b3b;
   --destructive-foreground: #ffffff;
 
-  --background: #f3f6f9;
+  --background: var(--cloud);
   --foreground: #0b1a24;
   --card: #ffffff;
   --card-foreground: #0b1a24;
   --popover: #ffffff;
   --popover-foreground: #0b1a24;
-  --muted: #e8eef4;
-  --muted-foreground: #7c7b80;
-  --academic: #7c7b80;
+  --muted: var(--sky-mist);
+  --muted-foreground: var(--academic-grey);
+  --academic: var(--academic-grey);
   --academic-foreground: #ffffff;
-  --border: #d8e0e8;
-  --input: #d8e0e8;
-  --ring: #2e7daa;
+  --border: var(--mist-grey);
+  --input: var(--mist-grey);
+  --ring: var(--horizon-blue);
 
   --sidebar: #071018;
   --sidebar-foreground: #e8eef5;
@@ -104,7 +117,7 @@
   --sidebar-accent-foreground: #ffffff;
 
   --radius: 1rem;
-  --surface-ink: #070f14;
+  --surface-ink: var(--navy-ink);
 }
 
 .dark {

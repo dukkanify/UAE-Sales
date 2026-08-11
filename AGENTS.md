@@ -19,10 +19,11 @@ Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `type
 
 **AviatorPass** — English LTR — tagline **YOUR AVIATION JOURNEY STARTS HERE**.
 
-| Token           | Hex       | Role              |
-| --------------- | --------- | ----------------- |
-| Aero Blue       | `#2E7DAA` | Primary           |
-| Altitude Orange | `#DD9B30` | Accent / PASS     |
-| Academic Grey   | `#7C7B80` | Secondary / muted |
+| Token                       | Hex       | Role              |
+| --------------------------- | --------- | ----------------- |
+| Horizon Blue / Aero Blue    | `#2E7DAA` | Primary           |
+| Sun Gold / Altitude Orange  | `#DD9B30` | Accent / PASS     |
+| Academic Grey               | `#7C7B80` | Secondary / muted |
+| Cloud / Sky Mist / Navy Ink | support   | Surfaces (theme)  |
 
 Typography: **Stimulatio Flat** (headings; Space Grotesk web substitute until licensed files land) + **IBM Plex Sans** (body). Logos under `public/brand/`; guidelines PDF at `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`. Update via `config/branding.ts` or Super Admin branding settings.
