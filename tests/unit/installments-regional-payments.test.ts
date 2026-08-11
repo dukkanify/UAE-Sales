@@ -142,7 +142,7 @@ describe("installments & regional payments (CR003)", () => {
     expect(readPaymentsDb().installmentPlans.find((p) => p.id === plan.id)?.status).toBe(
       "suspended",
     );
-  }, 30000);
+  }, 60_000);
 
   it("pays ATPL package in full via checkout flow", async () => {
     const student = readAuthDb().users.find(

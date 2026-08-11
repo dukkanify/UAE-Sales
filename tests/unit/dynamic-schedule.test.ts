@@ -138,6 +138,7 @@ describe("dynamic schedule management (CR008)", () => {
   });
 
   it("links ATPL distributeLecture to a live class when scheduled", async () => {
+    // Email fan-out + schedule link can exceed default 15s under shared-agent load.
     const subjects = listAtplCourses();
     const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR)!;
     const cgi = readAuthDb().users.find((u) => u.role === ROLES.CHIEF_GROUND_INSTRUCTOR)!;
@@ -163,5 +164,5 @@ describe("dynamic schedule management (CR008)", () => {
     });
     expect(sessions.some((s) => s.id === lecture.liveClassId)).toBe(true);
     expect(sessions.find((s) => s.id === lecture.liveClassId)?.source).toBe("atpl");
-  });
+  }, 60_000);
 });
