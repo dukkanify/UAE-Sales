@@ -1,24 +1,23 @@
 import type { MetadataRoute } from "next";
-import { BRAND } from "@/shared/constants/brand";
+
+import { siteConfig } from "@/config/site";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    background_color: "#FAF9F7",
-    description: BRAND.description,
+    name: siteConfig.legalName,
+    short_name: siteConfig.name,
+    description: siteConfig.description,
+    start_url: "/",
     display: "standalone",
+    background_color: "#F3F4F6",
+    theme_color: "#0B1F3A",
+    lang: "en",
     icons: [
       {
-        purpose: "any",
+        src: "/brand/icon.svg",
         sizes: "any",
-        src: "/brand/app-icon.svg",
         type: "image/svg+xml",
       },
     ],
-    lang: "ar",
-    name: `${BRAND.nameAr} — ${BRAND.nameEn}`,
-    orientation: "portrait",
-    short_name: BRAND.nameAr,
-    start_url: "/",
-    theme_color: "#0B1628",
   };
 }

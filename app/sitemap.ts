@@ -1,44 +1,24 @@
 import type { MetadataRoute } from "next";
-import { getAppUrl } from "@/shared/constants/site";
-import { getCategories } from "@/services/categories";
-import { getListings } from "@/services/listings";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = getAppUrl();
-  const [categories, listings] = await Promise.all([
-    getCategories(),
-    getListings(),
-  ]);
+import { siteConfig } from "@/config/site";
+import { routes } from "@/constants/routes";
 
-  const staticRoutes: MetadataRoute.Sitemap = [
-    "",
-    "/categories",
-    "/search",
-    "/featured",
-    "/login",
-    "/register",
-    "/escrow",
-    "/support",
-  ].map((path) => ({
-    changeFrequency: path === "" ? "daily" : "weekly",
-    lastModified: new Date(),
-    priority: path === "" ? 1 : 0.8,
-    url: `${base}${path}`,
-  }));
+export default function sitemap(): MetadataRoute.Sitemap {
+  const base = siteConfig.url;
 
-  const categoryRoutes = categories.map((category) => ({
-    changeFrequency: "weekly" as const,
-    lastModified: new Date(),
-    priority: 0.7,
-    url: `${base}/categories/${category.slug}`,
-  }));
-
-  const listingRoutes = listings.slice(0, 100).map((listing) => ({
-    changeFrequency: "weekly" as const,
-    lastModified: new Date(listing.postedAt ?? Date.now()),
-    priority: 0.6,
-    url: `${base}/listings/${listing.slug}`,
-  }));
-
-  return [...staticRoutes, ...categoryRoutes, ...listingRoutes];
+  return [
+    { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
+    {
+      url: `${base}${routes.login}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${base}${routes.register}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+  ];
 }
