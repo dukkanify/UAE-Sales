@@ -106,7 +106,7 @@ function DesignSystemShowcase() {
         <Section
           id="colors"
           title="Color roles"
-          description="Aero Blue, Altitude Orange, Academic Grey, and semantic states."
+          description="Horizon Blue, Sun Gold, Academic Grey, supporting surfaces, and semantic states."
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(colorRoles).map(([key, swatch]) => (

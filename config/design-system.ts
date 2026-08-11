@@ -1,6 +1,6 @@
 /**
- * AviatorPass Design System — official brand guidelines tokens.
- * Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
+ * AviatorPass Design System — Option A (Horizon Blue & Sun Gold).
+ * Horizon Blue / Aero Blue #2E7DAA · Sun Gold / Altitude Orange #DD9B30 · Academic Grey #7C7B80
  */
 
 export const breakpoints = {
@@ -51,13 +51,16 @@ export const typographyScale = {
 } as const;
 
 export const colorRoles = {
-  primary: { name: "Aero Blue", value: "#2E7DAA" },
+  primary: { name: "Horizon Blue", value: "#2E7DAA", aka: "Aero Blue" },
   secondary: { name: "Academic Grey", value: "#7C7B80" },
-  accent: { name: "Altitude Orange", value: "#DD9B30" },
-  success: { name: "Green", value: "#16A34A" },
-  warning: { name: "Altitude Orange", value: "#DD9B30" },
-  danger: { name: "Red", value: "#DC2626" },
-  background: { name: "Sky Mist", value: "#F3F6F9" },
+  accent: { name: "Sun Gold", value: "#DD9B30", aka: "Altitude Orange" },
+  success: { name: "Runway Green", value: "#2F8F5B" },
+  warning: { name: "Sun Gold", value: "#DD9B30" },
+  danger: { name: "Signal Red", value: "#C23B3B" },
+  background: { name: "Cloud", value: "#F7FAFC" },
+  muted: { name: "Sky Mist", value: "#E8F3F8" },
+  sand: { name: "Sand Glow", value: "#F8F1E4" },
+  ink: { name: "Navy Ink", value: "#0F2A3D" },
   card: { name: "White", value: "#FFFFFF" },
 } as const;
 

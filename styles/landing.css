@@ -1,15 +1,18 @@
 /* AviatorPass — premium single-page landing */
 
 .landing-root {
-  --landing-ink: #03080c;
-  --landing-ink-soft: #0a1620;
-  --landing-ink-mid: #122433;
-  --landing-mist: #d7e6ef;
-  --landing-mist-deep: #c5d8e6;
+  /* Option A — Horizon Blue & Sun Gold + supporting atmosphere */
+  --landing-ink: #0f2a3d;
+  --landing-ink-soft: #163a50;
+  --landing-ink-mid: #1e4f6d;
+  --landing-mist: #e8f3f8;
+  --landing-mist-deep: #d2e7f2;
   --landing-aero: #2e7daa;
-  --landing-aero-bright: #7ec0df;
+  --landing-aero-bright: #74b2d1;
   --landing-gold: #dd9b30;
-  --landing-gold-bright: #f0c56a;
+  --landing-gold-bright: #e5b85c;
+  --landing-sand: #f8f1e4;
+  --landing-cloud: #f7fafc;
 }
 
 /* —— Hero —— */

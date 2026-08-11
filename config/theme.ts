@@ -1,24 +1,30 @@
 /**
- * Design theme tokens — official AviatorPass brand guidelines.
- * Aero Blue #2E7DAA · Altitude Orange #DD9B30 · Academic Grey #7C7B80
+ * Design theme tokens — AviatorPass Option A (Horizon Blue & Sun Gold).
+ * Official hexes from brand guidelines:
+ *   Horizon Blue / Aero Blue #2E7DAA
+ *   Sun Gold / Altitude Orange #DD9B30
+ *   Academic Grey #7C7B80
+ * Supporting surfaces are derived tints that sit with the lockup (no clash).
  */
 
 export const theme = {
   colors: {
+    /** Horizon Blue / Aero Blue — primary brand */
     primary: {
       DEFAULT: "#2E7DAA",
       foreground: "#FFFFFF",
-      50: "#EAF3F8",
-      100: "#D0E5F0",
-      200: "#A8CEE3",
-      300: "#74B0D0",
-      400: "#4A94BC",
+      50: "#EAF4F9",
+      100: "#D2E7F2",
+      200: "#A8CFE4",
+      300: "#74B2D1",
+      400: "#4A95BD",
       500: "#2E7DAA",
       600: "#25648A",
       700: "#1E4F6D",
       800: "#163A50",
       900: "#0B1A24",
     },
+    /** Sun Gold / Altitude Orange — PASS / accent */
     accent: {
       DEFAULT: "#DD9B30",
       foreground: "#0B1A24",
@@ -34,8 +40,23 @@ export const theme = {
       DEFAULT: "#7C7B80",
       foreground: "#FFFFFF",
     },
+    /** Supporting palette — Option A companions (not replacements) */
+    support: {
+      /** Cool off-white page wash */
+      cloud: "#F7FAFC",
+      /** Soft blue surface from Horizon Blue */
+      skyMist: "#E8F3F8",
+      /** Deeper horizon for hero / chrome */
+      navyInk: "#0F2A3D",
+      /** Warm sand from Sun Gold — soft accent panels */
+      sandGlow: "#F8F1E4",
+      /** Soft gold highlight wash */
+      sunSoft: "#F3E0B8",
+      /** Cool mid grey for rules / dividers */
+      mistGrey: "#D5DCE3",
+    },
     success: {
-      DEFAULT: "#16A34A",
+      DEFAULT: "#2F8F5B",
       foreground: "#FFFFFF",
     },
     warning: {
@@ -43,14 +64,22 @@ export const theme = {
       foreground: "#0B1A24",
     },
     error: {
-      DEFAULT: "#DC2626",
+      DEFAULT: "#C23B3B",
       foreground: "#FFFFFF",
     },
-    background: "#F5F7FA",
+    background: "#F7FAFC",
     card: "#FFFFFF",
-    border: "#E2E6EC",
-    muted: "#EEF1F5",
+    border: "#D5DCE3",
+    muted: "#E8F3F8",
     foreground: "#0B1A24",
+  },
+  /** Marketing aliases matching Option A naming */
+  aliases: {
+    horizonBlue: "#2E7DAA",
+    aeroBlue: "#2E7DAA",
+    sunGold: "#DD9B30",
+    altitudeOrange: "#DD9B30",
+    academicGrey: "#7C7B80",
   },
   radius: {
     sm: "0.5rem",

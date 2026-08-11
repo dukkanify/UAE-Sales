@@ -25,12 +25,18 @@ export const siteStatic = {
     youtube: "",
   },
   brand: {
-    logo: "/brand/logo.svg",
-    logoDark: "/brand/logo-dark.svg",
-    logoStacked: "/brand/logo-stacked.svg",
-    icon: "/brand/icon.svg",
+    /** Raster lockups (transparent PNG) — preferred in UI for consistent render */
+    logo: "/brand/logo.png",
+    logoDark: "/brand/logo-dark.png",
+    logoStacked: "/brand/logo-stacked.png",
+    icon: "/brand/icon.png",
     favicon: "/brand/favicon.svg",
-    openGraph: "/brand/og.svg",
+    openGraph: "/brand/og.png",
+    /** Vector masters kept for edit / favicon / print */
+    logoSvg: "/brand/logo.svg",
+    logoDarkSvg: "/brand/logo-dark.svg",
+    logoStackedSvg: "/brand/logo-stacked.svg",
+    iconSvg: "/brand/icon.svg",
   },
   language: "en" as const,
   englishOnly: true,
