@@ -271,13 +271,19 @@ function CheckoutView() {
             </select>
 
             {paymentMode === "installments" ? (
-              <Input
-                type="number"
-                min={2}
-                max={rule?.maxInstallments ?? 4}
+              <select
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 value={installmentCount}
                 onChange={(e) => setInstallmentCount(Number(e.target.value) || 4)}
-              />
+              >
+                {[4, 5, 6]
+                  .filter((n) => n <= (rule?.maxInstallments ?? 6))
+                  .map((n) => (
+                    <option key={n} value={n}>
+                      {n} monthly installments
+                    </option>
+                  ))}
+              </select>
             ) : null}
 
             {paymentMode === "full" || paymentMode === "installments" ? (

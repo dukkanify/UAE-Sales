@@ -34,7 +34,7 @@ import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import { maxAllowedSessions, revokeExcessSessions } from "@/services/auth/session-service";
-import { emailRegistrationWelcome } from "@/services/email/automation-service";
+import { dispatchRoleAlert, emailRegistrationWelcome } from "@/services/email/automation-service";
 import { sendEmail } from "@/services/email/mailer";
 import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
@@ -475,6 +475,18 @@ export async function verifyOtp(input: {
       ...input.ctx,
     });
     await emailRegistrationWelcome({ userId: created.id, actorId: created.id });
+    const superAdmins = readAuthDb()
+      .users.filter((u) => u.role === ROLES.SUPER_ADMIN && u.status === "active")
+      .map((u) => u.id);
+    await dispatchRoleAlert({
+      event: "admin_alert",
+      title: "New student registered",
+      detail: `${created.email} created an AviatorPass account (${created.role}).`,
+      reference: created.id,
+      actorId: created.id,
+      userIds: superAdmins,
+      system: true,
+    });
   } else if (input.purpose === "booking") {
     const bookingId =
       typeof challenge.meta.bookingId === "string" ? challenge.meta.bookingId : null;

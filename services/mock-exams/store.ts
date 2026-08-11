@@ -43,12 +43,16 @@ export function defaultMockExamSettings(): MockExamSettings {
     zoomPasscode: true,
     autoIssueCertificate: true,
     examinerIds: [],
-    workingHours: [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({
-      weekday,
-      startHour: weekday === 5 || weekday === 6 ? 10 : 9,
-      endHour: weekday === 5 || weekday === 6 ? 16 : 20,
-      active: weekday !== 5, // Fri off by default
-    })),
+    // ELP / mock journey: Mon–Fri 17:00–20:00 · Sat–Sun 09:00–18:00 (0=Sun … 6=Sat).
+    workingHours: [0, 1, 2, 3, 4, 5, 6].map((weekday) => {
+      const isWeekend = weekday === 0 || weekday === 6;
+      return {
+        weekday,
+        startHour: isWeekend ? 9 : 17,
+        endHour: isWeekend ? 18 : 20,
+        active: true,
+      };
+    }),
     blackoutDates: [],
     taxRatePercent: 0,
     updatedAt: now,
@@ -57,6 +61,18 @@ export function defaultMockExamSettings(): MockExamSettings {
 
 function defaultExamTypes(): MockExamType[] {
   return [
+    {
+      id: "me_elp",
+      code: "ELP-MOCK",
+      name: "English Language Proficiency — Mock Exam",
+      description:
+        "Independent ELP mock exam with Zoom room, rush fees under 24h / 6–12h, and certificate after examiner completion.",
+      durationMinutes: 60,
+      basePrice: 40_000,
+      active: true,
+      peakMultiplier: 1,
+      offPeakMultiplier: 1,
+    },
     {
       id: "me_atpl_full",
       code: "ATPL-FULL",
@@ -104,12 +120,28 @@ function defaultExtraFees(): MockExamExtraFee[] {
       autoApply: false,
     },
     {
-      id: "fee_rush",
-      code: "RUSH",
-      label: "Rush booking (< 48h)",
+      id: "fee_rush_24",
+      code: "RUSH_24H",
+      label: "Rush booking (< 24h)",
       amount: 15_000,
       active: true,
       autoApply: true,
+    },
+    {
+      id: "fee_rush_12",
+      code: "RUSH_12H",
+      label: "Urgent booking (6–12h)",
+      amount: 25_000,
+      active: true,
+      autoApply: true,
+    },
+    {
+      id: "fee_rush",
+      code: "RUSH",
+      label: "Rush booking (< 48h) — legacy",
+      amount: 15_000,
+      active: false,
+      autoApply: false,
     },
     {
       id: "fee_resit",
@@ -179,11 +211,18 @@ export function resetMockExamsDbCache(): void {
 }
 
 export function ensureMockExamsSeeded(): void {
-  const db = readMockExamsDb();
-  if (db.seeded) return;
   writeMockExamsDb((d) => {
     if (!d.examTypes.length) d.examTypes = defaultExamTypes();
     if (!d.extraFees.length) d.extraFees = defaultExtraFees();
+    if (!d.examTypes.some((t) => t.code === "ELP-MOCK")) {
+      const elp = defaultExamTypes().find((t) => t.code === "ELP-MOCK");
+      if (elp) d.examTypes.unshift(elp);
+    }
+    for (const fee of defaultExtraFees()) {
+      if (!d.extraFees.some((f) => f.code === fee.code)) d.extraFees.push(fee);
+    }
+    // Keep ELP business hours aligned even on already-seeded DBs.
+    d.settings.workingHours = defaultMockExamSettings().workingHours;
     d.seeded = true;
     d.settings.updatedAt = new Date().toISOString();
   });

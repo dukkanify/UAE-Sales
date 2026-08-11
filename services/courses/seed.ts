@@ -7,6 +7,7 @@ import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { readAuthDb } from "@/services/auth/store";
 import { ROLES } from "@/constants/roles";
 import { readCoursesDb, writeCoursesDb } from "@/services/courses/store";
+import { ensureCustomerJourneyCourses } from "@/services/journeys/customer-journey-catalog";
 import type {
   Course,
   CourseCategory,
@@ -563,6 +564,7 @@ export function ensureCoursesSeeded(): void {
   const db = readCoursesDb();
   if (db.seeded && db.courses.length > 0) {
     ensurePublishedCatalogEnrichment();
+    ensureCustomerJourneyCourses();
     return;
   }
 
@@ -874,4 +876,5 @@ export function ensureCoursesSeeded(): void {
   });
 
   ensurePublishedCatalogEnrichment();
+  ensureCustomerJourneyCourses();
 }

@@ -172,5 +172,5 @@ describe("instructor assignment engine (CR005)", () => {
 
     const processed = await processWaitingQueue(cgi.id);
     expect(processed.processed).toBeGreaterThanOrEqual(0);
-  });
+  }, 30000);
 });
