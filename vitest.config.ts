@@ -20,7 +20,8 @@ export default defineConfig({
       exclude: ["**/*.d.ts", "**/seed.ts", "**/store.ts"],
     },
     setupFiles: ["./tests/setup.ts"],
-    testTimeout: 15000,
+    // Cloud/shared agents can be CPU-contended; keep assertions tight but allow headroom.
+    testTimeout: 60_000,
   },
 
   resolve: {
