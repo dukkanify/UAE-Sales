@@ -45,8 +45,22 @@ const FALLBACK: RuntimeBrand = {
 
 const BrandContext = React.createContext<RuntimeBrand>(FALLBACK);
 
+function applyBrandCssVars(brand: RuntimeBrand) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  root.style.setProperty("--horizon-blue", brand.primaryColor);
+  root.style.setProperty("--sun-gold", brand.accentColor);
+  root.style.setProperty("--primary", brand.primaryColor);
+  root.style.setProperty("--accent", brand.accentColor);
+  root.style.setProperty("--ring", brand.primaryColor);
+}
+
 export function BrandProvider({ children }: { children: React.ReactNode }) {
   const [brand, setBrand] = React.useState<RuntimeBrand>(FALLBACK);
+
+  React.useEffect(() => {
+    applyBrandCssVars(FALLBACK);
+  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -59,14 +73,18 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
         .then((json: { success?: boolean; data?: Partial<RuntimeBrand> }) => {
           if (cancelled || !json.success || !json.data) return;
           const next = { ...FALLBACK, ...json.data };
-          setBrand({
+          const resolved: RuntimeBrand = {
             ...next,
             platformName: next.platformName || FALLBACK.platformName,
             logoUrl: next.logoUrl || FALLBACK.logoUrl,
             darkLogoUrl: next.darkLogoUrl || FALLBACK.darkLogoUrl,
             faviconUrl: next.faviconUrl || FALLBACK.faviconUrl,
             openGraphImageUrl: next.openGraphImageUrl || FALLBACK.openGraphImageUrl,
-          });
+            primaryColor: next.primaryColor || FALLBACK.primaryColor,
+            accentColor: next.accentColor || FALLBACK.accentColor,
+          };
+          setBrand(resolved);
+          applyBrandCssVars(resolved);
         })
         .catch(() => {
           /* keep fallback */

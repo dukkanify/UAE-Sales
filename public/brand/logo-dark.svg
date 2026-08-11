@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="120" viewBox="0 0 560 120" fill="none">
-  <g transform="translate(8,18) scale(0.92)">
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="128" viewBox="0 0 640 128" fill="none">
+  <g transform="translate(6,16) scale(1.05)">
   <g>
-    <!-- lower wing bar -->
-    <path fill="#5BA3C9" d="M8 78 L46 78 C68 58 88 40 104 24 L72 54 C58 66 42 74 28 78 Z"/>
-    <!-- mid wing bar -->
-    <path fill="#5BA3C9" d="M14 58 L54 58 C78 38 100 20 118 8 L84 38 C68 50 50 56 34 58 Z"/>
-    <!-- upper wing bar -->
-    <path fill="#5BA3C9" d="M20 36 L62 36 C88 20 112 8 132 0 L96 22 C78 32 58 36 40 36 Z"/>
-    <!-- sun gold leading edge on top bar -->
-    <path fill="#DD9B30" d="M22 34 C48 20 78 8 130 -2 C108 4 82 12 64 22 C50 28 36 32 22 34 Z"/>
-    <!-- open book right pages -->
-    <path fill="none" stroke="#D1D0D4" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
-      d="M118 10 C138 2 162 6 176 18 V72 C154 58 136 56 118 64 V10 Z"/>
-    <path fill="none" stroke="#D1D0D4" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
-      d="M118 10 C100 18 88 36 86 54 V76 C98 64 108 60 118 64 V10 Z"/>
-    <path stroke="#D1D0D4" stroke-width="4.5" stroke-linecap="round" d="M118 64 V78"/>
+    <!-- Left wing-page feathers (bottom → top), meeting at spine -->
+    <path fill="#5BA3C9" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
+    <path fill="#5BA3C9" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
+    <path fill="#5BA3C9" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
+    <!-- Sun Gold leading edge on uppermost feather -->
+    <path fill="#DD9B30" d="M28 46 C50 28 74 12 96 0 L88 6 C68 18 48 32 32 44 Z"/>
+    <!-- Book spine -->
+    <path stroke="#C8C7CC" stroke-width="4.5" stroke-linecap="round" d="M96 8 V78"/>
+    <!-- Right open page -->
+    <path fill="none" stroke="#C8C7CC" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
+      d="M96 8 C118 0 146 6 160 20 V74 C138 58 116 54 96 66"/>
+    <!-- Left inner page edge (grey, completes open book) -->
+    <path fill="none" stroke="#C8C7CC" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
+      d="M96 8 C78 18 66 38 64 56 V78"/>
+    <path stroke="#C8C7CC" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
   </g></g>
-  <text x="188" y="58" font-family="Arial Black, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="1.5">
-    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="14" fill="#DD9B30">PASS</tspan>
+  <text x="200" y="60" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1.2">
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="16" fill="#DD9B30">PASS</tspan>
   </text>
-  <text x="188" y="86" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="3.4" fill="#D1D0D4">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="200" y="92" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="3.6" fill="#C8C7CC">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>

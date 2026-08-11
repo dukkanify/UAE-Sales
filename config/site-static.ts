@@ -25,13 +25,13 @@ export const siteStatic = {
     youtube: "",
   },
   brand: {
-    /** Raster lockups (transparent PNG) — preferred in UI for consistent render */
-    logo: "/brand/logo.png",
-    logoDark: "/brand/logo-dark.png",
-    logoStacked: "/brand/logo-stacked.png",
-    icon: "/brand/icon.png",
-    favicon: "/brand/favicon.svg",
-    openGraph: "/brand/og.png",
+    /** Raster lockups from Option A guidelines — cache-busted for deploy refresh */
+    logo: "/brand/logo.png?v=option-a-2",
+    logoDark: "/brand/logo-dark.png?v=option-a-2",
+    logoStacked: "/brand/logo-stacked.png?v=option-a-2",
+    icon: "/brand/icon.png?v=option-a-2",
+    favicon: "/brand/favicon.svg?v=option-a-2",
+    openGraph: "/brand/og.png?v=option-a-2",
     /** Vector masters kept for edit / favicon / print */
     logoSvg: "/brand/logo.svg",
     logoDarkSvg: "/brand/logo-dark.svg",
