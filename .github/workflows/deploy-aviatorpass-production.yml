@@ -1,0 +1,68 @@
+name: Deploy AviatorPass Production
+
+on:
+  push:
+    branches: [aviatorpass]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-aviatorpass-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production – aviatorpass
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      NEXT_PUBLIC_APP_NAME: AviatorPass
+      NEXT_PUBLIC_APP_ENV: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Require Vercel credentials
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::Missing secrets.VERCEL_TOKEN — cannot promote to production from Actions."
+            exit 1
+          fi
+          if [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::warning::VERCEL_ORG_ID / VERCEL_PROJECT_ID missing — attempting scope-based deploy."
+          fi
+      - run: npm ci
+      - name: Install Vercel CLI
+        run: npm install -g vercel@41.7.8
+      - name: Pull production env
+        run: |
+          if [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          else
+            mkdir -p .vercel
+            printf '%s\n' '{"projectId":"","orgId":""}' > .vercel/project.json
+            vercel link --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects --project aviatorpass || true
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects
+          fi
+      - name: Build
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+      - name: Deploy production
+        id: deploy
+        run: |
+          url="$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects)"
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Deployed: $url"
+      - name: Smoke production aliases
+        run: |
+          set -e
+          for host in https://aviatorpass.vercel.app https://dubai-test.blog; do
+            echo "Checking $host"
+            code=$(curl -sS -o /tmp/body.html -w '%{http_code}' --max-time 30 "$host/" || echo fail)
+            echo "HTTP $code"
+            rg -o '/brand/logo[^"'\'' ]+' /tmp/body.html | sort -u || true
+            curl -sS --max-time 30 "$host/api/health" | head -c 400 || true
+            echo
+          done
