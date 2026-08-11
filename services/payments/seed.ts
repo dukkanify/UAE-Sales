@@ -9,6 +9,7 @@ import { ROLES } from "@/constants/roles";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { listCourses } from "@/services/courses/course-service";
 import { majorToMinor } from "@/services/payments/money";
+import { ensureCustomerJourneyProducts } from "@/services/journeys/customer-journey-catalog";
 import { defaultRegionalPaymentRules } from "@/services/payments/regional-rules-service";
 import { ensureWallet } from "@/services/payments/wallet-service";
 import { readPaymentsDb, writePaymentsDb } from "@/services/payments/store";
@@ -20,6 +21,7 @@ export function ensurePaymentsSeeded(): void {
   const db = readPaymentsDb();
   if (db.seeded && db.products.length > 0) {
     ensureAtplPackageAndRegionalRules();
+    ensureCustomerJourneyProducts();
     return;
   }
 
@@ -356,6 +358,8 @@ export function ensurePaymentsSeeded(): void {
   // Ensure second instructor wallet exists empty
   const instructor2 = users.find((u) => u.role === ROLES.INSTRUCTOR && u.id !== instructor.id);
   if (instructor2) ensureWallet(instructor2.id);
+
+  ensureCustomerJourneyProducts();
 }
 
 /** Backfill ATPL package + regional BNPL rules on already-seeded payment DBs. */

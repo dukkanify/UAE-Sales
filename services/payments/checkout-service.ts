@@ -5,7 +5,10 @@
 import { generateId, generateToken } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { ORDER_EXPIRY_MINUTES } from "@/constants/payments";
+import { ROLES } from "@/constants/roles";
 import { logActivity } from "@/services/auth/activity-log";
+import { readAuthDb } from "@/services/auth/store";
+import { dispatchEmailEvent, dispatchRoleAlert } from "@/services/email/automation-service";
 import { assertCanCheckout, assertOwnOrder, PaymentError } from "@/services/payments/access";
 import { getProduct, validateCoupon } from "@/services/payments/catalog-service";
 import { getPaymentGateway } from "@/services/payments/gateway";
@@ -615,6 +618,33 @@ async function completePaidOrder(order: Order, payment: PaymentRecord, actorId: 
     reference: order.orderNumber,
     // Invoice + receipt emails are sent from issueInvoiceForOrder.
     email: false,
+  });
+
+  const productNames = order.items.map((i) => i.productName).join(", ");
+  await dispatchEmailEvent({
+    event: "payment",
+    userIds: [order.studentId],
+    data: {
+      title: "Your course is now available",
+      detail: `${productNames || "Your purchase"} is unlocked in My Courses. Open AviatorPass to start learning.`,
+      amount: formatMinor(order.totalAmount, order.currency),
+      reference: order.orderNumber,
+    },
+    actorId,
+    system: true,
+  });
+
+  const superAdmins = readAuthDb()
+    .users.filter((u) => u.role === ROLES.SUPER_ADMIN && u.status === "active")
+    .map((u) => u.id);
+  await dispatchRoleAlert({
+    event: "admin_alert",
+    title: "Payment received",
+    detail: `${order.orderNumber} · ${formatMinor(order.totalAmount, order.currency)} · ${productNames}. Invoice ${invoice.invoiceNumber ?? invoice.id}.`,
+    reference: order.orderNumber,
+    actorId,
+    userIds: superAdmins,
+    system: true,
   });
 
   await logActivity({

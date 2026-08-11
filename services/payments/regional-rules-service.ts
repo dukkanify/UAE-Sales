@@ -37,49 +37,80 @@ export function defaultRegionalPaymentRules(currency: string): RegionalPaymentRu
   });
 
   return [
-    base("KW", "Kuwait", ["tamara", "tabby"], {
+    base("KW", "Kuwait", ["tabby"], {
       currency: "KWD",
-      notes: "Tamara + Tabby (تالي) available for ATPL package checkout.",
+      maxInstallments: 6,
+      notes: "Customer journey: Tabby (تالي) for Kuwait · installments 4/5/6.",
     }),
-    base("SA", "Saudi Arabia", ["tamara", "tabby"], {
+    base("SA", "Saudi Arabia", ["tamara"], {
       currency: "SAR",
-      notes: "Tamara (home market) + Tabby supported.",
+      maxInstallments: 6,
+      notes: "Tamara (home market). Platform installments up to 6.",
     }),
-    base("AE", "United Arab Emirates", ["tamara", "tabby"], {
+    base("AE", "United Arab Emirates", ["tamara"], {
       currency: "AED",
-      notes: "Tamara + Tabby supported.",
+      maxInstallments: 6,
+      notes: "Customer journey: Tamara for UAE · installments 4/5/6.",
     }),
-    base("BH", "Bahrain", ["tamara", "tabby"], {
+    base("BH", "Bahrain", ["tamara"], {
       currency: "BHD",
-      notes: "Tamara + Tabby supported.",
+      maxInstallments: 6,
+      notes: "Tamara supported · installments up to 6.",
     }),
     base("QA", "Qatar", [], {
       currency: "QAR",
       allowInstallments: true,
+      maxInstallments: 6,
       bnplProviders: [],
-      notes: "Full payment + platform installments; BNPL not enabled by default.",
+      notes: "Full payment + platform installments (4/5/6); BNPL not enabled by default.",
     }),
     base("OM", "Oman", [], {
       currency: "OMR",
       allowInstallments: true,
+      maxInstallments: 6,
       bnplProviders: [],
       requiresPassport: true,
-      notes: "Full payment + platform installments.",
+      notes: "Full payment + platform installments (4/5/6).",
     }),
     base("XX", "Other / International", [], {
-      allowInstallments: false,
+      allowInstallments: true,
+      maxInstallments: 4,
       bnplProviders: [],
-      requiresPassport: false,
-      requiresAgreement: false,
-      notes: "Full payment only outside configured GCC markets.",
+      requiresPassport: true,
+      requiresAgreement: true,
+      notes:
+        "Outside KW/AE: full payment or platform installments (first deposit + monthly). Passport + agreement required.",
     }),
   ];
 }
 
 export function ensureRegionalRulesSeeded(): void {
   writePaymentsDb((db) => {
-    if (db.regionalRules.length > 0) return;
-    db.regionalRules = defaultRegionalPaymentRules(db.settings.currency);
+    if (db.regionalRules.length === 0) {
+      db.regionalRules = defaultRegionalPaymentRules(db.settings.currency);
+      return;
+    }
+    // Align existing seeds with customer-journey BNPL exclusivity.
+    const stamp = nowIso();
+    for (const rule of db.regionalRules) {
+      if (rule.countryCode === "KW") {
+        rule.bnplProviders = ["tabby"];
+        rule.maxInstallments = Math.max(rule.maxInstallments, 6);
+        rule.notes = "Customer journey: Tabby (تالي) for Kuwait · installments 4/5/6.";
+        rule.updatedAt = stamp;
+      } else if (rule.countryCode === "AE") {
+        rule.bnplProviders = ["tamara"];
+        rule.maxInstallments = Math.max(rule.maxInstallments, 6);
+        rule.notes = "Customer journey: Tamara for UAE · installments 4/5/6.";
+        rule.updatedAt = stamp;
+      } else if (rule.countryCode === "XX" && !rule.allowInstallments) {
+        rule.allowInstallments = true;
+        rule.maxInstallments = Math.max(rule.maxInstallments, 4);
+        rule.requiresPassport = true;
+        rule.requiresAgreement = true;
+        rule.updatedAt = stamp;
+      }
+    }
   });
 }
 

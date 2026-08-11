@@ -49,12 +49,17 @@ export function quoteMockExam(input: {
   const extraFees: MockExamFeeLine[] = [];
   for (const fee of db.extraFees.filter((f) => f.active)) {
     let apply = selected.has(fee.id);
-    if (fee.autoApply && fee.code === "RUSH" && hoursUntil > 0 && hoursUntil < 48) {
+    // ELP journey: higher urgent fee for 6–12h, standard rush under 24h.
+    if (fee.autoApply && fee.code === "RUSH_12H" && hoursUntil > 0 && hoursUntil <= 12) {
+      apply = true;
+    } else if (fee.autoApply && fee.code === "RUSH_24H" && hoursUntil > 12 && hoursUntil < 24) {
+      apply = true;
+    } else if (fee.autoApply && fee.code === "RUSH" && hoursUntil > 0 && hoursUntil < 48) {
       apply = true;
     }
     if (fee.autoApply && fee.code === "WEEKEND") {
       const day = start.getUTCDay();
-      if (day === 5 || day === 6) apply = true;
+      if (day === 0 || day === 6) apply = true;
     }
     if (apply) {
       extraFees.push({ code: fee.code, label: fee.label, amount: fee.amount });
