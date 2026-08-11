@@ -28,6 +28,7 @@ export function ensureDemoUsersSeeded(): void {
     seedFreshDemoUsers();
   }
   ensureCgiDemoUser();
+  ensureCaptainInstructorDemo();
   backfillDemoStudentDetails();
 }
 
@@ -134,15 +135,16 @@ function seedFreshDemoUsers(): void {
     {
       email: "instructor.one@eagerpilots.com",
       role: ROLES.INSTRUCTOR,
-      firstName: "James",
-      lastName: "Carter",
+      firstName: "Abdulaziz",
+      lastName: "Alshoail",
       status: ACCOUNT_STATUS.ACTIVE,
       profileComplete: true,
       emailVerified: true,
-      countryCode: "AE",
-      phone: "+971501112233",
-      nationality: "British",
-      city: "Dubai",
+      countryCode: "KW",
+      phone: "+96550000001",
+      nationality: "Kuwaiti",
+      city: "Kuwait City",
+      bio: "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.",
     },
     {
       email: "instructor.two@eagerpilots.com",
@@ -269,6 +271,23 @@ function seedFreshDemoUsers(): void {
         updatedAt: now,
       });
     }
+  });
+}
+
+/** Align primary instructor with Captain Abdulaziz Alshoail (customer journeys). */
+function ensureCaptainInstructorDemo(): void {
+  writeAuthDb((d) => {
+    const instructor = d.users.find((u) => u.email === "instructor.one@eagerpilots.com");
+    if (!instructor) return;
+    if (instructor.firstName === "Abdulaziz" && instructor.lastName === "Alshoail") return;
+    instructor.firstName = "Abdulaziz";
+    instructor.lastName = "Alshoail";
+    instructor.countryCode = "KW";
+    instructor.city = "Kuwait City";
+    instructor.nationality = "Kuwaiti";
+    instructor.bio =
+      "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.";
+    instructor.updatedAt = new Date().toISOString();
   });
 }
 

@@ -20,6 +20,10 @@ import { routes } from "@/constants/routes";
 import { cn } from "@/lib/utils";
 import { applyDueScheduledPublishes, getCourseDetail } from "@/services/courses/course-service";
 import { isCoursePubliclyListed } from "@/services/courses/publishing";
+import { getJourneyObjectives } from "@/services/journeys/customer-journey-catalog";
+import { listProducts } from "@/services/payments/catalog-service";
+import { ensurePaymentsSeeded } from "@/services/payments/seed";
+import { formatMinor } from "@/services/payments/money";
 
 type PageProps = { params: Promise<{ id: string }> };
 
@@ -51,6 +55,26 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
   const hours = Math.max(1, Math.round(course.estimatedDurationMinutes / 60));
   const lessonTotal =
     course.counts.lessons || course.modules.reduce((n, m) => n + m.lessons.length, 0);
+  ensurePaymentsSeeded();
+  const product = listProducts({ activeOnly: true, courseId: course.id })[0] ?? null;
+  const objectives = getJourneyObjectives(course);
+  const instructorLabel =
+    (typeof course.metadata?.instructorDisplayName === "string" &&
+      course.metadata.instructorDisplayName) ||
+    course.primaryInstructorName ||
+    "Captain Abdulaziz Alshoail";
+  const deliveryLabel = course.deliveryType === "live" ? "Live Online" : "Recorded";
+  const languageLabel =
+    course.language === "en/ar"
+      ? "Arabic / English"
+      : course.language === "ar"
+        ? "Arabic"
+        : "English";
+  const enrollHref = product ? `/student/checkout?productId=${product.id}` : routes.register;
+  const programWeeks =
+    typeof course.metadata?.programWeeks === "number" ? course.metadata.programWeeks : null;
+  const lectureCount =
+    typeof course.metadata?.lectureCount === "number" ? course.metadata.lectureCount : null;
 
   return (
     <div className="platform-altitude landing-root">
@@ -104,34 +128,53 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
 
           <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-sm text-white/60">
             <span className="inline-flex items-center gap-1.5">
-              <Clock3 className="h-4 w-4 text-accent/80" />~{hours} study hours
+              <Clock3 className="h-4 w-4 text-accent/80" />
+              {hours} study hours
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Layers3 className="h-4 w-4 text-accent/80" />
-              {course.counts.modules} modules · {lessonTotal} lessons
+              {deliveryLabel}
+              {lectureCount ? ` · ${lectureCount} lectures` : ` · ${course.counts.modules} modules`}
             </span>
-            {course.primaryInstructorName ? (
-              <span className="inline-flex items-center gap-1.5">
-                <UserRound className="h-4 w-4 text-accent/80" />
-                {course.primaryInstructorName}
+            <span className="inline-flex items-center gap-1.5">
+              <BookOpen className="h-4 w-4 text-accent/80" />
+              {languageLabel}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <UserRound className="h-4 w-4 text-accent/80" />
+              {instructorLabel}
+            </span>
+            {product ? (
+              <span className="inline-flex items-center gap-1.5 font-medium text-accent">
+                {formatMinor(product.priceAmount, product.currency)}
               </span>
             ) : null}
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
             <Button variant="accent" className="hero-cta-primary" asChild>
-              <Link href={routes.register}>
-                Join to enroll
+              <Link href={enrollHref}>
+                Enroll in course
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button
-              variant="outline"
-              className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
-              asChild
-            >
-              <Link href={routes.book}>Book live Zoom</Link>
-            </Button>
+            {course.deliveryType === "live" ? (
+              <Button
+                variant="outline"
+                className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                asChild
+              >
+                <Link href={routes.book}>Book live Zoom</Link>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                className="border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                asChild
+              >
+                <Link href={routes.login}>Enter My Courses</Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -146,6 +189,23 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
             <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed text-muted-foreground sm:text-lg">
               {course.fullDescription || course.shortDescription}
             </p>
+
+            {objectives.length > 0 ? (
+              <div className="mt-10">
+                <p className="landing-kicker text-primary">Objectives</p>
+                <ul className="mt-4 space-y-3 text-base leading-relaxed text-muted-foreground">
+                  {objectives.map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span
+                        className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
+                        aria-hidden
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             {course.modules.length > 0 ? (
               <div className="mt-14">
@@ -256,45 +316,43 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
                   Start learning
                 </p>
                 <p className="mt-3 font-display text-2xl font-semibold tracking-[-0.03em]">
-                  Enter the lane
+                  {product ? formatMinor(product.priceAmount, product.currency) : "Enroll"}
                 </p>
                 <p className="mt-3 text-sm leading-relaxed text-white/65">
-                  Create a learner account to enroll, track progress, and book instructor Zoom when
-                  you need coaching altitude.
+                  {deliveryLabel} lane with currency choice at checkout (full, installments 4/5/6,
+                  Tabby in Kuwait, or Tamara in UAE).
                 </p>
 
                 <dl className="mt-6 space-y-3 border-t border-white/10 pt-5 text-sm">
                   <div className="flex items-center justify-between gap-3">
-                    <dt className="text-white/50">Difficulty</dt>
-                    <dd className="font-medium text-white">
-                      {DIFFICULTY_LABELS[course.difficulty]}
-                    </dd>
+                    <dt className="text-white/50">Delivery</dt>
+                    <dd className="font-medium text-white">{deliveryLabel}</dd>
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <dt className="text-white/50">Study load</dt>
-                    <dd className="font-medium text-white">~{hours} hours</dd>
+                    <dd className="font-medium text-white">{hours} hours</dd>
                   </div>
                   <div className="flex items-center justify-between gap-3">
-                    <dt className="text-white/50">Structure</dt>
-                    <dd className="font-medium text-white">
-                      {course.counts.modules} / {lessonTotal}
-                    </dd>
+                    <dt className="text-white/50">Language</dt>
+                    <dd className="font-medium text-white">{languageLabel}</dd>
                   </div>
-                  {course.primaryInstructorName ? (
+                  {programWeeks ? (
                     <div className="flex items-center justify-between gap-3">
-                      <dt className="text-white/50">Instructor</dt>
-                      <dd className="truncate font-medium text-white">
-                        {course.primaryInstructorName}
-                      </dd>
+                      <dt className="text-white/50">Program</dt>
+                      <dd className="font-medium text-white">{programWeeks} weeks</dd>
                     </div>
                   ) : null}
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-white/50">Instructor</dt>
+                    <dd className="truncate font-medium text-white">{instructorLabel}</dd>
+                  </div>
                 </dl>
 
                 <div className="mt-6 flex flex-col gap-3">
                   <Button variant="accent" className="hero-cta-primary w-full" asChild>
-                    <Link href={routes.register}>
+                    <Link href={enrollHref}>
                       <GraduationCap className="h-4 w-4" />
-                      Create student account
+                      Enroll in course
                     </Link>
                   </Button>
                   <Button
@@ -309,8 +367,8 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
                     className="w-full text-white/70 hover:bg-white/10 hover:text-white"
                     asChild
                   >
-                    <Link href={routes.book}>
-                      Book live Zoom
+                    <Link href={routes.register}>
+                      Create student account
                       <ArrowUpRight className="h-4 w-4" />
                     </Link>
                   </Button>

@@ -5,8 +5,10 @@
 import { generateId } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { logActivity } from "@/services/auth/activity-log";
+import { maybeAutoIssueCertificate } from "@/services/certificates/certificate-service";
 import { getCourseDetail } from "@/services/courses/course-service";
 import { listStudentEnrollments } from "@/services/courses/enrollment-service";
+import { courseAllowsSequentialLock } from "@/services/journeys/customer-journey-catalog";
 import {
   assertStudentEnrolled,
   getActiveEnrollment,
@@ -15,11 +17,28 @@ import {
 import { recordHistory } from "@/services/learning/history-service";
 import { syncGoalHoursFromProgress } from "@/services/learning/planner-service";
 import { readLearningDb, writeLearningDb } from "@/services/learning/store";
-import type {
-  CourseLearningState,
-  LessonProgressRecord,
-} from "@/types/learning";
+import type { CourseLearningState, LessonProgressRecord } from "@/types/learning";
 import type { UserProfile } from "@/types";
+
+/** When sequential lock is enabled, previous published lessons must be completed. */
+export function assertLessonUnlocked(studentId: string, courseId: string, lessonId: string) {
+  const course = getCourseDetail(courseId);
+  if (!course || !courseAllowsSequentialLock(course)) return;
+  const lessons = publishedLessons(courseId);
+  const index = lessons.findIndex((e) => e.lesson.id === lessonId);
+  if (index <= 0) return;
+  const rows = listProgressForStudent(studentId).filter((p) => p.courseId === courseId);
+  for (let i = 0; i < index; i++) {
+    const prev = lessons[i]!;
+    const row = rows.find((r) => r.lessonId === prev.lesson.id);
+    if (!row?.completed) {
+      throw new LearningAccessError(
+        `Complete “${prev.lesson.title}” before opening the next lesson.`,
+        403,
+      );
+    }
+  }
+}
 
 export function listProgressForStudent(studentId: string): LessonProgressRecord[] {
   return readLearningDb()
@@ -32,9 +51,8 @@ export function getLessonProgress(
   lessonId: string,
 ): LessonProgressRecord | null {
   return (
-    readLearningDb().progress.find(
-      (p) => p.studentId === studentId && p.lessonId === lessonId,
-    ) ?? null
+    readLearningDb().progress.find((p) => p.studentId === studentId && p.lessonId === lessonId) ??
+    null
   );
 }
 
@@ -51,10 +69,7 @@ function publishedLessons(courseId: string) {
     );
 }
 
-export function getCourseLearningState(
-  studentId: string,
-  courseId: string,
-): CourseLearningState {
+export function getCourseLearningState(studentId: string, courseId: string): CourseLearningState {
   const enrollment = getActiveEnrollment(studentId, courseId);
   if (!enrollment) {
     throw new LearningAccessError("You are not enrolled in this course");
@@ -90,16 +105,10 @@ export function getCourseLearningState(
 
   const store = readLearningDb();
   const bookmarked = store.bookmarks.some(
-    (b) =>
-      b.studentId === studentId &&
-      b.targetType === "lesson" &&
-      b.courseId === courseId,
+    (b) => b.studentId === studentId && b.targetType === "lesson" && b.courseId === courseId,
   );
   const favorited = store.favorites.some(
-    (f) =>
-      f.studentId === studentId &&
-      f.targetType === "course" &&
-      f.targetId === courseId,
+    (f) => f.studentId === studentId && f.targetType === "course" && f.targetId === courseId,
   );
 
   const startedAt =
@@ -109,11 +118,11 @@ export function getCourseLearningState(
       .sort()[0] ?? null;
   const allDone = totalLessons > 0 && completedLessons >= totalLessons;
   const completedAt = allDone
-    ? rows
+    ? (rows
         .map((r) => r.completedAt)
         .filter(Boolean)
         .sort()
-        .at(-1) ?? null
+        .at(-1) ?? null)
     : null;
 
   return {
@@ -169,8 +178,7 @@ export function getOverallProgress(studentId: string): {
     activeCourses,
     completedCourses,
     learningHours: Math.round((totalSeconds / 3600) * 10) / 10,
-    progressPercent:
-      courseIds.length === 0 ? 0 : Math.round((sumPct / courseIds.length) * 10) / 10,
+    progressPercent: courseIds.length === 0 ? 0 : Math.round((sumPct / courseIds.length) * 10) / 10,
     lessonsStarted: progress.filter((p) => p.startedAt || p.timeSpentSeconds > 0 || p.completed)
       .length,
     lessonsCompleted: progress.filter((p) => p.completed).length,
@@ -186,10 +194,9 @@ export async function touchLessonProgress(input: {
   markStarted?: boolean;
 }): Promise<LessonProgressRecord> {
   const enrollment = assertStudentEnrolled(input.user, input.courseId);
-  const found = publishedLessons(input.courseId).find(
-    (e) => e.lesson.id === input.lessonId,
-  );
+  const found = publishedLessons(input.courseId).find((e) => e.lesson.id === input.lessonId);
   if (!found) throw new LearningAccessError("Lesson not found", 404);
+  assertLessonUnlocked(input.user.id, input.courseId, input.lessonId);
 
   const now = new Date().toISOString();
   const delta = Math.max(0, Math.min(input.deltaSeconds ?? 0, 300));
@@ -290,9 +297,7 @@ export async function completeLessonProgress(input: {
     deltaSeconds: 30,
   });
 
-  const found = publishedLessons(input.courseId).find(
-    (e) => e.lesson.id === input.lessonId,
-  );
+  const found = publishedLessons(input.courseId).find((e) => e.lesson.id === input.lessonId);
   const now = new Date().toISOString();
 
   writeLearningDb((d) => {
@@ -322,6 +327,18 @@ export async function completeLessonProgress(input: {
   });
 
   syncGoalHoursFromProgress(input.user.id);
+
+  // Customer journey: auto-issue AviatorPass certificate at 100% progress.
+  try {
+    await maybeAutoIssueCertificate({
+      actor: input.user,
+      studentId: input.user.id,
+      courseId: input.courseId,
+    });
+  } catch {
+    /* certificate issuance is best-effort */
+  }
+
   return getLessonProgress(input.user.id, input.lessonId)!;
 }
 
@@ -353,18 +370,17 @@ export async function recordResourceDownload(input: {
 export function getAdjacentLessons(
   courseId: string,
   lessonId: string,
-): { prev: { id: string; title: string; moduleId: string } | null; next: { id: string; title: string; moduleId: string } | null } {
+): {
+  prev: { id: string; title: string; moduleId: string } | null;
+  next: { id: string; title: string; moduleId: string } | null;
+} {
   const lessons = publishedLessons(courseId);
   const idx = lessons.findIndex((e) => e.lesson.id === lessonId);
   if (idx < 0) return { prev: null, next: null };
   const prev = idx > 0 ? lessons[idx - 1]! : null;
   const next = idx < lessons.length - 1 ? lessons[idx + 1]! : null;
   return {
-    prev: prev
-      ? { id: prev.lesson.id, title: prev.lesson.title, moduleId: prev.moduleId }
-      : null,
-    next: next
-      ? { id: next.lesson.id, title: next.lesson.title, moduleId: next.moduleId }
-      : null,
+    prev: prev ? { id: prev.lesson.id, title: prev.lesson.title, moduleId: prev.moduleId } : null,
+    next: next ? { id: next.lesson.id, title: next.lesson.title, moduleId: next.moduleId } : null,
   };
 }

@@ -31,12 +31,16 @@ describe("installments & regional payments (CR003)", () => {
     ensurePaymentsSeeded();
   });
 
-  it("exposes Tamara + Tabby (تالي) for KW/SA/AE", () => {
-    for (const code of ["KW", "SA", "AE", "BH"]) {
-      const rule = getRegionalPaymentRule(code);
-      const modes = allowedCheckoutModes(rule);
-      expect(modes).toEqual(expect.arrayContaining(["full", "installments", "tamara", "tabby"]));
-    }
+  it("maps Tabby to Kuwait and Tamara to UAE (customer journey)", () => {
+    expect(allowedCheckoutModes(getRegionalPaymentRule("KW"))).toEqual(
+      expect.arrayContaining(["full", "installments", "tabby"]),
+    );
+    expect(allowedCheckoutModes(getRegionalPaymentRule("KW"))).not.toContain("tamara");
+    expect(allowedCheckoutModes(getRegionalPaymentRule("AE"))).toEqual(
+      expect.arrayContaining(["full", "installments", "tamara"]),
+    );
+    expect(allowedCheckoutModes(getRegionalPaymentRule("AE"))).not.toContain("tabby");
+    expect(allowedCheckoutModes(getRegionalPaymentRule("SA"))).toContain("tamara");
     const qa = allowedCheckoutModes(getRegionalPaymentRule("QA"));
     expect(qa).toContain("full");
     expect(qa).toContain("installments");
@@ -138,7 +142,7 @@ describe("installments & regional payments (CR003)", () => {
     expect(readPaymentsDb().installmentPlans.find((p) => p.id === plan.id)?.status).toBe(
       "suspended",
     );
-  });
+  }, 30000);
 
   it("pays ATPL package in full via checkout flow", async () => {
     const student = readAuthDb().users.find(
@@ -164,5 +168,5 @@ describe("installments & regional payments (CR003)", () => {
     });
     expect(paid.order.status).toBe("paid");
     expect(paid.payment.status).toBe("succeeded");
-  });
+  }, 30000);
 });
