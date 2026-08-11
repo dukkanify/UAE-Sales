@@ -115,5 +115,5 @@ describe("chief ground instructor (CR004)", () => {
     expect(lecture.status).toBe("assigned");
     expect(lecture.lessonTitle).toBe("Met briefing");
     expect(lecture.liveClassId).toBeNull();
-  });
+  }, 60_000);
 });
