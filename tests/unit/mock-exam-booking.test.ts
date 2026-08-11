@@ -43,6 +43,12 @@ describe("mock exam booking (CR007)", () => {
       db.settings.peakEndHour = 21;
       db.settings.autoCreateZoom = true;
       db.settings.autoIssueCertificate = true;
+      for (const fee of db.extraFees) {
+        if (fee.code === "RUSH_12H" || fee.code === "RUSH_24H") {
+          fee.active = true;
+          fee.autoApply = true;
+        }
+      }
     });
   });
 
@@ -60,14 +66,22 @@ describe("mock exam booking (CR007)", () => {
     });
     expect(peakQuote.multiplier).toBe(examType.peakMultiplier);
 
-    // Deterministic window for legacy RUSH (24h–48h), outside ELP RUSH_12H/RUSH_24H bands.
-    const rush = new Date(Date.now() + 36 * 3_600_000);
-    rush.setUTCMinutes(0, 0, 0);
+    // ELP rush bands (legacy RUSH is inactive by default).
+    const within24h = new Date(Date.now() + 18 * 3_600_000);
+    within24h.setUTCMinutes(0, 0, 0);
     const rushQuote = quoteMockExam({
       examTypeId: examType.id,
-      startsAt: rush.toISOString(),
+      startsAt: within24h.toISOString(),
     });
-    expect(rushQuote.extraFees.some((f) => f.code === "RUSH")).toBe(true);
+    expect(rushQuote.extraFees.some((f) => f.code === "RUSH_24H")).toBe(true);
+
+    const within12h = new Date(Date.now() + 8 * 3_600_000);
+    within12h.setUTCMinutes(0, 0, 0);
+    const urgentQuote = quoteMockExam({
+      examTypeId: examType.id,
+      startsAt: within12h.toISOString(),
+    });
+    expect(urgentQuote.extraFees.some((f) => f.code === "RUSH_12H")).toBe(true);
   });
 
   it("books available slot with Zoom, completes session, issues certificate", async () => {
