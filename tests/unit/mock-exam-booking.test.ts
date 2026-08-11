@@ -60,7 +60,8 @@ describe("mock exam booking (CR007)", () => {
     });
     expect(peakQuote.multiplier).toBe(examType.peakMultiplier);
 
-    const rush = new Date(Date.now() + 24 * 3_600_000);
+    // Deterministic window for legacy RUSH (24h–48h), outside ELP RUSH_12H/RUSH_24H bands.
+    const rush = new Date(Date.now() + 36 * 3_600_000);
     rush.setUTCMinutes(0, 0, 0);
     const rushQuote = quoteMockExam({
       examTypeId: examType.id,
