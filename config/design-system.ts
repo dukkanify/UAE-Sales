@@ -1,6 +1,6 @@
 /**
- * AviatorPass Design System — Option A (Horizon Blue & Sun Gold).
- * Horizon Blue / Aero Blue #2E7DAA · Sun Gold / Altitude Orange #DD9B30 · Academic Grey #7C7B80
+ * AviatorPass Design System — official brand guidelines.
+ * Aviator Blue #143048 · Aviator Gold #CCA04C · Academic Grey #7C7B80
  */
 
 export const breakpoints = {
@@ -14,7 +14,7 @@ export const breakpoints = {
 export const typographyScale = {
   display: {
     className: "font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl",
-    label: "Display (Stimulatio Flat / Space Grotesk)",
+    label: "Display (Stimulatio Flat / Exo 2)",
   },
   h1: {
     className: "font-display text-3xl font-semibold tracking-tight sm:text-4xl",
@@ -51,16 +51,16 @@ export const typographyScale = {
 } as const;
 
 export const colorRoles = {
-  primary: { name: "Horizon Blue", value: "#2E7DAA", aka: "Aero Blue" },
+  primary: { name: "Aviator Blue", value: "#143048" },
   secondary: { name: "Academic Grey", value: "#7C7B80" },
-  accent: { name: "Sun Gold", value: "#DD9B30", aka: "Altitude Orange" },
+  accent: { name: "Aviator Gold", value: "#CCA04C", aka: "Gold mid #CCA04C" },
   success: { name: "Runway Green", value: "#2F8F5B" },
-  warning: { name: "Sun Gold", value: "#DD9B30" },
+  warning: { name: "Aviator Gold", value: "#CCA04C" },
   danger: { name: "Signal Red", value: "#C23B3B" },
-  background: { name: "Cloud", value: "#F7FAFC" },
-  muted: { name: "Sky Mist", value: "#E8F3F8" },
+  background: { name: "Cloud", value: "#F4F6F8" },
+  muted: { name: "Sky Mist", value: "#E6ECF1" },
   sand: { name: "Sand Glow", value: "#F8F1E4" },
-  ink: { name: "Navy Ink", value: "#0F2A3D" },
+  ink: { name: "Navy Ink", value: "#0D2235" },
   card: { name: "White", value: "#FFFFFF" },
 } as const;
 

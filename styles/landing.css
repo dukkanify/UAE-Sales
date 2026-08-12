@@ -1,27 +1,27 @@
 /* AviatorPass — premium single-page landing */
 
 .landing-root {
-  /* Option A — Horizon Blue & Sun Gold + supporting atmosphere */
-  --landing-ink: #0f2a3d;
-  --landing-ink-soft: #163a50;
-  --landing-ink-mid: #1e4f6d;
-  --landing-mist: #e8f3f8;
-  --landing-mist-deep: #d2e7f2;
-  --landing-aero: #2e7daa;
-  --landing-aero-bright: #74b2d1;
-  --landing-gold: #dd9b30;
-  --landing-gold-bright: #e5b85c;
+  /* Official — Aviator Blue & Aviator Gold + supporting atmosphere */
+  --landing-ink: #0d2235;
+  --landing-ink-soft: #143048;
+  --landing-ink-mid: #1a3a52;
+  --landing-mist: #e6ecf1;
+  --landing-mist-deep: #d9e1e8;
+  --landing-aero: #143048;
+  --landing-aero-bright: #7a97ad;
+  --landing-gold: #cca04c;
+  --landing-gold-bright: #f6c36c;
   --landing-sand: #f8f1e4;
-  --landing-cloud: #f7fafc;
+  --landing-cloud: #f4f6f8;
 }
 
 /* —— Hero —— */
 .hero-aviation {
   background-color: var(--landing-ink);
   background-image:
-    radial-gradient(ellipse 110% 70% at 88% -8%, rgba(46, 125, 170, 0.62), transparent 56%),
-    radial-gradient(ellipse 55% 42% at 8% 108%, rgba(221, 155, 48, 0.22), transparent 58%),
-    radial-gradient(ellipse 40% 32% at 42% 52%, rgba(126, 192, 223, 0.1), transparent 72%),
+    radial-gradient(ellipse 110% 70% at 88% -8%, rgba(20, 48, 72, 0.62), transparent 56%),
+    radial-gradient(ellipse 55% 42% at 8% 108%, rgba(204, 160, 76, 0.22), transparent 58%),
+    radial-gradient(ellipse 40% 32% at 42% 52%, rgba(122, 151, 173, 0.12), transparent 72%),
     linear-gradient(
       188deg,
       rgba(3, 8, 12, 0.02) 0%,
@@ -58,9 +58,9 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(126, 192, 223, 0.22) 18%,
+    rgba(122, 151, 173, 0.22) 18%,
     rgba(240, 197, 106, 0.9) 50%,
-    rgba(126, 192, 223, 0.22) 82%,
+    rgba(122, 151, 173, 0.22) 82%,
     transparent 100%
   );
   animation: platform-scan 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
@@ -78,10 +78,10 @@
     linear-gradient(
       180deg,
       transparent 0%,
-      rgba(46, 125, 170, 0.08) 32%,
-      rgba(221, 155, 48, 0.16) 100%
+      rgba(20, 48, 72, 0.08) 32%,
+      rgba(204, 160, 76, 0.16) 100%
     ),
-    radial-gradient(ellipse 95% 58% at 50% 100%, rgba(221, 155, 48, 0.32), transparent 70%);
+    radial-gradient(ellipse 95% 58% at 50% 100%, rgba(204, 160, 76, 0.32), transparent 70%);
   animation: hero-horizon-breathe 11s ease-in-out infinite;
 }
 
@@ -103,18 +103,18 @@
 .hero-brand {
   letter-spacing: -0.048em;
   line-height: 0.86;
-  filter: drop-shadow(0 14px 52px rgba(46, 125, 170, 0.32));
+  filter: drop-shadow(0 14px 52px rgba(20, 48, 72, 0.45));
 }
 
 .hero-brand-aviator {
-  background: linear-gradient(115deg, #f2f9fc 0%, #a8d6eb 36%, #4f9bc4 100%);
+  background: linear-gradient(115deg, #f4f7fa 0%, #c5d4e0 40%, #8aa4b8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
 .hero-brand-pass {
-  background: linear-gradient(115deg, #ffe4a8 0%, #dd9b30 46%, #a86a14 100%);
+  background: linear-gradient(115deg, #f6c36c 0%, #cca04c 46%, #9e712e 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -122,8 +122,8 @@
 
 .hero-cta-primary {
   box-shadow:
-    0 0 0 1px rgba(240, 197, 106, 0.28),
-    0 20px 44px -18px rgba(221, 155, 48, 0.6);
+    0 0 0 1px rgba(246, 195, 108, 0.28),
+    0 20px 44px -18px rgba(158, 113, 46, 0.55);
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease;
@@ -132,8 +132,8 @@
 .hero-cta-primary:hover {
   transform: translateY(-2px);
   box-shadow:
-    0 0 0 1px rgba(240, 197, 106, 0.4),
-    0 24px 48px -16px rgba(221, 155, 48, 0.7);
+    0 0 0 1px rgba(246, 195, 108, 0.4),
+    0 24px 48px -16px rgba(158, 113, 46, 0.65);
 }
 
 .hero-cta-secondary {
@@ -142,11 +142,11 @@
 
 /* —— Page continuity —— */
 .platform-surface {
-  background-color: #edf3f7;
+  background-color: #edf1f4;
   background-image:
-    radial-gradient(ellipse 80% 55% at 100% -20%, rgb(46 125 170 / 0.13), transparent 58%),
-    radial-gradient(ellipse 45% 40% at -8% 110%, rgb(221 155 48 / 0.08), transparent 52%),
-    linear-gradient(180deg, #e2ebf2 0%, #edf3f7 42%, #f5f9fc 100%);
+    radial-gradient(ellipse 80% 55% at 100% -20%, rgb(20 48 72 / 0.12), transparent 58%),
+    radial-gradient(ellipse 45% 40% at -8% 110%, rgb(204 160 76 / 0.1), transparent 52%),
+    linear-gradient(180deg, #e2e8ee 0%, #edf1f4 42%, #f4f6f8 100%);
 }
 
 /* Cooler mid-altitude sheet for course lanes */
@@ -154,14 +154,14 @@
   background-color: #e8eef4;
   background-image:
     radial-gradient(ellipse 70% 50% at 0% -10%, rgb(18 36 51 / 0.08), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 100% 100%, rgb(46 125 170 / 0.1), transparent 50%),
+    radial-gradient(ellipse 55% 45% at 100% 100%, rgb(20 48 72 / 0.1), transparent 50%),
     linear-gradient(180deg, #dfe8f0 0%, #e8eef4 45%, #eef3f7 100%);
 }
 
 .platform-band {
   background:
-    radial-gradient(ellipse 95% 75% at 88% -15%, rgba(46, 125, 170, 0.5), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 0% 115%, rgba(221, 155, 48, 0.18), transparent 52%),
+    radial-gradient(ellipse 95% 75% at 88% -15%, rgba(20, 48, 72, 0.5), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 0% 115%, rgba(204, 160, 76, 0.18), transparent 52%),
     linear-gradient(168deg, #03080c 0%, #0a1620 48%, #123044 100%);
 }
 
@@ -184,7 +184,7 @@
   inset-inline: 10%;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(221, 155, 48, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(204, 160, 76, 0.45), transparent);
   pointer-events: none;
 }
 
@@ -203,8 +203,8 @@
   background: linear-gradient(
     180deg,
     transparent,
-    rgba(46, 125, 170, 0.5) 12%,
-    rgba(221, 155, 48, 0.6) 88%,
+    rgba(20, 48, 72, 0.5) 12%,
+    rgba(204, 160, 76, 0.6) 88%,
     transparent
   );
 }
@@ -239,7 +239,7 @@
   height: 0.55rem;
   border-radius: 9999px;
   background: linear-gradient(135deg, var(--landing-aero), var(--landing-gold));
-  box-shadow: 0 0 0 4px rgba(46, 125, 170, 0.14);
+  box-shadow: 0 0 0 4px rgba(20, 48, 72, 0.14);
   animation: node-pop 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -266,7 +266,7 @@
 .flightpath-index {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.06em;
-  background: linear-gradient(135deg, rgba(46, 125, 170, 0.6), rgba(221, 155, 48, 0.5));
+  background: linear-gradient(135deg, rgba(20, 48, 72, 0.6), rgba(204, 160, 76, 0.5));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -281,8 +281,8 @@
 
 .landing-close {
   background:
-    radial-gradient(ellipse 80% 70% at 50% 120%, rgba(221, 155, 48, 0.22), transparent 52%),
-    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(46, 125, 170, 0.12), transparent 55%),
+    radial-gradient(ellipse 80% 70% at 50% 120%, rgba(204, 160, 76, 0.22), transparent 52%),
+    radial-gradient(ellipse 50% 40% at 50% 0%, rgba(20, 48, 72, 0.12), transparent 55%),
     linear-gradient(180deg, #0a1620 0%, #03080c 100%);
 }
 
@@ -292,8 +292,8 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(46, 125, 170, 0.35),
-    rgba(221, 155, 48, 0.55),
+    rgba(20, 48, 72, 0.35),
+    rgba(204, 160, 76, 0.55),
     transparent
   );
 }
@@ -375,7 +375,7 @@
   height: 48%;
   background:
     linear-gradient(180deg, transparent, rgba(3, 8, 12, 0.35) 40%, rgba(3, 8, 12, 0.72)),
-    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(221, 155, 48, 0.28), transparent 70%);
+    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(204, 160, 76, 0.28), transparent 70%);
   pointer-events: none;
 }
 
@@ -388,9 +388,9 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(126, 192, 223, 0.15) 20%,
+    rgba(122, 151, 173, 0.15) 20%,
     rgba(240, 197, 106, 0.85) 52%,
-    rgba(126, 192, 223, 0.15) 80%,
+    rgba(122, 151, 173, 0.15) 80%,
     transparent
   );
   transform: rotate(-11deg);
@@ -410,7 +410,7 @@
 }
 
 .course-lane-cover-code {
-  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.85rem, 3vw, 2.35rem);
   font-weight: 600;
   letter-spacing: -0.04em;
@@ -430,29 +430,29 @@
 
 .course-lane-cover[data-tone="0"] {
   background-image:
-    radial-gradient(ellipse 85% 70% at 88% 12%, rgba(46, 125, 170, 0.62), transparent 58%),
-    radial-gradient(ellipse 50% 45% at 8% 88%, rgba(126, 192, 223, 0.2), transparent 55%),
+    radial-gradient(ellipse 85% 70% at 88% 12%, rgba(20, 48, 72, 0.62), transparent 58%),
+    radial-gradient(ellipse 50% 45% at 8% 88%, rgba(122, 151, 173, 0.2), transparent 55%),
     linear-gradient(155deg, #07131c 0%, #123044 52%, #1a5570 100%);
 }
 
 .course-lane-cover[data-tone="1"] {
   background-image:
-    radial-gradient(ellipse 75% 60% at 18% 82%, rgba(221, 155, 48, 0.42), transparent 55%),
-    radial-gradient(ellipse 55% 50% at 92% 18%, rgba(46, 125, 170, 0.35), transparent 58%),
+    radial-gradient(ellipse 75% 60% at 18% 82%, rgba(204, 160, 76, 0.42), transparent 55%),
+    radial-gradient(ellipse 55% 50% at 92% 18%, rgba(20, 48, 72, 0.35), transparent 58%),
     linear-gradient(155deg, #08141c 0%, #163042 48%, #2a4630 100%);
 }
 
 .course-lane-cover[data-tone="2"] {
   background-image:
-    radial-gradient(ellipse 80% 65% at 72% 78%, rgba(126, 192, 223, 0.38), transparent 55%),
-    radial-gradient(ellipse 45% 40% at 12% 18%, rgba(46, 125, 170, 0.4), transparent 60%),
+    radial-gradient(ellipse 80% 65% at 72% 78%, rgba(122, 151, 173, 0.38), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 12% 18%, rgba(20, 48, 72, 0.4), transparent 60%),
     linear-gradient(155deg, #050f16 0%, #0e2436 50%, #184866 100%);
 }
 
 .course-lane-cover[data-tone="3"] {
   background-image:
-    radial-gradient(ellipse 70% 55% at 42% 28%, rgba(221, 155, 48, 0.3), transparent 55%),
-    radial-gradient(ellipse 60% 50% at 88% 80%, rgba(46, 125, 170, 0.45), transparent 58%),
+    radial-gradient(ellipse 70% 55% at 42% 28%, rgba(204, 160, 76, 0.3), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 88% 80%, rgba(20, 48, 72, 0.45), transparent 58%),
     linear-gradient(155deg, #061018 0%, #142c44 48%, #1c4060 100%);
 }
 
@@ -477,7 +477,7 @@
 
 .course-lane-title {
   margin-top: 0.7rem;
-  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -533,7 +533,7 @@
 }
 
 .course-instructor-name {
-  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.55rem, 2.5vw, 2.1rem);
   font-weight: 600;
   letter-spacing: -0.035em;
@@ -573,12 +573,12 @@
 .catalog-deck-title {
   margin-top: 0.7rem;
   max-width: 16ch;
-  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(1.85rem, 3.8vw, 2.75rem);
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.05;
-  background: linear-gradient(115deg, rgb(8 18 26) 0%, rgb(30 79 109) 58%, rgb(46 125 170) 100%);
+  background: linear-gradient(115deg, rgb(8 18 26) 0%, rgb(30 79 109) 58%, rgb(20 48 72) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -608,7 +608,7 @@
 }
 
 .catalog-deck-stat-value {
-  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(2.4rem, 4vw, 3.25rem);
   font-weight: 600;
   letter-spacing: -0.045em;
@@ -684,14 +684,14 @@
 
 .catalog-hero-climb-node {
   fill: var(--landing-gold);
-  filter: drop-shadow(0 0 10px rgba(221, 155, 48, 0.55));
+  filter: drop-shadow(0 0 10px rgba(204, 160, 76, 0.55));
   opacity: 0;
   animation: node-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) 2.1s forwards;
 }
 
 .catalog-hero-climb-pulse {
   fill: none;
-  stroke: rgba(221, 155, 48, 0.55);
+  stroke: rgba(204, 160, 76, 0.55);
   stroke-width: 1.2;
   opacity: 0;
   transform-origin: center;
@@ -735,7 +735,7 @@
 .catalog-hero-descend-mark {
   width: 1px;
   height: 1.75rem;
-  background: linear-gradient(180deg, rgba(221, 155, 48, 0.05), rgba(221, 155, 48, 0.85));
+  background: linear-gradient(180deg, rgba(204, 160, 76, 0.05), rgba(204, 160, 76, 0.85));
   animation: catalog-descend-pulse 1.8s ease-in-out infinite;
 }
 
@@ -752,8 +752,8 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(46, 125, 170, 0.28),
-    rgba(221, 155, 48, 0.5),
+    rgba(20, 48, 72, 0.28),
+    rgba(204, 160, 76, 0.5),
     transparent
   );
   pointer-events: none;
@@ -978,7 +978,7 @@
 }
 
 .site-header-link:hover::after {
-  background: rgba(221, 155, 48, 0.45);
+  background: rgba(204, 160, 76, 0.45);
   opacity: 1;
   transform: scaleX(1);
 }
@@ -989,7 +989,7 @@
 }
 
 .site-header-link[data-active="true"]::after {
-  background: var(--landing-gold, #dd9b30);
+  background: var(--landing-gold, #cca04c);
   opacity: 1;
   transform: scaleX(1);
 }
@@ -1006,8 +1006,8 @@
   overflow: hidden;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    radial-gradient(ellipse 55% 55% at 100% 0%, rgba(46, 125, 170, 0.22), transparent 58%),
-    radial-gradient(ellipse 40% 45% at 0% 100%, rgba(221, 155, 48, 0.1), transparent 55%), #03080c;
+    radial-gradient(ellipse 55% 55% at 100% 0%, rgba(20, 48, 72, 0.22), transparent 58%),
+    radial-gradient(ellipse 40% 45% at 0% 100%, rgba(204, 160, 76, 0.1), transparent 55%), #03080c;
   color: #fff;
   padding-block: 2.5rem 1.75rem;
 }
@@ -1027,8 +1027,8 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(46, 125, 170, 0.35),
-    rgba(221, 155, 48, 0.55),
+    rgba(20, 48, 72, 0.35),
+    rgba(204, 160, 76, 0.55),
     transparent
   );
 }
@@ -1068,7 +1068,7 @@
   margin-top: 0.15rem;
   padding: 0.55rem 0.9rem;
   border: 1px solid rgba(240, 197, 106, 0.35);
-  background: linear-gradient(180deg, rgba(221, 155, 48, 0.22), rgba(221, 155, 48, 0.08));
+  background: linear-gradient(180deg, rgba(204, 160, 76, 0.22), rgba(204, 160, 76, 0.08));
   color: #f0c56a;
   font-size: 0.82rem;
   font-weight: 600;
@@ -1082,7 +1082,7 @@
 
 .site-footer-cta:hover {
   border-color: rgba(240, 197, 106, 0.55);
-  background: linear-gradient(180deg, rgba(221, 155, 48, 0.32), rgba(221, 155, 48, 0.14));
+  background: linear-gradient(180deg, rgba(204, 160, 76, 0.32), rgba(204, 160, 76, 0.14));
   color: #ffe4a8;
   transform: translateY(-1px);
 }
@@ -1192,7 +1192,7 @@
   width: 0.2rem;
   height: 0.2rem;
   border-radius: 999px;
-  background: rgba(221, 155, 48, 0.55);
+  background: rgba(204, 160, 76, 0.55);
 }
 
 @media (prefers-reduced-motion: reduce) {

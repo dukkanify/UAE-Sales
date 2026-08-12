@@ -79,7 +79,7 @@ export function renderAnalyticsPrintHtml(
     metadata: { format: "pdf" },
   });
   return `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>${scope} report</title>
-<style>body{font-family:IBM Plex Sans,system-ui,sans-serif;padding:32px;color:#0B1A24}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}h1{font-family:Space Grotesk,Arial,sans-serif;color:#2E7DAA}</style>
+<style>body{font-family:IBM Plex Sans,system-ui,sans-serif;padding:32px;color:#0B1A24}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left}h1{font-family:Exo 2,Arial,sans-serif;color:#143048}</style>
 </head><body><h1>${scope.toUpperCase()} Report</h1><p>Generated ${new Date().toLocaleString()}</p>
 <table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>
 <script>window.onload=()=>setTimeout(()=>window.print(),200)</script></body></html>`;

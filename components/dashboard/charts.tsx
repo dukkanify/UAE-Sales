@@ -24,11 +24,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { cn } from "@/lib/utils";
 
 export const CHART_COLORS = [
-  "#2E7DAA",
-  "#DD9B30",
+  "#143048",
+  "#CCA04C",
   "#7C7B80",
   "#2F8F5B",
-  "#0F2A3D",
+  "#0D2235",
   "#C48422",
   "#74B2D1",
   "#F3E0B8",

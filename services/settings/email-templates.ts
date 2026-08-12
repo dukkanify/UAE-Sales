@@ -67,7 +67,7 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
           </tr>
           <tr>
             <td style="padding:32px;">
-              <h1 style="margin:0 0 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:22px;color:${primary};">${payload.title}</h1>
+              <h1 style="margin:0 0 16px;font-family:'Exo 2',Arial,sans-serif;font-size:22px;color:${primary};">${payload.title}</h1>
               <div style="font-size:15px;line-height:1.6;color:#0B1A24;">${payload.bodyHtml}</div>
             </td>
           </tr>
@@ -106,7 +106,7 @@ export function otpEmailTemplate(code: string, purpose: string) {
     title: "Your verification code",
     preheader: `Your AviatorPass code is ${code}`,
     bodyHtml: `<p>Use this one-time code to ${purpose}:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#2E7DAA;">${code}</p>
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#143048;">${code}</p>
       <p>This code expires shortly. If you did not request it, you can ignore this email.</p>`,
   });
 }

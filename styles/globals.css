@@ -3,10 +3,10 @@
 @import "./booking.css";
 
 /* =============================================================================
-   AviatorPass — Option A: Horizon Blue & Sun Gold
-   Horizon Blue / Aero Blue #2E7DAA | Sun Gold / Altitude Orange #DD9B30
-   Academic Grey #7C7B80 | Support: Cloud · Sky Mist · Navy Ink · Sand Glow
-   Display: Stimulatio Flat (Space Grotesk web substitute) | Body: IBM Plex Sans
+   AviatorPass — Official brand guidelines
+   Aviator Blue #143048 | Aviator Gold #9E712E–#CCA04C–#F6C36C | Academic Grey #7C7B80
+   Support: Cloud · Sky Mist · Navy Ink · Sand Glow
+   Display: Stimulatio Flat (Exo 2 web substitute) | Body: IBM Plex Sans
    Tagline: YOUR AVIATION JOURNEY STARTS HERE
    ============================================================================= */
 
@@ -60,38 +60,43 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   --font-sans: var(--font-ibm-plex), ui-sans-serif, system-ui, sans-serif;
-  --font-display:
-    var(--font-space-grotesk), var(--font-ibm-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-exo-2), var(--font-ibm-plex), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-soft: 0 1px 2px 0 rgb(11 26 36 / 0.04), 0 1px 1px -1px rgb(11 26 36 / 0.03);
-  --shadow-medium: 0 12px 32px -12px rgb(46 125 170 / 0.22), 0 4px 12px -4px rgb(11 26 36 / 0.08);
+  --shadow-medium: 0 12px 32px -12px rgb(20 48 72 / 0.28), 0 4px 12px -4px rgb(11 26 36 / 0.08);
 }
 
 :root {
-  /* Option A core */
-  --horizon-blue: #2e7daa;
-  --sun-gold: #dd9b30;
+  /* Official core */
+  --aviator-blue: #143048;
+  --aviator-gold: #cca04c;
+  --aviator-gold-dark: #9e712e;
+  --aviator-gold-light: #f6c36c;
   --academic-grey: #7c7b80;
+  /* Legacy aliases */
+  --horizon-blue: var(--aviator-blue);
+  --sun-gold: var(--aviator-gold);
   /* Supporting (non-clashing companions) */
-  --cloud: #f7fafc;
-  --sky-mist: #e8f3f8;
-  --navy-ink: #0f2a3d;
+  --cloud: #f4f6f8;
+  --sky-mist: #e6ecf1;
+  --navy-ink: #0d2235;
   --sand-glow: #f8f1e4;
-  --sun-soft: #f3e0b8;
-  --mist-grey: #d5dce3;
+  --sun-soft: #f3e4c0;
+  --mist-grey: #d5d8dd;
+  --gold-gradient: linear-gradient(115deg, #9e712e 0%, #cca04c 48%, #f6c36c 100%);
 
-  --primary: var(--horizon-blue);
+  --primary: var(--aviator-blue);
   --primary-foreground: #ffffff;
 
   --secondary: var(--sky-mist);
   --secondary-foreground: #0b1a24;
 
-  --accent: var(--sun-gold);
+  --accent: var(--aviator-gold);
   --accent-foreground: #0b1a24;
 
   --success: #2f8f5b;
   --success-foreground: #ffffff;
-  --warning: var(--sun-gold);
+  --warning: var(--aviator-gold);
   --warning-foreground: #0b1a24;
   --destructive: #c23b3b;
   --destructive-foreground: #ffffff;
@@ -108,12 +113,12 @@
   --academic-foreground: #ffffff;
   --border: var(--mist-grey);
   --input: var(--mist-grey);
-  --ring: var(--horizon-blue);
+  --ring: var(--aviator-gold);
 
   --sidebar: #071018;
   --sidebar-foreground: #e8eef5;
   --sidebar-border: #142838;
-  --sidebar-accent: #1a4a66;
+  --sidebar-accent: #1a3548;
   --sidebar-accent-foreground: #ffffff;
 
   --radius: 1rem;
@@ -121,15 +126,15 @@
 }
 
 .dark {
-  --primary: #5ba3c9;
+  --primary: #9eb6c9;
   --primary-foreground: #061018;
   --secondary: #12202b;
   --secondary-foreground: #e8eef5;
-  --accent: #e0a63f;
+  --accent: #d4ae5e;
   --accent-foreground: #0b1a24;
   --success: #22c55e;
   --success-foreground: #052e16;
-  --warning: #e5b85c;
+  --warning: #e0b86e;
   --warning-foreground: #0b1a24;
   --destructive: #ef4444;
   --destructive-foreground: #fef2f2;
@@ -145,11 +150,11 @@
   --academic-foreground: #0b1a24;
   --border: #1a2b38;
   --input: #1a2b38;
-  --ring: #e0a63f;
+  --ring: #d4ae5e;
   --sidebar: #050b10;
   --sidebar-foreground: #e8eef5;
   --sidebar-border: #12202b;
-  --sidebar-accent: #1a4a66;
+  --sidebar-accent: #1a3548;
   --sidebar-accent-foreground: #ffffff;
   --surface-ink: #050b10;
 }
@@ -167,15 +172,15 @@
   body {
     @apply bg-background text-foreground font-sans;
     background-image:
-      radial-gradient(ellipse 80% 50% at 100% -20%, rgb(46 125 170 / 0.07), transparent 55%),
-      radial-gradient(ellipse 50% 40% at -10% 100%, rgb(221 155 48 / 0.05), transparent 50%);
+      radial-gradient(ellipse 80% 50% at 100% -20%, rgb(20 48 72 / 0.07), transparent 55%),
+      radial-gradient(ellipse 50% 40% at -10% 100%, rgb(204 160 76 / 0.05), transparent 50%);
     background-attachment: fixed;
   }
 
   .dark body {
     background-image:
-      radial-gradient(ellipse 70% 45% at 100% 0%, rgb(46 125 170 / 0.12), transparent 55%),
-      radial-gradient(ellipse 45% 35% at 0% 100%, rgb(221 155 48 / 0.06), transparent 50%);
+      radial-gradient(ellipse 70% 45% at 100% 0%, rgb(20 48 72 / 0.12), transparent 55%),
+      radial-gradient(ellipse 45% 35% at 0% 100%, rgb(204 160 76 / 0.06), transparent 50%);
   }
 
   h1,
@@ -192,7 +197,7 @@
   }
 
   ::selection {
-    background: rgb(46 125 170 / 0.22);
+    background: rgb(20 48 72 / 0.22);
   }
 }
 
