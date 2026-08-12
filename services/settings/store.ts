@@ -21,22 +21,23 @@ const DATA_FILE = path.join(dataDir(), "aep-settings.json");
 const MAX_SETTINGS_HISTORY = 40;
 
 function slimHistoryEntry(entry: SettingChangeRecord): SettingChangeRecord {
-  const pickKeys = (value: PlatformSettings | null | undefined) => {
-    if (!value) return value;
+  const pickKeys = (value: unknown) => {
+    if (!value || typeof value !== "object") return value;
+    const settings = value as PlatformSettings;
     return {
-      updatedAt: value.updatedAt,
-      updatedBy: value.updatedBy,
+      updatedAt: settings.updatedAt,
+      updatedBy: settings.updatedBy,
       branding: {
-        primaryColor: value.branding?.primaryColor,
-        accentColor: value.branding?.accentColor,
-        logoUrl: value.branding?.logoUrl,
+        primaryColor: settings.branding?.primaryColor,
+        accentColor: settings.branding?.accentColor,
+        logoUrl: settings.branding?.logoUrl,
       },
-      courses: value.courses,
+      courses: settings.courses,
       general: {
-        platformName: value.general?.platformName,
-        maintenanceMode: value.general?.maintenanceMode,
+        platformName: settings.general?.platformName,
+        maintenanceMode: settings.general?.maintenanceMode,
       },
-    } as unknown as PlatformSettings;
+    };
   };
   return {
     ...entry,
