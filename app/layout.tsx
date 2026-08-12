@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
+import { Exo_2, IBM_Plex_Sans } from "next/font/google";
 
 import { AppProviders } from "@/providers/app-providers";
 import { siteConfig } from "@/config/site";
@@ -16,10 +16,11 @@ const ibmPlex = IBM_Plex_Sans({
   adjustFontFallback: true,
 });
 
-const spaceGrotesk = Space_Grotesk({
+/** Wide aerodynamic display face — Stimulatio Flat web substitute */
+const exo2 = Exo_2({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
-  variable: "--font-space-grotesk",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-exo-2",
   display: "swap",
   preload: true,
   adjustFontFallback: true,
@@ -61,8 +62,11 @@ export const metadata: Metadata = {
     images: [siteConfig.brand.openGraph],
   },
   icons: {
-    icon: [{ url: siteConfig.brand.favicon, type: "image/svg+xml" }],
-    apple: [{ url: siteConfig.brand.icon }],
+    icon: [
+      { url: siteConfig.brand.favicon, type: "image/svg+xml" },
+      { url: siteConfig.brand.icon, type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: siteConfig.brand.appleTouchIcon || siteConfig.brand.icon, sizes: "180x180" }],
   },
   alternates: {
     canonical: "/",
@@ -86,8 +90,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F3F6F9" },
-    { media: "(prefers-color-scheme: dark)", color: "#070F14" },
+    { media: "(prefers-color-scheme: light)", color: "#143048" },
+    { media: "(prefers-color-scheme: dark)", color: "#0D2235" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -103,7 +107,7 @@ export default function RootLayout({
     <html
       lang="en"
       dir="ltr"
-      className={`${ibmPlex.variable} ${spaceGrotesk.variable}`}
+      className={`${ibmPlex.variable} ${exo2.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">

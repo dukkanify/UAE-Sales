@@ -18,8 +18,8 @@ interface BrandLogoProps {
 }
 
 /**
- * Option A lockup (Horizon Blue & Sun Gold).
- * Prefers runtime branding settings when available; falls back to siteStatic PNGs.
+ * Official AviatorPass lockup (wing + open book).
+ * Prefers runtime branding settings when available; falls back to siteStatic assets.
  */
 function BrandLogo({
   className,
@@ -33,7 +33,7 @@ function BrandLogo({
 
   const src =
     variant === "mark"
-      ? siteStatic.brand.icon
+      ? siteStatic.brand.iconLight
       : variant === "dark"
         ? brand.darkLogoUrl || siteStatic.brand.logoDark
         : variant === "stacked"

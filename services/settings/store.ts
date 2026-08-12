@@ -52,40 +52,46 @@ function emptyDb(): SettingsDatabase {
   };
 }
 
-/** Upgrade persisted brand asset paths from legacy SVG masters to Option A PNGs. */
+/** Upgrade persisted brand assets/colors to the official brand guidelines lockup. */
 function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
   const branding = { ...settings.branding };
   const target = {
     logoUrl: DEFAULT_PLATFORM_SETTINGS.branding.logoUrl,
     darkLogoUrl: DEFAULT_PLATFORM_SETTINGS.branding.darkLogoUrl,
     openGraphImageUrl: DEFAULT_PLATFORM_SETTINGS.branding.openGraphImageUrl,
+    faviconUrl: DEFAULT_PLATFORM_SETTINGS.branding.faviconUrl,
   };
   let changed = false;
   for (const key of Object.keys(target) as (keyof typeof target)[]) {
     const current = branding[key];
+    const next = target[key];
+    if (current === next) continue;
     if (
       !current ||
+      current.startsWith("/brand/") ||
       current.endsWith(".svg") ||
-      current === "/brand/logo.png" ||
-      current === "/brand/logo-dark.png" ||
-      current === "/brand/og.png" ||
-      // Bust stale Option A PNG query strings so clipped lockups refresh.
-      /\/brand\/(logo|logo-dark|og)\.png(\?v=option-a-[12])?$/.test(current)
+      /option-a-\d+/.test(current)
     ) {
-      branding[key] = target[key];
+      branding[key] = next;
       changed = true;
     }
   }
-  if (!branding.primaryColor || branding.primaryColor.toUpperCase() === "#0B1F33") {
+  const legacyPrimaries = new Set(["#0B1F33", "#2E7DAA", "#2e7daa"]);
+  if (!branding.primaryColor || legacyPrimaries.has(branding.primaryColor)) {
     branding.primaryColor = DEFAULT_PLATFORM_SETTINGS.branding.primaryColor;
     changed = true;
   }
-  if (!branding.accentColor) {
+  const legacyAccents = new Set(["#DD9B30", "#dd9b30"]);
+  if (!branding.accentColor || legacyAccents.has(branding.accentColor)) {
     branding.accentColor = DEFAULT_PLATFORM_SETTINGS.branding.accentColor;
     changed = true;
   }
   if (!branding.secondaryColor) {
     branding.secondaryColor = DEFAULT_PLATFORM_SETTINGS.branding.secondaryColor;
+    changed = true;
+  }
+  if (branding.typographyDisplay === "Space Grotesk") {
+    branding.typographyDisplay = DEFAULT_PLATFORM_SETTINGS.branding.typographyDisplay;
     changed = true;
   }
   return changed ? { ...settings, branding } : settings;

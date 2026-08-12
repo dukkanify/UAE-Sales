@@ -43,7 +43,7 @@ function Header() {
       className={cn(
         "site-header sticky top-0 z-40 text-white transition-[background-color,border-color,backdrop-filter,box-shadow,padding] duration-300",
         solid
-          ? "border-b border-white/10 bg-[var(--surface-ink)]/80 shadow-[0_1px_0_0_rgba(221,155,48,0.14)] backdrop-blur-2xl"
+          ? "border-b border-white/10 bg-[var(--surface-ink)]/80 shadow-[0_1px_0_0_rgba(204,160,76,0.14)] backdrop-blur-2xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
@@ -93,7 +93,7 @@ function Header() {
           </Button>
           <Button
             variant="accent"
-            className="hero-cta-primary h-10 rounded-xl px-4 shadow-[0_12px_28px_-16px_rgba(221,155,48,0.85)]"
+            className="hero-cta-primary h-10 rounded-xl px-4 shadow-[0_12px_28px_-16px_rgba(204,160,76,0.85)]"
             asChild
           >
             <Link href={isBook ? routes.register : routes.book}>

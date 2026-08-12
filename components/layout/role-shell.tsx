@@ -177,7 +177,7 @@ function RoleSidebar({
         ) : (
           <div className="min-w-0">
             <BrandLogo
-              variant="full"
+              variant="dark"
               href={`/${rolePathSegment(role)}/dashboard`}
               className="max-w-[140px]"
             />

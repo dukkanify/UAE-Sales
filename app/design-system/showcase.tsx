@@ -66,7 +66,7 @@ function DesignSystemShowcase() {
   const [otp, setOtp] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [dial, setDial] = React.useState("+965");
-  const [color, setColor] = React.useState("#2E7DAA");
+  const [color, setColor] = React.useState("#143048");
   const [currency, setCurrency] = React.useState("120");
   const [multi, setMulti] = React.useState<string[]>(["ppl"]);
   const [time, setTime] = React.useState("09:30");
@@ -106,7 +106,7 @@ function DesignSystemShowcase() {
         <Section
           id="colors"
           title="Color roles"
-          description="Horizon Blue, Sun Gold, Academic Grey, supporting surfaces, and semantic states."
+          description="Aviator Blue, Aviator Gold, Academic Grey, supporting surfaces, and semantic states."
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(colorRoles).map(([key, swatch]) => (
@@ -128,7 +128,7 @@ function DesignSystemShowcase() {
         <Section
           id="typography"
           title="Typography"
-          description="Stimulatio Flat / Space Grotesk (display) + IBM Plex Sans (body). English LTR only."
+          description="Stimulatio Flat / Exo 2 (display) + IBM Plex Sans (body). English LTR only."
         >
           <Card>
             <CardContent className="space-y-4 pt-6">
@@ -259,7 +259,7 @@ function DesignSystemShowcase() {
                 <RadioGroup defaultValue="a" className="flex gap-4">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="a" id="r1" />
-                    <Label htmlFor="r1">Option A</Label>
+                    <Label htmlFor="r1">AviatorPass</Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="b" id="r2" />
