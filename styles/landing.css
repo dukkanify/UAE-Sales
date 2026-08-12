@@ -578,7 +578,10 @@
   font-weight: 600;
   letter-spacing: -0.035em;
   line-height: 1.05;
-  color: rgb(8 18 26);
+  background: linear-gradient(115deg, rgb(8 18 26) 0%, rgb(30 79 109) 58%, rgb(46 125 170) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .catalog-deck-lead {
@@ -630,9 +633,110 @@
 .catalog-page-hero {
   position: relative;
   overflow: hidden;
-  min-height: min(72vh, 40rem);
+  min-height: min(88svh, 46rem);
   display: flex;
   align-items: flex-end;
+}
+
+.catalog-page-hero .container-app {
+  padding-bottom: clamp(5.5rem, 10vh, 7.5rem);
+}
+
+.catalog-hero-atmosphere {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.catalog-hero-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, rgba(242, 249, 252, 0.7), transparent),
+    radial-gradient(1px 1px at 28% 48%, rgba(168, 214, 235, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 63% 18%, rgba(255, 228, 168, 0.55), transparent),
+    radial-gradient(1px 1px at 78% 36%, rgba(242, 249, 252, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 88% 58%, rgba(116, 178, 209, 0.5), transparent),
+    radial-gradient(1px 1px at 41% 14%, rgba(242, 249, 252, 0.35), transparent);
+  animation: catalog-stars-twinkle 7s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+.catalog-hero-climb {
+  position: absolute;
+  right: max(2%, calc(50% - 36rem));
+  bottom: 18%;
+  width: min(48vw, 28rem);
+  height: auto;
+  overflow: visible;
+}
+
+.catalog-hero-climb-path {
+  fill: none;
+  stroke: url(#catalogClimbStroke);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  animation: catalog-climb-draw 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+
+.catalog-hero-climb-node {
+  fill: var(--landing-gold);
+  filter: drop-shadow(0 0 10px rgba(221, 155, 48, 0.55));
+  opacity: 0;
+  animation: node-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) 2.1s forwards;
+}
+
+.catalog-hero-climb-pulse {
+  fill: none;
+  stroke: rgba(221, 155, 48, 0.55);
+  stroke-width: 1.2;
+  opacity: 0;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: catalog-climb-pulse 2.8s ease-out 2.3s infinite;
+}
+
+.catalog-hero-brand {
+  animation: catalog-brand-settle 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.catalog-hero-brand .hero-brand-aviator,
+.catalog-hero-brand .hero-brand-pass {
+  background-size: 180% 100%;
+  animation: catalog-brand-shimmer 7s ease-in-out 1.1s infinite;
+}
+
+.catalog-hero-descend {
+  position: absolute;
+  left: 50%;
+  bottom: 1.35rem;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  transform: translateX(-50%);
+  color: rgb(255 255 255 / 0.55);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.catalog-hero-descend:hover {
+  color: rgb(255 255 255 / 0.9);
+}
+
+.catalog-hero-descend-mark {
+  width: 1px;
+  height: 1.75rem;
+  background: linear-gradient(180deg, rgba(221, 155, 48, 0.05), rgba(221, 155, 48, 0.85));
+  animation: catalog-descend-pulse 1.8s ease-in-out infinite;
 }
 
 .catalog-page-body {
@@ -653,6 +757,68 @@
     transparent
   );
   pointer-events: none;
+}
+
+@keyframes catalog-stars-twinkle {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes catalog-climb-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes catalog-climb-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.55);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+
+@keyframes catalog-brand-settle {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes catalog-brand-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes catalog-descend-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.72);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
 @keyframes platform-scan {
@@ -736,7 +902,15 @@
   .hero-horizon,
   .flightpath-node::before,
   .course-lane,
-  .hero-cta-primary {
+  .hero-cta-primary,
+  .catalog-hero-stars,
+  .catalog-hero-climb-path,
+  .catalog-hero-climb-node,
+  .catalog-hero-climb-pulse,
+  .catalog-hero-brand,
+  .catalog-hero-brand .hero-brand-aviator,
+  .catalog-hero-brand .hero-brand-pass,
+  .catalog-hero-descend-mark {
     animation: none !important;
   }
 
@@ -752,6 +926,14 @@
   .hero-horizon {
     opacity: 0.8;
     transform: none;
+  }
+
+  .catalog-hero-climb-path {
+    stroke-dashoffset: 0;
+  }
+
+  .catalog-hero-climb-node {
+    opacity: 1;
   }
 
   .course-lane:hover,
