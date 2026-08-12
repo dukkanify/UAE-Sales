@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "@/components/ui/app-link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const course = resolvePublicCourse(id);
   if (!course) {
-    return { title: "Course not found" };
+    return { title: "ATPL courses" };
   }
   return {
     title: course.title,
@@ -55,7 +55,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PublicCourseDetailPage({ params }: PageProps) {
   const { id } = await params;
   const course = resolvePublicCourse(id);
-  if (!course) notFound();
+  // Never soft-404 a stale UUID/code — send learners back to the live catalog.
+  if (!course) redirect(routes.courses);
 
   const hours = Math.max(1, Math.round(course.estimatedDurationMinutes / 60));
   const lessonTotal =
