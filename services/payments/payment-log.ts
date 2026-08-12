@@ -1,7 +1,14 @@
-import type { PaymentEventLog } from "@/types/domain/payment";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import type { PaymentEventLog } from "@/types/domain/payment";
 
 const PAYMENT_LOG_FILE = "payment-events.json";
+const PROCESSED_EVENTS_FILE = "stripe-webhook-events.json";
+
+type ProcessedStripeEvent = {
+  id: string;
+  type: string;
+  processedAt: string;
+};
 
 export async function logPaymentEvent(
   input: Omit<PaymentEventLog, "id" | "createdAt">,
@@ -17,4 +24,22 @@ export async function logPaymentEvent(
 
 export async function getPaymentEvents(): Promise<PaymentEventLog[]> {
   return loadCollection<PaymentEventLog>(PAYMENT_LOG_FILE);
+}
+
+/** Returns true if this Stripe event id was already handled. */
+export async function claimStripeWebhookEvent(
+  eventId: string,
+  eventType: string,
+): Promise<"new" | "duplicate"> {
+  const rows = await loadCollection<ProcessedStripeEvent>(PROCESSED_EVENTS_FILE);
+  if (rows.some((row) => row.id === eventId)) {
+    return "duplicate";
+  }
+  rows.unshift({
+    id: eventId,
+    type: eventType,
+    processedAt: new Date().toISOString(),
+  });
+  await saveCollection(PROCESSED_EVENTS_FILE, rows.slice(0, 1000));
+  return "new";
 }

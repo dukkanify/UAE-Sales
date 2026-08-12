@@ -24,10 +24,24 @@ function getStripeClient(): Stripe {
   return stripeClient;
 }
 
+function orderMetadata(order: Order): Record<string, string> {
+  return {
+    orderId: order.id,
+    listingId: order.listingId,
+    buyerId: order.buyerId ?? "",
+    sellerId: order.sellerId,
+    platform: "sooqna",
+    escrow: "true",
+    shippingMethod: order.shippingMethod ?? "",
+  };
+}
+
 export type CreateCheckoutSessionInput = {
   order: Order;
   buyerEmail: string;
   listingTitle: string;
+  /** Use a fresh idempotency key when recreating after an expired/closed session. */
+  freshSession?: boolean;
 };
 
 export async function createCheckoutSession(
@@ -37,17 +51,19 @@ export async function createCheckoutSession(
   const appUrl = getAppUrl();
   const currency = getStripeCurrency();
   const listingParam = input.order.listingSlug ?? input.order.listingId;
+  const metadata = orderMetadata(input.order);
 
   const session = await stripe.checkout.sessions.create(
     {
       mode: "payment",
+      locale: "auto",
       customer_email: input.buyerEmail,
       line_items: [
         {
           quantity: 1,
           price_data: {
             currency,
-            unit_amount: input.order.fees.total * 100,
+            unit_amount: Math.round(input.order.fees.total * 100),
             product_data: {
               name: input.listingTitle,
               description: `طلب ${input.order.id} — سوقنا`,
@@ -55,20 +71,18 @@ export async function createCheckoutSession(
           },
         },
       ],
-      metadata: {
-        orderId: input.order.id,
-        listingId: input.order.listingId,
-        buyerId: input.order.buyerId ?? "",
-        sellerId: input.order.sellerId,
-        platform: "sooqna",
-        escrow: "true",
-        shippingMethod: input.order.shippingMethod ?? "",
+      metadata,
+      payment_intent_data: {
+        metadata,
+        description: `Sooqna escrow — ${input.order.id}`,
       },
-      success_url: `${appUrl}/checkout/success?orderId=${input.order.id}`,
-      cancel_url: `${appUrl}/checkout?listingId=${listingParam}&payment=cancelled`,
+      success_url: `${appUrl}/checkout/success?orderId=${encodeURIComponent(input.order.id)}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/checkout?listingId=${encodeURIComponent(listingParam)}&payment=cancelled`,
     },
     {
-      idempotencyKey: `checkout-${input.order.id}`,
+      idempotencyKey: input.freshSession
+        ? `checkout-${input.order.id}-${Date.now()}`
+        : `checkout-${input.order.id}`,
     },
   );
 
@@ -86,22 +100,24 @@ export async function createCheckoutSession(
   };
 }
 
+export async function retrieveCheckoutSession(
+  sessionId: string,
+): Promise<Stripe.Checkout.Session> {
+  const stripe = getStripeClient();
+  return stripe.checkout.sessions.retrieve(sessionId);
+}
+
 export async function createPaymentIntent(order: Order) {
   const stripe = getStripeClient();
   const currency = getStripeCurrency();
+  const metadata = orderMetadata(order);
 
   return stripe.paymentIntents.create(
     {
-      amount: order.fees.total * 100,
+      amount: Math.round(order.fees.total * 100),
       currency,
-      metadata: {
-        orderId: order.id,
-        listingId: order.listingId,
-        buyerId: order.buyerId ?? "",
-        sellerId: order.sellerId,
-        platform: "sooqna",
-        escrow: "true",
-      },
+      metadata,
+      description: `Sooqna escrow — ${order.id}`,
       automatic_payment_methods: { enabled: true },
     },
     { idempotencyKey: `pi-${order.id}` },

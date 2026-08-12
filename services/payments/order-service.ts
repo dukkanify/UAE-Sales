@@ -16,16 +16,22 @@ import {
   createOrder,
   findPendingOrder,
   generateOrderId,
+  getOrderByCheckoutSessionId,
   getOrderById,
+  getOrderByPaymentIntentId,
   isValidOrderTransition,
   updateOrder,
 } from "@/services/payments/order-store";
 import { logPaymentEvent } from "@/services/payments/payment-log";
-import { isStripeConfigured, isMockCheckoutAllowed } from "@/services/payments/payment-config";
+import {
+  isStripeConfigured,
+  isMockCheckoutAllowed,
+} from "@/services/payments/payment-config";
 import type { CreateCheckoutInput } from "@/services/payments/payment-schemas";
 import {
   createCheckoutSession,
   refundStripePayment,
+  retrieveCheckoutSession,
 } from "@/services/payments/stripe.service";
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
@@ -111,10 +117,7 @@ export async function initiateCheckout(
     if (input.forceMock && isMockCheckoutAllowed()) {
       return { mode: "mock", orderId: existingPending.id };
     }
-    return {
-      mode: isStripeConfigured() ? "checkout" : "mock",
-      orderId: existingPending.id,
-    };
+    return resumeCheckoutForOrder(existingPending, buyerEmail, listing.title);
   }
 
   let buyerEmirate: string | undefined;
@@ -174,10 +177,13 @@ export async function initiateCheckout(
     saveAddress: input.deliveryAddress?.saveAddress,
   });
 
-  if (!isStripeConfigured() || (input.forceMock && isMockCheckoutAllowed())) {
-    if (input.forceMock && isMockCheckoutAllowed()) {
+  if (!isStripeConfigured()) {
+    if (!isMockCheckoutAllowed()) {
+      throw new Error("STRIPE_NOT_CONFIGURED");
+    }
+    if (input.forceMock) {
       console.warn("[Sooqna Payments] Forced mock checkout (testing).");
-    } else if (process.env.NODE_ENV !== "production") {
+    } else {
       console.warn(
         "[Sooqna Payments] STRIPE_SECRET_KEY is missing — using mock checkout fallback.",
       );
@@ -185,10 +191,56 @@ export async function initiateCheckout(
     return { mode: "mock", orderId: order.id };
   }
 
+  if (input.forceMock && isMockCheckoutAllowed()) {
+    console.warn("[Sooqna Payments] Forced mock checkout (testing).");
+    return { mode: "mock", orderId: order.id };
+  }
+
+  return attachStripeCheckout(order, buyerEmail, listing.title);
+}
+
+async function resumeCheckoutForOrder(
+  order: Order,
+  buyerEmail: string,
+  listingTitle: string,
+): Promise<CheckoutSessionResult> {
+  if (!isStripeConfigured()) {
+    if (!isMockCheckoutAllowed()) {
+      throw new Error("STRIPE_NOT_CONFIGURED");
+    }
+    return { mode: "mock", orderId: order.id };
+  }
+
+  if (order.stripeCheckoutSessionId) {
+    try {
+      const existing = await retrieveCheckoutSession(order.stripeCheckoutSessionId);
+      if (existing.status === "open" && existing.url) {
+        return {
+          mode: "checkout",
+          orderId: order.id,
+          checkoutUrl: existing.url,
+          sessionId: existing.id,
+        };
+      }
+    } catch {
+      // Session missing or unusable — create a fresh one below.
+    }
+  }
+
+  return attachStripeCheckout(order, buyerEmail, listingTitle, true);
+}
+
+async function attachStripeCheckout(
+  order: Order,
+  buyerEmail: string,
+  listingTitle: string,
+  freshSession = false,
+): Promise<CheckoutSessionResult> {
   const session = await createCheckoutSession({
     order,
     buyerEmail,
-    listingTitle: listing.title,
+    listingTitle,
+    freshSession,
   });
 
   await updateOrder(
@@ -411,18 +463,27 @@ export async function confirmOrderReceived(
 }
 
 /** Caller must enforce admin session before invoking. */
-export async function refundOrder(orderId: string): Promise<Order | undefined> {
+export async function refundOrder(
+  orderId: string,
+  options?: { skipStripe?: boolean; stripeRefundId?: string },
+): Promise<Order | undefined> {
   const order = await getOrderById(orderId);
   if (!order) return undefined;
 
   if (order.status === "refunded") return order;
 
-  if (order.stripePaymentIntentId && isStripeConfigured()) {
+  if (
+    !options?.skipStripe &&
+    order.stripePaymentIntentId &&
+    isStripeConfigured()
+  ) {
     const refund = await refundStripePayment(
       order.stripePaymentIntentId,
       orderId,
     );
     await updateOrder(orderId, { stripeRefundId: refund.id });
+  } else if (options?.stripeRefundId) {
+    await updateOrder(orderId, { stripeRefundId: options.stripeRefundId });
   }
 
   const updated = await updateOrder(
@@ -435,7 +496,9 @@ export async function refundOrder(orderId: string): Promise<Order | undefined> {
     },
     {
       type: "order_refunded",
-      message: "تم استرداد المبلغ",
+      message: options?.skipStripe
+        ? "تمت مزامنة الاسترداد من Stripe"
+        : "تم استرداد المبلغ",
     },
   );
 
@@ -470,6 +533,43 @@ export async function refundOrder(orderId: string): Promise<Order | undefined> {
   });
 
   return updated;
+}
+
+/** Sync local order when Stripe Dashboard issues a refund. */
+export async function syncRefundFromStripeCharge(input: {
+  paymentIntentId?: string;
+  chargeId?: string;
+  refundId?: string;
+}): Promise<Order | undefined> {
+  if (!input.paymentIntentId) return undefined;
+  const order = await getOrderByPaymentIntentId(input.paymentIntentId);
+  if (!order) return undefined;
+  return refundOrder(order.id, {
+    skipStripe: true,
+    stripeRefundId: input.refundId,
+  });
+}
+
+/** Resolve order after Stripe redirect using Checkout Session id. */
+export async function resolveOrderFromCheckoutSession(
+  sessionId: string,
+): Promise<Order | undefined> {
+  if (!sessionId || !isStripeConfigured()) return undefined;
+
+  const local = await getOrderByCheckoutSessionId(sessionId);
+  if (local && local.status !== "pending_payment") return local;
+
+  try {
+    const session = await retrieveCheckoutSession(sessionId);
+    if (session.payment_status === "paid") {
+      await handleCheckoutSessionCompleted(session);
+    }
+    const orderId = session.metadata?.orderId ?? local?.id;
+    if (!orderId) return local;
+    return getOrderById(orderId);
+  } catch {
+    return local;
+  }
 }
 
 /** Admin force-release of held escrow to the seller (no buyer confirmation).

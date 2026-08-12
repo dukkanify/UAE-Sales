@@ -71,11 +71,12 @@ See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) for the full list.
 
 ## Known Limitations
 
-- **No backend** — all catalog data is in-memory mocks; user listings and sessions use `localStorage`
-- **No cross-device sync** — data is per-browser only
-- **No real payments** — buy-now routes to a placeholder checkout page
+- **Durable DB not on `main` yet** — orders/wallets use file/`data-store` (fine for beta; use durable storage before high volume)
+- **Stripe ready for activation** — set live keys + webhook per `STRIPE_GO_LIVE.md`; mock checkout is blocked in production
+- **No Stripe Connect payouts yet** — escrow is an internal ledger; seller payouts are operational from the platform Stripe balance
 - **No automated tests** — validate via `npm run lint`, `npm run build`, and manual browser testing
-- **Admin actions are mock** — escrow and wallet show static demo data
+
+See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) and [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 
 ## Project Structure
 

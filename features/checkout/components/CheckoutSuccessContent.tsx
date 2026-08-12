@@ -13,12 +13,13 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { PageHero } from "@/shared/ui/PageHero";
 
 type CheckoutSuccessContentProps = {
-  orderId: string;
+  orderId?: string;
   guestToken?: string;
+  sessionId?: string;
 };
 
 const statusLabels: Record<Order["status"], string> = {
-  pending_payment: "بانتظار الدفع",
+  pending_payment: "بانتظار تأكيد الدفع",
   paid_held_in_escrow: "مدفوع — محجوز في الضمان",
   delivered: "تم التسليم",
   confirmed: "تم التأكيد",
@@ -27,10 +28,14 @@ const statusLabels: Record<Order["status"], string> = {
   refunded: "مسترد",
 };
 
-const MAX_POLL_ATTEMPTS = 8;
+const MAX_POLL_ATTEMPTS = 12;
 const POLL_INTERVAL_MS = 1500;
 
-export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessContentProps) {
+export function CheckoutSuccessContent({
+  orderId: initialOrderId,
+  guestToken,
+  sessionId,
+}: CheckoutSuccessContentProps) {
   const [order, setOrder] = useState<Order | null>(null);
   const [address, setAddress] = useState<DeliveryAddress | null>(null);
   const [error, setError] = useState("");
@@ -38,6 +43,7 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
   const [hasExistingAccount, setHasExistingAccount] = useState(false);
   const attemptsRef = useRef(0);
   const timeoutRef = useRef<number | null>(null);
+  const orderIdRef = useRef(initialOrderId ?? "");
   const sessionUser = getSessionSnapshot();
 
   useEffect(() => {
@@ -45,6 +51,24 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
 
     const load = async () => {
       try {
+        if (sessionId && attemptsRef.current === 0) {
+          const confirmRes = await fetch(
+            `/api/checkout/confirm-session?session_id=${encodeURIComponent(sessionId)}`,
+          );
+          if (confirmRes.ok) {
+            const confirmData = await confirmRes.json();
+            if (confirmData.order?.id) {
+              orderIdRef.current = confirmData.order.id as string;
+            }
+          }
+        }
+
+        const orderId = orderIdRef.current;
+        if (!orderId && !guestToken) {
+          setError("لم يتم العثور على رقم الطلب.");
+          return;
+        }
+
         const url = guestToken
           ? `/api/order-status?token=${encodeURIComponent(guestToken)}`
           : `/api/orders/${orderId}`;
@@ -53,11 +77,17 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
         if (cancelled) return;
 
         if (!data.order) {
+          if (attemptsRef.current < MAX_POLL_ATTEMPTS) {
+            attemptsRef.current += 1;
+            timeoutRef.current = window.setTimeout(load, POLL_INTERVAL_MS);
+            return;
+          }
           setError("لم يتم العثور على الطلب.");
           return;
         }
 
         setOrder(data.order);
+        orderIdRef.current = data.order.id;
         setHasExistingAccount(Boolean(data.order.hasExistingAccount));
 
         if (data.order.deliveryAddressSnapshot) {
@@ -84,13 +114,16 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
             `/api/addresses?userId=${encodeURIComponent(data.order.buyerId)}`,
           );
           const addressData = await addressResponse.json();
-          const match = (addressData.addresses as DeliveryAddress[] | undefined)?.find(
-            (item) => item.id === data.order.deliveryAddressId,
-          );
+          const match = (
+            addressData.addresses as DeliveryAddress[] | undefined
+          )?.find((item) => item.id === data.order.deliveryAddressId);
           if (match) setAddress(match);
         }
 
-        if (data.order.status === "pending_payment" && attemptsRef.current < MAX_POLL_ATTEMPTS) {
+        if (
+          data.order.status === "pending_payment" &&
+          attemptsRef.current < MAX_POLL_ATTEMPTS
+        ) {
           attemptsRef.current += 1;
           timeoutRef.current = window.setTimeout(load, POLL_INTERVAL_MS);
           return;
@@ -110,7 +143,7 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
       cancelled = true;
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     };
-  }, [orderId, guestToken]);
+  }, [guestToken, sessionId]);
 
   if (error) {
     return (
@@ -124,7 +157,7 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
     return (
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm text-muted">جاري تأكيد الدفع...</p>
+          <p className="text-sm text-muted">جاري تأكيد الدفع مع Stripe...</p>
         </Card>
       </section>
     );
@@ -139,19 +172,25 @@ export function CheckoutSuccessContent({ orderId, guestToken }: CheckoutSuccessC
   const trackHref = guestToken
     ? `/order-status?token=${encodeURIComponent(guestToken)}`
     : `/orders/${order.id}`;
+  const isPending = order.status === "pending_payment";
 
   return (
     <section className="app-container page-padding">
       <PageHero
-        description="شكراً لك. تم استلام طلبك بنجاح."
+        description={
+          isPending
+            ? "استلمنا عودتك من Stripe. ننتظر تأكيد الدفع النهائي."
+            : "شكراً لك. تم استلام طلبك بنجاح."
+        }
         eyebrow="تأكيد الطلب"
-        title="تم إتمام الشراء"
+        title={isPending ? "بانتظار تأكيد الدفع" : "تم إتمام الشراء"}
       />
 
       <div className="mx-auto mt-6 max-w-2xl grid gap-5">
-        {pollingDelayed ? (
-          <FormMessage variant="success">
-            تم تأكيد طلبك. يمكنك متابعة الطلب من صفحة التأكيد.
+        {isPending || pollingDelayed ? (
+          <FormMessage variant="error">
+            الدفع قيد التأكيد. إن خصم المبلغ من بطاقتك، حدّث الصفحة خلال دقيقة أو
+            راجع صفحة الطلب. إن استمر التأخير تواصل مع الدعم وأرفق رقم الطلب.
           </FormMessage>
         ) : (
           <FormMessage variant="success">
