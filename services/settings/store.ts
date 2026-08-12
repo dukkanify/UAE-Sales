@@ -17,6 +17,33 @@ interface SettingsDatabase {
 }
 
 const DATA_FILE = path.join(dataDir(), "aep-settings.json");
+/** Keep settings history tiny — full before/after snapshots previously ballooned to ~2MB. */
+const MAX_SETTINGS_HISTORY = 40;
+
+function slimHistoryEntry(entry: SettingChangeRecord): SettingChangeRecord {
+  const pickKeys = (value: PlatformSettings | null | undefined) => {
+    if (!value) return value;
+    return {
+      updatedAt: value.updatedAt,
+      updatedBy: value.updatedBy,
+      branding: {
+        primaryColor: value.branding?.primaryColor,
+        accentColor: value.branding?.accentColor,
+        logoUrl: value.branding?.logoUrl,
+      },
+      courses: value.courses,
+      general: {
+        platformName: value.general?.platformName,
+        maintenanceMode: value.general?.maintenanceMode,
+      },
+    } as unknown as PlatformSettings;
+  };
+  return {
+    ...entry,
+    before: pickKeys(entry.before),
+    after: pickKeys(entry.after),
+  };
+}
 
 function deepMerge<T extends Record<string, unknown>>(base: T, patch: Partial<T>): T {
   const out = { ...base };
@@ -105,11 +132,20 @@ function ensureStore(): SettingsDatabase {
       (raw.settings ?? emptyDb().settings) as unknown as Record<string, unknown>,
     ) as unknown as PlatformSettings,
   );
-  return {
+  const history = (raw.history ?? []).slice(0, MAX_SETTINGS_HISTORY).map(slimHistoryEntry);
+  const db: SettingsDatabase = {
     settings,
-    history: raw.history ?? [],
+    history,
     seeded: Boolean(raw.seeded ?? true),
   };
+
+  // Persist a trimmed history once so cold starts stop re-parsing multi‑MB JSON.
+  const rawHistoryLen = Array.isArray(raw.history) ? raw.history.length : 0;
+  if (rawHistoryLen > MAX_SETTINGS_HISTORY) {
+    writeJsonFile(DATA_FILE, db);
+  }
+
+  return db;
 }
 
 export function readSettingsDb(): SettingsDatabase {
@@ -140,16 +176,18 @@ export function patchStoredSettings(
     ) as unknown as PlatformSettings;
     db.settings.updatedAt = new Date().toISOString();
     db.settings.updatedBy = actorId;
-    db.history.unshift({
-      id: generateId(),
-      category: "all",
-      actorId,
-      before,
-      after: structuredClone(db.settings),
-      createdAt: new Date().toISOString(),
-    });
-    if (db.history.length > 200) {
-      db.history = db.history.slice(0, 200);
+    db.history.unshift(
+      slimHistoryEntry({
+        id: generateId(),
+        category: "all",
+        actorId,
+        before,
+        after: structuredClone(db.settings),
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    if (db.history.length > MAX_SETTINGS_HISTORY) {
+      db.history = db.history.slice(0, MAX_SETTINGS_HISTORY);
     }
     next = db.settings;
   });

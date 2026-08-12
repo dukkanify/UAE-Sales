@@ -2,40 +2,59 @@
  * Durable JSON file helpers with in-memory fallback.
  * On read-only hosts (e.g. Vercel serverless) disk writes fail — keep serving
  * from process memory so marketing SSR never 500s.
+ *
+ * Important: cache the *parsed* value, not only the raw string — re-parsing
+ * multi‑MB files on every request (settings history) can OOM/timeout SSR.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
-const memory = new Map<string, string>();
+const rawMemory = new Map<string, string>();
+const parsedMemory = new Map<string, unknown>();
 
 export function dataDir(): string {
   return path.join(process.cwd(), ".data");
 }
 
 export function readJsonFile<T>(filePath: string, fallback: () => T): T {
-  const mem = memory.get(filePath);
+  if (parsedMemory.has(filePath)) {
+    return parsedMemory.get(filePath) as T;
+  }
+
+  const mem = rawMemory.get(filePath);
   if (mem) {
     try {
-      return JSON.parse(mem) as T;
+      const parsed = JSON.parse(mem) as T;
+      parsedMemory.set(filePath, parsed);
+      return parsed;
     } catch {
-      memory.delete(filePath);
+      rawMemory.delete(filePath);
     }
   }
 
   try {
-    if (!existsSync(filePath)) return fallback();
+    if (!existsSync(filePath)) {
+      const value = fallback();
+      parsedMemory.set(filePath, value);
+      return value;
+    }
     const raw = readFileSync(filePath, "utf8");
-    memory.set(filePath, raw);
-    return JSON.parse(raw) as T;
+    rawMemory.set(filePath, raw);
+    const parsed = JSON.parse(raw) as T;
+    parsedMemory.set(filePath, parsed);
+    return parsed;
   } catch {
-    return fallback();
+    const value = fallback();
+    parsedMemory.set(filePath, value);
+    return value;
   }
 }
 
 export function writeJsonFile(filePath: string, value: unknown): void {
   const raw = JSON.stringify(value, null, 2);
-  memory.set(filePath, raw);
+  rawMemory.set(filePath, raw);
+  parsedMemory.set(filePath, value);
 
   try {
     const dir = path.dirname(filePath);
@@ -53,4 +72,15 @@ export function writeJsonFile(filePath: string, value: unknown): void {
       );
     }
   }
+}
+
+/** Drop cached entries (tests). */
+export function clearJsonFileCache(filePath?: string): void {
+  if (!filePath) {
+    rawMemory.clear();
+    parsedMemory.clear();
+    return;
+  }
+  rawMemory.delete(filePath);
+  parsedMemory.delete(filePath);
 }

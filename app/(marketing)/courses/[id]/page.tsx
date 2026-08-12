@@ -61,8 +61,13 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
   const hours = Math.max(1, Math.round(course.estimatedDurationMinutes / 60));
   const lessonTotal =
     course.counts.lessons || course.modules.reduce((n, m) => n + m.lessons.length, 0);
-  ensurePaymentsSeeded();
-  const product = listProducts({ activeOnly: true, courseId: course.id })[0] ?? null;
+  let product: ReturnType<typeof listProducts>[number] | null = null;
+  try {
+    ensurePaymentsSeeded();
+    product = listProducts({ activeOnly: true, courseId: course.id })[0] ?? null;
+  } catch (error) {
+    console.error("[public-course-detail] payments", error);
+  }
   const objectives = getJourneyObjectives(course);
   const instructorLabel =
     (typeof course.metadata?.instructorDisplayName === "string" &&
