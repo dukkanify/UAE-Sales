@@ -8,6 +8,10 @@ import { HomeCoursesByInstructor } from "@/features/marketing/components/home-co
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 
+/** Home embeds the published catalog — avoid CDN-stale UUID course links. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: {
     absolute: "AviatorPass | Your Aviation Journey Starts Here",
