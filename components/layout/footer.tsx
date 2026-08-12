@@ -9,9 +9,9 @@ import { siteStatic } from "@/config/site-static";
 import { routes } from "@/constants/routes";
 
 const exploreLinks = [
-  { href: "/#flightpath", label: "Flightpath" },
+  { href: routes.flightpath, label: "Flightpath" },
   { href: routes.courses, label: "Courses" },
-  { href: "/#live", label: "Live Zoom" },
+  { href: routes.live, label: "Live Zoom" },
   { href: routes.book, label: "Book a session" },
 ] as const;
 

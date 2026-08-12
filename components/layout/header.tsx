@@ -12,15 +12,11 @@ import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand/brand-logo";
 
 function navHrefKey(href: (typeof NAV_ITEMS)[number]["href"]): string {
-  if (typeof href === "string") return href;
-  const path = href.pathname ?? "/";
-  const hash = href.hash ? `#${href.hash.replace(/^#/, "")}` : "";
-  return `${path}${hash}`;
+  return href;
 }
 
 function navPathname(href: (typeof NAV_ITEMS)[number]["href"]): string {
-  if (typeof href === "string") return href.split("#")[0] || "/";
-  return href.pathname || "/";
+  return href.split("#")[0] || "/";
 }
 
 function Header() {
@@ -69,7 +65,7 @@ function Header() {
             const itemPath = navPathname(item.href);
             const active =
               itemPath === "/"
-                ? pathname === "/" && typeof item.href === "string"
+                ? pathname === "/"
                 : pathname === itemPath || pathname.startsWith(`${itemPath}/`);
             return (
               <Link
@@ -130,7 +126,7 @@ function Header() {
               const itemPath = navPathname(item.href);
               const active =
                 itemPath === "/"
-                  ? pathname === "/" && typeof item.href === "string"
+                  ? pathname === "/"
                   : pathname === itemPath || pathname.startsWith(`${itemPath}/`);
               return (
                 <Link
