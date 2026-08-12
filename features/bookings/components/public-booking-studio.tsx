@@ -18,6 +18,7 @@ import {
   formatSlotDateTime,
   formatSlotTime,
   maxBookableDate,
+  utcHourFromIso,
   type ResolvedBookableDay,
 } from "@/features/bookings/lib/slot-utils";
 import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
@@ -73,7 +74,7 @@ function groupOpenSlots(slots: BookingSlot[]) {
     { label: "Evening", slots: [] },
   ];
   for (const slot of slots.filter((s) => s.available)) {
-    const hour = new Date(slot.startsAt).getHours();
+    const hour = utcHourFromIso(slot.startsAt);
     const label = periodForHour(hour);
     groups.find((g) => g.label === label)?.slots.push(slot);
   }
@@ -324,13 +325,13 @@ function PublicBookingStudio() {
                 <div className="min-w-0">
                   <h2 className="booking-step-heading">Choose your Zoom window</h2>
                   <p className="booking-step-lead">
-                    Session, instructor, and an open time — only bookable slots appear.
+                    Session, instructor, and an open GMT time — only bookable slots appear.
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-medium tabular-nums text-muted-foreground">
                   {loadingSlots
                     ? "Scanning…"
-                    : `${openCount} open slot${openCount === 1 ? "" : "s"}`}
+                    : `${openCount} open GMT slot${openCount === 1 ? "" : "s"}`}
                 </p>
               </div>
 
@@ -407,13 +408,19 @@ function PublicBookingStudio() {
               <div className="mt-5">
                 <p className="mb-2.5 inline-flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   <Clock3 className="h-3.5 w-3.5 text-primary/70" />
-                  Open times
+                  Open times · GMT
                   {date ? (
                     <span className="normal-case tracking-normal text-foreground/70">
-                      · {format(parseISO(date), "EEE d MMM")}
+                      · {format(parseISO(`${date}T12:00:00Z`), "EEE d MMM")}
                     </span>
                   ) : null}
                 </p>
+
+                {!instructorId ? (
+                  <p className="mb-3 border border-dashed border-border/70 px-3 py-8 text-center text-sm text-muted-foreground">
+                    No instructors are available for booking yet. Refresh or contact support.
+                  </p>
+                ) : null}
 
                 {slotHint ? (
                   <p className="mb-3 border border-accent/25 bg-accent/10 px-3 py-2 text-sm leading-snug text-foreground/85">
@@ -422,7 +429,7 @@ function PublicBookingStudio() {
                 ) : null}
 
                 {loadingSlots ? (
-                  <p className="text-sm text-muted-foreground">Loading open times…</p>
+                  <p className="text-sm text-muted-foreground">Loading open times (GMT)…</p>
                 ) : openCount > 0 ? (
                   <div className="space-y-4">
                     {groupedSlots.map((group) => (
@@ -430,7 +437,7 @@ function PublicBookingStudio() {
                         <p className="mb-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
                           {group.label}
                           <span className="ml-2 font-medium normal-case tracking-normal text-muted-foreground">
-                            {group.slots.length}
+                            {group.slots.length} · GMT
                           </span>
                         </p>
                         <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8">
@@ -443,6 +450,7 @@ function PublicBookingStudio() {
                                 data-selected={selected}
                                 className="booking-slot px-1.5 py-2.5 text-sm font-semibold"
                                 onClick={() => setSelectedSlot(slot.startsAt)}
+                                aria-label={`${formatSlotTime(slot.startsAt)} GMT`}
                               >
                                 {formatSlotTime(slot.startsAt)}
                               </button>
@@ -452,11 +460,11 @@ function PublicBookingStudio() {
                       </div>
                     ))}
                   </div>
-                ) : (
+                ) : instructorId ? (
                   <p className="border border-dashed border-border/70 px-3 py-8 text-center text-sm text-muted-foreground">
-                    No open times on this date. Choose another day above.
+                    No open GMT times on this date. Choose another day above.
                   </p>
-                )}
+                ) : null}
               </div>
 
               <div className="booking-footer-bar">
