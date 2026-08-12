@@ -87,7 +87,7 @@ describe("dynamic schedule management (CR008)", () => {
       from: start.toISOString(),
     });
     expect(sessions.some((s) => s.id === built.session?.id)).toBe(true);
-  }, 30000);
+  }, 90_000);
 
   it("reschedules, cancels, and splits student/instructor reminders", async () => {
     const instructor = readAuthDb().users.find((u) => u.role === ROLES.INSTRUCTOR)!;

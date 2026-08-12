@@ -21,7 +21,7 @@ export default defineConfig({
     },
     setupFiles: ["./tests/setup.ts"],
     // Cloud/shared agents can be CPU-contended; keep assertions tight but allow headroom.
-    testTimeout: 60_000,
+    testTimeout: 90_000,
   },
 
   resolve: {

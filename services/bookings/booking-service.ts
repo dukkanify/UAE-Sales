@@ -2,12 +2,13 @@
  * 24/7 appointment booking — admin-controlled settings, student self-book.
  */
 
-import { addDays, addMinutes, format, isBefore, parseISO, startOfDay } from "date-fns";
+import { addDays, addMinutes, format, isBefore, parseISO } from "date-fns";
 
 import { generateId } from "@/lib/security/crypto";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { ROLES } from "@/constants/roles";
 import { logActivity } from "@/services/auth/activity-log";
+import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { readAuthDb, toUserProfile } from "@/services/auth/store";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { BookingAccessError } from "@/services/bookings/access";
@@ -202,14 +203,19 @@ export async function updateBookingSettings(input: {
 }
 
 export function listBookableInstructors(): UserProfile[] {
+  ensureDemoUsersSeeded();
   const settings = getBookingSettings();
   const instructors = readAuthDb()
     .users.filter((u) => u.role === ROLES.INSTRUCTOR && u.status === ACCOUNT_STATUS.ACTIVE)
     .map(toUserProfile);
 
   if (!settings.instructorIds.length) return instructors;
+
   const allow = new Set(settings.instructorIds);
-  return instructors.filter((i) => allow.has(i.id));
+  const filtered = instructors.filter((i) => allow.has(i.id));
+  // Stale allow-list (e.g. after serverless reseed) would hide every instructor.
+  if (filtered.length === 0) return instructors;
+  return filtered;
 }
 
 function overlaps(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
@@ -242,8 +248,8 @@ export function getAvailableSlots(input: {
 
   if (settings.blackoutDates.includes(input.date)) return [];
 
-  const day = startOfDay(parseISO(`${input.date}T00:00:00`));
-  const today = startOfDay(new Date());
+  const day = utcStartOfDay(input.date);
+  const today = utcStartOfDay(format(new Date(), "yyyy-MM-dd"));
   if (isBefore(day, today)) return [];
 
   const maxDay = addDays(today, settings.maxAdvanceDays);
@@ -257,14 +263,14 @@ export function getAvailableSlots(input: {
     (b) =>
       b.instructorId === input.instructorId &&
       ACTIVE_BOOKING.includes(b.status) &&
-      b.startsAt.startsWith(input.date),
+      utcDateKey(b.startsAt) === input.date,
   );
 
   const now = new Date();
   const earliest = addMinutes(now, settings.minNoticeMinutes);
 
   return generateSlotsReliable({
-    day,
+    date: input.date,
     duration,
     settings,
     bookings,
@@ -307,8 +313,19 @@ export function findNextAvailableSlots(input: {
   return { date: input.startDate, slots, autoAdvanced: false };
 }
 
+function utcStartOfDay(date: string): Date {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(Date.UTC(y!, (m ?? 1) - 1, d ?? 1, 0, 0, 0, 0));
+}
+
+function utcDateKey(iso: string): string {
+  const date = parseISO(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}-${String(date.getUTCDate()).padStart(2, "0")}`;
+}
+
 function generateSlotsReliable(input: {
-  day: Date;
+  date: string;
   duration: number;
   settings: BookingSettings;
   bookings: AppointmentBooking[];
@@ -316,21 +333,18 @@ function generateSlotsReliable(input: {
   startHour: number;
   endHour: number;
 }): BookingSlot[] {
-  const { day, duration, settings, bookings, earliest, startHour, endHour } = input;
+  const { date, duration, settings, bookings, earliest, startHour, endHour } = input;
   const step = duration;
   const slots: BookingSlot[] = [];
 
-  const dayStart = new Date(day);
-  dayStart.setHours(startHour, 0, 0, 0);
-  const dayEnd = new Date(day);
-  if (endHour >= 24) {
-    dayEnd.setDate(dayEnd.getDate() + 1);
-    dayEnd.setHours(0, 0, 0, 0);
-  } else {
-    dayEnd.setHours(endHour, 0, 0, 0);
-  }
+  const [y, m, d] = date.split("-").map(Number);
+  const dayStartMs = Date.UTC(y!, (m ?? 1) - 1, d ?? 1, startHour, 0, 0, 0);
+  const dayEndMs =
+    endHour >= 24
+      ? Date.UTC(y!, (m ?? 1) - 1, (d ?? 1) + 1, 0, 0, 0, 0)
+      : Date.UTC(y!, (m ?? 1) - 1, d ?? 1, endHour, 0, 0, 0);
 
-  for (let t = dayStart.getTime(); t + duration * 60_000 <= dayEnd.getTime(); t += step * 60_000) {
+  for (let t = dayStartMs; t + duration * 60_000 <= dayEndMs; t += step * 60_000) {
     const startsAt = new Date(t);
     const endsAt = addMinutes(startsAt, duration);
     let available = true;
@@ -392,7 +406,7 @@ export async function createBooking(input: {
     throw new BookingAccessError("Invalid startsAt");
   }
 
-  const date = format(startsAt, "yyyy-MM-dd");
+  const date = utcDateKey(input.startsAt);
   const slots = getAvailableSlots({
     date,
     instructorId: input.instructorId,
@@ -711,7 +725,7 @@ export async function createGuestBookingHold(input: {
   const startsAt = parseISO(input.startsAt);
   if (Number.isNaN(startsAt.getTime())) throw new BookingAccessError("Invalid startsAt");
 
-  const date = format(startsAt, "yyyy-MM-dd");
+  const date = utcDateKey(input.startsAt);
   const slots = getAvailableSlots({
     date,
     instructorId: input.instructorId,
