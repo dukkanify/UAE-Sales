@@ -26,12 +26,12 @@ export const siteStatic = {
   },
   brand: {
     /** Raster lockups from Option A guidelines — cache-busted for deploy refresh */
-    logo: "/brand/logo.png?v=option-a-2",
-    logoDark: "/brand/logo-dark.png?v=option-a-2",
-    logoStacked: "/brand/logo-stacked.png?v=option-a-2",
-    icon: "/brand/icon.png?v=option-a-2",
-    favicon: "/brand/favicon.svg?v=option-a-2",
-    openGraph: "/brand/og.png?v=option-a-2",
+    logo: "/brand/logo.png?v=option-a-3",
+    logoDark: "/brand/logo-dark.png?v=option-a-3",
+    logoStacked: "/brand/logo-stacked.png?v=option-a-3",
+    icon: "/brand/icon.png?v=option-a-3",
+    favicon: "/brand/favicon.svg?v=option-a-3",
+    openGraph: "/brand/og.png?v=option-a-3",
     /** Vector masters kept for edit / favicon / print */
     logoSvg: "/brand/logo.svg",
     logoDarkSvg: "/brand/logo-dark.svg",

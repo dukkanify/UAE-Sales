@@ -57,7 +57,7 @@ function Header() {
             variant="dark"
             href={routes.home}
             priority
-            className="[&_img]:h-11 [&_img]:max-w-[280px] sm:[&_img]:h-12"
+            className="[&_img]:h-11 [&_img]:max-w-[360px] sm:[&_img]:h-12"
           />
         </div>
 
