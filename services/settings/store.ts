@@ -68,7 +68,9 @@ function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
       current.endsWith(".svg") ||
       current === "/brand/logo.png" ||
       current === "/brand/logo-dark.png" ||
-      current === "/brand/og.png"
+      current === "/brand/og.png" ||
+      // Bust stale Option A PNG query strings so clipped lockups refresh.
+      /\/brand\/(logo|logo-dark|og)\.png(\?v=option-a-[12])?$/.test(current)
     ) {
       branding[key] = target[key];
       changed = true;

@@ -9,7 +9,6 @@ out/
 dist/
 build/
 # Environment
-.env
 .env*.local
 .env.production
 # Debug
@@ -50,3 +49,11 @@ public/exports/*
 coverage/
 playwright-report/
 test-results/
+
+.projects/cache
+.projects/vault
+.projects/state.test.json
+.projects/state.local.test.json
+.env
+.env.*
+!.env.example
