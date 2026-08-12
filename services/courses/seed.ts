@@ -3,6 +3,7 @@
  */
 
 import { generateId } from "@/lib/security/crypto";
+import { stableCourseId } from "@/lib/courses/public-course-path";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { readAuthDb } from "@/services/auth/store";
 import { ROLES } from "@/constants/roles";
@@ -474,7 +475,7 @@ function ensurePublishedCatalogEnrichment(): void {
 
     for (const def of extras) {
       if (existingCodes.has(def.code)) continue;
-      const courseId = generateId();
+      const courseId = stableCourseId(def.code) || generateId();
       d.courses.push({
         id: courseId,
         title: def.title,
@@ -738,7 +739,7 @@ export function ensureCoursesSeeded(): void {
   const enrollments: Enrollment[] = [];
 
   for (const def of courseDefs) {
-    const courseId = generateId();
+    const courseId = stableCourseId(def.code) || generateId();
     const course: Course = {
       id: courseId,
       title: def.title,

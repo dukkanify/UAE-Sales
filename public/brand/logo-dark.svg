@@ -1,15 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 96" fill="none" role="img" aria-label="AviatorPass">
-  <g transform="translate(4,16)">
-    <path d="M8 48C18 40 34 28 52 18C40 30 28 42 18 52L8 48Z" fill="#5BA3CC"/>
-    <path d="M10 36C24 26 42 14 62 6C48 20 34 34 22 44L10 36Z" fill="#5BA3CC"/>
-    <path d="M12 24C28 14 48 4 70 0C54 12 38 26 24 36L12 24Z" fill="#5BA3CC"/>
-    <path d="M14 22C30 12 50 2 72 -1C70 0 54 10 40 18C32 22 22 26 14 22Z" fill="#DD9B30"/>
-    <path d="M72 8C86 4 102 6 112 12V50C98 42 84 40 72 44V8Z" fill="none" stroke="#C4C3C7" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M72 8C62 12 54 22 52 34V52C58 44 66 42 72 44V8Z" fill="none" stroke="#C4C3C7" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M72 44V52" stroke="#C4C3C7" stroke-width="3" stroke-linecap="round"/>
-  </g>
-  <text x="128" y="44" font-family="Space Grotesk, Arial Black, Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="0.02em">
-    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="8" fill="#DD9B30">PASS</tspan>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="128" viewBox="0 0 720 128" fill="none">
+  <g transform="translate(8,16) scale(1.05)">
+  <g>
+    <path fill="#5BA3C9" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
+    <path fill="#5BA3C9" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
+    <path fill="#5BA3C9" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
+    <path fill="#DD9B30" d="M28 46 C50 28 74 12 96 0 L88 6 C68 18 48 32 32 44 Z"/>
+    <path stroke="#D1D0D4" stroke-width="4.5" stroke-linecap="round" d="M96 8 V78"/>
+    <path fill="none" stroke="#D1D0D4" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
+      d="M96 8 C118 0 146 6 160 20 V74 C138 58 116 54 96 66"/>
+    <path fill="none" stroke="#D1D0D4" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
+      d="M96 8 C78 18 66 38 64 56 V78"/>
+    <path stroke="#D1D0D4" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
+  </g></g>
+  <text x="200" y="58" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1.2">
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="16" fill="#DD9B30">PASS</tspan>
   </text>
-  <text x="128" y="68" font-family="IBM Plex Sans, Arial, sans-serif" font-size="8.5" font-weight="500" fill="#C4C3C7" letter-spacing="0.16em">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="200" y="90" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="3.2" fill="#D1D0D4">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>

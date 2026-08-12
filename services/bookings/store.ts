@@ -56,7 +56,7 @@ export function defaultBookingSettings(): BookingSettings {
       },
     ],
     blackoutDates: [],
-    timezone: "Asia/Kuwait",
+    timezone: "UTC",
     updatedAt: now,
   };
 }
@@ -69,10 +69,24 @@ function emptyDb(): BookingsDatabase {
   };
 }
 
+function normalizeBookingSettings(raw: Partial<BookingSettings> | undefined): BookingSettings {
+  const merged = { ...defaultBookingSettings(), ...(raw ?? {}) };
+  // Public studio is Greenwich Mean Time — migrate legacy Kuwait default.
+  if (!merged.timezone || merged.timezone === "Asia/Kuwait") {
+    merged.timezone = "UTC";
+  }
+  if (!Array.isArray(merged.instructorIds)) merged.instructorIds = [];
+  if (!Array.isArray(merged.blackoutDates)) merged.blackoutDates = [];
+  if (!Array.isArray(merged.sessionTypes) || merged.sessionTypes.length === 0) {
+    merged.sessionTypes = defaultBookingSettings().sessionTypes;
+  }
+  return merged;
+}
+
 export function ensureBookingsStore(): BookingsDatabase {
   const raw = readJsonFile<Partial<BookingsDatabase>>(DATA_FILE, emptyDb);
   return {
-    settings: { ...defaultBookingSettings(), ...(raw.settings ?? {}) },
+    settings: normalizeBookingSettings(raw.settings),
     bookings: raw.bookings ?? [],
     seeded: Boolean(raw.seeded),
   };

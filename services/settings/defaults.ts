@@ -1,6 +1,6 @@
 /**
- * Default platform settings — AviatorPass official brand guidelines.
- * Palette: Aero Blue / Altitude Orange / Academic Grey.
+ * Default platform settings — AviatorPass Option A (Horizon Blue & Sun Gold).
+ * Palette: Horizon Blue / Aero Blue · Sun Gold / Altitude Orange · Academic Grey.
  * Typography: Stimulatio Flat pending licensed files (Space Grotesk substitute) + IBM Plex Sans.
  */
 
@@ -33,12 +33,12 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     },
   },
   branding: {
-    logoUrl: "/brand/logo.svg",
-    darkLogoUrl: "/brand/logo-dark.svg",
-    faviconUrl: "/brand/favicon.svg",
+    logoUrl: "/brand/logo.png?v=option-a-3",
+    darkLogoUrl: "/brand/logo-dark.png?v=option-a-3",
+    faviconUrl: "/brand/favicon.svg?v=option-a-3",
     loginBackgroundUrl: "/images/hero-aviation.svg",
     loginIllustrationUrl: "/images/hero-aviation.svg",
-    openGraphImageUrl: "/brand/og.svg",
+    openGraphImageUrl: "/brand/og.png?v=option-a-3",
     primaryColor: "#2E7DAA",
     secondaryColor: "#7C7B80",
     accentColor: "#DD9B30",

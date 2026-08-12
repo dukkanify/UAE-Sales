@@ -1,16 +1,18 @@
 # AviatorPass Design System
 
-Official brand guidelines applied across product surfaces.
+Option A — Horizon Blue & Sun Gold — applied across product surfaces.
 
 ## Colour roles
 
-| Role              | Name            | Hex       |
-| ----------------- | --------------- | --------- |
-| Primary           | Aero Blue       | `#2E7DAA` |
-| Accent            | Altitude Orange | `#DD9B30` |
-| Secondary / muted | Academic Grey   | `#7C7B80` |
-| Ink               | Deep cockpit    | `#0B1A24` |
-| Background        | Sky mist        | `#F3F6F9` |
+| Role              | Name                       | Hex       |
+| ----------------- | -------------------------- | --------- |
+| Primary           | Horizon Blue (Aero Blue)   | `#2E7DAA` |
+| Accent            | Sun Gold (Altitude Orange) | `#DD9B30` |
+| Secondary / muted | Academic Grey              | `#7C7B80` |
+| Ink               | Navy Ink                   | `#0F2A3D` |
+| Background        | Cloud                      | `#F7FAFC` |
+| Muted surface     | Sky Mist                   | `#E8F3F8` |
+| Warm panel        | Sand Glow                  | `#F8F1E4` |
 
 ## Typography
 
@@ -23,11 +25,11 @@ Official brand guidelines applied across product surfaces.
 
 - Tagline: **YOUR AVIATION JOURNEY STARTS HERE**
 - Secondary: **UNLOCK YOUR PILOT LICENSE**
-- Wordmark: **AVIATOR** (Aero Blue) + **PASS** (Altitude Orange)
+- Wordmark: **AVIATOR** (Horizon Blue) + **PASS** (Sun Gold)
 
 ## Source of truth
 
 - Tokens: `config/theme.ts`, `styles/globals.css`, `config/design-system.ts`
 - Branding: `config/branding.ts`
-- Assets: `public/brand/`
+- Assets: `public/brand/` (UI uses transparent PNG lockups)
 - Guidelines PDF: `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`

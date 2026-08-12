@@ -29,6 +29,7 @@ export function ensureDemoUsersSeeded(): void {
   }
   ensureCgiDemoUser();
   ensureCaptainInstructorDemo();
+  ensureSecondaryInstructorDemo();
   backfillDemoStudentDetails();
 }
 
@@ -277,17 +278,91 @@ function seedFreshDemoUsers(): void {
 /** Align primary instructor with Captain Abdulaziz Alshoail (customer journeys). */
 function ensureCaptainInstructorDemo(): void {
   writeAuthDb((d) => {
-    const instructor = d.users.find((u) => u.email === "instructor.one@eagerpilots.com");
-    if (!instructor) return;
-    if (instructor.firstName === "Abdulaziz" && instructor.lastName === "Alshoail") return;
+    const now = new Date().toISOString();
+    let instructor = d.users.find((u) => u.email === "instructor.one@eagerpilots.com");
+    if (!instructor) {
+      instructor = {
+        id: generateId(),
+        email: "instructor.one@eagerpilots.com",
+        firstName: "Abdulaziz",
+        lastName: "Alshoail",
+        phone: "+96550000001",
+        countryCode: "KW",
+        nationality: "Kuwaiti",
+        dateOfBirth: null,
+        gender: null,
+        city: "Kuwait City",
+        bio: "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.",
+        emergencyContactName: null,
+        emergencyContactPhone: null,
+        avatarUrl: null,
+        timezone: "UTC",
+        language: "en",
+        role: ROLES.INSTRUCTOR,
+        status: ACCOUNT_STATUS.ACTIVE,
+        emailVerified: true,
+        profileComplete: true,
+        passwordHash: null,
+        passwordSalt: null,
+        lastLoginAt: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      d.users.push(instructor);
+      return;
+    }
+    if (instructor.firstName === "Abdulaziz" && instructor.lastName === "Alshoail") {
+      if (instructor.status !== ACCOUNT_STATUS.ACTIVE) {
+        instructor.status = ACCOUNT_STATUS.ACTIVE;
+        instructor.updatedAt = now;
+      }
+      return;
+    }
     instructor.firstName = "Abdulaziz";
     instructor.lastName = "Alshoail";
     instructor.countryCode = "KW";
     instructor.city = "Kuwait City";
     instructor.nationality = "Kuwaiti";
+    instructor.status = ACCOUNT_STATUS.ACTIVE;
     instructor.bio =
       "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.";
-    instructor.updatedAt = new Date().toISOString();
+    instructor.updatedAt = now;
+  });
+}
+
+/** Ensure a second active instructor exists for public booking studio. */
+function ensureSecondaryInstructorDemo(): void {
+  writeAuthDb((d) => {
+    const email = "instructor.two@eagerpilots.com";
+    if (d.users.some((u) => u.email === email)) return;
+    const now = new Date().toISOString();
+    d.users.push({
+      id: generateId(),
+      email,
+      firstName: "Sara",
+      lastName: "Al Mansoori",
+      phone: "+971509998877",
+      countryCode: "AE",
+      nationality: "Emirati",
+      dateOfBirth: null,
+      gender: null,
+      city: "Abu Dhabi",
+      bio: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+      avatarUrl: null,
+      timezone: "UTC",
+      language: "en",
+      role: ROLES.INSTRUCTOR,
+      status: ACCOUNT_STATUS.ACTIVE,
+      emailVerified: true,
+      profileComplete: true,
+      passwordHash: null,
+      passwordSalt: null,
+      lastLoginAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
   });
 }
 

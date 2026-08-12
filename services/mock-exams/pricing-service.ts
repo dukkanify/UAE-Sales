@@ -54,7 +54,8 @@ export function quoteMockExam(input: {
       apply = true;
     } else if (fee.autoApply && fee.code === "RUSH_24H" && hoursUntil > 12 && hoursUntil < 24) {
       apply = true;
-    } else if (fee.autoApply && fee.code === "RUSH" && hoursUntil > 0 && hoursUntil < 48) {
+    } else if (fee.autoApply && fee.code === "RUSH" && hoursUntil >= 24 && hoursUntil < 48) {
+      // Legacy generic rush — only outside the ELP 12h/24h windows to avoid double fees.
       apply = true;
     }
     if (fee.autoApply && fee.code === "WEEKEND") {

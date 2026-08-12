@@ -2,23 +2,41 @@ import { addDays, format, isValid, parseISO } from "date-fns";
 
 import type { BookingSlot } from "@/types/bookings";
 
+/** Public booking studio always shows Greenwich Mean Time. */
+export const BOOKING_DISPLAY_TIMEZONE = "GMT";
+
 export type ResolvedBookableDay = {
   date: string;
   slots: BookingSlot[];
   autoAdvanced: boolean;
 };
 
-/** Safe HH:mm label — invalid dates must never crash the booking UI. */
+function pad2(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+/** Safe HH:mm GMT label — invalid dates must never crash the booking UI. */
 export function formatSlotTime(iso: string): string {
   const date = parseISO(iso);
   if (!isValid(date)) return "--:--";
-  return format(date, "HH:mm");
+  return `${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())}`;
 }
 
 export function formatSlotDateTime(iso: string): string {
   const date = parseISO(iso);
   if (!isValid(date)) return "Invalid time";
-  return date.toLocaleString();
+  const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getUTCDay()] ?? "";
+  const month =
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][
+      date.getUTCMonth()
+    ] ?? "";
+  return `${weekday} ${date.getUTCDate()} ${month} · ${formatSlotTime(iso)} GMT`;
+}
+
+export function utcHourFromIso(iso: string): number {
+  const date = parseISO(iso);
+  if (!isValid(date)) return 0;
+  return date.getUTCHours();
 }
 
 export function hasAvailableSlot(slots: BookingSlot[]): boolean {

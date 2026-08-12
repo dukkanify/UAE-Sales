@@ -4,6 +4,7 @@
  */
 
 import { generateId } from "@/lib/security/crypto";
+import { stableCourseId } from "@/lib/courses/public-course-path";
 import { ROLES } from "@/constants/roles";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { readAuthDb } from "@/services/auth/store";
@@ -282,7 +283,7 @@ export function ensureCustomerJourneyCourses(): void {
         continue;
       }
 
-      const courseId = generateId();
+      const courseId = stableCourseId(def.code) || generateId();
       d.courses.push({
         id: courseId,
         title: def.title,
