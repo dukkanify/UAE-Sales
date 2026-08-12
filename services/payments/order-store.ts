@@ -26,6 +26,22 @@ export async function getOrderById(orderId: string): Promise<Order | undefined> 
   return orders.find((order) => order.id === orderId);
 }
 
+export async function getOrderByPaymentIntentId(
+  paymentIntentId: string,
+): Promise<Order | undefined> {
+  if (!paymentIntentId) return undefined;
+  const orders = await getAllOrders();
+  return orders.find((order) => order.stripePaymentIntentId === paymentIntentId);
+}
+
+export async function getOrderByCheckoutSessionId(
+  sessionId: string,
+): Promise<Order | undefined> {
+  if (!sessionId) return undefined;
+  const orders = await getAllOrders();
+  return orders.find((order) => order.stripeCheckoutSessionId === sessionId);
+}
+
 export async function getOrdersForUser(userId: string): Promise<Order[]> {
   const orders = await getAllOrders();
   return orders.filter(

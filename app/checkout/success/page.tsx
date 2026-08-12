@@ -3,7 +3,11 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 type CheckoutSuccessPageProps = {
-  searchParams: Promise<{ orderId?: string; token?: string }>;
+  searchParams: Promise<{
+    orderId?: string;
+    token?: string;
+    session_id?: string;
+  }>;
 };
 
 export default async function CheckoutSuccessPage({
@@ -11,7 +15,7 @@ export default async function CheckoutSuccessPage({
 }: CheckoutSuccessPageProps) {
   const params = await searchParams;
 
-  if (!params.orderId) {
+  if (!params.orderId && !params.session_id) {
     return (
       <>
         <SiteHeader />
@@ -29,7 +33,11 @@ export default async function CheckoutSuccessPage({
     <>
       <SiteHeader />
       <main>
-        <CheckoutSuccessContent guestToken={params.token} orderId={params.orderId} />
+        <CheckoutSuccessContent
+          guestToken={params.token}
+          orderId={params.orderId}
+          sessionId={params.session_id}
+        />
       </main>
       <SiteFooter />
     </>

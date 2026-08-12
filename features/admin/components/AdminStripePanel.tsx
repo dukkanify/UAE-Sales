@@ -108,6 +108,58 @@ export function AdminStripePanel() {
       </div>
 
       <section className="admin-ops__panel">
+        <h2 className="admin-ops__panel-title">تفعيل الحساب (Go-Live)</h2>
+        <p className="admin-ops__panel-sub">
+          الكود جاهز. بعد تفعيل Stripe ضع المفاتيح على Vercel واربط الـ webhook ثم
+          أعد النشر. الدليل الكامل:{" "}
+          <code className="text-xs">STRIPE_GO_LIVE.md</code>
+        </p>
+        <ol className="mt-3 grid gap-2 text-sm text-muted">
+          <li>
+            1. Dashboard → API keys → انسخ{" "}
+            <strong className="text-ink">sk_live</strong> و{" "}
+            <strong className="text-ink">pk_live</strong>
+          </li>
+          <li>
+            2. Webhooks →{" "}
+            <code className="text-xs">https://sooqna.site/api/webhooks/stripe</code>
+          </li>
+          <li>
+            3. أحداث:{" "}
+            <code className="text-xs">checkout.session.completed</code>،{" "}
+            <code className="text-xs">payment_intent.*</code>،{" "}
+            <code className="text-xs">charge.refunded</code>
+          </li>
+          <li>
+            4. Vercel env: عطّل Mock (
+            <code className="text-xs">NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT=false</code>)
+          </li>
+          <li>5. Redeploy ثم اشترِ بمبلغ صغير للتحقق</li>
+        </ol>
+        <div
+          className="admin-ops__quick-links"
+          style={{ marginTop: "0.85rem" }}
+        >
+          <a
+            className="admin-ops__chip-link"
+            href={links.apiKeys}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            API Keys
+          </a>
+          <a
+            className="admin-ops__chip-link"
+            href={links.webhooks}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Webhooks
+          </a>
+        </div>
+      </section>
+
+      <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">روابط لوحة Stripe</h2>
         <p className="admin-ops__panel-sub">
           افتح حساب Stripe مباشرة للتحكم بالمدفوعات، المفاتيح، والنزاعات.

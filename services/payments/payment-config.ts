@@ -20,10 +20,26 @@ export function getStripePublishableKey(): string | undefined {
   return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
 }
 
-/** Server-side guard for forced mock checkout (preview / non-production). */
+export function isStripeWebhookConfigured(): boolean {
+  return Boolean(getStripeWebhookSecret());
+}
+
+/** True when running a production-like deployment (live Vercel or NODE_ENV=production). */
+export function isProductionLike(): boolean {
+  if (process.env.VERCEL_ENV === "production") return true;
+  if (process.env.VERCEL_ENV === "preview") return false;
+  return process.env.NODE_ENV === "production";
+}
+
+/**
+ * Server-side guard for forced/automatic mock checkout.
+ * Never allow silent mock on production-like hosts unless ALLOW_MOCK_CHECKOUT=true
+ * (emergency/preview only — do not set on sooqna.site).
+ */
 export function isMockCheckoutAllowed(): boolean {
   if (process.env.ALLOW_MOCK_CHECKOUT === "true") return true;
   if (process.env.VERCEL_ENV === "preview") return true;
+  if (isProductionLike()) return false;
   return process.env.NODE_ENV !== "production";
 }
 

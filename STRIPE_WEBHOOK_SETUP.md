@@ -26,7 +26,7 @@ STRIPE_SECRET_KEY=sk_test_...   # or sk_live_... in production
 | `checkout.session.completed` | Mark order paid, create escrow hold, update wallet |
 | `payment_intent.succeeded` | Fallback payment confirmation |
 | `payment_intent.payment_failed` | Mark payment failed |
-| `charge.refunded` | Log refund event |
+| `charge.refunded` | Sync local order to refunded (no second Stripe refund call) |
 
 ## Local Development with Stripe CLI
 
@@ -124,6 +124,4 @@ The endpoint uses `stripe.webhooks.constructEvent()` with the raw request body a
 
 ## Security Notes
 
-- Never expose `STRIPE_SECRET_KEY` or `STRIPE_WEBHOOK_SECRET` to the client
-- Use separate webhook endpoints for test and live mode
-- Monitor failed webhook deliveries in Stripe Dashboard
+تفاصيل التفعيل للإنتاج: [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md)

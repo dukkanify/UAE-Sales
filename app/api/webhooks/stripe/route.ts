@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { isStripeConfigured } from "@/services/payments/payment-config";
-import { logPaymentEvent } from "@/services/payments/payment-log";
+import {
+  claimStripeWebhookEvent,
+  logPaymentEvent,
+} from "@/services/payments/payment-log";
 import {
   handleCheckoutSessionCompleted,
   handlePaymentIntentFailed,
+  syncRefundFromStripeCharge,
 } from "@/services/payments/order-service";
 import { getOrderById } from "@/services/payments/order-store";
 import { verifyStripeWebhook } from "@/services/payments/stripe.service";
@@ -26,6 +30,11 @@ export async function POST(request: Request) {
     event = verifyStripeWebhook(payload, signature);
   } catch {
     return NextResponse.json({ error: "INVALID_SIGNATURE" }, { status: 400 });
+  }
+
+  const claim = await claimStripeWebhookEvent(event.id, event.type);
+  if (claim === "duplicate") {
+    return NextResponse.json({ received: true, duplicate: true });
   }
 
   await logPaymentEvent({
@@ -67,9 +76,15 @@ export async function POST(request: Request) {
           typeof charge.payment_intent === "string"
             ? charge.payment_intent
             : charge.payment_intent?.id;
+        const refundId = charge.refunds?.data?.[0]?.id;
+        await syncRefundFromStripeCharge({
+          paymentIntentId,
+          chargeId: charge.id,
+          refundId,
+        });
         await logPaymentEvent({
-          type: "charge.refunded",
-          payload: { paymentIntentId, chargeId: charge.id },
+          type: "charge.refunded.synced",
+          payload: { paymentIntentId, chargeId: charge.id, refundId },
         });
         break;
       }
