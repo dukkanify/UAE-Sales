@@ -15,7 +15,7 @@ interface ColorPickerProps {
 }
 
 function ColorPicker({
-  value = "#2E7DAA",
+  value = "#143048",
   onValueChange,
   disabled,
   className,

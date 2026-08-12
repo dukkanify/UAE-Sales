@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
-  <rect width="1200" height="630" fill="#0F2A3D"/>
-  <rect width="1200" height="10" fill="#DD9B30"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630">
+      <stop offset="0%" stop-color="#0D2235"/>
+      <stop offset="55%" stop-color="#143048"/>
+      <stop offset="100%" stop-color="#1A3A52"/>
+    </linearGradient>
+    <linearGradient id="aviatorGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9E712E"/>
+      <stop offset="48%" stop-color="#CCA04C"/>
+      <stop offset="100%" stop-color="#F6C36C"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="10" fill="url(#aviatorGold)"/>
   <g transform="translate(120,190) scale(2.2)">
-  <g>
-    <path fill="#5BA3C9" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
-    <path fill="#5BA3C9" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
-    <path fill="#5BA3C9" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
-    <path fill="#DD9B30" d="M28 46 C50 28 74 12 96 0 L88 6 C68 18 48 32 32 44 Z"/>
-    <path stroke="#D1D0D4" stroke-width="4.5" stroke-linecap="round" d="M96 8 V78"/>
-    <path fill="none" stroke="#D1D0D4" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
+    <path fill="#E8EEF5" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
+    <path fill="#E8EEF5" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
+    <path fill="#E8EEF5" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
+    <path fill="url(#aviatorGold)" d="M28 46 C50 28 74 12 96 0 L88 6 C68 18 48 32 32 44 Z"/>
+    <path stroke="url(#aviatorGold)" stroke-width="4.5" stroke-linecap="round" d="M96 8 V78"/>
+    <path fill="none" stroke="url(#aviatorGold)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
       d="M96 8 C118 0 146 6 160 20 V74 C138 58 116 54 96 66"/>
-    <path fill="none" stroke="#D1D0D4" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
+    <path fill="none" stroke="url(#aviatorGold)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
       d="M96 8 C78 18 66 38 64 56 V78"/>
-    <path stroke="#D1D0D4" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
-  </g></g>
+    <path stroke="url(#aviatorGold)" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
+  </g>
   <text x="480" y="300" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="64" font-weight="800" letter-spacing="2">
-    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="18" fill="#DD9B30">PASS</tspan>
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="18" fill="#CCA04C">PASS</tspan>
   </text>
-  <text x="480" y="355" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="4" fill="#D1D0D4">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="480" y="355" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="4" fill="#B8B7BC">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>

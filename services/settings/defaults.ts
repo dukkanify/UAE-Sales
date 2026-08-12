@@ -1,7 +1,7 @@
 /**
- * Default platform settings — AviatorPass Option A (Horizon Blue & Sun Gold).
- * Palette: Horizon Blue / Aero Blue · Sun Gold / Altitude Orange · Academic Grey.
- * Typography: Stimulatio Flat pending licensed files (Space Grotesk substitute) + IBM Plex Sans.
+ * Default platform settings — AviatorPass official brand guidelines.
+ * Palette: Aviator Blue · Aviator Gold · Academic Grey.
+ * Typography: Stimulatio Flat pending licensed files (Exo 2 substitute) + IBM Plex Sans.
  */
 
 import type { PlatformSettings } from "@/types/settings";
@@ -33,16 +33,16 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
     },
   },
   branding: {
-    logoUrl: "/brand/logo.png?v=option-a-3",
-    darkLogoUrl: "/brand/logo-dark.png?v=option-a-3",
-    faviconUrl: "/brand/favicon.svg?v=option-a-3",
+    logoUrl: "/brand/logo.png?v=brand-guide-1",
+    darkLogoUrl: "/brand/logo-dark.png?v=brand-guide-1",
+    faviconUrl: "/brand/favicon.svg?v=brand-guide-1",
     loginBackgroundUrl: "/images/hero-aviation.svg",
     loginIllustrationUrl: "/images/hero-aviation.svg",
-    openGraphImageUrl: "/brand/og.png?v=option-a-3",
-    primaryColor: "#2E7DAA",
+    openGraphImageUrl: "/brand/og.png?v=brand-guide-1",
+    primaryColor: "#143048",
     secondaryColor: "#7C7B80",
-    accentColor: "#DD9B30",
-    typographyDisplay: "Space Grotesk",
+    accentColor: "#CCA04C",
+    typographyDisplay: "Exo 2",
     typographyBody: "IBM Plex Sans",
     footerInformation:
       "AviatorPass — YOUR AVIATION JOURNEY STARTS HERE. Kuwait & Dubai ATPL theory, live Zoom coaching, and exam mastery.",

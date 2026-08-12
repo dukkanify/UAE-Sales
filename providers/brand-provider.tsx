@@ -38,8 +38,8 @@ const FALLBACK: RuntimeBrand = {
   socialHandle: siteStatic.socialHandle,
   socialLinks: { ...siteStatic.social },
   footerText: siteStatic.description,
-  primaryColor: "#2E7DAA",
-  accentColor: "#DD9B30",
+  primaryColor: "#143048",
+  accentColor: "#CCA04C",
   metaDescription: siteStatic.description,
 };
 

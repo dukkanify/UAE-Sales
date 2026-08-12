@@ -29,11 +29,11 @@ export function MaintenanceStatusView({ status }: { status: MaintenanceStatus })
   const eta = formatEta(status.estimatedReturnAt);
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_#2E7DAA_0%,_#0B1A24_50%,_#061018_100%)] px-4 text-white">
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_top,_#143048_0%,_#0B1A24_50%,_#061018_100%)] px-4 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[url('/images/hero-aviation.svg')] bg-cover bg-center opacity-[0.08]" />
       <div className="relative z-10 mx-auto w-full max-w-xl text-center">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
-          <Wrench className="h-7 w-7 text-[#DD9B30]" aria-hidden />
+          <Wrench className="h-7 w-7 text-[#CCA04C]" aria-hidden />
         </div>
         <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#5BA3C9]">
           {status.platformName}

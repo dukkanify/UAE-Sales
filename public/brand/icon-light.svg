@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="128" viewBox="0 0 720 128" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="none">
   <defs>
     <linearGradient id="aviatorGold" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#9E712E"/>
@@ -7,7 +7,7 @@
       <stop offset="100%" stop-color="#F6C36C"/>
     </linearGradient>
   </defs>
-  <g transform="translate(8,16) scale(1.05)">
+  <g transform="translate(28,48) scale(1.15)">
     <path fill="#E8EEF5" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
     <path fill="#E8EEF5" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
     <path fill="#E8EEF5" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
@@ -19,8 +19,4 @@
       d="M96 8 C78 18 66 38 64 56 V78"/>
     <path stroke="url(#aviatorGold)" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
   </g>
-  <text x="200" y="58" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1.6">
-    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="16" fill="#CCA04C">PASS</tspan>
-  </text>
-  <text x="200" y="90" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="3.2" fill="#B8B7BC">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>

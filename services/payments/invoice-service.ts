@@ -145,7 +145,7 @@ export function renderInvoiceHtml(invoiceId: string): string {
 <html><head><meta charset="utf-8"/><title>${invoice.invoiceNumber}</title>
 <style>
   body{font-family:IBM Plex Sans,system-ui,sans-serif;color:#0B1A24;margin:40px}
-  h1{font-family:Space Grotesk,Arial,sans-serif;color:#2E7DAA}
+  h1{font-family:Exo 2,Arial,sans-serif;color:#143048}
   table{width:100%;border-collapse:collapse;margin-top:24px}
   th,td{border-bottom:1px solid #e5e7eb;padding:10px;text-align:left}
   .muted{color:#64748b;font-size:14px}
