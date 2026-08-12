@@ -18,12 +18,16 @@ export function AdminUnauthorized() {
         </p>
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Button href="/login?next=/admin">تسجيل دخول الأدمن</Button>
-          <Link className="text-sm font-semibold text-muted hover:text-ink" href="/">
+          <Link
+            className="text-sm font-semibold text-muted hover:text-ink"
+            href="/"
+          >
             العودة للرئيسية
           </Link>
         </div>
         <p className="mt-6 text-xs text-muted">
-          تجريبي: <span className="font-semibold text-ink">admin@sooqna.demo</span> /{" "}
+          تجريبي:{" "}
+          <span className="font-semibold text-ink">admin@sooqna.demo</span> /{" "}
           <span className="font-semibold text-ink">Admin@123</span>
         </p>
       </Card>

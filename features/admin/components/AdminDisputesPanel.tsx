@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { AdminDisputeRecord, DisputeStatus } from "@/types";
@@ -47,7 +48,7 @@ export function AdminDisputesPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/disputes", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/disputes")
       .then((res) => res.json())
       .then((data) => setDisputes(data.disputes ?? []))
       .catch(() => setDisputes([]));
@@ -63,16 +64,19 @@ export function AdminDisputesPanel() {
     return disputes.filter((d) => d.status === statusFilter);
   }, [disputes, statusFilter]);
 
-  async function patchDispute(id: string, status: DisputeStatus, note?: string) {
+  async function patchDispute(
+    id: string,
+    status: DisputeStatus,
+    note?: string,
+  ) {
     const session = getSessionUser();
     if (!session) return;
     setBusyId(id);
     try {
-      const response = await fetch(`/api/admin/disputes/${id}`, {
+      const response = await adminFetch(`/api/admin/disputes/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           status,

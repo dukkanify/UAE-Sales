@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { Input } from "@/shared/ui/Input";
+import { Select } from "@/shared/ui/Select";
 
 type WalletRow = {
   availableBalance: number;
@@ -29,17 +33,63 @@ type WalletsPayload = {
 
 export function AdminWalletsPanel() {
   const [data, setData] = useState<WalletsPayload | null>(null);
+  const [userId, setUserId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [type, setType] = useState<"deposit" | "withdrawal">("deposit");
+  const [description, setDescription] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
 
-  useEffect(() => {
+  function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/wallets", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/wallets")
       .then((res) => res.json())
       .then((payload) => {
         if (payload?.summary) setData(payload as WalletsPayload);
       })
       .catch(() => undefined);
+  }
+
+  useEffect(() => {
+    load();
   }, []);
+
+  async function handleAdjust() {
+    const session = getSessionUser();
+    if (!session) return;
+    const parsedAmount = Number(amount);
+    if (!userId.trim() || !Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      setMessage("أدخل معرّف مستخدم ومبلغاً صالحاً.");
+      return;
+    }
+    setBusy(true);
+    setMessage("");
+    try {
+      const res = await adminFetch("/api/admin/wallets", {
+        method: "POST",
+        body: JSON.stringify({
+          userId: userId.trim(),
+          amount: parsedAmount,
+          type,
+          description: description.trim() || undefined,
+        }),
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        setMessage("تعذّر تعديل المحفظة.");
+        return;
+      }
+      if (payload?.summary) setData(payload as WalletsPayload);
+      setMessage(type === "deposit" ? "تم الإيداع." : "تم السحب.");
+      setAmount("");
+      setDescription("");
+    } catch {
+      setMessage("تعذّر تعديل المحفظة.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   if (!data) {
     return (
@@ -76,6 +126,53 @@ export function AdminWalletsPanel() {
         </div>
       </div>
 
+      <Card className="grid gap-3 p-5" variant="flat">
+        <h2 className="text-sm font-bold text-ink">تعديل رصيد إداري</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Input
+            label="معرّف المستخدم"
+            onChange={(e) => setUserId(e.target.value)}
+            placeholder="user-..."
+            value={userId}
+          />
+          <Input
+            label="المبلغ (د.إ)"
+            onChange={(e) => setAmount(e.target.value)}
+            type="number"
+            value={amount}
+          />
+          <Select
+            label="النوع"
+            onChange={(e) =>
+              setType(
+                e.target.value === "withdrawal" ? "withdrawal" : "deposit",
+              )
+            }
+            options={[
+              { label: "إيداع", value: "deposit" },
+              { label: "سحب", value: "withdrawal" },
+            ]}
+            value={type}
+          />
+          <Input
+            label="ملاحظة (اختياري)"
+            onChange={(e) => setDescription(e.target.value)}
+            value={description}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            loading={busy}
+            onClick={handleAdjust}
+            size="sm"
+            variant="primary"
+          >
+            تنفيذ
+          </Button>
+          {message ? <p className="text-xs text-muted">{message}</p> : null}
+        </div>
+      </Card>
+
       <ul className="admin-ops__queue">
         {data.wallets.length === 0 ? (
           <li className="admin-ops__queue-item">
@@ -85,7 +182,13 @@ export function AdminWalletsPanel() {
           data.wallets.map((wallet) => (
             <li key={wallet.userId} className="admin-ops__queue-item">
               <div>
-                <p className="admin-ops__queue-label">{wallet.userId}</p>
+                <button
+                  className="admin-ops__queue-label text-start"
+                  onClick={() => setUserId(wallet.userId)}
+                  type="button"
+                >
+                  {wallet.userId}
+                </button>
                 <p className="admin-ops__queue-meta">
                   {wallet.transactionsCount} حركة
                   {wallet.lastTransaction

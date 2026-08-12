@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import {
   createListingFromAdmin,
@@ -6,10 +10,10 @@ import {
 } from "@/services/listings/listing-store";
 import type { AdminListingCreateInput, Listing } from "@/types";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
   return NextResponse.json({ listings: await getAdminListingRecords() });
 }
@@ -19,9 +23,9 @@ export async function GET(request: Request) {
  * (including localStorage-created ones).
  */
 export async function POST(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const body = (await request.json()) as {

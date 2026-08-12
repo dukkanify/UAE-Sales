@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { ServerFavorite } from "@/types/domain/server-favorite";
 import { getSessionUser } from "@/services/storage";
@@ -17,7 +18,7 @@ export function AdminFavoritesPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/favorites", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/favorites")
       .then((res) => res.json())
       .then((payload) => {
         if (payload?.summary) setData(payload as FavoritesPayload);
@@ -52,7 +53,10 @@ export function AdminFavoritesPanel() {
 
       <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">الأكثر إضافة للمفضلة</h2>
-        <div className="admin-ops__detail-grid" style={{ marginTop: "0.75rem" }}>
+        <div
+          className="admin-ops__detail-grid"
+          style={{ marginTop: "0.75rem" }}
+        >
           {data.topListings.length === 0 ? (
             <p className="admin-ops__queue-meta">لا بيانات بعد.</p>
           ) : (
@@ -70,7 +74,9 @@ export function AdminFavoritesPanel() {
         {data.favorites.map((item) => (
           <li key={item.id} className="admin-ops__queue-item">
             <div>
-              <p className="admin-ops__queue-label">{item.title || item.listingId}</p>
+              <p className="admin-ops__queue-label">
+                {item.title || item.listingId}
+              </p>
               <p className="admin-ops__queue-meta">
                 {item.userId} · {new Date(item.savedAt).toLocaleString("ar-AE")}
               </p>

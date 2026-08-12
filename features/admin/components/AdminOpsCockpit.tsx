@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
@@ -93,7 +94,7 @@ export function AdminOpsCockpit() {
     const timeoutId = window.setTimeout(() => {
       const user = getSessionUser();
       if (!user || user.role !== "admin") return;
-      fetch("/api/admin/summary", { headers: { "x-admin-role": "admin" } })
+      adminFetch("/api/admin/summary")
         .then((res) => res.json())
         .then((data) => {
           if (data?.kpis) setSummary(data as OpsSummary);
@@ -111,7 +112,8 @@ export function AdminOpsCockpit() {
     );
   }
 
-  const { kpis, attention, pulse, analytics, sections, stripe, settings } = summary;
+  const { kpis, attention, pulse, analytics, sections, stripe, settings } =
+    summary;
   const critical = attention.filter((item) => item.alert && item.count > 0);
   const maxVolume = Math.max(...analytics.daily.map((d) => d.volume), 1);
 
@@ -120,23 +122,31 @@ export function AdminOpsCockpit() {
       <div className="admin-ops__status-row">
         <div
           className={`admin-ops__status-chip${
-            stripe.configured ? " admin-ops__status-chip--ok" : " admin-ops__status-chip--warn"
+            stripe.configured
+              ? " admin-ops__status-chip--ok"
+              : " admin-ops__status-chip--warn"
           }`}
         >
-          Stripe {stripe.configured ? "متصل" : "غير مُعدّ"} · {stripe.currency.toUpperCase()}
+          Stripe {stripe.configured ? "متصل" : "غير مُعدّ"} ·{" "}
+          {stripe.currency.toUpperCase()}
         </div>
         <div className="admin-ops__status-chip">
           رسوم المنصة {settings.platformFeePercent}%
         </div>
         <div
           className={`admin-ops__status-chip${
-            settings.maintenanceMode ? " admin-ops__status-chip--warn" : " admin-ops__status-chip--ok"
+            settings.maintenanceMode
+              ? " admin-ops__status-chip--warn"
+              : " admin-ops__status-chip--ok"
           }`}
         >
           {settings.maintenanceMode ? "صيانة" : "تشغيل عادي"}
         </div>
         <div className="admin-ops__status-actions">
-          <Link className="admin-ops__ext-link admin-ops__ext-link--primary" href="/admin/listings">
+          <Link
+            className="admin-ops__ext-link admin-ops__ext-link--primary"
+            href="/admin/listings"
+          >
             + إضافة إعلان
           </Link>
           <a
@@ -163,7 +173,8 @@ export function AdminOpsCockpit() {
             <CurrencyAmount amount={kpis.volume} size="lg" />
           </div>
           <p className="admin-ops__kpi-hint">
-            {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع · تحويل {kpis.conversionRate}%
+            {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع · تحويل{" "}
+            {kpis.conversionRate}%
           </p>
         </div>
         <div className="admin-ops__kpi">
@@ -189,7 +200,9 @@ export function AdminOpsCockpit() {
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">ضمان محجوز</p>
-          <p className="admin-ops__kpi-value">{kpis.heldEscrow.toLocaleString("ar-AE")}</p>
+          <p className="admin-ops__kpi-value">
+            {kpis.heldEscrow.toLocaleString("ar-AE")}
+          </p>
           <p className="admin-ops__kpi-hint">{kpis.refundedOrders} مسترد</p>
         </div>
         <div className="admin-ops__kpi">
@@ -217,19 +230,27 @@ export function AdminOpsCockpit() {
           <div className="admin-ops__panel-head">
             <div>
               <h2 className="admin-ops__panel-title">الأداء — 7 أيام</h2>
-              <p className="admin-ops__panel-sub">حجم المدفوعات الناجحة يومياً</p>
+              <p className="admin-ops__panel-sub">
+                حجم المدفوعات الناجحة يومياً
+              </p>
             </div>
             <Link className="admin-ops__text-link" href="/admin/analytics">
               التحليلات
             </Link>
           </div>
-          <div className="admin-ops__bars" role="img" aria-label="مخطط حجم المدفوعات">
+          <div
+            className="admin-ops__bars"
+            role="img"
+            aria-label="مخطط حجم المدفوعات"
+          >
             {analytics.daily.map((point) => (
               <div key={point.date} className="admin-ops__bar-col">
                 <div className="admin-ops__bar-track">
                   <div
                     className="admin-ops__bar-fill"
-                    style={{ height: `${Math.max(8, (point.volume / maxVolume) * 100)}%` }}
+                    style={{
+                      height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
+                    }}
                     title={`${point.volume} AED`}
                   />
                 </div>
@@ -252,11 +273,17 @@ export function AdminOpsCockpit() {
           <div className="admin-ops__queue">
             {critical.length === 0 ? (
               <div className="admin-ops__queue-item">
-                <p className="admin-ops__queue-meta">لا توجد عناصر عاجلة حالياً.</p>
+                <p className="admin-ops__queue-meta">
+                  لا توجد عناصر عاجلة حالياً.
+                </p>
               </div>
             ) : (
               critical.map((item) => (
-                <Link key={item.href} className="admin-ops__queue-item" href={item.href}>
+                <Link
+                  key={item.href}
+                  className="admin-ops__queue-item"
+                  href={item.href}
+                >
                   <div>
                     <p className="admin-ops__queue-label">{item.label}</p>
                     <p className="admin-ops__queue-meta">{item.meta}</p>
@@ -278,28 +305,36 @@ export function AdminOpsCockpit() {
             <p className="admin-ops__panel-sub">وصول سريع لكل أقسام التشغيل</p>
           </div>
         </div>
-        {(["insight", "moderation", "money", "leads", "system"] as const).map((group) => {
-          const items = sections.filter((s) => s.group === group);
-          if (items.length === 0) return null;
-          return (
-            <div key={group} className="admin-ops__map-group">
-              <p className="admin-ops__map-label">{sectionGroupLabels[group]}</p>
-              <div className="admin-ops__map-grid">
-                {items.map((item) => (
-                  <Link key={item.href} className="admin-ops__map-card" href={item.href}>
-                    <div>
-                      <p className="admin-ops__map-title">{item.label}</p>
-                      <p className="admin-ops__map-meta">{item.meta}</p>
-                    </div>
-                    <span className="admin-ops__map-count">
-                      {item.count.toLocaleString("ar-AE")}
-                    </span>
-                  </Link>
-                ))}
+        {(["insight", "moderation", "money", "leads", "system"] as const).map(
+          (group) => {
+            const items = sections.filter((s) => s.group === group);
+            if (items.length === 0) return null;
+            return (
+              <div key={group} className="admin-ops__map-group">
+                <p className="admin-ops__map-label">
+                  {sectionGroupLabels[group]}
+                </p>
+                <div className="admin-ops__map-grid">
+                  {items.map((item) => (
+                    <Link
+                      key={item.href}
+                      className="admin-ops__map-card"
+                      href={item.href}
+                    >
+                      <div>
+                        <p className="admin-ops__map-title">{item.label}</p>
+                        <p className="admin-ops__map-meta">{item.meta}</p>
+                      </div>
+                      <span className="admin-ops__map-count">
+                        {item.count.toLocaleString("ar-AE")}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          },
+        )}
       </section>
 
       <div className="admin-ops__panels">
@@ -318,7 +353,10 @@ export function AdminOpsCockpit() {
               </div>
             ))}
           </div>
-          <div className="admin-ops__detail-grid" style={{ marginTop: "0.35rem" }}>
+          <div
+            className="admin-ops__detail-grid"
+            style={{ marginTop: "0.35rem" }}
+          >
             {analytics.paymentStatuses.slice(0, 4).map((slice) => (
               <div key={slice.key} className="admin-ops__detail-row">
                 <span>دفع · {slice.label}</span>
@@ -389,14 +427,20 @@ export function AdminOpsCockpit() {
         </div>
         <div className="admin-ops__queue admin-ops__queue--dense">
           {attention.map((item) => (
-            <Link key={item.href} className="admin-ops__queue-item" href={item.href}>
+            <Link
+              key={item.href}
+              className="admin-ops__queue-item"
+              href={item.href}
+            >
               <div>
                 <p className="admin-ops__queue-label">{item.label}</p>
                 <p className="admin-ops__queue-meta">{item.meta}</p>
               </div>
               <span
                 className={`admin-ops__queue-count${
-                  item.alert && item.count > 0 ? " admin-ops__queue-count--alert" : ""
+                  item.alert && item.count > 0
+                    ? " admin-ops__queue-count--alert"
+                    : ""
                 }`}
               >
                 {item.count.toLocaleString("ar-AE")}

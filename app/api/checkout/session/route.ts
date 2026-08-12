@@ -57,7 +57,8 @@ export async function POST(request: Request) {
     const status =
       message === "LISTING_NOT_FOUND"
         ? 404
-        : message === "CANNOT_BUY_OWN_LISTING"
+        : message === "CANNOT_BUY_OWN_LISTING" ||
+            message === "GUEST_CHECKOUT_DISABLED"
           ? 403
           : message === "SHIPPING_UNAVAILABLE"
             ? 400

@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import {
@@ -5,10 +9,10 @@ import {
   updateAdminSettings,
 } from "@/services/admin/admin-settings-store";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const settings = await getAdminSettings();
@@ -16,9 +20,9 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const body = (await request.json()) as Record<string, unknown>;
@@ -28,11 +32,17 @@ export async function PATCH(request: Request) {
         ? body.platformFeePercent
         : undefined,
     gatewayFeePercent:
-      typeof body.gatewayFeePercent === "number" ? body.gatewayFeePercent : undefined,
+      typeof body.gatewayFeePercent === "number"
+        ? body.gatewayFeePercent
+        : undefined,
     gatewayFeeFixed:
-      typeof body.gatewayFeeFixed === "number" ? body.gatewayFeeFixed : undefined,
+      typeof body.gatewayFeeFixed === "number"
+        ? body.gatewayFeeFixed
+        : undefined,
     maintenanceMode:
-      typeof body.maintenanceMode === "boolean" ? body.maintenanceMode : undefined,
+      typeof body.maintenanceMode === "boolean"
+        ? body.maintenanceMode
+        : undefined,
     allowGuestCheckout:
       typeof body.allowGuestCheckout === "boolean"
         ? body.allowGuestCheckout
@@ -48,14 +58,14 @@ export async function PATCH(request: Request) {
   });
 
   await logAdminAction({
-    actorId: typeof body.actorId === "string" ? body.actorId : "admin",
-    actorName: typeof body.actorName === "string" ? body.actorName : "Admin",
+    actorId: admin.id,
+    actorName: admin.fullName,
     action: "settings_update",
     targetType: "settings",
     targetId: "site",
     detail: `رسوم ${settings.platformFeePercent}% · صيانة ${
       settings.maintenanceMode ? "نعم" : "لا"
-    }`,
+    } · ضيوف ${settings.allowGuestCheckout ? "نعم" : "لا"}`,
   });
 
   return NextResponse.json({ settings });

@@ -1,8 +1,13 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import type { AdminCategoryRecord, AdminListingRecord, ListingStatus } from "@/types";
+import type {
+  AdminCategoryRecord,
+  AdminListingRecord,
+  ListingStatus,
+} from "@/types";
 import { cities } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
@@ -86,23 +91,20 @@ export function AdminListingsPanel() {
       const localListings = getLocalListings();
       const sync =
         localListings.length > 0
-          ? fetch("/api/admin/listings", {
+          ? adminFetch("/api/admin/listings", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "x-admin-role": "admin",
               },
               body: JSON.stringify({ listings: localListings }),
             }).then((res) => res.json())
-          : fetch("/api/admin/listings", {
-              headers: { "x-admin-role": "admin" },
-            }).then((res) => res.json());
+          : adminFetch("/api/admin/listings").then((res) => res.json());
 
       sync
         .then((data) => setListings(data.listings ?? []))
         .catch(() => setListings([]));
 
-      fetch("/api/admin/categories", { headers: { "x-admin-role": "admin" } })
+      adminFetch("/api/admin/categories")
         .then((res) => res.json())
         .then((data) => {
           const rows = (data.categories ?? []) as AdminCategoryRecord[];
@@ -146,11 +148,10 @@ export function AdminListingsPanel() {
     if (!session) return;
     setBusyId(id);
     try {
-      const response = await fetch(`/api/admin/listings/${id}`, {
+      const response = await adminFetch(`/api/admin/listings/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify(patch),
       });
@@ -213,17 +214,20 @@ export function AdminListingsPanel() {
     const price = Number(formData.get("price") ?? form.price);
     const title = isDynamic ? parsed.title : form.title.trim();
     const city = isDynamic ? parsed.city : form.city;
-    const description = String(formData.get("description") ?? form.description).trim();
-    const contactPhone = String(formData.get("contact") ?? form.contactPhone).trim();
+    const description = String(
+      formData.get("description") ?? form.description,
+    ).trim();
+    const contactPhone = String(
+      formData.get("contact") ?? form.contactPhone,
+    ).trim();
 
     setCreating(true);
     setCreateError("");
     try {
-      const response = await fetch("/api/admin/listings", {
+      const response = await adminFetch("/api/admin/listings", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           create: {
@@ -287,8 +291,8 @@ export function AdminListingsPanel() {
           </Button>
         </div>
         <p className="mt-2 text-xs text-muted">
-          عند اختيار القسم تظهر حقوله الخاصة (مثل الغرف والحمامات للعقارات، أو العداد والماركة
-          للسيارات) بنفس منطق صفحة إضافة الإعلان.
+          عند اختيار القسم تظهر حقوله الخاصة (مثل الغرف والحمامات للعقارات، أو
+          العداد والماركة للسيارات) بنفس منطق صفحة إضافة الإعلان.
         </p>
 
         <form className="mt-4 grid gap-4" key={formKey} onSubmit={handleCreate}>
@@ -314,7 +318,10 @@ export function AdminListingsPanel() {
             <Select
               label="حالة النشر"
               onChange={(event) =>
-                setForm((current) => ({ ...current, status: event.target.value }))
+                setForm((current) => ({
+                  ...current,
+                  status: event.target.value,
+                }))
               }
               options={publishStatusOptions}
               value={form.status}
@@ -322,7 +329,9 @@ export function AdminListingsPanel() {
           </div>
 
           {fieldErrors.category ? (
-            <FormMessage variant="error">{String(fieldErrors.category)}</FormMessage>
+            <FormMessage variant="error">
+              {String(fieldErrors.category)}
+            </FormMessage>
           ) : null}
 
           {isDynamic ? (
@@ -338,7 +347,10 @@ export function AdminListingsPanel() {
                 label="عنوان الإعلان"
                 name="title"
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, title: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    title: event.target.value,
+                  }))
                 }
                 placeholder="مثال: طقم كنب مودرن"
                 value={form.title}
@@ -348,7 +360,10 @@ export function AdminListingsPanel() {
                 inputMode="numeric"
                 name="price"
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, price: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    price: event.target.value,
+                  }))
                 }
                 placeholder="85000"
                 value={form.price}
@@ -357,7 +372,10 @@ export function AdminListingsPanel() {
                 label="المدينة"
                 name="city"
                 onChange={(event) =>
-                  setForm((current) => ({ ...current, city: event.target.value }))
+                  setForm((current) => ({
+                    ...current,
+                    city: event.target.value,
+                  }))
                 }
                 options={cities.map((city) => ({
                   label: city.name,
@@ -532,7 +550,11 @@ export function AdminListingsPanel() {
               >
                 {listing.isFeatured ? "إلغاء التمييز" : "تمييز"}
               </Button>
-              <Button href={`/listings/${listing.slug}`} size="sm" variant="ghost">
+              <Button
+                href={`/listings/${listing.slug}`}
+                size="sm"
+                variant="ghost"
+              >
                 عرض
               </Button>
             </div>

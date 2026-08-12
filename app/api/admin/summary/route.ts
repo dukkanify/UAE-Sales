@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { getAdminAuditLog } from "@/services/admin/admin-audit-store";
 import {
@@ -32,10 +36,10 @@ import {
   isStripeConfigured,
 } from "@/services/payments/payment-config";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const settings = await getAdminSettings();
@@ -88,12 +92,19 @@ export async function GET(request: Request) {
   const volume = paid.reduce((sum, o) => sum + o.fees.total, 0);
   const fees = paid.reduce((sum, o) => sum + o.fees.platformFee, 0);
   const walletHeld = wallets.reduce((sum, w) => sum + w.heldInEscrow, 0);
-  const walletAvailable = wallets.reduce((sum, w) => sum + w.availableBalance, 0);
-  const suspendedUsers = users.filter((u) => u.accountStatus === "suspended").length;
+  const walletAvailable = wallets.reduce(
+    (sum, w) => sum + w.availableBalance,
+    0,
+  );
+  const suspendedUsers = users.filter(
+    (u) => u.accountStatus === "suspended",
+  ).length;
   const disabledCategories = categories.filter((c) => !c.enabled).length;
   const unreadNotifications = notifications.filter((n) => !n.read).length;
   const submittedJobs = jobs.filter((j) => j.status === "submitted").length;
-  const activeBookings = bookings.filter((b) => b.status === "confirmed").length;
+  const activeBookings = bookings.filter(
+    (b) => b.status === "confirmed",
+  ).length;
   const openQuotes = quotes.filter((q) => q.status === "submitted").length;
 
   const attention = [
@@ -136,7 +147,8 @@ export async function GET(request: Request) {
       href: "/admin/stripe",
       label: "مدفوعات Stripe معلّقة",
       meta: "مراجعة بوابة الدفع",
-      count: failedPayments.filter((o) => Boolean(o.stripePaymentIntentId)).length,
+      count: failedPayments.filter((o) => Boolean(o.stripePaymentIntentId))
+        .length,
       alert: true,
     },
     {
@@ -316,7 +328,9 @@ export async function GET(request: Request) {
       walletAvailable,
       walletHeld,
       conversionRate:
-        orders.length === 0 ? 0 : Math.round((paid.length / orders.length) * 100),
+        orders.length === 0
+          ? 0
+          : Math.round((paid.length / orders.length) * 100),
       favorites: favorites.length,
       notifications: notifications.length,
       unreadNotifications,

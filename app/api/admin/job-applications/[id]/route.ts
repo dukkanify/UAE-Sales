@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import { updateJobApplicationStatus } from "@/services/job-applications/job-application-store";
@@ -8,9 +12,9 @@ type RouteParams = { params: Promise<{ id: string }> };
 const ALLOWED: JobApplication["status"][] = ["submitted", "reviewed"];
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const { id } = await params;

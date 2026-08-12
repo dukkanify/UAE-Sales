@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { AppNotification } from "@/types/domain/notification";
 import { getSessionUser } from "@/services/storage";
@@ -12,7 +13,7 @@ export function AdminNotificationsPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/notifications", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/notifications")
       .then((res) => res.json())
       .then((data) => {
         setItems(data.notifications ?? []);

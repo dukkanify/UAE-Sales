@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { AdminCategoryRecord } from "@/types";
@@ -20,7 +21,7 @@ export function AdminCategoriesPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/categories", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data.categories ?? []))
       .catch(() => setCategories([]));
@@ -31,20 +32,20 @@ export function AdminCategoriesPanel() {
     if (!session) return;
     setBusyId(category.id);
     try {
-      const response = await fetch(`/api/admin/categories/${category.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-role": "admin",
+      const response = await adminFetch(
+        `/api/admin/categories/${category.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ enabled: !category.enabled }),
         },
-        body: JSON.stringify({ enabled: !category.enabled }),
-      });
+      );
       const data = await response.json();
       if (response.ok && data.category) {
         setCategories((prev) =>
-          prev.map((item) =>
-            item.id === category.id ? data.category : item,
-          ),
+          prev.map((item) => (item.id === category.id ? data.category : item)),
         );
       }
     } finally {
@@ -57,11 +58,10 @@ export function AdminCategoriesPanel() {
     if (!session || !name.trim() || !slug.trim()) return;
     setCreating(true);
     try {
-      const response = await fetch("/api/admin/categories", {
+      const response = await adminFetch("/api/admin/categories", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({ name: name.trim(), slug: slug.trim() }),
       });

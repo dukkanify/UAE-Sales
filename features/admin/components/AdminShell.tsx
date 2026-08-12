@@ -11,10 +11,7 @@ import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
 import { BRAND } from "@/shared/constants/brand";
-import {
-  clearSessionUser,
-  getSessionUser,
-} from "@/services/storage";
+import { clearSessionUser, getSessionUser } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
 import "./admin-ops.css";
 
@@ -214,9 +211,9 @@ export function AdminShell({
   description,
   title,
 }: AdminShellProps) {
-  const [authState, setAuthState] = useState<"loading" | "guest" | "user" | "admin">(
-    "loading",
-  );
+  const [authState, setAuthState] = useState<
+    "loading" | "guest" | "user" | "admin"
+  >("loading");
   const [displayUser, setDisplayUser] = useState<UserProfile | null>(null);
   const [query, setQuery] = useState("");
   const router = useRouter();
@@ -256,7 +253,9 @@ export function AdminShell({
     return (
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm font-medium text-muted">جاري توجيهك لتسجيل الدخول...</p>
+          <p className="text-sm font-medium text-muted">
+            جاري توجيهك لتسجيل الدخول...
+          </p>
         </Card>
       </section>
     );
@@ -293,11 +292,15 @@ export function AdminShell({
           </label>
           <nav className="admin-ops__nav">
             {groupOrder.map((group) => {
-              const links = filteredLinks.filter((link) => link.group === group);
+              const links = filteredLinks.filter(
+                (link) => link.group === group,
+              );
               if (links.length === 0) return null;
               return (
                 <div key={group} className="admin-ops__nav-group">
-                  <p className="admin-ops__nav-group-label">{groupLabels[group]}</p>
+                  <p className="admin-ops__nav-group-label">
+                    {groupLabels[group]}
+                  </p>
                   {links.map((link) => {
                     const active = link.href === activePath;
                     return (
@@ -329,7 +332,12 @@ export function AdminShell({
             <Link className="admin-ops__back" href="/">
               العودة إلى السوق
             </Link>
-            <Button onClick={handleLogout} size="sm" type="button" variant="secondary">
+            <Button
+              onClick={handleLogout}
+              size="sm"
+              type="button"
+              variant="secondary"
+            >
               تسجيل الخروج
             </Button>
           </div>
@@ -357,10 +365,17 @@ export function AdminShell({
                 مباشر
               </span>
               <div className="admin-ops__who">
-                <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
+                <p className="admin-ops__who-name">
+                  {displayUser?.fullName ?? "Admin"}
+                </p>
                 <p className="admin-ops__who-role">مدير النظام</p>
               </div>
-              <Button onClick={handleLogout} size="sm" type="button" variant="secondary">
+              <Button
+                onClick={handleLogout}
+                size="sm"
+                type="button"
+                variant="secondary"
+              >
                 خروج
               </Button>
             </div>
@@ -393,7 +408,9 @@ export function AdminShell({
                 النظام يعمل
               </span>
               <div className="admin-ops__who">
-                <p className="admin-ops__who-name">{displayUser?.fullName ?? "Admin"}</p>
+                <p className="admin-ops__who-name">
+                  {displayUser?.fullName ?? "Admin"}
+                </p>
                 <p className="admin-ops__who-role">مدير النظام</p>
               </div>
             </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
 import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner";
+import { MaintenanceGate } from "@/shared/components/MaintenanceGate";
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
@@ -76,7 +77,7 @@ export default function RootLayout({
         <ToastProvider>
           <BrandJsonLd />
           <DeferredOfflineBanner />
-          {children}
+          <MaintenanceGate>{children}</MaintenanceGate>
         </ToastProvider>
       </body>
     </html>

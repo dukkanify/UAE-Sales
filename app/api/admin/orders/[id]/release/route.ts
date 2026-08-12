@@ -1,30 +1,30 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import { adminReleaseEscrow } from "@/services/payments/order-service";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function POST(request: Request, { params }: RouteParams) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function POST(_request: Request, { params }: RouteParams) {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   try {
     const { id } = await params;
-    const body = (await request.json().catch(() => ({}))) as {
-      actorId?: string;
-      actorName?: string;
-    };
 
-    const order = await adminReleaseEscrow(id, "admin");
+    const order = await adminReleaseEscrow(id);
     if (!order) {
       return NextResponse.json({ error: "ORDER_NOT_FOUND" }, { status: 404 });
     }
 
     await logAdminAction({
-      actorId: body.actorId ?? "admin",
-      actorName: body.actorName ?? "Admin",
+      actorId: admin.id,
+      actorName: admin.fullName,
       action: "escrow_release",
       targetType: "order",
       targetId: id,

@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
@@ -40,12 +41,15 @@ export function AdminReportsPanel() {
   const [events, setEvents] = useState<PaymentEvent[]>([]);
   const [daily, setDaily] = useState<DailyPoint[]>([]);
   const [walletAccounts, setWalletAccounts] = useState(0);
-  const [walletBalances, setWalletBalances] = useState({ available: 0, held: 0 });
+  const [walletBalances, setWalletBalances] = useState({
+    available: 0,
+    held: 0,
+  });
 
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/reports", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/reports")
       .then((res) => res.json())
       .then((data) => {
         setSummary(data.summary ?? null);
@@ -126,7 +130,9 @@ export function AdminReportsPanel() {
               <div className="admin-ops__bar-track">
                 <div
                   className="admin-ops__bar-fill"
-                  style={{ height: `${Math.max(8, (point.volume / maxVolume) * 100)}%` }}
+                  style={{
+                    height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
+                  }}
                 />
               </div>
               <p className="admin-ops__bar-value">{point.orders}</p>
@@ -139,7 +145,10 @@ export function AdminReportsPanel() {
       <div className="admin-ops__panels">
         <section className="admin-ops__panel">
           <h2 className="admin-ops__panel-title">ملخص السوق</h2>
-          <div className="admin-ops__detail-grid" style={{ marginTop: "0.85rem" }}>
+          <div
+            className="admin-ops__detail-grid"
+            style={{ marginTop: "0.85rem" }}
+          >
             <div className="admin-ops__detail-row">
               <span>المستخدمون</span>
               <strong>{summary.totalUsers}</strong>

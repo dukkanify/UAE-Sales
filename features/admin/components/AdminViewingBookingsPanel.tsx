@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { ViewingBooking } from "@/types/domain/viewing-booking";
 import { getSessionUser } from "@/services/storage";
@@ -18,7 +19,7 @@ export function AdminViewingBookingsPanel() {
   function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/viewing-bookings", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/viewing-bookings")
       .then((res) => res.json())
       .then((data) => setItems(data.bookings ?? []))
       .catch(() => setItems([]));
@@ -33,11 +34,10 @@ export function AdminViewingBookingsPanel() {
     if (!user) return;
     setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/viewing-bookings/${id}`, {
+      const res = await adminFetch(`/api/admin/viewing-bookings/${id}`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           status,

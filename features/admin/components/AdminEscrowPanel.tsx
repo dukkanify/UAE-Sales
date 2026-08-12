@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Order } from "@/types";
@@ -16,7 +17,7 @@ export function AdminEscrowPanel() {
   function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/escrow", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/escrow")
       .then((res) => res.json())
       .then((data) => {
         setOrders(data.orders ?? []);
@@ -34,16 +35,9 @@ export function AdminEscrowPanel() {
     if (!user) return;
     setBusyId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/release`, {
+      const res = await adminFetch(`/api/admin/orders/${orderId}/release`, {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-admin-role": "admin",
-        },
-        body: JSON.stringify({
-          actorId: user.id,
-          actorName: user.fullName,
-        }),
+        body: JSON.stringify({}),
       });
       if (res.ok) load();
     } finally {
@@ -56,17 +50,9 @@ export function AdminEscrowPanel() {
     if (!user) return;
     setBusyId(orderId);
     try {
-      const res = await fetch(`/api/orders/${orderId}/refund`, {
+      const res = await adminFetch(`/api/orders/${orderId}/refund`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin: {
-            id: user.id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
-          },
-        }),
+        body: JSON.stringify({}),
       });
       if (res.ok) load();
     } finally {
@@ -104,7 +90,8 @@ export function AdminEscrowPanel() {
                 <div>
                   <p className="admin-ops__queue-label">{order.listingTitle}</p>
                   <p className="admin-ops__queue-meta">
-                    {order.buyerName} → {order.sellerName} · {order.escrowStatus} ·{" "}
+                    {order.buyerName} → {order.sellerName} ·{" "}
+                    {order.escrowStatus} ·{" "}
                     {new Date(order.createdAt).toLocaleString("ar-AE")}
                   </p>
                   {order.stripePaymentIntentId ? (
@@ -136,7 +123,9 @@ export function AdminEscrowPanel() {
                       </Button>
                     </div>
                   ) : (
-                    <span className="admin-ops__status-chip">{order.status}</span>
+                    <span className="admin-ops__status-chip">
+                      {order.status}
+                    </span>
                   )}
                 </div>
               </li>
