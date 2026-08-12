@@ -4,8 +4,13 @@ import { ArrowUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { JsonLd } from "@/components/seo/json-ld";
+import { HomeCoursesByInstructor } from "@/features/marketing/components/home-courses-by-instructor";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
+
+/** Avoid CDN-caching home HTML with ephemeral course UUIDs. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: {
@@ -44,36 +49,9 @@ export const metadata: Metadata = {
   },
 };
 
-const gateways = [
-  {
-    href: routes.courses,
-    kicker: "Courses",
-    title: "ATPL lanes by instructor",
-    body: "Published theory modules — open a lane for the full syllabus.",
-  },
-  {
-    href: routes.flightpath,
-    kicker: "Flightpath",
-    title: "Three altitudes",
-    body: "Course engine, live Zoom lane, and mastery loop — how training moves.",
-  },
-  {
-    href: routes.live,
-    kicker: "Live",
-    title: "Instructor Zoom",
-    body: "How live coaching works before you reserve a GMT window.",
-  },
-  {
-    href: routes.book,
-    kicker: "Book",
-    title: "Booking studio",
-    body: "Pick a session, instructor, and open GMT time — confirm by email.",
-  },
-] as const;
-
 export default function HomePage() {
   return (
-    <div className="landing-root">
+    <div className="landing-root home-premium">
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -120,107 +98,83 @@ export default function HomePage() {
         }}
       />
 
-      <section className="relative isolate -mt-[4.75rem] min-h-[100svh] overflow-hidden pt-[4.75rem]">
+      <section className="home-hero relative isolate -mt-[4.75rem] min-h-[100svh] overflow-hidden pt-[4.75rem]">
         <div className="hero-aviation absolute inset-0" />
         <div className="hero-horizon" aria-hidden />
         <div className="hero-vignette" aria-hidden />
+        <div className="home-hero-atmosphere" aria-hidden>
+          <div className="home-hero-stars" />
+          <div className="home-hero-gold-wash" />
+        </div>
 
-        <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-end pb-20 pt-16 sm:justify-center sm:pb-28">
-          <p className="animate-in-up hero-brand font-display text-[clamp(2.75rem,10vw,6.5rem)] font-bold tracking-[0.02em]">
+        <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-end pb-16 pt-20 sm:justify-center sm:pb-24">
+          <p className="animate-in-up hero-brand font-display text-[clamp(3rem,11vw,7rem)] font-bold tracking-[0.02em]">
             <span className="hero-brand-aviator">AVIATOR</span>
             <span className="hero-brand-pass"> PASS</span>
           </p>
 
-          <p className="animate-in-up-delay-1 mt-4 text-[0.72rem] font-medium uppercase tracking-[0.22em] text-white/70 sm:text-xs">
+          <p className="animate-in-up-delay-1 mt-5 max-w-[28ch] text-[0.7rem] font-medium uppercase tracking-[0.28em] text-white/55 sm:text-[0.75rem]">
             Your aviation journey starts here
           </p>
 
-          <h1 className="animate-in-up-delay-1 mt-8 max-w-[18ch] font-display text-[clamp(1.7rem,3.9vw,3.15rem)] font-semibold tracking-[-0.032em] text-white sm:leading-[1.06]">
+          <h1 className="animate-in-up-delay-2 mt-10 max-w-[22ch] font-display text-[clamp(1.55rem,3.6vw,2.65rem)] font-semibold tracking-[-0.03em] leading-[1.12] text-white/94">
             Elevate aviation training to global standards of precision
           </h1>
 
-          <p className="animate-in-up-delay-2 mt-5 max-w-lg text-[1.05rem] leading-relaxed text-white/68 sm:text-lg">
-            ATPL theory, live Zoom coaching, and exam mastery — built for pilots in{" "}
+          <p className="animate-in-up-delay-2 mt-5 max-w-md text-[1.02rem] leading-relaxed text-white/58 sm:text-lg">
+            ATPL theory lanes and live Zoom coaching for pilots in{" "}
             {siteConfig.locations.join(" & ")}.
           </p>
 
           <div className="animate-in-up-delay-3 mt-12 flex flex-wrap items-center gap-3">
             <Button size="lg" variant="accent" className="hero-cta-primary px-9" asChild>
-              <Link href={routes.login}>
-                Enter platform
+              <Link href="#courses">
+                View courses
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              className="hero-cta-secondary border-white/25 bg-white/[0.06] px-8 text-white hover:bg-white/12 hover:text-white"
+              className="hero-cta-secondary border-white/22 bg-white/[0.05] px-8 text-white hover:bg-white/10 hover:text-white"
               asChild
             >
-              <Link href={routes.courses}>Browse courses</Link>
+              <Link href={routes.book}>Book live Zoom</Link>
             </Button>
           </div>
         </div>
+
+        <a href="#courses" className="home-hero-descend">
+          <span className="home-hero-descend-mark" aria-hidden />
+          Courses below
+        </a>
       </section>
 
-      <section className="platform-surface content-auto py-20 sm:py-28">
-        <div className="container-app">
-          <p className="landing-kicker text-primary">Platform map</p>
-          <h2 className="mt-4 max-w-[16ch] font-display text-[clamp(1.85rem,3.8vw,3rem)] font-semibold tracking-[-0.035em] text-foreground leading-[1.05]">
-            Each destination is its own page
-          </h2>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Courses, flightpath, live coaching, and booking — open one route at a time.
-          </p>
+      <HomeCoursesByInstructor />
 
-          <div className="landing-rule mt-12 opacity-70" />
-
-          <ul className="mt-12 grid gap-10 sm:grid-cols-2">
-            {gateways.map((item, index) => (
-              <li
-                key={item.href}
-                className="animate-in-up border-t border-[rgb(18_36_51_/0.12)] pt-6"
-                style={{ animationDelay: `${0.06 + index * 0.08}s` }}
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
-                  {item.kicker}
-                </p>
-                <h3 className="mt-3 font-display text-xl font-semibold tracking-[-0.025em] text-foreground sm:text-2xl">
-                  <Link href={item.href} className="transition hover:text-primary">
-                    {item.title}
-                  </Link>
-                </h3>
-                <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                  {item.body}
-                </p>
-                <Link
-                  href={item.href}
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-accent transition hover:text-accent/80"
-                >
-                  Open page
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="landing-close relative overflow-hidden py-20 text-white sm:py-24">
+      <section className="landing-close home-close relative overflow-hidden py-20 text-white sm:py-28">
         <div className="container-app relative z-10 text-center">
-          <p className="landing-kicker mb-5 text-white/40">Ready for takeoff</p>
-          <h2 className="mx-auto max-w-[16ch] font-display text-[clamp(1.9rem,4.2vw,3.4rem)] font-semibold tracking-[-0.035em] leading-[1.06] text-white">
-            Your next ATPL hour starts on the platform
+          <p className="landing-kicker mb-5 text-accent/70">Ready for takeoff</p>
+          <h2 className="mx-auto max-w-[14ch] font-display text-[clamp(1.9rem,4.2vw,3.35rem)] font-semibold tracking-[-0.035em] leading-[1.06] text-white">
+            Enter the platform when you are ready to climb
           </h2>
-          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/55">
-            English-only. Built for serious pilots — not another course catalog.
+          <p className="mx-auto mt-5 max-w-md text-base leading-relaxed text-white/50">
+            Enroll in a published lane, or book a live instructor session in GMT.
           </p>
-          <div className="mt-10 flex justify-center">
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Button size="lg" variant="accent" className="hero-cta-primary px-10" asChild>
               <Link href={routes.login}>
                 Enter AviatorPass
                 <ArrowUpRight className="h-4 w-4" />
               </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/20 bg-white/5 px-8 text-white hover:bg-white/10 hover:text-white"
+              asChild
+            >
+              <Link href={routes.courses}>Full catalog</Link>
             </Button>
           </div>
         </div>
