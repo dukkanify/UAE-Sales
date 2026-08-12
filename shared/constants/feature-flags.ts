@@ -8,9 +8,25 @@ export function isEmailOtpEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_EMAIL_OTP === "true";
 }
 
-/** Guest checkout without login — enabled by default. */
-export function isGuestCheckoutEnabled(): boolean {
+/** Env kill-switch for guest checkout (build-time). */
+export function isGuestCheckoutEnvEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_GUEST_CHECKOUT !== "false";
+}
+
+/**
+ * Guest checkout without login.
+ * Prefers admin site setting when hydrated via `setGuestCheckoutOverride`.
+ */
+let guestCheckoutOverride: boolean | null = null;
+
+export function setGuestCheckoutOverride(allowed: boolean | null): void {
+  guestCheckoutOverride = allowed;
+}
+
+export function isGuestCheckoutEnabled(): boolean {
+  if (!isGuestCheckoutEnvEnabled()) return false;
+  if (guestCheckoutOverride !== null) return guestCheckoutOverride;
+  return true;
 }
 
 /** Mock checkout button (skip Stripe) — enabled on preview/dev by default. */

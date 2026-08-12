@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { JobApplication } from "@/types/domain/job-application";
 import { getSessionUser } from "@/services/storage";
@@ -18,7 +19,7 @@ export function AdminJobApplicationsPanel() {
   function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/job-applications", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/job-applications")
       .then((res) => res.json())
       .then((data) => setItems(data.applications ?? []))
       .catch(() => setItems([]));
@@ -33,11 +34,10 @@ export function AdminJobApplicationsPanel() {
     if (!user) return;
     setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/job-applications/${id}`, {
+      const res = await adminFetch(`/api/admin/job-applications/${id}`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           status,
@@ -79,7 +79,9 @@ export function AdminJobApplicationsPanel() {
               <div className="flex flex-col items-end gap-2">
                 <span
                   className={`admin-ops__status-chip${
-                    item.status === "reviewed" ? " admin-ops__status-chip--ok" : ""
+                    item.status === "reviewed"
+                      ? " admin-ops__status-chip--ok"
+                      : ""
                   }`}
                 >
                   {statusLabel[item.status]}

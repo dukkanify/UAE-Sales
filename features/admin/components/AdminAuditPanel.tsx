@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { AdminAuditEntry } from "@/services/admin/admin-audit-store";
 import { getSessionUser } from "@/services/storage";
@@ -11,7 +12,7 @@ export function AdminAuditPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/audit", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/audit")
       .then((res) => res.json())
       .then((data) => setEntries(data.entries ?? []))
       .catch(() => setEntries([]));
@@ -22,7 +23,8 @@ export function AdminAuditPanel() {
       {entries.length === 0 ? (
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm text-muted">
-            لا توجد عمليات مسجّلة بعد. ستظهر هنا إجراءات التحرير والاسترداد وتحديث الحالات.
+            لا توجد عمليات مسجّلة بعد. ستظهر هنا إجراءات التحرير والاسترداد
+            وتحديث الحالات.
           </p>
         </Card>
       ) : (

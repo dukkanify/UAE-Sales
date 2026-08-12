@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { QuoteRequest } from "@/types/domain/quote-request";
 import { getSessionUser } from "@/services/storage";
@@ -12,7 +13,10 @@ const statusLabel: Record<QuoteRequest["status"], string> = {
   accepted: "مقبول",
 };
 
-const nextStatus: Record<QuoteRequest["status"], QuoteRequest["status"] | null> = {
+const nextStatus: Record<
+  QuoteRequest["status"],
+  QuoteRequest["status"] | null
+> = {
   submitted: "quoted",
   quoted: "accepted",
   accepted: null,
@@ -25,7 +29,7 @@ export function AdminQuoteRequestsPanel() {
   function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/quote-requests", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/quote-requests")
       .then((res) => res.json())
       .then((data) => setItems(data.quoteRequests ?? []))
       .catch(() => setItems([]));
@@ -40,11 +44,10 @@ export function AdminQuoteRequestsPanel() {
     if (!user) return;
     setBusyId(id);
     try {
-      const res = await fetch(`/api/admin/quote-requests/${id}`, {
+      const res = await adminFetch(`/api/admin/quote-requests/${id}`, {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           status,
@@ -81,7 +84,8 @@ export function AdminQuoteRequestsPanel() {
                     {item.requesterName} · {item.phone} · {item.serviceRequired}
                   </p>
                   <p className="admin-ops__queue-meta">
-                    {item.emirate} / {item.area} · {item.preferredDate} {item.preferredTime}
+                    {item.emirate} / {item.area} · {item.preferredDate}{" "}
+                    {item.preferredTime}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-2">

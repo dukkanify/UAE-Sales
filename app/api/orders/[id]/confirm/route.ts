@@ -21,7 +21,12 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ order });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
-    const status = message === "UNAUTHORIZED" ? 403 : message === "INVALID_STATUS" ? 409 : 500;
+    const status =
+      message === "UNAUTHORIZED"
+        ? 403
+        : message === "INVALID_STATUS"
+          ? 409
+          : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

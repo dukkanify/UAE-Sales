@@ -30,6 +30,7 @@ import {
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
 import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
+import { getAdminSettings } from "@/services/admin/admin-settings-store";
 import { formatCurrencyLabel } from "@/shared/utils/currency";
 import { normalizeUaePhone } from "@/shared/utils/phone";
 
@@ -89,6 +90,13 @@ export async function initiateCheckout(
   const buyerEmail = normalizeEmail(input.buyer.email);
   const buyerName = input.buyer.fullName.trim();
   const buyerPhone = normalizeUaePhone(input.buyer.phone ?? "");
+
+  if (guest) {
+    const settings = await getAdminSettings();
+    if (!settings.allowGuestCheckout) {
+      throw new Error("GUEST_CHECKOUT_DISABLED");
+    }
+  }
 
   if (!guest && listing.seller.id === input.buyer.id) {
     throw new Error("CANNOT_BUY_OWN_LISTING");
@@ -402,14 +410,8 @@ export async function confirmOrderReceived(
   return released;
 }
 
-export async function refundOrder(
-  orderId: string,
-  adminRole?: string,
-): Promise<Order | undefined> {
-  if (adminRole !== "admin") {
-    throw new Error("UNAUTHORIZED");
-  }
-
+/** Caller must enforce admin session before invoking. */
+export async function refundOrder(orderId: string): Promise<Order | undefined> {
   const order = await getOrderById(orderId);
   if (!order) return undefined;
 
@@ -470,15 +472,11 @@ export async function refundOrder(
   return updated;
 }
 
-/** Admin force-release of held escrow to the seller (no buyer confirmation). */
+/** Admin force-release of held escrow to the seller (no buyer confirmation).
+ * Caller must enforce admin session before invoking. */
 export async function adminReleaseEscrow(
   orderId: string,
-  adminRole?: string,
 ): Promise<Order | undefined> {
-  if (adminRole !== "admin") {
-    throw new Error("UNAUTHORIZED");
-  }
-
   const order = await getOrderById(orderId);
   if (!order) return undefined;
 

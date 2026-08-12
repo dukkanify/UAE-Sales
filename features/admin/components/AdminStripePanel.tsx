@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
@@ -23,7 +24,12 @@ type StripePayload = {
     payments: string;
     webhooks: string;
   };
-  recentEvents: { createdAt: string; id: string; orderId?: string; type: string }[];
+  recentEvents: {
+    createdAt: string;
+    id: string;
+    orderId?: string;
+    type: string;
+  }[];
   recentStripeOrders: {
     amount: number;
     createdAt: string;
@@ -49,7 +55,7 @@ export function AdminStripePanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/stripe", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/stripe")
       .then((res) => res.json())
       .then((payload) => {
         if (payload?.status) setData(payload as StripePayload);
@@ -72,7 +78,9 @@ export function AdminStripePanel() {
       <div className="admin-ops__status-row">
         <div
           className={`admin-ops__status-chip${
-            status.configured ? " admin-ops__status-chip--ok" : " admin-ops__status-chip--warn"
+            status.configured
+              ? " admin-ops__status-chip--ok"
+              : " admin-ops__status-chip--warn"
           }`}
         >
           Secret Key: {status.secretKeyPresent ? "موجود" : "ناقص"}
@@ -104,26 +112,64 @@ export function AdminStripePanel() {
         <p className="admin-ops__panel-sub">
           افتح حساب Stripe مباشرة للتحكم بالمدفوعات، المفاتيح، والنزاعات.
         </p>
-        <div className="admin-ops__quick-links" style={{ marginTop: "0.85rem" }}>
-          <a className="admin-ops__chip-link" href={links.dashboard} rel="noopener noreferrer" target="_blank">
+        <div
+          className="admin-ops__quick-links"
+          style={{ marginTop: "0.85rem" }}
+        >
+          <a
+            className="admin-ops__chip-link"
+            href={links.dashboard}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Dashboard
           </a>
-          <a className="admin-ops__chip-link" href={links.payments} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.payments}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Payments
           </a>
-          <a className="admin-ops__chip-link" href={links.webhooks} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.webhooks}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Webhooks
           </a>
-          <a className="admin-ops__chip-link" href={links.customers} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.customers}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Customers
           </a>
-          <a className="admin-ops__chip-link" href={links.balances} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.balances}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Balance
           </a>
-          <a className="admin-ops__chip-link" href={links.disputes} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.disputes}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Disputes
           </a>
-          <a className="admin-ops__chip-link" href={links.apiKeys} rel="noopener noreferrer" target="_blank">
+          <a
+            className="admin-ops__chip-link"
+            href={links.apiKeys}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             API Keys
           </a>
         </div>

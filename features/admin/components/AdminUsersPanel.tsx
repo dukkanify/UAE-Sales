@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { AdminUserRecord } from "@/types";
@@ -38,7 +39,7 @@ export function AdminUsersPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/users", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/users")
       .then((res) => res.json())
       .then((data) => setUsers(data.users ?? []))
       .catch(() => setUsers([]));
@@ -64,11 +65,10 @@ export function AdminUsersPanel() {
     if (!session) return;
     setBusyId(id);
     try {
-      const response = await fetch(`/api/admin/users/${id}`, {
+      const response = await adminFetch(`/api/admin/users/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify(patch),
       });

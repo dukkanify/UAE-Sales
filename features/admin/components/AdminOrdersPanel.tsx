@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { Order } from "@/types";
@@ -21,7 +22,7 @@ export function AdminOrdersPanel() {
   function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/orders", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/orders")
       .then((res) => res.json())
       .then((data) => setOrders(data.orders ?? []))
       .catch(() => setOrders([]));
@@ -36,17 +37,9 @@ export function AdminOrdersPanel() {
     if (!user) return;
     setBusyId(orderId);
     try {
-      const response = await fetch(`/api/orders/${orderId}/refund`, {
+      const response = await adminFetch(`/api/orders/${orderId}/refund`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          admin: {
-            id: user.id,
-            email: user.email,
-            fullName: user.fullName,
-            role: user.role,
-          },
-        }),
+        body: JSON.stringify({}),
       });
       const data = await response.json();
       if (response.ok && data.order) {
@@ -64,16 +57,9 @@ export function AdminOrdersPanel() {
     if (!user) return;
     setBusyId(orderId);
     try {
-      const res = await fetch(`/api/admin/orders/${orderId}/release`, {
+      const res = await adminFetch(`/api/admin/orders/${orderId}/release`, {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-admin-role": "admin",
-        },
-        body: JSON.stringify({
-          actorId: user.id,
-          actorName: user.fullName,
-        }),
+        body: JSON.stringify({}),
       });
       const data = await res.json();
       if (res.ok && data.order) {
@@ -99,7 +85,11 @@ export function AdminOrdersPanel() {
               order.escrowStatus === "held" ||
               order.status === "paid_held_in_escrow";
             return (
-              <li key={order.id} className="admin-ops__queue-item" style={{ alignItems: "flex-start" }}>
+              <li
+                key={order.id}
+                className="admin-ops__queue-item"
+                style={{ alignItems: "flex-start" }}
+              >
                 <div>
                   <p className="admin-ops__queue-label">{order.listingTitle}</p>
                   <p className="admin-ops__queue-meta">{order.id}</p>
@@ -128,7 +118,11 @@ export function AdminOrdersPanel() {
                     {order.status} · {order.paymentStatus}
                   </span>
                   <div className="flex flex-wrap justify-end gap-2">
-                    <Button href={`/orders/${order.id}`} size="sm" variant="secondary">
+                    <Button
+                      href={`/orders/${order.id}`}
+                      size="sm"
+                      variant="secondary"
+                    >
                       عرض
                     </Button>
                     {held ? (

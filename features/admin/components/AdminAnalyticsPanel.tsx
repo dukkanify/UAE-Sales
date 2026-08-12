@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
@@ -37,7 +38,7 @@ export function AdminAnalyticsPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/analytics", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/analytics")
       .then((res) => res.json())
       .then((payload) => {
         if (payload?.overview) setData(payload as AnalyticsPayload);
@@ -72,7 +73,9 @@ export function AdminAnalyticsPanel() {
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">التحويل</p>
-          <p className="admin-ops__kpi-value">{data.overview.conversionRate}%</p>
+          <p className="admin-ops__kpi-value">
+            {data.overview.conversionRate}%
+          </p>
         </div>
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">المستخدمون / الإعلانات</p>
@@ -90,7 +93,9 @@ export function AdminAnalyticsPanel() {
               <div className="admin-ops__bar-track">
                 <div
                   className="admin-ops__bar-fill"
-                  style={{ height: `${Math.max(8, (point.volume / maxVolume) * 100)}%` }}
+                  style={{
+                    height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
+                  }}
                 />
               </div>
               <p className="admin-ops__bar-value">{point.orders}</p>
@@ -103,7 +108,10 @@ export function AdminAnalyticsPanel() {
       <div className="admin-ops__panels">
         <section className="admin-ops__panel">
           <h2 className="admin-ops__panel-title">حالات الطلبات</h2>
-          <div className="admin-ops__detail-grid" style={{ marginTop: "0.85rem" }}>
+          <div
+            className="admin-ops__detail-grid"
+            style={{ marginTop: "0.85rem" }}
+          >
             {data.orderStatuses.map((slice) => (
               <div key={slice.key} className="admin-ops__detail-row">
                 <span>{slice.label}</span>
@@ -114,7 +122,10 @@ export function AdminAnalyticsPanel() {
         </section>
         <section className="admin-ops__panel">
           <h2 className="admin-ops__panel-title">حالات الدفع</h2>
-          <div className="admin-ops__detail-grid" style={{ marginTop: "0.85rem" }}>
+          <div
+            className="admin-ops__detail-grid"
+            style={{ marginTop: "0.85rem" }}
+          >
             {data.paymentStatuses.map((slice) => (
               <div key={slice.key} className="admin-ops__detail-row">
                 <span>{slice.label}</span>
@@ -127,7 +138,10 @@ export function AdminAnalyticsPanel() {
 
       <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">أعلى التصنيفات بالإعلانات</h2>
-        <div className="admin-ops__detail-grid" style={{ marginTop: "0.85rem" }}>
+        <div
+          className="admin-ops__detail-grid"
+          style={{ marginTop: "0.85rem" }}
+        >
           {data.topCategories.map((slice) => (
             <div key={slice.key} className="admin-ops__detail-row">
               <span>{slice.label}</span>

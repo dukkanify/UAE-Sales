@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { AdminSiteSettings } from "@/services/admin/admin-settings-store";
 import { getSessionUser } from "@/services/storage";
@@ -15,7 +16,7 @@ export function AdminSettingsPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/settings", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/settings")
       .then((res) => res.json())
       .then((data) => {
         if (data?.settings) setSettings(data.settings as AdminSiteSettings);
@@ -29,11 +30,10 @@ export function AdminSettingsPanel() {
     setSaving(true);
     setMessage("");
     try {
-      const res = await fetch("/api/admin/settings", {
+      const res = await adminFetch("/api/admin/settings", {
         method: "PATCH",
         headers: {
           "content-type": "application/json",
-          "x-admin-role": "admin",
         },
         body: JSON.stringify({
           ...settings,
@@ -67,7 +67,9 @@ export function AdminSettingsPanel() {
     <div className="grid gap-5">
       <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">الرسوم والمدفوعات</h2>
-        <p className="admin-ops__panel-sub">تتحكم في نسبة المنصة وبوابة الدفع لكل طلب جديد.</p>
+        <p className="admin-ops__panel-sub">
+          تتحكم في نسبة المنصة وبوابة الدفع لكل طلب جديد.
+        </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <Input
             label="رسوم المنصة %"
@@ -157,7 +159,10 @@ export function AdminSettingsPanel() {
               checked={settings.allowGuestCheckout}
               type="checkbox"
               onChange={(e) =>
-                setSettings({ ...settings, allowGuestCheckout: e.target.checked })
+                setSettings({
+                  ...settings,
+                  allowGuestCheckout: e.target.checked,
+                })
               }
             />
             <span>السماح بالشراء كضيف</span>
@@ -169,7 +174,9 @@ export function AdminSettingsPanel() {
         <Button disabled={saving} onClick={handleSave} type="button">
           {saving ? "جاري الحفظ..." : "حفظ الإعدادات"}
         </Button>
-        {message ? <p className="text-sm font-semibold text-ink">{message}</p> : null}
+        {message ? (
+          <p className="text-sm font-semibold text-ink">{message}</p>
+        ) : null}
       </div>
       <p className="text-xs text-muted">
         آخر تحديث: {new Date(settings.updatedAt).toLocaleString("ar-AE")}

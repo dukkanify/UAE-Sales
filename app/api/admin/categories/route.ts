@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import {
   createCategoryRecord,
@@ -5,18 +9,18 @@ import {
 } from "@/services/categories/category-store";
 import type { AdminCategoryCreateInput } from "@/types";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
   return NextResponse.json({ categories: await getAdminCategoryRecords() });
 }
 
 export async function POST(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const body = (await request.json()) as AdminCategoryCreateInput;

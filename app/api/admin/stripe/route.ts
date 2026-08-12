@@ -1,3 +1,7 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
 import { getAllOrders } from "@/services/payments/order-store";
@@ -10,14 +14,17 @@ import {
   isStripeConfigured,
 } from "@/services/payments/payment-config";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
 
   const settings = await getAdminSettings();
-  const [orders, events] = await Promise.all([getAllOrders(), getPaymentEvents()]);
+  const [orders, events] = await Promise.all([
+    getAllOrders(),
+    getPaymentEvents(),
+  ]);
 
   const withStripe = orders.filter((o) => Boolean(o.stripePaymentIntentId));
   const failed = orders.filter(

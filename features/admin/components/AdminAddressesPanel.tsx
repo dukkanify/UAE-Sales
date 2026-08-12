@@ -1,5 +1,6 @@
 "use client";
 
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { DeliveryAddress } from "@/types/domain/address";
 import { getSessionUser } from "@/services/storage";
@@ -12,7 +13,7 @@ export function AdminAddressesPanel() {
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/addresses", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/addresses")
       .then((res) => res.json())
       .then((data) => {
         setItems(data.addresses ?? []);
