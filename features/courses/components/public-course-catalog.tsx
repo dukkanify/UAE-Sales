@@ -11,6 +11,13 @@ function PublicCourseCatalog() {
     groups = listPublishedCoursesGroupedByInstructor(100);
   } catch (error) {
     console.error("[public-course-catalog]", error);
+    return (
+      <EmptyState
+        icon={<BookOpen className="h-6 w-6" />}
+        title="Courses temporarily unavailable"
+        description="We could not load the published catalog right now. Please try again in a moment."
+      />
+    );
   }
   const total = groups.reduce((sum, g) => sum + g.courses.length, 0);
 
