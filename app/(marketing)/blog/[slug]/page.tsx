@@ -1,39 +1,55 @@
 "use client";
 
 import * as React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { routes } from "@/constants/routes";
 import { commFetch, commJson } from "@/features/communication/lib/api";
 import type { BlogPost, CommentRecord } from "@/types/communication";
 
 export default function BlogArticlePage() {
   const params = useParams<{ slug: string }>();
+  const router = useRouter();
   const [post, setPost] = React.useState<BlogPost | null>(null);
   const [related, setRelated] = React.useState<BlogPost[]>([]);
   const [comments, setComments] = React.useState<CommentRecord[]>([]);
   const [body, setBody] = React.useState("");
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    let cancelled = false;
     void (async () => {
+      setLoading(true);
       const list = await commFetch<{ posts: BlogPost[] }>("/api/communication/blog?public=1");
+      if (cancelled) return;
       const found = (list.data?.posts ?? []).find((p) => p.slug === params.slug);
-      if (!found) return;
+      if (!found) {
+        router.replace("/blog");
+        return;
+      }
       const detail = await commFetch<{
         post: BlogPost;
         related: BlogPost[];
         comments: CommentRecord[];
       }>(`/api/communication/blog?id=${found.id}`);
+      if (cancelled) return;
       setPost(detail.data?.post ?? found);
       setRelated(detail.data?.related ?? []);
       setComments(detail.data?.comments ?? []);
+      setLoading(false);
     })();
-  }, [params.slug]);
+    return () => {
+      cancelled = true;
+    };
+  }, [params.slug, router]);
 
-  if (!post) {
-    return <div className="mx-auto max-w-3xl px-4 py-16 text-muted-foreground">Loading article…</div>;
+  if (loading || !post) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-16 text-muted-foreground">Loading article…</div>
+    );
   }
 
   return (
@@ -49,7 +65,8 @@ export default function BlogArticlePage() {
         <h1 className="font-display text-4xl tracking-tight">{post.title}</h1>
         <p className="text-muted-foreground">{post.excerpt}</p>
         <p className="text-xs text-muted-foreground">
-          {post.authorName} · {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ""}
+          {post.authorName} ·{" "}
+          {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : ""}
         </p>
       </header>
       <div
@@ -65,7 +82,11 @@ export default function BlogArticlePage() {
             <p>{c.body}</p>
           </div>
         ))}
-        <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Add a comment" />
+        <Textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Add a comment"
+        />
         <Button
           onClick={() =>
             void commJson("/api/communication/blog", "POST", {
@@ -91,7 +112,10 @@ export default function BlogArticlePage() {
           <ul className="space-y-2">
             {related.map((r) => (
               <li key={r.id}>
-                <a className="text-primary underline-offset-4 hover:underline" href={`/blog/${r.slug}`}>
+                <a
+                  className="text-primary underline-offset-4 hover:underline"
+                  href={`/blog/${r.slug}`}
+                >
                   {r.title}
                 </a>
               </li>
@@ -99,6 +123,12 @@ export default function BlogArticlePage() {
           </ul>
         </section>
       ) : null}
+
+      <p className="text-sm text-muted-foreground">
+        <a className="underline-offset-4 hover:underline" href={routes.home}>
+          Back to platform
+        </a>
+      </p>
     </article>
   );
 }

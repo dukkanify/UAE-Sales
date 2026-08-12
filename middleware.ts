@@ -64,16 +64,39 @@ async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Friendly aliases — never leave visitors on a dead path.
+  const aliases: Record<string, string> = {
+    "/course": "/courses",
+    "/catalog": "/courses",
+    "/classes": "/courses",
+    "/booking": "/book",
+    "/bookings": "/book",
+    "/zoom": "/live",
+    "/live-zoom": "/live",
+    "/flight-path": "/flightpath",
+    "/platform": "/",
+    "/home": "/",
+  };
+  const aliasTarget = aliases[pathname.toLowerCase()];
+  if (aliasTarget && aliasTarget !== pathname) {
+    const url = request.nextUrl.clone();
+    url.pathname = aliasTarget;
+    return NextResponse.redirect(url);
+  }
+
   // Browsers / autocomplete sometimes hit /BOOK — canonicalize known public paths.
   if (pathname !== pathname.toLowerCase()) {
     const lower = pathname.toLowerCase();
     if (
       lower === "/book" ||
       lower === "/courses" ||
+      lower === "/flightpath" ||
+      lower === "/live" ||
       lower === "/login" ||
       lower === "/register" ||
       lower === "/register/instructor" ||
-      lower === "/verify-otp"
+      lower === "/verify-otp" ||
+      lower === "/blog"
     ) {
       const url = request.nextUrl.clone();
       url.pathname = lower;

@@ -56,6 +56,21 @@ const nextConfig: NextConfig = {
       "@radix-ui/react-tooltip",
     ],
   },
+  async redirects() {
+    return [
+      { source: "/course", destination: "/courses", permanent: true },
+      { source: "/course/:path*", destination: "/courses/:path*", permanent: true },
+      { source: "/catalog", destination: "/courses", permanent: true },
+      { source: "/classes", destination: "/courses", permanent: true },
+      { source: "/booking", destination: "/book", permanent: true },
+      { source: "/bookings", destination: "/book", permanent: true },
+      { source: "/zoom", destination: "/live", permanent: true },
+      { source: "/live-zoom", destination: "/live", permanent: true },
+      { source: "/flight-path", destination: "/flightpath", permanent: true },
+      { source: "/platform", destination: "/", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+    ];
+  },
   async headers() {
     const securityHeaders = [
       { key: "X-DNS-Prefetch-Control", value: "on" },
