@@ -3,6 +3,7 @@
  */
 
 import { generateId } from "@/lib/security/crypto";
+import { stableCourseId } from "@/lib/courses/public-course-path";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { DEFAULT_COURSE_PAGE_SIZE } from "@/constants/courses";
 import { logActivity, logAudit } from "@/services/auth/activity-log";
@@ -62,7 +63,14 @@ function toListItem(course: Course): CourseListItem {
 
 export function getCourseById(id: string, includeDeleted = false): Course | null {
   ensureCoursesSeeded();
-  const course = readCoursesDb().courses.find((c) => c.id === id);
+  const ref = decodeURIComponent(id || "").trim();
+  if (!ref) return null;
+  const courses = readCoursesDb().courses;
+  const lower = ref.toLowerCase();
+  const course =
+    courses.find((c) => c.id === ref) ??
+    courses.find((c) => c.code && c.code.toLowerCase() === lower) ??
+    courses.find((c) => c.code && stableCourseId(c.code) === ref);
   if (!course) return null;
   if (course.deletedAt && !includeDeleted) return null;
   return course;
@@ -110,7 +118,14 @@ export function applyDueScheduledPublishes(): number {
 /** Demo/integration fixtures that should not appear on marketing surfaces. */
 export function isPublicCatalogFixture(course: Pick<Course, "code" | "title">): boolean {
   const code = (course.code || "").toUpperCase();
-  if (code.startsWith("INS-TEST-") || code.startsWith("HOME-")) return true;
+  if (
+    code.startsWith("INS-TEST-") ||
+    code.startsWith("HOME-") ||
+    code.startsWith("CR001-") ||
+    code.startsWith("TEST-")
+  ) {
+    return true;
+  }
   return /instructor owned/i.test(course.title || "");
 }
 
@@ -156,9 +171,10 @@ export function listPublishedCoursesGroupedByInstructor(pageSize = 100): Instruc
 export function getCourseDetail(id: string): CourseDetail | null {
   const course = getCourseById(id);
   if (!course) return null;
+  const courseId = course.id;
   const db = readCoursesDb();
   const modules = db.modules
-    .filter((m) => m.courseId === id)
+    .filter((m) => m.courseId === courseId)
     .sort((a, b) => a.order - b.order)
     .map((mod) => ({
       ...mod,
@@ -176,7 +192,7 @@ export function getCourseDetail(id: string): CourseDetail | null {
   return {
     ...toListItem(course),
     modules,
-    instructors: db.instructors.filter((i) => i.courseId === id),
+    instructors: db.instructors.filter((i) => i.courseId === courseId),
   };
 }
 

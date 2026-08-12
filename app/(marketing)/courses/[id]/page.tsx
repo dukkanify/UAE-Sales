@@ -18,6 +18,7 @@ import { DIFFICULTY_LABELS } from "@/constants/courses";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 import { cn } from "@/lib/utils";
+import { publicCourseHref } from "@/lib/courses/public-course-path";
 import { applyDueScheduledPublishes, getCourseDetail } from "@/services/courses/course-service";
 import { isCoursePubliclyListed } from "@/services/courses/publishing";
 import { getJourneyObjectives } from "@/services/journeys/customer-journey-catalog";
@@ -26,6 +27,10 @@ import { ensurePaymentsSeeded } from "@/services/payments/seed";
 import { formatMinor } from "@/services/payments/money";
 
 type PageProps = { params: Promise<{ id: string }> };
+
+/** Public course pages resolve by id or code against the live store. */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 function resolvePublicCourse(id: string) {
   applyDueScheduledPublishes();
@@ -43,7 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: course.title,
     description: course.shortDescription || course.fullDescription.slice(0, 160),
-    alternates: { canonical: `${routes.courses}/${course.id}` },
+    alternates: { canonical: publicCourseHref(course) },
   };
 }
 
@@ -75,6 +80,7 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
     typeof course.metadata?.programWeeks === "number" ? course.metadata.programWeeks : null;
   const lectureCount =
     typeof course.metadata?.lectureCount === "number" ? course.metadata.lectureCount : null;
+  const publicPath = publicCourseHref(course);
 
   return (
     <div className="platform-altitude landing-root">
@@ -85,7 +91,7 @@ export default async function PublicCourseDetailPage({ params }: PageProps) {
           name: course.title,
           description: course.shortDescription || course.fullDescription,
           provider: { "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
-          url: `${siteConfig.url}${routes.courses}/${course.id}`,
+          url: `${siteConfig.url}${publicPath}`,
           inLanguage: course.language || "en",
         }}
       />

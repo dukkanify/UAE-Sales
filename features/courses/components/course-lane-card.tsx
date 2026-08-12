@@ -1,10 +1,9 @@
 import Link from "@/components/ui/app-link";
 import { ArrowUpRight, Clock3 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { DIFFICULTY_LABELS } from "@/constants/courses";
-import { routes } from "@/constants/routes";
-import { safePath } from "@/lib/links/safe-href";
+import { publicCourseHref } from "@/lib/courses/public-course-path";
+import { cn } from "@/lib/utils";
 import type { InstructorCourseGroup } from "@/services/courses/course-service";
 
 type CatalogCourse = InstructorCourseGroup["courses"][number];
@@ -66,54 +65,55 @@ function CourseLaneCard({
   showInstructor?: boolean;
   descriptionLines?: 2 | 3;
 }) {
+  const href = publicCourseHref(course);
+
   return (
     <article className="course-lane" style={{ animationDelay: `${delay}s` }}>
-      <CourseLaneCover course={course} tone={tone} />
-      <div className="course-lane-body">
-        <div className="course-lane-tags">
-          {course.categoryName ? (
-            <span className="text-primary/85">{course.categoryName}</span>
-          ) : null}
-          {course.counts.modules > 0 ? (
-            <span className="text-foreground/45">{course.counts.modules} modules</span>
-          ) : null}
-        </div>
-        <h3 className="course-lane-title">{course.title}</h3>
-        <p
-          className={
-            descriptionLines === 2
-              ? "course-lane-copy line-clamp-2"
-              : "course-lane-copy line-clamp-3"
-          }
-        >
-          {course.shortDescription || course.fullDescription}
-        </p>
-        <div className="course-lane-footer">
-          <div className="min-w-0">
-            {showInstructor ? (
-              <p className="truncate text-xs font-medium text-foreground/85">
-                {course.primaryInstructorName || "AviatorPass faculty"}
-              </p>
+      <Link href={href} className="course-lane-hit" aria-label={`Open ${course.title}`}>
+        <CourseLaneCover course={course} tone={tone} />
+        <div className="course-lane-body">
+          <div className="course-lane-tags">
+            {course.categoryName ? (
+              <span className="text-primary/85">{course.categoryName}</span>
             ) : null}
-            <p
-              className={
-                showInstructor
-                  ? "mt-0.5 inline-flex items-center gap-1.5 text-xs text-muted-foreground"
-                  : "inline-flex items-center gap-1.5 text-xs text-muted-foreground"
-              }
-            >
-              <Clock3 className="h-3.5 w-3.5 text-primary/70" />
-              {formatHours(course.estimatedDurationMinutes)}
-            </p>
+            {course.counts.modules > 0 ? (
+              <span className="text-foreground/45">{course.counts.modules} modules</span>
+            ) : null}
           </div>
-          <Button size="sm" variant="accent" className="hero-cta-primary shrink-0" asChild>
-            <Link href={safePath(["courses", course.id], routes.courses)}>
+          <h3 className="course-lane-title">{course.title}</h3>
+          <p
+            className={
+              descriptionLines === 2
+                ? "course-lane-copy line-clamp-2"
+                : "course-lane-copy line-clamp-3"
+            }
+          >
+            {course.shortDescription || course.fullDescription}
+          </p>
+          <div className="course-lane-footer">
+            <div className="min-w-0">
+              {showInstructor ? (
+                <p className="truncate text-xs font-medium text-foreground/85">
+                  {course.primaryInstructorName || "AviatorPass faculty"}
+                </p>
+              ) : null}
+              <p
+                className={cn(
+                  "inline-flex items-center gap-1.5 text-xs text-muted-foreground",
+                  showInstructor && "mt-0.5",
+                )}
+              >
+                <Clock3 className="h-3.5 w-3.5 text-primary/70" />
+                {formatHours(course.estimatedDurationMinutes)}
+              </p>
+            </div>
+            <span className="hero-cta-primary inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md bg-accent px-3 text-sm font-medium text-accent-foreground">
               {ctaLabel}
               <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
+            </span>
+          </div>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
