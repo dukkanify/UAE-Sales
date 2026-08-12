@@ -78,6 +78,8 @@ See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) for the full list.
 
 See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) and [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 
+## Project Structure
+
 - `app` — Next.js App Router pages
 - `features` — domain features (home, listings, auth, chat, wallet…)
 - `shared` — UI components, layouts, brand constants
