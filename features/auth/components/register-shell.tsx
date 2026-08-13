@@ -19,10 +19,19 @@ import {
   ROLE_COPY,
   type RegisterRole,
 } from "@/features/auth/components/register-form";
+import { useAuth } from "@/providers/auth-provider";
 
 function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole }) {
   const [role, setRole] = React.useState<RegisterRole>(initialRole);
+  const { user, isLoading, signOut } = useAuth();
   const copy = ROLE_COPY[role];
+
+  // Clear any prior admin/instructor/student session so a new registration
+  // cannot keep bouncing into another account's dashboard.
+  React.useEffect(() => {
+    if (isLoading || !user) return;
+    void signOut();
+  }, [isLoading, user, signOut]);
 
   const handleRoleChange = (next: RegisterRole) => {
     setRole(next);

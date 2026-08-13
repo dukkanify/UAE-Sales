@@ -33,7 +33,11 @@ import {
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
-import { maxAllowedSessions, revokeExcessSessions } from "@/services/auth/session-service";
+import {
+  maxAllowedSessions,
+  revokeExcessSessions,
+  revokeSessionById,
+} from "@/services/auth/session-service";
 import { dispatchRoleAlert, emailRegistrationWelcome } from "@/services/email/automation-service";
 import { sendEmail } from "@/services/email/mailer";
 import { otpEmailTemplate } from "@/services/settings/email-templates";
@@ -122,6 +126,13 @@ async function issueSession(
             (60 * 24),
         ),
       );
+
+  // Drop any prior browser identity first so admin → student/instructor switches cannot stick.
+  const prior = await readSessionCookie();
+  if (prior?.payload.sid) {
+    revokeSessionById(prior.payload.sid);
+  }
+
   const token = generateToken(32);
   const sessionId = generateId();
   const expiresAt = addDays(days);

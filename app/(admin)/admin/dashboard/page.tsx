@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { AdminDashboardView } from "@/features/dashboard/admin-dashboard-view";
+import { routes } from "@/constants/routes";
+import { ROLES } from "@/constants/roles";
+import { getCurrentSession } from "@/services/auth/auth-service";
 import {
   getAdminOverview,
   getDashboardCalendarEvents,
@@ -11,7 +15,13 @@ import {
 
 export const metadata: Metadata = { title: "Admin Dashboard" };
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const { user } = await getCurrentSession();
+  if (!user) redirect(routes.login);
+  if (user.role !== ROLES.ADMIN && user.role !== ROLES.SUPER_ADMIN) {
+    redirect(routes.accessDenied);
+  }
+
   return (
     <AdminDashboardView
       overview={getAdminOverview()}
