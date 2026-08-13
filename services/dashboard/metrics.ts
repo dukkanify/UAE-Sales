@@ -181,10 +181,13 @@ export function getDashboardCalendarEvents(user?: UserProfile | null): CalendarE
   ];
 }
 
-export function getRecentActivityFeed(): ActivityItem[] {
+export function getRecentActivityFeed(actorUserId?: string | null): ActivityItem[] {
   ensureDemoUsersSeeded();
   const db = readAuthDb();
-  return db.activityLogs.slice(0, 8).map((log) => ({
+  const logs = actorUserId
+    ? db.activityLogs.filter((log) => log.actorId === actorUserId)
+    : db.activityLogs;
+  return logs.slice(0, 8).map((log) => ({
     id: log.id,
     title: log.action,
     description: [log.entityType, log.entityId?.slice(0, 8)].filter(Boolean).join(" · "),
@@ -201,24 +204,37 @@ export function listUsersByRole(role?: Role) {
 }
 
 export function getInstructorOverview(instructorUserId?: string | null) {
-  const overview = getPlatformOverview();
   ensureCoursesSeeded();
   ensureClassesSeeded();
   const users = readAuthDb().users;
-  const instructor =
-    (instructorUserId ? users.find((u) => u.id === instructorUserId) : null) ??
-    users.find((u) => u.role === ROLES.INSTRUCTOR);
+  const instructor = instructorUserId
+    ? users.find(
+        (u) =>
+          u.id === instructorUserId &&
+          (u.role === ROLES.INSTRUCTOR || u.role === ROLES.CHIEF_GROUND_INSTRUCTOR),
+      )
+    : null;
+  if (!instructor) {
+    return {
+      myCourses: 0,
+      todaysClasses: 0,
+      upcomingClasses: 0,
+      students: 0,
+      assignments: 0,
+      quizzes: 0,
+      earnings: 0,
+      walletBalance: 0,
+    };
+  }
   const mine = listCoursesForMetrics({
     role: "instructor",
-    instructorId: instructor?.id ?? null,
+    instructorId: instructor.id,
   });
-  const classStats = getClassStats(instructor?.id);
-  const students = instructor?.id
-    ? listInstructorStudents(instructor.id).reduce((set, row) => {
-        set.add(row.studentId);
-        return set;
-      }, new Set<string>()).size
-    : overview.totalStudents;
+  const classStats = getClassStats(instructor.id);
+  const students = listInstructorStudents(instructor.id).reduce((set, row) => {
+    set.add(row.studentId);
+    return set;
+  }, new Set<string>()).size;
   return {
     myCourses: mine,
     todaysClasses: classStats.today,
@@ -231,12 +247,14 @@ export function getInstructorOverview(instructorUserId?: string | null) {
   };
 }
 
-export function getStudentOverview() {
+export function getStudentOverview(studentUserId?: string | null) {
   ensureCoursesSeeded();
   ensureLearningSeeded();
-  const student = readAuthDb().users.find(
-    (u) => u.role === ROLES.STUDENT && u.status === ACCOUNT_STATUS.ACTIVE,
-  );
+  const users = readAuthDb().users;
+  const student =
+    (studentUserId
+      ? users.find((u) => u.id === studentUserId && u.role === ROLES.STUDENT)
+      : null) ?? null;
   if (student) {
     const learning = getLearningDashboard(toUserProfile(student));
     ensureCertificatesSeeded();
@@ -250,13 +268,13 @@ export function getStudentOverview() {
       assignments: learning.assignments,
       quizzes: 0,
       weeklyProgress: learning.weeklyGoalPercent,
-      attendance: 91,
+      attendance: 0,
       learningHours: learning.learningHours,
     };
   }
-  const enrolled = listCoursesForMetrics({ role: "student" });
+  // Never fall back to another student's demo profile — empty for this account only.
   return {
-    currentCourses: enrolled,
+    currentCourses: 0,
     nextLiveClass: "None scheduled",
     progress: 0,
     certificates: 0,

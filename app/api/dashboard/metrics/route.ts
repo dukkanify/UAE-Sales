@@ -25,7 +25,12 @@ export async function GET(request: Request) {
     const scope = resolveDashboardScope(user.role, searchParams.get("scope"));
 
     const calendar = getDashboardCalendarEvents();
-    const activity = getRecentActivityFeed();
+    const activity =
+      scope === ROLES.STUDENT ||
+      scope === ROLES.INSTRUCTOR ||
+      scope === ROLES.CHIEF_GROUND_INSTRUCTOR
+        ? getRecentActivityFeed(user.id)
+        : getRecentActivityFeed();
 
     if (scope === ROLES.SUPER_ADMIN) {
       return NextResponse.json({
@@ -65,11 +70,11 @@ export async function GET(request: Request) {
       });
     }
 
-    if (scope === ROLES.INSTRUCTOR) {
+    if (scope === ROLES.INSTRUCTOR || scope === ROLES.CHIEF_GROUND_INSTRUCTOR) {
       return NextResponse.json({
         success: true,
         data: {
-          overview: getInstructorOverview(),
+          overview: getInstructorOverview(user.id),
           calendar,
           activity,
           charts: {
@@ -86,7 +91,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       success: true,
       data: {
-        overview: getStudentOverview(),
+        overview: getStudentOverview(user.id),
         calendar,
         activity,
         charts: {

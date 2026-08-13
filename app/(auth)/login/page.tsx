@@ -1,4 +1,5 @@
 import Link from "@/components/ui/app-link";
+import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { LoginForm } from "@/features/auth/components/login-form";
@@ -10,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { LoadingState } from "@/components/shared/loading-state";
 import { routes } from "@/constants/routes";
 import { BrandLogo } from "@/components/brand/brand-logo";
 import { siteConfig } from "@/config/site";
@@ -41,7 +43,9 @@ export default function LoginPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <LoginForm />
+          <Suspense fallback={<LoadingState label="Loading sign-in..." />}>
+            <LoginForm />
+          </Suspense>
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
           New to AviatorPass?{" "}

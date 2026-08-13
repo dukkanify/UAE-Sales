@@ -18,7 +18,9 @@ export const metadata: Metadata = { title: "Instructor Dashboard" };
 export default async function InstructorDashboardPage() {
   const { user } = await getCurrentSession();
   if (!user) redirect(routes.login);
-  if (user.role !== ROLES.INSTRUCTOR) redirect(routes.accessDenied);
+  if (user.role !== ROLES.INSTRUCTOR && user.role !== ROLES.CHIEF_GROUND_INSTRUCTOR) {
+    redirect(routes.accessDenied);
+  }
 
   return (
     <InstructorDashboardView

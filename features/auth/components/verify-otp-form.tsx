@@ -72,9 +72,12 @@ function VerifyOtpForm() {
       }
 
       setUser(result.data.user);
-      await refresh();
       toast.success("Signed in successfully");
+      // Navigate with the verified identity first — refresh in the background so a
+      // lingering prior cookie cannot overwrite the new student/instructor session
+      // before the role dashboard loads.
       router.replace(result.data.redirectTo);
+      void refresh();
     } finally {
       setPending(false);
     }
