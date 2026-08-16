@@ -173,13 +173,28 @@ export function listLiveClasses(filters: ClassFilters = {}): {
   };
 }
 
-export function getClassStats(instructorId?: string): ClassStats {
+export function getClassStats(
+  instructorIdOrOpts?: string | { instructorId?: string; studentId?: string },
+): ClassStats {
   ensureClassesSeeded();
+  const opts =
+    typeof instructorIdOrOpts === "string"
+      ? { instructorId: instructorIdOrOpts }
+      : (instructorIdOrOpts ?? {});
   let rows = readClassesDb().classes.filter((c) => !c.deletedAt);
-  if (instructorId) {
+  if (opts.instructorId) {
     rows = rows.filter(
-      (c) => c.instructorId === instructorId || c.assistantInstructorId === instructorId,
+      (c) =>
+        c.instructorId === opts.instructorId || c.assistantInstructorId === opts.instructorId,
     );
+  }
+  if (opts.studentId) {
+    const classIds = new Set(
+      readClassesDb()
+        .participants.filter((p) => p.userId === opts.studentId)
+        .map((p) => p.liveClassId),
+    );
+    rows = rows.filter((c) => classIds.has(c.id));
   }
   const items = rows.map(toListItem);
   const todayStart = new Date();
@@ -187,7 +202,8 @@ export function getClassStats(instructorId?: string): ClassStats {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
 
-  const attendance = readClassesDb().attendance;
+  const classIds = new Set(rows.map((c) => c.id));
+  const attendance = readClassesDb().attendance.filter((a) => classIds.has(a.liveClassId));
   const marked = attendance.filter((a) => a.status !== "unknown");
   const presentish = attendance.filter((a) => ["present", "late"].includes(a.status)).length;
   const attendanceRate = marked.length === 0 ? 0 : Math.round((presentish / marked.length) * 100);

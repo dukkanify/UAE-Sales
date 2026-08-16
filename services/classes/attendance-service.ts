@@ -145,14 +145,33 @@ export async function markLeave(input: {
   });
 }
 
-export function getAttendanceOverview(instructorId?: string) {
-  const classes = readClassesDb().classes.filter((c) => {
-    if (c.deletedAt) return false;
-    if (!instructorId) return true;
-    return c.instructorId === instructorId || c.assistantInstructorId === instructorId;
-  });
+export function getAttendanceOverview(
+  instructorIdOrOpts?: string | { instructorId?: string; studentId?: string },
+) {
+  const opts =
+    typeof instructorIdOrOpts === "string"
+      ? { instructorId: instructorIdOrOpts }
+      : (instructorIdOrOpts ?? {});
+  let classes = readClassesDb().classes.filter((c) => !c.deletedAt);
+  if (opts.instructorId) {
+    classes = classes.filter(
+      (c) =>
+        c.instructorId === opts.instructorId || c.assistantInstructorId === opts.instructorId,
+    );
+  }
+  if (opts.studentId) {
+    const classIds = new Set(
+      readClassesDb()
+        .participants.filter((p) => p.userId === opts.studentId)
+        .map((p) => p.liveClassId),
+    );
+    classes = classes.filter((c) => classIds.has(c.id));
+  }
   const ids = new Set(classes.map((c) => c.id));
-  const rows = readClassesDb().attendance.filter((a) => ids.has(a.liveClassId));
+  let rows = readClassesDb().attendance.filter((a) => ids.has(a.liveClassId));
+  if (opts.studentId) {
+    rows = rows.filter((a) => a.studentId === opts.studentId);
+  }
   const total = rows.length;
   const present = rows.filter((a) => ["present", "late"].includes(a.status)).length;
   return {

@@ -60,7 +60,8 @@ export async function setSessionCookies(
   );
 
   const store = await cookies();
-  store.set(SESSION_COOKIE, `${jwt}.${rawToken}`, sessionCookieOptions(maxAgeSeconds));
+  const opts = sessionCookieOptions(maxAgeSeconds);
+  store.set(SESSION_COOKIE, `${jwt}.${rawToken}`, opts);
 }
 
 export async function clearSessionCookies(): Promise<void> {

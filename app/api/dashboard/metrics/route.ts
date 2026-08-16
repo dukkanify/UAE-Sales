@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const scope = resolveDashboardScope(user.role, searchParams.get("scope"));
 
-    const calendar = getDashboardCalendarEvents();
+    const calendar = getDashboardCalendarEvents(user);
     const activity =
       scope === ROLES.STUDENT ||
       scope === ROLES.INSTRUCTOR ||
@@ -78,7 +78,7 @@ export async function GET(request: Request) {
           calendar,
           activity,
           charts: {
-            attendance: getAttendanceSeries(),
+            attendance: getAttendanceSeries(user.id),
             earnings: getEarningsSeries(),
             enrollments: getEnrollmentSeries(),
             progress: getProgressBreakdown(),
@@ -95,8 +95,8 @@ export async function GET(request: Request) {
         calendar,
         activity,
         charts: {
-          progress: getProgressBreakdown(),
-          attendance: getAttendanceSeries(),
+          progress: getProgressBreakdown(user.id),
+          attendance: getAttendanceSeries(undefined, user.id),
         },
       },
       error: null,
