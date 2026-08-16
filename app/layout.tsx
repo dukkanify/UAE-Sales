@@ -19,10 +19,10 @@ const ibmPlex = IBM_Plex_Sans({
 /** Wide aerodynamic display face — Stimulatio Flat web substitute */
 const exo2 = Exo_2({
   subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+  weight: ["600", "700"],
   variable: "--font-exo-2",
   display: "swap",
-  preload: true,
+  preload: false,
   adjustFontFallback: true,
 });
 

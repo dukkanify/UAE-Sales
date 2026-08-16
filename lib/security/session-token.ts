@@ -1,6 +1,8 @@
 import { SignJWT, jwtVerify } from "jose";
 
 export const SESSION_COOKIE = "aep_session";
+/** Non-httpOnly hint so the client can skip /api/auth/me when signed out. */
+export const SESSION_HINT_COOKIE = "aep_signed_in";
 export const CSRF_COOKIE = "aep_csrf";
 
 export interface SessionJwtPayload {

@@ -47,15 +47,35 @@ async function readClaims(request: NextRequest): Promise<{
 
 async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
   if (publicEnv.NEXT_PUBLIC_MAINTENANCE_MODE) return true;
+
+  // Edge-friendly TTL cache — avoid a same-origin round-trip on every HTML request.
+  const now = Date.now();
+  const cached = (globalThis as typeof globalThis & {
+    __aepMaintenanceCache?: { at: number; enabled: boolean };
+  }).__aepMaintenanceCache;
+  if (cached && now - cached.at < 15_000) {
+    return cached.enabled;
+  }
+
   try {
     const statusUrl = new URL("/api/public/maintenance", request.nextUrl.origin);
     const res = await fetch(statusUrl, {
       headers: { accept: "application/json" },
-      cache: "no-store",
+      // Allow short CDN/edge reuse between navigations in the same isolate.
+      next: { revalidate: 15 },
     });
-    if (!res.ok) return false;
+    if (!res.ok) {
+      (globalThis as typeof globalThis & {
+        __aepMaintenanceCache?: { at: number; enabled: boolean };
+      }).__aepMaintenanceCache = { at: now, enabled: false };
+      return false;
+    }
     const json = (await res.json()) as { data?: { enabled?: boolean } };
-    return Boolean(json.data?.enabled);
+    const enabled = Boolean(json.data?.enabled);
+    (globalThis as typeof globalThis & {
+      __aepMaintenanceCache?: { at: number; enabled: boolean };
+    }).__aepMaintenanceCache = { at: now, enabled };
+    return enabled;
   } catch {
     return false;
   }

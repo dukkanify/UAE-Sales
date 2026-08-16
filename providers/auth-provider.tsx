@@ -6,6 +6,7 @@ import type { Permission } from "@/constants/permissions";
 import type { AuthSession, UserProfile } from "@/types";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
+import { SESSION_HINT_COOKIE } from "@/lib/security/session-token";
 
 interface AuthContextValue extends AuthSession {
   setUser: (user: UserProfile | null) => void;
@@ -23,6 +24,11 @@ interface AuthProviderProps {
   initialPermissions?: Permission[];
 }
 
+function hasSignedInHint(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.cookie.split("; ").some((row) => row.startsWith(`${SESSION_HINT_COOKIE}=`));
+}
+
 function AuthProvider({
   children,
   initialUser = null,
@@ -34,7 +40,15 @@ function AuthProvider({
   const hasResolvedRef = React.useRef(Boolean(initialUser));
 
   const refresh = React.useCallback(async () => {
-    // Avoid full-screen blocking on background revalidation
+    // Anonymous visitors: skip /api/auth/me entirely (huge win on marketing pages).
+    if (!initialUser && !hasSignedInHint()) {
+      setUser(null);
+      setPermissions([]);
+      hasResolvedRef.current = true;
+      setIsLoading(false);
+      return;
+    }
+
     if (!hasResolvedRef.current) setIsLoading(true);
     try {
       const result = await authFetch<{
@@ -53,7 +67,7 @@ function AuthProvider({
       hasResolvedRef.current = true;
       setIsLoading(false);
     }
-  }, []);
+  }, [initialUser]);
 
   React.useEffect(() => {
     void refresh();

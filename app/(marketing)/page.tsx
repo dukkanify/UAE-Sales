@@ -8,9 +8,8 @@ import { HomeCoursesByInstructor } from "@/features/marketing/components/home-co
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 
-/** Avoid CDN-caching home HTML with ephemeral course UUIDs. */
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+/** Cache public marketing HTML briefly — catalog IDs are stable enough for short ISR. */
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: {
