@@ -19,7 +19,20 @@ function nowIso() {
 }
 
 export type JourneySku =
-  "PPL-RECORDED" | "PPL-LIVE" | "BASICS-RECORDED" | "BASICS-LIVE" | "ATPL-PACKAGE" | "ELP-MOCK";
+  | "PPL-RECORDED"
+  | "PPL-LIVE"
+  | "BASICS-RECORDED"
+  | "BASICS-LIVE"
+  | "ATPL-PACKAGE"
+  | "ELP-MOCK";
+
+/** Canonical paths for the four official customer-journey PDFs. */
+export const JOURNEY_SOURCE_PDFS = {
+  basics: "/brand/source/journeys/Basics_Customer_Journey_AR.pdf",
+  ppl: "/brand/source/journeys/PPL_Customer_Journey_AR.pdf",
+  atplPackage: "/brand/source/journeys/ATPL_Package_Customer_Journey_AR.pdf",
+  elpMock: "/brand/source/journeys/ELP_Mock_Customer_Journey_AR.pdf",
+} as const;
 
 type JourneyCourseDef = {
   code: string;

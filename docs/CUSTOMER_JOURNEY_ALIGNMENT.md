@@ -2,6 +2,17 @@
 
 Audit + implementation map for the four AviatorPass customer-journey PDFs.
 
+## Source PDFs (byte-matched to client uploads)
+
+| Journey PDF (repo) | Original client filename | Public path |
+| ------------------ | ------------------------ | ----------- |
+| `Basics_Customer_Journey_AR.pdf` | Aviator_Pass_Basics of Aviation_Customer_Journey_AR.pdf | `/brand/source/journeys/Basics_Customer_Journey_AR.pdf` |
+| `PPL_Customer_Journey_AR.pdf` | Aviator_Pass_Private Pilot License_Customer_Journey_AR.pdf | `/brand/source/journeys/PPL_Customer_Journey_AR.pdf` |
+| `ATPL_Package_Customer_Journey_AR.pdf` | Aviator_Pass_ِِATPL Package_Exam_Customer_Journey_AR.pdf | `/brand/source/journeys/ATPL_Package_Customer_Journey_AR.pdf` |
+| `ELP_Mock_Customer_Journey_AR.pdf` | Aviator_Pass_ELP Mock_Exam_Customer_Journey_AR.pdf | `/brand/source/journeys/ELP_Mock_Customer_Journey_AR.pdf` |
+
+Folder: `public/brand/source/journeys/` (see README there).
+
 ## Journeys
 
 | Journey                             | Status             | Notes                                                                                              |
@@ -33,4 +44,9 @@ Audit + implementation map for the four AviatorPass customer-journey PDFs.
 - `ensureCustomerJourneyProducts()` — checkout products
 - `ensureMockExamsSeeded()` — ELP type + rush fees + working hours
 
-Source PDFs live under the agent uploads / brand source docs for this engagement.
+## Verification
+
+```bash
+npm run test -- tests/unit/customer-journey-alignment.test.ts
+md5sum public/brand/source/journeys/*.pdf
+```
