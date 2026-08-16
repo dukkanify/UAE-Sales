@@ -35,10 +35,11 @@ function BrandLogo({
     variant === "mark"
       ? siteStatic.brand.iconLight
       : variant === "dark"
-        ? brand.darkLogoUrl || siteStatic.brand.logoDark
+        ? // Prefer static lockup so runtime settings cannot stick on an outdated cache key.
+          siteStatic.brand.logoDark
         : variant === "stacked"
           ? siteStatic.brand.logoStacked
-          : brand.logoUrl || siteStatic.brand.logo;
+          : siteStatic.brand.logo || brand.logoUrl;
 
   // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
   // (JS default params do NOT apply when the caller passes `href={undefined}`).

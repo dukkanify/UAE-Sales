@@ -26,15 +26,15 @@ export const siteStatic = {
   },
   brand: {
     /** Official lockups — cache-busted after brand guide apply */
-    logo: "/brand/logo.png?v=brand-guide-2",
-    logoDark: "/brand/logo-dark.png?v=brand-guide-2",
-    logoStacked: "/brand/logo-stacked.png?v=brand-guide-2",
-    icon: "/brand/icon.png?v=brand-guide-2",
+    logo: "/brand/logo.png?v=brand-guide-3",
+    logoDark: "/brand/logo-dark.png?v=brand-guide-3",
+    logoStacked: "/brand/logo-stacked.png?v=brand-guide-3",
+    icon: "/brand/icon.png?v=brand-guide-3",
     /** Light mark for dark chrome (sidebar / collapsed nav) */
-    iconLight: "/brand/icon-light.png?v=brand-guide-2",
-    favicon: "/brand/favicon.svg?v=brand-guide-2",
-    openGraph: "/brand/og.png?v=brand-guide-2",
-    appleTouchIcon: "/brand/apple-touch-icon.png?v=brand-guide-2",
+    iconLight: "/brand/icon-light.png?v=brand-guide-3",
+    favicon: "/brand/favicon.svg?v=brand-guide-3",
+    openGraph: "/brand/og.png?v=brand-guide-3",
+    appleTouchIcon: "/brand/apple-touch-icon.png?v=brand-guide-3",
     /** Vector masters kept for edit / favicon / print */
     logoSvg: "/brand/logo.svg",
     logoDarkSvg: "/brand/logo-dark.svg",
