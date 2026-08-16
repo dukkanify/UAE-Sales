@@ -7,20 +7,21 @@
       <stop offset="100%" stop-color="#F6C36C"/>
     </linearGradient>
   </defs>
-  <g transform="translate(8,16) scale(1.05)">
-    <path fill="#E8EEF5" d="M18 86 C34 70 52 52 68 36 L52 54 C40 66 28 78 18 86 Z"/>
-    <path fill="#E8EEF5" d="M22 68 C40 50 60 32 78 18 L60 38 C46 52 34 62 22 68 Z"/>
-    <path fill="#E8EEF5" d="M26 48 C46 32 68 16 90 4 L70 24 C54 36 40 44 26 48 Z"/>
-    <path fill="url(#aviatorGold)" d="M28 46 C50 28 74 12 96 0 L88 6 C68 18 48 32 32 44 Z"/>
-    <path stroke="url(#aviatorGold)" stroke-width="4.5" stroke-linecap="round" d="M96 8 V78"/>
-    <path fill="none" stroke="url(#aviatorGold)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"
-      d="M96 8 C118 0 146 6 160 20 V74 C138 58 116 54 96 66"/>
-    <path fill="none" stroke="url(#aviatorGold)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"
-      d="M96 8 C78 18 66 38 64 56 V78"/>
-    <path stroke="url(#aviatorGold)" stroke-width="4" stroke-linecap="round" d="M96 66 V80"/>
+  <g transform="translate(4,8) scale(0.92)">
+    <path fill="#E8EEF5" d="M12 108 C28 92 48 72 70 52 L54 72 C40 86 26 98 12 108 Z"/>
+    <path fill="#E8EEF5" d="M18 86 C38 66 62 44 86 26 L68 48 C52 64 34 76 18 86 Z"/>
+    <path fill="#E8EEF5" d="M26 62 C50 42 78 22 106 8 L86 30 C66 44 46 54 26 62 Z"/>
+    <path fill="none" stroke="url(#aviatorGold)" stroke-width="5" stroke-linecap="round"
+      d="M28 58 C52 38 80 18 108 6"/>
+    <path stroke="url(#aviatorGold)" stroke-width="5.5" stroke-linecap="round" d="M112 10 V98"/>
+    <path fill="none" stroke="url(#aviatorGold)" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"
+      d="M112 10 C138 2 168 10 184 28 V90 C160 72 136 68 112 82"/>
+    <path fill="none" stroke="url(#aviatorGold)" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"
+      d="M112 10 C92 22 78 44 74 66 V96"/>
+    <path stroke="url(#aviatorGold)" stroke-width="4.5" stroke-linecap="round" d="M112 82 V100"/>
   </g>
-  <text x="200" y="58" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1.6">
-    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="16" fill="#CCA04C">PASS</tspan>
+  <text x="210" y="58" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-size="40" font-weight="800" letter-spacing="1.8">
+    <tspan fill="#FFFFFF">AVIATOR</tspan><tspan dx="14" fill="#CCA04C">PASS</tspan>
   </text>
-  <text x="200" y="90" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" letter-spacing="3.2" fill="#B8B7BC">YOUR AVIATION JOURNEY STARTS HERE</text>
+  <text x="210" y="90" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" letter-spacing="3.4" fill="#B8B7BB">YOUR AVIATION JOURNEY STARTS HERE</text>
 </svg>
