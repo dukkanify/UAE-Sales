@@ -122,12 +122,15 @@ function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
     branding.typographyDisplay = DEFAULT_PLATFORM_SETTINGS.branding.typographyDisplay;
     changed = true;
   }
-  // Bump asset query when lockups regenerate
+  // Always prefer current lockup cache key (official PDF raster masters).
   for (const key of ["logoUrl", "darkLogoUrl", "faviconUrl", "openGraphImageUrl"] as const) {
     const current = branding[key];
-    if (typeof current === "string" && current.includes("brand-guide-1")) {
-      branding[key] = current.replace("brand-guide-1", "brand-guide-2");
-      changed = true;
+    if (typeof current === "string" && /brand-guide-\d+/.test(current)) {
+      const next = current.replace(/brand-guide-\d+/, "brand-guide-3");
+      if (next !== current) {
+        branding[key] = next;
+        changed = true;
+      }
     }
   }
   return changed ? { ...settings, branding } : settings;

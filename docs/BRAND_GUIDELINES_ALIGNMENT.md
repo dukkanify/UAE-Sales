@@ -9,7 +9,8 @@ Applied from the official **AVIATOR PASS Brand Guidelines** PDF.
 - Tagline: **YOUR AVIATION JOURNEY STARTS HERE**
 - Secondary (stacked): **UNLOCK YOUR PILOT LICENSE**
 - Mark: aircraft wing (Aviator Blue) + open book (Aviator Gold)
-- Logos: transparent PNG lockups + SVG masters under `public/brand/` (UI prefers PNG; cache `?v=brand-guide-2`)
+- Logos: transparent PNG lockups + SVG masters under `public/brand/` (UI prefers PNG; cache `?v=brand-guide-3`)
+- Lockups regenerated from official PDF page “The Logo” (wing + open book)
 - Guidelines PDF: `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`
 - Tokens: `styles/globals.css`, `config/theme.ts`, `config/design-system.ts`, `config/branding.ts`
 - Surfaces: marketing hero, footer, emails, invoices, charts, manifest, maintenance
