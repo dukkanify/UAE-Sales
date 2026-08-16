@@ -104,23 +104,34 @@ function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
       changed = true;
     }
   }
-  const legacyPrimaries = new Set(["#0B1F33", "#2E7DAA", "#2e7daa"]);
+  const legacyPrimaries = new Set(["#0B1F33", "#0B1F3A", "#0b1f3a", "#2E7DAA", "#2e7daa"]);
   if (!branding.primaryColor || legacyPrimaries.has(branding.primaryColor)) {
     branding.primaryColor = DEFAULT_PLATFORM_SETTINGS.branding.primaryColor;
     changed = true;
   }
-  const legacyAccents = new Set(["#DD9B30", "#dd9b30"]);
+  const legacyAccents = new Set(["#DD9B30", "#dd9b30", "#38BDF8", "#38bdf8"]);
   if (!branding.accentColor || legacyAccents.has(branding.accentColor)) {
     branding.accentColor = DEFAULT_PLATFORM_SETTINGS.branding.accentColor;
     changed = true;
   }
-  if (!branding.secondaryColor) {
+  if (!branding.secondaryColor || branding.secondaryColor === "#4B5563") {
     branding.secondaryColor = DEFAULT_PLATFORM_SETTINGS.branding.secondaryColor;
     changed = true;
   }
   if (branding.typographyDisplay === "Space Grotesk") {
     branding.typographyDisplay = DEFAULT_PLATFORM_SETTINGS.branding.typographyDisplay;
     changed = true;
+  }
+  // Always prefer current lockup cache key (official PDF raster masters).
+  for (const key of ["logoUrl", "darkLogoUrl", "faviconUrl", "openGraphImageUrl"] as const) {
+    const current = branding[key];
+    if (typeof current === "string" && /brand-guide-\d+/.test(current)) {
+      const next = current.replace(/brand-guide-\d+/, "brand-guide-3");
+      if (next !== current) {
+        branding[key] = next;
+        changed = true;
+      }
+    }
   }
   return changed ? { ...settings, branding } : settings;
 }
