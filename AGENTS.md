@@ -21,9 +21,11 @@ Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `type
 
 | Token                       | Hex       | Role              |
 | --------------------------- | --------- | ----------------- |
-| Horizon Blue / Aero Blue    | `#2E7DAA` | Primary           |
-| Sun Gold / Altitude Orange  | `#DD9B30` | Accent / PASS     |
+| Aviator Blue                | `#143048` | Primary           |
+| Aviator Gold                | `#CCA04C` | Accent / PASS     |
 | Academic Grey               | `#7C7B80` | Secondary / muted |
 | Cloud / Sky Mist / Navy Ink | support   | Surfaces (theme)  |
 
-Typography: **Stimulatio Flat** (headings; Space Grotesk web substitute until licensed files land) + **IBM Plex Sans** (body). Logos under `public/brand/`; guidelines PDF at `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`. Update via `config/branding.ts` or Super Admin branding settings.
+Gold gradient (print/digital accents): `#9E712E → #CCA04C → #F6C36C`.
+
+Typography: **Stimulatio Flat** (headings; Exo 2 web substitute until licensed files land) + **IBM Plex Sans** (body). Logos under `public/brand/`; guidelines PDF at `public/brand/source/AVIATORPASS_Brand_Guidelines.pdf`. Update via `config/branding.ts` or Super Admin branding settings.

@@ -59,7 +59,7 @@ export async function collectDeviceFingerprint(): Promise<string | null> {
       ctx.font = "14px Arial";
       ctx.fillStyle = "#1e3a5f";
       ctx.fillRect(0, 0, 64, 24);
-      ctx.fillStyle = "#38bdf8";
+      ctx.fillStyle = "#cca04c";
       ctx.fillText("AviatorPass", 2, 4);
       parts.push(canvas.toDataURL());
     }
