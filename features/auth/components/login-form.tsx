@@ -26,6 +26,19 @@ function LoginForm() {
 
   React.useEffect(() => {
     if (!switching || isLoading || !user) return;
+    // #region agent log
+    void fetch("/api/public/__debug_log", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        hypothesisId: "B",
+        location: "login-form.tsx:switchSignOut",
+        message: "login?switch=1 forcing signOut of existing user",
+        data: { userId: user.id, email: user.email, role: user.role },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => undefined);
+    // #endregion
     void signOut();
   }, [switching, isLoading, user, signOut]);
 
@@ -44,6 +57,25 @@ function LoginForm() {
     setPending(true);
     try {
       if (user) {
+        // #region agent log
+        void fetch("/api/public/__debug_log", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            hypothesisId: "A",
+            location: "login-form.tsx:preOtpSignOut",
+            message: "signing out before student OTP request",
+            data: {
+              priorUserId: user.id,
+              priorEmail: user.email,
+              priorRole: user.role,
+              loginEmail: parsed.data.email,
+              switching,
+            },
+            timestamp: Date.now(),
+          }),
+        }).catch(() => undefined);
+        // #endregion
         await signOut();
       }
       const result = await authFetch<{ email: string; demoOtp?: string }>(

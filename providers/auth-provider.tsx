@@ -42,6 +42,26 @@ function AuthProvider({
         permissions: Permission[];
         isAuthenticated: boolean;
       }>(routes.api.auth.me);
+      // #region agent log
+      void fetch("/api/public/__debug_log", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          hypothesisId: "D",
+          location: "auth-provider.tsx:refresh",
+          message: "AuthProvider.refresh /api/auth/me result",
+          data: {
+            success: result.success,
+            userId: result.data?.user?.id ?? null,
+            email: result.data?.user?.email ?? null,
+            role: result.data?.user?.role ?? null,
+            hadResolvedBefore: hasResolvedRef.current,
+            prevUserId: null,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => undefined);
+      // #endregion
       if (result.success && result.data) {
         setUser(result.data.user);
         setPermissions(result.data.permissions ?? []);
