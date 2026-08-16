@@ -178,7 +178,7 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = claims.profileComplete ? ROLE_DASHBOARD[claims.role] : routes.completeProfile;
       // #region agent log
-      void fetch(new URL("/api/public/__debug_log", request.nextUrl.origin), {
+      void fetch(new URL("/api/public/agent-debug-log", request.nextUrl.origin), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -200,7 +200,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
     // #region agent log
-    void fetch(new URL("/api/public/__debug_log", request.nextUrl.origin), {
+    void fetch(new URL("/api/public/agent-debug-log", request.nextUrl.origin), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({

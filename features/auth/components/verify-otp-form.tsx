@@ -66,7 +66,7 @@ function VerifyOtpForm() {
       }
 
       // #region agent log
-      void fetch("/api/public/__debug_log", {
+      void fetch("/api/public/agent-debug-log", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
