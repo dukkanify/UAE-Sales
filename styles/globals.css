@@ -1,6 +1,5 @@
 @import "tailwindcss";
 @import "./landing.css";
-@import "./booking.css";
 
 /* =============================================================================
    AviatorPass — Official brand guidelines
@@ -174,7 +173,12 @@
     background-image:
       radial-gradient(ellipse 80% 50% at 100% -20%, rgb(20 48 72 / 0.07), transparent 55%),
       radial-gradient(ellipse 50% 40% at -10% 100%, rgb(204 160 76 / 0.05), transparent 50%);
-    background-attachment: fixed;
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      background-attachment: fixed;
+    }
   }
 
   .dark body {

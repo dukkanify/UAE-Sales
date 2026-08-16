@@ -33,13 +33,13 @@ function BrandLogo({
 
   const src =
     variant === "mark"
-      ? siteStatic.brand.iconLight
+      ? siteStatic.brand.iconSvg || siteStatic.brand.iconLight
       : variant === "dark"
-        ? // Prefer static lockup so runtime settings cannot stick on an outdated cache key.
-          siteStatic.brand.logoDark
+        ? // Prefer vector lockup for LCP; PNG remains available for OG/print.
+          siteStatic.brand.logoDarkSvg || siteStatic.brand.logoDark
         : variant === "stacked"
-          ? siteStatic.brand.logoStacked
-          : siteStatic.brand.logo || brand.logoUrl;
+          ? siteStatic.brand.logoStackedSvg || siteStatic.brand.logoStacked
+          : siteStatic.brand.logoSvg || siteStatic.brand.logo || brand.logoUrl;
 
   // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
   // (JS default params do NOT apply when the caller passes `href={undefined}`).

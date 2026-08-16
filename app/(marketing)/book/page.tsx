@@ -6,6 +6,8 @@ import { routes } from "@/constants/routes";
 
 import { BookStudioClient } from "./book-studio-client";
 
+import "@/styles/booking.css";
+
 export const metadata: Metadata = {
   title: "Book live Zoom ATPL coaching",
   description:
