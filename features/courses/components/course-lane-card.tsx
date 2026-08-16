@@ -23,6 +23,13 @@ function resolveCoverArt(course: CatalogCourse): string | null {
   return raw;
 }
 
+function instructorInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "AP";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return `${parts[0]![0] ?? ""}${parts[parts.length - 1]![0] ?? ""}`.toUpperCase();
+}
+
 function CourseLaneCover({ course, tone }: { course: CatalogCourse; tone: number }) {
   const art = resolveCoverArt(course);
   const code = course.code?.trim() || "ATPL";
@@ -34,12 +41,13 @@ function CourseLaneCover({ course, tone }: { course: CatalogCourse; tone: number
       style={
         art
           ? {
-              backgroundImage: `linear-gradient(165deg, rgba(3,8,12,0.15) 0%, rgba(3,8,12,0.78) 100%), url(${art})`,
+              backgroundImage: `linear-gradient(165deg, rgba(3,8,12,0.12) 0%, rgba(3,8,12,0.82) 100%), url(${art})`,
             }
           : undefined
       }
     >
       <div className="course-lane-cover-grid" aria-hidden />
+      <div className="course-lane-cover-glow" aria-hidden />
       <div className="course-lane-cover-horizon" aria-hidden />
       <div className="course-lane-cover-beam" aria-hidden />
       <div className="course-lane-cover-meta">
@@ -74,10 +82,10 @@ function CourseLaneCard({
         <div className="course-lane-body">
           <div className="course-lane-tags">
             {course.categoryName ? (
-              <span className="text-primary/85">{course.categoryName}</span>
+              <span className="course-lane-tag">{course.categoryName}</span>
             ) : null}
             {course.counts.modules > 0 ? (
-              <span className="text-foreground/45">{course.counts.modules} modules</span>
+              <span className="course-lane-tag muted">{course.counts.modules} modules</span>
             ) : null}
           </div>
           <h3 className="course-lane-title">{course.title}</h3>
@@ -107,9 +115,9 @@ function CourseLaneCard({
                 {formatHours(course.estimatedDurationMinutes)}
               </p>
             </div>
-            <span className="hero-cta-primary inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md bg-accent px-3 text-sm font-medium text-accent-foreground">
+            <span className="course-lane-cta">
               {ctaLabel}
-              <ArrowUpRight className="h-3.5 w-3.5" />
+              <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
             </span>
           </div>
         </div>
@@ -132,11 +140,16 @@ function InstructorCourseGrid({
   descriptionLines?: 2 | 3;
 }) {
   return (
-    <div>
+    <section className="course-instructor-block" data-index={groupIndex}>
       <div className="course-instructor-rail">
-        <div>
-          <p className="landing-kicker text-muted-foreground">Instructor</p>
-          <h3 className="course-instructor-name mt-2 text-foreground">{group.instructorName}</h3>
+        <div className="course-instructor-identity">
+          <span className="course-instructor-mark" aria-hidden>
+            {instructorInitials(group.instructorName)}
+          </span>
+          <div>
+            <p className="landing-kicker text-muted-foreground">Instructor</p>
+            <h3 className="course-instructor-name mt-2 text-foreground">{group.instructorName}</h3>
+          </div>
         </div>
         <p className="course-instructor-count">
           {group.courses.length} lane{group.courses.length === 1 ? "" : "s"}
@@ -155,7 +168,7 @@ function InstructorCourseGrid({
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
 

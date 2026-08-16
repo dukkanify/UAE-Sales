@@ -34,25 +34,30 @@ function PublicCourseCatalog() {
   return (
     <div className="catalog-deck">
       <header className="catalog-deck-header">
-        <div>
-          <p className="landing-kicker text-primary">Published lanes</p>
+        <div className="catalog-deck-copy">
+          <p className="landing-kicker text-primary">Course catalog</p>
           <h2 className="catalog-deck-title">
             {total} course{total === 1 ? "" : "s"} ready to fly
           </h2>
           <p className="catalog-deck-lead">
-            Browse by instructor, open a lane for the syllabus, then enter AviatorPass to enroll or
-            book live Zoom coaching.
+            Browse by instructor, open a lane for the syllabus, then enroll or book live Zoom
+            coaching on AviatorPass.
           </p>
         </div>
-        <div className="catalog-deck-stat" aria-label={`${groups.length} instructors`}>
-          <span className="catalog-deck-stat-value">{groups.length}</span>
-          <span className="catalog-deck-stat-label">
-            instructor{groups.length === 1 ? "" : "s"}
-          </span>
-        </div>
+        <aside className="catalog-deck-meta" aria-label="Catalog summary">
+          <div className="catalog-deck-stat">
+            <span className="catalog-deck-stat-value">{total}</span>
+            <span className="catalog-deck-stat-label">lanes</span>
+          </div>
+          <div className="catalog-deck-stat-divider" aria-hidden />
+          <div className="catalog-deck-stat">
+            <span className="catalog-deck-stat-value">{groups.length}</span>
+            <span className="catalog-deck-stat-label">
+              instructor{groups.length === 1 ? "" : "s"}
+            </span>
+          </div>
+        </aside>
       </header>
-
-      <div className="landing-rule opacity-70" />
 
       <div className="catalog-deck-groups">
         {groups.map((group, groupIndex) => (
@@ -60,9 +65,9 @@ function PublicCourseCatalog() {
             key={group.instructorId ?? group.instructorName}
             group={group}
             groupIndex={groupIndex}
-            ctaLabel="View course"
-            showInstructorOnCard
-            descriptionLines={3}
+            ctaLabel="Open lane"
+            showInstructorOnCard={false}
+            descriptionLines={2}
           />
         ))}
       </div>
