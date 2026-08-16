@@ -27,7 +27,7 @@ function LoginForm() {
   React.useEffect(() => {
     if (!switching || isLoading || !user) return;
     // #region agent log
-    void fetch("/api/public/__debug_log", {
+    void fetch("/api/public/agent-debug-log", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
@@ -58,7 +58,7 @@ function LoginForm() {
     try {
       if (user) {
         // #region agent log
-        void fetch("/api/public/__debug_log", {
+        void fetch("/api/public/agent-debug-log", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
