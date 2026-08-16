@@ -71,7 +71,7 @@ import {
   SheetTitle,
 } from "@/components/layout/mobile-sidebar-sheet";
 import { useAuth } from "@/providers/auth-provider";
-import { ROLE_LABELS, rolePathSegment, type Role } from "@/constants/roles";
+import { ROLE_DASHBOARD, ROLE_LABELS, rolePathSegment, type Role, ROLES } from "@/constants/roles";
 import { routes } from "@/constants/routes";
 import {
   DASHBOARD_NAV,
@@ -279,11 +279,27 @@ function LanguageSelector() {
   );
 }
 
+function roleMatchesShell(userRole: Role, shellRole: Role): boolean {
+  if (userRole === shellRole) return true;
+  if (shellRole === ROLES.ADMIN && userRole === ROLES.SUPER_ADMIN) return true;
+  if (shellRole === ROLES.INSTRUCTOR && userRole === ROLES.CHIEF_GROUND_INSTRUCTOR) return true;
+  return false;
+}
+
 function RoleShell({ role, navItems, children }: RoleShellProps) {
   const items = navItems ?? DASHBOARD_NAV[role];
   const [collapsed, setCollapsed] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const [commandOpen, setCommandOpen] = React.useState(false);
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+
+  // Client backup: if the live session belongs to another role, leave this shell.
+  React.useEffect(() => {
+    if (isLoading || !user) return;
+    if (roleMatchesShell(user.role, role)) return;
+    router.replace(user.profileComplete ? ROLE_DASHBOARD[user.role] : routes.completeProfile);
+  }, [isLoading, user, role, router]);
 
   return (
     <div className="flex min-h-screen bg-background">

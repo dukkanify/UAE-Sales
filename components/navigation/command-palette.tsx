@@ -21,6 +21,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useAuth } from "@/providers/auth-provider";
+import { rolePathSegment } from "@/constants/roles";
 
 interface CommandPaletteProps {
   open?: boolean;
@@ -45,8 +46,7 @@ function CommandPalette({ open: controlledOpen, onOpenChange }: CommandPalettePr
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open, setOpen]);
 
-  const roleSegment =
-    user?.role === "super_admin" ? "super-admin" : user?.role ?? "student";
+  const roleSegment = user ? rolePathSegment(user.role) : "student";
 
   const run = (href: string) => {
     setOpen(false);
