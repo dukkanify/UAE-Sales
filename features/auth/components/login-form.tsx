@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "@/components/ui/app-link";
 
@@ -17,30 +17,18 @@ import { useAuth } from "@/providers/auth-provider";
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { user, isLoading, signOut } = useAuth();
   const [email, setEmail] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
   const [pending, setPending] = React.useState(false);
-  const switching = searchParams.get("switch") === "1";
+  const [clearedPriorSession, setClearedPriorSession] = React.useState(false);
 
+  // Enter platform always means switchable sign-in: clear any existing session.
   React.useEffect(() => {
-    if (!switching || isLoading || !user) return;
-    // #region agent log
-    void fetch("/api/public/agent-debug-log", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        hypothesisId: "B",
-        location: "login-form.tsx:switchSignOut",
-        message: "login?switch=1 forcing signOut of existing user",
-        data: { userId: user.id, email: user.email, role: user.role },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => undefined);
-    // #endregion
+    if (isLoading || !user) return;
+    setClearedPriorSession(true);
     void signOut();
-  }, [switching, isLoading, user, signOut]);
+  }, [isLoading, user, signOut]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,25 +45,6 @@ function LoginForm() {
     setPending(true);
     try {
       if (user) {
-        // #region agent log
-        void fetch("/api/public/agent-debug-log", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            hypothesisId: "A",
-            location: "login-form.tsx:preOtpSignOut",
-            message: "signing out before student OTP request",
-            data: {
-              priorUserId: user.id,
-              priorEmail: user.email,
-              priorRole: user.role,
-              loginEmail: parsed.data.email,
-              switching,
-            },
-            timestamp: Date.now(),
-          }),
-        }).catch(() => undefined);
-        // #endregion
         await signOut();
       }
       const result = await authFetch<{ email: string; demoOtp?: string }>(
@@ -109,7 +78,7 @@ function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {switching ? (
+      {clearedPriorSession ? (
         <p className="rounded-md border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
           Switching accounts — sign in with the student, instructor, or admin email you want.
         </p>
@@ -139,11 +108,6 @@ function LoginForm() {
       <p className="text-center text-sm text-muted-foreground">
         <Link href={routes.forgotPassword} className="text-primary hover:underline">
           Forgot password?
-        </Link>
-      </p>
-      <p className="text-center text-xs text-muted-foreground">
-        <Link href={`${routes.login}?switch=1`} className="text-primary hover:underline">
-          Use a different account
         </Link>
       </p>
     </form>
