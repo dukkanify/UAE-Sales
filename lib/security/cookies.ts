@@ -60,12 +60,46 @@ export async function setSessionCookies(
   );
 
   const store = await cookies();
-  store.set(SESSION_COOKIE, `${jwt}.${rawToken}`, sessionCookieOptions(maxAgeSeconds));
+  const opts = sessionCookieOptions(maxAgeSeconds);
+  store.set(SESSION_COOKIE, `${jwt}.${rawToken}`, opts);
+  // #region agent log
+  {
+    const { agentLog } = await import("@/lib/debug/agent-log");
+    agentLog({
+      hypothesisId: "F",
+      location: "cookies.ts:setSessionCookies",
+      message: "session cookie written",
+      data: {
+        sessionId,
+        userId: claims.userId,
+        role: claims.role,
+        maxAgeSeconds,
+        secure: opts.secure === true,
+        path: opts.path,
+        sameSite: opts.sameSite,
+        nodeEnv: process.env.NODE_ENV ?? null,
+        cookieName: SESSION_COOKIE,
+        valueParts: `${jwt}.${rawToken}`.split(".").length,
+      },
+    });
+  }
+  // #endregion
 }
 
 export async function clearSessionCookies(): Promise<void> {
   const store = await cookies();
   store.set(SESSION_COOKIE, "", { ...sessionCookieOptions(0), maxAge: 0 });
+  // #region agent log
+  {
+    const { agentLog } = await import("@/lib/debug/agent-log");
+    agentLog({
+      hypothesisId: "A",
+      location: "cookies.ts:clearSessionCookies",
+      message: "session cookie cleared",
+      data: { cookieName: SESSION_COOKIE },
+    });
+  }
+  // #endregion
 }
 
 export async function readSessionCookie(): Promise<{
@@ -76,9 +110,35 @@ export async function readSessionCookie(): Promise<{
   const value = store.get(SESSION_COOKIE)?.value;
   if (!value) return null;
   const split = splitSessionCookie(value);
-  if (!split) return null;
+  if (!split) {
+    // #region agent log
+    {
+      const { agentLog } = await import("@/lib/debug/agent-log");
+      agentLog({
+        hypothesisId: "F",
+        location: "cookies.ts:readSessionCookie",
+        message: "cookie present but split failed",
+        data: { parts: value.split(".").length },
+      });
+    }
+    // #endregion
+    return null;
+  }
   const payload = await verifySessionJwt(split.jwt);
-  if (!payload) return null;
+  if (!payload) {
+    // #region agent log
+    {
+      const { agentLog } = await import("@/lib/debug/agent-log");
+      agentLog({
+        hypothesisId: "F",
+        location: "cookies.ts:readSessionCookie",
+        message: "jwt verify failed",
+        data: { hasJwt: Boolean(split.jwt) },
+      });
+    }
+    // #endregion
+    return null;
+  }
   return { payload, rawToken: split.rawToken };
 }
 
