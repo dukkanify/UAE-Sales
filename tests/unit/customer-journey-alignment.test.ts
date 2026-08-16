@@ -78,4 +78,15 @@ describe("customer journey alignment", () => {
     expect(q12.extraFees.some((f) => f.code === "RUSH_12H")).toBe(true);
     expect(q24.extraFees.some((f) => f.code === "RUSH_24H")).toBe(true);
   });
+
+  it("exposes the four official journey PDF paths under public/brand/source/journeys", async () => {
+    const { JOURNEY_SOURCE_PDFS } = await import("@/services/journeys/customer-journey-catalog");
+    const { existsSync, statSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    for (const url of Object.values(JOURNEY_SOURCE_PDFS)) {
+      const file = join(process.cwd(), "public", url.replace(/^\//, ""));
+      expect(existsSync(file), file).toBe(true);
+      expect(statSync(file).size).toBeGreaterThan(10_000);
+    }
+  });
 });
