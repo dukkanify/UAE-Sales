@@ -41,6 +41,10 @@ export function canScheduleReports(user: UserProfile): boolean {
 }
 
 export function assertScopeAccess(user: UserProfile, scope: AnalyticsScope) {
+  // Students may only view their own student analytics — never platform aggregates.
+  if (user.role === ROLES.STUDENT && scope !== "student") {
+    throw new AnalyticsError("Students may only view personal analytics", 403);
+  }
   if (scope === "financial" && !canViewFinanceAnalytics(user)) {
     throw new AnalyticsError("Financial analytics restricted", 403);
   }

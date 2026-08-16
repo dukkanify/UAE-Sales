@@ -4,7 +4,7 @@
  */
 
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
-import { readAuthDb, toUserProfile, type StoredUser } from "@/services/auth/store";
+import { findUserById, readAuthDb, toUserProfile, type StoredUser } from "@/services/auth/store";
 import { ROLES, type Role } from "@/constants/roles";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { getCourseStats } from "@/services/courses/course-service";
@@ -121,9 +121,14 @@ export function getEnrollmentSeries(): SeriesPoint[] {
   ];
 }
 
-export function getAttendanceSeries(): SeriesPoint[] {
+export function getAttendanceSeries(
+  instructorId?: string,
+  studentId?: string,
+): SeriesPoint[] {
   ensureClassesSeeded();
-  const rate = getClassStats().attendanceRate;
+  const rate = getClassStats(
+    studentId ? { studentId } : instructorId ? { instructorId } : undefined,
+  ).attendanceRate;
   return [
     { name: "Mon", value: Math.max(40, rate - 10) },
     { name: "Tue", value: Math.max(45, rate - 5) },
@@ -143,7 +148,26 @@ export function getEarningsSeries(): SeriesPoint[] {
   }));
 }
 
-export function getProgressBreakdown(): { name: string; value: number }[] {
+export function getProgressBreakdown(studentUserId?: string | null): {
+  name: string;
+  value: number;
+}[] {
+  if (studentUserId) {
+    ensureLearningSeeded();
+    const student = findUserById(studentUserId);
+    if (student) {
+      const learning = getLearningDashboard(toUserProfile(student));
+      const completed = Math.max(0, Math.min(100, Math.round(learning.progressPercent)));
+      const inProgress = Math.max(0, Math.min(100 - completed, 100 - completed));
+      const notStarted = Math.max(0, 100 - completed - Math.round(inProgress * 0.5));
+      const mid = Math.max(0, 100 - completed - notStarted);
+      return [
+        { name: "Completed", value: completed },
+        { name: "In progress", value: mid },
+        { name: "Not started", value: notStarted },
+      ];
+    }
+  }
   return [
     { name: "Completed", value: 42 },
     { name: "In progress", value: 35 },
