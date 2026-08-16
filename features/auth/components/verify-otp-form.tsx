@@ -65,26 +65,6 @@ function VerifyOtpForm() {
         return;
       }
 
-      // #region agent log
-      void fetch("/api/public/agent-debug-log", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          hypothesisId: "C",
-          location: "verify-otp-form.tsx:onSuccess",
-          message: "OTP verify client received redirect",
-          data: {
-            purpose,
-            userId: result.data.user.id,
-            email: result.data.user.email,
-            role: result.data.user.role,
-            redirectTo: result.data.redirectTo,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => undefined);
-      // #endregion
-
       if (purpose === "reset_password") {
         toast.success("Code verified. Set your new password.");
         router.replace(result.data.redirectTo);

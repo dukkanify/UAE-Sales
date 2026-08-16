@@ -9,23 +9,6 @@ export async function GET() {
   await ensureCsrfToken();
   const session = await getCurrentSession();
 
-  // #region agent log
-  {
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "D",
-      location: "api/auth/me/route.ts:GET",
-      message: "/api/auth/me response",
-      data: {
-        userId: session.user?.id ?? null,
-        email: session.user?.email ?? null,
-        role: session.user?.role ?? null,
-        permissionCount: session.permissions.length,
-      },
-    });
-  }
-  // #endregion
-
   return NextResponse.json({
     success: true,
     data: {

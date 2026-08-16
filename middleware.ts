@@ -164,59 +164,21 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Allow register / OTP / explicit switch so creating a student or instructor
-  // while an admin session is open does not bounce back to the admin dashboard.
+  // Allow register / OTP / login so account creation or switching while another
+  // session is open does not bounce back to the prior role dashboard.
   if (isAuthRoute && claims && claims.status !== ACCOUNT_STATUS.SUSPENDED) {
-    const switchAccount =
+    const allowAuthWhileSignedIn =
       pathname === routes.register ||
       pathname.startsWith(`${routes.register}/`) ||
       pathname === routes.verifyOtp ||
       pathname === routes.forgotPassword ||
       pathname === routes.resetPassword ||
-      (pathname === routes.login && request.nextUrl.searchParams.get("switch") === "1");
-    if (!switchAccount) {
+      pathname === routes.login;
+    if (!allowAuthWhileSignedIn) {
       const url = request.nextUrl.clone();
       url.pathname = claims.profileComplete ? ROLE_DASHBOARD[claims.role] : routes.completeProfile;
-      // #region agent log
-      void fetch(new URL("/api/public/agent-debug-log", request.nextUrl.origin), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          hypothesisId: "B",
-          location: "middleware.ts:authRouteBounce",
-          message: "bouncing authenticated user off auth route",
-          data: {
-            pathname,
-            switchParam: request.nextUrl.searchParams.get("switch"),
-            claimsRole: claims.role,
-            claimsUserId: claims.userId,
-            claimsSid: claims.sessionId,
-            bounceTo: url.pathname,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => undefined);
-      // #endregion
       return NextResponse.redirect(url);
     }
-    // #region agent log
-    void fetch(new URL("/api/public/agent-debug-log", request.nextUrl.origin), {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        hypothesisId: "B",
-        location: "middleware.ts:authRouteAllow",
-        message: "allowing auth route despite existing claims",
-        data: {
-          pathname,
-          switchParam: request.nextUrl.searchParams.get("switch"),
-          claimsRole: claims.role,
-          claimsUserId: claims.userId,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => undefined);
-    // #endregion
   }
 
   for (const [prefix, requiredRole] of Object.entries(ROLE_ROUTE_GUARDS)) {

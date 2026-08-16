@@ -129,23 +129,6 @@ async function issueSession(
 
   // Drop any prior browser identity first so admin → student/instructor switches cannot stick.
   const prior = await readSessionCookie();
-  // #region agent log
-  const { agentLog } = await import("@/lib/debug/agent-log");
-  agentLog({
-    hypothesisId: "A",
-    location: "auth-service.ts:issueSession:entry",
-    message: "issueSession start",
-    data: {
-      targetUserId: user.id,
-      targetEmail: user.email,
-      targetRole: user.role,
-      priorSid: prior?.payload.sid ?? null,
-      priorUid: prior?.payload.uid ?? null,
-      priorRole: prior?.payload.role ?? null,
-      rememberMe,
-    },
-  });
-  // #endregion
   if (prior?.payload.sid) {
     revokeSessionById(prior.payload.sid);
   }
@@ -222,22 +205,6 @@ async function issueSession(
     days * 86_400,
   );
 
-  // #region agent log
-  agentLog({
-    hypothesisId: "A",
-    location: "auth-service.ts:issueSession:exit",
-    message: "issueSession cookies set",
-    data: {
-      newSid: sessionId,
-      freshUserId: fresh.id,
-      freshEmail: fresh.email,
-      freshRole: fresh.role,
-      priorRevokedSid: prior?.payload.sid ?? null,
-      maxAgeDays: days,
-    },
-  });
-  // #endregion
-
   return { profile: toUserProfile(fresh), expiresAt };
 }
 
@@ -249,36 +216,12 @@ export async function getCurrentSession(): Promise<{
 
   const parsed = await readSessionCookie();
   if (!parsed) {
-    // #region agent log
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "D",
-      location: "auth-service.ts:getCurrentSession",
-      message: "no session cookie",
-      data: { user: null },
-    });
-    // #endregion
     return { user: null, permissions: [] };
   }
 
   const db = readAuthDb();
   const session = db.sessions.find((s) => s.id === parsed.payload.sid);
   if (!session || session.revokedAt) {
-    // #region agent log
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "A",
-      location: "auth-service.ts:getCurrentSession",
-      message: "session missing or revoked",
-      data: {
-        sid: parsed.payload.sid,
-        jwtUid: parsed.payload.uid,
-        jwtRole: parsed.payload.role,
-        found: Boolean(session),
-        revokedAt: session?.revokedAt ?? null,
-      },
-    });
-    // #endregion
     await clearSessionCookies();
     return { user: null, permissions: [] };
   }
@@ -293,29 +236,11 @@ export async function getCurrentSession(): Promise<{
   }
 
   if (session.tokenHash !== hashSessionToken(parsed.rawToken)) {
-    // #region agent log
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "F",
-      location: "auth-service.ts:getCurrentSession",
-      message: "token hash mismatch vs rawToken",
-      data: { sid: session.id, sessionUserId: session.userId },
-    });
-    // #endregion
     await clearSessionCookies();
     return { user: null, permissions: [] };
   }
 
   if (session.tokenHash !== parsed.payload.th) {
-    // #region agent log
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "F",
-      location: "auth-service.ts:getCurrentSession",
-      message: "token hash mismatch vs jwt th",
-      data: { sid: session.id, sessionUserId: session.userId },
-    });
-    // #endregion
     await clearSessionCookies();
     return { user: null, permissions: [] };
   }
@@ -325,27 +250,6 @@ export async function getCurrentSession(): Promise<{
     await clearSessionCookies();
     return { user: null, permissions: [] };
   }
-
-  // #region agent log
-  {
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "D",
-      location: "auth-service.ts:getCurrentSession",
-      message: "resolved session user",
-      data: {
-        sid: session.id,
-        jwtUid: parsed.payload.uid,
-        jwtRole: parsed.payload.role,
-        dbUserId: user.id,
-        dbEmail: user.email,
-        dbRole: user.role,
-        uidMatch: parsed.payload.uid === user.id,
-        roleMatch: parsed.payload.role === user.role,
-      },
-    });
-  }
-  // #endregion
 
   if (user.status === ACCOUNT_STATUS.SUSPENDED || user.status === ACCOUNT_STATUS.INACTIVE) {
     return { user: toUserProfile(user), permissions: [] };
@@ -543,27 +447,6 @@ export async function verifyOtp(input: {
   }
 
   let user = findUserByEmail(email);
-
-  // #region agent log
-  {
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    const allMatches = readAuthDb().users.filter((u) => u.email === email);
-    agentLog({
-      hypothesisId: "E",
-      location: "auth-service.ts:verifyOtp:lookup",
-      message: "email lookup before session",
-      data: {
-        email,
-        purpose: input.purpose,
-        foundUserId: user?.id ?? null,
-        foundRole: user?.role ?? null,
-        matchCount: allMatches.length,
-        matchRoles: allMatches.map((u) => u.role),
-        matchIds: allMatches.map((u) => u.id),
-      },
-    });
-  }
-  // #endregion
 
   if (input.purpose === "register") {
     const intendedRole =
@@ -795,27 +678,6 @@ export async function verifyOtp(input: {
       : profile.profileComplete
         ? ROLE_DASHBOARD[profile.role]
         : "/complete-profile";
-
-  // #region agent log
-  {
-    const { agentLog } = await import("@/lib/debug/agent-log");
-    agentLog({
-      hypothesisId: "C",
-      location: "auth-service.ts:verifyOtp:redirect",
-      message: "verifyOtp redirect computed",
-      data: {
-        email,
-        purpose: input.purpose,
-        profileId: profile.id,
-        profileEmail: profile.email,
-        profileRole: profile.role,
-        profileComplete: profile.profileComplete,
-        redirectTo,
-        roleDashboard: ROLE_DASHBOARD[profile.role],
-      },
-    });
-  }
-  // #endregion
 
   return {
     success: true,
