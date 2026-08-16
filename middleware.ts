@@ -164,17 +164,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Allow register / OTP / explicit switch so creating a student or instructor
-  // while an admin session is open does not bounce back to the admin dashboard.
+  // Allow register / OTP / login so account creation or switching while another
+  // session is open does not bounce back to the prior role dashboard.
   if (isAuthRoute && claims && claims.status !== ACCOUNT_STATUS.SUSPENDED) {
-    const switchAccount =
+    const allowAuthWhileSignedIn =
       pathname === routes.register ||
       pathname.startsWith(`${routes.register}/`) ||
       pathname === routes.verifyOtp ||
       pathname === routes.forgotPassword ||
       pathname === routes.resetPassword ||
-      (pathname === routes.login && request.nextUrl.searchParams.get("switch") === "1");
-    if (!switchAccount) {
+      pathname === routes.login;
+    if (!allowAuthWhileSignedIn) {
       const url = request.nextUrl.clone();
       url.pathname = claims.profileComplete ? ROLE_DASHBOARD[claims.role] : routes.completeProfile;
       return NextResponse.redirect(url);

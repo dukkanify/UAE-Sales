@@ -487,8 +487,15 @@ export function listMyBookings(user: UserProfile): BookingListItem[] {
   let rows = db.bookings;
   if (user.role === ROLES.STUDENT) {
     rows = rows.filter((b) => b.studentId === user.id);
-  } else if (user.role === ROLES.INSTRUCTOR) {
+  } else if (
+    user.role === ROLES.INSTRUCTOR ||
+    user.role === ROLES.CHIEF_GROUND_INSTRUCTOR
+  ) {
+    // Instructors and CGI only see sessions they teach — never the full platform book.
     rows = rows.filter((b) => b.instructorId === user.id);
+  } else {
+    // Non-manage roles must never fall through to every booking.
+    rows = [];
   }
   return rows
     .slice()

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 
 import { ACCOUNT_STATUS } from "@/constants/account-status";
+import { ROLE_DASHBOARD, ROLES, type Role } from "@/constants/roles";
 import { routes } from "@/constants/routes";
 import { getCurrentSession } from "@/services/auth/auth-service";
 import { assertPermission, PermissionError } from "@/services/auth/permissions";
@@ -34,6 +36,31 @@ export async function requireAuth(): Promise<UserProfile> {
 export async function requirePermission(permission: Permission): Promise<UserProfile> {
   const user = await requireAuth();
   assertPermission(user, permission);
+  return user;
+}
+
+/**
+ * Server layout/page gate: each person only enters their own role shell.
+ * Elevations mirror middleware (super_admin → admin, CGI → instructor).
+ */
+export async function requirePageRole(allowed: Role | Role[]): Promise<UserProfile> {
+  const { user } = await getCurrentSession();
+  if (!user) redirect(routes.login);
+  if (user.status === ACCOUNT_STATUS.SUSPENDED) redirect(routes.accountSuspended);
+
+  const allowedRoles = Array.isArray(allowed) ? allowed : [allowed];
+  const elevatedAdmin =
+    allowedRoles.includes(ROLES.ADMIN) && user.role === ROLES.SUPER_ADMIN;
+  const elevatedInstructor =
+    allowedRoles.includes(ROLES.INSTRUCTOR) &&
+    user.role === ROLES.CHIEF_GROUND_INSTRUCTOR;
+
+  if (!allowedRoles.includes(user.role) && !elevatedAdmin && !elevatedInstructor) {
+    redirect(
+      user.profileComplete ? ROLE_DASHBOARD[user.role] : routes.completeProfile,
+    );
+  }
+
   return user;
 }
 
