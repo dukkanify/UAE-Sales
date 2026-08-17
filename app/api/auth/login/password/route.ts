@@ -4,6 +4,7 @@ import { findDemoAccount } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import { findUserByEmail, toUserProfile, getRedirectAfterAuth, restoreUserWithPasswordProof } from "@/services/auth/user-store";
 import { verifyPassword } from "@/services/auth/password.service";
+import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { getPostLoginPath } from "@/services/auth/auth.service";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
@@ -51,15 +52,23 @@ export async function POST(request: Request) {
     const credentialsMatch = Boolean(
       stored?.passwordHash && passwordMatches(stored.passwordHash, password),
     );
-    if (!credentialsMatch && parsed.data.accountProof) {
-      stored =
-        (await restoreUserWithPasswordProof({
-          email,
-          password,
-          passwordHash: parsed.data.accountProof,
-          fullName: parsed.data.fullName,
-          accountType: parsed.data.accountType,
-        })) ?? stored;
+    if (!credentialsMatch) {
+      try {
+        const cookieProof = await readAccountProofCookie(email);
+        const passwordHash = parsed.data.accountProof ?? cookieProof?.passwordHash;
+        if (passwordHash) {
+          stored =
+            (await restoreUserWithPasswordProof({
+              email,
+              password,
+              passwordHash,
+              fullName: parsed.data.fullName ?? cookieProof?.fullName,
+              accountType: parsed.data.accountType ?? cookieProof?.accountType,
+            })) ?? stored;
+        }
+      } catch {
+        // Fall through to invalid-credentials if restore fails.
+      }
     }
     if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
       if (stored.accountStatus === "suspended") {

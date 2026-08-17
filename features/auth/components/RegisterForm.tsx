@@ -15,6 +15,10 @@ import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
+import {
+  isStrongPassword,
+  STRONG_PASSWORD_HINT,
+} from "@/shared/utils/password-rules";
 
 type RegisterErrors = {
   email?: string;
@@ -33,15 +37,15 @@ export function RegisterForm() {
   const emailOtpEnabled = isEmailOtpEnabled();
   const router = useRouter();
 
-  const { isLoading, run: handleSubmit } = useAsyncAction(
+  const { error: submitError, isLoading, run: handleSubmit } = useAsyncAction(
     useCallback(async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
 
       const formData = new FormData(event.currentTarget);
       const fullName = String(formData.get("fullName") ?? "").trim();
       const nextEmail = String(formData.get("email") ?? "").trim().toLowerCase();
-      const password = String(formData.get("password") ?? "");
-      const confirmPassword = String(formData.get("confirmPassword") ?? "");
+      const password = String(formData.get("password") ?? "").trim();
+      const confirmPassword = String(formData.get("confirmPassword") ?? "").trim();
       const accountType = String(formData.get("accountType") ?? "individual") as
         | "individual"
         | "company";
@@ -59,8 +63,8 @@ export function RegisterForm() {
       }
 
       if (!emailOtpEnabled) {
-        if (password.length < 8) {
-          nextErrors.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل.";
+        if (!isStrongPassword(password)) {
+          nextErrors.password = STRONG_PASSWORD_HINT;
         }
         if (password !== confirmPassword) {
           nextErrors.confirmPassword = "كلمتا المرور غير متطابقتين.";
@@ -87,7 +91,12 @@ export function RegisterForm() {
         });
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.message ?? "تعذر إنشاء الحساب.");
+          throw new Error(
+            data.message ??
+              (data.error === "EMAIL_ALREADY_REGISTERED"
+                ? "هذا البريد مسجّل مسبقًا. سجّل الدخول بنفس البيانات."
+                : "تعذر إنشاء الحساب."),
+          );
         }
         setSessionUser(data.user as UserProfile);
         if (typeof data.accountProof === "string") {
@@ -180,6 +189,7 @@ export function RegisterForm() {
           <Input
             autoComplete="new-password"
             error={errors.password}
+            hint={STRONG_PASSWORD_HINT}
             label="كلمة المرور"
             name="password"
             required
@@ -234,6 +244,8 @@ export function RegisterForm() {
         </label>
         {errors.terms ? <FormMessage variant="error">{errors.terms}</FormMessage> : null}
       </div>
+
+      {submitError ? <FormMessage variant="error">{submitError}</FormMessage> : null}
 
       <Button loading={isLoading} type="submit">
         {emailOtpEnabled ? "متابعة" : "إنشاء الحساب"}

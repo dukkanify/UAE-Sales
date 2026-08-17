@@ -233,6 +233,5 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
             : "إرسال رمز الدخول"}
         </Button>
       </form>
-    </>
   );
 }
