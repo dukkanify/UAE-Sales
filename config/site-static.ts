@@ -25,17 +25,17 @@ export const siteStatic = {
     youtube: "",
   },
   brand: {
-    /** Official lockups — cache-busted after brand guide apply */
-    logo: "/brand/logo.png?v=brand-guide-3",
-    logoDark: "/brand/logo-dark.png?v=brand-guide-3",
-    logoStacked: "/brand/logo-stacked.png?v=brand-guide-3",
-    icon: "/brand/icon.png?v=brand-guide-3",
+    /** Official lockups from AVIATOR PASS brand guidelines PDF */
+    logo: "/brand/logo.png?v=brand-guide-4",
+    logoDark: "/brand/logo-dark.png?v=brand-guide-4",
+    logoStacked: "/brand/logo-stacked.png?v=brand-guide-4",
+    icon: "/brand/icon.png?v=brand-guide-4",
     /** Light mark for dark chrome (sidebar / collapsed nav) */
-    iconLight: "/brand/icon-light.png?v=brand-guide-3",
-    favicon: "/brand/favicon.svg?v=brand-guide-3",
-    openGraph: "/brand/og.png?v=brand-guide-3",
-    appleTouchIcon: "/brand/apple-touch-icon.png?v=brand-guide-3",
-    /** Vector masters kept for edit / favicon / print */
+    iconLight: "/brand/icon-light.png?v=brand-guide-4",
+    favicon: "/brand/favicon.svg?v=brand-guide-4",
+    openGraph: "/brand/og.png?v=brand-guide-4",
+    appleTouchIcon: "/brand/apple-touch-icon.png?v=brand-guide-4",
+    /** Approximate SVG masters — edit/favicon only; UI uses PNGs above */
     logoSvg: "/brand/logo.svg",
     logoDarkSvg: "/brand/logo-dark.svg",
     logoStackedSvg: "/brand/logo-stacked.svg",
