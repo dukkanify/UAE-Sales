@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { findUserById } from "@/services/auth/user-store";
 import { sendViewingBookingEmails } from "@/services/email/email.service";
+import { findStoredEmail, listingPublicUrl } from "@/services/listings/listing-action-mail";
 import { createNotification } from "@/services/payments/notification-store";
 import {
   assertNotOwnListing,
@@ -87,33 +87,49 @@ export async function POST(request: Request) {
 
   const booking = await createViewingBooking(payload);
 
+  const listingHref = listing
+    ? listing.id.startsWith("local-")
+      ? `/listings/local/${listing.id}`
+      : `/listings/${listing.slug}`
+    : payload.listingSlug
+      ? `/listings/${payload.listingSlug}`
+      : "/search";
+
   await Promise.all([
     createNotification({
       userId: payload.buyerId,
       type: "viewing_booking",
       title: "تم تأكيد حجز المعاينة",
       body: `معاينة «${payload.listingTitle}» بتاريخ ${payload.date} الساعة ${payload.time}.`,
+      href: listingHref,
     }),
     createNotification({
       userId: payload.sellerId,
       type: "viewing_booking",
       title: "حجز معاينة جديد",
       body: `${payload.buyerName} حجز معاينة لـ «${payload.listingTitle}».`,
+      href: listingHref,
     }),
   ]);
 
-  const sellerUser = await findUserById(payload.sellerId);
-  if (sellerUser?.email) {
-    await sendViewingBookingEmails({
-      buyer: { email: payload.buyerEmail, name: payload.buyerName },
-      seller: { email: sellerUser.email, name: payload.sellerName },
-      listingTitle: payload.listingTitle,
-      date: payload.date,
-      time: payload.time,
-    });
-  }
+  const sellerEmail = await findStoredEmail(payload.sellerId);
+  const emailed = await sendViewingBookingEmails({
+    buyer: { email: payload.buyerEmail, name: payload.buyerName },
+    seller: sellerEmail
+      ? { email: sellerEmail, name: payload.sellerName }
+      : undefined,
+    listingTitle: payload.listingTitle,
+    listingUrl: listingPublicUrl({
+      listingId: payload.listingId,
+      listingSlug: payload.listingSlug,
+    }),
+    date: payload.date,
+    time: payload.time,
+    phone: payload.phone,
+    visitors: payload.visitors,
+  });
 
-  return NextResponse.json({ booking });
+  return NextResponse.json({ booking, emailed: emailed.buyerEmailed });
 }
 
 export async function GET(request: Request) {

@@ -15,7 +15,7 @@ type QuoteRequestModalProps = {
   kind?: QuoteRequestKind;
   listing: Listing;
   onClose: () => void;
-  onSuccess: (requestId: string) => void;
+  onSuccess: (requestId: string, emailed: boolean) => void;
   open: boolean;
 };
 
@@ -44,6 +44,7 @@ export function QuoteRequestModal({
 }: QuoteRequestModalProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [emailed, setEmailed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isBooking = kind === "service_booking";
@@ -114,7 +115,8 @@ export function QuoteRequestModal({
       }
 
       setSuccess(true);
-      onSuccess(data.quoteRequest.id);
+      setEmailed(data.emailed === true);
+      onSuccess(data.quoteRequest.id, data.emailed === true);
     } catch {
       setError("تعذر إرسال الطلب.");
     } finally {
@@ -130,11 +132,20 @@ export function QuoteRequestModal({
       title={title}
     >
       {success ? (
-        <FormMessage variant="success">
-          {isBooking
-            ? "تم إرسال طلب الحجز. سيتواصل مزود الخدمة معك قريباً."
-            : "تم إرسال طلبك. سيتواصل مزود الخدمة معك قريباً."}
-        </FormMessage>
+        <div className="grid gap-4">
+          <FormMessage variant="success">
+            {emailed
+              ? isBooking
+                ? "تم إرسال طلب الحجز وأرسلنا تأكيدًا إلى بريدك. سيتواصل مزود الخدمة معك قريبًا."
+                : "تم إرسال طلبك وأرسلنا تأكيدًا إلى بريدك. سيتواصل مزود الخدمة معك قريبًا."
+              : isBooking
+                ? "تم إرسال طلب الحجز. يظهر في إشعارات حسابك وسيتواصل مزود الخدمة معك قريبًا."
+                : "تم إرسال طلبك. يظهر في إشعارات حسابك وسيتواصل مزود الخدمة معك قريبًا."}
+          </FormMessage>
+          <Button onClick={onClose} type="button">
+            تم
+          </Button>
+        </div>
       ) : (
         <form className="grid gap-4" onSubmit={handleSubmit}>
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}

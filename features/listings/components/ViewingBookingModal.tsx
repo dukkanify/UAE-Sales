@@ -14,8 +14,15 @@ import { getSessionUser } from "@/services/storage";
 type ViewingBookingModalProps = {
   listing: Listing;
   onClose: () => void;
-  onSuccess: (bookingId: string) => void;
+  onSuccess: (bookingId: string, emailed: boolean) => void;
   open: boolean;
+};
+
+type Confirmation = {
+  date: string;
+  email: string;
+  emailed: boolean;
+  time: string;
 };
 
 export function ViewingBookingModal({
@@ -25,7 +32,7 @@ export function ViewingBookingModal({
   open,
 }: ViewingBookingModalProps) {
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dates, setDates] = useState<string[]>([]);
   const [slots, setSlots] = useState<string[]>([]);
@@ -35,7 +42,11 @@ export function ViewingBookingModal({
     if (!open) return;
     fetch("/api/viewing-bookings/slots")
       .then((res) => res.json())
-      .then((data) => setDates(data.dates ?? []))
+      .then((data) => {
+        const nextDates = (data.dates as string[] | undefined) ?? [];
+        setDates(nextDates);
+        setSelectedDate((current) => current || nextDates[0] || "");
+      })
       .catch(() => setDates([]));
   }, [open]);
 
@@ -56,6 +67,9 @@ export function ViewingBookingModal({
     if (!user) return;
 
     const form = new FormData(event.currentTarget);
+    const buyerEmail = String(form.get("email") ?? user.email).trim();
+    const date = String(form.get("date") ?? "");
+    const time = String(form.get("time") ?? "");
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/viewing-bookings", {
@@ -67,10 +81,10 @@ export function ViewingBookingModal({
           listingSlug: listing.slug,
           buyerId: user.id,
           buyerName: String(form.get("fullName") ?? user.fullName),
-          buyerEmail: String(form.get("email") ?? user.email),
+          buyerEmail,
           phone: String(form.get("phone") ?? ""),
-          date: String(form.get("date") ?? ""),
-          time: String(form.get("time") ?? ""),
+          date,
+          time,
           visitors: Number(form.get("visitors") ?? 1),
           notes: String(form.get("notes") ?? ""),
           sellerId: listing.seller.id,
@@ -100,8 +114,13 @@ export function ViewingBookingModal({
         return;
       }
 
-      setSuccess(true);
-      onSuccess(data.booking.id);
+      setConfirmation({
+        date,
+        time,
+        email: buyerEmail,
+        emailed: data.emailed === true,
+      });
+      onSuccess(data.booking.id, data.emailed === true);
     } catch {
       setError("تعذر حجز المعاينة.");
     } finally {
@@ -118,10 +137,31 @@ export function ViewingBookingModal({
       open={open}
       title="احجز معاينة"
     >
-      {success ? (
-        <FormMessage variant="success">
-          تم تأكيد حجز المعاينة. ستصلك تفاصيل الموعد في الإشعارات.
-        </FormMessage>
+      {confirmation ? (
+        <div className="grid gap-4">
+          <FormMessage variant="success">
+            {confirmation.emailed
+              ? `تم تأكيد حجز المعاينة وأرسلنا التفاصيل إلى ${confirmation.email}.`
+              : "تم تأكيد حجز المعاينة. يظهر الموعد في إشعارات حسابك."}
+          </FormMessage>
+          <dl className="grid gap-2 rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3 text-sm">
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted">التاريخ</dt>
+              <dd className="font-semibold text-ink">{confirmation.date}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted">الوقت</dt>
+              <dd className="font-semibold text-ink">{confirmation.time}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted">العقار</dt>
+              <dd className="text-end font-semibold text-ink">{listing.title}</dd>
+            </div>
+          </dl>
+          <Button onClick={onClose} type="button">
+            تم
+          </Button>
+        </div>
       ) : (
         <form className="grid gap-3" onSubmit={handleSubmit}>
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}
@@ -133,12 +173,20 @@ export function ViewingBookingModal({
           />
           <Input
             defaultValue={user?.email}
+            dir="ltr"
             label="البريد الإلكتروني"
             name="email"
             required
             type="email"
           />
-          <Input label="رقم الهاتف" name="phone" required type="tel" />
+          <Input
+            defaultValue={user?.phone}
+            dir="ltr"
+            label="رقم الهاتف"
+            name="phone"
+            required
+            type="tel"
+          />
           <Select
             label="التاريخ"
             name="date"
@@ -150,10 +198,13 @@ export function ViewingBookingModal({
           <Select
             label="الوقت"
             name="time"
-            options={(selectedDate ? slots : []).map((slot) => ({
-              label: slot,
-              value: slot,
-            }))}
+            options={[
+              { label: "اختر الوقت", value: "" },
+              ...(selectedDate ? slots : []).map((slot) => ({
+                label: slot,
+                value: slot,
+              })),
+            ]}
             required
           />
           <Input

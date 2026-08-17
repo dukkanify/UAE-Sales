@@ -14,7 +14,7 @@ import { getSessionUser } from "@/services/storage";
 type JobApplicationModalProps = {
   listing: Listing;
   onClose: () => void;
-  onSuccess: (applicationId: string) => void;
+  onSuccess: (applicationId: string, emailed: boolean) => void;
   open: boolean;
 };
 
@@ -26,6 +26,7 @@ export function JobApplicationModal({
 }: JobApplicationModalProps) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [emailed, setEmailed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFileName, setCvFileName] = useState("");
 
@@ -93,7 +94,8 @@ export function JobApplicationModal({
       }
 
       setSuccess(true);
-      onSuccess(data.application.id);
+      setEmailed(data.emailed === true);
+      onSuccess(data.application.id, data.emailed === true);
     } catch {
       setError("تعذر إرسال الطلب.");
     } finally {
@@ -111,9 +113,16 @@ export function JobApplicationModal({
       title="تقديم على الوظيفة"
     >
       {success ? (
-        <FormMessage variant="success">
-          تم إرسال طلب التوظيف بنجاح. سيتم إخطارك عند تحديث الحالة.
-        </FormMessage>
+        <div className="grid gap-4">
+          <FormMessage variant="success">
+            {emailed
+              ? "تم إرسال طلب التوظيف بنجاح. أرسلنا تأكيدًا إلى بريدك، وسيظهر الطلب في إشعارات حسابك."
+              : "تم إرسال طلب التوظيف بنجاح. يظهر الطلب في إشعارات حسابك."}
+          </FormMessage>
+          <Button onClick={onClose} type="button">
+            تم
+          </Button>
+        </div>
       ) : (
         <form className="grid gap-3" onSubmit={handleSubmit}>
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}
@@ -125,12 +134,20 @@ export function JobApplicationModal({
           />
           <Input
             defaultValue={user?.email}
+            dir="ltr"
             label="البريد الإلكتروني"
             name="email"
             required
             type="email"
           />
-          <Input label="رقم الهاتف" name="phone" required type="tel" />
+          <Input
+            defaultValue={user?.phone}
+            dir="ltr"
+            label="رقم الهاتف"
+            name="phone"
+            required
+            type="tel"
+          />
           <Input label="المدينة الحالية" name="currentCity" required />
           <Input
             label="سنوات الخبرة"

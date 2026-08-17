@@ -206,7 +206,13 @@ export function ListingPrimaryAction({
         <JobApplicationModal
           listing={listing}
           onClose={() => setActiveModal(null)}
-          onSuccess={() => showToast("تم إرسال طلب التوظيف بنجاح")}
+          onSuccess={(_id, emailed) =>
+            showToast(
+              emailed
+                ? "تم إرسال طلب التوظيف وأرسلنا تأكيدًا إلى بريدك"
+                : "تم إرسال طلب التوظيف بنجاح",
+            )
+          }
           open
         />
       ) : null}
@@ -214,7 +220,13 @@ export function ListingPrimaryAction({
         <ViewingBookingModal
           listing={listing}
           onClose={() => setActiveModal(null)}
-          onSuccess={() => showToast("تم تأكيد حجز المعاينة")}
+          onSuccess={(_id, emailed) =>
+            showToast(
+              emailed
+                ? "تم تأكيد حجز المعاينة وأرسلنا التفاصيل إلى بريدك"
+                : "تم تأكيد حجز المعاينة",
+            )
+          }
           open
         />
       ) : null}
@@ -222,7 +234,13 @@ export function ListingPrimaryAction({
         <QuoteRequestModal
           listing={listing}
           onClose={() => setActiveModal(null)}
-          onSuccess={() => showToast("تم إرسال الطلب بنجاح")}
+          onSuccess={(_id, emailed) =>
+            showToast(
+              emailed
+                ? "تم إرسال الطلب وأرسلنا تأكيدًا إلى بريدك"
+                : "تم إرسال الطلب بنجاح",
+            )
+          }
           open
         />
       ) : null}
@@ -231,7 +249,13 @@ export function ListingPrimaryAction({
           kind="service_booking"
           listing={listing}
           onClose={() => setActiveModal(null)}
-          onSuccess={() => showToast("تم إرسال طلب حجز الخدمة")}
+          onSuccess={(_id, emailed) =>
+            showToast(
+              emailed
+                ? "تم إرسال طلب حجز الخدمة وأرسلنا تأكيدًا إلى بريدك"
+                : "تم إرسال طلب حجز الخدمة",
+            )
+          }
           open
         />
       ) : null}

@@ -337,66 +337,158 @@ function buildTransactionalHtml(body: string): string {
   `.trim();
 }
 
+function listingLinkHtml(url: string): string {
+  return `<p style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:12px 22px;background:${BRAND_COLORS.gold};color:${BRAND_COLORS.navy};text-decoration:none;border-radius:12px;font-weight:700;">عرض الإعلان</a></p>`;
+}
+
 export async function sendViewingBookingEmails(input: {
   buyer: EmailParty;
-  seller: EmailParty;
+  seller?: EmailParty;
   listingTitle: string;
+  listingUrl: string;
   date: string;
   time: string;
-}): Promise<void> {
+  phone?: string;
+  visitors?: number;
+}): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const title = escapeHtml(input.listingTitle);
+  const buyerName = escapeHtml(input.buyer.name);
+  const date = escapeHtml(input.date);
+  const time = escapeHtml(input.time);
+  const visitors =
+    typeof input.visitors === "number" ? String(input.visitors) : "";
+  const phone = input.phone ? escapeHtml(input.phone) : "";
+
   const buyerHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.buyer.name}،</p>
-      <p style="font-size:16px;line-height:1.8;">تم تأكيد حجز معاينة لعقار «${input.listingTitle}».</p>
-      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${input.date}</strong><br/>الوقت: <strong>${input.time}</strong></p>
-    `);
-  const sellerHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.seller.name}،</p>
-      <p style="font-size:16px;line-height:1.8;">حجز معاينة جديد على إعلانك «${input.listingTitle}» من ${input.buyer.name}.</p>
-      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${input.date}</strong><br/>الوقت: <strong>${input.time}</strong></p>
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">تم تأكيد حجز معاينة لعقار «${title}».</p>
+      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${visitors ? `<br/>عدد الزوار: <strong>${visitors}</strong>` : ""}${phone ? `<br/>رقم التواصل: <strong dir="ltr">${phone}</strong>` : ""}</p>
+      ${listingLinkHtml(input.listingUrl)}
     `);
 
-  await Promise.all([
-    deliverEmailSafely({
-      to: input.buyer.email,
-      subject: `تأكيد معاينة — ${input.listingTitle}`,
-      html: buyerHtml,
-      text: `مرحبًا ${input.buyer.name}،\nتم تأكيد معاينة «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\nفريق سوقنا`,
-    }),
-    deliverEmailSafely({
-      to: input.seller.email,
-      subject: `حجز معاينة جديد — ${input.listingTitle}`,
-      html: sellerHtml,
-      text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\nفريق سوقنا`,
-    }),
-  ]);
+  const buyerEmailed = await deliverEmailSafely({
+    to: input.buyer.email,
+    subject: `تأكيد معاينة — ${input.listingTitle}`,
+    html: buyerHtml,
+    text: [
+      `مرحبًا ${input.buyer.name}،`,
+      `تم تأكيد معاينة «${input.listingTitle}».`,
+      `التاريخ: ${input.date}`,
+      `الوقت: ${input.time}`,
+      input.listingUrl,
+      "فريق سوقنا",
+    ].join("\n"),
+  });
+
+  if (!input.seller?.email) {
+    return { buyerEmailed, sellerEmailed: false };
+  }
+
+  const sellerName = escapeHtml(input.seller.name);
+  const sellerHtml = buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">حجز معاينة جديد على إعلانك «${title}» من ${buyerName}.</p>
+      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong></p>
+      ${listingLinkHtml(input.listingUrl)}
+    `);
+
+  const sellerEmailed = await deliverEmailSafely({
+    to: input.seller.email,
+    subject: `حجز معاينة جديد — ${input.listingTitle}`,
+    html: sellerHtml,
+    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\n${input.listingUrl}\nفريق سوقنا`,
+  });
+
+  return { buyerEmailed, sellerEmailed };
 }
 
 export async function sendJobApplicationEmails(input: {
   buyer: EmailParty;
-  seller: EmailParty;
+  seller?: EmailParty;
   listingTitle: string;
-}): Promise<void> {
-  const applicantHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.buyer.name}،</p>
-      <p style="font-size:16px;line-height:1.8;">تم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.</p>
-    `);
-  const employerHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.seller.name}،</p>
-      <p style="font-size:16px;line-height:1.8;">طلب توظيف جديد من ${input.buyer.name} على وظيفة «${input.listingTitle}».</p>
-    `);
+  listingUrl: string;
+}): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const title = escapeHtml(input.listingTitle);
+  const buyerName = escapeHtml(input.buyer.name);
 
-  await Promise.all([
-    deliverEmailSafely({
-      to: input.buyer.email,
-      subject: `طلب توظيف — ${input.listingTitle}`,
-      html: applicantHtml,
-      text: `مرحبًا ${input.buyer.name}،\nتم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.\nفريق سوقنا`,
-    }),
-    deliverEmailSafely({
-      to: input.seller.email,
-      subject: `طلب توظيف جديد — ${input.listingTitle}`,
-      html: employerHtml,
-      text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} قدّم على وظيفة «${input.listingTitle}».\nفريق سوقنا`,
-    }),
-  ]);
+  const buyerEmailed = await deliverEmailSafely({
+    to: input.buyer.email,
+    subject: `تأكيد طلب التوظيف — ${input.listingTitle}`,
+    html: buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">تم استلام طلبك على وظيفة «${title}» بنجاح. سنُعلمك عند تحديث الحالة.</p>
+      ${listingLinkHtml(input.listingUrl)}
+    `),
+    text: `مرحبًا ${input.buyer.name}،\nتم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.\n${input.listingUrl}\nفريق سوقنا`,
+  });
+
+  if (!input.seller?.email) {
+    return { buyerEmailed, sellerEmailed: false };
+  }
+
+  const sellerName = escapeHtml(input.seller.name);
+  const sellerEmailed = await deliverEmailSafely({
+    to: input.seller.email,
+    subject: `طلب توظيف جديد — ${input.listingTitle}`,
+    html: buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">طلب توظيف جديد من ${buyerName} على وظيفة «${title}».</p>
+      ${listingLinkHtml(input.listingUrl)}
+    `),
+    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} قدّم على وظيفة «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+  });
+
+  return { buyerEmailed, sellerEmailed };
+}
+
+export async function sendQuoteRequestEmails(input: {
+  buyer: EmailParty;
+  seller?: EmailParty;
+  listingTitle: string;
+  listingUrl: string;
+  kind: "quote" | "service_booking";
+  preferredDate?: string;
+  preferredTime?: string;
+}): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const title = escapeHtml(input.listingTitle);
+  const buyerName = escapeHtml(input.buyer.name);
+  const isBooking = input.kind === "service_booking";
+  const buyerSubject = isBooking
+    ? `تأكيد طلب حجز الخدمة — ${input.listingTitle}`
+    : `تأكيد طلب عرض السعر — ${input.listingTitle}`;
+  const schedule =
+    input.preferredDate && input.preferredTime
+      ? `<p style="font-size:16px;line-height:1.8;">الموعد المفضل: <strong>${escapeHtml(input.preferredDate)}</strong> الساعة <strong>${escapeHtml(input.preferredTime)}</strong></p>`
+      : "";
+
+  const buyerEmailed = await deliverEmailSafely({
+    to: input.buyer.email,
+    subject: buyerSubject,
+    html: buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">${isBooking ? "تم استلام طلب حجز الخدمة" : "تم استلام طلب عرض السعر"} لـ «${title}». سيتواصل مزود الخدمة معك قريبًا.</p>
+      ${schedule}
+      ${listingLinkHtml(input.listingUrl)}
+    `),
+    text: `مرحبًا ${input.buyer.name}،\nتم استلام طلبك لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+  });
+
+  if (!input.seller?.email) {
+    return { buyerEmailed, sellerEmailed: false };
+  }
+
+  const sellerName = escapeHtml(input.seller.name);
+  const sellerEmailed = await deliverEmailSafely({
+    to: input.seller.email,
+    subject: `طلب خدمة جديد — ${input.listingTitle}`,
+    html: buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+      <p style="font-size:16px;line-height:1.8;">${buyerName} أرسل طلبًا على «${title}».</p>
+      ${schedule}
+      ${listingLinkHtml(input.listingUrl)}
+    `),
+    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} طلب خدمة لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+  });
+
+  return { buyerEmailed, sellerEmailed };
 }
