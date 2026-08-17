@@ -43,6 +43,16 @@ export function MarketHeader() {
   }, [pathname]);
 
   useEffect(() => {
+    const desktopNav = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (desktopNav.matches) setMenuOpen(false);
+    };
+    closeOnDesktop();
+    desktopNav.addEventListener("change", closeOnDesktop);
+    return () => desktopNav.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!menuOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);

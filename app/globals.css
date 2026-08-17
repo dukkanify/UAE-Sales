@@ -571,19 +571,25 @@ html[data-theme="dark"] .market-hero-search {
 }
 
 .market-header__menu-btn {
-  display: grid;
-  width: 2.55rem;
-  height: 2.55rem;
-  place-items: center;
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  background: var(--color-surface);
-  color: var(--color-ink);
-  box-shadow: var(--shadow-xs);
-  transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    transform 160ms ease;
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .market-header__menu-btn {
+    display: grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-xs);
+    transition:
+      border-color 160ms ease,
+      background 160ms ease,
+      transform 160ms ease;
+  }
 }
 
 .market-header__menu-btn:hover {
@@ -706,6 +712,11 @@ html[data-theme="dark"] .market-hero-search {
 @media (min-width: 1024px) {
   .market-header__nav {
     display: flex;
+  }
+
+  .market-header__menu-btn,
+  .market-header__drawer {
+    display: none !important;
   }
 }
 
