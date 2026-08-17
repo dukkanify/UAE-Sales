@@ -200,7 +200,17 @@ export function RegisterForm() {
       <div>
         <label className="flex gap-3 rounded-[var(--radius-2xl)] bg-surface-muted p-4 text-sm font-medium leading-7 text-muted">
           <input className="mt-1 size-4 accent-primary" name="terms" required type="checkbox" />
-          <span>أوافق على شروط الاستخدام وسياسة الخصوصية.</span>
+          <span>
+            أوافق على{" "}
+            <Link className="font-semibold text-primary" href="/terms">
+              شروط الاستخدام
+            </Link>{" "}
+            و
+            <Link className="font-semibold text-primary" href="/privacy">
+              سياسة الخصوصية
+            </Link>
+            .
+          </span>
         </label>
         {errors.terms ? <FormMessage variant="error">{errors.terms}</FormMessage> : null}
       </div>

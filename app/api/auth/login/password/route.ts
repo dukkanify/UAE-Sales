@@ -46,6 +46,21 @@ export async function POST(request: Request) {
 
     const stored = await findUserByEmail(email);
     if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
+      if (stored.accountStatus === "suspended") {
+        return NextResponse.json(
+          { error: "ACCOUNT_SUSPENDED", message: "تم إيقاف هذا الحساب." },
+          { status: 403 },
+        );
+      }
+      if (stored.accountStatus && stored.accountStatus !== "active") {
+        return NextResponse.json(
+          {
+            error: "ACCOUNT_INACTIVE",
+            message: "الحساب غير مفعّل بعد. أكمل التحقق من البريد ثم حاول مجدداً.",
+          },
+          { status: 403 },
+        );
+      }
       const user = toUserProfile(stored);
       await setSessionCookie(user);
       trackAuthEvent("login_verified");

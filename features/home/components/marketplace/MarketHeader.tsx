@@ -67,7 +67,7 @@ export function MarketHeader() {
             />
 
             <div className="market-header__cluster">
-              <ThemeToggle className="market-header__icon-btn hidden sm:grid" />
+              <ThemeToggle className="market-header__icon-btn" />
 
               <Link
                 aria-label="بحث"
@@ -79,13 +79,11 @@ export function MarketHeader() {
 
               <Link
                 aria-label={user ? "حسابي" : "تسجيل الدخول"}
-                className="market-header__icon-btn hidden sm:grid"
+                className="market-header__icon-btn market-header__icon-btn--desktop"
                 href={user ? "/profile" : "/login"}
               >
                 <Icon name="user" size={18} />
               </Link>
-
-              <ThemeToggle className="market-header__icon-btn sm:hidden" />
             </div>
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">

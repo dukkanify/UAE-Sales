@@ -6,7 +6,7 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { getEscrowSummary, getEscrowTransactions } from "@/services/escrowService";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 const statusLabels = {
   held: "محجوز",
@@ -16,7 +16,7 @@ const statusLabels = {
 
 export default async function EscrowPage() {
   const [user, transactions, summary, steps] = await Promise.all([
-    getCurrentUser(),
+    requireCurrentUser("/escrow"),
     getEscrowTransactions(),
     getEscrowSummary(),
     getMarketEscrowSteps(),

@@ -1,3 +1,5 @@
+"use client";
+
 import { AppImage } from "@/shared/components/AppImage";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -10,7 +12,10 @@ import {
   addListingStepTitleClass,
 } from "./utils";
 
+const MAX_IMAGES = 12;
+
 type MediaContactStepProps = {
+  defaultContact?: string;
   errors: AddListingErrors;
   imagePreviews: string[];
   onImageChange: (
@@ -20,6 +25,7 @@ type MediaContactStepProps = {
 };
 
 export function MediaContactStep({
+  defaultContact = "",
   errors,
   imagePreviews,
   onImageChange,
@@ -58,7 +64,7 @@ export function MediaContactStep({
                   </div>
                 ))}
 
-                {imagePreviews.length < 6 ? (
+                {imagePreviews.length < MAX_IMAGES ? (
                   <label className="grid aspect-[4/3] cursor-pointer place-items-center rounded-[var(--radius-xl)] border border-dashed border-secondary bg-surface p-3 text-center text-xs font-semibold text-primary transition hover:bg-secondary/10">
                     <input
                       accept="image/*"
@@ -86,28 +92,33 @@ export function MediaContactStep({
                     onImageChange(event.target.files, "replace");
                     event.target.value = "";
                   }}
+                  required
                   type="file"
                 />
                 <span>
-                  رفع صور الإعلان
+                  رفع صور الإعلان *
                   <span className="mt-2 block text-xs font-medium text-muted">
-                    اختر حتى 6 صور — ستظهر هنا مباشرة
+                    صورة واحدة على الأقل مطلوبة — حتى {MAX_IMAGES} صور
                   </span>
                 </span>
               </label>
             )}
           </div>
 
+          {errors.images ? (
+            <FormMessage variant="error">{errors.images}</FormMessage>
+          ) : null}
+
           {hasImages ? (
             <p className="text-xs font-medium text-muted">
-              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف في
-              المعاينة
+              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف
             </p>
           ) : null}
         </div>
         <div className="grid gap-4">
           <div>
             <Input
+              defaultValue={defaultContact}
               label="رقم التواصل"
               name="contact"
               placeholder="05xxxxxxxx"
@@ -116,14 +127,21 @@ export function MediaContactStep({
             {errors.contact ? (
               <FormMessage variant="error">{errors.contact}</FormMessage>
             ) : null}
+            {defaultContact ? (
+              <p className="mt-1 text-xs text-muted">
+                تم تعبئة الرقم من ملفك الشخصي — يمكنك تعديله لهذا الإعلان.
+              </p>
+            ) : null}
           </div>
           <Select
             label="باقة الإعلان"
             name="package"
             options={[
               { label: "مجانية", value: "free" },
-              { label: "مميز لمدة 7 أيام", value: "featured_7" },
-              { label: "مميز لمدة 30 يوم", value: "featured_30" },
+              {
+                label: "مميز (يتطلب دفعاً — قريباً)",
+                value: "featured_pending",
+              },
             ]}
           />
         </div>

@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 type FormMessageProps = {
-  children: string;
+  children: ReactNode;
   variant: "error" | "success";
 };
 

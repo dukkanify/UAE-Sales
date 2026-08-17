@@ -185,7 +185,11 @@ export function ListingPrimaryAction({
       {embedPhoneConfirm && phoneConfirm && tel ? (
         <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">
           <p className="text-sm font-semibold text-ink">هل تريد الاتصال بالبائع؟</p>
-          {masked ? <p className="mt-1 text-xs text-muted">{masked}</p> : null}
+          {masked ? (
+            <p className="mt-1 text-xs text-muted" dir="ltr">
+              {masked}
+            </p>
+          ) : null}
           <div className="mt-3 flex gap-2">
             <Button href={tel} size="sm" variant="accent">
               <Icon className="shrink-0" name="phone-call" size={14} />
@@ -275,7 +279,17 @@ export function SellerContactActions({
       {phoneConfirm && tel ? (
         <div className="sm:col-span-2">
           <FormMessage variant="success">
-            {`هل تريد الاتصال بالبائع؟${masked ? ` (${masked})` : ""}`}
+            {masked ? (
+              <>
+                هل تريد الاتصال بالبائع؟ (
+                <span dir="ltr" className="inline-block font-semibold tracking-wide">
+                  {masked}
+                </span>
+                )
+              </>
+            ) : (
+              "هل تريد الاتصال بالبائع؟"
+            )}
           </FormMessage>
           <div className="mt-2 flex gap-2">
             <Button href={tel} size="sm" variant="accent">

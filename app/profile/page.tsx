@@ -7,10 +7,10 @@ import { ProfileForm } from "@/features/profile/components/ProfileForm";
 import { Card } from "@/shared/ui/Card";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 export default async function ProfilePage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser("/profile");
 
   return (
     <>

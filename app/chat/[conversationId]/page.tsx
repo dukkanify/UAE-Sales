@@ -2,7 +2,7 @@ import { ChatConversationView } from "@/features/chat/components/ChatConversatio
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 type ChatConversationPageProps = {
   params: Promise<{ conversationId: string }>;
@@ -11,7 +11,7 @@ type ChatConversationPageProps = {
 export default async function ChatConversationPage({
   params,
 }: ChatConversationPageProps) {
-  const [{ conversationId }, user] = await Promise.all([params, getCurrentUser()]);
+  const [{ conversationId }, user] = await Promise.all([params, requireCurrentUser("/chat")]);
 
   return (
     <>

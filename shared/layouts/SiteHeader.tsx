@@ -91,7 +91,7 @@ export function SiteHeader() {
           </form>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle className="hidden sm:grid" />
+            <ThemeToggle />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
@@ -100,12 +100,20 @@ export function SiteHeader() {
                 {user.fullName.split(" ")[0]}
               </Link>
             ) : (
-              <Link
-                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
-                href="/login"
-              >
-                دخول
-              </Link>
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link
+                  className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
+                  href="/login"
+                >
+                  دخول
+                </Link>
+                <Link
+                  className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft"
+                  href="/register"
+                >
+                  انضم إلينا
+                </Link>
+              </div>
             )}
             {!isComposeListing ? (
               <Button
@@ -118,7 +126,6 @@ export function SiteHeader() {
                 أضف إعلانك
               </Button>
             ) : null}
-            <ThemeToggle className="sm:hidden" />
             <button
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}

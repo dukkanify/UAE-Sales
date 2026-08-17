@@ -6,9 +6,9 @@ import { Icon } from "@/shared/ui/Icon";
 const groups = [
   {
     links: [
+      { href: "/search", label: "كل الإعلانات" },
       { href: "/categories", label: "التصنيفات" },
-      { href: "/featured", label: "الإعلانات المميزة" },
-      { href: "/search", label: "استكشف الإعلانات" },
+      { href: "/featured", label: "المميزة" },
       { href: "/listings/new", label: "أضف إعلانك" },
     ],
     title: "السوق",
@@ -17,8 +17,8 @@ const groups = [
     links: [
       { href: "/escrow", label: "الضمان المالي" },
       { href: "/support", label: "الدعم" },
-      { href: "/profile", label: "حسابي" },
-      { href: "/dashboard/listings", label: "إعلاناتي" },
+      { href: "/terms", label: "الشروط" },
+      { href: "/privacy", label: "الخصوصية" },
     ],
     title: "الثقة",
   },
@@ -26,8 +26,7 @@ const groups = [
     links: [
       { href: "/login", label: "تسجيل الدخول" },
       { href: "/register", label: "إنشاء حساب" },
-      { href: "/wallet", label: "المحفظة" },
-      { href: "/chat", label: "الرسائل" },
+      { href: "/dashboard/listings", label: "إعلاناتي" },
     ],
     title: "الحساب",
   },
@@ -83,7 +82,7 @@ export function MarketSiteFooter() {
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-xs text-white/45">
           <p>{BRAND.copyright}</p>
-          <p>صُمم في الإمارات لـ {BRAND.nameAr}.</p>
+          <p>تطوير وتنفيذ: دكانيفاي · {BRAND.nameAr}</p>
         </div>
       </div>
     </footer>

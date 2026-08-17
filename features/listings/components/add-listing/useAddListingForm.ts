@@ -45,7 +45,7 @@ export function useAddListingForm(categories: Category[]) {
 
   const handleImageChange = useCallback(
     (fileList: FileList | null, mode: "append" | "replace" = "replace") => {
-      setListingImages(fileList, 6, mode);
+      setListingImages(fileList, 12, mode);
     },
     [setListingImages],
   );
@@ -92,6 +92,9 @@ export function useAddListingForm(categories: Category[]) {
       if (!/^(\+971|971|0)?5\d{8}$/.test(contact)) {
         nextErrors.contact = "اكتب رقم تواصل إماراتي صحيح.";
       }
+      if (imageFiles.length === 0) {
+        nextErrors.images = "أضف صورة حقيقية واحدة على الأقل للمنتج.";
+      }
 
       setErrors(nextErrors);
       if (Object.keys(nextErrors).length > 0) {
@@ -102,8 +105,7 @@ export function useAddListingForm(categories: Category[]) {
 
       const price = Number(formData.get("price") ?? 0);
       const description = String(formData.get("description") ?? "").trim();
-      const persistedImages =
-        imageFiles.length > 0 ? await uploadListingImages(imageFiles) : [];
+      const persistedImages = await uploadListingImages(imageFiles);
 
       const cityName = isDynamicCategory(categoryId)
         ? parsed.city
@@ -127,11 +129,11 @@ export function useAddListingForm(categories: Category[]) {
         price,
         currency: "AED",
         condition: parsed.condition,
-        status: "active",
+        status: "pending_review",
         isFeatured: false,
         views: 0,
         imageUrl: persistedImages[0],
-        images: persistedImages.length > 0 ? persistedImages : undefined,
+        images: persistedImages,
         seller: buildSellerFromSession(user),
         imageTone: "gold",
         postedAt: new Date().toISOString(),
