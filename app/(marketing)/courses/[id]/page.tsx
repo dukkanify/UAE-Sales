@@ -29,8 +29,7 @@ import { formatMinor } from "@/services/payments/money";
 type PageProps = { params: Promise<{ id: string }> };
 
 /** Public course pages resolve by id or code against the live store. */
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 function resolvePublicCourse(id: string) {
   applyDueScheduledPublishes();

@@ -4,13 +4,14 @@ import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { generateToken, hashValue } from "@/lib/security/crypto";
 import {
   SESSION_COOKIE,
+  SESSION_HINT_COOKIE,
   CSRF_COOKIE,
   signSessionJwt,
   verifySessionJwt,
   type SessionJwtPayload,
 } from "@/lib/security/session-token";
 
-export { SESSION_COOKIE, CSRF_COOKIE, verifySessionJwt };
+export { SESSION_COOKIE, SESSION_HINT_COOKIE, CSRF_COOKIE, verifySessionJwt };
 export type { SessionJwtPayload };
 
 export function hashSessionToken(token: string): string {
@@ -62,11 +63,25 @@ export async function setSessionCookies(
   const store = await cookies();
   const opts = sessionCookieOptions(maxAgeSeconds);
   store.set(SESSION_COOKIE, `${jwt}.${rawToken}`, opts);
+  store.set(SESSION_HINT_COOKIE, "1", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: maxAgeSeconds,
+  });
 }
 
 export async function clearSessionCookies(): Promise<void> {
   const store = await cookies();
   store.set(SESSION_COOKIE, "", { ...sessionCookieOptions(0), maxAge: 0 });
+  store.set(SESSION_HINT_COOKIE, "", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }
 
 export async function readSessionCookie(): Promise<{
