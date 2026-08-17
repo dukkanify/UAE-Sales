@@ -349,111 +349,283 @@
 
 .course-lane-cover {
   position: relative;
-  height: 11.5rem;
+  height: 14rem;
   overflow: hidden;
-  background-color: var(--landing-ink-mid);
+  background-color: var(--landing-ink);
   background-size: cover;
   background-position: center;
+  isolation: isolate;
+}
+
+.course-lane-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(3, 8, 12, 0.42) 0%, transparent 22%),
+    linear-gradient(180deg, rgba(3, 8, 12, 0.28) 0%, transparent 32%),
+    linear-gradient(0deg, rgba(3, 8, 12, 0.55) 0%, transparent 42%);
+  pointer-events: none;
 }
 
 .course-lane-cover-grid {
   position: absolute;
   inset: 0;
+  z-index: 0;
   background-image:
-    linear-gradient(rgba(215, 230, 239, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(215, 230, 239, 0.06) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(180deg, black 0%, transparent 88%);
-  opacity: 0.55;
+    linear-gradient(rgba(215, 230, 239, 0.11) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(215, 230, 239, 0.11) 1px, transparent 1px);
+  background-size: 20px 20px;
+  mask-image: radial-gradient(ellipse 95% 90% at 42% 30%, black 18%, transparent 78%);
+  opacity: 0.78;
   pointer-events: none;
+}
+
+.course-lane-cover-orbit {
+  position: absolute;
+  right: -22%;
+  top: -48%;
+  width: 78%;
+  aspect-ratio: 1;
+  border: 1.5px solid rgba(240, 197, 106, 0.38);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgba(122, 151, 173, 0.16),
+    0 0 0 22px rgba(20, 48, 72, 0.22);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+}
+
+.course-lane-cover-orbit::before {
+  content: "";
+  position: absolute;
+  inset: 16%;
+  border: 1px solid rgba(122, 151, 173, 0.28);
+  border-radius: 50%;
+  border-top-color: rgba(246, 195, 108, 0.75);
+  border-right-color: rgba(246, 195, 108, 0.35);
 }
 
 .course-lane-cover-horizon {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: 48%;
+  height: 58%;
+  z-index: 0;
   background:
-    linear-gradient(180deg, transparent, rgba(3, 8, 12, 0.35) 40%, rgba(3, 8, 12, 0.72)),
-    radial-gradient(ellipse 90% 70% at 50% 100%, rgba(204, 160, 76, 0.28), transparent 70%);
+    linear-gradient(180deg, transparent, rgba(3, 8, 12, 0.35) 24%, rgba(3, 8, 12, 0.82)),
+    radial-gradient(ellipse 120% 90% at 38% 100%, rgba(204, 160, 76, 0.42), transparent 66%);
   pointer-events: none;
 }
 
 .course-lane-cover-beam {
   position: absolute;
-  left: -10%;
-  bottom: 28%;
-  width: 120%;
-  height: 1px;
+  left: -12%;
+  bottom: 22%;
+  width: 128%;
+  height: 2.5px;
+  z-index: 0;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(122, 151, 173, 0.15) 20%,
-    rgba(240, 197, 106, 0.85) 52%,
-    rgba(122, 151, 173, 0.15) 80%,
+    rgba(122, 151, 173, 0.14) 12%,
+    rgba(240, 197, 106, 0.95) 44%,
+    rgba(246, 195, 108, 1) 52%,
+    rgba(122, 151, 173, 0.2) 76%,
     transparent
   );
-  transform: rotate(-11deg);
+  transform: rotate(-18deg);
+  transform-origin: left center;
   pointer-events: none;
-  opacity: 0.9;
+  opacity: 1;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease;
+}
+
+.course-lane-cover-beam::after {
+  content: "";
+  position: absolute;
+  right: 36%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 1px;
+  background: var(--landing-gold-bright);
+  transform: translate(50%, -50%) rotate(45deg);
+  box-shadow: 0 0 0 4px rgba(204, 160, 76, 0.22);
+}
+
+.course-lane:hover .course-lane-cover-beam {
+  transform: rotate(-18deg) translateY(-8px) scaleX(1.04);
+  opacity: 1;
+}
+
+.course-lane-cover-ticks {
+  position: absolute;
+  inset-block: 1rem 1.2rem;
+  inset-inline-end: 0.9rem;
+  width: 16px;
+  z-index: 1;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(242, 249, 252, 0.7) 0 1.5px,
+      transparent 1.5px 11px
+    );
+  mask-image: linear-gradient(180deg, transparent, black 16%, black 84%, transparent);
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.course-lane-cover-ticks::before {
+  content: "";
+  position: absolute;
+  inset-inline-end: 0;
+  top: 22%;
+  width: 12px;
+  height: 2.5px;
+  background: var(--landing-gold-bright);
+}
+
+.course-lane-cover-frame {
+  position: absolute;
+  inset: 0.65rem;
+  z-index: 1;
+  pointer-events: none;
+  border: 1px solid rgba(242, 249, 252, 0.12);
+}
+
+.course-lane-cover-frame::before,
+.course-lane-cover-frame::after {
+  content: "";
+  position: absolute;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-color: rgba(246, 195, 108, 0.9);
+  border-style: solid;
+}
+
+.course-lane-cover-frame::before {
+  top: -1px;
+  left: -1px;
+  border-width: 2.5px 0 0 2.5px;
+}
+
+.course-lane-cover-frame::after {
+  right: -1px;
+  bottom: -1px;
+  border-width: 0 2.5px 2.5px 0;
+}
+
+.course-lane-cover-watermark {
+  position: absolute;
+  right: 0.35rem;
+  bottom: -0.35rem;
+  z-index: 0;
+  font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(4.5rem, 10vw, 6.5rem);
+  font-weight: 700;
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+  color: rgba(242, 249, 252, 0.06);
+  pointer-events: none;
+  user-select: none;
 }
 
 .course-lane-cover-meta {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1.1rem 1.2rem 1rem;
+  padding: 1.25rem 1.4rem 1.2rem;
   pointer-events: none;
+}
+
+.course-lane-cover-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .course-lane-cover-code {
   font-family: var(--font-exo-2), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.85rem, 3vw, 2.35rem);
-  font-weight: 600;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  color: #f2f9fc;
-  text-shadow: 0 10px 28px rgba(3, 8, 12, 0.45);
+  font-size: clamp(2.2rem, 3.6vw, 2.85rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  line-height: 0.92;
+  color: #f7fbfe;
+  text-shadow: 0 14px 36px rgba(3, 8, 12, 0.6);
+}
+
+.course-lane-cover-lane-mark {
+  margin-top: 0.25rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(215, 230, 239, 0.62);
 }
 
 .course-lane-cover-label {
   align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.4rem 0.7rem 0.4rem 0.5rem;
+  border: 1px solid rgba(240, 197, 106, 0.55);
+  background: rgba(3, 8, 12, 0.48);
   font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-weight: 700;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(240, 197, 106, 0.92);
+  color: rgba(246, 195, 108, 0.98);
+  backdrop-filter: blur(8px);
+}
+
+.course-lane-cover-label::before {
+  content: "";
+  width: 0.32rem;
+  height: 0.32rem;
+  background: var(--landing-gold-bright);
+}
+
+.course-lane:hover .course-lane-cover-label {
+  border-color: rgba(246, 195, 108, 0.85);
+  background: rgba(3, 8, 12, 0.62);
 }
 
 .course-lane-cover[data-tone="0"] {
   background-image:
-    radial-gradient(ellipse 85% 70% at 88% 12%, rgba(20, 48, 72, 0.62), transparent 58%),
-    radial-gradient(ellipse 50% 45% at 8% 88%, rgba(122, 151, 173, 0.2), transparent 55%),
-    linear-gradient(155deg, #07131c 0%, #123044 52%, #1a5570 100%);
+    radial-gradient(ellipse 95% 80% at 94% 6%, rgba(20, 48, 72, 0.92), transparent 55%),
+    radial-gradient(ellipse 58% 52% at 4% 94%, rgba(122, 151, 173, 0.34), transparent 58%),
+    linear-gradient(152deg, #03080e 0%, #0d2236 44%, #1a5570 100%);
 }
 
 .course-lane-cover[data-tone="1"] {
   background-image:
-    radial-gradient(ellipse 75% 60% at 18% 82%, rgba(204, 160, 76, 0.42), transparent 55%),
-    radial-gradient(ellipse 55% 50% at 92% 18%, rgba(20, 48, 72, 0.35), transparent 58%),
-    linear-gradient(155deg, #08141c 0%, #163042 48%, #2a4630 100%);
+    radial-gradient(ellipse 85% 70% at 12% 90%, rgba(204, 160, 76, 0.58), transparent 52%),
+    radial-gradient(ellipse 62% 58% at 96% 10%, rgba(20, 48, 72, 0.62), transparent 58%),
+    linear-gradient(152deg, #04090f 0%, #112a3e 42%, #2a4630 100%);
 }
 
 .course-lane-cover[data-tone="2"] {
   background-image:
-    radial-gradient(ellipse 80% 65% at 72% 78%, rgba(122, 151, 173, 0.38), transparent 55%),
-    radial-gradient(ellipse 45% 40% at 12% 18%, rgba(20, 48, 72, 0.4), transparent 60%),
-    linear-gradient(155deg, #050f16 0%, #0e2436 50%, #184866 100%);
+    radial-gradient(ellipse 88% 74% at 80% 84%, rgba(122, 151, 173, 0.55), transparent 55%),
+    radial-gradient(ellipse 52% 48% at 8% 12%, rgba(20, 48, 72, 0.62), transparent 60%),
+    linear-gradient(152deg, #02070c 0%, #0b1e32 46%, #184866 100%);
 }
 
 .course-lane-cover[data-tone="3"] {
   background-image:
-    radial-gradient(ellipse 70% 55% at 42% 28%, rgba(204, 160, 76, 0.3), transparent 55%),
-    radial-gradient(ellipse 60% 50% at 88% 80%, rgba(20, 48, 72, 0.45), transparent 58%),
-    linear-gradient(155deg, #061018 0%, #142c44 48%, #1c4060 100%);
+    radial-gradient(ellipse 78% 64% at 36% 18%, rgba(204, 160, 76, 0.45), transparent 55%),
+    radial-gradient(ellipse 68% 58% at 92% 88%, rgba(20, 48, 72, 0.68), transparent 58%),
+    linear-gradient(152deg, #03080d 0%, #113048 44%, #1c4060 100%);
 }
 
 .course-lane-body {
@@ -1076,6 +1248,10 @@
   .course-lane:hover,
   .hero-cta-primary:hover {
     transform: none;
+  }
+
+  .course-lane:hover .course-lane-cover-beam {
+    transform: rotate(-18deg);
   }
 }
 

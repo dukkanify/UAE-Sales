@@ -34,16 +34,25 @@ function CourseLaneCover({ course, tone }: { course: CatalogCourse; tone: number
       style={
         art
           ? {
-              backgroundImage: `linear-gradient(165deg, rgba(3,8,12,0.15) 0%, rgba(3,8,12,0.78) 100%), url(${art})`,
+              backgroundImage: `linear-gradient(168deg, rgba(3,8,12,0.2) 0%, rgba(3,8,12,0.55) 42%, rgba(3,8,12,0.88) 100%), url(${art})`,
             }
           : undefined
       }
     >
       <div className="course-lane-cover-grid" aria-hidden />
+      <div className="course-lane-cover-orbit" aria-hidden />
       <div className="course-lane-cover-horizon" aria-hidden />
       <div className="course-lane-cover-beam" aria-hidden />
+      <div className="course-lane-cover-ticks" aria-hidden />
+      <div className="course-lane-cover-frame" aria-hidden />
+      <span className="course-lane-cover-watermark" aria-hidden>
+        {code.replace(/[^0-9A-Z]/gi, "").slice(-3) || "AP"}
+      </span>
       <div className="course-lane-cover-meta">
-        <span className="course-lane-cover-code">{code}</span>
+        <div className="course-lane-cover-top">
+          <span className="course-lane-cover-code">{code}</span>
+          <span className="course-lane-cover-lane-mark">LANE</span>
+        </div>
         <span className="course-lane-cover-label">{DIFFICULTY_LABELS[course.difficulty]}</span>
       </div>
     </div>
