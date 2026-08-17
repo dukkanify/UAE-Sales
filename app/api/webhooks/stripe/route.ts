@@ -10,6 +10,7 @@ import {
   handlePaymentIntentFailed,
   syncRefundFromStripeCharge,
 } from "@/services/payments/order-service";
+import { markListingFeatured } from "@/services/payments/featured-checkout.service";
 import { getOrderById } from "@/services/payments/order-store";
 import { verifyStripeWebhook } from "@/services/payments/stripe.service";
 
@@ -47,7 +48,14 @@ export async function POST(request: Request) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutSessionCompleted(session);
+        if (session.metadata?.type === "featured_listing") {
+          const listingId = session.metadata.listingId;
+          if (listingId) {
+            await markListingFeatured(listingId, session.id);
+          }
+        } else {
+          await handleCheckoutSessionCompleted(session);
+        }
         break;
       }
       case "payment_intent.succeeded": {

@@ -30,9 +30,20 @@ export type {
   SellerType,
 } from "./domain/listing";
 
-export type { City, Country } from "./domain/location";
+export type {
+  City,
+  Country,
+  LocationCreateInput,
+  LocationPatch,
+  LocationRecord,
+} from "./domain/location";
 
-export type { AccountType, UserProfile, UserRole } from "./domain/user";
+export type {
+  AccountType,
+  AdminPermission,
+  UserProfile,
+  UserRole,
+} from "./domain/user";
 
 export type {
   AdminCategoryCreateInput,
@@ -74,3 +85,5 @@ export type {
   PaymentEventLog,
   StripePaymentMode,
 } from "./domain/payment";
+
+export type { Rating } from "./domain/rating";

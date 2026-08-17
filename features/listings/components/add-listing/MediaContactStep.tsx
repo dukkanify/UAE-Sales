@@ -133,13 +133,19 @@ export function MediaContactStep({
               </p>
             ) : null}
           </div>
+          <Input
+            label="رابط فيديو (اختياري)"
+            name="videoUrl"
+            placeholder="https://..."
+            type="url"
+          />
           <Select
             label="باقة الإعلان"
             name="package"
             options={[
               { label: "مجانية", value: "free" },
               {
-                label: "مميز (يتطلب دفعاً — قريباً)",
+                label: "مميز (يتطلب دفعاً)",
                 value: "featured_pending",
               },
             ]}

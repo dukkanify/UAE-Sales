@@ -160,4 +160,67 @@ export async function refundStripePayment(
   return refund;
 }
 
+export type CreateFeaturedCheckoutInput = {
+  listingId: string;
+  listingTitle: string;
+  userId: string;
+  email: string;
+  amountAed: number;
+};
+
+export async function createFeaturedCheckoutSession(
+  input: CreateFeaturedCheckoutInput,
+): Promise<{ checkoutUrl?: string; sessionId: string }> {
+  const stripe = getStripeClient();
+  const appUrl = getAppUrl();
+  const currency = getStripeCurrency();
+  const metadata = {
+    type: "featured_listing",
+    listingId: input.listingId,
+    userId: input.userId,
+    platform: "sooqna",
+  };
+
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      locale: "auto",
+      customer_email: input.email,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency,
+            unit_amount: Math.round(input.amountAed * 100),
+            product_data: {
+              name: `تمييز إعلان — ${input.listingTitle}`,
+              description: "باقة تمييز الإعلان — سوقنا",
+            },
+          },
+        },
+      ],
+      metadata,
+      payment_intent_data: {
+        metadata,
+        description: `Sooqna featured listing — ${input.listingId}`,
+      },
+      success_url: `${appUrl}/dashboard/listings?featured=1&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/dashboard/listings?featured=cancelled`,
+    },
+    {
+      idempotencyKey: `featured-${input.listingId}-${Date.now()}`,
+    },
+  );
+
+  await logPaymentEvent({
+    type: "checkout.session.created.featured",
+    payload: { sessionId: session.id, listingId: input.listingId },
+  });
+
+  return {
+    checkoutUrl: session.url ?? undefined,
+    sessionId: session.id,
+  };
+}
+
 export { isStripeConfigured };

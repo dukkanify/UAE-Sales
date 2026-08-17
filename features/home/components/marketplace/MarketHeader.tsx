@@ -37,6 +37,25 @@ export function MarketHeader() {
     return () => window.removeEventListener(STORAGE_EVENTS.sessionChange, sync);
   }, []);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setMenuOpen(false), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   return (
     <header className="market-header sticky top-0 z-50">
       <div className="market-header__accent" aria-hidden />

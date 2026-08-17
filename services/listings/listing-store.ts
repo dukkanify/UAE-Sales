@@ -3,6 +3,11 @@ import {
   marketplaceListings,
   marketplaceUserListings,
 } from "@/mock/listings.mock";
+import { getAdminSettings } from "@/services/admin/admin-settings-store";
+import {
+  computeExpiresAt,
+  expireStaleListings,
+} from "@/services/listings/listing-expiry";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
 import type { Listing } from "@/types";
 import type {
@@ -15,6 +20,7 @@ const FILE = "listings.json";
 
 let cacheRows: Listing[] | null = null;
 let inflight: Promise<Listing[]> | null = null;
+let expiryApplied = false;
 
 function seedListings(): Listing[] {
   const byId = new Map<string, Listing>();
@@ -60,8 +66,22 @@ function setCache(listings: Listing[]) {
   return cacheRows;
 }
 
+async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
+  if (expiryApplied) return listings;
+  expiryApplied = true;
+  const settings = await getAdminSettings();
+  const changed = expireStaleListings(listings, settings.listingActiveDays);
+  if (changed > 0) {
+    await saveCollection(FILE, listings);
+  }
+  return listings;
+}
+
 async function loadListingsUncached(): Promise<Listing[]> {
-  if (cacheRows) return cacheRows;
+  if (cacheRows) {
+    await applyListingExpiry(cacheRows);
+    return cacheRows;
+  }
 
   if (!inflight) {
     inflight = (async () => {
@@ -70,10 +90,12 @@ async function loadListingsUncached(): Promise<Listing[]> {
       );
       if (stored.length === 0) {
         const seeded = seedListings();
+        await applyListingExpiry(seeded);
         await saveCollection(FILE, seeded);
         return setCache(seeded);
       }
       const merged = await mergeMissingSeedListings(stored);
+      await applyListingExpiry(merged);
       return setCache(merged);
     })().finally(() => {
       inflight = null;
@@ -108,8 +130,16 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
 
 export async function upsertListing(listing: Listing): Promise<Listing> {
   const listings = await loadListingsUncached();
+  const settings = await getAdminSettings();
+  const postedAt = listing.postedAt ?? new Date().toISOString();
+  const next: Listing = {
+    ...listing,
+    postedAt,
+    expiresAt:
+      listing.expiresAt ??
+      computeExpiresAt(postedAt, settings.listingActiveDays),
+  };
   const index = listings.findIndex((item) => item.id === listing.id);
-  const next = { ...listing };
   if (index >= 0) listings[index] = next;
   else listings.unshift(next);
   await saveCollection(FILE, listings);
@@ -135,6 +165,8 @@ export async function createListingFromAdmin(
   const sellerName = input.sellerName?.trim() || "إدارة سوقنا";
   const city = input.city.trim();
   const emirate = input.emirate?.trim() || city;
+  const settings = await getAdminSettings();
+  const postedAt = new Date().toISOString();
 
   const listing: Listing = {
     id: `admin-${now}`,
@@ -164,7 +196,8 @@ export async function createListingFromAdmin(
     },
     verifiedSeller: true,
     escrowAvailable: true,
-    postedAt: new Date().toISOString(),
+    postedAt,
+    expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
     contactMethod: "both",
     contactPhone: input.contactPhone?.trim() || undefined,
     deliveryOption: "both",
@@ -188,6 +221,75 @@ export async function patchListingRecord(
   await saveCollection(FILE, listings);
   setCache(listings);
   return { ...listings[index] };
+}
+
+export async function setListingFeatured(
+  id: string,
+  featured: boolean,
+  days?: number,
+): Promise<Listing | undefined> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+
+  const settings = days == null ? await getAdminSettings() : null;
+  const featureDays = days ?? settings!.featuredListingDays;
+  const featuredUntil = featured
+    ? computeExpiresAt(new Date().toISOString(), featureDays)
+    : undefined;
+
+  listings[index] = {
+    ...listings[index],
+    isFeatured: featured,
+    isPremium: featured ? true : listings[index].isPremium,
+    featuredUntil,
+  };
+  await saveCollection(FILE, listings);
+  setCache(listings);
+  return { ...listings[index] };
+}
+
+export async function renewListing(id: string): Promise<Listing | undefined> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+
+  const settings = await getAdminSettings();
+  const postedAt = new Date().toISOString();
+  listings[index] = {
+    ...listings[index],
+    postedAt,
+    expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
+    status: "pending_review",
+  };
+  await saveCollection(FILE, listings);
+  setCache(listings);
+  return { ...listings[index] };
+}
+
+/** Update seller.rating / reviewCount on all listings for a seller. */
+export async function updateSellerListingRating(
+  sellerId: string,
+  average: number,
+  reviewCount: number,
+): Promise<void> {
+  const listings = await loadListingsUncached();
+  let changed = false;
+  for (let i = 0; i < listings.length; i += 1) {
+    if (listings[i].seller.id !== sellerId) continue;
+    listings[i] = {
+      ...listings[i],
+      seller: {
+        ...listings[i].seller,
+        rating: average,
+        reviewCount,
+      },
+    };
+    changed = true;
+  }
+  if (!changed) return;
+  await saveCollection(FILE, listings);
+  setCache(listings);
 }
 
 export function toAdminListingRecord(listing: Listing): AdminListingRecord {

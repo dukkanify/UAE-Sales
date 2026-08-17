@@ -7,6 +7,10 @@ export type AdminSiteSettings = {
   maintenanceMode: boolean;
   allowGuestCheckout: boolean;
   escrowHoldDays: number;
+  disputeWindowDays: number;
+  listingActiveDays: number;
+  featuredListingFeeAed: number;
+  featuredListingDays: number;
   supportEmail: string;
   stripeDashboardUrl: string;
   updatedAt: string;
@@ -21,6 +25,10 @@ const DEFAULT_SETTINGS: AdminSiteSettings = {
   maintenanceMode: false,
   allowGuestCheckout: true,
   escrowHoldDays: 7,
+  disputeWindowDays: 7,
+  listingActiveDays: 30,
+  featuredListingFeeAed: 49,
+  featuredListingDays: 14,
   supportEmail: "support@sooqna.site",
   stripeDashboardUrl: "https://dashboard.stripe.com",
   updatedAt: new Date().toISOString(),
@@ -57,6 +65,24 @@ export async function updateAdminSettings(
     ),
     gatewayFeeFixed: Math.max(0, patch.gatewayFeeFixed ?? current.gatewayFeeFixed),
     escrowHoldDays: Math.max(1, Math.round(patch.escrowHoldDays ?? current.escrowHoldDays)),
+    disputeWindowDays: Math.max(
+      1,
+      Math.round(patch.disputeWindowDays ?? current.disputeWindowDays),
+    ),
+    listingActiveDays: Math.max(
+      1,
+      Math.round(patch.listingActiveDays ?? current.listingActiveDays),
+    ),
+    featuredListingFeeAed: Math.max(
+      0,
+      Math.round(
+        (patch.featuredListingFeeAed ?? current.featuredListingFeeAed) * 100,
+      ) / 100,
+    ),
+    featuredListingDays: Math.max(
+      1,
+      Math.round(patch.featuredListingDays ?? current.featuredListingDays),
+    ),
     updatedAt: new Date().toISOString(),
   };
   cached = next;

@@ -81,6 +81,7 @@ export function useAddListingForm(categories: Category[]) {
       const categoryId = String(formData.get("categoryId") ?? selectedCategoryId);
       const contact = String(formData.get("contact") ?? "").trim();
       const subcategory = String(formData.get("subcategory") ?? "").trim();
+      const videoUrl = String(formData.get("videoUrl") ?? "").trim();
       const parsed = parseCategoryForm(formData, categoryId);
       const nextErrors: AddListingErrors & Record<string, string | undefined> = {
         ...parsed.errors,
@@ -112,6 +113,8 @@ export function useAddListingForm(categories: Category[]) {
         : cities.find((city) => city.id === parsed.city)?.name ?? "دبي";
 
       const id = `local-${Date.now()}`;
+      const postedAt = new Date().toISOString();
+      const listingPackage = String(formData.get("package") ?? "free");
       const listing: Listing = {
         id,
         title: isDynamicCategory(categoryId)
@@ -136,7 +139,7 @@ export function useAddListingForm(categories: Category[]) {
         images: persistedImages,
         seller: buildSellerFromSession(user),
         imageTone: "gold",
-        postedAt: new Date().toISOString(),
+        postedAt,
         categorySpecs: isDynamicCategory(categoryId) ? parsed.categorySpecs : undefined,
         features: parsed.features.length > 0 ? parsed.features : undefined,
         negotiable: parsed.negotiable,
@@ -144,14 +147,40 @@ export function useAddListingForm(categories: Category[]) {
         subcategory: subcategory || undefined,
         contactPhone: contact,
         contactMethod: "both",
+        ...(videoUrl ? { videoUrl } : {}),
       };
 
       saveLocalListing(listing);
-      void fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing }),
-      }).catch(() => undefined);
+      try {
+        await fetch("/api/listings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listing }),
+        });
+      } catch {
+        // Local listing already saved; catalog sync is best-effort.
+      }
+
+      if (listingPackage === "featured_pending") {
+        try {
+          const featureRes = await fetch(`/api/listings/${id}/feature`, {
+            method: "POST",
+          });
+          const featureData = await featureRes.json();
+          if (featureRes.ok && featureData.checkoutUrl) {
+            window.location.href = featureData.checkoutUrl as string;
+            return;
+          }
+          if (featureRes.ok && featureData.listing) {
+            saveLocalListing(featureData.listing as Listing);
+            router.push(`/listings/local/${id}`);
+            return;
+          }
+        } catch {
+          // Fall through to local listing view if checkout fails.
+        }
+      }
+
       router.push(`/listings/local/${id}`);
     },
     [imageFiles, router, selectedCategoryId],

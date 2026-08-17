@@ -63,6 +63,42 @@ async function loadDisputes(): Promise<AdminDisputeRecord[]> {
   return stored.map((row) => ({ ...row }));
 }
 
+export async function createDispute(input: {
+  orderId: string;
+  listingTitle: string;
+  buyerName: string;
+  sellerName: string;
+  reason: string;
+  amount: number;
+  evidenceUrls?: string[];
+}): Promise<AdminDisputeRecord> {
+  const disputes = await loadDisputes();
+  const existing = disputes.find((row) => row.orderId === input.orderId);
+  if (existing && (existing.status === "open" || existing.status === "under_review")) {
+    return { ...existing };
+  }
+
+  const record: AdminDisputeRecord = {
+    id: `dispute-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    orderId: input.orderId,
+    listingTitle: input.listingTitle,
+    buyerName: input.buyerName,
+    sellerName: input.sellerName,
+    reason: input.reason.trim(),
+    status: "open",
+    amount: input.amount,
+    createdAt: new Date().toISOString(),
+    evidenceUrls:
+      input.evidenceUrls && input.evidenceUrls.length > 0
+        ? input.evidenceUrls.filter((url) => url.trim().length > 0)
+        : undefined,
+  };
+
+  disputes.unshift(record);
+  await saveCollection(FILE, disputes);
+  return { ...record };
+}
+
 /** Merge persisted disputes with live disputed orders from the site. */
 export async function getAdminDisputes(): Promise<AdminDisputeRecord[]> {
   const [stored, orders] = await Promise.all([loadDisputes(), getAllOrders()]);

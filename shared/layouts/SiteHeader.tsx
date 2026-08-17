@@ -51,6 +51,25 @@ export function SiteHeader() {
       window.removeEventListener(STORAGE_EVENTS.sessionChange, syncSession);
   }, []);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setMenuOpen(false), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   return (
     <>
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">

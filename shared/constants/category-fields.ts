@@ -1,9 +1,15 @@
 import type { CategoryFieldDefinition } from "@/types";
+import { colorOptions } from "@/shared/constants/colors";
 import {
   carBrandOptions,
   electronicsBrandOptions,
   mobileBrandOptions,
 } from "@/shared/constants/product-brands";
+import {
+  carModelOptions,
+  mobileModelOptions,
+} from "@/shared/constants/product-models";
+import { cities } from "@/shared/constants/locations";
 
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
@@ -14,6 +20,11 @@ const emirateOptions = [
   { label: "الفجيرة", value: "الفجيرة" },
   { label: "أم القيوين", value: "أم القيوين" },
 ];
+
+const cityOptions = cities.map((city) => ({
+  label: city.name,
+  value: city.name,
+}));
 
 const yesNoOptions = [
   { label: "نعم", value: "نعم" },
@@ -47,7 +58,16 @@ const carFields: CategoryFieldDefinition[] = [
     options: carBrandOptions,
     placeholder: "ابحث عن الماركة (Toy… Nissan…)",
   },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: carModelOptions,
+    placeholder: "ابحث عن الموديل (Patrol… Camry…)",
+  },
   {
     key: "condition",
     label: "حالة السيارة",
@@ -61,7 +81,15 @@ const carFields: CategoryFieldDefinition[] = [
   },
   { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  { key: "city", label: "المدينة", type: "text", required: true, searchable: true },
+  {
+    key: "city",
+    label: "المدينة",
+    type: "select",
+    required: true,
+    searchable: true,
+    options: cityOptions,
+    note: "اختر المدينة ضمن إمارات الدولة.",
+  },
   { key: "mileage", label: "العداد (كم)", type: "text", required: true, searchable: true },
   { key: "transmission", label: "ناقل الحركة", type: "select", required: true, options: [
     { label: "أوتوماتيك", value: "أوتوماتيك" },
@@ -81,8 +109,20 @@ const carFields: CategoryFieldDefinition[] = [
     { label: "ياباني", value: "ياباني" },
     { label: "أخرى", value: "أخرى" },
   ]},
-  { key: "exteriorColor", label: "اللون الخارجي", type: "text", required: true },
-  { key: "interiorColor", label: "اللون الداخلي", type: "text", required: true },
+  {
+    key: "exteriorColor",
+    label: "اللون الخارجي",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
+  {
+    key: "interiorColor",
+    label: "اللون الداخلي",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accidentHistory", label: "سجل الحوادث", type: "select", required: true, options: [
     { label: "بدون حوادث", value: "بدون حوادث" },
@@ -130,7 +170,15 @@ const realEstateFields: CategoryFieldDefinition[] = [
   { key: "community", label: "المجتمع", type: "text", required: true, titlePart: true, searchable: true },
   { key: "titleDeedReady", label: "سند الملكية جاهز", type: "select", required: true, options: yesNoOptions },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  { key: "city", label: "المدينة", type: "text", required: true, searchable: true },
+  {
+    key: "city",
+    label: "المدينة",
+    type: "select",
+    required: true,
+    searchable: true,
+    options: cityOptions,
+    note: "اختر المدينة ضمن إمارات الدولة.",
+  },
 ];
 
 const mobileFields: CategoryFieldDefinition[] = [
@@ -144,7 +192,16 @@ const mobileFields: CategoryFieldDefinition[] = [
     options: mobileBrandOptions,
     placeholder: "ابحث عن الماركة (App… Sam…)",
   },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: mobileModelOptions,
+    placeholder: "ابحث عن الموديل (iPhone… Galaxy…)",
+  },
   { key: "storage", label: "التخزين", type: "select", required: true, searchable: true, options: [
     { label: "64 GB", value: "64 GB" },
     { label: "128 GB", value: "128 GB" },
@@ -159,7 +216,13 @@ const mobileFields: CategoryFieldDefinition[] = [
     { label: "12 GB", value: "12 GB" },
     { label: "16 GB", value: "16 GB" },
   ]},
-  { key: "color", label: "اللون", type: "text", required: true },
+  {
+    key: "color",
+    label: "اللون",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
   { key: "batteryHealth", label: "صحة البطارية", type: "text", required: true },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "purchaseDate", label: "تاريخ الشراء", type: "text", required: true },
@@ -182,7 +245,24 @@ const electronicsFields: CategoryFieldDefinition[] = [
     options: electronicsBrandOptions,
     placeholder: "ابحث عن الماركة (App… Son…)",
   },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "MacBook Pro", value: "MacBook Pro" },
+      { label: "MacBook Air", value: "MacBook Air" },
+      { label: "iPad Pro", value: "iPad Pro" },
+      { label: "PlayStation 5", value: "PlayStation 5" },
+      { label: "Xbox Series X", value: "Xbox Series X" },
+      { label: "Nintendo Switch", value: "Nintendo Switch" },
+      { label: "أخرى", value: "أخرى" },
+    ],
+    placeholder: "ابحث أو اكتب الموديل",
+  },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
     { label: "جديد", value: "new" },
     { label: "مستعمل", value: "used" },
@@ -224,6 +304,67 @@ const serviceFields: CategoryFieldDefinition[] = [
   { key: "experience", label: "سنوات الخبرة", type: "text", required: true },
 ];
 
+const foodFields: CategoryFieldDefinition[] = [
+  {
+    key: "cuisine",
+    label: "نوع المطبخ",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "إماراتي", value: "إماراتي" },
+      { label: "عربي", value: "عربي" },
+      { label: "آسيوي", value: "آسيوي" },
+      { label: "هندي", value: "هندي" },
+      { label: "غربي", value: "غربي" },
+      { label: "حلويات", value: "حلويات" },
+      { label: "مشروبات", value: "مشروبات" },
+      { label: "أخرى", value: "أخرى" },
+    ],
+  },
+  {
+    key: "portion",
+    label: "الحصة / الكمية",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: وجبة لشخصين",
+  },
+  {
+    key: "delivery",
+    label: "التوصيل",
+    type: "select",
+    required: true,
+    options: [
+      { label: "توصيل متاح", value: "توصيل متاح" },
+      { label: "استلام فقط", value: "استلام فقط" },
+      { label: "كلاهما", value: "كلاهما" },
+    ],
+  },
+  {
+    key: "freshness",
+    label: "الطزاجة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "طازج يومياً", value: "طازج يومياً" },
+      { label: "محضّر عند الطلب", value: "محضّر عند الطلب" },
+      { label: "مجمّد", value: "مجمّد" },
+      { label: "معلّب", value: "معلّب" },
+    ],
+  },
+  {
+    key: "city",
+    label: "المدينة",
+    type: "select",
+    required: true,
+    searchable: true,
+    options: cityOptions,
+    note: "اختر المدينة ضمن إمارات الدولة.",
+  },
+];
+
 export const DYNAMIC_CATEGORY_IDS = [
   "cars",
   "real-estate",
@@ -231,6 +372,7 @@ export const DYNAMIC_CATEGORY_IDS = [
   "electronics",
   "jobs",
   "services",
+  "food",
 ] as const;
 
 export type DynamicCategoryId = (typeof DYNAMIC_CATEGORY_IDS)[number];
@@ -242,6 +384,7 @@ const categoryFieldMap: Record<DynamicCategoryId, CategoryFieldDefinition[]> = {
   electronics: electronicsFields,
   jobs: jobFields,
   services: serviceFields,
+  food: foodFields,
 };
 
 export function isDynamicCategory(categoryId: string): categoryId is DynamicCategoryId {

@@ -1,7 +1,7 @@
 import {
   isSessionUser,
-  requireAdminUser,
 } from "@/services/auth/require-session";
+import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import {
@@ -10,7 +10,7 @@ import {
 } from "@/services/admin/admin-settings-store";
 
 export async function GET() {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("settings");
   if (!isSessionUser(admin)) {
     return admin;
   }
@@ -20,7 +20,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("settings");
   if (!isSessionUser(admin)) {
     return admin;
   }
@@ -49,6 +49,22 @@ export async function PATCH(request: Request) {
         : undefined,
     escrowHoldDays:
       typeof body.escrowHoldDays === "number" ? body.escrowHoldDays : undefined,
+    disputeWindowDays:
+      typeof body.disputeWindowDays === "number"
+        ? body.disputeWindowDays
+        : undefined,
+    listingActiveDays:
+      typeof body.listingActiveDays === "number"
+        ? body.listingActiveDays
+        : undefined,
+    featuredListingFeeAed:
+      typeof body.featuredListingFeeAed === "number"
+        ? body.featuredListingFeeAed
+        : undefined,
+    featuredListingDays:
+      typeof body.featuredListingDays === "number"
+        ? body.featuredListingDays
+        : undefined,
     supportEmail:
       typeof body.supportEmail === "string" ? body.supportEmail : undefined,
     stripeDashboardUrl:

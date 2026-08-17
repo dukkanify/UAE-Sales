@@ -1,7 +1,7 @@
 import type { CategoryIconName } from "./category";
 import type { CategorySpecs } from "./category-fields";
 import type { ListingCondition, ListingStatus } from "./listing";
-import type { AccountStatus, UserRole } from "./user";
+import type { AccountStatus, AdminPermission, UserRole } from "./user";
 
 export type DisputeStatus =
   | "open"
@@ -21,10 +21,14 @@ export type AdminUserRecord = {
   accountStatus: AccountStatus;
   joinedAt: string;
   listingsCount: number;
+  adminPermissions?: AdminPermission[];
 };
 
 export type AdminUserPatch = Partial<
-  Pick<AdminUserRecord, "isVerified" | "accountStatus" | "role">
+  Pick<
+    AdminUserRecord,
+    "isVerified" | "accountStatus" | "role" | "adminPermissions"
+  >
 >;
 
 export type AdminListingRecord = {
@@ -76,6 +80,7 @@ export type AdminDisputeRecord = {
   amount: number;
   createdAt: string;
   resolutionNote?: string;
+  evidenceUrls?: string[];
 };
 
 export type AdminDisputePatch = Partial<
@@ -89,17 +94,22 @@ export type AdminCategoryRecord = {
   icon: CategoryIconName;
   listingCount: number;
   enabled: boolean;
+  sortOrder: number;
   subcategories: string[];
 };
 
 export type AdminCategoryPatch = Partial<
-  Pick<AdminCategoryRecord, "name" | "slug" | "enabled" | "listingCount" | "icon">
+  Pick<
+    AdminCategoryRecord,
+    "name" | "slug" | "enabled" | "listingCount" | "icon" | "sortOrder"
+  >
 >;
 
 export type AdminCategoryCreateInput = {
   name: string;
   slug: string;
   icon?: CategoryIconName;
+  sortOrder?: number;
 };
 
 export type AdminModerationSummary = {

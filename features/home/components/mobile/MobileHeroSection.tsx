@@ -9,7 +9,7 @@ export async function MobileHeroSection() {
       <div className="mobile-home-hero__media">
         <div className="mobile-home-hero__bg">
           <AppImage
-            alt="أفق دبي — برج خليفة وأفق المدينة"
+            alt="أفق الإمارات ومطار دولي"
             className="object-cover"
             fallback="emirates"
             fill
@@ -22,7 +22,7 @@ export async function MobileHeroSection() {
 
         <span className="mobile-home-hero__badge">
           <span className="inline-block h-3 w-4 overflow-hidden rounded-sm uae-flag-strip" />
-          منصة إماراتية موثوقة
+          من الإمارات إلى العالم
         </span>
       </div>
 

@@ -7,6 +7,16 @@ export type AccountType =
 
 export type UserRole = "user" | "business" | "admin";
 
+export type AdminPermission =
+  | "users"
+  | "listings"
+  | "orders"
+  | "disputes"
+  | "payments"
+  | "reports"
+  | "settings"
+  | "categories";
+
 export type AccountStatus = "pending" | "active" | "suspended";
 
 export type RegistrationSource =
@@ -46,6 +56,8 @@ export type UserProfile = {
   favoritesCount?: number;
   listingsCount?: number;
   role?: UserRole;
+  /** When role is admin, empty/undefined = full access; otherwise gated permissions. */
+  adminPermissions?: AdminPermission[];
   subscription?: string;
   walletBalance?: number;
   businessProfile?: BusinessProfile;

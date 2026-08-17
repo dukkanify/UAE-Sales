@@ -53,6 +53,32 @@ export function AdminCategoriesPanel() {
     }
   }
 
+  async function patchSortOrder(category: AdminCategoryRecord, nextOrder: number) {
+    const session = getSessionUser();
+    if (!session || !Number.isFinite(nextOrder)) return;
+    setBusyId(category.id);
+    try {
+      const response = await adminFetch(
+        `/api/admin/categories/${category.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sortOrder: nextOrder }),
+        },
+      );
+      const data = await response.json();
+      if (response.ok && data.category) {
+        setCategories((prev) =>
+          prev
+            .map((item) => (item.id === category.id ? data.category : item))
+            .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+        );
+      }
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function handleCreate() {
     const session = getSessionUser();
     if (!session || !name.trim() || !slug.trim()) return;
@@ -128,6 +154,21 @@ export function AdminCategoriesPanel() {
                   <Badge variant="muted">
                     {category.listingCount.toLocaleString("ar-AE")} إعلان
                   </Badge>
+                  <label className="flex items-center gap-1 text-xs text-muted">
+                    ترتيب
+                    <input
+                      className="w-16 rounded border border-border bg-surface px-2 py-1 text-ink"
+                      defaultValue={category.sortOrder ?? 0}
+                      key={`${category.id}-${category.sortOrder}`}
+                      onBlur={(event) => {
+                        const next = Number(event.target.value);
+                        if (next !== category.sortOrder) {
+                          void patchSortOrder(category, next);
+                        }
+                      }}
+                      type="number"
+                    />
+                  </label>
                 </div>
                 {category.subcategories.length > 0 ? (
                   <p className="mt-2 text-xs text-muted">

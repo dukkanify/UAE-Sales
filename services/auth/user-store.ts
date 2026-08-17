@@ -247,7 +247,9 @@ export async function updateUserOnboarding(
 
 export async function updateUserAdmin(
   userId: string,
-  patch: Partial<Pick<StoredUser, "isVerified" | "accountStatus" | "role">>,
+  patch: Partial<
+    Pick<StoredUser, "isVerified" | "accountStatus" | "role" | "adminPermissions">
+  >,
 ): Promise<StoredUser | null> {
   const user = await findUserById(userId);
   if (!user) return null;
@@ -273,6 +275,7 @@ export function toAdminUserRecord(
   accountStatus: AccountStatus;
   joinedAt: string;
   listingsCount: number;
+  adminPermissions?: StoredUser["adminPermissions"];
 } {
   return {
     id: user.id,
@@ -285,6 +288,7 @@ export function toAdminUserRecord(
     accountStatus: user.accountStatus ?? "active",
     joinedAt: user.joinedAt,
     listingsCount,
+    adminPermissions: user.adminPermissions,
   };
 }
 

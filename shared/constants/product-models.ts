@@ -1,0 +1,67 @@
+import type { CategoryFieldOption } from "@/types";
+
+/** Common car models (static list for combobox). */
+export const carModelOptions: CategoryFieldOption[] = [
+  { label: "Patrol", value: "Patrol" },
+  { label: "Land Cruiser", value: "Land Cruiser" },
+  { label: "Camry", value: "Camry" },
+  { label: "Corolla", value: "Corolla" },
+  { label: "Hilux", value: "Hilux" },
+  { label: "Yaris", value: "Yaris" },
+  { label: "Fortuner", value: "Fortuner" },
+  { label: "Accord", value: "Accord" },
+  { label: "Civic", value: "Civic" },
+  { label: "CR-V", value: "CR-V" },
+  { label: "G-Class", value: "G-Class" },
+  { label: "C-Class", value: "C-Class" },
+  { label: "E-Class", value: "E-Class" },
+  { label: "S-Class", value: "S-Class" },
+  { label: "GLC", value: "GLC" },
+  { label: "X5", value: "X5" },
+  { label: "X3", value: "X3" },
+  { label: "3 Series", value: "3 Series" },
+  { label: "5 Series", value: "5 Series" },
+  { label: "A4", value: "A4" },
+  { label: "Q7", value: "Q7" },
+  { label: "Range Rover", value: "Range Rover" },
+  { label: "Defender", value: "Defender" },
+  { label: "Pajero", value: "Pajero" },
+  { label: "Sportage", value: "Sportage" },
+  { label: "Tucson", value: "Tucson" },
+  { label: "Elantra", value: "Elantra" },
+  { label: "Sonata", value: "Sonata" },
+  { label: "CX-5", value: "CX-5" },
+  { label: "Mustang", value: "Mustang" },
+  { label: "F-150", value: "F-150" },
+  { label: "أخرى", value: "أخرى" },
+];
+
+/** Common mobile models (static list for combobox). */
+export const mobileModelOptions: CategoryFieldOption[] = [
+  { label: "iPhone 16 Pro Max", value: "iPhone 16 Pro Max" },
+  { label: "iPhone 16 Pro", value: "iPhone 16 Pro" },
+  { label: "iPhone 16", value: "iPhone 16" },
+  { label: "iPhone 15 Pro Max", value: "iPhone 15 Pro Max" },
+  { label: "iPhone 15 Pro", value: "iPhone 15 Pro" },
+  { label: "iPhone 15", value: "iPhone 15" },
+  { label: "iPhone 14 Pro", value: "iPhone 14 Pro" },
+  { label: "iPhone 13", value: "iPhone 13" },
+  { label: "Galaxy S25 Ultra", value: "Galaxy S25 Ultra" },
+  { label: "Galaxy S24 Ultra", value: "Galaxy S24 Ultra" },
+  { label: "Galaxy S24", value: "Galaxy S24" },
+  { label: "Galaxy Z Fold", value: "Galaxy Z Fold" },
+  { label: "Galaxy Z Flip", value: "Galaxy Z Flip" },
+  { label: "Galaxy A55", value: "Galaxy A55" },
+  { label: "Pixel 9 Pro", value: "Pixel 9 Pro" },
+  { label: "Pixel 8", value: "Pixel 8" },
+  { label: "Xiaomi 14", value: "Xiaomi 14" },
+  { label: "Redmi Note 13", value: "Redmi Note 13" },
+  { label: "Huawei P60", value: "Huawei P60" },
+  { label: "OnePlus 12", value: "OnePlus 12" },
+  { label: "أخرى", value: "أخرى" },
+];
+
+export const productModelOptions: CategoryFieldOption[] = [
+  ...carModelOptions,
+  ...mobileModelOptions,
+];

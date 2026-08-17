@@ -166,145 +166,328 @@ export function AdminOpsCockpit() {
         </div>
       </div>
 
-      <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
-        <div className="admin-ops__kpi admin-ops__kpi--feature">
-          <p className="admin-ops__kpi-label">إجمالي حجم المدفوعات</p>
-          <div className="admin-ops__kpi-value">
-            <CurrencyAmount amount={kpis.volume} size="lg" />
-          </div>
-          <p className="admin-ops__kpi-hint">
-            {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع · تحويل{" "}
-            {kpis.conversionRate}%
-          </p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">رسوم المنصة</p>
-          <div className="admin-ops__kpi-value">
-            <CurrencyAmount amount={kpis.fees} size="md" />
-          </div>
-          <p className="admin-ops__kpi-hint">إيراد تشغيلي</p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">بانتظار المراجعة</p>
-          <p className="admin-ops__kpi-value">
-            {kpis.pendingListings.toLocaleString("ar-AE")}
-          </p>
-          <p className="admin-ops__kpi-hint">إعلانات</p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">نزاعات مفتوحة</p>
-          <p className="admin-ops__kpi-value">
-            {kpis.openDisputes.toLocaleString("ar-AE")}
-          </p>
-          <p className="admin-ops__kpi-hint">تحتاج قرار</p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">ضمان محجوز</p>
-          <p className="admin-ops__kpi-value">
-            {kpis.heldEscrow.toLocaleString("ar-AE")}
-          </p>
-          <p className="admin-ops__kpi-hint">{kpis.refundedOrders} مسترد</p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">المستخدمون</p>
-          <p className="admin-ops__kpi-value">
-            {kpis.totalUsers.toLocaleString("ar-AE")}
-          </p>
-          <p className="admin-ops__kpi-hint">
-            {kpis.totalListings.toLocaleString("ar-AE")} إعلان
-          </p>
-        </div>
-        <div className="admin-ops__kpi">
-          <p className="admin-ops__kpi-label">أرصدة المحافظ</p>
-          <div className="admin-ops__kpi-value">
-            <CurrencyAmount amount={kpis.walletAvailable} size="md" />
-          </div>
-          <p className="admin-ops__kpi-hint">
-            محجوز <CurrencyAmount amount={kpis.walletHeld} size="sm" />
-          </p>
-        </div>
-      </div>
-
-      <div className="admin-ops__dash-row">
-        <section className="admin-ops__panel admin-ops__panel--chart">
-          <div className="admin-ops__panel-head">
-            <div>
-              <h2 className="admin-ops__panel-title">الأداء — 7 أيام</h2>
-              <p className="admin-ops__panel-sub">
-                حجم المدفوعات الناجحة يومياً
-              </p>
-            </div>
-            <Link className="admin-ops__text-link" href="/admin/analytics">
-              التحليلات
-            </Link>
-          </div>
-          <div
-            className="admin-ops__bars"
-            role="img"
-            aria-label="مخطط حجم المدفوعات"
-          >
-            {analytics.daily.map((point) => (
-              <div key={point.date} className="admin-ops__bar-col">
-                <div className="admin-ops__bar-track">
-                  <div
-                    className="admin-ops__bar-fill"
-                    style={{
-                      height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
-                    }}
-                    title={`${point.volume} AED`}
-                  />
-                </div>
-                <p className="admin-ops__bar-value">{point.orders}</p>
-                <p className="admin-ops__bar-label">{point.label}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section
-          className={`admin-ops__panel${critical.length > 0 ? " admin-ops__panel--alert" : ""}`}
-        >
-          <div className="admin-ops__panel-head">
-            <div>
-              <h2 className="admin-ops__panel-title">يحتاج قراراً</h2>
-              <p className="admin-ops__panel-sub">عناصر عاجلة في الطابور</p>
-            </div>
-          </div>
-          <div className="admin-ops__queue">
-            {critical.length === 0 ? (
-              <div className="admin-ops__queue-item">
-                <p className="admin-ops__queue-meta">
-                  لا توجد عناصر عاجلة حالياً.
-                </p>
-              </div>
-            ) : (
-              critical.map((item) => (
-                <Link
-                  key={item.href}
-                  className="admin-ops__queue-item"
-                  href={item.href}
-                >
-                  <div>
-                    <p className="admin-ops__queue-label">{item.label}</p>
-                    <p className="admin-ops__queue-meta">{item.meta}</p>
-                  </div>
-                  <span className="admin-ops__queue-count admin-ops__queue-count--alert">
-                    {item.count.toLocaleString("ar-AE")}
-                  </span>
-                </Link>
-              ))
-            )}
-          </div>
-        </section>
-      </div>
-
+      {/* —— المال —— */}
       <section className="admin-ops__panel">
         <div className="admin-ops__panel-head">
           <div>
-            <h2 className="admin-ops__panel-title">وحدات التحكم</h2>
-            <p className="admin-ops__panel-sub">وصول سريع لكل أقسام التشغيل</p>
+            <h2 className="admin-ops__panel-title">المال</h2>
+            <p className="admin-ops__panel-sub">
+              المدفوعات والرسوم وأرصدة الضمان والمحافظ
+            </p>
+          </div>
+          <Link className="admin-ops__text-link" href="/admin/reports">
+            التقارير
+          </Link>
+        </div>
+        <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
+          <div className="admin-ops__kpi admin-ops__kpi--feature">
+            <p className="admin-ops__kpi-label">إجمالي حجم المدفوعات</p>
+            <div className="admin-ops__kpi-value">
+              <CurrencyAmount amount={kpis.volume} size="lg" />
+            </div>
+            <p className="admin-ops__kpi-hint">
+              {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع · تحويل{" "}
+              {kpis.conversionRate}%
+            </p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">رسوم المنصة</p>
+            <div className="admin-ops__kpi-value">
+              <CurrencyAmount amount={kpis.fees} size="md" />
+            </div>
+            <p className="admin-ops__kpi-hint">إيراد تشغيلي</p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">ضمان محجوز</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.heldEscrow.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">{kpis.refundedOrders} مسترد</p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">أرصدة المحافظ</p>
+            <div className="admin-ops__kpi-value">
+              <CurrencyAmount amount={kpis.walletAvailable} size="md" />
+            </div>
+            <p className="admin-ops__kpi-hint">
+              محجوز <CurrencyAmount amount={kpis.walletHeld} size="sm" />
+            </p>
           </div>
         </div>
+
+        <div className="admin-ops__dash-row" style={{ marginTop: "1rem" }}>
+          <section className="admin-ops__panel admin-ops__panel--chart">
+            <div className="admin-ops__panel-head">
+              <div>
+                <h3 className="admin-ops__panel-title">الأداء — 7 أيام</h3>
+                <p className="admin-ops__panel-sub">
+                  حجم المدفوعات الناجحة يومياً
+                </p>
+              </div>
+              <Link className="admin-ops__text-link" href="/admin/analytics">
+                التحليلات
+              </Link>
+            </div>
+            <div
+              className="admin-ops__bars"
+              role="img"
+              aria-label="مخطط حجم المدفوعات"
+            >
+              {analytics.daily.map((point) => (
+                <div key={point.date} className="admin-ops__bar-col">
+                  <div className="admin-ops__bar-track">
+                    <div
+                      className="admin-ops__bar-fill"
+                      style={{
+                        height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
+                      }}
+                      title={`${point.volume} AED`}
+                    />
+                  </div>
+                  <p className="admin-ops__bar-value">{point.orders}</p>
+                  <p className="admin-ops__bar-label">{point.label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="admin-ops__panel">
+            <div className="admin-ops__panel-head">
+              <h3 className="admin-ops__panel-title">نشاط المدفوعات</h3>
+              <Link className="admin-ops__text-link" href="/admin/stripe">
+                Stripe
+              </Link>
+            </div>
+            <ul className="admin-ops__queue">
+              {pulse.length === 0 ? (
+                <li className="admin-ops__queue-item">
+                  <p className="admin-ops__queue-meta">لا أحداث حديثة.</p>
+                </li>
+              ) : (
+                pulse.slice(0, 6).map((item) => (
+                  <li key={item.id} className="admin-ops__queue-item">
+                    <div>
+                      <p className="admin-ops__queue-label">{item.text}</p>
+                      <p className="admin-ops__queue-meta">
+                        {item.time
+                          ? new Date(item.time).toLocaleString("ar-AE")
+                          : "الآن"}
+                        {item.orderId ? ` · ${item.orderId}` : ""}
+                      </p>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+            <div className="admin-ops__quick-links">
+              <a
+                className="admin-ops__chip-link"
+                href={stripe.paymentsUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Payments
+              </a>
+              <a
+                className="admin-ops__chip-link"
+                href={stripe.webhooksUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Webhooks
+              </a>
+              <Link className="admin-ops__chip-link" href="/admin/orders">
+                الطلبات
+              </Link>
+              <Link className="admin-ops__chip-link" href="/admin/wallets">
+                المحافظ
+              </Link>
+            </div>
+          </section>
+        </div>
+
+        <div className="admin-ops__detail-grid" style={{ marginTop: "0.75rem" }}>
+          {analytics.orderStatuses.slice(0, 6).map((slice) => (
+            <div key={slice.key} className="admin-ops__detail-row">
+              <span>{slice.label}</span>
+              <strong>{slice.count.toLocaleString("ar-AE")}</strong>
+            </div>
+          ))}
+          {analytics.paymentStatuses.slice(0, 4).map((slice) => (
+            <div key={slice.key} className="admin-ops__detail-row">
+              <span>دفع · {slice.label}</span>
+              <strong>{slice.count.toLocaleString("ar-AE")}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* —— الإشراف —— */}
+      <section
+        className={`admin-ops__panel${critical.length > 0 ? " admin-ops__panel--alert" : ""}`}
+      >
+        <div className="admin-ops__panel-head">
+          <div>
+            <h2 className="admin-ops__panel-title">الإشراف</h2>
+            <p className="admin-ops__panel-sub">
+              مراجعة الإعلانات والنزاعات والطابور التشغيلي
+            </p>
+          </div>
+        </div>
+        <div className="admin-ops__kpi-grid">
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">بانتظار المراجعة</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.pendingListings.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">إعلانات</p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">نزاعات مفتوحة</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.openDisputes.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">تحتاج قرار</p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">إجمالي الإعلانات</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.totalListings.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">في الكتالوج</p>
+          </div>
+        </div>
+        <div className="admin-ops__queue" style={{ marginTop: "0.75rem" }}>
+          {critical.length === 0 ? (
+            <div className="admin-ops__queue-item">
+              <p className="admin-ops__queue-meta">
+                لا توجد عناصر عاجلة حالياً.
+              </p>
+            </div>
+          ) : (
+            critical.map((item) => (
+              <Link
+                key={item.href}
+                className="admin-ops__queue-item"
+                href={item.href}
+              >
+                <div>
+                  <p className="admin-ops__queue-label">{item.label}</p>
+                  <p className="admin-ops__queue-meta">{item.meta}</p>
+                </div>
+                <span className="admin-ops__queue-count admin-ops__queue-count--alert">
+                  {item.count.toLocaleString("ar-AE")}
+                </span>
+              </Link>
+            ))
+          )}
+        </div>
+        <div className="admin-ops__queue admin-ops__queue--dense" style={{ marginTop: "0.5rem" }}>
+          {attention.map((item) => (
+            <Link
+              key={item.href}
+              className="admin-ops__queue-item"
+              href={item.href}
+            >
+              <div>
+                <p className="admin-ops__queue-label">{item.label}</p>
+                <p className="admin-ops__queue-meta">{item.meta}</p>
+              </div>
+              <span
+                className={`admin-ops__queue-count${
+                  item.alert && item.count > 0
+                    ? " admin-ops__queue-count--alert"
+                    : ""
+                }`}
+              >
+                {item.count.toLocaleString("ar-AE")}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* —— العملاء —— */}
+      <section className="admin-ops__panel">
+        <div className="admin-ops__panel-head">
+          <div>
+            <h2 className="admin-ops__panel-title">العملاء</h2>
+            <p className="admin-ops__panel-sub">
+              المستخدمون والطلبات وحسابات المحافظ
+            </p>
+          </div>
+          <Link className="admin-ops__text-link" href="/admin/users">
+            المستخدمون
+          </Link>
+        </div>
+        <div className="admin-ops__kpi-grid">
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">المستخدمون</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.totalUsers.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">حسابات مسجّلة</p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">الطلبات</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.totalOrders.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">
+              {kpis.paidOrders.toLocaleString("ar-AE")} مدفوع
+            </p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">حسابات المحافظ</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.walletAccounts.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">محافظ نشطة</p>
+          </div>
+        </div>
+      </section>
+
+      {/* —— النظام —— */}
+      <section className="admin-ops__panel">
+        <div className="admin-ops__panel-head">
+          <div>
+            <h2 className="admin-ops__panel-title">النظام</h2>
+            <p className="admin-ops__panel-sub">
+              حالة البوابة والإعدادات ووحدات التحكم
+            </p>
+          </div>
+          <Link className="admin-ops__text-link" href="/admin/settings">
+            الإعدادات
+          </Link>
+        </div>
+        <div className="admin-ops__kpi-grid">
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">Stripe</p>
+            <p className="admin-ops__kpi-value" style={{ fontSize: "1.1rem" }}>
+              {stripe.configured ? "متصل" : "غير مُعدّ"}
+            </p>
+            <p className="admin-ops__kpi-hint">
+              Webhook {stripe.webhookConfigured ? "جاهز" : "ناقص"}
+            </p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">وضع التشغيل</p>
+            <p className="admin-ops__kpi-value" style={{ fontSize: "1.1rem" }}>
+              {settings.maintenanceMode ? "صيانة" : "عادي"}
+            </p>
+            <p className="admin-ops__kpi-hint">
+              ضمان {settings.escrowHoldDays} يوم
+            </p>
+          </div>
+          <div className="admin-ops__kpi">
+            <p className="admin-ops__kpi-label">أحداث حديثة</p>
+            <p className="admin-ops__kpi-value">
+              {kpis.recentEvents.toLocaleString("ar-AE")}
+            </p>
+            <p className="admin-ops__kpi-hint">سجل العمليات</p>
+          </div>
+        </div>
+
         {(["insight", "moderation", "money", "leads", "system"] as const).map(
           (group) => {
             const items = sections.filter((s) => s.group === group);
@@ -335,119 +518,6 @@ export function AdminOpsCockpit() {
             );
           },
         )}
-      </section>
-
-      <div className="admin-ops__panels">
-        <section className="admin-ops__panel">
-          <div className="admin-ops__panel-head">
-            <h2 className="admin-ops__panel-title">ملخص الحالات</h2>
-            <Link className="admin-ops__text-link" href="/admin/reports">
-              التقارير
-            </Link>
-          </div>
-          <div className="admin-ops__detail-grid">
-            {analytics.orderStatuses.slice(0, 6).map((slice) => (
-              <div key={slice.key} className="admin-ops__detail-row">
-                <span>{slice.label}</span>
-                <strong>{slice.count.toLocaleString("ar-AE")}</strong>
-              </div>
-            ))}
-          </div>
-          <div
-            className="admin-ops__detail-grid"
-            style={{ marginTop: "0.35rem" }}
-          >
-            {analytics.paymentStatuses.slice(0, 4).map((slice) => (
-              <div key={slice.key} className="admin-ops__detail-row">
-                <span>دفع · {slice.label}</span>
-                <strong>{slice.count.toLocaleString("ar-AE")}</strong>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="admin-ops__panel">
-          <div className="admin-ops__panel-head">
-            <h2 className="admin-ops__panel-title">نشاط المدفوعات</h2>
-            <Link className="admin-ops__text-link" href="/admin/stripe">
-              Stripe
-            </Link>
-          </div>
-          <ul className="admin-ops__queue">
-            {pulse.length === 0 ? (
-              <li className="admin-ops__queue-item">
-                <p className="admin-ops__queue-meta">لا أحداث حديثة.</p>
-              </li>
-            ) : (
-              pulse.slice(0, 6).map((item) => (
-                <li key={item.id} className="admin-ops__queue-item">
-                  <div>
-                    <p className="admin-ops__queue-label">{item.text}</p>
-                    <p className="admin-ops__queue-meta">
-                      {item.time
-                        ? new Date(item.time).toLocaleString("ar-AE")
-                        : "الآن"}
-                      {item.orderId ? ` · ${item.orderId}` : ""}
-                    </p>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-          <div className="admin-ops__quick-links">
-            <a
-              className="admin-ops__chip-link"
-              href={stripe.paymentsUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Payments
-            </a>
-            <a
-              className="admin-ops__chip-link"
-              href={stripe.webhooksUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Webhooks
-            </a>
-            <Link className="admin-ops__chip-link" href="/admin/orders">
-              الطلبات
-            </Link>
-            <Link className="admin-ops__chip-link" href="/admin/wallets">
-              المحافظ
-            </Link>
-          </div>
-        </section>
-      </div>
-
-      <section className="admin-ops__panel">
-        <div className="admin-ops__panel-head">
-          <h2 className="admin-ops__panel-title">طابور التشغيل</h2>
-        </div>
-        <div className="admin-ops__queue admin-ops__queue--dense">
-          {attention.map((item) => (
-            <Link
-              key={item.href}
-              className="admin-ops__queue-item"
-              href={item.href}
-            >
-              <div>
-                <p className="admin-ops__queue-label">{item.label}</p>
-                <p className="admin-ops__queue-meta">{item.meta}</p>
-              </div>
-              <span
-                className={`admin-ops__queue-count${
-                  item.alert && item.count > 0
-                    ? " admin-ops__queue-count--alert"
-                    : ""
-                }`}
-              >
-                {item.count.toLocaleString("ar-AE")}
-              </span>
-            </Link>
-          ))}
-        </div>
       </section>
     </div>
   );

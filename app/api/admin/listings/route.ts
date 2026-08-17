@@ -1,7 +1,7 @@
 import {
   isSessionUser,
-  requireAdminUser,
 } from "@/services/auth/require-session";
+import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import {
   createListingFromAdmin,
@@ -11,7 +11,7 @@ import {
 import type { AdminListingCreateInput, Listing } from "@/types";
 
 export async function GET() {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("listings");
   if (!isSessionUser(admin)) {
     return admin;
   }
@@ -23,7 +23,7 @@ export async function GET() {
  * (including localStorage-created ones).
  */
 export async function POST(request: Request) {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("listings");
   if (!isSessionUser(admin)) {
     return admin;
   }

@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { findUserById } from "@/services/auth/user-store";
+import { sendJobApplicationEmails } from "@/services/email/email.service";
 import {
   createJobApplication,
   findJobApplication,
@@ -23,7 +25,7 @@ const schema = z.object({
   currentCity: z.string().min(1),
   yearsOfExperience: z.number().min(0).max(50),
   availabilityDate: z.string().min(1),
-  coverMessage: z.string().min(20),
+  coverMessage: z.string().max(2000).optional().default(""),
   cvFileName: z.string().min(1),
   employerId: z.string().min(1),
   employerName: z.string().min(1),
@@ -87,6 +89,15 @@ export async function POST(request: Request) {
       body: `${payload.applicantName} قدّم على وظيفة «${payload.listingTitle}».`,
     }),
   ]);
+
+  const employerUser = await findUserById(payload.employerId);
+  if (employerUser?.email) {
+    await sendJobApplicationEmails({
+      buyer: { email: payload.applicantEmail, name: payload.applicantName },
+      seller: { email: employerUser.email, name: payload.employerName },
+      listingTitle: payload.listingTitle,
+    });
+  }
 
   return NextResponse.json({ application });
 }
