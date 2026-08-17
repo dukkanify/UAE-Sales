@@ -212,6 +212,18 @@
   gap: 1rem;
 }
 
+.auth-form__legal-link {
+  font-weight: 800;
+  color: #a88642;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 160ms ease;
+}
+
+.auth-form__legal-link:hover {
+  color: #8a7040;
+}
+
 .auth-form__links {
   display: flex;
   flex-wrap: wrap;

@@ -202,11 +202,23 @@ export function RegisterForm() {
           <input className="mt-1 size-4 accent-primary" name="terms" required type="checkbox" />
           <span>
             أوافق على{" "}
-            <Link className="font-semibold text-primary" href="/terms">
+            <Link
+              className="auth-form__legal-link"
+              href="/terms"
+              onClick={(event) => event.stopPropagation()}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               شروط الاستخدام
             </Link>{" "}
             و
-            <Link className="font-semibold text-primary" href="/privacy">
+            <Link
+              className="auth-form__legal-link"
+              href="/privacy"
+              onClick={(event) => event.stopPropagation()}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               سياسة الخصوصية
             </Link>
             .
