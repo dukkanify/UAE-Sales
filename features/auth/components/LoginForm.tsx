@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useState } from "react";
-import { DemoAccountsPanel } from "@/features/auth/components/DemoAccountsPanel";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -13,7 +12,7 @@ import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
-import { setSessionUser } from "@/services/storage";
+import { getAccountProof, saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 
@@ -26,11 +25,8 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function getLoginErrorMessage(data: { message?: string; error?: string }, email: string) {
+function getLoginErrorMessage(data: { message?: string; error?: string }) {
   if (data.error === "INVALID_CREDENTIALS") {
-    if (email.includes("sooqna.demo") || email.includes("uaesales.demo")) {
-      return "بيانات الدخول غير صحيحة. تأكد من البريد وكلمة المرور كما هي: Admin@123 (حرف A كبير).";
-    }
     return data.message ?? "بيانات الدخول غير صحيحة.";
   }
 
@@ -59,6 +55,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       const normalizedPassword = nextPassword.trim();
       const nextParam = new URLSearchParams(window.location.search).get("next");
 
+      const proof = getAccountProof(normalizedEmail);
       const response = await fetch("/api/auth/login/password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,14 +64,25 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
           email: normalizedEmail,
           password: normalizedPassword,
           next: nextParam,
+          accountProof: proof?.passwordHash,
+          fullName: proof?.fullName,
+          accountType: proof?.accountType,
         }),
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(getLoginErrorMessage(data, normalizedEmail));
+        throw new Error(getLoginErrorMessage(data));
       }
 
       setSessionUser(data.user as UserProfile);
+      if (typeof data.accountProof === "string") {
+        saveAccountProof({
+          email: normalizedEmail,
+          passwordHash: data.accountProof,
+          fullName: (data.user as UserProfile).fullName,
+          accountType: (data.user as UserProfile).accountType,
+        });
+      }
       await persistSessionCookie(data.user);
       await syncFavoritesAfterLogin(data.user.id);
       trackAuthEventClient("login_verified");
@@ -82,13 +90,6 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
     },
     [router],
   );
-
-  function fillDemoAccount(nextEmail: string, nextPassword: string) {
-    setEmail(nextEmail);
-    setPassword(nextPassword);
-    setUsePassword(true);
-    setErrors({});
-  }
 
   const { error: submitError, isLoading, run: handleSubmit } = useAsyncAction(
     useCallback(
@@ -139,35 +140,20 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
     ),
   );
 
-  const {
-    error: demoLoginError,
-    isLoading: isDemoLoginLoading,
-    run: loginDemoAccount,
-  } = useAsyncAction(
-    useCallback(
-      async (nextEmail: string, nextPassword: string) => {
-        fillDemoAccount(nextEmail, nextPassword);
-        await completePasswordLogin(nextEmail, nextPassword);
-      },
-      [completePasswordLogin],
-    ),
-  );
-
-  const isBusy = isLoading || isDemoLoginLoading;
-  const authError = submitError ?? demoLoginError;
+  const isBusy = isLoading;
+  const authError = submitError;
 
   return (
-    <>
-      <form
-        className="auth-form"
-        method="post"
-        noValidate
-        onSubmit={(event) => {
-          // Prevent native submit (default method was GET → credentials in URL).
-          event.preventDefault();
-          void handleSubmit(event);
-        }}
-      >
+    <form
+      className="auth-form"
+      method="post"
+      noValidate
+      onSubmit={(event) => {
+        // Prevent native submit (default method was GET → credentials in URL).
+        event.preventDefault();
+        void handleSubmit(event);
+      }}
+    >
         <div className="auth-form__header">
           <p className="auth-form__eyebrow">
             {isAdminNext ? "دخول آمن" : "تسجيل الدخول"}
@@ -190,7 +176,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
           label="البريد الإلكتروني"
           name="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="admin@sooqna.demo"
+          placeholder="name@email.com"
           required
           type="email"
           value={email}
@@ -203,7 +189,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
             label="كلمة المرور"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Admin@123"
+            placeholder="••••••••"
             required
             type="password"
             value={password}
@@ -247,14 +233,5 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
             : "إرسال رمز الدخول"}
         </Button>
       </form>
-
-      {variant === "admin" ? null : (
-        <DemoAccountsPanel
-          isLoading={isBusy}
-          onFillAccount={fillDemoAccount}
-          onLoginAccount={loginDemoAccount}
-        />
-      )}
-    </>
   );
 }

@@ -43,6 +43,16 @@ export function MarketHeader() {
   }, [pathname]);
 
   useEffect(() => {
+    const desktopNav = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (desktopNav.matches) setMenuOpen(false);
+    };
+    closeOnDesktop();
+    desktopNav.addEventListener("change", closeOnDesktop);
+    return () => desktopNav.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!menuOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -96,13 +106,19 @@ export function MarketHeader() {
                 <Icon name="search" size={18} />
               </Link>
 
-              <Link
-                aria-label={user ? "حسابي" : "تسجيل الدخول"}
-                className="market-header__icon-btn market-header__icon-btn--desktop"
-                href={user ? "/profile" : "/login"}
-              >
-                <Icon name="user" size={18} />
-              </Link>
+              {user ? (
+                <Link
+                  aria-label="حسابي"
+                  className="market-header__icon-btn market-header__icon-btn--desktop"
+                  href="/profile"
+                >
+                  <Icon name="user" size={18} />
+                </Link>
+              ) : (
+                <Link className="market-header__join-link" href="/login">
+                  سجّل الدخول وانضم إلينا
+                </Link>
+              )}
             </div>
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
@@ -163,7 +179,7 @@ export function MarketHeader() {
                 onClick={() => setMenuOpen(false)}
               >
                 <Icon name="user" size={16} />
-                {user ? user.fullName.split(" ")[0] : "تسجيل الدخول"}
+                {user ? user.fullName.split(" ")[0] : "سجّل الدخول وانضم إلينا"}
               </Link>
               <Button
                 className="sooqna-gold-gradient rounded-full"

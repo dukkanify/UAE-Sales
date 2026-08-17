@@ -44,6 +44,7 @@ export const STORAGE_KEYS = {
   chatConversations: "sooqna-chat-conversations",
   favorites: "sooqna-favorites",
   theme: "sooqna-theme",
+  accountProofs: "sooqna-account-proofs",
 } as const;
 
 /** Legacy keys migrated on read */

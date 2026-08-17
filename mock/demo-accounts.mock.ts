@@ -34,7 +34,7 @@ export const demoAccounts: DemoAccount[] = [
       listingsCount: 8,
       phone: "0501234567",
       role: "user",
-      walletBalance: 18750,
+      walletBalance: 0,
     },
   },
   {
@@ -57,7 +57,7 @@ export const demoAccounts: DemoAccount[] = [
       phone: "0551234567",
       role: "business",
       subscription: "Premium",
-      walletBalance: 245000,
+      walletBalance: 0,
     },
   },
   {

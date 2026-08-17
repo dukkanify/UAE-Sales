@@ -24,17 +24,25 @@ export async function POST(request: Request) {
   const body = await request.json();
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
+    return NextResponse.json(
+      { error: "INVALID_INPUT", message: "أكمل البيانات المطلوبة بشكل صحيح." },
+      { status: 400 },
+    );
   }
 
-  if (parsed.data.password !== parsed.data.confirmPassword) {
+  const password = parsed.data.password.trim();
+  const confirmPassword = parsed.data.confirmPassword.trim();
+  const email = parsed.data.email.trim().toLowerCase();
+  const fullName = parsed.data.fullName.trim();
+
+  if (password !== confirmPassword) {
     return NextResponse.json(
       { error: "PASSWORD_MISMATCH", message: "كلمتا المرور غير متطابقتين." },
       { status: 400 },
     );
   }
 
-  if (!isStrongPassword(parsed.data.password)) {
+  if (!isStrongPassword(password)) {
     return NextResponse.json(
       {
         error: "WEAK_PASSWORD",
@@ -46,9 +54,9 @@ export async function POST(request: Request) {
 
   try {
     const stored = await createStandardUser({
-      email: parsed.data.email,
-      fullName: parsed.data.fullName,
-      passwordHash: hashPassword(parsed.data.password),
+      email,
+      fullName,
+      passwordHash: hashPassword(password),
       accountType: parsed.data.accountType,
     });
     const profile = toUserProfile(stored);
@@ -70,6 +78,7 @@ export async function POST(request: Request) {
       user: profile,
       redirectTo,
       welcomeEmailed: welcome.emailed,
+      accountProof: stored.passwordHash,
     });
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {

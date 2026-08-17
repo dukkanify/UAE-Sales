@@ -116,23 +116,15 @@ export function SiteHeader() {
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
                 href="/profile"
               >
-                {user.fullName.split(" ")[0]}
+                حسابي
               </Link>
             ) : (
-              <div className="hidden items-center gap-1 sm:flex">
-                <Link
-                  className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink"
-                  href="/login"
-                >
-                  دخول
-                </Link>
-                <Link
-                  className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft"
-                  href="/register"
-                >
-                  انضم إلينا
-                </Link>
-              </div>
+              <Link
+                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft sm:inline-flex"
+                href="/login"
+              >
+                سجّل الدخول وانضم إلينا
+              </Link>
             )}
             {!isComposeListing ? (
               <Button

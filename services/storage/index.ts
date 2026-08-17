@@ -10,6 +10,8 @@ export {
   getRecentSearches,
   getSessionUser,
   isFavoriteListing,
+  saveAccountProof,
+  getAccountProof,
   saveLocalListing,
   setSessionUser,
   toggleFavorite,

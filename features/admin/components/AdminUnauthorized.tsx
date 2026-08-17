@@ -25,11 +25,6 @@ export function AdminUnauthorized() {
             العودة للرئيسية
           </Link>
         </div>
-        <p className="mt-6 text-xs text-muted">
-          تجريبي:{" "}
-          <span className="font-semibold text-ink">admin@sooqna.demo</span> /{" "}
-          <span className="font-semibold text-ink">Admin@123</span>
-        </p>
       </Card>
     </section>
   );

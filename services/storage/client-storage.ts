@@ -192,3 +192,47 @@ export function clearRecentSearches() {
   window.localStorage.removeItem(STORAGE_KEYS.recentSearches);
   window.dispatchEvent(new Event(STORAGE_EVENTS.recentSearchesChange));
 }
+
+type AccountProofRecord = {
+  email: string;
+  passwordHash: string;
+  fullName?: string;
+  accountType?: UserProfile["accountType"];
+};
+
+function getAccountProofs(): AccountProofRecord[] {
+  if (!canUseStorage()) return [];
+  const raw = window.localStorage.getItem(STORAGE_KEYS.accountProofs);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (item): item is AccountProofRecord =>
+        Boolean(
+          item &&
+            typeof item === "object" &&
+            typeof (item as AccountProofRecord).email === "string" &&
+            typeof (item as AccountProofRecord).passwordHash === "string",
+        ),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export function saveAccountProof(input: AccountProofRecord) {
+  if (!canUseStorage()) return;
+  const email = input.email.trim().toLowerCase();
+  if (!email || !input.passwordHash) return;
+  const next = [
+    { ...input, email },
+    ...getAccountProofs().filter((item) => item.email !== email),
+  ].slice(0, 12);
+  safeSetItem(STORAGE_KEYS.accountProofs, JSON.stringify(next));
+}
+
+export function getAccountProof(email: string): AccountProofRecord | null {
+  const normalized = email.trim().toLowerCase();
+  return getAccountProofs().find((item) => item.email === normalized) ?? null;
+}
