@@ -45,6 +45,9 @@ function CourseLaneCover({ course, tone }: { course: CatalogCourse; tone: number
       <div className="course-lane-cover-beam" aria-hidden />
       <div className="course-lane-cover-ticks" aria-hidden />
       <div className="course-lane-cover-frame" aria-hidden />
+      <span className="course-lane-cover-watermark" aria-hidden>
+        {code.replace(/[^0-9A-Z]/gi, "").slice(-3) || "AP"}
+      </span>
       <div className="course-lane-cover-meta">
         <div className="course-lane-cover-top">
           <span className="course-lane-cover-code">{code}</span>
