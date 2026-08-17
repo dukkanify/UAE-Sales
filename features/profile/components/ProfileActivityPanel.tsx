@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { Card } from "@/shared/ui/Card";
+import { EmptyState } from "@/shared/ui/EmptyState";
 import { Icon } from "@/shared/ui/Icon";
 import { getNotifications } from "@/services/activityService";
 
-export async function ProfileActivityPanel() {
-  const notifications = await getNotifications();
+export async function ProfileActivityPanel({ userId }: { userId: string }) {
+  const notifications = await getNotifications(userId);
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
@@ -18,17 +19,42 @@ export async function ProfileActivityPanel() {
             </span>
           ) : null}
         </div>
-        <ul className="mt-4 grid gap-2">
-          {notifications.slice(0, 4).map((item) => (
-            <li
-              key={item.id}
-              className={`rounded-[var(--radius-xl)] px-4 py-3 text-sm ${item.read ? "bg-surface-muted text-muted" : "border border-primary/15 bg-primary-soft"}`}
-            >
-              <p className="font-semibold text-ink">{item.title}</p>
-              <p className="mt-0.5 text-xs">{item.body}</p>
-            </li>
-          ))}
-        </ul>
+        {notifications.length === 0 ? (
+          <div className="mt-4">
+            <EmptyState
+              actionHref="/search"
+              actionLabel="استكشف السوق"
+              description="ستظهر هنا رسالة الترحيب وتنبيهات الطلبات والضمان عندما تحدث فعلاً."
+              icon="message"
+              title="لا إشعارات حتى الآن"
+            />
+          </div>
+        ) : (
+          <ul className="mt-4 grid gap-2">
+            {notifications.slice(0, 8).map((item) => {
+              const content = (
+                <>
+                  <p className="font-semibold text-ink">{item.title}</p>
+                  <p className="mt-0.5 text-xs">{item.body}</p>
+                </>
+              );
+              return (
+                <li
+                  key={item.id}
+                  className={`rounded-[var(--radius-xl)] px-4 py-3 text-sm ${item.read ? "bg-surface-muted text-muted" : "border border-primary/15 bg-primary-soft"}`}
+                >
+                  {item.href ? (
+                    <Link className="block" href={item.href}>
+                      {content}
+                    </Link>
+                  ) : (
+                    content
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </Card>
 
       <div className="grid gap-3 sm:grid-cols-3">

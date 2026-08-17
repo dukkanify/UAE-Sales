@@ -1,3 +1,6 @@
+import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
+import { getAppUrl } from "@/shared/constants/site";
+
 type SendEmailInput = {
   html: string;
   subject: string;
@@ -5,18 +8,32 @@ type SendEmailInput = {
   to: string;
 };
 
+const RESEND_ONBOARDING_FROM = `${BRAND.nameEn} <beth.t@example.com>`;
+const EMAIL_TIMEOUT_MS = 8_000;
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function getFromAddress(): string {
-  const name = process.env.EMAIL_FROM_NAME?.trim() || "Sooqna";
+  const name = process.env.EMAIL_FROM_NAME?.trim() || BRAND.nameEn;
   const address = process.env.EMAIL_FROM_ADDRESS?.trim() || "no-reply@sooqna.site";
   return `${name} <${address}>`;
 }
 
-async function sendWithResend(input: SendEmailInput): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY?.trim();
-  if (!apiKey) {
-    return false;
-  }
+function extractEmailAddress(from: string): string {
+  return from.match(/<([^>]+)>/)?.[1]?.trim().toLowerCase() ?? from.trim().toLowerCase();
+}
 
+async function postResend(
+  from: string,
+  input: SendEmailInput,
+  apiKey: string,
+): Promise<{ body: string; ok: boolean; status: number }> {
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -24,20 +41,77 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: getFromAddress(),
+      from,
       to: [input.to],
       subject: input.subject,
       html: input.html,
       text: input.text,
     }),
+    signal: AbortSignal.timeout(EMAIL_TIMEOUT_MS),
   });
+  const body = await response.text();
+  return { body, ok: response.ok, status: response.status };
+}
 
-  return response.ok;
+async function sendWithResend(input: SendEmailInput): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) {
+    console.warn("[Sooqna Email] RESEND_API_KEY is not set; email not sent", {
+      to: input.to,
+      subject: input.subject,
+    });
+    return false;
+  }
+
+  const primaryFrom = getFromAddress();
+  try {
+    const first = await postResend(primaryFrom, input, apiKey);
+    if (first.ok) {
+      console.info("[Sooqna Email] sent", { to: input.to, subject: input.subject });
+      return true;
+    }
+
+    console.error("[Sooqna Email] Resend rejected", {
+      to: input.to,
+      subject: input.subject,
+      from: primaryFrom,
+      status: first.status,
+      body: first.body.slice(0, 500),
+    });
+
+    const primaryAddress = extractEmailAddress(primaryFrom);
+    if (primaryAddress.endsWith("@resend.dev")) {
+      return false;
+    }
+
+    const retry = await postResend(RESEND_ONBOARDING_FROM, input, apiKey);
+    if (retry.ok) {
+      console.warn(
+        "[Sooqna Email] sent via Resend onboarding sender; verify sooqna.site in Resend",
+        { to: input.to, subject: input.subject },
+      );
+      return true;
+    }
+
+    console.error("[Sooqna Email] Resend retry rejected", {
+      to: input.to,
+      subject: input.subject,
+      status: retry.status,
+      body: retry.body.slice(0, 500),
+    });
+    return false;
+  } catch (error) {
+    console.error("[Sooqna Email] Resend request failed", {
+      to: input.to,
+      subject: input.subject,
+      error: error instanceof Error ? error.message : error,
+    });
+    return false;
+  }
 }
 
 async function deliverEmail(input: SendEmailInput): Promise<void> {
-  const provider = process.env.EMAIL_PROVIDER?.trim() || "resend";
-  const sent = provider === "resend" ? await sendWithResend(input) : await sendWithResend(input);
+  const sent = await sendWithResend(input);
 
   if (sent) {
     return;
@@ -56,10 +130,12 @@ export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean
   try {
     await deliverEmail(input);
     return true;
-  } catch {
-    if (process.env.NODE_ENV !== "production") {
-      console.info("[Sooqna Email:queued]", input.to, input.subject);
-    }
+  } catch (error) {
+    console.error("[Sooqna Email] delivery failed", {
+      to: input.to,
+      subject: input.subject,
+      error: error instanceof Error ? error.message : error,
+    });
     return false;
   }
 }
@@ -163,15 +239,59 @@ export async function sendEmailChangeOtp(input: {
   });
 }
 
+function buildWelcomeEmailHtml(name: string, appUrl: string): string {
+  const safeName = escapeHtml(name);
+  const browseUrl = `${appUrl}/search`;
+  const postUrl = `${appUrl}/listings/new`;
+  const profileUrl = `${appUrl}/profile`;
+  const navy = BRAND_COLORS.navy;
+  const gold = BRAND_COLORS.gold;
+  const cream = BRAND_COLORS.white;
+
+  return `
+    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:${cream};color:${navy};direction:rtl;text-align:right;">
+      <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid ${gold};">
+        <strong style="font-size:24px;color:${navy};">${BRAND.nameAr} ${BRAND.nameEn}</strong>
+        <p style="margin:8px 0 0;font-size:13px;color:#555;">${BRAND.taglineAr}</p>
+      </div>
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${safeName}،</p>
+      <p style="font-size:16px;line-height:1.8;">تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.</p>
+      <p style="font-size:16px;line-height:1.8;">يمكنك الآن تصفّح العروض، نشر إعلانك، أو إدارة حسابك من لوحة التحكم.</p>
+      <div style="margin:28px 0;text-align:center;">
+        <a href="${browseUrl}" style="display:inline-block;margin:6px;padding:12px 22px;background:${gold};color:${navy};text-decoration:none;border-radius:12px;font-weight:700;">تصفّح العروض</a>
+        <a href="${postUrl}" style="display:inline-block;margin:6px;padding:12px 22px;background:${navy};color:#ffffff;text-decoration:none;border-radius:12px;font-weight:700;">أضف إعلانك</a>
+      </div>
+      <p style="font-size:14px;line-height:1.8;color:#555;">حسابك: <a href="${profileUrl}" style="color:${navy};">${profileUrl}</a></p>
+      <p style="font-size:14px;margin-top:32px;color:#555;">فريق ${BRAND.nameAr}</p>
+    </div>
+  `.trim();
+}
+
+function buildWelcomeEmailText(name: string, appUrl: string): string {
+  return [
+    `مرحبًا ${name}،`,
+    "",
+    `تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.`,
+    "",
+    `تصفّح العروض: ${appUrl}/search`,
+    `أضف إعلانك: ${appUrl}/listings/new`,
+    `حسابك: ${appUrl}/profile`,
+    "",
+    `فريق ${BRAND.nameAr}`,
+  ].join("\n");
+}
+
 export async function sendWelcomeEmail(input: {
   email: string;
   name: string;
-}): Promise<void> {
-  await deliverEmail({
+}): Promise<boolean> {
+  const name = input.name.trim() || "عميل سوقنا";
+  const appUrl = getAppUrl();
+  return deliverEmailSafely({
     to: input.email,
-    subject: "مرحبًا بك في سوقنا",
-    html: `<p style="font-family:Tahoma,Arial,sans-serif;direction:rtl;text-align:right;">مرحبًا ${input.name}،<br/>تم إنشاء حسابك بنجاح في سوقنا.</p>`,
-    text: `مرحبًا ${input.name}،\nتم إنشاء حسابك بنجاح في سوقنا.`,
+    subject: `مرحبًا بك في ${BRAND.nameAr} — حسابك جاهز`,
+    html: buildWelcomeEmailHtml(name, appUrl),
+    text: buildWelcomeEmailText(name, appUrl),
   });
 }
 

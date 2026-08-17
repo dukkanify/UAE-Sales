@@ -5,7 +5,7 @@ import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { sendWelcomeEmail } from "@/services/email/email.service";
+import { completeRegistrationWelcome } from "@/services/auth/welcome";
 import {
   activateUser,
   findUserByEmail,
@@ -63,7 +63,11 @@ export async function POST(request: Request) {
     );
   }
 
-  void sendWelcomeEmail({ email: user.email, name: user.fullName }).catch(() => undefined);
+  await completeRegistrationWelcome({
+    userId: user.id,
+    email: user.email,
+    name: user.fullName,
+  });
   trackAuthEvent("registration_verified", { accountType: user.accountType });
 
   const redirectTo = getRedirectAfterAuth(user, parsed.data.next);

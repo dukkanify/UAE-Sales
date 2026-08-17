@@ -9,7 +9,7 @@ import {
 } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
-import { deliverEmailSafely, sendWelcomeEmail } from "@/services/email/email.service";
+import { completeRegistrationWelcome } from "@/services/auth/welcome";
 
 const schema = z.object({
   fullName: z.string().min(3),
@@ -54,22 +54,23 @@ export async function POST(request: Request) {
     const profile = toUserProfile(stored);
     await setSessionCookie(profile);
     trackAuthEvent("registration_verified");
-    void sendWelcomeEmail({
+    const welcome = await completeRegistrationWelcome({
+      userId: profile.id,
       email: profile.email,
       name: profile.fullName,
-    }).catch(() => deliverEmailSafely({
-      to: profile.email,
-      subject: "مرحبًا بك في سوقنا",
-      html: `<p>مرحبًا ${profile.fullName}</p>`,
-      text: `مرحبا ${profile.fullName}`,
-    }));
+    });
 
     const redirectTo = getSafeNextPath(
       parsed.data.next,
       getRedirectAfterAuth(profile, parsed.data.next),
     );
 
-    return NextResponse.json({ ok: true, user: profile, redirectTo });
+    return NextResponse.json({
+      ok: true,
+      user: profile,
+      redirectTo,
+      welcomeEmailed: welcome.emailed,
+    });
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
       return NextResponse.json(

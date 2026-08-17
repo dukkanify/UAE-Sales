@@ -1,4 +1,5 @@
 export type NotificationType =
+  | "welcome"
   | "order_paid"
   | "order_confirmed"
   | "order_released"
@@ -18,6 +19,7 @@ export type AppNotification = {
   type: NotificationType;
   title: string;
   body: string;
+  href?: string;
   read: boolean;
   createdAt: string;
 };

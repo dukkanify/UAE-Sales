@@ -33,7 +33,7 @@ export default async function ProfilePage() {
               <FavoritesPanel />
             </div>
           </Card>
-          <ProfileActivityPanel />
+          <ProfileActivityPanel userId={user.id} />
         </DashboardShell>
       </main>
       <SiteFooter />

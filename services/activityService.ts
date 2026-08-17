@@ -1,8 +1,8 @@
-import { mockDashboardNotifications } from "@/mock";
+import { getNotificationsForUser } from "@/services/payments/notification-store";
 import { getCategoryFallbackUrl, unsplashUrl } from "@/shared/constants/image-fallbacks";
 
-export async function getNotifications() {
-  return mockDashboardNotifications;
+export async function getNotifications(userId: string) {
+  return getNotificationsForUser(userId);
 }
 
 export async function getSavedListings() {

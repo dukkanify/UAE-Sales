@@ -8,8 +8,8 @@ import { setSessionCookie } from "@/services/auth/session-cookie";
 import {
   sendLoginVerificationEmail,
   sendOtpEmail,
-  sendWelcomeEmail,
 } from "@/services/email/email.service";
+import { completeRegistrationWelcome } from "@/services/auth/welcome";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
@@ -138,11 +138,11 @@ export async function POST(request: Request) {
 
     const user = buildRegisteredUser(email, metadata);
     await setSessionCookie(user);
-    try {
-      await sendWelcomeEmail({ email: user.email, name: user.fullName });
-    } catch {
-      // Welcome email is non-blocking after account activation
-    }
+    await completeRegistrationWelcome({
+      userId: user.id,
+      email: user.email,
+      name: user.fullName,
+    });
     return NextResponse.json({ ok: true, user });
   }
 
