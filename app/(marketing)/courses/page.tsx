@@ -8,9 +8,8 @@ import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
 
-/** Avoid CDN-caching catalog HTML with ephemeral course UUIDs. */
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+/** Cache catalog HTML briefly; publishes revalidate within a minute. */
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "ATPL courses",

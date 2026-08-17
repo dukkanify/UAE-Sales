@@ -94,6 +94,18 @@ export type InstructorCourseGroup = {
 export function applyDueScheduledPublishes(): number {
   ensureCoursesSeeded();
   const now = Date.now();
+  const snapshot = readCoursesDb();
+  const hasDue = snapshot.courses.some((course) => {
+    if (course.deletedAt || course.status !== "scheduled" || !course.scheduledPublishAt) {
+      return false;
+    }
+    if (!course.primaryInstructorId) return false;
+    const at = Date.parse(course.scheduledPublishAt);
+    return !Number.isNaN(at) && at <= now;
+  });
+  // Hot path for marketing SSR — skip disk write when nothing is due.
+  if (!hasDue) return 0;
+
   let changed = 0;
   writeCoursesDb((d) => {
     for (let i = 0; i < d.courses.length; i += 1) {
