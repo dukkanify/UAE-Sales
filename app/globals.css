@@ -519,14 +519,24 @@ html[data-theme="dark"] .market-hero-search {
   height: 2.35rem;
   place-items: center;
   border: 0 !important;
-  border-radius: 999px !important;
-  background: transparent !important;
-  color: var(--color-ink);
   box-shadow: none !important;
+  border-radius: 999px;
+  color: var(--color-ink);
+  background: transparent;
   transition:
-    background 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
+    background var(--duration-fast) var(--ease-premium),
+    color var(--duration-fast) var(--ease-premium),
+    transform var(--duration-fast) var(--ease-premium);
+}
+
+.market-header__icon-btn--desktop {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .market-header__icon-btn--desktop {
+    display: grid;
+  }
 }
 
 .market-header__icon-btn--desktop {
