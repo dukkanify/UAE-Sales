@@ -23,12 +23,12 @@ function HomeCoursesByInstructor() {
           <p className="landing-kicker text-primary">Courses</p>
           <div className="mt-5 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h2 className="max-w-[14ch] font-display text-[clamp(2rem,4.6vw,3.6rem)] font-semibold tracking-[-0.035em] text-foreground leading-[1.05]">
-                Published ATPL lanes by instructor
+              <h2 className="max-w-[12ch] font-display text-[clamp(2.1rem,4.8vw,3.7rem)] font-semibold tracking-[-0.04em] text-foreground leading-[1.02]">
+                ATPL lanes by instructor
               </h2>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Open a lane for the full syllabus — then enter the platform to enroll, or book live
-                Zoom when you need coaching altitude.
+                Open a lane for the syllabus — then enroll on AviatorPass, or book live Zoom when
+                you need coaching altitude.
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-4">
@@ -47,8 +47,6 @@ function HomeCoursesByInstructor() {
             </div>
           </div>
         </div>
-
-        <div className="landing-rule mt-12 opacity-60" />
 
         {groups.length === 0 ? (
           <p className="mt-16 text-sm text-muted-foreground">

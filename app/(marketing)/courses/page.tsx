@@ -101,7 +101,7 @@ export default function PublicCoursesPage() {
       </section>
 
       <section id="catalog-lanes" className="catalog-page-body scroll-mt-28">
-        <div className="container-app py-16 sm:py-24">
+        <div className="container-app relative z-10 py-16 sm:py-24 lg:py-28">
           <PublicCourseCatalog />
         </div>
       </section>
