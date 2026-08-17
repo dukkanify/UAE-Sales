@@ -215,6 +215,9 @@ export function CategoryFieldsForm({
               className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
             >
               {renderField(field, defaults, selectedFeatures)}
+              {field.note ? (
+                <p className="mt-1 text-xs text-muted">{field.note}</p>
+              ) : null}
               {errors[field.key] ? (
                 <FormMessage variant="error">{String(errors[field.key])}</FormMessage>
               ) : null}

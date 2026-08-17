@@ -52,6 +52,20 @@ export function ListingDetailsView({
           <div className="min-w-0 lg:col-start-1">
             <ListingGallery listing={listing} />
 
+            {listing.videoUrl ? (
+              <div className="marketplace-panel mt-4 p-4">
+                <p className="text-sm font-semibold text-ink">فيديو الإعلان</p>
+                <a
+                  className="mt-1 block break-all text-sm font-medium text-primary underline-offset-2 hover:underline"
+                  href={listing.videoUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {listing.videoUrl}
+                </a>
+              </div>
+            ) : null}
+
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">
                 {getListingCardBadges(listing).map((badge) => (

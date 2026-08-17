@@ -87,6 +87,8 @@ export type Listing = {
   emirate?: string;
   area?: string;
   images?: string[];
+  /** Optional listing video URL (YouTube / direct link). */
+  videoUrl?: string;
   isPremium?: boolean;
   /** Urgent sale — highlighted on listing cards. */
   isUrgent?: boolean;
@@ -94,6 +96,10 @@ export type Listing = {
   escrowAvailable?: boolean;
   verifiedSeller?: boolean;
   postedAt?: string;
+  /** ISO timestamp when the listing becomes / became expired. */
+  expiresAt?: string;
+  /** ISO timestamp until which the listing stays featured. */
+  featuredUntil?: string;
   contactMethod?: ContactMethod;
   deliveryOption?: DeliveryOption;
   features?: string[];

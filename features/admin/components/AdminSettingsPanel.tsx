@@ -122,6 +122,50 @@ export function AdminSettingsPanel() {
             }
           />
           <Input
+            label="مهلة النزاع (أيام)"
+            type="number"
+            value={String(settings.disputeWindowDays)}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                disputeWindowDays: Number(e.target.value),
+              })
+            }
+          />
+          <Input
+            label="مدة نشاط الإعلان (أيام)"
+            type="number"
+            value={String(settings.listingActiveDays)}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                listingActiveDays: Number(e.target.value),
+              })
+            }
+          />
+          <Input
+            label="رسوم الإعلان المميز (AED)"
+            type="number"
+            value={String(settings.featuredListingFeeAed)}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                featuredListingFeeAed: Number(e.target.value),
+              })
+            }
+          />
+          <Input
+            label="مدة التمييز (أيام)"
+            type="number"
+            value={String(settings.featuredListingDays)}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                featuredListingDays: Number(e.target.value),
+              })
+            }
+          />
+          <Input
             label="بريد الدعم"
             type="email"
             value={settings.supportEmail}

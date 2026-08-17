@@ -3,7 +3,11 @@
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { AdminUserRecord } from "@/types";
+import type { AdminPermission, AdminUserRecord } from "@/types";
+import {
+  ALL_ADMIN_PERMISSIONS,
+  ADMIN_PERMISSION_LABELS,
+} from "@/services/auth/admin-permission-checks";
 import { getSessionUser } from "@/services/storage";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
@@ -59,7 +63,12 @@ export function AdminUsersPanel() {
 
   async function patchUser(
     id: string,
-    patch: Partial<Pick<AdminUserRecord, "isVerified" | "accountStatus">>,
+    patch: Partial<
+      Pick<
+        AdminUserRecord,
+        "isVerified" | "accountStatus" | "role" | "adminPermissions"
+      >
+    >,
   ) {
     const session = getSessionUser();
     if (!session) return;
@@ -81,6 +90,15 @@ export function AdminUsersPanel() {
     } finally {
       setBusyId(null);
     }
+  }
+
+  function togglePermission(user: AdminUserRecord, permission: AdminPermission) {
+    const current = user.adminPermissions ?? [];
+    const has = current.includes(permission);
+    const next = has
+      ? current.filter((item) => item !== permission)
+      : [...current, permission];
+    void patchUser(user.id, { adminPermissions: next });
   }
 
   return (
@@ -167,7 +185,47 @@ export function AdminUsersPanel() {
                   إعادة تفعيل
                 </Button>
               )}
+              {user.role !== "admin" ? (
+                <Button
+                  loading={busyId === user.id}
+                  onClick={() => patchUser(user.id, { role: "admin" })}
+                  size="sm"
+                  variant="secondary"
+                >
+                  ترقية لمدير
+                </Button>
+              ) : null}
             </div>
+            {user.role === "admin" ? (
+              <div className="mt-4 rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 p-3">
+                <p className="text-xs font-semibold text-ink">
+                  صلاحيات الإدارة
+                </p>
+                <p className="mt-1 text-[11px] text-muted">
+                  فارغة = وصول كامل. فعّل صلاحيات محددة لتقييد الوصول.
+                </p>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {ALL_ADMIN_PERMISSIONS.map((permission) => {
+                    const checked =
+                      (user.adminPermissions ?? []).includes(permission);
+                    return (
+                      <label
+                        key={permission}
+                        className="flex items-center gap-2 text-xs text-ink"
+                      >
+                        <input
+                          checked={checked}
+                          disabled={busyId === user.id}
+                          onChange={() => togglePermission(user, permission)}
+                          type="checkbox"
+                        />
+                        {ADMIN_PERMISSION_LABELS[permission]}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </Card>
         ))
       )}

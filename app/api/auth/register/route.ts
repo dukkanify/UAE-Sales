@@ -9,6 +9,7 @@ import {
 } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
+import { deliverEmailSafely, sendWelcomeEmail } from "@/services/email/email.service";
 
 const schema = z.object({
   fullName: z.string().min(3),
@@ -53,6 +54,15 @@ export async function POST(request: Request) {
     const profile = toUserProfile(stored);
     await setSessionCookie(profile);
     trackAuthEvent("registration_verified");
+    void sendWelcomeEmail({
+      email: profile.email,
+      name: profile.fullName,
+    }).catch(() => deliverEmailSafely({
+      to: profile.email,
+      subject: "مرحبًا بك في سوقنا",
+      html: `<p>مرحبًا ${profile.fullName}</p>`,
+      text: `مرحبا ${profile.fullName}`,
+    }));
 
     const redirectTo = getSafeNextPath(
       parsed.data.next,

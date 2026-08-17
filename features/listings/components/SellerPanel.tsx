@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
@@ -27,11 +30,38 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           listing.seller.rating,
       );
 
+  const [storeAverage, setStoreAverage] = useState<number | null>(null);
+  const [storeCount, setStoreCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/sellers/${encodeURIComponent(listing.seller.id)}/ratings`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (typeof data.average === "number" && data.count > 0) {
+          setStoreAverage(data.average);
+          setStoreCount(data.count);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [listing.seller.id]);
+
+  const rating =
+    storeAverage ??
+    (typeof listing.seller.rating === "number" ? listing.seller.rating : null);
+  const reviewCount =
+    storeCount ??
+    (typeof listing.seller.reviewCount === "number"
+      ? listing.seller.reviewCount
+      : null);
+
+  const showRating = typeof rating === "number" && rating > 0;
+  const showReviews = typeof reviewCount === "number" && reviewCount > 0;
   const showCompany = listing.seller.sellerType === "business";
-  const showRating =
-    !isUserListing && typeof listing.seller.rating === "number";
-  const showReviews =
-    !isUserListing && typeof listing.seller.reviewCount === "number";
   const showResponseTime = Boolean(listing.seller.responseTime?.trim());
   const showJoinedAt = Boolean(listing.seller.joinedAt?.trim());
   const showTransactions =
@@ -62,11 +92,11 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           {showRating ? (
             <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
               <Icon className="text-secondary" name="star" size={14} />
-              {listing.seller.rating}
+              {rating}
               {showReviews ? (
                 <>
                   <span className="text-border">·</span>
-                  {listing.seller.reviewCount!.toLocaleString("ar-AE")} تقييم
+                  {reviewCount!.toLocaleString("ar-AE")} تقييم
                 </>
               ) : null}
             </p>

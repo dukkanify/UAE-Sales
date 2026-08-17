@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { findUserById } from "@/services/auth/user-store";
+import { sendViewingBookingEmails } from "@/services/email/email.service";
 import { createNotification } from "@/services/payments/notification-store";
 import {
   assertNotOwnListing,
@@ -99,6 +101,17 @@ export async function POST(request: Request) {
       body: `${payload.buyerName} حجز معاينة لـ «${payload.listingTitle}».`,
     }),
   ]);
+
+  const sellerUser = await findUserById(payload.sellerId);
+  if (sellerUser?.email) {
+    await sendViewingBookingEmails({
+      buyer: { email: payload.buyerEmail, name: payload.buyerName },
+      seller: { email: sellerUser.email, name: payload.sellerName },
+      listingTitle: payload.listingTitle,
+      date: payload.date,
+      time: payload.time,
+    });
+  }
 
   return NextResponse.json({ booking });
 }

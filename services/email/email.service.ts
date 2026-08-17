@@ -199,3 +199,84 @@ export async function sendLoginVerificationEmail(input: {
 }): Promise<void> {
   await sendLoginOtp(input);
 }
+
+type EmailParty = {
+  email: string;
+  name: string;
+};
+
+function buildTransactionalHtml(body: string): string {
+  return `
+    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
+      </div>
+      ${body}
+      <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
+    </div>
+  `.trim();
+}
+
+export async function sendViewingBookingEmails(input: {
+  buyer: EmailParty;
+  seller: EmailParty;
+  listingTitle: string;
+  date: string;
+  time: string;
+}): Promise<void> {
+  const buyerHtml = buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.buyer.name}،</p>
+      <p style="font-size:16px;line-height:1.8;">تم تأكيد حجز معاينة لعقار «${input.listingTitle}».</p>
+      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${input.date}</strong><br/>الوقت: <strong>${input.time}</strong></p>
+    `);
+  const sellerHtml = buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.seller.name}،</p>
+      <p style="font-size:16px;line-height:1.8;">حجز معاينة جديد على إعلانك «${input.listingTitle}» من ${input.buyer.name}.</p>
+      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${input.date}</strong><br/>الوقت: <strong>${input.time}</strong></p>
+    `);
+
+  await Promise.all([
+    deliverEmailSafely({
+      to: input.buyer.email,
+      subject: `تأكيد معاينة — ${input.listingTitle}`,
+      html: buyerHtml,
+      text: `مرحبًا ${input.buyer.name}،\nتم تأكيد معاينة «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\nفريق سوقنا`,
+    }),
+    deliverEmailSafely({
+      to: input.seller.email,
+      subject: `حجز معاينة جديد — ${input.listingTitle}`,
+      html: sellerHtml,
+      text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\nفريق سوقنا`,
+    }),
+  ]);
+}
+
+export async function sendJobApplicationEmails(input: {
+  buyer: EmailParty;
+  seller: EmailParty;
+  listingTitle: string;
+}): Promise<void> {
+  const applicantHtml = buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.buyer.name}،</p>
+      <p style="font-size:16px;line-height:1.8;">تم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.</p>
+    `);
+  const employerHtml = buildTransactionalHtml(`
+      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.seller.name}،</p>
+      <p style="font-size:16px;line-height:1.8;">طلب توظيف جديد من ${input.buyer.name} على وظيفة «${input.listingTitle}».</p>
+    `);
+
+  await Promise.all([
+    deliverEmailSafely({
+      to: input.buyer.email,
+      subject: `طلب توظيف — ${input.listingTitle}`,
+      html: applicantHtml,
+      text: `مرحبًا ${input.buyer.name}،\nتم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.\nفريق سوقنا`,
+    }),
+    deliverEmailSafely({
+      to: input.seller.email,
+      subject: `طلب توظيف جديد — ${input.listingTitle}`,
+      html: employerHtml,
+      text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} قدّم على وظيفة «${input.listingTitle}».\nفريق سوقنا`,
+    }),
+  ]);
+}

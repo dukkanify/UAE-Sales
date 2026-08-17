@@ -11,15 +11,16 @@ import { getAllListings } from "@/services/listings/listing-store";
 
 const FILE = "categories.json";
 
-type StoredCategory = Category & { enabled: boolean };
+type StoredCategory = Category & { enabled: boolean; sortOrder: number };
 
 let cacheRows: StoredCategory[] | null = null;
 let inflight: Promise<StoredCategory[]> | null = null;
 
 function seedCategories(): StoredCategory[] {
-  return mockCategories.map((category) => ({
+  return mockCategories.map((category, index) => ({
     ...category,
     enabled: true,
+    sortOrder: index + 1,
   }));
 }
 
@@ -48,7 +49,12 @@ async function loadCategoryRecordsUncached(): Promise<StoredCategory[]> {
         await saveCollection(FILE, seeded);
         return setCache(seeded);
       }
-      return setCache(stored);
+      return setCache(
+        stored.map((row, index) => ({
+          ...row,
+          sortOrder: typeof row.sortOrder === "number" ? row.sortOrder : index + 1,
+        })),
+      );
     })().finally(() => {
       inflight = null;
     });
@@ -75,6 +81,7 @@ export const getEnabledCategories = cache(async (): Promise<Category[]> => {
 
   return categories
     .filter((category) => category.enabled)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ar"))
     .map((category) => ({
       id: category.id,
       name: category.name,
@@ -102,13 +109,17 @@ export async function getAdminCategoryRecords(): Promise<AdminCategoryRecord[]> 
     counts.set(listing.categoryId, (counts.get(listing.categoryId) ?? 0) + 1);
   }
 
-  return categories.map((category) => ({
+  return categories
+    .slice()
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "ar"))
+    .map((category) => ({
     id: category.id,
     name: category.name,
     slug: category.slug,
     icon: category.icon,
     listingCount: counts.get(category.id) ?? 0,
     enabled: category.enabled,
+    sortOrder: category.sortOrder,
     subcategories: [...category.subcategories],
   }));
 }
@@ -118,6 +129,10 @@ export async function createCategoryRecord(
 ): Promise<AdminCategoryRecord> {
   const categories = await loadCategoryRecordsUncached();
   const slug = input.slug.trim().toLowerCase().replace(/\s+/g, "-");
+  const maxOrder = categories.reduce(
+    (max, row) => Math.max(max, row.sortOrder ?? 0),
+    0,
+  );
   const record: StoredCategory = {
     id: `cat-${Date.now()}`,
     name: input.name.trim(),
@@ -126,6 +141,7 @@ export async function createCategoryRecord(
     listingCount: 0,
     subcategories: [],
     enabled: true,
+    sortOrder: input.sortOrder ?? maxOrder + 1,
   };
   categories.unshift(record);
   await saveCollection(FILE, categories);
@@ -137,6 +153,7 @@ export async function createCategoryRecord(
     icon: record.icon,
     listingCount: 0,
     enabled: true,
+    sortOrder: record.sortOrder,
     subcategories: [],
   };
 }
@@ -163,6 +180,7 @@ export async function patchCategoryRecord(
     icon: row.icon,
     listingCount: row.listingCount,
     enabled: row.enabled,
+    sortOrder: row.sortOrder,
     subcategories: [...row.subcategories],
   };
 }

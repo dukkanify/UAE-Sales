@@ -10,6 +10,9 @@ export async function GET() {
       allowGuestCheckout: settings.allowGuestCheckout,
       supportEmail: settings.supportEmail,
       escrowHoldDays: settings.escrowHoldDays,
+      disputeWindowDays: settings.disputeWindowDays,
+      listingActiveDays: settings.listingActiveDays,
+      featuredListingFeeAed: settings.featuredListingFeeAed,
     },
   });
 }

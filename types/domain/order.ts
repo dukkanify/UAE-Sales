@@ -92,5 +92,9 @@ export type Order = {
   confirmedAt?: string;
   releasedAt?: string;
   refundedAt?: string;
+  sellerProofUrls?: string[];
+  sellerProofNote?: string;
+  sellerProofAt?: string;
+  buyerMatchConfirmedAt?: string;
   auditLog: OrderAuditEvent[];
 };

@@ -24,7 +24,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     const status =
       message === "UNAUTHORIZED"
         ? 403
-        : message === "INVALID_STATUS"
+        : message === "INVALID_STATUS" || message === "PROOF_REQUIRED"
           ? 409
           : 500;
     return NextResponse.json({ error: message }, { status });

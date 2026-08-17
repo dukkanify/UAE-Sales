@@ -16,6 +16,7 @@ import {
   deleteLocalListing,
   getLocalListingsForSeller,
   getSessionUser,
+  saveLocalListing,
 } from "@/services/storage";
 
 type MyListingsDashboardProps = {
@@ -31,25 +32,33 @@ const statusOrder: ListingStatus[] = [
   "rejected",
 ];
 
+function readFeaturedSuccessFlag(): boolean {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("featured") === "1";
+}
+
 export function MyListingsDashboard({
   categories,
   listings,
 }: MyListingsDashboardProps) {
   const [activeStatus, setActiveStatus] = useState("all");
   const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const [overrides, setOverrides] = useState<Record<string, Listing>>({});
   const [actionMessage, setActionMessage] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [featuredSuccess] = useState(readFeaturedSuccessFlag);
 
   const allListings = useMemo(() => {
     const byId = new Map<string, Listing>();
-    // Server listings already scoped to the signed-in user.
     for (const listing of listings) {
-      byId.set(listing.id, listing);
+      byId.set(listing.id, overrides[listing.id] ?? listing);
     }
     for (const listing of localListings) {
-      byId.set(listing.id, listing);
+      byId.set(listing.id, overrides[listing.id] ?? listing);
     }
     return Array.from(byId.values());
-  }, [listings, localListings]);
+  }, [listings, localListings, overrides]);
 
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
@@ -78,6 +87,10 @@ export function MyListingsDashboard({
     })),
   ];
 
+  const successMessage =
+    actionMessage ||
+    (featuredSuccess ? "تم تمييز الإعلان بنجاح." : "");
+
   useEffect(() => {
     const syncLocalListings = () => {
       const user = getSessionUser();
@@ -92,6 +105,67 @@ export function MyListingsDashboard({
       window.removeEventListener(STORAGE_EVENTS.sessionChange, syncLocalListings);
     };
   }, []);
+
+  function applyListingUpdate(updated: Listing) {
+    setOverrides((prev) => ({ ...prev, [updated.id]: updated }));
+    if (updated.id.startsWith("local-")) {
+      saveLocalListing(updated);
+    }
+  }
+
+  async function handleRenew(listing: Listing) {
+    setBusyId(listing.id);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const response = await fetch(`/api/listings/${listing.id}/renew`, {
+        method: "PATCH",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setActionError("تعذر تجديد الإعلان.");
+        return;
+      }
+      applyListingUpdate(data.listing as Listing);
+      setActionMessage("تم إرسال الإعلان للتجديد وهو قيد المراجعة.");
+    } catch {
+      setActionError("تعذر تجديد الإعلان.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleFeature(listing: Listing) {
+    setBusyId(listing.id);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const response = await fetch(`/api/listings/${listing.id}/feature`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setActionError(
+          data.error === "ALREADY_FEATURED"
+            ? "هذا الإعلان مميز بالفعل."
+            : "تعذر بدء تمييز الإعلان.",
+        );
+        return;
+      }
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl as string;
+        return;
+      }
+      if (data.listing) {
+        applyListingUpdate(data.listing as Listing);
+      }
+      setActionMessage("تم تمييز الإعلان بنجاح.");
+    } catch {
+      setActionError("تعذر بدء تمييز الإعلان.");
+    } finally {
+      setBusyId(null);
+    }
+  }
 
   return (
     <div className="grid gap-5">
@@ -128,9 +202,10 @@ export function MyListingsDashboard({
         </div>
       </div>
 
-      {actionMessage ? (
-        <FormMessage variant="success">{actionMessage}</FormMessage>
+      {successMessage ? (
+        <FormMessage variant="success">{successMessage}</FormMessage>
       ) : null}
+      {actionError ? <FormMessage variant="error">{actionError}</FormMessage> : null}
 
       {filteredListings.length === 0 ? (
         <EmptyState
@@ -150,7 +225,19 @@ export function MyListingsDashboard({
                 listing={listing}
               />
               <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                <ListingStatusBadge status={listing.status} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <ListingStatusBadge status={listing.status} />
+                  {listing.status === "expired" ? (
+                    <span className="rounded-[var(--radius-md)] border border-error/20 bg-error-soft px-2 py-0.5 text-[11px] font-semibold text-error">
+                      منتهي الصلاحية
+                    </span>
+                  ) : null}
+                  {listing.isFeatured ? (
+                    <span className="rounded-[var(--radius-md)] border border-[#c9a45c]/35 bg-[#c9a45c]/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                      مميز
+                    </span>
+                  ) : null}
+                </div>
                 <div className="flex flex-wrap gap-2">
                 <Button
                   href={
@@ -174,6 +261,26 @@ export function MyListingsDashboard({
                 >
                   تعديل
                 </Button>
+                {listing.status === "expired" ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleRenew(listing)}
+                    size="sm"
+                    variant="accent"
+                  >
+                    تجديد
+                  </Button>
+                ) : null}
+                {!listing.isFeatured && listing.status !== "expired" ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleFeature(listing)}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    تمييز الإعلان
+                  </Button>
+                ) : null}
                 {listing.id.startsWith("local-") ? (
                   <Button
                     onClick={() => {

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+
+type LocationOption = { id: string; name: string };
 
 type EmirateLocationSelectProps = {
   className?: string;
@@ -18,6 +20,26 @@ export function EmirateLocationSelect({
   variant = "mobile",
 }: EmirateLocationSelectProps) {
   const [city, setCity] = useState(defaultCity);
+  const [options, setOptions] = useState<LocationOption[]>(cities);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/locations")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        const list = (data?.locations ?? []) as LocationOption[];
+        if (list.length > 0) {
+          setOptions(list.map((item) => ({ id: item.id, name: item.name })));
+        }
+      })
+      .catch(() => {
+        /* keep constants fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleChange(nextCity: string) {
     setCity(nextCity);
@@ -37,7 +59,7 @@ export function EmirateLocationSelect({
           onChange={(event) => handleChange(event.target.value)}
           value={city}
         >
-          {cities.map((item) => (
+          {options.map((item) => (
             <option key={item.id} value={item.name}>
               {item.name}
             </option>
@@ -58,7 +80,7 @@ export function EmirateLocationSelect({
         onChange={(event) => handleChange(event.target.value)}
         value={city}
       >
-        {cities.map((item) => (
+        {options.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name}
           </option>

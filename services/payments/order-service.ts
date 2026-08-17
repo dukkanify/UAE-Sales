@@ -381,6 +381,16 @@ export async function handleCheckoutSessionCompleted(
     payment_intent?: string | { id: string } | null;
   },
 ): Promise<void> {
+  if (session.metadata?.type === "featured_listing") {
+    const listingId = session.metadata.listingId;
+    if (!listingId) return;
+    const { markListingFeatured } = await import(
+      "@/services/payments/featured-checkout.service"
+    );
+    await markListingFeatured(listingId, session.id);
+    return;
+  }
+
   const orderId = session.metadata?.orderId;
   if (!orderId) return;
 
@@ -411,35 +421,68 @@ export async function handlePaymentIntentFailed(
   );
 }
 
-export async function confirmOrderReceived(
-  orderId: string,
-  buyerId: string,
+/** Shared escrow release path used by buyer confirm / match flows. */
+async function releaseEscrowToSeller(
+  order: Order,
+  audit: { type: string; message: string },
+  options?: { buyerMatchConfirmedAt?: string },
 ): Promise<Order | undefined> {
-  const order = await getOrderById(orderId);
-  if (!order) return undefined;
-  if (order.buyerId !== buyerId) {
-    throw new Error("UNAUTHORIZED");
+  if (order.status === "released" && order.escrowStatus === "released") {
+    if (options?.buyerMatchConfirmedAt && !order.buyerMatchConfirmedAt) {
+      return updateOrder(order.id, {
+        buyerMatchConfirmedAt: options.buyerMatchConfirmedAt,
+      });
+    }
+    return order;
   }
 
-  if (!isValidOrderTransition(order.status, "confirmed")) {
+  const fromHeld =
+    order.status === "paid_held_in_escrow" || order.status === "delivered";
+  const fromConfirmed = order.status === "confirmed";
+
+  if (!fromHeld && !fromConfirmed) {
     throw new Error("INVALID_STATUS");
   }
 
-  const updated = await updateOrder(
-    orderId,
-    {
-      status: "confirmed",
-      escrowStatus: "released",
-      confirmedAt: new Date().toISOString(),
-      releasedAt: new Date().toISOString(),
-    },
-    {
-      type: "buyer_confirmed",
-      message: "أكد المشتري استلام الطلب",
-    },
-  );
+  if (fromHeld && !isValidOrderTransition(order.status, "confirmed")) {
+    throw new Error("INVALID_STATUS");
+  }
+  if (fromConfirmed && !isValidOrderTransition(order.status, "released")) {
+    throw new Error("INVALID_STATUS");
+  }
 
-  if (!updated) return undefined;
+  const now = new Date().toISOString();
+  const matchPatch = options?.buyerMatchConfirmedAt
+    ? { buyerMatchConfirmedAt: options.buyerMatchConfirmedAt }
+    : {};
+
+  let working: Order | undefined;
+  if (fromHeld) {
+    working = await updateOrder(
+      order.id,
+      {
+        status: "confirmed",
+        escrowStatus: "released",
+        confirmedAt: now,
+        releasedAt: now,
+        ...matchPatch,
+      },
+      audit,
+    );
+  } else {
+    working = await updateOrder(
+      order.id,
+      {
+        status: "released",
+        escrowStatus: "released",
+        releasedAt: now,
+        ...matchPatch,
+      },
+      audit,
+    );
+  }
+
+  if (!working) return undefined;
 
   const sellerNet = order.fees.productPrice;
   await addWalletTransaction(order.sellerId, {
@@ -458,8 +501,138 @@ export async function confirmOrderReceived(
     body: `تم تحويل ${formatCurrencyLabel(sellerNet)} إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
   });
 
-  const released = await updateOrder(orderId, { status: "released" });
+  if (order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "order_confirmed",
+      title: "تم تأكيد الاستلام",
+      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
+    });
+  }
+
+  if (working.status === "released") {
+    return working;
+  }
+
+  return updateOrder(order.id, { status: "released" });
+}
+
+export async function submitSellerProof(
+  orderId: string,
+  sellerId: string,
+  proofUrls: string[],
+  note?: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.sellerId !== sellerId) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  const eligible =
+    order.status === "paid_held_in_escrow" || order.status === "delivered";
+  if (!eligible) {
+    throw new Error("INVALID_STATUS");
+  }
+
+  const urls = proofUrls.map((url) => url.trim()).filter(Boolean);
+  if (urls.length === 0) {
+    throw new Error("INVALID_PROOF");
+  }
+
+  const updated = await updateOrder(
+    orderId,
+    {
+      sellerProofUrls: urls,
+      sellerProofNote: note?.trim() || undefined,
+      sellerProofAt: new Date().toISOString(),
+    },
+    {
+      type: "seller_proof_submitted",
+      message: "رفع البائع إثبات التسليم / المطابقة",
+    },
+  );
+
+  if (!updated) return undefined;
+
+  if (order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "seller_proof",
+      title: "إثبات من البائع",
+      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+    });
+  }
+
+  return updated;
+}
+
+/**
+ * Buyer confirms item match after seller proof — preferred release path.
+ * Sets buyerMatchConfirmedAt then releases escrow like confirmOrderReceived.
+ */
+export async function confirmBuyerMatch(
+  orderId: string,
+  buyerId: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.buyerId !== buyerId) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!order.sellerProofAt) {
+    throw new Error("PROOF_REQUIRED");
+  }
+
+  if (order.buyerMatchConfirmedAt && order.status === "released") {
+    return order;
+  }
+
+  const matchAt = new Date().toISOString();
+  const released = await releaseEscrowToSeller(
+    order,
+    {
+      type: "buyer_match_confirmed",
+      message: "أكد المشتري المطابقة وتم تحويل الضمان",
+    },
+    { buyerMatchConfirmedAt: matchAt },
+  );
+
+  if (released && order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "buyer_match",
+      title: "تم تأكيد المطابقة",
+      body: `تم تأكيد مطابقة طلب «${order.listingTitle}» وتحرير الضمان.`,
+    });
+  }
+
   return released;
+}
+
+/** Buyer confirm receipt — requires seller proof before escrow release. */
+export async function confirmOrderReceived(
+  orderId: string,
+  buyerId: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.buyerId !== buyerId) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!order.sellerProofAt) {
+    throw new Error("PROOF_REQUIRED");
+  }
+
+  return releaseEscrowToSeller(order, {
+    type: "buyer_confirmed",
+    message: "أكد المشتري استلام الطلب",
+  });
 }
 
 /** Caller must enforce admin session before invoking. */

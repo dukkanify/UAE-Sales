@@ -51,6 +51,7 @@ export function useEditListingForm(listingId: string) {
       const formData = new FormData(event.currentTarget);
       const categoryId = currentListing.categoryId;
       const contact = String(formData.get("contact") ?? "").trim();
+      const videoUrl = String(formData.get("videoUrl") ?? "").trim();
       const parsed = parseCategoryForm(formData, categoryId);
       const nextErrors: CategoryFieldErrors = { ...parsed.errors };
 
@@ -98,6 +99,7 @@ export function useEditListingForm(listingId: string) {
         emirate: parsed.emirate,
         contactPhone: contact,
         contactMethod: "both",
+        videoUrl: videoUrl || undefined,
       };
 
       saveLocalListing(updatedListing);

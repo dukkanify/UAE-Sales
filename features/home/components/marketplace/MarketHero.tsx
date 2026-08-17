@@ -23,7 +23,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
     <section className="market-hero relative overflow-hidden">
       <div className="market-hero-bg absolute inset-0">
         <AppImage
-          alt="أفق دبي — برج خليفة وأفق المدينة"
+          alt="أفق الإمارات ومطار دولي"
           className="object-cover object-center"
           fallback="emirates"
           fill
@@ -42,7 +42,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
             <div className="market-hero-copy">
               <span className="market-hero-chip inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold shadow-sm">
                 <span className="inline-block h-3.5 w-5 overflow-hidden rounded-sm uae-flag-strip" />
-                منصة إماراتية موثوقة
+                من الإمارات إلى العالم
               </span>
 
               <h1 className="market-hero-title mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl md:leading-[1.1]">

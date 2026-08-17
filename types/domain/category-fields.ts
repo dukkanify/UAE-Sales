@@ -18,6 +18,8 @@ export type CategoryFieldDefinition = {
   required?: boolean;
   placeholder?: string;
   options?: CategoryFieldOption[];
+  /** Helper note shown under the field */
+  note?: string;
   /** Included in auto-generated listing title */
   titlePart?: boolean;
   /** Searchable in query matching */

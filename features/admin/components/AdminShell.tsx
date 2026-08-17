@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { UserProfile } from "@/types";
+import type { AdminPermission } from "@/types/domain/user";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
 import { BRAND } from "@/shared/constants/brand";
+import { hasAdminPermission } from "@/services/auth/admin-permission-checks";
 import { clearSessionUser, getSessionUser } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
 import "./admin-ops.css";
@@ -23,6 +25,7 @@ export type AdminPath =
   | "/admin/listings"
   | "/admin/disputes"
   | "/admin/categories"
+  | "/admin/locations"
   | "/admin/orders"
   | "/admin/escrow"
   | "/admin/wallets"
@@ -51,6 +54,7 @@ const adminLinks: {
   label: string;
   group: NavGroup;
   keywords: string;
+  permission?: AdminPermission;
 }[] = [
   {
     href: "/admin",
@@ -65,6 +69,7 @@ const adminLinks: {
     label: "التحليلات",
     group: "insight",
     keywords: "إحصائيات charts trends",
+    permission: "reports",
   },
   {
     href: "/admin/reports",
@@ -72,6 +77,7 @@ const adminLinks: {
     label: "التقارير",
     group: "insight",
     keywords: "مالية fees volume",
+    permission: "reports",
   },
   {
     href: "/admin/users",
@@ -79,6 +85,7 @@ const adminLinks: {
     label: "المستخدمون",
     group: "moderation",
     keywords: "حسابات تعليق تحقق",
+    permission: "users",
   },
   {
     href: "/admin/listings",
@@ -86,6 +93,7 @@ const adminLinks: {
     label: "الإعلانات",
     group: "moderation",
     keywords: "مراجعة اعتماد إضافة نشر إعلان",
+    permission: "listings",
   },
   {
     href: "/admin/disputes",
@@ -93,6 +101,7 @@ const adminLinks: {
     label: "النزاعات",
     group: "moderation",
     keywords: "خلاف حكم",
+    permission: "disputes",
   },
   {
     href: "/admin/categories",
@@ -100,6 +109,15 @@ const adminLinks: {
     label: "التصنيفات",
     group: "moderation",
     keywords: "فئات",
+    permission: "categories",
+  },
+  {
+    href: "/admin/locations",
+    icon: "map",
+    label: "المواقع / المدن",
+    group: "moderation",
+    keywords: "مدن مواقع emirates",
+    permission: "categories",
   },
   {
     href: "/admin/orders",
@@ -107,6 +125,7 @@ const adminLinks: {
     label: "الطلبات",
     group: "money",
     keywords: "استرداد checkout",
+    permission: "orders",
   },
   {
     href: "/admin/escrow",
@@ -114,6 +133,7 @@ const adminLinks: {
     label: "الضمان",
     group: "money",
     keywords: "حجز escrow",
+    permission: "payments",
   },
   {
     href: "/admin/wallets",
@@ -121,6 +141,7 @@ const adminLinks: {
     label: "المحافظ",
     group: "money",
     keywords: "أرصدة",
+    permission: "payments",
   },
   {
     href: "/admin/stripe",
@@ -128,6 +149,7 @@ const adminLinks: {
     label: "Stripe",
     group: "money",
     keywords: "دفع بوابة webhook payments",
+    permission: "payments",
   },
   {
     href: "/admin/favorites",
@@ -135,6 +157,7 @@ const adminLinks: {
     label: "المفضلة",
     group: "insight",
     keywords: "favorites اهتمام",
+    permission: "listings",
   },
   {
     href: "/admin/notifications",
@@ -142,6 +165,7 @@ const adminLinks: {
     label: "الإشعارات",
     group: "leads",
     keywords: "تنبيهات notifications",
+    permission: "listings",
   },
   {
     href: "/admin/addresses",
@@ -149,6 +173,7 @@ const adminLinks: {
     label: "العناوين",
     group: "leads",
     keywords: "توصيل addresses",
+    permission: "orders",
   },
   {
     href: "/admin/job-applications",
@@ -156,6 +181,7 @@ const adminLinks: {
     label: "التوظيف",
     group: "leads",
     keywords: "وظائف",
+    permission: "listings",
   },
   {
     href: "/admin/viewing-bookings",
@@ -163,6 +189,7 @@ const adminLinks: {
     label: "المعاينات",
     group: "leads",
     keywords: "عقارات",
+    permission: "listings",
   },
   {
     href: "/admin/quote-requests",
@@ -170,6 +197,7 @@ const adminLinks: {
     label: "عروض الأسعار",
     group: "leads",
     keywords: "خدمات",
+    permission: "listings",
   },
   {
     href: "/admin/settings",
@@ -177,6 +205,7 @@ const adminLinks: {
     label: "إعدادات الموقع",
     group: "system",
     keywords: "رسوم صيانة stripe url",
+    permission: "settings",
   },
   {
     href: "/admin/audit",
@@ -184,6 +213,7 @@ const adminLinks: {
     label: "سجل العمليات",
     group: "system",
     keywords: "audit log تاريخ",
+    permission: "settings",
   },
 ];
 
@@ -233,15 +263,19 @@ export function AdminShell({
   }, [pathname, activePath, router]);
 
   const filteredLinks = useMemo(() => {
+    const permitted = adminLinks.filter(
+      (link) =>
+        !link.permission || hasAdminPermission(displayUser, link.permission),
+    );
     const q = query.trim().toLowerCase();
-    if (!q) return adminLinks;
-    return adminLinks.filter(
+    if (!q) return permitted;
+    return permitted.filter(
       (link) =>
         link.label.includes(query.trim()) ||
         link.keywords.toLowerCase().includes(q) ||
         link.href.includes(q),
     );
-  }, [query]);
+  }, [query, displayUser]);
 
   async function handleLogout() {
     clearSessionUser();
@@ -382,7 +416,7 @@ export function AdminShell({
           </header>
 
           <div className="admin-ops__mobile-nav" aria-label="تنقل سريع">
-            {adminLinks.map((link) => {
+            {filteredLinks.map((link) => {
               const active = link.href === activePath;
               return (
                 <Link

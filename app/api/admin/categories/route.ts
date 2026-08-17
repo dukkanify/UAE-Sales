@@ -1,7 +1,7 @@
 import {
   isSessionUser,
-  requireAdminUser,
 } from "@/services/auth/require-session";
+import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import {
   createCategoryRecord,
@@ -10,7 +10,7 @@ import {
 import type { AdminCategoryCreateInput } from "@/types";
 
 export async function GET() {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("categories");
   if (!isSessionUser(admin)) {
     return admin;
   }
@@ -18,7 +18,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("categories");
   if (!isSessionUser(admin)) {
     return admin;
   }

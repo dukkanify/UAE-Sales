@@ -1,7 +1,7 @@
 import {
   isSessionUser,
-  requireAdminUser,
 } from "@/services/auth/require-session";
+import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import {
@@ -13,7 +13,7 @@ import type { AdminListingPatch } from "@/types";
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, context: RouteParams) {
-  const admin = await requireAdminUser();
+  const admin = await requireAdminPermission("listings");
   if (!isSessionUser(admin)) {
     return admin;
   }
