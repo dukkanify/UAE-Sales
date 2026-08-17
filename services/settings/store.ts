@@ -126,7 +126,7 @@ function migrateBrandingAssets(settings: PlatformSettings): PlatformSettings {
   for (const key of ["logoUrl", "darkLogoUrl", "faviconUrl", "openGraphImageUrl"] as const) {
     const current = branding[key];
     if (typeof current === "string" && /brand-guide-\d+/.test(current)) {
-      const next = current.replace(/brand-guide-\d+/, "brand-guide-3");
+      const next = current.replace(/brand-guide-\d+/, "brand-guide-4");
       if (next !== current) {
         branding[key] = next;
         changed = true;
