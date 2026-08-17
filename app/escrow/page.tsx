@@ -15,10 +15,10 @@ const statusLabels = {
 } as const;
 
 export default async function EscrowPage() {
-  const [user, transactions, summary, steps] = await Promise.all([
-    requireCurrentUser("/escrow"),
-    getEscrowTransactions(),
-    getEscrowSummary(),
+  const user = await requireCurrentUser("/escrow");
+  const [transactions, summary, steps] = await Promise.all([
+    getEscrowTransactions(user.id),
+    getEscrowSummary(user.id),
     getMarketEscrowSteps(),
   ]);
 

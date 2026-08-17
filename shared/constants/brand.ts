@@ -7,6 +7,7 @@ export const BRAND = {
     "منصة سوق إماراتية موثوقة — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
   copyright: "© 2026 سوقنا Sooqna. جميع الحقوق محفوظة.",
   domain: "sooqna.site",
+  supportEmail: "support@sooqna.site",
 } as const;
 
 export const BRAND_COLORS = {

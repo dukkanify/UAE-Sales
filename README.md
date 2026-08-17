@@ -4,16 +4,22 @@
 
 ## Current Status
 
-**Closed Beta Ready** — `v0.1.0-beta`
+**Live marketplace** on [sooqna.site](https://sooqna.site) — `v0.1.0-beta` going public.
 
-This release is frozen for closed beta testing. All critical demo flows pass (register, login, dynamic listings, search, chat, wallet). Payment completion, orders, and admin moderation remain placeholders — see [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md).
+Customer flows that are live in this codebase:
+
+- Register, login (including after logout), profile, and in-app notifications
+- Welcome email and viewing/job/quote confirmation emails (needs `RESEND_API_KEY`)
+- Browse, search, listing details, add/edit listings
+- Checkout + Stripe escrow, orders, disputes, wallet (real zeros until payments exist)
+- Admin cockpit, support form, chat
+
+Production env checklist: `STRIPE_*` per [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md), `RESEND_API_KEY`, `EMAIL_FROM_ADDRESS`, `NEXT_PUBLIC_APP_URL=https://sooqna.site`.
 
 | Document | Purpose |
 |----------|---------|
-| [CLOSED_BETA_PLAN.md](./CLOSED_BETA_PLAN.md) | Beta scope, test accounts, success criteria |
-| [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) | Placeholder surfaces and technical limits |
-| [BETA_FEEDBACK_FORM.md](./BETA_FEEDBACK_FORM.md) | Feedback questions for testers |
-| [FINAL_E2E_QA_REPORT.md](./FINAL_E2E_QA_REPORT.md) | Full QA flow matrix |
+| [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md) | Stripe keys and webhook |
+| [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) | Remaining infra limits |
 
 ## Setup
 
@@ -22,9 +28,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
-
-No environment variables are required for the current mock-data flow. `NEXT_PUBLIC_API_BASE_URL` is referenced by `services/apiClient.ts` but is not wired to any page yet.
+Open `http://localhost:3000`. Copy `.env.example` for Stripe/email keys. Mocks still work without keys; production mail and card payments need Resend + Stripe.
 
 ### Production build
 
@@ -42,32 +46,17 @@ npm run start
 | Business | `company@sooqna.demo` | `Company@123` | `123456` | `/dashboard/listings` |
 | Admin | `admin@sooqna.demo` | `Admin@123` | `123456` | `/admin` |
 
-New accounts can also be created via `/register`. Data is stored in the browser (`localStorage`) and does not sync across devices.
+New accounts are created via `/register`. Demo logins are not shown on the public login screen.
 
-## What Works in Beta
+## What Works Live
 
-- Register and login (demo accounts + new local accounts)
-- Add and edit listings with dynamic category fields (cars, real estate, mobiles, electronics, jobs, services)
-- Search catalog and locally created listings
-- Listing detail pages with data-integrity specs (no fake fields on user listings)
-- Chat with sellers (demo and local listings)
-- Wallet and escrow overview (mock balances and transactions)
-- Profile editing (persists locally)
-
-## Known Placeholders
-
-These routes exist but are **not fully functional** in `v0.1.0-beta`:
-
-| Surface | Route | Status |
-|---------|-------|--------|
-| Checkout completion | `/checkout` | Coming Soon — shows listing context only |
-| Order details | — | Not implemented |
-| Admin moderation | `/admin` | Coming Soon — no approve/reject actions |
-| Disputes form | `/disputes/new` | Coming Soon |
-| Notifications page | — | Mock panel on profile only; no `/notifications` route |
-| Mark order delivered | — | Not implemented |
-
-See [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) for the full list.
+- Register and login (accounts persist across logout on the same browser)
+- Welcome email + in-app welcome notification
+- Add and edit listings with dynamic category fields
+- Search catalog and user listings
+- Viewing bookings, job applications, and quote requests with confirmation email
+- Stripe checkout, orders, escrow, disputes, wallet ledger
+- Admin moderation and support contact form
 
 ## Known Limitations
 

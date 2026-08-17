@@ -1,9 +1,17 @@
 import { getAllOrders } from "@/services/payments/order-store";
 
-export async function getEscrowTransactions() {
+function isEscrowVisible(status: string) {
+  return status === "held" || status === "released";
+}
+
+export async function getEscrowTransactions(userId?: string) {
   const orders = await getAllOrders();
   return orders
-    .filter((order) => order.escrowStatus === "held" || order.escrowStatus === "released")
+    .filter((order) => {
+      if (!isEscrowVisible(order.escrowStatus)) return false;
+      if (!userId) return true;
+      return order.buyerId === userId || order.sellerId === userId;
+    })
     .map((order) => ({
       id: order.id,
       listingTitle: order.listingTitle,
@@ -21,13 +29,13 @@ export async function getEscrowTransactions() {
     }));
 }
 
-export async function getEscrowSummary() {
-  const orders = await getAllOrders();
-  const held = orders.filter((order) => order.escrowStatus === "held");
+export async function getEscrowSummary(userId?: string) {
+  const transactions = await getEscrowTransactions(userId);
+  const held = transactions.filter((item) => item.status === "held");
 
   return {
     activeHolds: held.length,
-    totalProtected: held.reduce((sum, order) => sum + order.fees.productPrice, 0),
+    totalProtected: held.reduce((sum, item) => sum + item.amount, 0),
     currency: "AED" as const,
   };
 }
