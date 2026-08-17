@@ -539,6 +539,44 @@ html[data-theme="dark"] .market-hero-search {
   }
 }
 
+.market-header__join-link {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.35rem;
+  max-width: 9.5rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--color-ink);
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+@media (min-width: 640px) {
+  .market-header__join-link {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .market-header__join-link {
+    max-width: none;
+    font-size: 0.78rem;
+    white-space: nowrap;
+    padding-inline: 0.85rem;
+  }
+}
+
+.market-header__join-link:hover {
+  background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
+  color: #a88642;
+}
+
 .market-header__icon-btn:hover {
   background: color-mix(in srgb, var(--color-secondary) 14%, transparent);
   color: #a88642;
