@@ -6,7 +6,7 @@ import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 import { getWalletSummary } from "@/services/walletService";
 
 const activityLabels = {
@@ -22,7 +22,7 @@ const activityLabels = {
 
 export default async function WalletPage() {
   const [user, wallet] = await Promise.all([
-    getCurrentUser(),
+    requireCurrentUser("/wallet"),
     getWalletSummary(),
   ]);
 

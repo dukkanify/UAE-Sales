@@ -1,11 +1,11 @@
 import { BusinessOnboardingForm } from "@/features/auth/components/BusinessOnboardingForm";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
 export default async function BusinessOnboardingPage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser("/dashboard/business-onboarding");
 
   return (
     <>

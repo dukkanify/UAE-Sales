@@ -1,8 +1,9 @@
 "use client";
 
 import type { Category } from "@/types";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
+import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
@@ -19,6 +20,9 @@ type AddListingFormProps = {
 
 export function AddListingForm({ categories }: AddListingFormProps) {
   const detailsSectionRef = useRef<HTMLDivElement>(null);
+  const [defaultContact] = useState(
+    () => getSessionUser()?.phone?.trim() ?? "",
+  );
   const {
     errors,
     handleImageChange,
@@ -94,6 +98,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         </div>
 
         <MediaContactStep
+          defaultContact={defaultContact}
           errors={errors}
           imagePreviews={imagePreviews}
           onImageChange={handleImageChange}
@@ -101,10 +106,10 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
           <p className="font-medium">
-            بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
+            بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث.
           </p>
           <Button className="shrink-0" loading={isSubmitting} type="submit">
-            نشر الإعلان
+            إرسال للمراجعة
           </Button>
         </Card>
       </div>

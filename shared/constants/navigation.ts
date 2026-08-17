@@ -17,16 +17,17 @@ export const footerLinks = [
     title: "حسابك",
     links: [
       { label: "تسجيل الدخول", href: "/login" },
+      { label: "إنشاء حساب", href: "/register" },
       { label: "إعلاناتي", href: "/dashboard/listings" },
-      { label: "المحفظة", href: "/wallet" },
     ],
   },
   {
-    title: "الدعم",
+    title: "الدعم والسياسات",
     links: [
       { label: "كيف يعمل الضمان", href: "/escrow" },
-      { label: "فتح نزاع", href: "/disputes/new" },
       { label: "تواصل معنا", href: "/support" },
+      { label: "الشروط والأحكام", href: "/terms" },
+      { label: "سياسة الخصوصية", href: "/privacy" },
     ],
   },
 ];

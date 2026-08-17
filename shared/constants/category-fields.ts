@@ -48,6 +48,17 @@ const carFields: CategoryFieldDefinition[] = [
     placeholder: "ابحث عن الماركة (Toy… Nissan…)",
   },
   { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "condition",
+    label: "حالة السيارة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "جديدة", value: "new" },
+      { label: "مستعملة", value: "used" },
+      { label: "ممتازة", value: "excellent" },
+    ],
+  },
   { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
   { key: "city", label: "المدينة", type: "text", required: true, searchable: true },
@@ -154,9 +165,9 @@ const mobileFields: CategoryFieldDefinition[] = [
   { key: "purchaseDate", label: "تاريخ الشراء", type: "text", required: true },
   { key: "accessoriesIncluded", label: "الملحقات المرفقة", type: "textarea", required: true },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
-    { label: "جديد", value: "جديد" },
-    { label: "مستعمل", value: "مستعمل" },
-    { label: "ممتاز", value: "ممتاز" },
+    { label: "جديد", value: "new" },
+    { label: "مستعمل", value: "used" },
+    { label: "ممتاز", value: "excellent" },
   ]},
 ];
 
@@ -173,9 +184,9 @@ const electronicsFields: CategoryFieldDefinition[] = [
   },
   { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
-    { label: "جديد", value: "جديد" },
-    { label: "مستعمل", value: "مستعمل" },
-    { label: "ممتاز", value: "ممتاز" },
+    { label: "جديد", value: "new" },
+    { label: "مستعمل", value: "used" },
+    { label: "ممتاز", value: "excellent" },
   ]},
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accessories", label: "الملحقات", type: "textarea", required: true },

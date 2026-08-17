@@ -32,6 +32,25 @@ function hasFieldValue(value: string | string[]): boolean {
   return value.length > 0;
 }
 
+function normalizeCondition(value: string): ListingCondition {
+  const normalized = value.trim().toLowerCase();
+  if (
+    normalized === "new" ||
+    value === "جديد" ||
+    value === "جديدة"
+  ) {
+    return "new";
+  }
+  if (
+    normalized === "excellent" ||
+    value === "ممتاز" ||
+    value === "ممتازة"
+  ) {
+    return "excellent";
+  }
+  return "used";
+}
+
 export function parseCategoryForm(
   formData: FormData,
   categoryId: string,
@@ -86,7 +105,7 @@ export function parseCategoryForm(
     }
 
     if (field.key === "condition") {
-      condition = value as ListingCondition;
+      condition = normalizeCondition(value);
     } else if (field.key === "city") {
       city = value;
     } else if (field.key === "emirate") {

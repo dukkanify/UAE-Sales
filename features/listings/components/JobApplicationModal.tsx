@@ -55,11 +55,6 @@ export function JobApplicationModal({
     const years = Number(form.get("yearsOfExperience"));
     const coverMessage = String(form.get("coverMessage") ?? "").trim();
 
-    if (coverMessage.length < 20) {
-      setError("رسالة التقديم يجب أن تكون 20 حرفاً على الأقل.");
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/job-applications", {
@@ -76,7 +71,7 @@ export function JobApplicationModal({
           currentCity: String(form.get("currentCity") ?? ""),
           yearsOfExperience: years,
           availabilityDate: String(form.get("availabilityDate") ?? ""),
-          coverMessage,
+          coverMessage: coverMessage || "تم التقديم عبر الملف المرفق.",
           cvFileName,
           employerId: listing.seller.id,
           employerName: listing.seller.name,
@@ -162,10 +157,9 @@ export function JobApplicationModal({
             />
           </div>
           <Textarea
-            label="رسالة التقديم"
+            label="رسالة التقديم (اختياري)"
             name="coverMessage"
-            placeholder="اذكر خبرتك ولماذا أنت مناسب لهذه الوظيفة..."
-            required
+            placeholder="اذكر خبرتك أو أي ملاحظة — اختيارية"
           />
           <div className="flex gap-2">
             <Button loading={isSubmitting} type="submit" variant="accent">

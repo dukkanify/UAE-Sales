@@ -126,7 +126,7 @@ export function SiteFooter() {
               </Link>
             ))}
           </div>
-          <p className="text-xs text-muted/80">صُمم في الإمارات 🇦🇪</p>
+          <p className="text-xs text-muted/80">تطوير وتنفيذ: دكانيفاي</p>
         </div>
       </div>
     </footer>

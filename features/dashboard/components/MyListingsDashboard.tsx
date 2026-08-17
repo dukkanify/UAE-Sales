@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { demoAccounts } from "@/mock/demo-accounts.mock";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
@@ -32,12 +31,6 @@ const statusOrder: ListingStatus[] = [
   "rejected",
 ];
 
-function isDemoSessionUser(email?: string, id?: string) {
-  return demoAccounts.some(
-    (account) => account.profile.email === email || account.profile.id === id,
-  );
-}
-
 export function MyListingsDashboard({
   categories,
   listings,
@@ -45,12 +38,18 @@ export function MyListingsDashboard({
   const [activeStatus, setActiveStatus] = useState("all");
   const [localListings, setLocalListings] = useState<Listing[]>([]);
   const [actionMessage, setActionMessage] = useState("");
-  const [showDemoListings, setShowDemoListings] = useState(false);
 
   const allListings = useMemo(() => {
-    const demoListings = showDemoListings ? listings : [];
-    return [...localListings, ...demoListings];
-  }, [listings, localListings, showDemoListings]);
+    const byId = new Map<string, Listing>();
+    // Server listings already scoped to the signed-in user.
+    for (const listing of listings) {
+      byId.set(listing.id, listing);
+    }
+    for (const listing of localListings) {
+      byId.set(listing.id, listing);
+    }
+    return Array.from(byId.values());
+  }, [listings, localListings]);
 
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
@@ -82,10 +81,7 @@ export function MyListingsDashboard({
   useEffect(() => {
     const syncLocalListings = () => {
       const user = getSessionUser();
-      setLocalListings(
-        user ? getLocalListingsForSeller(user.id) : [],
-      );
-      setShowDemoListings(isDemoSessionUser(user?.email, user?.id));
+      setLocalListings(user ? getLocalListingsForSeller(user.id) : []);
     };
 
     syncLocalListings();

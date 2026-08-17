@@ -2,7 +2,7 @@ import { OrderDetailContent } from "@/features/orders/components/OrderDetailCont
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 type OrderPageProps = {
   params: Promise<{ id: string }>;
@@ -12,7 +12,7 @@ type OrderPageProps = {
 export default async function OrderPage({ params, searchParams }: OrderPageProps) {
   const { id } = await params;
   const { payment } = await searchParams;
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser("/orders");
 
   return (
     <>

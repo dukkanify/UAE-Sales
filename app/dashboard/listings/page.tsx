@@ -4,13 +4,13 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import { getMyListings } from "@/services/listings";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 export default async function DashboardListingsPage() {
-  const [categories, listings, user] = await Promise.all([
+  const user = await requireCurrentUser("/dashboard/listings");
+  const [categories, listings] = await Promise.all([
     getCategories(),
-    getMyListings(),
-    getCurrentUser(),
+    getMyListings(user.id),
   ]);
 
   return (
