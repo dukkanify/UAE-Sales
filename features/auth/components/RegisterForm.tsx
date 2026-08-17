@@ -13,7 +13,7 @@ import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
-import { setSessionUser } from "@/services/storage";
+import { saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 type RegisterErrors = {
@@ -90,6 +90,14 @@ export function RegisterForm() {
           throw new Error(data.message ?? "تعذر إنشاء الحساب.");
         }
         setSessionUser(data.user as UserProfile);
+        if (typeof data.accountProof === "string") {
+          saveAccountProof({
+            email: nextEmail,
+            passwordHash: data.accountProof,
+            fullName,
+            accountType,
+          });
+        }
         await persistSessionCookie(data.user);
         trackAuthEventClient("registration_verified");
         router.push(getSafeNextPath(data.redirectTo, "/profile"));

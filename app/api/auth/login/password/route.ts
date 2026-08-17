@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { findDemoAccount } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { findUserByEmail, toUserProfile, getRedirectAfterAuth } from "@/services/auth/user-store";
+import { findUserByEmail, toUserProfile, getRedirectAfterAuth, restoreUserWithPasswordProof } from "@/services/auth/user-store";
 import { verifyPassword } from "@/services/auth/password.service";
 import { getPostLoginPath } from "@/services/auth/auth.service";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
@@ -12,6 +12,9 @@ const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
   next: z.string().optional(),
+  accountProof: z.string().min(20).optional(),
+  fullName: z.string().min(1).optional(),
+  accountType: z.enum(["buyer", "seller", "business", "individual", "company"]).optional(),
 });
 
 function passwordMatches(storedHash: string, password: string): boolean {
@@ -44,7 +47,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, user: demo.profile, redirectTo });
     }
 
-    const stored = await findUserByEmail(email);
+    let stored = await findUserByEmail(email);
+    const credentialsMatch = Boolean(
+      stored?.passwordHash && passwordMatches(stored.passwordHash, password),
+    );
+    if (!credentialsMatch && parsed.data.accountProof) {
+      stored =
+        (await restoreUserWithPasswordProof({
+          email,
+          password,
+          passwordHash: parsed.data.accountProof,
+          fullName: parsed.data.fullName,
+          accountType: parsed.data.accountType,
+        })) ?? stored;
+    }
     if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
       if (stored.accountStatus === "suspended") {
         return NextResponse.json(
@@ -68,7 +84,12 @@ export async function POST(request: Request) {
         parsed.data.next,
         getRedirectAfterAuth(user, parsed.data.next),
       );
-      return NextResponse.json({ ok: true, user, redirectTo });
+      return NextResponse.json({
+        ok: true,
+        user,
+        redirectTo,
+        accountProof: stored.passwordHash,
+      });
     }
 
     return NextResponse.json(

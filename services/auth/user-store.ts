@@ -1,6 +1,11 @@
 import { demoAccounts } from "@/mock/demo-accounts.mock";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
-import { hashPassword } from "@/services/auth/password.service";
+import { hashPassword, verifyPassword } from "@/services/auth/password.service";
+import {
+  findInAccountVault,
+  readAccountVault,
+  upsertAccountVault,
+} from "@/services/auth/account-vault";
 import type { AccountStatus, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
@@ -83,39 +88,82 @@ function ensureDemoUsers(users: StoredUser[]): StoredUser[] {
   return changed ? Array.from(byEmail.values()) : users;
 }
 
+async function mergeVaultUsers(users: StoredUser[]): Promise<StoredUser[]> {
+  const vault = await readAccountVault();
+  if (vault.length === 0) return users;
+
+  const byEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
+  let changed = false;
+  for (const account of vault) {
+    const email = account.email.toLowerCase();
+    const existing = byEmail.get(email);
+    if (!existing) {
+      byEmail.set(email, account);
+      changed = true;
+      continue;
+    }
+    if (!existing.passwordHash && account.passwordHash) {
+      byEmail.set(email, { ...existing, ...account, id: existing.id });
+      changed = true;
+    }
+  }
+
+  return changed ? Array.from(byEmail.values()) : users;
+}
+
 export async function getAllUsers(): Promise<StoredUser[]> {
   const users = await loadCollection<StoredUser>(FILE);
-  if (users.length === 0) {
-    const seeded = seedDemoUsers([]);
-    await saveCollection(FILE, seeded);
-    return seeded;
+  let next = users;
+  if (next.length === 0) {
+    next = seedDemoUsers([]);
+    await saveCollection(FILE, next);
+  } else {
+    const ensured = ensureDemoUsers(next);
+    if (ensured !== next) {
+      next = ensured;
+      await saveCollection(FILE, next);
+    }
   }
 
-  const ensured = ensureDemoUsers(users);
-  if (ensured !== users) {
-    await saveCollection(FILE, ensured);
-    return ensured;
+  const merged = await mergeVaultUsers(next);
+  if (merged !== next) {
+    await saveCollection(FILE, merged);
+    return merged;
   }
 
-  return users;
+  return next;
 }
 
 export async function findUserByEmail(email: string): Promise<StoredUser | null> {
   const normalized = email.trim().toLowerCase();
   const users = await getAllUsers();
-  return users.find((user) => user.email.toLowerCase() === normalized) ?? null;
+  const found = users.find((user) => user.email.toLowerCase() === normalized);
+  if (found) return found;
+
+  const vaulted = await findInAccountVault(normalized);
+  if (!vaulted) return null;
+  return saveUser(vaulted);
 }
 
 export async function findUserById(id: string): Promise<StoredUser | null> {
   const users = await getAllUsers();
-  return users.find((user) => user.id === id) ?? null;
+  const found = users.find((user) => user.id === id);
+  if (found) return found;
+  const vault = await readAccountVault();
+  const vaulted = vault.find((user) => user.id === id);
+  if (!vaulted) return null;
+  return saveUser(vaulted);
 }
 
 export async function saveUser(user: StoredUser): Promise<StoredUser> {
   const users = await getAllUsers();
-  const next = users.filter((item) => item.id !== user.id);
+  const next = users.filter(
+    (item) =>
+      item.id !== user.id && item.email.toLowerCase() !== user.email.toLowerCase(),
+  );
   next.unshift(user);
   await saveCollection(FILE, next);
+  await upsertAccountVault(user);
   return user;
 }
 
@@ -227,6 +275,52 @@ export async function setUserPassword(userId: string, passwordHash: string): Pro
   const updated: StoredUser = { ...user, passwordHash };
   await saveUser(updated);
   return toProfile(updated);
+}
+
+/** Recreate a registered account on this instance from a client/device password proof. */
+export async function restoreUserWithPasswordProof(input: {
+  email: string;
+  password: string;
+  passwordHash: string;
+  fullName?: string;
+  accountType?: StoredUser["accountType"];
+}): Promise<StoredUser | null> {
+  if (!verifyPassword(input.password, input.passwordHash)) {
+    return null;
+  }
+
+  const email = input.email.trim().toLowerCase();
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    return saveUser({
+      ...existing,
+      passwordHash: input.passwordHash,
+      accountStatus: existing.accountStatus === "suspended" ? "suspended" : "active",
+    });
+  }
+
+  return saveUser({
+    id: `user-${Date.now()}`,
+    fullName: input.fullName?.trim() || email.split("@")[0],
+    email,
+    normalizedEmail: email,
+    phone: "",
+    city: "دبي",
+    accountType: input.accountType ?? "individual",
+    isVerified: true,
+    joinedAt: new Date().toISOString().slice(0, 10),
+    accountStatus: "active",
+    emailVerifiedAt: new Date().toISOString(),
+    passwordHash: input.passwordHash,
+    registrationSource: "STANDARD",
+    isGuestConverted: false,
+    onboardingStatus: input.accountType === "company" ? "business_pending" : "none",
+    role:
+      input.accountType === "company" || input.accountType === "business"
+        ? "business"
+        : "user",
+    walletBalance: 0,
+  });
 }
 
 export async function updateUserOnboarding(

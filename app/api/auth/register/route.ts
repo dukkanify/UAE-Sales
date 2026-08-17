@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const stored = await createStandardUser({
       email: parsed.data.email,
       fullName: parsed.data.fullName,
-      passwordHash: hashPassword(parsed.data.password),
+      passwordHash: hashPassword(parsed.data.password.trim()),
       accountType: parsed.data.accountType,
     });
     const profile = toUserProfile(stored);
@@ -69,7 +69,12 @@ export async function POST(request: Request) {
       getRedirectAfterAuth(profile, parsed.data.next),
     );
 
-    return NextResponse.json({ ok: true, user: profile, redirectTo });
+    return NextResponse.json({
+      ok: true,
+      user: profile,
+      redirectTo,
+      accountProof: stored.passwordHash,
+    });
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
       return NextResponse.json(

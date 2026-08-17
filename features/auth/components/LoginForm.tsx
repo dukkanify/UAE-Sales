@@ -13,7 +13,7 @@ import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
-import { setSessionUser } from "@/services/storage";
+import { getAccountProof, saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 
@@ -59,6 +59,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       const normalizedPassword = nextPassword.trim();
       const nextParam = new URLSearchParams(window.location.search).get("next");
 
+      const proof = getAccountProof(normalizedEmail);
       const response = await fetch("/api/auth/login/password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,6 +68,9 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
           email: normalizedEmail,
           password: normalizedPassword,
           next: nextParam,
+          accountProof: proof?.passwordHash,
+          fullName: proof?.fullName,
+          accountType: proof?.accountType,
         }),
       });
       const data = await response.json();
@@ -75,6 +79,14 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       }
 
       setSessionUser(data.user as UserProfile);
+      if (typeof data.accountProof === "string") {
+        saveAccountProof({
+          email: normalizedEmail,
+          passwordHash: data.accountProof,
+          fullName: (data.user as UserProfile).fullName,
+          accountType: (data.user as UserProfile).accountType,
+        });
+      }
       await persistSessionCookie(data.user);
       await syncFavoritesAfterLogin(data.user.id);
       trackAuthEventClient("login_verified");

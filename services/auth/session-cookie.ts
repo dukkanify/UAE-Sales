@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import type { UserProfile } from "@/types";
 import { getSiteDomain } from "@/shared/constants/site";
 import { parseSessionCookieValue } from "@/services/auth/session-cookie-parse";
@@ -15,11 +15,33 @@ type SessionCookieOptions = {
   secure: boolean;
 };
 
-export function getSessionCookieOptions(): SessionCookieOptions {
-  const isProduction = process.env.NODE_ENV === "production";
+async function resolveCookieDomain(): Promise<string | undefined> {
   const configuredDomain = process.env.SESSION_COOKIE_DOMAIN?.trim();
-  const domain =
-    configuredDomain || (isProduction ? `.${getSiteDomain()}` : undefined);
+  if (configuredDomain) return configuredDomain;
+  if (process.env.NODE_ENV !== "production") return undefined;
+
+  try {
+    const headerStore = await headers();
+    const host = (headerStore.get("x-forwarded-host") ?? headerStore.get("host") ?? "")
+      .split(",")[0]
+      .trim()
+      .split(":")[0]
+      .replace(/^www\./i, "")
+      .toLowerCase();
+    const siteDomain = getSiteDomain().toLowerCase();
+    if (host === siteDomain || host.endsWith(`.${siteDomain}`)) {
+      return `.${siteDomain}`;
+    }
+  } catch {
+    return undefined;
+  }
+
+  return undefined;
+}
+
+export async function getSessionCookieOptions(): Promise<SessionCookieOptions> {
+  const isProduction = process.env.NODE_ENV === "production";
+  const domain = await resolveCookieDomain();
 
   return {
     httpOnly: true,
@@ -36,14 +58,14 @@ export async function setSessionCookie(user: UserProfile): Promise<void> {
   cookieStore.set(
     SESSION_COOKIE_NAME,
     JSON.stringify(user),
-    getSessionCookieOptions(),
+    await getSessionCookieOptions(),
   );
 }
 
 export async function clearSessionCookie(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE_NAME, "", {
-    ...getSessionCookieOptions(),
+    ...(await getSessionCookieOptions()),
     maxAge: 0,
   });
 }
