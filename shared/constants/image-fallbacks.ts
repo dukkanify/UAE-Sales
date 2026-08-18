@@ -238,7 +238,7 @@ export function galleryFromPool(
   return urls;
 }
 
-export const heroBackgroundUrl = `https://images.unsplash.com/photo-1556388158-158ea5ccacbd?auto=format&fit=crop&w=1280&h=720&q=75`;
+export const heroBackgroundUrl = unsplashUrl("photo-1512453979798-5ea266f8880c", 1600);
 
 /** Verified seller portrait URLs */
 export const sellerAvatarUrls = {
