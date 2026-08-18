@@ -4,9 +4,14 @@ import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { CategoryFilterBar } from "@/features/search/components/CategoryFilterBar";
 import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import {
+  parseSearchFilterState,
+  toListingSearchFilters,
+} from "@/features/search/components/parse-search-filters";
 import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
@@ -39,18 +44,6 @@ type CategoryPageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-function getParam(params: SearchParams, key: string) {
-  const value = params[key];
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function getNumberParam(params: SearchParams, key: string) {
-  const value = getParam(params, key);
-  if (!value) return undefined;
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : undefined;
-}
-
 export async function generateStaticParams() {
   const categories = await getCategories();
   return categories.map((category) => ({ slug: category.slug }));
@@ -76,38 +69,11 @@ export default async function CategoryPage({
   const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const selectedFilters = {
-    category: category.id,
-    city: getParam(queryParams, "city") ?? "",
-    condition: getParam(queryParams, "condition") ?? "",
-    country: getParam(queryParams, "country") ?? "",
-    maxPrice: getParam(queryParams, "maxPrice") ?? "",
-    minPrice: getParam(queryParams, "minPrice") ?? "",
-    query: getParam(queryParams, "q") ?? "",
-    sort: getParam(queryParams, "sort") ?? "newest",
-  };
+  const selectedFilters = parseSearchFilterState(queryParams, category.id);
 
   const [categories, listings, suggestionTitles] = await Promise.all([
     getCategories(),
-    searchListings({
-      categoryId: category.id,
-      city: selectedFilters.city || undefined,
-      condition:
-        selectedFilters.condition === "new" ||
-        selectedFilters.condition === "used" ||
-        selectedFilters.condition === "excellent"
-          ? selectedFilters.condition
-          : undefined,
-      country: selectedFilters.country || undefined,
-      maxPrice: getNumberParam(queryParams, "maxPrice"),
-      minPrice: getNumberParam(queryParams, "minPrice"),
-      query: selectedFilters.query || undefined,
-      sort:
-        selectedFilters.sort === "price_asc" ||
-        selectedFilters.sort === "price_desc"
-          ? selectedFilters.sort
-          : "newest",
-    }),
+    searchListings(toListingSearchFilters(selectedFilters)),
     getSearchSuggestionTitles(),
   ]);
 
@@ -144,7 +110,13 @@ export default async function CategoryPage({
             ))}
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
+          <CategoryFilterBar
+            action={`/categories/${category.slug}`}
+            categories={categories}
+            selectedFilters={selectedFilters}
+          />
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
             <aside className="lg:sticky lg:top-24 lg:self-start">
               <SearchFilters
                 action={`/categories/${category.slug}`}
@@ -170,6 +142,7 @@ export default async function CategoryPage({
 
               <div className="mt-5">
                 <SearchResultsList
+                  basePath={`/categories/${category.slug}`}
                   categoryId={category.id}
                   categories={categories}
                   listings={listings}

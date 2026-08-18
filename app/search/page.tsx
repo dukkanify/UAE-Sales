@@ -1,8 +1,13 @@
 import { cities, countries } from "@/shared/constants/locations";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { CategoryFilterBar } from "@/features/search/components/CategoryFilterBar";
 import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import {
+  parseSearchFilterState,
+  toListingSearchFilters,
+} from "@/features/search/components/parse-search-filters";
 import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -12,78 +17,17 @@ import { searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
-function getParam(params: SearchParams, key: string) {
-  const value = params[key];
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function getNumberParam(params: SearchParams, key: string) {
-  const value = getParam(params, key);
-  if (!value) return undefined;
-  const numberValue = Number(value);
-  return Number.isFinite(numberValue) ? numberValue : undefined;
-}
-
-function parseHomePriceBand(band?: string): {
-  maxPrice?: number;
-  minPrice?: number;
-} {
-  if (!band) return {};
-
-  if (band.endsWith("+")) {
-    const minPrice = Number(band.slice(0, -1));
-    return Number.isFinite(minPrice) ? { minPrice } : {};
-  }
-
-  const [rawMin, rawMax] = band.split("-");
-  const minPrice = Number(rawMin);
-  const maxPrice = Number(rawMax);
-
-  return {
-    ...(Number.isFinite(minPrice) ? { minPrice } : {}),
-    ...(Number.isFinite(maxPrice) ? { maxPrice } : {}),
-  };
-}
-
 export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const priceBand = parseHomePriceBand(getParam(params, "price"));
-  const selectedFilters = {
-    category: getParam(params, "category") ?? "",
-    city: getParam(params, "city") ?? "",
-    condition: getParam(params, "condition") ?? "",
-    country: getParam(params, "country") ?? "",
-    maxPrice: getParam(params, "maxPrice") ?? (priceBand.maxPrice?.toString() ?? ""),
-    minPrice: getParam(params, "minPrice") ?? (priceBand.minPrice?.toString() ?? ""),
-    query: getParam(params, "q") ?? "",
-    sort: getParam(params, "sort") ?? "newest",
-  };
+  const selectedFilters = parseSearchFilterState(params);
 
   const [categories, listings, suggestionTitles] = await Promise.all([
     getCategories(),
-    searchListings({
-      categoryId: selectedFilters.category || undefined,
-      city: selectedFilters.city || undefined,
-      condition:
-        selectedFilters.condition === "new" ||
-        selectedFilters.condition === "used" ||
-        selectedFilters.condition === "excellent"
-          ? selectedFilters.condition
-          : undefined,
-      country: selectedFilters.country || undefined,
-      maxPrice: getNumberParam(params, "maxPrice") ?? priceBand.maxPrice,
-      minPrice: getNumberParam(params, "minPrice") ?? priceBand.minPrice,
-      query: selectedFilters.query || undefined,
-      sort:
-        selectedFilters.sort === "price_asc" ||
-        selectedFilters.sort === "price_desc"
-          ? selectedFilters.sort
-          : "newest",
-    }),
+    searchListings(toListingSearchFilters(selectedFilters)),
     getSearchSuggestionTitles(),
   ]);
 
@@ -100,7 +44,7 @@ export default async function SearchPage({
       <RecordRecentSearch query={selectedFilters.query} />
       <main className="bg-background">
         <section className="app-container page-padding pb-28 lg:pb-8">
-          <div className="mb-8">
+          <div className="mb-6">
             <p className="text-xs font-bold text-[#B8955F]">بحث السوق</p>
             <h1 className="mt-1 text-2xl font-bold text-ink md:text-3xl">
               {selectedFilters.query
@@ -108,12 +52,18 @@ export default async function SearchPage({
                 : "اعثر على الإعلان المناسب"}
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-muted">
-              فلترة دقيقة حسب الإمارة والتصنيف والسعر — نفس جودة عرض الإعلانات في
-              الصفحة الرئيسية.
+              فلاتر ذكية تتغيّر حسب القسم: سيارات، عقارات، موبايلات، وباقي السوق.
             </p>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
+          <CategoryFilterBar
+            action="/search"
+            categories={categories}
+            selectedFilters={selectedFilters}
+            showCategory
+          />
+
+          <div className="mt-6 grid gap-6 lg:grid-cols-[18rem_1fr] xl:grid-cols-[20rem_1fr]">
             <aside className="lg:sticky lg:top-24 lg:self-start">
               <SearchFilters
                 categories={categories}
@@ -127,6 +77,7 @@ export default async function SearchPage({
 
             <div>
               <SearchResultsList
+                basePath="/search"
                 categories={categories}
                 listings={listings}
                 selectedFilters={selectedFilters}

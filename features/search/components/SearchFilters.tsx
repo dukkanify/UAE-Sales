@@ -10,6 +10,7 @@ import {
   SearchTypeahead,
   type SearchSuggestion,
 } from "./SearchTypeahead";
+import type { SearchFilterState } from "./search-url";
 
 type SearchFiltersProps = {
   action?: string;
@@ -20,16 +21,7 @@ type SearchFiltersProps = {
     name: string;
   }[];
   layout?: "bar" | "sidebar";
-  selectedFilters: {
-    category?: string;
-    city?: string;
-    condition?: string;
-    country?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    query?: string;
-    sort?: string;
-  };
+  selectedFilters: SearchFilterState;
   showCategory?: boolean;
   suggestions?: SearchSuggestion[];
 };
@@ -196,6 +188,9 @@ export function SearchFilters({
         action={action}
         className={`${mobileOpen ? "flex" : "hidden"} min-h-0 flex-1 flex-col lg:flex`}
       >
+        {Object.entries(selectedFilters.specs ?? {}).map(([key, value]) =>
+          value ? <input key={key} name={key} type="hidden" value={value} /> : null,
+        )}
         <div className="relative z-20 shrink-0 space-y-2.5 overflow-visible px-4 pt-3">
           <h2 className="hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
           <SearchTypeahead
