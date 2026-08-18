@@ -38,15 +38,9 @@ npm run build
 npm run start
 ```
 
-## Demo Credentials
+## Accounts
 
-| Role | Email | Password | OTP | After login |
-|------|-------|----------|-----|-------------|
-| User | `user@sooqna.demo` | `User@123` | `123456` | `/profile` |
-| Business | `company@sooqna.demo` | `Company@123` | `123456` | `/dashboard/listings` |
-| Admin | `admin@sooqna.demo` | `Admin@123` | `123456` | `/admin` |
-
-New accounts are created via `/register`. Demo logins are not shown on the public login screen.
+Create accounts via `/register`. There are no public demo logins. Promote the first admin from `/admin/users` after an operator account exists.
 
 ## What Works Live
 
