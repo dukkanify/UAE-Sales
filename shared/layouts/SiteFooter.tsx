@@ -12,7 +12,6 @@ type FooterGroup = (typeof footerLinks)[number];
 const storeBadges = [
   { id: "app-store", eyebrow: "Coming soon", title: "App Store" },
   { id: "google-play", eyebrow: "Coming soon", title: "Google Play" },
-  { id: "app-gallery", eyebrow: "Coming soon", title: "AppGallery" },
 ] as const;
 
 function AppleGlyph() {
@@ -34,21 +33,9 @@ function PlayGlyph() {
   );
 }
 
-function GalleryGlyph() {
-  return (
-    <svg aria-hidden viewBox="0 0 24 24">
-      <path
-        d="M12 3.2 14.6 8l5.4.4-4.1 3.5 1.3 5.2L12 14.6 6.8 17.1 8.1 11.9 4 8.4 9.4 8 12 3.2Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 function storeIcon(id: (typeof storeBadges)[number]["id"]) {
-  if (id === "app-store") return <AppleGlyph />;
   if (id === "google-play") return <PlayGlyph />;
-  return <GalleryGlyph />;
+  return <AppleGlyph />;
 }
 
 function InstagramGlyph() {
