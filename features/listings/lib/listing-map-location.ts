@@ -1,10 +1,9 @@
-export type DemoMapPoint = {
+export type ListingMapPoint = {
   lat: number;
   lng: number;
   label: string;
 };
 
-/** Approximate neighborhood centers for demo map embeds (not exact pin accuracy). */
 const AREA_COORDINATES: Record<string, { lat: number; lng: number }> = {
   "دبي مارينا": { lat: 25.0805, lng: 55.1403 },
   البرشاء: { lat: 25.1124, lng: 55.2003 },
@@ -23,6 +22,27 @@ const AREA_COORDINATES: Record<string, { lat: number; lng: number }> = {
   مويلح: { lat: 25.31, lng: 55.46 },
   النعيمية: { lat: 25.405, lng: 55.51 },
   "مدينة الفجيرة": { lat: 25.1288, lng: 56.3269 },
+  المنصورة: { lat: 25.3575, lng: 55.409 },
+  ديرة: { lat: 25.2713, lng: 55.331 },
+  القصباء: { lat: 25.3216, lng: 55.3765 },
+  الخالدية: { lat: 24.4663, lng: 54.3531 },
+  الراشدية: { lat: 25.392, lng: 55.478 },
+  جميرا: { lat: 25.2065, lng: 55.2487 },
+  الرقة: { lat: 25.2668, lng: 55.3265 },
+  السطوة: { lat: 25.2282, lng: 55.2734 },
+  الكرامة: { lat: 25.2434, lng: 55.304 },
+  "مدينة زايد": { lat: 23.652, lng: 53.704 },
+  "مدينة الشارقة للجامعات": { lat: 25.2865, lng: 55.478 },
+  قدفع: { lat: 25.166, lng: 56.354 },
+  السعديات: { lat: 24.541, lng: 54.434 },
+  الرمس: { lat: 25.879, lng: 56.023 },
+  الروضة: { lat: 25.394, lng: 55.47 },
+  "منطقة المزارع": { lat: 25.145, lng: 56.29 },
+  مردف: { lat: 25.219, lng: 55.42 },
+  المنامة: { lat: 25.325, lng: 55.586 },
+  الخان: { lat: 25.339, lng: 55.388 },
+  النخيل: { lat: 25.789, lng: 55.943 },
+  المرحلة: { lat: 25.123, lng: 56.334 },
 };
 
 const EMIRATE_COORDINATES: Record<string, { lat: number; lng: number }> = {
@@ -44,16 +64,17 @@ function buildLocationLabel(area?: string, emirate?: string, city?: string) {
   return area || emirate || city || "الإمارات العربية المتحدة";
 }
 
-export function resolveDemoMapPoint(input: {
+export function resolveListingMapPoint(input: {
   area?: string;
   emirate?: string;
   city?: string;
-}): DemoMapPoint {
+}): ListingMapPoint {
   const { area, emirate, city } = input;
   const coords =
     (area && AREA_COORDINATES[area]) ||
+    (city && AREA_COORDINATES[city]) ||
     (emirate && EMIRATE_COORDINATES[emirate]) ||
-    (city && (AREA_COORDINATES[city] || EMIRATE_COORDINATES[city])) ||
+    (city && EMIRATE_COORDINATES[city]) ||
     UAE_FALLBACK;
 
   return {
@@ -62,8 +83,7 @@ export function resolveDemoMapPoint(input: {
   };
 }
 
-/** ~neighborhood zoom for OSM export/embed.html */
-export function buildOsmEmbedUrl(point: DemoMapPoint, delta = 0.018) {
+export function buildOsmEmbedUrl(point: ListingMapPoint, delta = 0.014) {
   const { lat, lng } = point;
   const bbox = [
     lng - delta,
@@ -81,11 +101,16 @@ export function buildOsmEmbedUrl(point: DemoMapPoint, delta = 0.018) {
   return `https://www.openstreetmap.org/export/embed.html?${params.toString()}`;
 }
 
-export function buildGoogleMapsUrl(point: DemoMapPoint) {
-  const query = encodeURIComponent(`${point.label}, الإمارات العربية المتحدة`);
+export function buildGoogleMapsUrl(point: ListingMapPoint) {
+  const query = encodeURIComponent(`${point.lat},${point.lng}`);
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-export function buildOsmBrowseUrl(point: DemoMapPoint) {
-  return `https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lng}#map=15/${point.lat}/${point.lng}`;
+export function buildGoogleDirectionsUrl(point: ListingMapPoint) {
+  const destination = encodeURIComponent(`${point.lat},${point.lng}`);
+  return `https://www.google.com/maps/dir/?api=1&destination=${destination}`;
+}
+
+export function buildOsmBrowseUrl(point: ListingMapPoint) {
+  return `https://www.openstreetmap.org/?mlat=${point.lat}&mlon=${point.lng}#map=16/${point.lat}/${point.lng}`;
 }

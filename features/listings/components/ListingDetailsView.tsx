@@ -5,7 +5,7 @@ import { EscrowProtectionCard } from "@/features/listings/components/EscrowProte
 import { ListingPlatformNotice } from "@/features/listings/components/ListingPlatformNotice";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
-import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
+import { ListingLocationMap } from "@/features/listings/components/ListingLocationMap";
 import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
 import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
 import {
@@ -99,7 +99,7 @@ export function ListingDetailsView({
             </div>
 
             <ListingDetailToolbar listing={listing} />
-            <ListingMapPlaceholder listing={listing} />
+            <ListingLocationMap listing={listing} />
 
             <div className="marketplace-panel mt-6 p-6">
               <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
