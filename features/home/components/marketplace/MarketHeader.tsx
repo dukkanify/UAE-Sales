@@ -95,31 +95,29 @@ export function MarketHeader() {
               variant="desktop"
             />
 
-            <div className="market-header__cluster">
-              <ThemeToggle className="market-header__icon-btn" />
+            <ThemeToggle className="market-header__icon-btn" />
 
+            <Link
+              aria-label="بحث"
+              className="market-header__icon-btn"
+              href="/search"
+            >
+              <Icon name="search" size={18} />
+            </Link>
+
+            {user ? (
               <Link
-                aria-label="بحث"
-                className="market-header__icon-btn"
-                href="/search"
+                aria-label="حسابي"
+                className="market-header__icon-btn market-header__icon-btn--desktop"
+                href="/profile"
               >
-                <Icon name="search" size={18} />
+                <Icon name="user" size={18} />
               </Link>
-
-              {user ? (
-                <Link
-                  aria-label="حسابي"
-                  className="market-header__icon-btn market-header__icon-btn--desktop"
-                  href="/profile"
-                >
-                  <Icon name="user" size={18} />
-                </Link>
-              ) : (
-                <Link className="market-header__join-link" href="/login">
-                  سجّل الدخول وانضم إلينا
-                </Link>
-              )}
-            </div>
+            ) : (
+              <Link className="market-header__join-link" href="/login">
+                سجّل الدخول وانضم إلينا
+              </Link>
+            )}
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
               <Icon name="plus" size={15} />
