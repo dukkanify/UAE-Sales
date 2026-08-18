@@ -197,7 +197,7 @@ export function AdminUsersPanel() {
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {user.accountStatus === "pending" ? (
+              {user.accountStatus === "pending" && user.emailVerifiedAt ? (
                 <Button
                   loading={busyId === user.id}
                   onClick={() => patchUser(user.id, { accountStatus: "active" })}

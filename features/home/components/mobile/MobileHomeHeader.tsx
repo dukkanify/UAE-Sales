@@ -7,6 +7,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
+import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -78,15 +79,7 @@ export function MobileHomeHeader() {
 
             <ThemeToggle className="mobile-home-header__icon-btn !size-[2.25rem] !min-h-0 !rounded-full !border-0 !shadow-none" />
 
-            <Link
-              aria-label="الإشعارات"
-              className="mobile-home-header__notify"
-              href="/profile#notifications"
-            >
-              <span className="mobile-home-header__notify-ring" aria-hidden />
-              <Icon className="mobile-home-header__notify-icon" name="bell" size={17} />
-              <span className="mobile-home-header__badge">3</span>
-            </Link>
+            <NotificationBell />
           </div>
         </div>
       </div>

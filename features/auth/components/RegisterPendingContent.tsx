@@ -78,7 +78,7 @@ export function RegisterPendingContent() {
         <li className="rounded-[var(--radius-2xl)] border border-primary/30 bg-primary/10 p-4">
           <p className="text-sm font-black text-ink">2. اعتماد الحساب</p>
           <p className="mt-1 text-sm text-muted">
-            يعتمد الإدارة الحساب بضغطة واحدة. سنُعلمك فور التفعيل.
+            يعتمد الإدارة الحساب بضغطة واحدة. يصلك إشعار في حسابك فور التفعيل.
           </p>
         </li>
       </ol>

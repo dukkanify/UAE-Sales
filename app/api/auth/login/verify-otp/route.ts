@@ -38,7 +38,11 @@ export async function POST(request: Request) {
   const stored = await findUserByEmail(email);
   const demo = findDemoAccountByIdentifier(email);
 
-  let user = stored && stored.accountStatus === "active" ? toUserProfile(stored) : null;
+  const canEnter =
+    stored &&
+    Boolean(stored.emailVerifiedAt) &&
+    (stored.accountStatus === "active" || stored.accountStatus === "pending");
+  let user = canEnter ? toUserProfile(stored) : null;
   if (!user && demo) {
     user = demo.profile;
   }

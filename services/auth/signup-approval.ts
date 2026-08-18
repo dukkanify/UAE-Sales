@@ -4,6 +4,7 @@ import {
   approveRegisteredUser,
   markPersonVerified,
 } from "@/services/auth/user-store";
+import { completeRegistrationWelcome } from "@/services/auth/welcome";
 import { createNotification } from "@/services/payments/notification-store";
 import type { UserProfile } from "@/types";
 
@@ -16,35 +17,38 @@ export async function completePersonVerification(
 
   if (autoApprove) {
     const user = await approveRegisteredUser(userId);
-    await notifyUserApproved(user);
+    await completeRegistrationWelcome({
+      userId: user.id,
+      email: user.email,
+      name: user.fullName,
+    });
     return { approved: true, user };
   }
 
-  await createNotification({
-    userId: verified.id,
-    type: "account_verified",
-    title: "تم التحقق من حسابك",
-    body: "تحققنا من بريدك. حسابك بانتظار اعتماد سريع من الإدارة.",
-    href: "/register/pending",
-  });
-  await notifyAdminsPendingApproval(verified);
+  try {
+    await createNotification({
+      userId: verified.id,
+      type: "account_verified",
+      title: "تم التحقق من حسابك",
+      body: "تحققنا من بريدك. حسابك بانتظار اعتماد سريع من الإدارة.",
+      href: "/register/pending",
+    });
+    await notifyAdminsPendingApproval(verified);
+  } catch (error) {
+    console.error("[Sooqna Signup] pending notifications failed", error);
+  }
+
   return { approved: false, user: verified };
 }
 
 export async function approvePendingUser(userId: string): Promise<UserProfile> {
   const user = await approveRegisteredUser(userId);
-  await notifyUserApproved(user);
-  return user;
-}
-
-async function notifyUserApproved(user: UserProfile): Promise<void> {
-  await createNotification({
+  await completeRegistrationWelcome({
     userId: user.id,
-    type: "account_approved",
-    title: "تم اعتماد حسابك",
-    body: "حسابك في سوقنا نشط الآن. يمكنك البيع والشراء بثقة.",
-    href: "/profile",
+    email: user.email,
+    name: user.fullName,
   });
+  return user;
 }
 
 async function notifyAdminsPendingApproval(user: UserProfile): Promise<void> {
@@ -53,7 +57,7 @@ async function notifyAdminsPendingApproval(user: UserProfile): Promise<void> {
     admins.map((admin) =>
       createNotification({
         userId: admin.id,
-        type: "account_verified",
+        type: "account_pending_approval",
         title: "حساب بانتظار الاعتماد",
         body: `تم التحقق من ${user.fullName} (${user.email}). اعتمد الحساب بضغطة واحدة.`,
         href: "/admin/users",

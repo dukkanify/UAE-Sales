@@ -34,7 +34,11 @@ export async function POST(request: Request) {
 
     const stored = await findUserByEmail(email);
     const demo = findDemoAccountByIdentifier(email);
-    const canLogin = (stored?.accountStatus === "active" && stored.emailVerifiedAt) || demo;
+    const canLogin =
+      Boolean(
+        stored?.emailVerifiedAt &&
+          (stored.accountStatus === "active" || stored.accountStatus === "pending"),
+      ) || Boolean(demo);
 
     if (canLogin) {
       await sendOtpForPurpose({

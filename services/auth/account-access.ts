@@ -4,7 +4,7 @@ export function isMarketplaceAccountReady(
   user?: { accountStatus?: AccountStatus } | null,
 ): boolean {
   if (!user) return false;
-  return !user.accountStatus || user.accountStatus === "active";
+  return user.accountStatus !== "pending" && user.accountStatus !== "suspended";
 }
 
 export function getAccountGatePath(user: Pick<UserProfile, "email" | "emailVerifiedAt" | "accountStatus">): string {

@@ -18,7 +18,7 @@ export async function completeRegistrationWelcome(input: {
       userId: input.userId,
       type: "welcome",
       title: "أهلاً بك في سوقنا",
-      body: `مرحباً ${name}، تم إنشاء حسابك بنجاح. ابدأ بنشر إعلان أو تصفّح العروض.`,
+      body: `مرحباً ${name}، حسابك في سوقنا نشط الآن. ابدأ بنشر إعلان أو تصفّح العروض.`,
       href: "/search",
     });
   } catch (error) {

@@ -4,7 +4,6 @@ import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { completeRegistrationWelcome } from "@/services/auth/welcome";
 import { completePersonVerification } from "@/services/auth/signup-approval";
 import {
   findUserByEmail,
@@ -37,13 +36,12 @@ export async function POST(request: Request) {
   }
 
   const stored = await findUserByEmail(email);
-  const userId = verifyResult.record.metadata?.userId ?? stored?.id;
-  if (!userId || !stored) {
+  if (!stored) {
     trackAuthEvent("registration_failed");
     return NextResponse.json({ error: "INVALID" }, { status: 400 });
   }
 
-  const { approved, user } = await completePersonVerification(userId);
+  const { approved, user } = await completePersonVerification(stored.id);
 
   try {
     await setSessionCookie(user);
@@ -55,13 +53,6 @@ export async function POST(request: Request) {
     );
   }
 
-  if (approved) {
-    await completeRegistrationWelcome({
-      userId: user.id,
-      email: user.email,
-      name: user.fullName,
-    });
-  }
   trackAuthEvent("registration_verified", { accountType: user.accountType });
 
   const redirectTo = approved

@@ -274,7 +274,7 @@ export async function approveRegisteredUser(userId: string): Promise<UserProfile
   const activated: StoredUser = {
     ...user,
     accountStatus: "active",
-    emailVerifiedAt: user.emailVerifiedAt ?? new Date().toISOString(),
+    emailVerifiedAt: user.emailVerifiedAt,
     isVerified: true,
   };
 
@@ -313,7 +313,7 @@ export async function restoreUserWithPasswordProof(input: {
     return saveUser({
       ...existing,
       passwordHash: input.passwordHash,
-      accountStatus: existing.accountStatus === "suspended" ? "suspended" : "active",
+      accountStatus: existing.accountStatus ?? "active",
     });
   }
 

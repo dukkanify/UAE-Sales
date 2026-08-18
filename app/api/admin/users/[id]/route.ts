@@ -29,6 +29,15 @@ export async function PATCH(request: Request, context: RouteParams) {
   }
 
   if (body.accountStatus === "active" && current.accountStatus === "pending") {
+    if (!current.emailVerifiedAt) {
+      return NextResponse.json(
+        {
+          error: "PERSON_NOT_VERIFIED",
+          message: "تحقق من الشخص أولاً قبل اعتماد الحساب.",
+        },
+        { status: 400 },
+      );
+    }
     await approvePendingUser(id);
   }
 

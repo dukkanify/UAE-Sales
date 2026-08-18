@@ -43,3 +43,12 @@ export async function claimStripeWebhookEvent(
   await saveCollection(PROCESSED_EVENTS_FILE, rows.slice(0, 1000));
   return "new";
 }
+
+/** Drop a claimed event so Stripe can retry after a handler failure. */
+export async function releaseStripeWebhookEvent(eventId: string): Promise<void> {
+  const rows = await loadCollection<ProcessedStripeEvent>(PROCESSED_EVENTS_FILE);
+  await saveCollection(
+    PROCESSED_EVENTS_FILE,
+    rows.filter((row) => row.id !== eventId),
+  );
+}
