@@ -19,7 +19,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
       <MarketSectionHeader
         actionHref="/search"
         actionLabel="عرض الكل"
-        description="إعلانات قريبة من موقعك — تصفّح وتواصل بسرعة."
+        description="إعلانات من مدن الإمارات — تصفّح وتواصل بسرعة."
         eyebrow="Nearby"
         title="القريبة منك"
       />

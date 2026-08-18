@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
-import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
-import { getRedirectAfterAuth } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { findUserByEmail, toUserProfile } from "@/services/auth/user-store";
-import { getPostLoginPath } from "@/services/auth/auth.service";
+import { findUserByEmail, getRedirectAfterAuth, toUserProfile } from "@/services/auth/user-store";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const schema = z.object({
@@ -36,16 +33,11 @@ export async function POST(request: Request) {
   }
 
   const stored = await findUserByEmail(email);
-  const demo = findDemoAccountByIdentifier(email);
-
   const canEnter =
     stored &&
     Boolean(stored.emailVerifiedAt) &&
     (stored.accountStatus === "active" || stored.accountStatus === "pending");
-  let user = canEnter ? toUserProfile(stored) : null;
-  if (!user && demo) {
-    user = demo.profile;
-  }
+  const user = canEnter ? toUserProfile(stored) : null;
 
   if (!user) {
     return NextResponse.json({ error: "INVALID" }, { status: 400 });
@@ -63,9 +55,10 @@ export async function POST(request: Request) {
   }
   trackAuthEvent("login_verified");
 
-  const redirectTo = parsed.data.next
-    ? getSafeNextPath(parsed.data.next, getRedirectAfterAuth(user))
-    : getSafeNextPath(null, getPostLoginPath(email, getRedirectAfterAuth(user)));
+  const redirectTo = getSafeNextPath(
+    parsed.data.next,
+    getRedirectAfterAuth(user),
+  );
 
   return NextResponse.json({ ok: true, user, redirectTo });
 }

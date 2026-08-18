@@ -1,12 +1,4 @@
-export { demoAccounts, DEMO_OTP } from "./demo-accounts.mock";
 export { mockCategories } from "./categories.mock";
-export {
-  mockDashboardNotifications,
-  mockDashboardQuickActions,
-  mockDashboardRecentActivity,
-  mockDashboardSummaryCards,
-  mockDashboardViewsChart,
-} from "./dashboard.mock";
 export {
   mockEmirateHighlights,
   mockHomeCategorySections,
@@ -17,7 +9,6 @@ export {
   marketplaceUserListings,
 } from "./listings.mock";
 export {
-  mockCurrentUser,
   marketplaceSellers,
   resolveSeller,
 } from "./users.mock";

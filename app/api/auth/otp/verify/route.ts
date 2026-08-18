@@ -2,14 +2,13 @@ import { createHash, randomBytes } from "node:crypto";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import {
   sendLoginVerificationEmail,
   sendOtpEmail,
 } from "@/services/email/email.service";
 import { completePersonVerification } from "@/services/auth/signup-approval";
-import { findUserByEmail, getRedirectAfterAuth } from "@/services/auth/user-store";
+import { findUserByEmail, getRedirectAfterAuth, toUserProfile } from "@/services/auth/user-store";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
@@ -52,10 +51,10 @@ export async function POST(request: Request) {
       });
 
       if (parsed.data.purpose === "LOGIN") {
-        const account = findDemoAccountByIdentifier(email);
+        const stored = await findUserByEmail(email);
         await sendLoginVerificationEmail({
           email,
-          name: account?.profile.fullName ?? "مستخدم سوقنا",
+          name: stored?.fullName ?? "مستخدم سوقنا",
           otp: code,
         });
       } else {
@@ -106,12 +105,17 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.purpose === "LOGIN") {
-    const account = findDemoAccountByIdentifier(email);
-    if (!account) {
+    const stored = await findUserByEmail(email);
+    if (!stored) {
       return NextResponse.json({ error: "INVALID" }, { status: 400 });
     }
-    await setSessionCookie(account.profile);
-    return NextResponse.json({ ok: true, user: account.profile });
+    const user = toUserProfile(stored);
+    await setSessionCookie(user);
+    return NextResponse.json({
+      ok: true,
+      user,
+      redirectTo: getRedirectAfterAuth(user),
+    });
   }
 
   if (parsed.data.purpose === "REGISTER") {

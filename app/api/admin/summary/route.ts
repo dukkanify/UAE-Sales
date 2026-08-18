@@ -161,9 +161,10 @@ export async function GET() {
       href: "/admin/stripe",
       label: "مدفوعات Stripe معلّقة",
       meta: "مراجعة بوابة الدفع",
-      count: failedPayments.filter((o) => Boolean(o.stripePaymentIntentId))
+        count: failedPayments.filter((o) => Boolean(o.stripePaymentIntentId))
         .length,
-      alert: true,
+      alert:
+        failedPayments.filter((o) => Boolean(o.stripePaymentIntentId)).length > 0,
     },
     {
       href: "/admin/job-applications",

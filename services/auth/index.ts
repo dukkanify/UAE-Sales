@@ -1,8 +1,1 @@
-export {
-  completeLogin,
-  DEMO_OTP,
-  getPostLoginPath,
-  isValidDemoOtp,
-  requestLoginOtp,
-  validateLoginCredentials,
-} from "./auth.service";
+export { getPostLoginPath } from "./auth.service";
