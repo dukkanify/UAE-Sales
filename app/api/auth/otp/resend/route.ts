@@ -7,8 +7,10 @@ import {
   otpCooldownResponse,
   otpSendFailedResponse,
   sendOtpForPurpose,
+  sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { findUserByEmail } from "@/services/auth/user-store";
 import type { OtpPurpose } from "@/types/domain/otp";
 
 const schema = z.object({
@@ -25,8 +27,6 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const disabled = emailOtpDisabledResponse();
-  if (disabled) return disabled;
   try {
     const body = await request.json();
     const parsed = schema.safeParse(body);
@@ -34,16 +34,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
+    if (parsed.data.purpose !== "REGISTER") {
+      const disabled = emailOtpDisabledResponse();
+      if (disabled) return disabled;
+    }
+
     const email = parsed.data.email.trim().toLowerCase();
     if (!(await enforceRateLimit(request, email))) {
       return genericOtpResponse(email);
     }
 
-    await sendOtpForPurpose({
-      email,
-      fullName: parsed.data.fullName ?? "مستخدم سوقنا",
-      purpose: parsed.data.purpose as OtpPurpose,
-    });
+    if (parsed.data.purpose === "REGISTER") {
+      const stored = await findUserByEmail(email);
+      if (stored) {
+        await sendRegistrationVerifyOtp({
+          email,
+          fullName: parsed.data.fullName ?? stored.fullName,
+          userId: stored.id,
+          accountType: stored.accountType,
+        });
+      }
+    } else {
+      await sendOtpForPurpose({
+        email,
+        fullName: parsed.data.fullName ?? "مستخدم سوقنا",
+        purpose: parsed.data.purpose as OtpPurpose,
+      });
+    }
 
     trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
     return genericOtpResponse(email);

@@ -11,9 +11,7 @@ import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
-import type { UserProfile } from "@/types";
-import { persistSessionCookie } from "@/services/auth/session-sync";
-import { saveAccountProof, setSessionUser } from "@/services/storage";
+import { saveAccountProof } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import {
   isStrongPassword,
@@ -98,7 +96,6 @@ export function RegisterForm() {
                 : "تعذر إنشاء الحساب."),
           );
         }
-        setSessionUser(data.user as UserProfile);
         if (typeof data.accountProof === "string") {
           saveAccountProof({
             email: nextEmail,
@@ -107,9 +104,13 @@ export function RegisterForm() {
             accountType,
           });
         }
-        await persistSessionCookie(data.user);
-        trackAuthEventClient("registration_verified");
-        router.push(getSafeNextPath(data.redirectTo, "/profile"));
+        trackAuthEventClient("registration_otp_sent");
+        router.push(
+          getSafeNextPath(
+            data.redirectTo,
+            `/verify-email?email=${encodeURIComponent(nextEmail)}&purpose=REGISTER`,
+          ),
+        );
         return;
       }
 
@@ -159,8 +160,8 @@ export function RegisterForm() {
         </h2>
         <p className="auth-form__subtitle">
           {emailOtpEnabled
-            ? "سنرسل لك رمز تحقق لتفعيل حسابك — بدون كلمة مرور إلزامية."
-            : "أنشئ حسابك الآن وابدأ البيع والشراء بثقة في الإمارات."}
+            ? "أولاً نتحقق منك برمز يصل إلى بريدك، ثم يُعتمد حسابك بسهولة."
+            : "أنشئ حسابك، تحقّق من بريدك برمز سريع، ثم يُعتمد حسابك بسهولة."}
         </p>
       </div>
 
@@ -248,7 +249,7 @@ export function RegisterForm() {
       {submitError ? <FormMessage variant="error">{submitError}</FormMessage> : null}
 
       <Button loading={isLoading} type="submit">
-        {emailOtpEnabled ? "متابعة" : "إنشاء الحساب"}
+        متابعة للتحقق
       </Button>
 
       {!emailOtpEnabled ? (

@@ -71,6 +71,10 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       });
       const data = await response.json();
       if (!response.ok) {
+        if (data.error === "ACCOUNT_UNVERIFIED" && typeof data.redirectTo === "string") {
+          router.push(getSafeNextPath(data.redirectTo, "/verify-email"));
+          return;
+        }
         throw new Error(getLoginErrorMessage(data));
       }
 

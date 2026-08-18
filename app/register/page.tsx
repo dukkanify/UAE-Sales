@@ -9,7 +9,7 @@ export default function RegisterPage() {
       <SiteHeader />
       <main className="auth-page">
         <AuthShell
-          description="انضم إلى منصة إماراتية موثوقة تتيح لك بيع وشراء المنتجات والخدمات مع ضمان مالي وتجربة آمنة داخل الإمارات."
+          description="أولاً نتحقق من الشخص برمز يصل إلى بريدك، ثم يُعتمد حسابك بسهولة لتبدأ البيع والشراء بثقة."
           footerAction={{
             href: "/login",
             label: "سجّل الدخول",

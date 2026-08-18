@@ -23,7 +23,7 @@ const roleLabels: Record<AdminUserRecord["role"], string> = {
 
 const statusLabels: Record<AdminUserRecord["accountStatus"], string> = {
   active: "نشط",
-  pending: "قيد التفعيل",
+  pending: "بانتظار الاعتماد",
   suspended: "موقوف",
 };
 
@@ -38,6 +38,7 @@ function statusBadgeVariant(
 export function AdminUsersPanel() {
   const [users, setUsers] = useState<AdminUserRecord[]>([]);
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending">("all");
   const [busyId, setBusyId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,21 +46,42 @@ export function AdminUsersPanel() {
     if (!user || user.role !== "admin") return;
     adminFetch("/api/admin/users")
       .then((res) => res.json())
-      .then((data) => setUsers(data.users ?? []))
+      .then((data) => {
+        const nextUsers = (data.users ?? []) as AdminUserRecord[];
+        setUsers(nextUsers);
+        if (nextUsers.some((user) => user.accountStatus === "pending")) {
+          setStatusFilter("pending");
+        }
+      })
       .catch(() => setUsers([]));
   }, []);
 
+  const pendingCount = useMemo(
+    () => users.filter((user) => user.accountStatus === "pending").length,
+    [users],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return users;
-    return users.filter(
-      (user) =>
-        user.fullName.toLowerCase().includes(q) ||
-        user.email.toLowerCase().includes(q) ||
-        user.phone.includes(q) ||
-        user.city.includes(q),
-    );
-  }, [users, query]);
+    return users
+      .filter((user) =>
+        statusFilter === "pending" ? user.accountStatus === "pending" : true,
+      )
+      .filter((user) => {
+        if (!q) return true;
+        return (
+          user.fullName.toLowerCase().includes(q) ||
+          user.email.toLowerCase().includes(q) ||
+          user.phone.includes(q) ||
+          user.city.includes(q)
+        );
+      })
+      .sort((a, b) => {
+        if (a.accountStatus === "pending" && b.accountStatus !== "pending") return -1;
+        if (b.accountStatus === "pending" && a.accountStatus !== "pending") return 1;
+        return 0;
+      });
+  }, [users, query, statusFilter]);
 
   async function patchUser(
     id: string,
@@ -113,10 +135,28 @@ export function AdminUsersPanel() {
               value={query}
             />
           </div>
-          <p className="pb-2 text-xs text-muted">
-            <Icon className="ms-1 inline" name="user" size={14} />
-            {filtered.length} مستخدم
-          </p>
+          <div className="flex flex-wrap items-center gap-2 pb-2">
+            <Button
+              onClick={() => setStatusFilter("all")}
+              size="sm"
+              type="button"
+              variant={statusFilter === "all" ? "primary" : "ghost"}
+            >
+              الكل
+            </Button>
+            <Button
+              onClick={() => setStatusFilter("pending")}
+              size="sm"
+              type="button"
+              variant={statusFilter === "pending" ? "primary" : "ghost"}
+            >
+              بانتظار الاعتماد ({pendingCount})
+            </Button>
+            <p className="text-xs text-muted">
+              <Icon className="ms-1 inline" name="user" size={14} />
+              {filtered.length} مستخدم
+            </p>
+          </div>
         </div>
       </Card>
 
@@ -139,6 +179,11 @@ export function AdminUsersPanel() {
                   <Badge variant={statusBadgeVariant(user.accountStatus)}>
                     {statusLabels[user.accountStatus]}
                   </Badge>
+                  {user.emailVerifiedAt ? (
+                    <Badge variant="verified">تم التحقق</Badge>
+                  ) : (
+                    <Badge variant="pending">لم يتحقق بعد</Badge>
+                  )}
                   {user.isVerified ? (
                     <Badge variant="verified">موثّق</Badge>
                   ) : (
@@ -152,7 +197,17 @@ export function AdminUsersPanel() {
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
-              {!user.isVerified ? (
+              {user.accountStatus === "pending" ? (
+                <Button
+                  loading={busyId === user.id}
+                  onClick={() => patchUser(user.id, { accountStatus: "active" })}
+                  size="sm"
+                  variant="primary"
+                >
+                  اعتماد
+                </Button>
+              ) : null}
+              {user.accountStatus === "active" && !user.isVerified ? (
                 <Button
                   loading={busyId === user.id}
                   onClick={() => patchUser(user.id, { isVerified: true })}

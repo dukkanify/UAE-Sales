@@ -10,13 +10,13 @@ export default function VerifyEmailPage() {
       <SiteHeader />
       <main className="auth-page">
         <AuthShell
-          description="أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال العملية."
+          description="أدخل رمز التحقق المرسل إلى بريدك. بعد التحقق من الشخص يُعتمد حسابك بسهولة."
           footerAction={{
             href: "/login",
             label: "تسجيل الدخول",
             prompt: "لديك حساب؟",
           }}
-          title="التحقق من البريد الإلكتروني"
+          title="تحقق من الشخص"
         >
           <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
             <VerifyEmailContent />

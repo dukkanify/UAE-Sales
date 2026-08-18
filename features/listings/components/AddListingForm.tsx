@@ -24,6 +24,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     () => getSessionUser()?.phone?.trim() ?? "",
   );
   const {
+    blockReason,
     errors,
     handleImageChange,
     imagePreviews,
@@ -56,9 +57,13 @@ export function AddListingForm({ categories }: AddListingFormProps) {
   if (!isAllowed) {
     return (
       <Card className="overflow-hidden p-8 text-center">
-        <h1 className="text-2xl font-black text-ink">يلزم تسجيل الدخول</h1>
+        <h1 className="text-2xl font-black text-ink">
+          {blockReason === "pending" ? "الحساب بانتظار الاعتماد" : "يلزم تسجيل الدخول"}
+        </h1>
         <p className="mt-3 text-muted">
-          سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد.
+          {blockReason === "pending"
+            ? "بعد التحقق من الشخص يتم اعتماد الحساب بسهولة. يمكنك إضافة إعلان فور التفعيل."
+            : "سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد."}
         </p>
       </Card>
     );

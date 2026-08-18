@@ -16,6 +16,7 @@ type OtpVerificationProps = {
   nextPath?: string;
   onBack: () => void;
   onVerified?: (data?: {
+    approved?: boolean;
     metadata?: Record<string, string>;
     ok?: boolean;
     redirectTo?: string;
@@ -173,11 +174,13 @@ export function OtpVerification({
     <div className="grid gap-4">
       <div>
         <p className="text-xs font-medium tracking-wide text-secondary uppercase">
-          التحقق بالبريد الإلكتروني
+          {purpose === "REGISTER" ? "التحقق من الشخص" : "التحقق بالبريد الإلكتروني"}
         </p>
         <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز التحقق</h2>
         <p className="mt-2 text-sm font-medium text-muted">
-          أرسلنا رمز تحقق مكوّنًا من 6 أرقام إلى بريدك الإلكتروني
+          {purpose === "REGISTER"
+            ? "أرسلنا رمزًا مكوّنًا من 6 أرقام. بعد التحقق يُعتمد حسابك بسهولة."
+            : "أرسلنا رمز تحقق مكوّنًا من 6 أرقام إلى بريدك الإلكتروني"}
         </p>
         <p className="mt-1 text-sm font-bold text-ink" dir="ltr">
           {displayEmail}

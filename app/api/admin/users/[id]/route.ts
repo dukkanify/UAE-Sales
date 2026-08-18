@@ -4,7 +4,12 @@ import {
 import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
-import { toAdminUserRecord, updateUserAdmin } from "@/services/auth/user-store";
+import { approvePendingUser } from "@/services/auth/signup-approval";
+import {
+  findUserById,
+  toAdminUserRecord,
+  updateUserAdmin,
+} from "@/services/auth/user-store";
 import { getAllListings } from "@/services/listings/listing-store";
 import type { AdminUserPatch } from "@/types";
 
@@ -18,8 +23,16 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminUserPatch;
-  const user = await updateUserAdmin(id, body);
+  const current = await findUserById(id);
+  if (!current) {
+    return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  }
 
+  if (body.accountStatus === "active" && current.accountStatus === "pending") {
+    await approvePendingUser(id);
+  }
+
+  const user = await updateUserAdmin(id, body);
   if (!user) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }

@@ -67,6 +67,37 @@ export async function handleOtpVerify(input: {
   return result;
 }
 
+/** Register verification stays easy even if inbox delivery fails. */
+export async function sendRegistrationVerifyOtp(input: {
+  email: string;
+  fullName: string;
+  userId: string;
+  accountType: string;
+}) {
+  const { record, code } = await createOtpRequest({
+    email: input.email,
+    purpose: "REGISTER",
+    userId: input.userId,
+    metadata: {
+      fullName: input.fullName,
+      accountType: input.accountType,
+      userId: input.userId,
+    },
+  });
+
+  try {
+    const senders = await import("@/services/email/email.service");
+    await senders.sendRegistrationOtp({
+      email: input.email,
+      name: input.fullName,
+      otp: code,
+    });
+  } catch {
+    // Keep the code so the person can still finish verification.
+    void record;
+  }
+}
+
 export async function sendOtpForPurpose(input: {
   email: string;
   fullName: string;

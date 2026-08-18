@@ -7,6 +7,10 @@ import { useImagePreviews } from "./useImagePreviews";
 import { cities, countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import type { Category, Listing } from "@/types";
+import {
+  getAccountGatePath,
+  isMarketplaceAccountReady,
+} from "@/services/auth/account-access";
 import { getSessionUser, saveLocalListing } from "@/services/storage";
 import { uploadListingImages } from "@/services/upload";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
@@ -53,9 +57,17 @@ export function useAddListingForm(categories: Category[]) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     categories[0]?.id ?? "",
   );
-  const [isAllowed] = useState(
-    () => typeof window !== "undefined" && Boolean(getSessionUser()),
-  );
+  const [isAllowed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return isMarketplaceAccountReady(getSessionUser());
+  });
+  const [blockReason] = useState<"login" | "pending" | "blocked">(() => {
+    if (typeof window === "undefined") return "login";
+    const user = getSessionUser();
+    if (!user) return "login";
+    if (user.accountStatus === "pending") return "pending";
+    return "blocked";
+  });
   const publishedRef = useRef(false);
 
   const selectedCategory = useMemo(
@@ -72,8 +84,10 @@ export function useAddListingForm(categories: Category[]) {
       }
 
       const user = getSessionUser();
-      if (!user) {
-        router.replace("/login?next=/listings/new");
+      if (!user || !isMarketplaceAccountReady(user)) {
+        router.replace(
+          user ? getAccountGatePath(user) : "/login?next=/listings/new",
+        );
         return;
       }
 
@@ -190,12 +204,13 @@ export function useAddListingForm(categories: Category[]) {
     useAsyncAction(publishListing);
 
   useEffect(() => {
-    if (!isAllowed) {
-      router.replace("/login?next=/listings/new");
-    }
+    if (isAllowed) return;
+    const user = getSessionUser();
+    router.replace(user ? getAccountGatePath(user) : "/login?next=/listings/new");
   }, [isAllowed, router]);
 
   return {
+    blockReason,
     errors,
     handleImageChange,
     imagePreviews,

@@ -23,7 +23,12 @@ export function VerifyEmailContent() {
   const nextPath = searchParams.get("next") ?? undefined;
 
   const handleVerified = useCallback(
-    async (data?: { redirectTo?: string; resetToken?: string; user?: UserProfile }) => {
+    async (data?: {
+      approved?: boolean;
+      redirectTo?: string;
+      resetToken?: string;
+      user?: UserProfile;
+    }) => {
       if (purpose === "PASSWORD_RESET" && data?.resetToken) {
         router.push(
           `/forgot-password?step=password&email=${encodeURIComponent(email)}&token=${encodeURIComponent(data.resetToken)}`,
@@ -49,7 +54,7 @@ export function VerifyEmailContent() {
     [email, nextPath, purpose, router],
   );
 
-  if (!emailOtpEnabled) {
+  if (!emailOtpEnabled && purpose !== "REGISTER") {
     return (
       <div className="grid gap-3">
         <FormMessage variant="error">التحقق بالرمز غير متاح حاليًا.</FormMessage>
