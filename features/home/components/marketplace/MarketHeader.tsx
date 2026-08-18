@@ -70,17 +70,20 @@ export function MarketHeader() {
     <header className="market-header sticky top-0 z-50">
       <div className="market-header__accent" aria-hidden />
       <div className="app-container">
-        <div className="market-header__bar">
+        <div className="market-header__bar flex min-h-[4.15rem] w-full flex-nowrap items-center justify-between gap-3 md:min-h-[4.4rem]">
           <BrandLogo showTagline={false} size="md" />
 
-          <nav aria-label="التنقل الرئيسي" className="market-header__nav">
+          <nav
+            aria-label="التنقل الرئيسي"
+            className="market-header__nav hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex"
+          >
             {nav.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
                 <Link
                   key={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`market-header__nav-link${active ? " is-active" : ""}`}
+                  className={`market-header__nav-link whitespace-nowrap${active ? " is-active" : ""}`}
                   href={item.href}
                 >
                   {item.label}
@@ -89,18 +92,20 @@ export function MarketHeader() {
             })}
           </nav>
 
-          <div className="market-header__actions">
-            <EmirateLocationSelect
-              className="market-header__location hidden lg:inline-flex"
-              variant="desktop"
-            />
+          <div className="market-header__actions flex shrink-0 items-center gap-2">
+            <div className="hidden lg:block">
+              <EmirateLocationSelect
+                className="market-header__location"
+                variant="desktop"
+              />
+            </div>
 
-            <div className="market-header__cluster">
+            <div className="market-header__cluster inline-flex items-center gap-0.5">
               <ThemeToggle className="market-header__icon-btn" />
 
               <Link
                 aria-label="بحث"
-                className="market-header__icon-btn"
+                className="market-header__icon-btn grid size-[2.35rem] place-items-center"
                 href="/search"
               >
                 <Icon name="search" size={18} />
@@ -109,19 +114,19 @@ export function MarketHeader() {
               {user ? (
                 <Link
                   aria-label="حسابي"
-                  className="market-header__icon-btn market-header__icon-btn--desktop"
+                  className="market-header__icon-btn market-header__icon-btn--desktop hidden size-[2.35rem] place-items-center sm:grid"
                   href="/profile"
                 >
                   <Icon name="user" size={18} />
                 </Link>
               ) : (
-                <Link className="market-header__join-link" href="/login">
+                <Link className="market-header__join-link hidden sm:inline-flex" href="/login">
                   سجّل الدخول وانضم إلينا
                 </Link>
               )}
             </div>
 
-            <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
+            <Link className="market-header__cta hidden items-center gap-1.5 sm:inline-flex" href="/listings/new">
               <Icon name="plus" size={15} />
               <span>أضف إعلانك</span>
             </Link>
@@ -129,7 +134,7 @@ export function MarketHeader() {
             <button
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
-              className="market-header__menu-btn lg:hidden"
+              className="market-header__menu-btn grid size-[2.55rem] place-items-center lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
