@@ -25,7 +25,10 @@ const schema = z.object({
   currentCity: z.string().min(1),
   yearsOfExperience: z.number().min(0).max(50),
   availabilityDate: z.string().min(1),
-  coverMessage: z.string().max(2000).optional().default(""),
+  coverMessage: z.preprocess(
+    (value) => (typeof value === "string" ? value : ""),
+    z.string().max(2000),
+  ),
   cvFileName: z.string().min(1),
   employerId: z.string().min(1),
   employerName: z.string().min(1),
