@@ -7,12 +7,40 @@ import {
   otpCooldownResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
+import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import {
   createStandardUser,
   toUserProfile,
 } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { maskEmail } from "@/shared/utils/mask-email";
+
+function registerOtpResponse(input: {
+  accountProof?: string | null;
+  email: string;
+  emailDelivered: boolean;
+  otp?: string;
+}) {
+  const params = new URLSearchParams({
+    email: input.email,
+    purpose: "REGISTER",
+    masked: maskEmail(input.email),
+  });
+  const response = NextResponse.json({
+    ok: true,
+    needsVerification: true,
+    email: input.email,
+    maskedEmail: maskEmail(input.email),
+    emailDelivered: input.emailDelivered,
+    ...(input.otp ? { otp: input.otp } : {}),
+    redirectTo: `/verify-email?${params.toString()}`,
+    accountProof: input.accountProof,
+  });
+  if (input.otp) {
+    attachOtpDisplayCookie(response, input.email, input.otp);
+  }
+  return response;
+}
 
 const schema = z.object({
   fullName: z.string().min(3),
@@ -70,32 +98,28 @@ export async function POST(request: Request) {
     trackAuthEvent("registration_started", { accountType: profile.accountType });
 
     try {
-      await sendRegistrationVerifyOtp({
+      const sent = await sendRegistrationVerifyOtp({
         email,
         fullName,
         userId: stored.id,
         accountType: parsed.data.accountType,
       });
+      trackAuthEvent("registration_otp_sent");
+      return registerOtpResponse({
+        accountProof: stored.passwordHash,
+        email,
+        emailDelivered: sent.delivered,
+        otp: sent.code,
+      });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
+      return registerOtpResponse({
+        accountProof: stored.passwordHash,
+        email,
+        emailDelivered: false,
+      });
     }
-
-    trackAuthEvent("registration_otp_sent");
-    const params = new URLSearchParams({
-      email,
-      purpose: "REGISTER",
-      masked: maskEmail(email),
-    });
-
-    return NextResponse.json({
-      ok: true,
-      needsVerification: true,
-      email,
-      maskedEmail: maskEmail(email),
-      redirectTo: `/verify-email?${params.toString()}`,
-      accountProof: stored.passwordHash,
-    });
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
       return NextResponse.json(

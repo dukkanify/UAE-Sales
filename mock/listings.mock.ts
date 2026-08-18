@@ -89,10 +89,7 @@ function buildListing(seed: ListingSeed): Listing {
     escrowAvailable: seed.escrowAvailable,
     postedAt: toDemoPostedAt(seed.postedAt, seed.id),
     contactMethod: seed.contactMethod,
-    contactPhone:
-      seed.contactMethod === "phone" || seed.contactMethod === "both"
-        ? getSellerDemoPhone(seed.sellerKey)
-        : undefined,
+    contactPhone: getSellerDemoPhone(seed.sellerKey),
     deliveryOption: seed.deliveryOption,
     imageTone: seed.imageTone,
     features: extras?.features,

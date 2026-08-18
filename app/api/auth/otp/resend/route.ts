@@ -47,23 +47,34 @@ export async function POST(request: Request) {
     if (parsed.data.purpose === "REGISTER") {
       const stored = await findUserByEmail(email);
       if (stored) {
-        await sendRegistrationVerifyOtp({
+        const sent = await sendRegistrationVerifyOtp({
           email,
           fullName: parsed.data.fullName ?? stored.fullName,
           userId: stored.id,
           accountType: stored.accountType,
         });
+        trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
+        return genericOtpResponse(email, {
+          emailDelivered: sent.delivered,
+          otp: sent.code,
+          revealOtp: true,
+        });
       }
-    } else {
-      await sendOtpForPurpose({
-        email,
-        fullName: parsed.data.fullName ?? "مستخدم سوقنا",
-        purpose: parsed.data.purpose as OtpPurpose,
-      });
+      trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
+      return genericOtpResponse(email);
     }
 
+    const sent = await sendOtpForPurpose({
+      email,
+      fullName: parsed.data.fullName ?? "مستخدم سوقنا",
+      purpose: parsed.data.purpose as OtpPurpose,
+    });
+
     trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
-    return genericOtpResponse(email);
+    return genericOtpResponse(email, {
+      emailDelivered: sent.delivered,
+      otp: sent.code,
+    });
   } catch (error) {
     const cooldown = otpCooldownResponse(error);
     if (cooldown) return cooldown;

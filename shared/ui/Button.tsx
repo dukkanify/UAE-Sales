@@ -61,10 +61,18 @@ export function Button({
   );
 
   if (href && !loading) {
+    const isAppPath = href.startsWith("/") && !href.startsWith("//");
+    if (isAppPath) {
+      return (
+        <Link aria-busy={loading} className={classes} href={href} onClick={onClick}>
+          {inner}
+        </Link>
+      );
+    }
     return (
-      <Link aria-busy={loading} className={classes} href={href} onClick={onClick}>
+      <a aria-busy={loading} className={classes} href={href} onClick={onClick}>
         {inner}
-      </Link>
+      </a>
     );
   }
 

@@ -10,7 +10,6 @@ import {
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import {
-  getMaskedPhone,
   getTelHref,
   getWhatsAppHref,
 } from "@/shared/listings/listing-contact";
@@ -18,7 +17,6 @@ import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listi
 import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
-import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon, type IconName } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
 import dynamic from "next/dynamic";
@@ -52,8 +50,6 @@ type ActiveModal = "job" | "viewing" | "quote" | "service" | null;
 type ListingPrimaryActionProps = {
   action: ListingActionType;
   className?: string;
-  /** When false, phone confirmation is not rendered under the button (e.g. sticky bars). */
-  embedPhoneConfirm?: boolean;
   fullWidth?: boolean;
   listing: Listing;
   size?: "sm" | "md" | "lg";
@@ -73,7 +69,6 @@ const PRIMARY_ACTION_ICONS: Partial<Record<ListingActionType, IconName>> = {
 export function ListingPrimaryAction({
   action,
   className,
-  embedPhoneConfirm = true,
   fullWidth = true,
   listing,
   size = "lg",
@@ -82,11 +77,27 @@ export function ListingPrimaryAction({
   const router = useRouter();
   const { showToast } = useToast();
   const config = getListingActionConfig(listing);
-  const [phoneConfirm, setPhoneConfirm] = useState(false);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
 
   if (action === "SEND_MESSAGE") {
     return <StartChatButton fullWidth={fullWidth} listing={listing} size={size} />;
+  }
+
+  if (action === "CONTACT_SELLER") {
+    return (
+      <Button
+        className={className}
+        fullWidth={fullWidth}
+        href={getTelHref(listing)}
+        size={size}
+        variant={variant}
+      >
+        <span className="inline-flex items-center justify-center gap-2">
+          <Icon name="phone-call" size={16} />
+          {ACTION_LABELS.CONTACT_SELLER}
+        </span>
+      </Button>
+    );
   }
 
   function requireAuth(nextPath: string): boolean {
@@ -131,19 +142,6 @@ export function ListingPrimaryAction({
         if (config.checkoutEnabled) handleBuyOrReserve();
         else showToast(LISTING_ERRORS.listingUnavailable, "error");
         break;
-      case "CONTACT_SELLER": {
-        const tel = getTelHref(listing);
-        if (!tel) {
-          showToast(LISTING_ERRORS.phoneUnavailable, "error");
-          return;
-        }
-        if (!embedPhoneConfirm) {
-          window.location.href = tel;
-          return;
-        }
-        setPhoneConfirm(true);
-        break;
-      }
       case "APPLY_JOB":
         openModal("job");
         break;
@@ -160,9 +158,6 @@ export function ListingPrimaryAction({
         break;
     }
   }
-
-  const tel = getTelHref(listing);
-  const masked = getMaskedPhone(listing);
 
   return (
     <>
@@ -182,25 +177,6 @@ export function ListingPrimaryAction({
           ACTION_LABELS[action]
         )}
       </Button>
-      {embedPhoneConfirm && phoneConfirm && tel ? (
-        <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">
-          <p className="text-sm font-semibold text-ink">هل تريد الاتصال بالبائع؟</p>
-          {masked ? (
-            <p className="mt-1 text-xs text-muted" dir="ltr">
-              {masked}
-            </p>
-          ) : null}
-          <div className="mt-3 flex gap-2">
-            <Button href={tel} size="sm" variant="accent">
-              <Icon className="shrink-0" name="phone-call" size={14} />
-              اتصال
-            </Button>
-            <Button onClick={() => setPhoneConfirm(false)} size="sm" variant="secondary">
-              إلغاء
-            </Button>
-          </div>
-        </div>
-      ) : null}
 
       {activeModal === "job" ? (
         <JobApplicationModal
@@ -274,63 +250,28 @@ export function SellerContactActions({
   listing,
   stacked = false,
 }: SellerContactActionsProps) {
-  const [phoneConfirm, setPhoneConfirm] = useState(false);
   const tel = getTelHref(listing);
   const whatsapp = getWhatsAppHref(listing, getListingCanonicalUrl(listing));
-  const masked = getMaskedPhone(listing);
   const gridClass = stacked ? "grid gap-2" : "grid gap-2 sm:grid-cols-2";
 
   return (
     <div className={gridClass}>
-      {tel && !hidePhone ? (
-        <Button onClick={() => setPhoneConfirm(true)} variant="secondary">
+      {hidePhone ? null : (
+        <Button href={tel} variant="secondary">
           <Icon className="shrink-0" name="phone-call" size={16} />
           اتصال
         </Button>
-      ) : null}
-      {whatsapp ? (
-        <a
-          className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[#25D366]/25 bg-gradient-to-br from-[#25D366]/10 to-[#128C7E]/10 px-5 text-sm font-semibold text-[#128C7E] shadow-[var(--shadow-xs)] transition duration-200 hover:border-[#25D366]/45"
-          href={whatsapp}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <Icon name="whatsapp" size={18} />
-          واتساب
-        </a>
-      ) : null}
+      )}
+      <a
+        className="focus-ring interactive-lift inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-xl)] border border-[#25D366]/25 bg-gradient-to-br from-[#25D366]/10 to-[#128C7E]/10 px-5 text-sm font-semibold text-[#128C7E] shadow-[var(--shadow-xs)] transition duration-200 hover:border-[#25D366]/45"
+        href={whatsapp}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        <Icon name="whatsapp" size={18} />
+        واتساب
+      </a>
       <StartChatButton listing={listing} variant="secondary" />
-      {phoneConfirm && tel ? (
-        <div className="sm:col-span-2">
-          <FormMessage variant="success">
-            {masked ? (
-              <>
-                هل تريد الاتصال بالبائع؟ (
-                <span dir="ltr" className="inline-block font-semibold tracking-wide">
-                  {masked}
-                </span>
-                )
-              </>
-            ) : (
-              "هل تريد الاتصال بالبائع؟"
-            )}
-          </FormMessage>
-          <div className="mt-2 flex gap-2">
-            <Button href={tel} size="sm" variant="accent">
-              <Icon className="shrink-0" name="phone-call" size={14} />
-              تأكيد الاتصال
-            </Button>
-            <Button onClick={() => setPhoneConfirm(false)} size="sm" variant="ghost">
-              إلغاء
-            </Button>
-          </div>
-        </div>
-      ) : null}
-      {!tel && !whatsapp ? (
-        <p className="text-xs text-muted sm:col-span-2">
-          التواصل متاح عبر المحادثة داخل سوقنا.
-        </p>
-      ) : null}
     </div>
   );
 }

@@ -26,6 +26,7 @@ import { getAllNotifications } from "@/services/payments/notification-store";
 import { getAllOrders } from "@/services/payments/order-store";
 import { getPaymentEvents } from "@/services/payments/payment-log";
 import { getAllWalletAccounts } from "@/services/payments/wallet-ledger";
+import { getAllListingReports } from "@/services/listings/listing-report-store";
 import { getAllQuoteRequests } from "@/services/quote-requests/quote-request-store";
 import { getAllViewingBookings } from "@/services/viewing-bookings/viewing-booking-store";
 import {
@@ -56,6 +57,7 @@ export async function GET() {
     jobs,
     bookings,
     quotes,
+    listingReports,
     wallets,
     audit,
     notifications,
@@ -73,6 +75,7 @@ export async function GET() {
     getAllJobApplications(),
     getAllViewingBookings(),
     getAllQuoteRequests(),
+    getAllListingReports(),
     getAllWalletAccounts(),
     getAdminAuditLog(20),
     getAllNotifications(),
@@ -109,6 +112,7 @@ export async function GET() {
     (b) => b.status === "confirmed",
   ).length;
   const openQuotes = quotes.filter((q) => q.status === "submitted").length;
+  const openListingReports = listingReports.filter((r) => r.status === "open").length;
 
   const attention = [
     {
@@ -181,6 +185,13 @@ export async function GET() {
       meta: "خدمات",
       count: openQuotes,
       alert: openQuotes > 0,
+    },
+    {
+      href: "/admin/listing-reports",
+      label: "بلاغات إعلانات جديدة",
+      meta: "هوية الزائر: اسم، بريد، هاتف",
+      count: openListingReports,
+      alert: openListingReports > 0,
     },
     {
       href: "/admin/notifications",
@@ -303,6 +314,13 @@ export async function GET() {
       meta: "خدمات",
       group: "leads",
       count: quotes.length,
+    },
+    {
+      href: "/admin/listing-reports",
+      label: "بلاغات الإعلانات",
+      meta: `${openListingReports} بانتظار المراجعة`,
+      group: "moderation",
+      count: listingReports.length,
     },
     {
       href: "/admin/settings",

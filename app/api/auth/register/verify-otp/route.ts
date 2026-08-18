@@ -3,6 +3,7 @@ import { z } from "zod";
 import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { clearOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import { completePersonVerification } from "@/services/auth/signup-approval";
 import {
@@ -59,10 +60,12 @@ export async function POST(request: Request) {
     ? getRedirectAfterAuth(user, parsed.data.next)
     : "/register/pending";
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     ok: true,
     approved,
     user,
     redirectTo,
   });
+  clearOtpDisplayCookie(response);
+  return response;
 }

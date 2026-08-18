@@ -12,7 +12,11 @@ import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 import Link from "next/link";
 
-export function VerifyEmailContent() {
+type VerifyEmailContentProps = {
+  initialOtp?: string | null;
+};
+
+export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailOtpEnabled = isEmailOtpEnabled();
@@ -78,6 +82,7 @@ export function VerifyEmailContent() {
   return (
     <OtpVerification
       email={email}
+      initialOtp={initialOtp}
       maskedEmail={maskedEmail}
       nextPath={nextPath}
       onBack={() => router.push(purpose === "REGISTER" ? "/register" : "/login")}

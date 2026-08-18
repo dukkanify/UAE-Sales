@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     });
 
     try {
-      await sendOtpForPurpose({
+      const sent = await sendOtpForPurpose({
         email,
         fullName: parsed.data.fullName,
         purpose: "REGISTER",
@@ -61,13 +61,16 @@ export async function POST(request: Request) {
           userId: pending.id,
         },
       });
+      trackAuthEvent("registration_otp_sent");
+      return genericOtpResponse(email, {
+        emailDelivered: sent.delivered,
+        otp: sent.code,
+        revealOtp: true,
+      });
     } catch (sendError) {
       await deletePendingUser(pending.id);
       throw sendError;
     }
-
-    trackAuthEvent("registration_otp_sent");
-    return genericOtpResponse(email);
   } catch (error) {
     const cooldown = otpCooldownResponse(error);
     if (cooldown) return cooldown;
