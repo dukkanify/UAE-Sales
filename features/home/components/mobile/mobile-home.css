@@ -86,11 +86,13 @@
 
 .mobile-home-header__side--end {
   justify-content: flex-end;
+  overflow: visible;
 }
 
 .mobile-home-header__actions,
 .mobile-home-header__cluster {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.2rem;
   padding: 0.15rem;
@@ -341,6 +343,20 @@
   color: var(--mh-gold);
 }
 
+.mobile-home-header__drawer-theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  padding: 0.65rem 0.875rem;
+  border-radius: var(--mh-radius-md);
+  background: #f8fafc;
+  font-size: var(--mh-text-sm);
+  font-weight: 700;
+  color: var(--mh-primary);
+}
+
 .mobile-home-header__drawer-cta {
   display: inline-flex;
   margin-top: 0.5rem;
@@ -432,6 +448,17 @@
     background var(--mh-duration) var(--mh-ease),
     color var(--mh-duration) var(--mh-ease),
     transform var(--mh-duration) var(--mh-ease);
+}
+
+.mobile-home-header__theme-toggle {
+  width: 2.25rem !important;
+  min-width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .mobile-home-header__icon-btn--ghost {
@@ -2473,6 +2500,11 @@ html[data-theme="dark"] .mobile-home-header__drawer-profile-icon {
 
 html[data-theme="dark"] .mobile-home-header__drawer-profile-action {
   background: rgb(255 255 255 / 6%);
+}
+
+html[data-theme="dark"] .mobile-home-header__drawer-theme {
+  background: #1a2336;
+  color: #eef2f8;
 }
 
 html[data-theme="dark"] .mobile-home-header__drawer-link-icon {

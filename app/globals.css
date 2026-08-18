@@ -529,6 +529,13 @@ html[data-theme="dark"] .market-hero-search {
     transform 160ms ease;
 }
 
+.market-header__icon-btn.theme-toggle {
+  width: 2.35rem;
+  min-width: 2.35rem;
+  height: 2.35rem;
+  min-height: 0;
+}
+
 .market-header__icon-btn--desktop {
   display: none;
 }

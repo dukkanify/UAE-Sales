@@ -112,7 +112,7 @@ export function SiteHeader() {
           </form>
 
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <ThemeToggle className="shrink-0" />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
@@ -159,9 +159,7 @@ export function SiteHeader() {
           <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
             <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
               <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[0.65rem] font-bold text-[#0b1628]">
-                أقسام
-              </span>
+              <ThemeToggle />
             </div>
 
             <div className="grid gap-1.5">

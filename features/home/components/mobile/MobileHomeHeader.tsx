@@ -79,7 +79,7 @@ export function MobileHomeHeader() {
               <Icon name="search" size={17} />
             </Link>
 
-            <ThemeToggle className="mobile-home-header__icon-btn !size-[2.25rem] !min-h-0 !rounded-full !border-0 !shadow-none" />
+            <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
 
             <NotificationBell />
           </div>
@@ -146,6 +146,10 @@ export function MobileHomeHeader() {
                 </Link>
               );
             })}
+            <div className="mobile-home-header__drawer-theme">
+              <span>الوضع الليلي</span>
+              <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
+            </div>
             <Link
               className="mobile-home-header__drawer-cta"
               href="/listings/new"

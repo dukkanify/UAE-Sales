@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
@@ -90,6 +91,8 @@ export function MarketHeader() {
           </nav>
 
           <div className="market-header__actions">
+            <ThemeToggle className="market-header__icon-btn" />
+
             {user ? (
               <Link
                 aria-label="حسابي"
@@ -128,6 +131,7 @@ export function MarketHeader() {
                 <p className="market-header__drawer-eyebrow">تصفّح سوقنا</p>
                 <p className="market-header__drawer-title">كل الأقسام في مكان واحد</p>
               </div>
+              <ThemeToggle className="market-header__icon-btn" />
             </div>
 
             <div className="market-header__drawer-grid">
