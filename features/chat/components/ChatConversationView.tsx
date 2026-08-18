@@ -8,6 +8,7 @@ import {
   getChatConversationById,
 } from "@/services/chat";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { notifyChatEmail } from "@/features/chat/lib/notify-chat-email";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -86,6 +87,16 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
       setError("تعذر إرسال الرسالة.");
       return;
     }
+
+    const recipientUserId =
+      user.id === conversation.sellerId ? conversation.buyerId : conversation.sellerId;
+    notifyChatEmail({
+      conversationId: conversation.id,
+      listingTitle: conversation.listingTitle,
+      preview: message.trim(),
+      recipientUserId,
+      senderName: user.fullName,
+    });
 
     setConversation(updated);
     setMessage("");

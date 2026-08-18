@@ -1,5 +1,6 @@
 export {
   addMessageToConversation,
+  findConversationForListing,
   getChatConversationById,
   getChatConversations,
   getChatThreads,

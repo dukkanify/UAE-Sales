@@ -10,7 +10,7 @@ export default function ForgotPasswordPage() {
       <SiteHeader />
       <main className="auth-page">
         <AuthShell
-          description="استعد الوصول إلى حسابك بخطوات بسيطة وآمنة عبر البريد الإلكتروني."
+          description="أرسل رابطاً آمناً إلى بريدك لإعادة تعيين كلمة المرور دون استخدام رمز تحقق."
           footerAction={{
             href: "/register",
             label: "إنشاء حساب",

@@ -68,7 +68,9 @@ export type AdminListingCreateInput = {
 
 export type AdminListingPatch = Partial<
   Pick<AdminListingRecord, "status" | "isFeatured">
->;
+> & {
+  rejectReason?: string;
+};
 
 export type AdminDisputeRecord = {
   id: string;

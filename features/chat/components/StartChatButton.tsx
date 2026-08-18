@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Listing } from "@/types";
-import { openListingConversation } from "@/services/chat";
+import { notifyChatEmail } from "@/features/chat/lib/notify-chat-email";
+import {
+  findConversationForListing,
+  openListingConversation,
+} from "@/services/chat";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { useToast } from "@/shared/components/ToastProvider";
 import { getSessionUser } from "@/services/storage";
@@ -59,10 +63,20 @@ export function StartChatButton({
         return;
       }
 
+      const existing = findConversationForListing(listing.id, user.id);
       const conversationId = openListingConversation(listing, {
         id: user.id,
         name: user.fullName,
       });
+      if (!existing && listing.seller.id) {
+        notifyChatEmail({
+          conversationId,
+          listingTitle: listing.title,
+          preview: `مرحباً، أنا مهتم بإعلان «${listing.title}».`,
+          recipientUserId: listing.seller.id,
+          senderName: user.fullName,
+        });
+      }
       router.push(`/chat/${conversationId}`);
     } catch {
       const message = "تعذر فتح المحادثة. حاول مرة أخرى.";
