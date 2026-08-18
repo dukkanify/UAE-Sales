@@ -333,6 +333,16 @@ textarea {
   box-shadow: 0 24px 72px rgb(15 20 25 / 14%);
 }
 
+.market-hero-search select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%236b6560' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 8.5 9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 1rem center;
+  background-size: 0.75rem;
+  padding-inline-end: 2.5rem;
+}
+
 html[data-theme="dark"] .market-hero-bg img {
   filter: brightness(0.3) saturate(0.72) contrast(1.08);
 }
@@ -422,6 +432,10 @@ html[data-theme="dark"] .market-hero-stat-label {
 html[data-theme="dark"] .market-hero-search {
   border-color: var(--color-border);
   box-shadow: 0 24px 72px rgb(0 0 0 / 45%);
+}
+
+html[data-theme="dark"] .market-hero-search select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23d7deea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 4.5 6 8.5 9 4.5'/%3E%3C/svg%3E");
 }
 
 /* Night navy panels — stay dark even when --color-primary flips in dark mode */

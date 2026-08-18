@@ -731,6 +731,8 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   min-width: 0;
   flex: 1;
   border: 0;
+  appearance: none;
+  -webkit-appearance: none;
   background: transparent;
   font-size: 0.75rem;
   font-weight: 700;
