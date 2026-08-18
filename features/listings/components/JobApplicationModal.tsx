@@ -70,9 +70,9 @@ export function JobApplicationModal({
           applicantEmail: String(form.get("email") ?? user.email),
           phone: String(form.get("phone") ?? ""),
           currentCity: String(form.get("currentCity") ?? ""),
-          yearsOfExperience: years,
+          yearsOfExperience: Number.isFinite(years) ? years : 0,
           availabilityDate: String(form.get("availabilityDate") ?? ""),
-          coverMessage: coverMessage || "تم التقديم عبر الملف المرفق.",
+          coverMessage,
           cvFileName,
           employerId: listing.seller.id,
           employerName: listing.seller.name,
@@ -174,9 +174,11 @@ export function JobApplicationModal({
             />
           </div>
           <Textarea
+            hint="اختياري — يمكنك إرسال الطلب بدون كتابة أي رسالة."
             label="رسالة التقديم (اختياري)"
             name="coverMessage"
-            placeholder="اذكر خبرتك أو أي ملاحظة — اختيارية"
+            placeholder="اذكر خبرتك أو أي ملاحظة إن رغبت"
+            required={false}
           />
           <div className="flex gap-2">
             <Button loading={isSubmitting} type="submit" variant="accent">
