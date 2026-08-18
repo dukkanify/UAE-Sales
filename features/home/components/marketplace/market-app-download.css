@@ -215,6 +215,7 @@
   height: 1.15rem;
   border-radius: 999px;
   background: #000;
+  pointer-events: none;
 }
 
 .market-app-download__device-screen {
@@ -222,7 +223,8 @@
   inset: 0.4rem;
   overflow: hidden;
   border-radius: 1.55rem;
-  background: #f4f6f8;
+  isolation: isolate;
+  background: #eef2f6;
 }
 
 @keyframes market-app-float {

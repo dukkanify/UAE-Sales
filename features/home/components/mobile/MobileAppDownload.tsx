@@ -47,11 +47,7 @@ export function MobileAppDownload({
             <div className="mobile-home-app__device">
               <div className="mobile-home-app__device-island" />
               <div className="mobile-home-app__device-screen">
-                {previews.length > 0 ? (
-                  <MobileAppDevicePreview listings={previews} />
-                ) : (
-                  <div className="mobile-home-app__device-fallback" />
-                )}
+                <MobileAppDevicePreview listings={previews} />
               </div>
             </div>
           </div>
