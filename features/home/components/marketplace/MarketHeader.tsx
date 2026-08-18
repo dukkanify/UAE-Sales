@@ -131,7 +131,6 @@ export function MarketHeader() {
                 <p className="market-header__drawer-eyebrow">تصفّح سوقنا</p>
                 <p className="market-header__drawer-title">كل الأقسام في مكان واحد</p>
               </div>
-              <ThemeToggle className="market-header__icon-btn" />
             </div>
 
             <div className="market-header__drawer-grid">

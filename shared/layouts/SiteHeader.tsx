@@ -159,7 +159,6 @@ export function SiteHeader() {
           <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
             <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
               <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
-              <ThemeToggle />
             </div>
 
             <div className="grid gap-1.5">

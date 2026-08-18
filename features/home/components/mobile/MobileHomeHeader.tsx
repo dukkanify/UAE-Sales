@@ -146,10 +146,6 @@ export function MobileHomeHeader() {
                 </Link>
               );
             })}
-            <div className="mobile-home-header__drawer-theme">
-              <span>الوضع الليلي</span>
-              <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
-            </div>
             <Link
               className="mobile-home-header__drawer-cta"
               href="/listings/new"
