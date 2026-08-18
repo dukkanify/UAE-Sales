@@ -5,6 +5,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   clearRecentSearches,
   getRecentSearches,
+  getSavedSearches,
+  type SavedSearch,
 } from "@/services/storage";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { searchTextMatches } from "@/shared/listings/search-text";
@@ -14,7 +16,7 @@ import { buildSearchUrl, type SearchFilterState } from "./search-url";
 export type SearchSuggestion = {
   href?: string;
   label: string;
-  kind: "query" | "category" | "city" | "listing" | "recent";
+  kind: "query" | "category" | "city" | "listing" | "recent" | "saved";
 };
 
 type SearchTypeaheadProps = {
@@ -32,6 +34,7 @@ function kindLabel(kind: SearchSuggestion["kind"]) {
   if (kind === "city") return "إمارة";
   if (kind === "listing") return "إعلان";
   if (kind === "recent") return "سابق";
+  if (kind === "saved") return "محفوظ";
   return "بحث";
 }
 
@@ -51,6 +54,7 @@ export function SearchTypeahead({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [recent, setRecent] = useState<string[]>([]);
+  const [saved, setSaved] = useState<SavedSearch[]>([]);
 
   if (syncedDefault !== defaultValue) {
     setSyncedDefault(defaultValue);
@@ -58,12 +62,17 @@ export function SearchTypeahead({
   }
 
   useEffect(() => {
-    const sync = () => setRecent(getRecentSearches());
+    const sync = () => {
+      setRecent(getRecentSearches());
+      setSaved(getSavedSearches());
+    };
     sync();
     window.addEventListener(STORAGE_EVENTS.recentSearchesChange, sync);
+    window.addEventListener(STORAGE_EVENTS.savedSearchesChange, sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener(STORAGE_EVENTS.recentSearchesChange, sync);
+      window.removeEventListener(STORAGE_EVENTS.savedSearchesChange, sync);
       window.removeEventListener("storage", sync);
     };
   }, []);
@@ -84,6 +93,13 @@ export function SearchTypeahead({
     const next: SearchSuggestion[] = [];
 
     if (!normalized) {
+      for (const item of saved.slice(0, 5)) {
+        next.push({
+          kind: "saved",
+          label: item.label,
+          href: item.url,
+        });
+      }
       for (const query of recent.slice(0, 5)) {
         next.push({
           kind: "recent",
@@ -114,7 +130,7 @@ export function SearchTypeahead({
     }
 
     return next;
-  }, [recent, selectedFilters, suggestions, value]);
+  }, [recent, saved, selectedFilters, suggestions, value]);
 
   function choose(item: SearchSuggestion) {
     setValue(item.label);
@@ -188,9 +204,11 @@ export function SearchTypeahead({
           id={listId}
           role="listbox"
         >
-          {!value.trim() && recent.length > 0 ? (
+          {!value.trim() && (saved.length > 0 || recent.length > 0) ? (
             <div className="flex items-center justify-between border-b border-border/70 px-3 py-2">
-              <p className="text-[0.7rem] font-bold text-muted">عمليات البحث الأخيرة</p>
+              <p className="text-[0.7rem] font-bold text-muted">
+                {saved.length > 0 ? "محفوظة وأخيرة" : "عمليات البحث الأخيرة"}
+              </p>
               <button
                 className="text-[0.65rem] font-semibold text-muted hover:text-ink"
                 onClick={() => {
@@ -228,7 +246,7 @@ export function SearchTypeahead({
                   <span className="inline-flex min-w-0 items-center gap-2">
                     <Icon
                       className="shrink-0 text-secondary"
-                      name={item.kind === "recent" ? "clock" : "search"}
+                      name={item.kind === "recent" ? "clock" : item.kind === "saved" ? "heart" : "search"}
                       size={14}
                     />
                     <span className="truncate font-semibold">{item.label}</span>

@@ -34,9 +34,13 @@ function buildCurrentUrl(filters: SearchResultsToolbarProps["selectedFilters"]) 
   return query ? `/search?${query}` : "/search";
 }
 
-function buildLabel(filters: SearchResultsToolbarProps["selectedFilters"]) {
+function buildLabel(
+  filters: SearchResultsToolbarProps["selectedFilters"],
+  categories: Category[],
+) {
   if (filters.query) return filters.query;
-  const parts = [filters.city, filters.country].filter(Boolean);
+  const categoryName = categories.find((item) => item.id === filters.category)?.name;
+  const parts = [categoryName, filters.city, filters.country].filter(Boolean);
   return parts.length > 0 ? parts.join(" · ") : "بحث مخصص";
 }
 
@@ -59,7 +63,7 @@ export function SearchResultsToolbar({
       </div>
       <SearchQuickFilters categories={categories} selectedFilters={selectedFilters} />
       <SearchFilterChips categories={categories} selectedFilters={selectedFilters} />
-      <SavedSearches currentLabel={buildLabel(selectedFilters)} currentUrl={currentUrl} />
+      <SavedSearches currentLabel={buildLabel(selectedFilters, categories)} currentUrl={currentUrl} />
     </div>
   );
 }

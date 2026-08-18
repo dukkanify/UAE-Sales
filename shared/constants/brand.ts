@@ -33,6 +33,7 @@ export const STORAGE_EVENTS = {
   chatChange: "sooqna-chat-change",
   favoritesChange: "sooqna-favorites-change",
   recentSearchesChange: "sooqna-recent-searches-change",
+  savedSearchesChange: "sooqna-saved-searches-change",
   themeChange: "sooqna-theme-change",
 } as const;
 
