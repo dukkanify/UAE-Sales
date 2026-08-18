@@ -121,6 +121,7 @@ export function RegisterForm() {
       const response = await fetch("/api/auth/register/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           email: nextEmail,
           fullName,

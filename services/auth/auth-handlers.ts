@@ -6,6 +6,7 @@ import {
   OTP_VERIFY_MESSAGES,
   RESEND_COOLDOWN_MESSAGE,
 } from "@/services/auth/auth-messages";
+import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
@@ -19,10 +20,12 @@ export async function enforceRateLimit(request: Request, email: string): Promise
 
 export function genericOtpResponse(
   email: string,
-  extras?: { emailDelivered?: boolean; otp?: string },
+  extras?: { emailDelivered?: boolean; otp?: string; revealOtp?: boolean },
 ) {
   const emailDelivered = extras?.emailDelivered ?? true;
-  return NextResponse.json({
+  const revealOtp =
+    Boolean(extras?.otp) && Boolean(extras?.revealOtp || !emailDelivered);
+  const response = NextResponse.json({
     ok: true,
     message: emailDelivered
       ? GENERIC_OTP_SENT_MESSAGE
@@ -30,8 +33,12 @@ export function genericOtpResponse(
     maskedEmail: maskEmail(email),
     email,
     emailDelivered,
-    ...(emailDelivered || !extras?.otp ? {} : { otp: extras.otp }),
+    ...(revealOtp ? { otp: extras?.otp } : {}),
   });
+  if (revealOtp && extras?.otp) {
+    attachOtpDisplayCookie(response, email, extras.otp);
+  }
+  return response;
 }
 
 export function otpSendFailedResponse() {

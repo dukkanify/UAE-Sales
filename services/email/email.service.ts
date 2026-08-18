@@ -66,7 +66,15 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
   const primaryFrom = getFromAddress();
   try {
     const first = await postResend(primaryFrom, input, apiKey);
+    const primaryAddress = extractEmailAddress(primaryFrom);
     if (first.ok) {
+      if (primaryAddress.endsWith("@resend.dev")) {
+        console.warn(
+          "[Sooqna Email] Resend onboarding sender cannot reach third-party inboxes",
+          { to: input.to, subject: input.subject, from: primaryFrom },
+        );
+        return false;
+      }
       console.info("[Sooqna Email] sent", { to: input.to, subject: input.subject });
       return true;
     }
@@ -79,7 +87,6 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
       body: first.body.slice(0, 500),
     });
 
-    const primaryAddress = extractEmailAddress(primaryFrom);
     if (primaryAddress.endsWith("@resend.dev")) {
       return false;
     }
@@ -87,10 +94,10 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
     const retry = await postResend(RESEND_ONBOARDING_FROM, input, apiKey);
     if (retry.ok) {
       console.warn(
-        "[Sooqna Email] sent via Resend onboarding sender; verify sooqna.site in Resend",
+        "[Sooqna Email] Resend onboarding sender cannot reach third-party inboxes",
         { to: input.to, subject: input.subject },
       );
-      return true;
+      return false;
     }
 
     console.error("[Sooqna Email] Resend retry rejected", {

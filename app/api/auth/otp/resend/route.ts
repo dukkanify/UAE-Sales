@@ -57,6 +57,7 @@ export async function POST(request: Request) {
         return genericOtpResponse(email, {
           emailDelivered: sent.delivered,
           otp: sent.code,
+          revealOtp: true,
         });
       }
       trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
