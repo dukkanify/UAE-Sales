@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import {
+  CategoriesMegaMenu,
+  CategoriesMobileAccordion,
+} from "@/shared/layouts/CategoriesMegaMenu";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -67,28 +71,12 @@ export function MarketHeader() {
   }, [menuOpen]);
 
   return (
-    <header className="market-header sticky top-0 z-50">
+    <header className="market-header sticky top-0 z-[80]">
       <VerifyAccountBanner />
       <div className="market-header__accent" aria-hidden />
       <div className="app-container">
         <div className="market-header__bar">
           <BrandLogo showTagline={false} size="md" />
-
-          <nav aria-label="التنقل الرئيسي" className="market-header__nav">
-            {nav.map((item) => {
-              const active = isActivePath(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  aria-current={active ? "page" : undefined}
-                  className={`market-header__nav-link${active ? " is-active" : ""}`}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
 
           <div className="market-header__actions">
             <ThemeToggle className="market-header__icon-btn" />
@@ -158,6 +146,8 @@ export function MarketHeader() {
               })}
             </div>
 
+            <CategoriesMobileAccordion onNavigate={() => setMenuOpen(false)} />
+
             <div className="market-header__drawer-footer">
               <Link
                 className="market-header__drawer-account"
@@ -182,6 +172,7 @@ export function MarketHeader() {
           </nav>
         ) : null}
       </div>
+      <CategoriesMegaMenu />
     </header>
   );
 }
