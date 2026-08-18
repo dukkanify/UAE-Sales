@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -92,6 +93,11 @@ export function MarketHeader() {
 
           <div className="market-header__actions">
             <ThemeToggle className="market-header__icon-btn" />
+            <NotificationBell
+              badgeClassName="notify-bell__badge"
+              className="market-header__icon-btn"
+              iconSize={18}
+            />
 
             {user ? (
               <Link

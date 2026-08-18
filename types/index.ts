@@ -78,6 +78,7 @@ export type {
 export type {
   AppNotification,
   NotificationType,
+  PushSubscriptionRecord,
 } from "./domain/notification";
 
 export type {

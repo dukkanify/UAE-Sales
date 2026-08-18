@@ -35,6 +35,7 @@ export const STORAGE_EVENTS = {
   recentSearchesChange: "sooqna-recent-searches-change",
   savedSearchesChange: "sooqna-saved-searches-change",
   themeChange: "sooqna-theme-change",
+  notificationsChange: "sooqna-notifications-change",
 } as const;
 
 export const STORAGE_KEYS = {
