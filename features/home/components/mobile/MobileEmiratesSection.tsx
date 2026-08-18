@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
-import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
+import type { UaeEmirateCard } from "@/features/home/shared/uae-emirates";
 import { MobileSectionHeader } from "./MobileSectionHeader";
 
-export async function MobileEmiratesSection() {
-  const emirates = await getUaeEmiratesCards();
+type MobileEmiratesSectionProps = {
+  emirates: UaeEmirateCard[];
+};
 
+export function MobileEmiratesSection({ emirates }: MobileEmiratesSectionProps) {
   return (
     <section aria-label="الإمارات الأكثر شعبية" className="mobile-home-emirates">
       <MobileSectionHeader title="الإمارات الأكثر شعبية" />

@@ -13,6 +13,7 @@ import {
 } from "@/features/home/components/mobile";
 import { MarketEscrow } from "@/features/home/components/marketplace/MarketEscrow";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import type { UaeEmirateCard } from "@/features/home/shared/uae-emirates";
 import type { Category, Listing } from "@/types";
 import "./mobile-home.css";
 
@@ -26,6 +27,7 @@ type MobileHomePageProps = {
   appPreviewListings: Listing[];
   categories: Category[];
   categoryById: (id: string) => string;
+  emirates: UaeEmirateCard[];
   featuredListings: Listing[];
   nearbyListings: Listing[];
   sectionListings: HomeSection[];
@@ -36,6 +38,7 @@ export function MobileHomePage({
   appPreviewListings,
   categories,
   categoryById,
+  emirates,
   featuredListings,
   nearbyListings,
   sectionListings,
@@ -51,7 +54,7 @@ export function MobileHomePage({
           <MobilePreviewStrip listings={featuredListings} />
           <MobileFeaturedRail listings={featuredListings} />
           <MobileNearbyRail listings={nearbyListings} />
-          <MobileEmiratesSection />
+          <MobileEmiratesSection emirates={emirates} />
           {sectionListings.map((section) => (
             <MobileCategoryRail
               key={section.categoryId}

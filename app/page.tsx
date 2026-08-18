@@ -14,6 +14,7 @@ import { resolveAppPreviewListings } from "@/features/home/components/mobile/mob
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { getCategories } from "@/services/categories";
 import { getHomeFeed } from "@/services/listings/home-feed";
+import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
@@ -22,7 +23,11 @@ export default async function Home() {
   const preferMobile =
     ua.device.type === "mobile" || ua.device.type === "tablet";
 
-  const [categories, feed] = await Promise.all([getCategories(), getHomeFeed()]);
+  const [categories, feed, emirates] = await Promise.all([
+    getCategories(),
+    getHomeFeed(),
+    getUaeEmiratesCards(),
+  ]);
 
   const categoryMeta = categories.map((category) => ({
     id: category.id,
@@ -56,6 +61,7 @@ export default async function Home() {
         appPreviewListings={appPreviewListings}
         categories={categories}
         categoryById={categoryById}
+        emirates={emirates}
         featuredListings={feed.featured}
         nearbyListings={feed.nearbySource}
         sectionListings={feed.sections}
@@ -91,6 +97,7 @@ export default async function Home() {
         <MarketEscrow />
         <DeferredHomeBelowFold
           appPreviewListings={appPreviewListings}
+          emirates={emirates}
           sections={belowFoldSections}
         />
       </main>

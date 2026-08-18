@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
-import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
+import type { UaeEmirateCard } from "@/features/home/shared/uae-emirates";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
-export async function MarketEmirates() {
-  const emirates = await getUaeEmiratesCards();
+type MarketEmiratesProps = {
+  emirates: UaeEmirateCard[];
+};
 
+export function MarketEmirates({ emirates }: MarketEmiratesProps) {
   return (
     <MarketSectionShell variant="sand">
       <MarketSectionHeader

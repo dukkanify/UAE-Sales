@@ -1,4 +1,5 @@
 import type { Listing } from "@/types";
+import type { UaeEmirateCard } from "@/features/home/shared/uae-emirates";
 import { MarketCategorySection } from "@/features/home/components/marketplace/MarketCategorySection";
 import { MarketEmirates } from "@/features/home/components/marketplace/MarketEmirates";
 import { MarketAppDownload } from "@/features/home/components/marketplace/MarketAppDownload";
@@ -15,12 +16,14 @@ type HomeSection = {
 
 type DeferredHomeBelowFoldProps = {
   appPreviewListings: Listing[];
+  emirates: UaeEmirateCard[];
   sections: HomeSection[];
 };
 
-/** Below-fold desktop rails. Stays a Server Component so async sections can await. */
+/** Below-fold desktop rails. Receives awaited emirate cards so this tree never suspends. */
 export function DeferredHomeBelowFold({
   appPreviewListings,
+  emirates,
   sections,
 }: DeferredHomeBelowFoldProps) {
   return (
@@ -37,7 +40,7 @@ export function DeferredHomeBelowFold({
           variant={section.variant}
         />
       ))}
-      <MarketEmirates />
+      <MarketEmirates emirates={emirates} />
       <MarketAppDownload previewListings={appPreviewListings} />
     </>
   );
