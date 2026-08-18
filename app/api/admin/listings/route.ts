@@ -60,9 +60,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
+  const existing = await getAdminListingRecords();
+  const existingIds = new Set(existing.map((item) => item.id));
+  const existingSlugs = new Set(existing.map((item) => item.slug));
   const saved = [];
   for (const listing of incoming) {
     if (!listing?.id || !listing?.title) continue;
+    if (existingIds.has(listing.id) || existingSlugs.has(listing.slug)) {
+      continue;
+    }
     saved.push(await upsertListing(listing));
   }
 

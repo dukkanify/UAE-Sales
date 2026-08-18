@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useImagePreviews } from "./useImagePreviews";
-import { cities, countries } from "@/shared/constants/locations";
+import { countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import type { Category, Listing } from "@/types";
 import {
@@ -110,6 +110,12 @@ export function useAddListingForm(categories: Category[]) {
       if (imageFiles.length === 0) {
         nextErrors.images = "أضف صورة حقيقية واحدة على الأقل للمنتج.";
       }
+      if (!(parsed.emirate ?? "").trim()) {
+        nextErrors.emirate = "اختر الإمارة.";
+      }
+      if (!parsed.city.trim()) {
+        nextErrors.city = "اكتب المدينة أو المنطقة.";
+      }
 
       setErrors(nextErrors);
       if (Object.keys(nextErrors).length > 0) {
@@ -121,14 +127,13 @@ export function useAddListingForm(categories: Category[]) {
       const price = Number(formData.get("price") ?? 0);
       const description = String(formData.get("description") ?? "").trim();
       const persistedImages = await uploadListingImages(imageFiles);
-
-      const cityName = isDynamicCategory(categoryId)
-        ? parsed.city
-        : cities.find((city) => city.id === parsed.city)?.name ?? "دبي";
+      const cityName = parsed.city.trim();
+      const emirateName = (parsed.emirate ?? "").trim() || cityName;
 
       const id = `local-${Date.now()}`;
       const postedAt = new Date().toISOString();
       const listingPackage = String(formData.get("package") ?? "free");
+      const wantsFeatured = listingPackage === "featured_pending";
       const listing: Listing = {
         id,
         title: isDynamicCategory(categoryId)
@@ -146,8 +151,9 @@ export function useAddListingForm(categories: Category[]) {
         price,
         currency: "AED",
         condition: parsed.condition,
-        status: "pending_review",
+        status: wantsFeatured ? "draft" : "pending_review",
         isFeatured: false,
+        featuredRequested: wantsFeatured || undefined,
         views: 0,
         imageUrl: persistedImages[0],
         images: persistedImages,
@@ -157,7 +163,7 @@ export function useAddListingForm(categories: Category[]) {
         categorySpecs: isDynamicCategory(categoryId) ? parsed.categorySpecs : undefined,
         features: parsed.features.length > 0 ? parsed.features : undefined,
         negotiable: parsed.negotiable,
-        emirate: parsed.emirate,
+        emirate: emirateName,
         subcategory: subcategory || undefined,
         contactPhone: contact,
         contactMethod: "both",
@@ -165,37 +171,56 @@ export function useAddListingForm(categories: Category[]) {
       };
 
       saveLocalListing(listing);
+
+      let saved = listing;
       try {
-        await fetch("/api/listings", {
+        const response = await fetch("/api/listings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          credentials: "include",
           body: JSON.stringify({ listing }),
         });
+        const data = await response.json();
+        if (!response.ok || !data.listing) {
+          publishedRef.current = false;
+          setErrors({
+            submit:
+              data.message ??
+              "تعذر حفظ الإعلان على الخادم. حاول مرة أخرى حتى يظهر في إعلاناتي.",
+          });
+          return;
+        }
+        saved = data.listing as Listing;
+        saveLocalListing(saved);
       } catch {
-        // Local listing already saved; catalog sync is best-effort.
+        publishedRef.current = false;
+        setErrors({
+          submit: "تعذر حفظ الإعلان على الخادم. حاول مرة أخرى.",
+        });
+        return;
       }
 
-      if (listingPackage === "featured_pending") {
+      if (wantsFeatured) {
         try {
-          const featureRes = await fetch(`/api/listings/${id}/feature`, {
+          const featureRes = await fetch(`/api/listings/${saved.id}/feature`, {
             method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({}),
           });
           const featureData = await featureRes.json();
           if (featureRes.ok && featureData.checkoutUrl) {
             window.location.href = featureData.checkoutUrl as string;
             return;
           }
-          if (featureRes.ok && featureData.listing) {
-            saveLocalListing(featureData.listing as Listing);
-            router.push(`/listings/local/${id}`);
-            return;
-          }
         } catch {
-          // Fall through to local listing view if checkout fails.
+          // Keep the draft in My Ads with a complete-payment action.
         }
+        router.push(`/dashboard/listings?featured=pay`);
+        return;
       }
 
-      router.push(`/listings/local/${id}`);
+      router.push(`/dashboard/listings?submitted=1`);
     },
     [imageFiles, router, selectedCategoryId],
   );

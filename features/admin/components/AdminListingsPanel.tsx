@@ -11,7 +11,7 @@ import type {
 import { cities } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
-import { getLocalListings, getSessionUser } from "@/services/storage";
+import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import {
   CategoryFieldsForm,
@@ -88,19 +88,8 @@ export function AdminListingsPanel() {
     if (!user || user.role !== "admin") return;
 
     const timeoutId = window.setTimeout(() => {
-      const localListings = getLocalListings();
-      const sync =
-        localListings.length > 0
-          ? adminFetch("/api/admin/listings", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ listings: localListings }),
-            }).then((res) => res.json())
-          : adminFetch("/api/admin/listings").then((res) => res.json());
-
-      sync
+      adminFetch("/api/admin/listings")
+        .then((res) => res.json())
         .then((data) => setListings(data.listings ?? []))
         .catch(() => setListings([]));
 

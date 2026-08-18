@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useImagePreviews } from "./add-listing/useImagePreviews";
-import { cities, countries } from "@/shared/constants/locations";
+import { countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import type { Listing } from "@/types";
@@ -74,9 +74,8 @@ export function useEditListingForm(listingId: string) {
         imageFiles.length > 0 ? await uploadListingImages(imageFiles) : [];
       const mergedImages = [...existingImages, ...newImages].slice(0, 6);
 
-      const cityName = isDynamicCategory(categoryId)
-        ? parsed.city
-        : cities.find((city) => city.id === parsed.city)?.name ?? currentListing.city;
+      const cityName = parsed.city.trim() || currentListing.city;
+      const emirateName = (parsed.emirate ?? "").trim() || currentListing.emirate || cityName;
 
       const title = isDynamicCategory(categoryId)
         ? parsed.title
@@ -96,18 +95,23 @@ export function useEditListingForm(listingId: string) {
         categorySpecs: isDynamicCategory(categoryId) ? parsed.categorySpecs : undefined,
         features: parsed.features.length > 0 ? parsed.features : undefined,
         negotiable: parsed.negotiable,
-        emirate: parsed.emirate,
+        emirate: emirateName,
         contactPhone: contact,
         contactMethod: "both",
         videoUrl: videoUrl || undefined,
       };
 
       saveLocalListing(updatedListing);
-      void fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing: updatedListing }),
-      }).catch(() => undefined);
+      try {
+        await fetch("/api/listings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ listing: updatedListing }),
+        });
+      } catch {
+        // Keep the local copy even if catalog sync fails.
+      }
       setSaveMessage("تم حفظ التعديلات بنجاح.");
       router.push(`/listings/local/${currentListing.id}`);
     },

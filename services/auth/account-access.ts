@@ -1,4 +1,5 @@
 import type { AccountStatus, UserProfile } from "@/types/domain/user";
+import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 
 export function isMarketplaceAccountReady(
   user?: { accountStatus?: AccountStatus } | null,
@@ -9,7 +10,7 @@ export function isMarketplaceAccountReady(
 
 export function getAccountGatePath(user: Pick<UserProfile, "email" | "emailVerifiedAt" | "accountStatus">): string {
   if (user.accountStatus === "pending") {
-    if (!user.emailVerifiedAt) {
+    if (!user.emailVerifiedAt && isEmailOtpEnabled()) {
       const params = new URLSearchParams({
         email: user.email,
         purpose: "REGISTER",
