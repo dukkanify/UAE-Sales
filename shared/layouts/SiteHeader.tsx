@@ -13,6 +13,10 @@ import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import {
+  CategoriesMegaMenu,
+  CategoriesMobileAccordion,
+} from "@/shared/layouts/CategoriesMegaMenu";
+import {
   clearSessionUser,
   getSessionUser,
 } from "@/services/storage";
@@ -73,35 +77,16 @@ export function SiteHeader() {
 
   return (
     <>
-    <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-[80] overflow-visible border-b border-border/80 bg-surface/90 backdrop-blur-xl lg:border-b-0">
       <VerifyAccountBanner />
       <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
         <div className="flex min-h-[4rem] items-center justify-between gap-4">
           <BrandLogo showTagline={false} size="sm" />
 
-          <nav className="hidden items-center gap-0.5 lg:flex">
-            {primaryNavigation.map((item) => {
-              const active = isActivePath(pathname, item.href);
-              return (
-                <Link
-                  key={item.href}
-                  className={`rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition ${
-                    active
-                      ? "bg-primary-soft text-ink"
-                      : "text-muted hover:bg-surface-muted hover:text-ink"
-                  }`}
-                  href={item.href}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
           <form
             action="/search"
-            className="relative hidden min-w-0 max-w-xs flex-1 md:block"
+            className="relative hidden min-w-0 max-w-md flex-1 md:block lg:max-w-lg"
           >
             <SearchTypeahead
               compact
@@ -192,6 +177,8 @@ export function SiteHeader() {
                 );
               })}
 
+              <CategoriesMobileAccordion onNavigate={() => setMenuOpen(false)} />
+
               <form action="/search" className="mt-1 px-0.5">
                 <InputShell />
               </form>
@@ -245,6 +232,7 @@ export function SiteHeader() {
           </nav>
         ) : null}
       </div>
+      <CategoriesMegaMenu />
     </header>
     <StickySearchDock />
     </>

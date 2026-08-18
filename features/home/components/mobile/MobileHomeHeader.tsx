@@ -11,6 +11,7 @@ import { getSessionSnapshot, subscribeSession } from "@/services/storage/externa
 import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
+import { CategoriesMobileAccordion } from "@/shared/layouts/CategoriesMegaMenu";
 
 const drawerIcons: Record<string, "home" | "grid" | "shield" | "star" | "search"> = {
   "/": "home",
@@ -146,6 +147,7 @@ export function MobileHomeHeader() {
                 </Link>
               );
             })}
+            <CategoriesMobileAccordion onNavigate={() => setMenuOpen(false)} />
             <div className="mobile-home-header__drawer-theme">
               <span>الوضع الليلي</span>
               <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
