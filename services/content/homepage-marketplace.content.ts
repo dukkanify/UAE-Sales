@@ -3,11 +3,6 @@ import { getActiveListingCount, getEmirateListingHighlights } from "@/mock/catal
 import type { HomeCityHighlight } from "@/types";
 import { getEmirateImageUrl, heroBackgroundUrl } from "@/shared/constants/image-fallbacks";
 
-export type MarketTrustStat = {
-  label: string;
-  value: string;
-};
-
 export type MarketEscrowStep = {
   description: string;
   icon: string;
@@ -21,17 +16,6 @@ export async function getMarketHeroBackground(): Promise<string> {
 const trustStatNumber = new Intl.NumberFormat("ar-AE", {
   numberingSystem: "latn",
 });
-
-export async function getMarketTrustStats(): Promise<MarketTrustStat[]> {
-  const activeListings = getActiveListingCount();
-
-  return [
-    { label: "إعلان نشط", value: trustStatNumber.format(activeListings) },
-    { label: "مستخدم موثق", value: "18,542" },
-    { label: "معاملة آمنة", value: "12,413" },
-    { label: "تقييم المنصة", value: "4.8/5" },
-  ];
-}
 
 export async function getMarketQuickSearches() {
   return [
