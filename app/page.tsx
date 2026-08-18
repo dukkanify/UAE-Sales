@@ -3,12 +3,12 @@ import {
   MarketCategorySection,
   MarketEscrow,
   MarketFeatured,
-  MarketHeader,
   MarketHero,
   MarketNearbySection,
   MarketPreviewStrip,
   MarketPromoBanner,
 } from "@/features/home";
+import { MarketHeader } from "@/features/home/components/marketplace/MarketHeader";
 import { DeferredHomeBelowFold } from "@/features/home/components/marketplace/DeferredHomeBelowFold";
 import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
