@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getUnreadChatCount } from "@/services/chat";
+import { getSessionUser } from "@/services/storage";
+import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
 
 const items = [
@@ -14,7 +17,7 @@ const items = [
     label: "المفضلة",
   },
   { fab: true, href: "/listings/new", icon: "plus" as const, label: "أضف إعلان" },
-  { badge: 2, href: "/chat", icon: "message" as const, label: "الرسائل" },
+  { href: "/chat", icon: "message" as const, label: "الرسائل" },
   { account: true, href: "/profile", icon: "user" as const, label: "الحساب" },
 ];
 
@@ -25,9 +28,14 @@ function scrollProfileHashIntoView() {
   el?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function readUnreadCount() {
+  return getUnreadChatCount(getSessionUser()?.id);
+}
+
 export function MobileBottomNav() {
   const pathname = usePathname();
   const [hash, setHash] = useState("");
+  const [unreadChat, setUnreadChat] = useState(0);
 
   useEffect(() => {
     const syncHash = () => setHash(window.location.hash);
@@ -35,6 +43,17 @@ export function MobileBottomNav() {
     window.addEventListener("hashchange", syncHash);
     return () => window.removeEventListener("hashchange", syncHash);
   }, [pathname]);
+
+  useEffect(() => {
+    const syncUnread = () => setUnreadChat(readUnreadCount());
+    syncUnread();
+    window.addEventListener(STORAGE_EVENTS.chatChange, syncUnread);
+    window.addEventListener(STORAGE_EVENTS.sessionChange, syncUnread);
+    return () => {
+      window.removeEventListener(STORAGE_EVENTS.chatChange, syncUnread);
+      window.removeEventListener(STORAGE_EVENTS.sessionChange, syncUnread);
+    };
+  }, []);
 
   return (
     <nav
@@ -46,6 +65,8 @@ export function MobileBottomNav() {
         {items.map((item) => {
           const isFavorites = "favorites" in item && item.favorites;
           const isAccount = "account" in item && item.account;
+          const isChat = item.href === "/chat";
+          const badge = isChat && unreadChat > 0 ? unreadChat : 0;
           const isActive =
             item.href === "/"
               ? pathname === "/"
@@ -69,6 +90,9 @@ export function MobileBottomNav() {
           return (
             <Link
               key={item.label}
+              aria-label={
+                isChat && badge > 0 ? `${item.label}، ${badge} غير مقروء` : item.label
+              }
               className={`mobile-bottom-nav__link ${
                 isActive ? "mobile-bottom-nav__link--active" : ""
               }`}
@@ -90,8 +114,8 @@ export function MobileBottomNav() {
                   name={item.icon}
                   size={item.icon === "heart" ? 21 : 20}
                 />
-                {"badge" in item && item.badge ? (
-                  <span className="mobile-bottom-nav__badge">{item.badge}</span>
+                {badge > 0 ? (
+                  <span className="mobile-bottom-nav__badge">{badge > 9 ? "9+" : badge}</span>
                 ) : null}
               </span>
               <span className="mobile-bottom-nav__label">{item.label}</span>

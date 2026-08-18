@@ -6,6 +6,7 @@ import type { ChatConversation } from "@/services/chat";
 import {
   addMessageToConversation,
   getChatConversationById,
+  markConversationRead,
 } from "@/services/chat";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { getSessionUser } from "@/services/storage";
@@ -28,8 +29,10 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
 
   useEffect(() => {
     const sync = () => {
-      setConversation(getChatConversationById(conversationId) ?? null);
+      const current = getChatConversationById(conversationId) ?? null;
+      setConversation(current);
       setIsReady(true);
+      if (current) markConversationRead(conversationId);
     };
     sync();
     window.addEventListener(STORAGE_EVENTS.chatChange, sync);

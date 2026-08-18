@@ -20,6 +20,7 @@ export type ChatConversation = {
   messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
+  lastReadAt?: string;
 };
 
 function canUseStorage() {
@@ -135,17 +136,47 @@ export function addMessageToConversation(
   return updated;
 }
 
-/** Server-safe demo threads for inbox when no local conversations exist */
+export function getConversationUnreadCount(
+  conversation: ChatConversation,
+  userId: string,
+): number {
+  if (conversation.buyerId !== userId && conversation.sellerId !== userId) {
+    return 0;
+  }
+  const lastRead = conversation.lastReadAt
+    ? new Date(conversation.lastReadAt).getTime()
+    : 0;
+  return conversation.messages.filter(
+    (item) =>
+      item.senderId !== userId && new Date(item.createdAt).getTime() > lastRead,
+  ).length;
+}
+
+/** Unread messages in this browser only — never uses demo/placeholder threads. */
+export function getUnreadChatCount(userId?: string | null): number {
+  if (!userId) return 0;
+  return readConversations().reduce(
+    (sum, conversation) => sum + getConversationUnreadCount(conversation, userId),
+    0,
+  );
+}
+
+export function markConversationRead(conversationId: string): void {
+  const conversations = readConversations();
+  const index = conversations.findIndex((item) => item.id === conversationId);
+  if (index < 0) return;
+
+  const current = conversations[index];
+  if (current.lastReadAt && current.lastReadAt >= current.updatedAt) return;
+
+  conversations[index] = {
+    ...current,
+    lastReadAt: new Date().toISOString(),
+  };
+  writeConversations(conversations);
+}
+
+/** Kept for callers that still import it — no fake inbox threads. */
 export async function getDemoChatThreads() {
-  return [
-    {
-      id: "thread-001",
-      listingTitle: "نيسان باترول بلاتينيوم 2022",
-      participantName: "خالد المنصوري",
-      lastMessage: "متى يمكنني معاينة السيارة في ياس؟",
-      lastMessageAt: "2026-07-04T16:20:00+04:00",
-      unreadCount: 2,
-      avatarUrl: "/brand/logo-icon.svg",
-    },
-  ];
+  return [];
 }

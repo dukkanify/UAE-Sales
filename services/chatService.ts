@@ -8,7 +8,7 @@ export async function getChatThreads() {
       participantName: "خالد المنصوري",
       lastMessage: "متى يمكنني معاينة السيارة في ياس؟",
       lastMessageAt: "2026-07-04T16:20:00+04:00",
-      unreadCount: 2,
+      unreadCount: 0,
       avatarUrl: sellerAvatarUrls.khalidAlMansoori,
     },
     {
@@ -26,7 +26,7 @@ export async function getChatThreads() {
       participantName: "دبي إيليت للعقارات",
       lastMessage: "أرسلت لك جدول المعاينة ليوم السبت.",
       lastMessageAt: "2026-07-03T18:40:00+04:00",
-      unreadCount: 1,
+      unreadCount: 0,
       avatarUrl: sellerAvatarUrls.dubaiElite,
     },
   ];
