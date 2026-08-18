@@ -68,7 +68,7 @@ export default async function Home() {
 
   return (
     <>
-      <MarketHeader />
+      <MarketHeader categories={categories} />
       <main>
         <MarketHero categories={categories} />
         <MarketCategoryGrid categories={categories} />

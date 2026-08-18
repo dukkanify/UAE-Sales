@@ -43,7 +43,7 @@ export function MobileHomePage({
   return (
     <>
       <MobileHomeShell fullWidth>
-        <MobileHomeHeader />
+        <MobileHomeHeader categories={categories} />
         <main className="mobile-home-main">
           <MobileHeroBlock categories={categories} />
           <MobileCategoryGrid categories={categories} />
