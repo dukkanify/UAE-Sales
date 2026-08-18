@@ -45,6 +45,7 @@ export default async function Home() {
   const appPreviewListings = resolveAppPreviewListings([
     ...feed.featured,
     ...feed.nearbySource,
+    ...feed.sections.flatMap((section) => section.items),
   ]);
 
   if (preferMobile) {

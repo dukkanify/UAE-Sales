@@ -1,132 +1,257 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND } from "@/shared/constants/brand";
-import { getListingImageUrl, getListingLocation } from "@/features/listings/components/listing-card.utils";
+import {
+  getListingImageUrl,
+  getListingLocation,
+} from "@/features/listings/components/listing-card.utils";
+import { getAppPreviewImageUrl } from "./mobile-app-preview.config";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
-import { getAppPreviewImageUrl } from "./mobile-app-preview.config";
+import "./app-phone-mock.css";
 
-type MobileAppDevicePreviewProps = {
+type AppPhoneMockupProps = {
   listings: Listing[];
 };
 
-const CATEGORY_CHIPS = ["سيارات", "عقارات", "إلكترونيات"] as const;
+const CHIPS = ["سيارات", "عقارات", "موبايلات", "إلكترونيات"] as const;
+const SLIDE_MS = 5200;
 
-function MockListingCard({ listing }: { listing: Listing }) {
-  const listingImage = getAppPreviewImageUrl(listing.slug, getListingImageUrl(listing));
-  const location = getListingLocation(listing);
+function coverUrl(listing: Listing): string {
+  return getAppPreviewImageUrl(listing.slug, getListingImageUrl(listing));
+}
 
+function Cover({
+  listing,
+  sizes,
+  priority = false,
+}: {
+  listing: Listing;
+  sizes: string;
+  priority?: boolean;
+}) {
   return (
-    <article className="mobile-home-app__mock-card">
-      <div className="mobile-home-app__mock-card-media">
-        <AppImage
-          alt=""
-          aria-hidden
-          className="object-cover"
-          fallbackCategory={listing.categoryId}
-          fill
-          loading="lazy"
-          sizes="240px"
-          src={listingImage}
-        />
-        {listing.isFeatured ? (
-          <span className="mobile-home-app__mock-card-badge">مميز</span>
-        ) : null}
-      </div>
-      <div className="mobile-home-app__mock-card-body">
-        <p className="mobile-home-app__mock-card-price" dir="ltr">
-          {formatCurrencyDisplay(listing.price, "ar-AE")}
-        </p>
-        <p className="mobile-home-app__mock-card-title">{listing.title}</p>
-        <p className="mobile-home-app__mock-card-meta">
-          <Icon name="map" size={8} />
-          {location}
-        </p>
-      </div>
-    </article>
+    <AppImage
+      alt=""
+      aria-hidden
+      className="object-cover"
+      fallbackCategory={listing.categoryId}
+      fill
+      loading={priority ? "eager" : "lazy"}
+      priority={priority}
+      sizes={sizes}
+      src={coverUrl(listing)}
+    />
   );
 }
 
-export function MobileAppDevicePreview({ listings }: MobileAppDevicePreviewProps) {
-  const cards = listings.slice(0, 2);
+function StatusBar() {
+  return (
+    <div className="app-phone__status">
+      <span>9:41</span>
+      <span className="app-phone__status-icons">
+        <span />
+        <span />
+        <span />
+      </span>
+    </div>
+  );
+}
 
-  if (cards.length === 0) return null;
+function TabBar({ active }: { active: "home" | "search" | "listing" }) {
+  return (
+    <nav className="app-phone__tabs">
+      <span className={`app-phone__tab${active === "home" ? " is-active" : ""}`}>
+        <Icon name="home" size={13} />
+        <b>الرئيسية</b>
+      </span>
+      <span className={`app-phone__tab${active === "search" ? " is-active" : ""}`}>
+        <Icon name="search" size={13} />
+        <b>بحث</b>
+      </span>
+      <span className="app-phone__tab app-phone__tab--fab">
+        <Icon name="plus" size={14} />
+      </span>
+      <span className="app-phone__tab">
+        <Icon name="message" size={13} />
+        <b>محادثات</b>
+      </span>
+      <span className="app-phone__tab">
+        <Icon name="user" size={13} />
+        <b>حسابي</b>
+      </span>
+    </nav>
+  );
+}
+
+function HomeScreen({ listings }: { listings: Listing[] }) {
+  const hero = listings[0];
+  const next = listings[1];
 
   return (
-    <div className="mobile-home-app__device-preview" aria-hidden>
-      <div className="mobile-home-app__mock">
-        <div className="mobile-home-app__mock-status">
-          <span>9:41</span>
-          <span className="mobile-home-app__mock-status-icons">
-            <span />
-            <span />
-            <span />
+    <div className="app-phone__screen">
+      <StatusBar />
+      <header className="app-phone__header">
+        <div className="app-phone__brand">
+          <BrandMark size={18} variant="default" />
+          <span>
+            <strong>{BRAND.nameAr}</strong>
+            <small>{BRAND.nameEn}</small>
           </span>
         </div>
+        <span className="app-phone__loc">
+          <Icon name="map" size={9} />
+          دبي
+        </span>
+      </header>
 
-        <header className="mobile-home-app__mock-header">
-          <div className="mobile-home-app__mock-header-brand">
-            <BrandMark size={18} variant="default" />
-            <div className="mobile-home-app__mock-header-copy">
-              <span className="mobile-home-app__mock-header-ar">{BRAND.nameAr}</span>
-              <span className="mobile-home-app__mock-header-en">{BRAND.nameEn}</span>
-            </div>
+      <div className="app-phone__search">
+        <Icon name="search" size={11} />
+        <span>ابحث في سوقنا...</span>
+      </div>
+
+      <div className="app-phone__chips">
+        {CHIPS.map((chip, index) => (
+          <span key={chip} className={index === 0 ? "is-active" : undefined}>
+            {chip}
+          </span>
+        ))}
+      </div>
+
+      {hero ? (
+        <article className="app-phone__hero">
+          <Cover listing={hero} priority sizes="280px" />
+          <div className="app-phone__hero-meta">
+            {hero.isFeatured ? <em>مميز</em> : null}
+            <p dir="ltr">{formatCurrencyDisplay(hero.price, "ar-AE")}</p>
+            <b>{hero.title}</b>
           </div>
-          <span className="mobile-home-app__mock-header-pill">
-            <Icon name="map" size={9} />
-            دبي
-          </span>
-        </header>
+        </article>
+      ) : null}
 
-        <div className="mobile-home-app__mock-search-pill">
-          <Icon name="search" size={11} />
-          <span>ابحث في سوقنا...</span>
+      {next ? (
+        <article className="app-phone__row">
+          <div className="app-phone__thumb">
+            <Cover listing={next} sizes="88px" />
+          </div>
+          <div className="app-phone__row-copy">
+            <p dir="ltr">{formatCurrencyDisplay(next.price, "ar-AE")}</p>
+            <b>{next.title}</b>
+            <small>
+              <Icon name="map" size={8} />
+              {getListingLocation(next)}
+            </small>
+          </div>
+        </article>
+      ) : null}
+
+      <TabBar active="home" />
+    </div>
+  );
+}
+
+function ListingScreen({ listing }: { listing?: Listing }) {
+  if (!listing) return null;
+
+  return (
+    <div className="app-phone__screen">
+      <StatusBar />
+      <div className="app-phone__detail-photo">
+        <Cover listing={listing} sizes="280px" />
+        <span className="app-phone__back">
+          <Icon name="chevron-left" size={12} />
+        </span>
+      </div>
+      <div className="app-phone__detail-body">
+        <p className="app-phone__kicker">{listing.subcategory ?? "إعلان مميز"}</p>
+        <h3>{listing.title}</h3>
+        <p className="app-phone__price" dir="ltr">
+          {formatCurrencyDisplay(listing.price, "ar-AE")}
+        </p>
+        <small>
+          <Icon name="map" size={9} />
+          {getListingLocation(listing)}
+        </small>
+        <div className="app-phone__seller">
+          <span>{listing.seller.name.slice(0, 1)}</span>
+          <div>
+            <b>{listing.seller.name}</b>
+            <small>بائع موثّق</small>
+          </div>
         </div>
+        <div className="app-phone__cta">تواصل مع البائع</div>
+      </div>
+      <TabBar active="listing" />
+    </div>
+  );
+}
 
-        <div className="mobile-home-app__mock-chips">
-          {CATEGORY_CHIPS.map((chip, index) => (
-            <span
-              key={chip}
-              className={`mobile-home-app__mock-chip${index === 0 ? " mobile-home-app__mock-chip--active" : ""}`}
-            >
-              {chip}
-            </span>
-          ))}
-        </div>
+function SearchScreen({ listings }: { listings: Listing[] }) {
+  return (
+    <div className="app-phone__screen">
+      <StatusBar />
+      <div className="app-phone__search app-phone__search--filled">
+        <Icon name="search" size={11} />
+        <span>مرسيدس · دبي</span>
+      </div>
+      <div className="app-phone__results">
+        {listings.slice(0, 3).map((listing) => (
+          <article key={listing.id} className="app-phone__row">
+            <div className="app-phone__thumb">
+              <Cover listing={listing} sizes="88px" />
+            </div>
+            <div className="app-phone__row-copy">
+              <p dir="ltr">{formatCurrencyDisplay(listing.price, "ar-AE")}</p>
+              <b>{listing.title}</b>
+              <small>
+                <Icon name="map" size={8} />
+                {getListingLocation(listing)}
+              </small>
+            </div>
+          </article>
+        ))}
+      </div>
+      <TabBar active="search" />
+    </div>
+  );
+}
 
-        <div className="mobile-home-app__mock-rail-head">
-          <span className="mobile-home-app__mock-rail-title">
-            <Icon name="star" size={10} />
-            إعلانات مميزة
-          </span>
-          <span className="mobile-home-app__mock-rail-link">الكل</span>
-        </div>
+export function AppPhoneMockup({ listings }: AppPhoneMockupProps) {
+  const [active, setActive] = useState(0);
+  const slides = Math.min(3, listings.length > 0 ? 3 : 1);
 
-        <div className="mobile-home-app__mock-rail">
-          {cards.map((listing) => (
-            <MockListingCard key={listing.id} listing={listing} />
-          ))}
-        </div>
+  useEffect(() => {
+    if (slides < 2) return;
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (media.matches) return;
+    const timer = window.setInterval(() => {
+      setActive((index) => (index + 1) % slides);
+    }, SLIDE_MS);
+    return () => window.clearInterval(timer);
+  }, [slides]);
 
-        <nav className="mobile-home-app__mock-nav">
-          <span className="mobile-home-app__mock-nav-item mobile-home-app__mock-nav-item--active">
-            <Icon name="home" size={11} />
-          </span>
-          <span className="mobile-home-app__mock-nav-item">
-            <Icon name="grid" size={11} />
-          </span>
-          <span className="mobile-home-app__mock-nav-item mobile-home-app__mock-nav-item--fab">
-            <Icon name="plus" size={12} />
-          </span>
-          <span className="mobile-home-app__mock-nav-item">
-            <Icon name="message" size={11} />
-          </span>
-          <span className="mobile-home-app__mock-nav-item">
-            <Icon name="user" size={11} />
-          </span>
-        </nav>
+  return (
+    <div aria-hidden className="app-phone">
+      <div className={`app-phone__slide${active === 0 ? " is-visible" : ""}`}>
+        <HomeScreen listings={listings} />
+      </div>
+      <div className={`app-phone__slide${active === 1 ? " is-visible" : ""}`}>
+        <ListingScreen listing={listings[0]} />
+      </div>
+      <div className={`app-phone__slide${active === 2 ? " is-visible" : ""}`}>
+        <SearchScreen listings={listings} />
+      </div>
+      <div className="app-phone__dots">
+        {Array.from({ length: slides }, (_, index) => (
+          <span key={index} className={index === active ? "is-active" : undefined} />
+        ))}
       </div>
     </div>
   );
 }
+
+export { AppPhoneMockup as MobileAppDevicePreview };
