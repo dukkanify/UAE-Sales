@@ -163,7 +163,7 @@ function fieldScore(
   return 0;
 }
 
-function scoreDoc(doc: SuggestDoc, queryNorm: string, latin: boolean): number {
+function scoreDoc(doc: SuggestDoc, queryNorm: string): number {
   const allowContains = queryNorm.length >= 2;
   const allowBlob = queryNorm.length >= 3;
   const labelNorm = normalizeSearchText(doc.label);
@@ -480,7 +480,7 @@ export async function getSearchSuggestions(
     return true;
   });
   const ranked = scoped
-    .map((doc) => ({ ...doc, score: scoreDoc(doc, queryNorm, latin) }))
+    .map((doc) => ({ ...doc, score: scoreDoc(doc, queryNorm) }))
     .filter((doc) => doc.score > 0)
     .sort((a, b) => b.score - a.score || a.label.length - b.label.length);
 
