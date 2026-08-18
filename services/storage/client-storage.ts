@@ -236,3 +236,67 @@ export function getAccountProof(email: string): AccountProofRecord | null {
   const normalized = email.trim().toLowerCase();
   return getAccountProofs().find((item) => item.email === normalized) ?? null;
 }
+
+export type SavedSearch = {
+  id: string;
+  label: string;
+  url: string;
+};
+
+const MAX_SAVED_SEARCHES = 8;
+
+export function getSavedSearches(): SavedSearch[] {
+  if (!canUseStorage()) return [];
+  ensureMigrated();
+  const raw = window.localStorage.getItem(STORAGE_KEYS.savedSearches);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item) => {
+        if (!item || typeof item !== "object") return null;
+        const record = item as Partial<SavedSearch>;
+        if (!record.id || !record.label || !record.url) return null;
+        return {
+          id: String(record.id),
+          label: String(record.label),
+          url: String(record.url),
+        };
+      })
+      .filter((item): item is SavedSearch => Boolean(item));
+  } catch {
+    return [];
+  }
+}
+
+function persistSavedSearches(items: SavedSearch[]) {
+  if (!canUseStorage()) return;
+  if (!safeSetItem(STORAGE_KEYS.savedSearches, JSON.stringify(items))) return;
+  window.dispatchEvent(new Event(STORAGE_EVENTS.savedSearchesChange));
+}
+
+export function saveCurrentSearch(input: { label: string; url: string }): {
+  alreadySaved: boolean;
+  items: SavedSearch[];
+} {
+  const items = getSavedSearches();
+  if (items.some((item) => item.url === input.url)) {
+    return { alreadySaved: true, items };
+  }
+
+  const next: SavedSearch = {
+    id: `search-${Date.now()}`,
+    label: input.label.trim() || "بحث محفوظ",
+    url: input.url,
+  };
+  const updated = [next, ...items].slice(0, MAX_SAVED_SEARCHES);
+  persistSavedSearches(updated);
+  return { alreadySaved: false, items: updated };
+}
+
+export function removeSavedSearch(id: string): SavedSearch[] {
+  const updated = getSavedSearches().filter((item) => item.id !== id);
+  persistSavedSearches(updated);
+  return updated;
+}

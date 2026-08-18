@@ -1,5 +1,6 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { FavoritesPanel } from "@/features/profile/components/FavoritesPanel";
+import { ProfileSavedSearches } from "@/features/profile/components/ProfileSavedSearches";
 import { ProfileActivityPanel } from "@/features/profile/components/ProfileActivityPanel";
 import { ProfileHashScroll } from "@/features/profile/components/ProfileHashScroll";
 import { SecuritySettingsPanel } from "@/features/profile/components/SecuritySettingsPanel";
@@ -31,6 +32,15 @@ export default async function ProfilePage() {
             <h2 className="text-sm font-semibold text-ink">المفضلة</h2>
             <div className="mt-4">
               <FavoritesPanel />
+            </div>
+          </Card>
+          <Card className="mt-6 scroll-mt-24 p-5" id="saved-searches" variant="flat">
+            <h2 className="text-sm font-semibold text-ink">عمليات البحث المحفوظة</h2>
+            <p className="mt-1 text-xs leading-6 text-muted">
+              نفس القائمة التي تظهر تحت زر «حفظ البحث» في صفحة النتائج.
+            </p>
+            <div className="mt-4">
+              <ProfileSavedSearches />
             </div>
           </Card>
           <ProfileActivityPanel userId={user.id} />
