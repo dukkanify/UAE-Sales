@@ -8,6 +8,7 @@ export type AdminSiteSettings = {
   allowGuestCheckout: boolean;
   escrowHoldDays: number;
   disputeWindowDays: number;
+  disputeResponseDays: number;
   listingActiveDays: number;
   featuredListingFeeAed: number;
   featuredListingDays: number;
@@ -26,6 +27,7 @@ const DEFAULT_SETTINGS: AdminSiteSettings = {
   allowGuestCheckout: true,
   escrowHoldDays: 7,
   disputeWindowDays: 7,
+  disputeResponseDays: 3,
   listingActiveDays: 30,
   featuredListingFeeAed: 49,
   featuredListingDays: 14,
@@ -68,6 +70,10 @@ export async function updateAdminSettings(
     disputeWindowDays: Math.max(
       1,
       Math.round(patch.disputeWindowDays ?? current.disputeWindowDays),
+    ),
+    disputeResponseDays: Math.max(
+      1,
+      Math.round(patch.disputeResponseDays ?? current.disputeResponseDays),
     ),
     listingActiveDays: Math.max(
       1,

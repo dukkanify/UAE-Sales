@@ -19,7 +19,7 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
       <SiteHeader />
       <main>
         <DashboardShell
-          activePath="/profile"
+          activePath="/orders"
           description="تفاصيل الطلب وحالة الضمان."
           title="تفاصيل الطلب"
           user={user}

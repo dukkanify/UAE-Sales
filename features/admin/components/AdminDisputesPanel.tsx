@@ -4,6 +4,7 @@ import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { AdminDisputeRecord, DisputeStatus } from "@/types";
+import { DISPUTE_REASON_LABELS } from "@/shared/constants/disputes";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
@@ -127,12 +128,33 @@ export function AdminDisputesPanel() {
                 <p className="mt-2 text-sm">
                   {dispute.buyerName} → {dispute.sellerName}
                 </p>
+                {dispute.reasonCode ? (
+                  <p className="mt-2 text-xs font-bold text-secondary">
+                    {DISPUTE_REASON_LABELS[dispute.reasonCode]}
+                  </p>
+                ) : null}
                 <p className="mt-2 text-sm text-muted">{dispute.reason}</p>
+                {dispute.sellerResponse ? (
+                  <p className="mt-2 rounded-[var(--radius-lg)] bg-surface-muted px-3 py-2 text-xs">
+                    رد البائع: {dispute.sellerResponse}
+                  </p>
+                ) : null}
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant={disputeBadgeVariant(dispute.status)}>
                     {statusLabels[dispute.status]}
                   </Badge>
+                  {dispute.responseDueAt ? (
+                    <span className="rounded-full bg-surface-muted px-2 py-0.5 text-[0.65rem] font-bold text-muted">
+                      مهلة الرد:{" "}
+                      {new Date(dispute.responseDueAt).toLocaleDateString("ar-AE")}
+                    </span>
+                  ) : null}
                 </div>
+                {dispute.evidenceUrls?.length ? (
+                  <p className="mt-2 text-xs text-muted">
+                    أدلة: {dispute.evidenceUrls.length}
+                  </p>
+                ) : null}
                 {dispute.resolutionNote ? (
                   <p className="mt-2 text-xs text-muted">
                     القرار: {dispute.resolutionNote}

@@ -5,6 +5,8 @@ export type NotificationType =
   | "order_released"
   | "order_refunded"
   | "order_disputed"
+  | "dispute_seller_response"
+  | "dispute_resolved"
   | "seller_proof"
   | "buyer_match"
   | "escrow_held"

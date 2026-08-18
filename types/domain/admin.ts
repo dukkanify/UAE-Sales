@@ -6,9 +6,17 @@ import type { AccountStatus, AdminPermission, UserRole } from "./user";
 export type DisputeStatus =
   | "open"
   | "under_review"
-  | "resolved_buyer"
   | "resolved_seller"
+  | "resolved_buyer"
   | "closed";
+
+export type DisputeReasonCode =
+  | "not_as_described"
+  | "not_received"
+  | "damaged"
+  | "wrong_item"
+  | "seller_unresponsive"
+  | "other";
 
 export type AdminUserRecord = {
   id: string;
@@ -75,16 +83,27 @@ export type AdminDisputeRecord = {
   listingTitle: string;
   buyerName: string;
   sellerName: string;
+  buyerId?: string;
+  sellerId?: string;
   reason: string;
+  reasonCode?: DisputeReasonCode;
   status: DisputeStatus;
   amount: number;
   createdAt: string;
   resolutionNote?: string;
   evidenceUrls?: string[];
+  windowDays?: number;
+  windowClosesAt?: string;
+  responseDueAt?: string;
+  sellerResponse?: string;
+  sellerRespondedAt?: string;
 };
 
 export type AdminDisputePatch = Partial<
-  Pick<AdminDisputeRecord, "status" | "resolutionNote">
+  Pick<
+    AdminDisputeRecord,
+    "status" | "resolutionNote" | "sellerResponse" | "sellerRespondedAt"
+  >
 >;
 
 export type AdminCategoryRecord = {

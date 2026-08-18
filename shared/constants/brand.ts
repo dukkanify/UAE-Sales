@@ -10,6 +10,11 @@ export const BRAND = {
   supportEmail: "support@sooqna.site",
 } as const;
 
+export const APP_STORE_LINKS = {
+  appStore: "https://apps.apple.com/",
+  playStore: "https://play.google.com/store",
+} as const;
+
 export const BRAND_COLORS = {
   navy: "#0B1628",
   navySoft: "#152238",
@@ -34,6 +39,7 @@ export const STORAGE_EVENTS = {
   favoritesChange: "sooqna-favorites-change",
   recentSearchesChange: "sooqna-recent-searches-change",
   themeChange: "sooqna-theme-change",
+  localeChange: "sooqna-locale-change",
 } as const;
 
 export const STORAGE_KEYS = {
@@ -45,6 +51,7 @@ export const STORAGE_KEYS = {
   chatConversations: "sooqna-chat-conversations",
   favorites: "sooqna-favorites",
   theme: "sooqna-theme",
+  locale: "sooqna-locale",
   accountProofs: "sooqna-account-proofs",
 } as const;
 

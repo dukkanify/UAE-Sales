@@ -53,6 +53,10 @@ export async function PATCH(request: Request) {
       typeof body.disputeWindowDays === "number"
         ? body.disputeWindowDays
         : undefined,
+    disputeResponseDays:
+      typeof body.disputeResponseDays === "number"
+        ? body.disputeResponseDays
+        : undefined,
     listingActiveDays:
       typeof body.listingActiveDays === "number"
         ? body.listingActiveDays

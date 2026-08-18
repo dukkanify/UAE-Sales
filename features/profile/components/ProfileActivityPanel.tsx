@@ -3,10 +3,14 @@ import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { Icon } from "@/shared/ui/Icon";
 import { getNotifications } from "@/services/activityService";
+import { markNotificationsReadForUser } from "@/services/payments/notification-store";
 
 export async function ProfileActivityPanel({ userId }: { userId: string }) {
   const notifications = await getNotifications(userId);
   const unread = notifications.filter((n) => !n.read).length;
+  if (unread > 0) {
+    await markNotificationsReadForUser(userId);
+  }
 
   return (
     <div className="mt-6 grid gap-5">
@@ -57,8 +61,9 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
         )}
       </Card>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { href: "/dashboard/disputes", icon: "shield" as const, label: "النزاعات" },
           { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
           { href: "/escrow", icon: "shield" as const, label: "الضمان المالي" },
           { href: "/chat", icon: "message" as const, label: "الرسائل" },

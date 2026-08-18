@@ -10,6 +10,16 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 const bodySchema = z.object({
   reason: z.string().min(10).max(2000),
+  reasonCode: z
+    .enum([
+      "not_as_described",
+      "not_received",
+      "damaged",
+      "wrong_item",
+      "seller_unresponsive",
+      "other",
+    ])
+    .optional(),
   evidenceUrls: z.array(z.string().min(1).max(2000)).max(10).optional(),
 });
 
@@ -30,6 +40,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       user.id,
       parsed.data.reason,
       parsed.data.evidenceUrls,
+      parsed.data.reasonCode ?? "other",
     );
 
     return NextResponse.json(result);

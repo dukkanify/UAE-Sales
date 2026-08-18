@@ -8,6 +8,7 @@ import {
   getAdminDisputes,
   patchAdminDispute,
 } from "@/services/admin/dispute-store";
+import { notifyDisputeResolution } from "@/services/payments/dispute-service";
 import {
   adminReleaseEscrow,
   refundOrder,
@@ -76,6 +77,10 @@ export async function PATCH(request: Request, context: RouteParams) {
   const dispute = await patchAdminDispute(id, body);
   if (!dispute) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  }
+
+  if (body.status && body.status !== existing.status) {
+    await notifyDisputeResolution(dispute, body.status);
   }
 
   await logAdminAction({

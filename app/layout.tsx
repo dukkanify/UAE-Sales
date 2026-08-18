@@ -6,6 +6,8 @@ import { MaintenanceGate } from "@/shared/components/MaintenanceGate";
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import { LocaleSync } from "@/shared/i18n/LocaleSync";
+import { LOCALE_BOOT_SCRIPT } from "@/shared/i18n/locale";
 import { THEME_BOOT_SCRIPT } from "@/shared/theme/theme";
 import "./globals.css";
 
@@ -72,9 +74,11 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
       </head>
       <body className={ibmPlexArabic.className}>
         <ToastProvider>
+          <LocaleSync />
           <BrandJsonLd />
           <DeferredOfflineBanner />
           <MaintenanceGate>{children}</MaintenanceGate>

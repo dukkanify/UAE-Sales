@@ -51,6 +51,7 @@ export type {
   AdminCategoryRecord,
   AdminDisputePatch,
   AdminDisputeRecord,
+  DisputeReasonCode,
   AdminListingCreateInput,
   AdminListingPatch,
   AdminListingRecord,

@@ -1,6 +1,10 @@
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
-import { getAllOrders } from "@/services/payments/order-store";
-import type { AdminDisputePatch, AdminDisputeRecord } from "@/types/domain/admin";
+import { getAllOrders, getOrdersForUser } from "@/services/payments/order-store";
+import type {
+  AdminDisputePatch,
+  AdminDisputeRecord,
+  DisputeReasonCode,
+} from "@/types/domain/admin";
 
 const FILE = "disputes.json";
 
@@ -68,9 +72,15 @@ export async function createDispute(input: {
   listingTitle: string;
   buyerName: string;
   sellerName: string;
+  buyerId?: string;
+  sellerId?: string;
   reason: string;
+  reasonCode?: DisputeReasonCode;
   amount: number;
   evidenceUrls?: string[];
+  windowDays?: number;
+  windowClosesAt?: string;
+  responseDueAt?: string;
 }): Promise<AdminDisputeRecord> {
   const disputes = await loadDisputes();
   const existing = disputes.find((row) => row.orderId === input.orderId);
@@ -84,7 +94,10 @@ export async function createDispute(input: {
     listingTitle: input.listingTitle,
     buyerName: input.buyerName,
     sellerName: input.sellerName,
+    buyerId: input.buyerId,
+    sellerId: input.sellerId,
     reason: input.reason.trim(),
+    reasonCode: input.reasonCode,
     status: "open",
     amount: input.amount,
     createdAt: new Date().toISOString(),
@@ -92,6 +105,9 @@ export async function createDispute(input: {
       input.evidenceUrls && input.evidenceUrls.length > 0
         ? input.evidenceUrls.filter((url) => url.trim().length > 0)
         : undefined,
+    windowDays: input.windowDays,
+    windowClosesAt: input.windowClosesAt,
+    responseDueAt: input.responseDueAt,
   };
 
   disputes.unshift(record);
@@ -143,4 +159,27 @@ export async function getOpenDisputeCount(): Promise<number> {
   return disputes.filter(
     (item) => item.status === "open" || item.status === "under_review",
   ).length;
+}
+
+export async function getDisputesForUser(
+  userId: string,
+): Promise<AdminDisputeRecord[]> {
+  const [disputes, orders] = await Promise.all([
+    getAdminDisputes(),
+    getOrdersForUser(userId),
+  ]);
+  const orderIds = new Set(orders.map((order) => order.id));
+  return disputes.filter(
+    (item) =>
+      item.buyerId === userId ||
+      item.sellerId === userId ||
+      orderIds.has(item.orderId),
+  );
+}
+
+export async function getDisputeById(
+  id: string,
+): Promise<AdminDisputeRecord | undefined> {
+  const disputes = await getAdminDisputes();
+  return disputes.find((item) => item.id === id);
 }

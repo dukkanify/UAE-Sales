@@ -120,6 +120,10 @@
   padding: 0 var(--mh-page-x) 0.65rem;
 }
 
+.mobile-home-header__smart-row .language-select {
+  flex-shrink: 0;
+}
+
 .mobile-home-header__smart-row .mobile-home-header__location {
   max-width: clamp(5.75rem, 28vw, 7.5rem);
   height: 2.25rem;

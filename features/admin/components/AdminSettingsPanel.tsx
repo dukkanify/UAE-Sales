@@ -122,13 +122,24 @@ export function AdminSettingsPanel() {
             }
           />
           <Input
-            label="مهلة النزاع (أيام)"
+            label="مهلة فتح النزاع للمشتري (أيام)"
             type="number"
             value={String(settings.disputeWindowDays)}
             onChange={(e) =>
               setSettings({
                 ...settings,
                 disputeWindowDays: Number(e.target.value),
+              })
+            }
+          />
+          <Input
+            label="مهلة رد البائع على النزاع (أيام)"
+            type="number"
+            value={String(settings.disputeResponseDays ?? 3)}
+            onChange={(e) =>
+              setSettings({
+                ...settings,
+                disputeResponseDays: Number(e.target.value),
               })
             }
           />

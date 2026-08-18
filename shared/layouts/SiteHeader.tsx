@@ -5,9 +5,13 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
+import { LanguageSelect } from "@/shared/components/LanguageSelect";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
+import { NotificationBell } from "@/shared/components/NotificationBell";
+import { useT } from "@/shared/i18n/useLocale";
+import type { MessageKey } from "@/shared/i18n/messages";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -32,6 +36,12 @@ const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
   "/escrow": "shield",
 };
 
+const navKeys: Record<string, MessageKey> = {
+  "/": "nav.home",
+  "/categories": "nav.categories",
+  "/escrow": "nav.escrow",
+};
+
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -39,6 +49,7 @@ function isActivePath(pathname: string, href: string) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const t = useT();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const isComposeListing = pathname.startsWith("/listings/new");
@@ -91,7 +102,7 @@ export function SiteHeader() {
                   }`}
                   href={item.href}
                 >
-                  {item.label}
+                  {t(navKeys[item.href] ?? "nav.home")}
                 </Link>
               );
             })}
@@ -105,25 +116,30 @@ export function SiteHeader() {
               compact
               label=""
               name="q"
-              placeholder="ابحث..."
+              placeholder={t("search.placeholderShort")}
             />
           </form>
 
           <div className="flex items-center gap-2">
+            <LanguageSelect className="hidden sm:inline-flex" />
             <ThemeToggle />
+            <NotificationBell
+              className="focus-ring relative grid size-10 shrink-0 place-items-center rounded-[var(--radius-xl)] border border-border bg-surface text-ink shadow-[var(--shadow-xs)] transition hover:border-secondary/50"
+              iconSize={18}
+            />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
                 href="/profile"
               >
-                حسابي
+                {t("action.account")}
               </Link>
             ) : (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft sm:inline-flex"
                 href="/login"
               >
-                سجّل الدخول وانضم إلينا
+                {t("action.join")}
               </Link>
             )}
             {!isComposeListing ? (
@@ -134,12 +150,12 @@ export function SiteHeader() {
                 variant="accent"
               >
                 <Icon className="shrink-0" name="plus" size={16} />
-                أضف إعلانك
+                {t("action.addListing")}
               </Button>
             ) : null}
             <button
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+              aria-label={menuOpen ? t("action.closeMenu") : t("action.menu")}
               className="focus-ring motion-press grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
@@ -154,12 +170,15 @@ export function SiteHeader() {
         </div>
 
         {menuOpen ? (
-          <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
+          <nav aria-label={t("drawer.mobileNav")} className="border-t border-border py-3 lg:hidden">
             <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
-              <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
+              <p className="text-sm font-bold text-ink">{t("drawer.browse")}</p>
               <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[0.65rem] font-bold text-[#0b1628]">
-                أقسام
+                {t("label.sections")}
               </span>
+            </div>
+            <div className="mb-3">
+              <LanguageSelect variant="drawer" />
             </div>
 
             <div className="grid gap-1.5">
@@ -184,16 +203,16 @@ export function SiteHeader() {
                     >
                       <Icon name={icon} size={18} />
                     </span>
-                    <span className="flex-1 text-right">{item.label}</span>
+                    <span className="flex-1 text-start">{t(navKeys[item.href] ?? "nav.home")}</span>
                     {active ? (
-                      <span className="text-[0.65rem] font-semibold text-secondary">الحالي</span>
+                      <span className="text-[0.65rem] font-semibold text-secondary">{t("label.current")}</span>
                     ) : null}
                   </Link>
                 );
               })}
 
               <form action="/search" className="mt-1 px-0.5">
-                <InputShell />
+                <InputShell placeholder={t("search.placeholder")} />
               </form>
 
               {!isComposeListing ? (
@@ -206,7 +225,7 @@ export function SiteHeader() {
                   variant="accent"
                 >
                   <Icon className="shrink-0" name="plus" size={16} />
-                  أضف إعلانك
+                  {t("action.addListing")}
                 </Button>
               ) : null}
 
@@ -217,7 +236,14 @@ export function SiteHeader() {
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
                   >
-                    حسابي
+                    {t("action.account")}
+                  </Link>
+                  <Link
+                    className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
+                    href="/profile#notifications"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t("action.notifications")}
                   </Link>
                   <Button
                     className="w-full justify-start"
@@ -229,7 +255,7 @@ export function SiteHeader() {
                     type="button"
                     variant="ghost"
                   >
-                    تسجيل الخروج
+                    {t("action.logout")}
                   </Button>
                 </>
               ) : (
@@ -238,7 +264,7 @@ export function SiteHeader() {
                   href="/login"
                   onClick={() => setMenuOpen(false)}
                 >
-                  تسجيل الدخول
+                  {t("action.login")}
                 </Link>
               )}
             </div>
@@ -251,13 +277,13 @@ export function SiteHeader() {
   );
 }
 
-function InputShell() {
+function InputShell({ placeholder }: { placeholder: string }) {
   return (
     <SearchTypeahead
       compact
       label=""
       name="q"
-      placeholder="ابحث عن أي شيء..."
+      placeholder={placeholder}
     />
   );
 }

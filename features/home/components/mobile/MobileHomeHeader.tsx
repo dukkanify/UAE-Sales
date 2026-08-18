@@ -5,10 +5,20 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
+import { LanguageSelect } from "@/shared/components/LanguageSelect";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
+import { NotificationBell } from "@/shared/components/NotificationBell";
+import { useT } from "@/shared/i18n/useLocale";
+import type { MessageKey } from "@/shared/i18n/messages";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
+
+const navKeys: Record<string, MessageKey> = {
+  "/": "nav.home",
+  "/categories": "nav.categories",
+  "/escrow": "nav.escrow",
+};
 
 const drawerIcons: Record<string, "home" | "grid" | "shield" | "star" | "search"> = {
   "/": "home",
@@ -25,6 +35,7 @@ function isActivePath(pathname: string, href: string) {
 
 export function MobileHomeHeader() {
   const pathname = usePathname();
+  const t = useT();
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
 
@@ -53,7 +64,7 @@ export function MobileHomeHeader() {
         <div className="mobile-home-header__side mobile-home-header__side--start">
           <button
             aria-expanded={menuOpen}
-            aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
+            aria-label={menuOpen ? t("action.closeMenu") : t("action.menu")}
             className="mobile-home-header__icon-btn"
             onClick={() => setMenuOpen((open) => !open)}
             type="button"
@@ -69,7 +80,7 @@ export function MobileHomeHeader() {
         <div className="mobile-home-header__side mobile-home-header__side--end">
           <div className="mobile-home-header__cluster">
             <Link
-              aria-label="بحث"
+              aria-label={t("action.search")}
               className="mobile-home-header__icon-btn"
               href="/search"
             >
@@ -78,24 +89,22 @@ export function MobileHomeHeader() {
 
             <ThemeToggle className="mobile-home-header__icon-btn !size-[2.25rem] !min-h-0 !rounded-full !border-0 !shadow-none" />
 
-            <Link
-              aria-label="الإشعارات"
+            <NotificationBell
               className="mobile-home-header__notify"
-              href="/profile#notifications"
-            >
-              <span className="mobile-home-header__notify-ring" aria-hidden />
-              <Icon className="mobile-home-header__notify-icon" name="bell" size={17} />
-              <span className="mobile-home-header__badge">3</span>
-            </Link>
+              iconClassName="mobile-home-header__notify-icon"
+              iconSize={17}
+              showRing
+            />
           </div>
         </div>
       </div>
 
       <div className="mobile-home-header__smart-row">
         <EmirateLocationSelect variant="mobile" />
+        <LanguageSelect />
         <Link className="mobile-home-header__quick-search" href="/search">
           <Icon name="search" size={14} />
-          <span>ابحث في سوقنا...</span>
+          <span>{t("search.home")}</span>
         </Link>
       </div>
 
@@ -111,13 +120,13 @@ export function MobileHomeHeader() {
                 <Icon name="user" size={18} />
               </span>
               <span className="mobile-home-header__drawer-profile-copy">
-                <span className="mobile-home-header__drawer-profile-eyebrow">حسابي</span>
+                <span className="mobile-home-header__drawer-profile-eyebrow">{t("action.account")}</span>
                 <span className="mobile-home-header__drawer-profile-name">
-                  {user ? user.fullName : "سجّل الدخول للمتابعة"}
+                  {user ? user.fullName : t("drawer.loginHint")}
                 </span>
               </span>
               <span className="mobile-home-header__drawer-profile-action">
-                {user ? "الملف" : "دخول"}
+                {user ? t("action.profile") : t("action.signInShort")}
                 <Icon name="chevron-left" size={14} />
               </span>
             </Link>
@@ -128,7 +137,22 @@ export function MobileHomeHeader() {
                 href="/register"
                 onClick={() => setMenuOpen(false)}
               >
-                ليس لديك حساب؟ <span>إنشاء حساب</span>
+                {t("drawer.noAccount")} <span>{t("action.register")}</span>
+              </Link>
+            ) : null}
+
+            <LanguageSelect className="mb-1" variant="drawer" />
+
+            {user ? (
+              <Link
+                className="mobile-home-header__drawer-link"
+                href="/profile#notifications"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className="mobile-home-header__drawer-link-icon">
+                  <Icon name="bell" size={16} />
+                </span>
+                <span className="mobile-home-header__drawer-link-label">{t("action.notifications")}</span>
               </Link>
             ) : null}
 
@@ -147,7 +171,9 @@ export function MobileHomeHeader() {
                   <span className="mobile-home-header__drawer-link-icon">
                     <Icon name={icon} size={16} />
                   </span>
-                  <span className="mobile-home-header__drawer-link-label">{item.label}</span>
+                  <span className="mobile-home-header__drawer-link-label">
+                    {t(navKeys[item.href] ?? "nav.home")}
+                  </span>
                 </Link>
               );
             })}
@@ -157,7 +183,7 @@ export function MobileHomeHeader() {
               onClick={() => setMenuOpen(false)}
             >
               <Icon name="plus" size={16} />
-              أضف إعلانك
+              {t("action.addListing")}
             </Link>
           </div>
         </nav>
