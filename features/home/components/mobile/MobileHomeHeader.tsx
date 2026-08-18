@@ -9,6 +9,8 @@ import { primaryNavigation } from "@/shared/constants/navigation";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -27,6 +29,7 @@ function isActivePath(pathname: string, href: string) {
 
 export function MobileHomeHeader() {
   const pathname = usePathname();
+  const copy = useLocaleMessages();
   const [menuOpen, setMenuOpen] = useState(false);
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
 
@@ -56,13 +59,14 @@ export function MobileHomeHeader() {
         <div className="mobile-home-header__side mobile-home-header__side--start">
           <button
             aria-expanded={menuOpen}
-            aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
+            aria-label={menuOpen ? copy.closeMenu : copy.menu}
             className="mobile-home-header__icon-btn"
             onClick={() => setMenuOpen((open) => !open)}
             type="button"
           >
             <Icon name={menuOpen ? "close" : "menu"} size={19} />
           </button>
+          <LanguageSwitch className="mobile-home-header__lang" variant="compact" />
         </div>
 
         <div className="mobile-home-header__brand">
@@ -72,7 +76,7 @@ export function MobileHomeHeader() {
         <div className="mobile-home-header__side mobile-home-header__side--end">
           <div className="mobile-home-header__cluster">
             <Link
-              aria-label="بحث"
+              aria-label={copy.search}
               className="mobile-home-header__icon-btn"
               href="/search"
             >
@@ -90,7 +94,7 @@ export function MobileHomeHeader() {
         <EmirateLocationSelect variant="mobile" />
         <Link className="mobile-home-header__quick-search" href="/search">
           <Icon name="search" size={14} />
-          <span>ابحث في سوقنا...</span>
+          <span>{copy.searchPlaceholder}</span>
         </Link>
       </div>
 
@@ -106,13 +110,13 @@ export function MobileHomeHeader() {
                 <Icon name="user" size={18} />
               </span>
               <span className="mobile-home-header__drawer-profile-copy">
-                <span className="mobile-home-header__drawer-profile-eyebrow">حسابي</span>
+                <span className="mobile-home-header__drawer-profile-eyebrow">{copy.account}</span>
                 <span className="mobile-home-header__drawer-profile-name">
-                  {user ? user.fullName : "سجّل الدخول للمتابعة"}
+                  {user ? user.fullName : copy.signInToContinue}
                 </span>
               </span>
               <span className="mobile-home-header__drawer-profile-action">
-                {user ? "الملف" : "دخول"}
+                {user ? copy.profile : copy.loginShort}
                 <Icon name="chevron-left" size={14} />
               </span>
             </Link>
@@ -123,13 +127,18 @@ export function MobileHomeHeader() {
                 href="/register"
                 onClick={() => setMenuOpen(false)}
               >
-                ليس لديك حساب؟ <span>إنشاء حساب</span>
+                {copy.noAccount} <span>{copy.createAccount}</span>
               </Link>
             ) : null}
 
             {primaryNavigation.map((item) => {
               const active = isActivePath(pathname, item.href);
               const icon = drawerIcons[item.href] ?? "grid";
+              const labels: Record<string, string> = {
+                "/": copy.home,
+                "/categories": copy.categories,
+                "/escrow": copy.escrowFull,
+              };
               return (
                 <Link
                   key={item.href}
@@ -142,12 +151,15 @@ export function MobileHomeHeader() {
                   <span className="mobile-home-header__drawer-link-icon">
                     <Icon name={icon} size={16} />
                   </span>
-                  <span className="mobile-home-header__drawer-link-label">{item.label}</span>
+                  <span className="mobile-home-header__drawer-link-label">
+                    {labels[item.href] ?? item.label}
+                  </span>
                 </Link>
               );
             })}
+            <LanguageSwitch className="mobile-home-header__language-switch" />
             <div className="mobile-home-header__drawer-theme">
-              <span>الوضع الليلي</span>
+              <span>{copy.nightMode}</span>
               <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
             </div>
             <Link
@@ -156,7 +168,7 @@ export function MobileHomeHeader() {
               onClick={() => setMenuOpen(false)}
             >
               <Icon name="plus" size={16} />
-              أضف إعلانك
+              {copy.addListing}
             </Link>
           </div>
         </nav>

@@ -3,6 +3,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND, DEVELOPER } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
 import { Icon } from "@/shared/ui/Icon";
 import "./site-footer.css";
 
@@ -231,6 +232,7 @@ export function SiteFooter() {
         <div className="app-container">
           <div className="site-footer__brand-row">
             <BrandLogo href="/" showTagline={false} size="md" />
+            <LanguageSwitch className="!mt-0" variant="compact" />
             <p className="site-footer__copy">{BRAND.copyright}</p>
           </div>
           <div className="site-footer__credit">

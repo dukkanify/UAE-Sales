@@ -344,6 +344,18 @@
   color: var(--mh-gold);
 }
 
+.mobile-home-header__lang {
+  margin-inline-start: 0.15rem;
+}
+
+.mobile-home-header__lang .language-switch__pills {
+  background: rgb(248 250 252 / 92%);
+}
+
+.mobile-home-header__language-switch {
+  margin-top: 0.5rem;
+}
+
 .mobile-home-header__drawer-theme {
   display: flex;
   align-items: center;
@@ -2471,6 +2483,10 @@ html[data-theme="dark"] .mobile-home-header__cluster {
   border-color: rgb(255 255 255 / 8%);
   background: rgb(18 26 42 / 92%);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+html[data-theme="dark"] .mobile-home-header__lang .language-switch__pills {
+  background: rgb(18 26 42 / 92%);
 }
 
 html[data-theme="dark"] .mobile-home-header__quick-search {

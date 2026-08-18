@@ -7,6 +7,7 @@ import { AppImage } from "@/shared/components/AppImage";
 import { CardShareButton } from "@/shared/components/CardShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
@@ -103,7 +104,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         <h3
           className={`line-clamp-2 break-words font-bold leading-snug text-ink transition group-hover:text-secondary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
         >
-          {listing.title}
+          <ListingTitle listing={listing} />
         </h3>
       </Link>
 

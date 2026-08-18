@@ -5,11 +5,12 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
-import { primaryNavigation } from "@/shared/constants/navigation";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -41,9 +42,15 @@ function isActivePath(pathname: string, href: string) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const copy = useLocaleMessages();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const isComposeListing = pathname.startsWith("/listings/new");
+  const nav = [
+    { href: "/", label: copy.home },
+    { href: "/categories", label: copy.categories },
+    { href: "/escrow", label: copy.escrowFull },
+  ];
 
   useEffect(() => {
     const syncSession = () => setUser(getSessionUser());
@@ -82,7 +89,7 @@ export function SiteHeader() {
           <BrandLogo showTagline={false} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
-            {primaryNavigation.map((item) => {
+            {nav.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
                 <Link
@@ -108,11 +115,12 @@ export function SiteHeader() {
               compact
               label=""
               name="q"
-              placeholder="ابحث..."
+              placeholder={copy.searchShort}
             />
           </form>
 
           <div className="flex shrink-0 items-center gap-2">
+            <LanguageSwitch variant="compact" />
             <NotificationBell
               badgeClassName="notify-bell__badge"
               className="notify-bell__site-trigger"
@@ -124,14 +132,14 @@ export function SiteHeader() {
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
                 href="/profile"
               >
-                حسابي
+                {copy.account}
               </Link>
             ) : (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft sm:inline-flex"
                 href="/login"
               >
-                سجّل الدخول وانضم إلينا
+                {copy.login}
               </Link>
             )}
             {!isComposeListing ? (
@@ -142,12 +150,12 @@ export function SiteHeader() {
                 variant="accent"
               >
                 <Icon className="shrink-0" name="plus" size={16} />
-                أضف إعلانك
+                {copy.addListing}
               </Button>
             ) : null}
             <button
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
+              aria-label={menuOpen ? copy.closeMenu : copy.menu}
               className="focus-ring motion-press grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
@@ -162,14 +170,14 @@ export function SiteHeader() {
         </div>
 
         {menuOpen ? (
-          <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
+          <nav aria-label={copy.menu} className="border-t border-border py-3 lg:hidden">
             <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
-              <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
+              <p className="text-sm font-bold text-ink">{copy.browse}</p>
               <ThemeToggle />
             </div>
 
             <div className="grid gap-1.5">
-              {primaryNavigation.map((item) => {
+              {nav.map((item) => {
                 const active = isActivePath(pathname, item.href);
                 const icon = drawerIcons[item.href] ?? "grid";
                 return (
@@ -190,16 +198,18 @@ export function SiteHeader() {
                     >
                       <Icon name={icon} size={18} />
                     </span>
-                    <span className="flex-1 text-right">{item.label}</span>
+                    <span className="flex-1 text-start">{item.label}</span>
                     {active ? (
-                      <span className="text-[0.65rem] font-semibold text-secondary">الحالي</span>
+                      <span className="text-[0.65rem] font-semibold text-secondary">{copy.current}</span>
                     ) : null}
                   </Link>
                 );
               })}
 
+              <LanguageSwitch />
+
               <form action="/search" className="mt-1 px-0.5">
-                <InputShell />
+                <InputShell placeholder={copy.searchPlaceholder} />
               </form>
 
               {!isComposeListing ? (
@@ -212,7 +222,7 @@ export function SiteHeader() {
                   variant="accent"
                 >
                   <Icon className="shrink-0" name="plus" size={16} />
-                  أضف إعلانك
+                  {copy.addListing}
                 </Button>
               ) : null}
 
@@ -223,7 +233,7 @@ export function SiteHeader() {
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
                   >
-                    حسابي
+                    {copy.account}
                   </Link>
                   <Button
                     className="w-full justify-start"
@@ -235,7 +245,7 @@ export function SiteHeader() {
                     type="button"
                     variant="ghost"
                   >
-                    تسجيل الخروج
+                    {copy.logout}
                   </Button>
                 </>
               ) : (
@@ -244,7 +254,7 @@ export function SiteHeader() {
                   href="/login"
                   onClick={() => setMenuOpen(false)}
                 >
-                  تسجيل الدخول
+                  {copy.loginShort}
                 </Link>
               )}
             </div>
@@ -257,13 +267,13 @@ export function SiteHeader() {
   );
 }
 
-function InputShell() {
+function InputShell({ placeholder }: { placeholder: string }) {
   return (
     <SearchTypeahead
       compact
       label=""
       name="q"
-      placeholder="ابحث عن أي شيء..."
+      placeholder={placeholder}
     />
   );
 }

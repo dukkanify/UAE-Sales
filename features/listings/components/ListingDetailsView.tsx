@@ -15,6 +15,9 @@ import {
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { listingDescription } from "@/shared/i18n/listing-copy";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { getListingCardBadges } from "@/features/listings/components/listing-card-badges";
@@ -36,6 +39,7 @@ export function ListingDetailsView({
   listing,
   relatedListings = [],
 }: ListingDetailsViewProps) {
+  const locale = useLocale();
   const escrowProtected = showsEscrowProtection(listing);
   const locationLabel = listing.area
     ? `${listing.area}، ${listing.emirate ?? listing.city}`
@@ -79,7 +83,7 @@ export function ListingDetailsView({
                 ) : null}
               </div>
               <h1 className="mt-3 text-2xl font-black leading-tight text-ink">
-                {listing.title}
+                <ListingTitle listing={listing} />
               </h1>
               <div className="mt-2">
                 <CurrencyAmount amount={listing.price} size="lg" />
@@ -104,13 +108,8 @@ export function ListingDetailsView({
             <div className="marketplace-panel mt-6 p-6">
               <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
               <p className="mt-4 text-sm font-medium leading-8 text-muted">
-                {listing.description}
+                {listingDescription(listing, locale)}
               </p>
-              {listing.descriptionEnglish ? (
-                <p className="mt-4 border-t border-border pt-4 text-sm leading-7 text-muted/80">
-                  {listing.descriptionEnglish}
-                </p>
-              ) : null}
             </div>
 
             <ListingSpecifications listing={listing} />

@@ -5,6 +5,7 @@ import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
 import { isListingVerified } from "@/features/listings/components/listing-card-badges";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
@@ -75,7 +76,9 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
         </p>
 
         <Link href={href}>
-          <h3 className="mobile-home-featured-card__title">{listing.title}</h3>
+          <h3 className="mobile-home-featured-card__title">
+            <ListingTitle listing={listing} />
+          </h3>
         </Link>
 
         <p className="mobile-home-featured-card__meta">

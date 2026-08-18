@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
 import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner";
@@ -7,6 +8,7 @@ import { MaintenanceGate } from "@/shared/components/MaintenanceGate";
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import { LOCALE_BOOT_SCRIPT, LOCALE_COOKIE } from "@/shared/i18n/locale";
 import { THEME_BOOT_SCRIPT } from "@/shared/theme/theme";
 import "./globals.css";
 
@@ -58,21 +60,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = (await cookies()).get(LOCALE_COOKIE)?.value === "en" ? "en" : "ar";
+
   return (
     <html
       className={`${ibmPlexArabic.variable} ${inter.variable}`}
       data-scroll-behavior="smooth"
-      dir="rtl"
-      lang="ar"
+      dir={locale === "en" ? "ltr" : "rtl"}
+      lang={locale}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
       </head>
       <body className={ibmPlexArabic.className}>
         <ToastProvider>
