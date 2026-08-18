@@ -25,9 +25,10 @@ export function VerifyAccountBanner() {
       <div className="verify-account-banner__inner app-container">
         <div className="verify-account-banner__copy">
           <span className="verify-account-banner__mark" aria-hidden>
-            <Icon name="check" size={13} />
+            <Icon name="shield" size={14} />
           </span>
           <p className="verify-account-banner__message">
+            <span className="verify-account-banner__kicker">ثقة سوقنا</span>
             <span className="verify-account-banner__message--full">{prompt.message}</span>
             <span className="verify-account-banner__message--short">{prompt.shortMessage}</span>
           </p>
