@@ -2,7 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAllUsers } from "@/services/auth/user-store";
 import { getSessionFromCookie } from "@/services/auth/session-cookie";
-import { createListingReport } from "@/services/listings/listing-report-store";
+import {
+  createListingReport,
+  listingReportReceipt,
+} from "@/services/listings/listing-report-store";
 import { resolveServerListing } from "@/services/listings/listing-action-resolver";
 import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
 import { createNotification } from "@/services/payments/notification-store";
@@ -71,5 +74,10 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json({ ok: true, reportId: report.id });
+  return NextResponse.json({
+    ok: true,
+    reportId: report.id,
+    report: listingReportReceipt(report),
+    adminPath: "/admin/listing-reports",
+  });
 }

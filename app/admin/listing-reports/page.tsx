@@ -5,7 +5,7 @@ export default function AdminListingReportsPage() {
   return (
     <AdminShell
       activePath="/admin/listing-reports"
-      description="بلاغات الإعلانات من الزوار والمستخدمين، مع اسم المُبلِغ وبريده وهاتفه."
+      description="بلاغات الإعلانات من الزوار والمستخدمين. هنا اسم العميل وبريده وهاتفه وتفاصيل البلاغ."
       title="بلاغات الإعلانات"
     >
       <AdminListingReportsPanel />

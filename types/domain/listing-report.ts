@@ -7,6 +7,14 @@ export type ListingReportReason =
 
 export type ListingReportStatus = "open" | "reviewed";
 
+export const LISTING_REPORT_REASON_LABELS: Record<ListingReportReason, string> = {
+  misleading: "محتوى مضلل",
+  fraud: "احتيال أو نصب",
+  duplicate: "إعلان مكرر",
+  prohibited: "محتوى ممنوع",
+  other: "سبب آخر",
+};
+
 export type ListingReport = {
   id: string;
   listingId: string;
@@ -21,6 +29,22 @@ export type ListingReport = {
   reporterPhone: string;
   reporterUserId?: string;
   guest: boolean;
+  publicToken?: string;
   status: ListingReportStatus;
   createdAt: string;
 };
+
+export type ListingReportReceipt = Pick<
+  ListingReport,
+  | "id"
+  | "listingTitle"
+  | "reason"
+  | "details"
+  | "reporterName"
+  | "reporterEmail"
+  | "reporterPhone"
+  | "guest"
+  | "publicToken"
+  | "status"
+  | "createdAt"
+>;

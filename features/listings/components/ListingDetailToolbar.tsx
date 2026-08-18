@@ -2,10 +2,12 @@
 
 import { ShareButton } from "@/shared/components/ShareButton";
 import type { Listing } from "@/types";
+import type { ListingReportReceipt } from "@/types/domain/listing-report";
 import { ReportListingModal } from "@/features/listings/components/ReportListingModal";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import Link from "next/link";
 import { useState } from "react";
 
 type ListingDetailToolbarProps = {
@@ -14,11 +16,16 @@ type ListingDetailToolbarProps = {
 
 export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
   const [reportOpen, setReportOpen] = useState(false);
-  const [reportMessage, setReportMessage] = useState("");
+  const [receipt, setReceipt] = useState<ListingReportReceipt | null>(null);
 
   function handlePrint() {
     window.print();
   }
+
+  const statusHref =
+    receipt?.publicToken
+      ? `/report-status/${receipt.id}?token=${encodeURIComponent(receipt.publicToken)}`
+      : null;
 
   return (
     <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -36,22 +43,33 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
         <Icon name="shield" size={14} />
         إبلاغ عن الإعلان
       </Button>
-      {reportMessage ? (
+      {receipt ? (
         <div className="w-full">
-          <FormMessage variant="success">{reportMessage}</FormMessage>
+          <FormMessage variant="success">
+            تم حفظ بلاغ {receipt.guest ? "الزائر" : "الحساب"} رقم{" "}
+            <span dir="ltr" className="inline-block font-black">
+              {receipt.id}
+            </span>
+            . المُبلِغ: {receipt.reporterName} · {receipt.reporterPhone}. التفاصيل في{" "}
+            <Link className="font-bold underline" href="/admin/listing-reports">
+              بلاغات الإعلانات
+            </Link>
+            {statusHref ? (
+              <>
+                {" "}
+                ·{" "}
+                <Link className="font-bold underline" href={statusHref}>
+                  ملخص بلاغي
+                </Link>
+              </>
+            ) : null}
+          </FormMessage>
         </div>
       ) : null}
       <ReportListingModal
         listing={listing}
         onClose={() => setReportOpen(false)}
-        onSuccess={(guest) => {
-          setReportOpen(false);
-          setReportMessage(
-            guest
-              ? "تم استلام بلاغك. سيظهر لفريق الثقة مع اسمك وبريدك وهاتفك في بلاغات الإعلانات."
-              : "تم استلام بلاغك. سيراجعه فريق الثقة وستصلك نسخة في الإشعارات.",
-          );
-        }}
+        onSuccess={setReceipt}
         open={reportOpen}
       />
     </div>
