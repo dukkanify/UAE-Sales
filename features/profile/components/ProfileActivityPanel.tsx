@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { MarkNotificationsRead } from "@/features/notifications/MarkNotificationsRead";
 import { Icon } from "@/shared/ui/Icon";
 import { getNotifications } from "@/services/activityService";
 
@@ -11,6 +12,7 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
   return (
     <div className="mt-6 grid gap-5">
       <Card className="scroll-mt-24 p-5" id="notifications" variant="flat">
+        <MarkNotificationsRead />
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-semibold text-ink">الإشعارات</h2>
           {unread > 0 ? (
@@ -24,7 +26,7 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
             <EmptyState
               actionHref="/search"
               actionLabel="استكشف السوق"
-              description="ستظهر هنا رسالة الترحيب بعد التحقق والاعتماد، وتنبيهات الطلبات والضمان عندما تحدث فعلاً."
+              description="ستظهر هنا رسالة الترحيب بعد التحقق والاعتماد، وتنبيهات الطلبات والضمان عندما تحدث فعلاً. فعّل تنبيهات المتصفح من أيقونة الجرس للوصول الفوري."
               icon="message"
               title="لا إشعارات حتى الآن"
             />

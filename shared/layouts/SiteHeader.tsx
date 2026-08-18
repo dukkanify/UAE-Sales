@@ -9,6 +9,7 @@ import { primaryNavigation } from "@/shared/constants/navigation";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
+import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -112,6 +113,11 @@ export function SiteHeader() {
           </form>
 
           <div className="flex shrink-0 items-center gap-2">
+            <NotificationBell
+              badgeClassName="notify-bell__badge"
+              className="notify-bell__site-trigger"
+              iconSize={18}
+            />
             <ThemeToggle className="shrink-0" />
             {user ? (
               <Link

@@ -27,3 +27,14 @@ export type AppNotification = {
   read: boolean;
   createdAt: string;
 };
+
+export type PushSubscriptionRecord = {
+  userId: string;
+  endpoint: string;
+  keys: {
+    auth: string;
+    p256dh: string;
+  };
+  userAgent?: string;
+  createdAt: string;
+};
