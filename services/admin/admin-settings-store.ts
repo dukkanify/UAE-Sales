@@ -6,6 +6,7 @@ export type AdminSiteSettings = {
   gatewayFeeFixed: number;
   maintenanceMode: boolean;
   allowGuestCheckout: boolean;
+  autoApproveUsers: boolean;
   escrowHoldDays: number;
   disputeWindowDays: number;
   listingActiveDays: number;
@@ -24,6 +25,7 @@ const DEFAULT_SETTINGS: AdminSiteSettings = {
   gatewayFeeFixed: 1,
   maintenanceMode: false,
   allowGuestCheckout: true,
+  autoApproveUsers: true,
   escrowHoldDays: 7,
   disputeWindowDays: 7,
   listingActiveDays: 30,
@@ -83,6 +85,10 @@ export async function updateAdminSettings(
       1,
       Math.round(patch.featuredListingDays ?? current.featuredListingDays),
     ),
+    autoApproveUsers:
+      typeof patch.autoApproveUsers === "boolean"
+        ? patch.autoApproveUsers
+        : current.autoApproveUsers,
     updatedAt: new Date().toISOString(),
   };
   cached = next;

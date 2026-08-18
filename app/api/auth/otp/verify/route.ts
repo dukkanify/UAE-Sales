@@ -2,14 +2,14 @@ import { createHash, randomBytes } from "node:crypto";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import type { UserProfile } from "@/types";
 import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import {
   sendLoginVerificationEmail,
   sendOtpEmail,
 } from "@/services/email/email.service";
-import { completeRegistrationWelcome } from "@/services/auth/welcome";
+import { completePersonVerification } from "@/services/auth/signup-approval";
+import { findUserByEmail, getRedirectAfterAuth } from "@/services/auth/user-store";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
@@ -31,22 +31,6 @@ function createResetToken(email: string): string {
   return createHash("sha256")
     .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
     .digest("hex");
-}
-
-function buildRegisteredUser(
-  email: string,
-  metadata?: Record<string, string>,
-): UserProfile {
-  return {
-    id: `user-${Date.now()}`,
-    fullName: metadata?.fullName ?? "مستخدم سوقنا",
-    email,
-    phone: metadata?.phone ?? "",
-    city: metadata?.city ?? "دبي",
-    accountType: (metadata?.accountType as UserProfile["accountType"]) ?? "individual",
-    isVerified: true,
-    joinedAt: new Date().toISOString().slice(0, 10),
-  };
 }
 
 export async function POST(request: Request) {
@@ -131,19 +115,19 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.purpose === "REGISTER") {
-    const metadata = result.record.metadata;
-    if (!metadata?.fullName) {
+    const stored = await findUserByEmail(email);
+    if (!stored) {
       return NextResponse.json({ error: "INVALID" }, { status: 400 });
     }
 
-    const user = buildRegisteredUser(email, metadata);
+    const { approved, user } = await completePersonVerification(stored.id);
     await setSessionCookie(user);
-    await completeRegistrationWelcome({
-      userId: user.id,
-      email: user.email,
-      name: user.fullName,
+    return NextResponse.json({
+      ok: true,
+      approved,
+      user,
+      redirectTo: approved ? getRedirectAfterAuth(user) : "/register/pending",
     });
-    return NextResponse.json({ ok: true, user });
   }
 
   if (parsed.data.purpose === "PASSWORD_RESET") {

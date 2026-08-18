@@ -96,6 +96,9 @@ export async function GET() {
     (sum, w) => sum + w.availableBalance,
     0,
   );
+  const pendingApprovalUsers = users.filter(
+    (u) => u.accountStatus === "pending" && Boolean(u.emailVerifiedAt),
+  ).length;
   const suspendedUsers = users.filter(
     (u) => u.accountStatus === "suspended",
   ).length;
@@ -108,6 +111,13 @@ export async function GET() {
   const openQuotes = quotes.filter((q) => q.status === "submitted").length;
 
   const attention = [
+    {
+      href: "/admin/users",
+      label: "حسابات بانتظار الاعتماد",
+      meta: "اعتماد بعد التحقق من الشخص",
+      count: pendingApprovalUsers,
+      alert: pendingApprovalUsers > 0,
+    },
     {
       href: "/admin/listings",
       label: "إعلانات بانتظار المراجعة",

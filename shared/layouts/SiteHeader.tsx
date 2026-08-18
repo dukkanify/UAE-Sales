@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
+import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
@@ -73,6 +74,7 @@ export function SiteHeader() {
   return (
     <>
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
+      <VerifyAccountBanner />
       <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
         <div className="flex min-h-[4rem] items-center justify-between gap-4">

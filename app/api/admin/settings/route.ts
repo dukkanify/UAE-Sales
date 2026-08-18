@@ -47,6 +47,10 @@ export async function PATCH(request: Request) {
       typeof body.allowGuestCheckout === "boolean"
         ? body.allowGuestCheckout
         : undefined,
+    autoApproveUsers:
+      typeof body.autoApproveUsers === "boolean"
+        ? body.autoApproveUsers
+        : undefined,
     escrowHoldDays:
       typeof body.escrowHoldDays === "number" ? body.escrowHoldDays : undefined,
     disputeWindowDays:
@@ -81,7 +85,9 @@ export async function PATCH(request: Request) {
     targetId: "site",
     detail: `رسوم ${settings.platformFeePercent}% · صيانة ${
       settings.maintenanceMode ? "نعم" : "لا"
-    } · ضيوف ${settings.allowGuestCheckout ? "نعم" : "لا"}`,
+    } · ضيوف ${settings.allowGuestCheckout ? "نعم" : "لا"} · اعتماد تلقائي ${
+      settings.autoApproveUsers ? "نعم" : "لا"
+    }`,
   });
 
   return NextResponse.json({ settings });

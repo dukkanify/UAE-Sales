@@ -77,14 +77,30 @@ export async function POST(request: Request) {
           { status: 403 },
         );
       }
-      if (stored.accountStatus && stored.accountStatus !== "active") {
+      if (stored.accountStatus === "pending" && !stored.emailVerifiedAt) {
+        const params = new URLSearchParams({
+          email,
+          purpose: "REGISTER",
+        });
         return NextResponse.json(
           {
-            error: "ACCOUNT_INACTIVE",
-            message: "الحساب غير مفعّل بعد. أكمل التحقق من البريد ثم حاول مجدداً.",
+            error: "ACCOUNT_UNVERIFIED",
+            message: "أكمل التحقق من بريدك أولاً قبل تسجيل الدخول.",
+            redirectTo: `/verify-email?${params.toString()}`,
           },
           { status: 403 },
         );
+      }
+      if (stored.accountStatus === "pending") {
+        const user = toUserProfile(stored);
+        await setSessionCookie(user);
+        trackAuthEvent("login_verified");
+        return NextResponse.json({
+          ok: true,
+          user,
+          redirectTo: "/register/pending",
+          accountProof: stored.passwordHash,
+        });
       }
       const user = toUserProfile(stored);
       await setSessionCookie(user);

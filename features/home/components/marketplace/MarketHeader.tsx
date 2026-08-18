@@ -4,9 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
-import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
+import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
-import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
@@ -68,6 +67,7 @@ export function MarketHeader() {
 
   return (
     <header className="market-header sticky top-0 z-50">
+      <VerifyAccountBanner />
       <div className="market-header__accent" aria-hidden />
       <div className="app-container">
         <div className="market-header__bar">
@@ -90,36 +90,19 @@ export function MarketHeader() {
           </nav>
 
           <div className="market-header__actions">
-            <EmirateLocationSelect
-              className="market-header__location hidden lg:inline-flex"
-              variant="desktop"
-            />
-
-            <div className="market-header__cluster">
-              <ThemeToggle className="market-header__icon-btn" />
-
+            {user ? (
               <Link
-                aria-label="بحث"
-                className="market-header__icon-btn"
-                href="/search"
+                aria-label="حسابي"
+                className="market-header__icon-btn market-header__icon-btn--desktop"
+                href="/profile"
               >
-                <Icon name="search" size={18} />
+                <Icon name="user" size={18} />
               </Link>
-
-              {user ? (
-                <Link
-                  aria-label="حسابي"
-                  className="market-header__icon-btn market-header__icon-btn--desktop"
-                  href="/profile"
-                >
-                  <Icon name="user" size={18} />
-                </Link>
-              ) : (
-                <Link className="market-header__join-link" href="/login">
-                  سجّل الدخول وانضم إلينا
-                </Link>
-              )}
-            </div>
+            ) : (
+              <Link className="market-header__join-link" href="/login">
+                سجّل الدخول وانضم إلينا
+              </Link>
+            )}
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
               <Icon name="plus" size={15} />
@@ -145,7 +128,6 @@ export function MarketHeader() {
                 <p className="market-header__drawer-eyebrow">تصفّح سوقنا</p>
                 <p className="market-header__drawer-title">كل الأقسام في مكان واحد</p>
               </div>
-              <EmirateLocationSelect className="market-header__drawer-location" variant="mobile" />
             </div>
 
             <div className="market-header__drawer-grid">

@@ -190,10 +190,10 @@ export async function createStandardUser(input: {
     phone: input.phone?.trim() ?? "",
     city: existing?.city ?? "دبي",
     accountType: input.accountType,
-    isVerified: true,
+    isVerified: false,
     joinedAt: now.slice(0, 10),
-    accountStatus: "active",
-    emailVerifiedAt: now,
+    accountStatus: "pending",
+    emailVerifiedAt: undefined,
     passwordHash: input.passwordHash,
     registrationSource: "STANDARD",
     isGuestConverted: false,
@@ -213,6 +213,7 @@ export async function createPendingUser(input: {
   email: string;
   fullName: string;
   accountType: StoredUser["accountType"];
+  passwordHash?: string;
 }): Promise<StoredUser> {
   const email = input.email.trim().toLowerCase();
   const existing = await findUserByEmail(email);
@@ -238,6 +239,7 @@ export async function createPendingUser(input: {
         ? "business"
         : "user",
     walletBalance: existing?.walletBalance ?? 0,
+    passwordHash: input.passwordHash ?? existing?.passwordHash,
   };
 
   return saveUser(user);
@@ -253,19 +255,35 @@ export async function deletePendingUser(userId: string): Promise<void> {
   );
 }
 
-export async function activateUser(userId: string): Promise<UserProfile> {
+export async function markPersonVerified(userId: string): Promise<UserProfile> {
+  const user = await findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
+
+  const verified: StoredUser = {
+    ...user,
+    emailVerifiedAt: user.emailVerifiedAt ?? new Date().toISOString(),
+  };
+  await saveUser(verified);
+  return toProfile(verified);
+}
+
+export async function approveRegisteredUser(userId: string): Promise<UserProfile> {
   const user = await findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
   const activated: StoredUser = {
     ...user,
     accountStatus: "active",
-    emailVerifiedAt: new Date().toISOString(),
+    emailVerifiedAt: user.emailVerifiedAt,
     isVerified: true,
   };
 
   await saveUser(activated);
   return toProfile(activated);
+}
+
+export async function activateUser(userId: string): Promise<UserProfile> {
+  return approveRegisteredUser(userId);
 }
 
 export async function setUserPassword(userId: string, passwordHash: string): Promise<UserProfile> {
@@ -295,7 +313,7 @@ export async function restoreUserWithPasswordProof(input: {
     return saveUser({
       ...existing,
       passwordHash: input.passwordHash,
-      accountStatus: existing.accountStatus === "suspended" ? "suspended" : "active",
+      accountStatus: existing.accountStatus ?? "active",
     });
   }
 
@@ -367,6 +385,7 @@ export function toAdminUserRecord(
   role: NonNullable<StoredUser["role"]>;
   isVerified: boolean;
   accountStatus: AccountStatus;
+  emailVerifiedAt?: string | null;
   joinedAt: string;
   listingsCount: number;
   adminPermissions?: StoredUser["adminPermissions"];
@@ -380,6 +399,7 @@ export function toAdminUserRecord(
     role: user.role ?? "user",
     isVerified: user.isVerified,
     accountStatus: user.accountStatus ?? "active",
+    emailVerifiedAt: user.emailVerifiedAt ?? null,
     joinedAt: user.joinedAt,
     listingsCount,
     adminPermissions: user.adminPermissions,
@@ -405,6 +425,10 @@ export async function resolveLoginUser(email: string): Promise<UserProfile | nul
 export function getRedirectAfterAuth(user: UserProfile, next?: string | null): string {
   if (user.role === "admin") {
     return getSafeNextPath(next, "/admin");
+  }
+
+  if (user.accountStatus === "pending") {
+    return "/register/pending";
   }
 
   const fallback =

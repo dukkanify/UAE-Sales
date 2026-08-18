@@ -19,6 +19,7 @@ export type AdminUserRecord = {
   role: UserRole;
   isVerified: boolean;
   accountStatus: AccountStatus;
+  emailVerifiedAt?: string | null;
   joinedAt: string;
   listingsCount: number;
   adminPermissions?: AdminPermission[];

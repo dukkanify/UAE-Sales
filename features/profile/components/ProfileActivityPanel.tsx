@@ -24,7 +24,7 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
             <EmptyState
               actionHref="/search"
               actionLabel="استكشف السوق"
-              description="ستظهر هنا رسالة الترحيب وتنبيهات الطلبات والضمان عندما تحدث فعلاً."
+              description="ستظهر هنا رسالة الترحيب بعد التحقق والاعتماد، وتنبيهات الطلبات والضمان عندما تحدث فعلاً."
               icon="message"
               title="لا إشعارات حتى الآن"
             />

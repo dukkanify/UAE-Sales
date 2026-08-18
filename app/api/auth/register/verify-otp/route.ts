@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { SESSION_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { handleOtpVerify } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { completeRegistrationWelcome } from "@/services/auth/welcome";
+import { completePersonVerification } from "@/services/auth/signup-approval";
 import {
-  activateUser,
   findUserByEmail,
   getRedirectAfterAuth,
 } from "@/services/auth/user-store";
@@ -37,22 +35,14 @@ export async function POST(request: Request) {
     return verifyResult;
   }
 
-  const metadata = verifyResult.record.metadata;
-  const userId = metadata?.userId;
-  if (!userId) {
-    trackAuthEvent("registration_failed");
-    return NextResponse.json({ error: "INVALID" }, { status: 400 });
-  }
-
   const stored = await findUserByEmail(email);
   if (!stored) {
     trackAuthEvent("registration_failed");
     return NextResponse.json({ error: "INVALID" }, { status: 400 });
   }
 
-  const user = await activateUser(userId);
-  const disabled = emailOtpDisabledResponse();
-  if (disabled) return disabled;
+  const { approved, user } = await completePersonVerification(stored.id);
+
   try {
     await setSessionCookie(user);
   } catch {
@@ -63,17 +53,15 @@ export async function POST(request: Request) {
     );
   }
 
-  await completeRegistrationWelcome({
-    userId: user.id,
-    email: user.email,
-    name: user.fullName,
-  });
   trackAuthEvent("registration_verified", { accountType: user.accountType });
 
-  const redirectTo = getRedirectAfterAuth(user, parsed.data.next);
+  const redirectTo = approved
+    ? getRedirectAfterAuth(user, parsed.data.next)
+    : "/register/pending";
 
   return NextResponse.json({
     ok: true,
+    approved,
     user,
     redirectTo,
   });

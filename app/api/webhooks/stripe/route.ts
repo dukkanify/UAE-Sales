@@ -4,6 +4,7 @@ import { isStripeConfigured } from "@/services/payments/payment-config";
 import {
   claimStripeWebhookEvent,
   logPaymentEvent,
+  releaseStripeWebhookEvent,
 } from "@/services/payments/payment-log";
 import {
   handleCheckoutSessionCompleted,
@@ -100,6 +101,7 @@ export async function POST(request: Request) {
         break;
     }
   } catch (error) {
+    await releaseStripeWebhookEvent(event.id);
     const message = error instanceof Error ? error.message : "WEBHOOK_HANDLER_ERROR";
     return NextResponse.json({ error: message }, { status: 500 });
   }

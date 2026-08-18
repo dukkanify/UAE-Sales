@@ -211,6 +211,19 @@ export function AdminSettingsPanel() {
             />
             <span>السماح بالشراء كضيف</span>
           </label>
+          <label className="admin-ops__toggle">
+            <input
+              checked={settings.autoApproveUsers}
+              type="checkbox"
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  autoApproveUsers: e.target.checked,
+                })
+              }
+            />
+            <span>اعتماد الحساب تلقائياً بعد التحقق من البريد</span>
+          </label>
         </div>
       </section>
 

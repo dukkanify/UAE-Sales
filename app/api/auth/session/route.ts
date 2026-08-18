@@ -16,6 +16,9 @@ const userSchema = z.object({
   accountType: z.enum(["buyer", "seller", "business", "individual", "company"]),
   isVerified: z.boolean(),
   joinedAt: z.string().min(1),
+  accountStatus: z.enum(["pending", "active", "suspended"]).optional(),
+  emailVerifiedAt: z.string().nullable().optional(),
+  onboardingStatus: z.enum(["none", "business_pending", "business_complete"]).optional(),
   role: z.enum(["user", "business", "admin"]).optional(),
   walletBalance: z.number().optional(),
 });

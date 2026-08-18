@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { hashPassword, isStrongPassword } from "@/services/auth/password.service";
-import { setSessionCookie } from "@/services/auth/session-cookie";
+import {
+  enforceRateLimit,
+  genericOtpResponse,
+  otpCooldownResponse,
+  sendRegistrationVerifyOtp,
+} from "@/services/auth/auth-handlers";
 import {
   createStandardUser,
-  getRedirectAfterAuth,
   toUserProfile,
 } from "@/services/auth/user-store";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
-import { getSafeNextPath } from "@/shared/utils/safe-next";
-import { completeRegistrationWelcome } from "@/services/auth/welcome";
+import { maskEmail } from "@/shared/utils/mask-email";
 
 const schema = z.object({
   fullName: z.string().min(3),
@@ -53,6 +56,10 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (!(await enforceRateLimit(request, email))) {
+      return genericOtpResponse(email);
+    }
+
     const stored = await createStandardUser({
       email,
       fullName,
@@ -60,24 +67,33 @@ export async function POST(request: Request) {
       accountType: parsed.data.accountType,
     });
     const profile = toUserProfile(stored);
-    await setSessionCookie(profile);
-    trackAuthEvent("registration_verified");
-    const welcome = await completeRegistrationWelcome({
-      userId: profile.id,
-      email: profile.email,
-      name: profile.fullName,
-    });
+    trackAuthEvent("registration_started", { accountType: profile.accountType });
 
-    const redirectTo = getSafeNextPath(
-      parsed.data.next,
-      getRedirectAfterAuth(profile, parsed.data.next),
-    );
+    try {
+      await sendRegistrationVerifyOtp({
+        email,
+        fullName,
+        userId: stored.id,
+        accountType: parsed.data.accountType,
+      });
+    } catch (error) {
+      const cooldown = otpCooldownResponse(error);
+      if (cooldown) return cooldown;
+    }
+
+    trackAuthEvent("registration_otp_sent");
+    const params = new URLSearchParams({
+      email,
+      purpose: "REGISTER",
+      masked: maskEmail(email),
+    });
 
     return NextResponse.json({
       ok: true,
-      user: profile,
-      redirectTo,
-      welcomeEmailed: welcome.emailed,
+      needsVerification: true,
+      email,
+      maskedEmail: maskEmail(email),
+      redirectTo: `/verify-email?${params.toString()}`,
       accountProof: stored.passwordHash,
     });
   } catch (error) {
