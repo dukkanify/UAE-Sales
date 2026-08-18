@@ -6,6 +6,7 @@ import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { Badge } from "@/shared/ui/Badge";
@@ -50,7 +51,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
-        {listing.title}
+        <ListingTitle listing={listing} />
       </h1>
 
       <div className="mt-4">

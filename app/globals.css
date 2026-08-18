@@ -858,25 +858,19 @@ html[data-theme="dark"] .uae-hero-sand-wash {
 }
 
 .market-header__menu-btn {
-  display: none;
-}
-
-@media (max-width: 1023px) {
-  .market-header__menu-btn {
-    display: grid;
-    width: 2.55rem;
-    height: 2.55rem;
-    place-items: center;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    background: var(--color-surface);
-    color: var(--color-ink);
-    box-shadow: var(--shadow-xs);
-    transition:
-      border-color 160ms ease,
-      background 160ms ease,
-      transform 160ms ease;
-  }
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-xs);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
 }
 
 .market-header__menu-btn:hover {
@@ -990,6 +984,55 @@ html[data-theme="dark"] .uae-hero-sand-wash {
   color: var(--color-ink);
 }
 
+.language-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface-muted) 80%, transparent);
+}
+
+.language-switch__label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.language-switch__pills {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+
+.language-switch__pill {
+  min-width: 3.4rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-muted);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.language-switch__pill.is-active {
+  background: #0b1628;
+  color: #fff;
+}
+
+html[data-theme="dark"] .language-switch {
+  background: #1a2336;
+}
+
+html[data-theme="dark"] .language-switch__pill.is-active {
+  background: #d4b87a;
+  color: #0b1628;
+}
+
 @media (min-width: 768px) {
   .market-header__bar {
     min-height: 4.4rem;
@@ -999,11 +1042,6 @@ html[data-theme="dark"] .uae-hero-sand-wash {
 @media (min-width: 1024px) {
   .market-header__nav {
     display: flex;
-  }
-
-  .market-header__menu-btn,
-  .market-header__drawer {
-    display: none !important;
   }
 }
 

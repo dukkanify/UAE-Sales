@@ -4,6 +4,7 @@ import Link from "next/link";
 import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import {
   getListingHref,
   getListingImageUrl,
@@ -41,7 +42,9 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
         />
         <span className="mobile-home-nearby-card__distance">{distance}</span>
       </div>
-      <p className="mobile-home-nearby-card__title">{listing.title}</p>
+      <p className="mobile-home-nearby-card__title">
+        <ListingTitle listing={listing} />
+      </p>
     </Link>
   );
 });

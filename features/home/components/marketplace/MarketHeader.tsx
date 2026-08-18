@@ -6,19 +6,13 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import { getSessionUser } from "@/services/storage";
 import type { UserProfile } from "@/types";
-
-const nav = [
-  { href: "/", icon: "home" as const, label: "الرئيسية" },
-  { href: "/categories", icon: "grid" as const, label: "التصنيفات" },
-  { href: "/featured", icon: "star" as const, label: "المميزة" },
-  { href: "/escrow", icon: "shield" as const, label: "الضمان" },
-  { href: "/search", icon: "search" as const, label: "استكشف" },
-];
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -27,8 +21,16 @@ function isActivePath(pathname: string, href: string) {
 
 export function MarketHeader() {
   const pathname = usePathname();
+  const copy = useLocaleMessages();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const nav = [
+    { href: "/", icon: "home" as const, label: copy.home },
+    { href: "/categories", icon: "grid" as const, label: copy.categories },
+    { href: "/featured", icon: "star" as const, label: copy.featured },
+    { href: "/escrow", icon: "shield" as const, label: copy.escrow },
+    { href: "/search", icon: "search" as const, label: copy.explore },
+  ];
 
   useEffect(() => {
     const sync = () => setUser(getSessionUser());
@@ -41,16 +43,6 @@ export function MarketHeader() {
     const timeoutId = window.setTimeout(() => setMenuOpen(false), 0);
     return () => window.clearTimeout(timeoutId);
   }, [pathname]);
-
-  useEffect(() => {
-    const desktopNav = window.matchMedia("(min-width: 1024px)");
-    const closeOnDesktop = () => {
-      if (desktopNav.matches) setMenuOpen(false);
-    };
-    closeOnDesktop();
-    desktopNav.addEventListener("change", closeOnDesktop);
-    return () => desktopNav.removeEventListener("change", closeOnDesktop);
-  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -74,7 +66,7 @@ export function MarketHeader() {
         <div className="market-header__bar">
           <BrandLogo showTagline={false} size="md" />
 
-          <nav aria-label="التنقل الرئيسي" className="market-header__nav">
+          <nav aria-label={copy.browse} className="market-header__nav">
             {nav.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
@@ -95,7 +87,7 @@ export function MarketHeader() {
 
             {user ? (
               <Link
-                aria-label="حسابي"
+                aria-label={copy.account}
                 className="market-header__icon-btn market-header__icon-btn--desktop"
                 href="/profile"
               >
@@ -103,19 +95,19 @@ export function MarketHeader() {
               </Link>
             ) : (
               <Link className="market-header__join-link" href="/login">
-                سجّل الدخول وانضم إلينا
+                {copy.login}
               </Link>
             )}
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
               <Icon name="plus" size={15} />
-              <span>أضف إعلانك</span>
+              <span>{copy.addListing}</span>
             </Link>
 
             <button
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
-              className="market-header__menu-btn lg:hidden"
+              aria-label={menuOpen ? copy.closeMenu : copy.menu}
+              className="market-header__menu-btn"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
@@ -125,11 +117,11 @@ export function MarketHeader() {
         </div>
 
         {menuOpen ? (
-          <nav aria-label="قائمة الجوال" className="market-header__drawer lg:hidden">
+          <nav aria-label={copy.menu} className="market-header__drawer">
             <div className="market-header__drawer-top">
               <div>
-                <p className="market-header__drawer-eyebrow">تصفّح سوقنا</p>
-                <p className="market-header__drawer-title">كل الأقسام في مكان واحد</p>
+                <p className="market-header__drawer-eyebrow">{copy.browse}</p>
+                <p className="market-header__drawer-title">{copy.browseTitle}</p>
               </div>
             </div>
 
@@ -148,7 +140,7 @@ export function MarketHeader() {
                     </span>
                     <span className="flex-1 text-start">{item.label}</span>
                     {active ? (
-                      <span className="market-header__drawer-now">الحالي</span>
+                      <span className="market-header__drawer-now">{copy.current}</span>
                     ) : (
                       <Icon className="opacity-40" name="chevron-left" size={14} />
                     )}
@@ -157,6 +149,8 @@ export function MarketHeader() {
               })}
             </div>
 
+            <LanguageSwitch />
+
             <div className="market-header__drawer-footer">
               <Link
                 className="market-header__drawer-account"
@@ -164,7 +158,7 @@ export function MarketHeader() {
                 onClick={() => setMenuOpen(false)}
               >
                 <Icon name="user" size={16} />
-                {user ? user.fullName.split(" ")[0] : "سجّل الدخول وانضم إلينا"}
+                {user ? user.fullName.split(" ")[0] : copy.login}
               </Link>
               <Button
                 className="sooqna-gold-gradient rounded-full"
@@ -175,7 +169,7 @@ export function MarketHeader() {
                 variant="accent"
               >
                 <Icon name="plus" size={16} />
-                أضف إعلانك
+                {copy.addListing}
               </Button>
             </div>
           </nav>

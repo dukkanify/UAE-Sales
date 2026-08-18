@@ -9,6 +9,7 @@ import { ListingCardBadges } from "@/features/listings/components/ListingCardBad
 import { isListingVerified } from "@/features/listings/components/listing-card-badges";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import {
   formatPostedTime,
   formatViews,
@@ -75,7 +76,9 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
         </p>
 
         <Link href={href}>
-          <h3 className="mobile-home-featured-card__title">{listing.title}</h3>
+          <h3 className="mobile-home-featured-card__title">
+            <ListingTitle listing={listing} />
+          </h3>
         </Link>
 
         <p className="mobile-home-featured-card__meta">

@@ -9,6 +9,7 @@ import { SellerContactActions } from "@/features/listings/components/ListingPrim
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { useToast } from "@/shared/components/ToastProvider";
 import {
   ACTION_LABELS,
@@ -72,7 +73,9 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         ) : null}
         </div>
 
-        <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
+        <h1 className="mt-4 text-2xl font-black leading-tight text-ink">
+          <ListingTitle listing={listing} />
+        </h1>
         <div className="mt-4">
           <CurrencyAmount amount={listing.price} size="xl" />
         </div>

@@ -343,6 +343,10 @@
   color: var(--mh-gold);
 }
 
+.mobile-home-header__language-switch {
+  margin-top: 0.5rem;
+}
+
 .mobile-home-header__drawer-cta {
   display: inline-flex;
   margin-top: 0.5rem;
