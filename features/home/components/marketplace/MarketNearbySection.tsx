@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { getNearbyListings } from "@/features/home/components/mobile/mobile-home.config";
 import { getListingHref, getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
@@ -48,7 +49,9 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
                   {distance}
                 </span>
               </div>
-              <p className="line-clamp-2 px-3 py-3 text-sm font-bold text-ink">{listing.title}</p>
+              <p className="line-clamp-2 px-3 py-3 text-sm font-bold text-ink">
+                <ListingTitle listing={listing} />
+              </p>
             </Link>
           );
         })}

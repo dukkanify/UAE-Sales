@@ -343,18 +343,8 @@
   color: var(--mh-gold);
 }
 
-.mobile-home-header__drawer-theme {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.35rem;
-  padding: 0.65rem 0.875rem;
-  border-radius: var(--mh-radius-md);
-  background: #f8fafc;
-  font-size: var(--mh-text-sm);
-  font-weight: 700;
-  color: var(--mh-primary);
+.mobile-home-header__language-switch {
+  margin-top: 0.5rem;
 }
 
 .mobile-home-header__drawer-cta {
@@ -2500,11 +2490,6 @@ html[data-theme="dark"] .mobile-home-header__drawer-profile-icon {
 
 html[data-theme="dark"] .mobile-home-header__drawer-profile-action {
   background: rgb(255 255 255 / 6%);
-}
-
-html[data-theme="dark"] .mobile-home-header__drawer-theme {
-  background: #1a2336;
-  color: #eef2f8;
 }
 
 html[data-theme="dark"] .mobile-home-header__drawer-link-icon {
