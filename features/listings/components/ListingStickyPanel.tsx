@@ -212,7 +212,6 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
             <ListingPrimaryAction
               action={config.primaryAction}
               className="mobile-sticky-bar__cta"
-              embedPhoneConfirm={false}
               listing={listing}
               size="sm"
             />
