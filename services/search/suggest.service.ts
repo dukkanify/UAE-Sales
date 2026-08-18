@@ -9,7 +9,7 @@ import type { Category, Listing } from "@/types";
 import type { SearchSuggestion, SearchSuggestionKind } from "@/features/search/types";
 import { buildSearchUrl } from "@/features/search/components/search-url";
 
-const INDEX_VERSION = 3;
+const INDEX_VERSION = 4;
 const MAX_RESULTS = 8;
 const MAX_LISTING_RESULTS = 5;
 const PRODUCT_CATEGORY_IDS = new Set(["cars", "mobiles", "electronics"]);
@@ -158,6 +158,9 @@ function fieldScore(
   }
 
   const tokens = haystackNorm.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  if (queryNorm.length === 1) {
+    return tokens[0]?.startsWith(queryNorm) ? 78 : 0;
+  }
   if (tokens.some((token) => token.startsWith(queryNorm))) return 78;
   if (allowContains && haystackNorm.includes(queryNorm)) return 46;
   return 0;
@@ -183,7 +186,12 @@ function scoreDoc(doc: SuggestDoc, queryNorm: string): number {
   const shortBonus = Math.max(0, 16 - Math.min(doc.label.length, 16)) * 0.4;
   const featuredBonus = doc.featured ? 7 : 0;
   const viewsBonus = Math.min(doc.views, 5000) / 900;
-  return best * doc.weight + shortBonus + featuredBonus + viewsBonus;
+  const cityExactBonus =
+    doc.kind === "city" &&
+    (labelNorm === queryNorm || labelEnNorm === queryNorm)
+      ? 40
+      : 0;
+  return best * doc.weight + shortBonus + featuredBonus + viewsBonus + cityExactBonus;
 }
 
 function pickLabel(doc: SuggestDoc, latin: boolean, queryNorm: string): string {
@@ -415,14 +423,20 @@ function pickDiverse(
   const seen = new Set<string>();
   let listingCount = 0;
   const shortQuery = queryNorm.length <= 2;
-  const slotOrder: Array<SuggestDoc["kind"]> = shortQuery
-    ? latin
-      ? ["listing", "brand", "model", "category", "city"]
-      : ["brand", "model", "category", "listing", "city"]
-    : ["listing", "brand", "model", "category", "city"];
+  const slotOrder: Array<SuggestDoc["kind"]> = latin
+    ? ["listing", "brand", "model", "category", "city"]
+    : ["brand", "model", "category", "listing", "city"];
 
   const push = (doc: SuggestDoc) => {
     if (shortQuery && doc.kind === "listing" && doc.categoryId === "jobs") {
+      return false;
+    }
+    if (
+      queryNorm.length === 1 &&
+      doc.kind === "listing" &&
+      doc.categoryId &&
+      !PRODUCT_CATEGORY_IDS.has(doc.categoryId)
+    ) {
       return false;
     }
     const label = pickLabel(doc, latin, queryNorm);
@@ -438,11 +452,13 @@ function pickDiverse(
     return true;
   };
 
-  for (const kind of slotOrder) {
-    if (picked.length >= MAX_RESULTS) break;
-    for (const doc of ranked) {
-      if (doc.kind !== kind) continue;
-      if (push(doc)) break;
+  if (shortQuery) {
+    for (const kind of slotOrder) {
+      if (picked.length >= MAX_RESULTS) break;
+      for (const doc of ranked) {
+        if (doc.kind !== kind) continue;
+        if (push(doc)) break;
+      }
     }
   }
 
