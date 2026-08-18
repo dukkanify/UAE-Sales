@@ -97,25 +97,41 @@ export function ListingDetailsStep({
               { label: "ممتاز", value: "excellent" },
             ]}
           />
-          <div className="col-span-2 md:col-span-1">
-            <Select
-              compact
-              label="الإمارة / المدينة"
-              name="city"
-              onChange={(event) =>
-                onPreviewChange((current) => ({
-                  ...current,
-                  city:
-                    cities.find((city) => city.id === event.target.value)?.name ??
-                    "دبي",
-                }))
-              }
-              options={cities.map((city) => ({
-                label: city.name,
-                value: city.id,
-              }))}
-            />
-          </div>
+          <Select
+            compact
+            label="الإمارة"
+            name="emirate"
+            onChange={(event) =>
+              onPreviewChange((current) => ({
+                ...current,
+                city: current.city || event.target.value,
+              }))
+            }
+            options={cities.map((city) => ({
+              label: city.name,
+              value: city.name,
+            }))}
+          />
+        </div>
+        <div>
+          <Input
+            compact
+            label="المدينة / المنطقة"
+            name="city"
+            onChange={(event) =>
+              onPreviewChange((current) => ({
+                ...current,
+                city: event.target.value || current.city,
+              }))
+            }
+            placeholder="مثال: دبي مارينا"
+          />
+          {errors.emirate ? (
+            <FormMessage variant="error">{errors.emirate}</FormMessage>
+          ) : null}
+          {errors.city ? (
+            <FormMessage variant="error">{errors.city}</FormMessage>
+          ) : null}
         </div>
       </div>
     </Card>

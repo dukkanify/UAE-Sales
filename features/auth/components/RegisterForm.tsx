@@ -11,8 +11,8 @@ import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
-import { saveAccountProof } from "@/services/storage";
-import { saveOtpFallback } from "@/features/auth/lib/otp-fallback";
+import { persistSessionCookie } from "@/services/auth/session-sync";
+import { saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import {
   isStrongPassword,
@@ -105,14 +105,15 @@ export function RegisterForm() {
             accountType,
           });
         }
-        if (typeof data.otp === "string") {
-          saveOtpFallback(nextEmail, data.otp);
+        if (data.user) {
+          setSessionUser(data.user);
+          await persistSessionCookie(data.user);
         }
-        trackAuthEventClient("registration_otp_sent");
+        trackAuthEventClient("registration_completed");
         router.push(
           getSafeNextPath(
             data.redirectTo,
-            `/verify-email?email=${encodeURIComponent(nextEmail)}&purpose=REGISTER`,
+            data.approved ? "/profile" : "/register/pending",
           ),
         );
         return;
@@ -133,14 +134,11 @@ export function RegisterForm() {
       if (!response.ok) {
         throw new Error(
           data.error === "EMAIL_SEND_FAILED"
-            ? "تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى."
+            ? "تعذر إرسال رمز التحقق إلى بريدك. حاول مرة أخرى."
             : "تعذر إنشاء طلب التحقق. حاول مرة أخرى.",
         );
       }
 
-      if (typeof data.otp === "string") {
-        saveOtpFallback(nextEmail, data.otp);
-      }
       trackAuthEventClient("registration_otp_sent");
       const params = new URLSearchParams({
         email: data.email ?? nextEmail,
@@ -169,7 +167,7 @@ export function RegisterForm() {
         <p className="auth-form__subtitle">
           {emailOtpEnabled
             ? "أولاً نتحقق منك برمز يصل إلى بريدك، ثم يُعتمد حسابك بسهولة."
-            : "أنشئ حسابك، تحقّق من بريدك برمز سريع، ثم يُعتمد حسابك بسهولة."}
+            : "أنشئ حسابك بكلمة المرور. رمز التحقق لا يظهر داخل النظام."}
         </p>
       </div>
 

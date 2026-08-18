@@ -66,11 +66,14 @@ export function parseCategoryForm(
     const title = String(formData.get("title") ?? "").trim();
     const description = String(formData.get("description") ?? "").trim();
     const price = Number(formData.get("price") ?? 0);
-    const cityId = String(formData.get("city") ?? "dubai");
+    const city = String(formData.get("city") ?? "").trim();
+    const emirate = String(formData.get("emirate") ?? "").trim();
 
     if (title.length < 8) errors.title = "عنوان الإعلان يجب أن يكون 8 أحرف على الأقل.";
     if (description.length < 20) errors.description = "اكتب وصفاً لا يقل عن 20 حرفاً.";
     if (!Number.isFinite(price) || price <= 0) errors.price = "اكتب سعراً صحيحاً.";
+    if (!emirate) errors.emirate = "اختر الإمارة.";
+    if (!city) errors.city = "اكتب المدينة أو المنطقة.";
 
     return {
       categorySpecs: {},
@@ -78,8 +81,8 @@ export function parseCategoryForm(
       features: [],
       title,
       condition: String(formData.get("condition") ?? "used") as ListingCondition,
-      city: cityId,
-      emirate: undefined,
+      city,
+      emirate: emirate || undefined,
     };
   }
 

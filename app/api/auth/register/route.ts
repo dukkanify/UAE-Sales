@@ -5,41 +5,38 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
+  otpSendFailedResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import {
   createStandardUser,
+  getRedirectAfterAuth,
   toUserProfile,
 } from "@/services/auth/user-store";
+import { completePersonVerification } from "@/services/auth/signup-approval";
+import { setSessionCookie } from "@/services/auth/session-cookie";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { maskEmail } from "@/shared/utils/mask-email";
 
 function registerOtpResponse(input: {
   accountProof?: string | null;
   email: string;
-  emailDelivered: boolean;
-  otp?: string;
 }) {
   const params = new URLSearchParams({
     email: input.email,
     purpose: "REGISTER",
     masked: maskEmail(input.email),
   });
-  const response = NextResponse.json({
+  return NextResponse.json({
     ok: true,
     needsVerification: true,
     email: input.email,
     maskedEmail: maskEmail(input.email),
-    emailDelivered: input.emailDelivered,
-    ...(input.otp ? { otp: input.otp } : {}),
+    emailDelivered: true,
     redirectTo: `/verify-email?${params.toString()}`,
     accountProof: input.accountProof,
   });
-  if (input.otp) {
-    attachOtpDisplayCookie(response, input.email, input.otp);
-  }
-  return response;
 }
 
 const schema = z.object({
@@ -97,8 +94,24 @@ export async function POST(request: Request) {
     const profile = toUserProfile(stored);
     trackAuthEvent("registration_started", { accountType: profile.accountType });
 
+    if (!isEmailOtpEnabled()) {
+      const { approved, user } = await completePersonVerification(stored.id);
+      await setSessionCookie(user);
+      trackAuthEvent("registration_completed", { autoApproved: approved });
+      return NextResponse.json({
+        ok: true,
+        needsVerification: false,
+        user,
+        approved,
+        redirectTo: approved
+          ? getRedirectAfterAuth(user, parsed.data.next)
+          : "/register/pending",
+        accountProof: stored.passwordHash,
+      });
+    }
+
     try {
-      const sent = await sendRegistrationVerifyOtp({
+      await sendRegistrationVerifyOtp({
         email,
         fullName,
         userId: stored.id,
@@ -108,17 +121,11 @@ export async function POST(request: Request) {
       return registerOtpResponse({
         accountProof: stored.passwordHash,
         email,
-        emailDelivered: sent.delivered,
-        otp: sent.code,
       });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
-      return registerOtpResponse({
-        accountProof: stored.passwordHash,
-        email,
-        emailDelivered: false,
-      });
+      return otpSendFailedResponse();
     }
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {

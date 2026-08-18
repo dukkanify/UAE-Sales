@@ -7,14 +7,21 @@ import { initiateFeaturedCheckout } from "@/services/payments/featured-checkout.
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function POST(_request: Request, { params }: RouteParams) {
+export async function POST(request: Request, { params }: RouteParams) {
   const user = await requireSessionUser();
   if (!isSessionUser(user)) return user;
 
   const { id } = await params;
+  let confirmMock = false;
+  try {
+    const body = (await request.json()) as { confirmMock?: boolean };
+    confirmMock = Boolean(body?.confirmMock);
+  } catch {
+    confirmMock = false;
+  }
 
   try {
-    const result = await initiateFeaturedCheckout(id, user.id);
+    const result = await initiateFeaturedCheckout(id, user.id, { confirmMock });
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";

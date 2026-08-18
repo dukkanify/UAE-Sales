@@ -9,7 +9,6 @@ import {
   carModelOptions,
   mobileModelOptions,
 } from "@/shared/constants/product-models";
-import { cities } from "@/shared/constants/locations";
 
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
@@ -21,10 +20,24 @@ const emirateOptions = [
   { label: "أم القيوين", value: "أم القيوين" },
 ];
 
-const cityOptions = cities.map((city) => ({
-  label: city.name,
-  value: city.name,
-}));
+const locationCityField: CategoryFieldDefinition = {
+  key: "city",
+  label: "المدينة / المنطقة",
+  type: "text",
+  required: true,
+  searchable: true,
+  placeholder: "مثال: دبي مارينا",
+  note: "اكتب اسم المدينة أو المنطقة داخل الإمارة.",
+};
+
+const locationEmirateField: CategoryFieldDefinition = {
+  key: "emirate",
+  label: "الإمارة",
+  type: "select",
+  required: true,
+  searchable: true,
+  options: emirateOptions,
+};
 
 const yesNoOptions = [
   { label: "نعم", value: "نعم" },
@@ -80,16 +93,8 @@ const carFields: CategoryFieldDefinition[] = [
     ],
   },
   { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
-  { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  {
-    key: "city",
-    label: "المدينة",
-    type: "select",
-    required: true,
-    searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
-  },
+  locationEmirateField,
+  locationCityField,
   { key: "mileage", label: "العداد (كم)", type: "text", required: true, searchable: true },
   { key: "transmission", label: "ناقل الحركة", type: "select", required: true, options: [
     { label: "أوتوماتيك", value: "أوتوماتيك" },
@@ -169,16 +174,8 @@ const realEstateFields: CategoryFieldDefinition[] = [
   { key: "developer", label: "المطور", type: "text", required: true, searchable: true },
   { key: "community", label: "المجتمع", type: "text", required: true, titlePart: true, searchable: true },
   { key: "titleDeedReady", label: "سند الملكية جاهز", type: "select", required: true, options: yesNoOptions },
-  { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  {
-    key: "city",
-    label: "المدينة",
-    type: "select",
-    required: true,
-    searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
-  },
+  locationEmirateField,
+  locationCityField,
 ];
 
 const mobileFields: CategoryFieldDefinition[] = [
@@ -232,6 +229,8 @@ const mobileFields: CategoryFieldDefinition[] = [
     { label: "مستعمل", value: "used" },
     { label: "ممتاز", value: "excellent" },
   ]},
+  locationEmirateField,
+  locationCityField,
 ];
 
 const electronicsFields: CategoryFieldDefinition[] = [
@@ -270,6 +269,8 @@ const electronicsFields: CategoryFieldDefinition[] = [
   ]},
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accessories", label: "الملحقات", type: "textarea", required: true },
+  locationEmirateField,
+  locationCityField,
 ];
 
 const jobFields: CategoryFieldDefinition[] = [
@@ -290,6 +291,8 @@ const jobFields: CategoryFieldDefinition[] = [
     { label: "أنثى", value: "أنثى" },
     { label: "أي", value: "أي" },
   ]},
+  locationEmirateField,
+  locationCityField,
 ];
 
 const serviceFields: CategoryFieldDefinition[] = [
@@ -302,6 +305,8 @@ const serviceFields: CategoryFieldDefinition[] = [
     { label: "حسب الموعد", value: "حسب الموعد" },
   ]},
   { key: "experience", label: "سنوات الخبرة", type: "text", required: true },
+  locationEmirateField,
+  locationCityField,
 ];
 
 const foodFields: CategoryFieldDefinition[] = [
@@ -354,15 +359,8 @@ const foodFields: CategoryFieldDefinition[] = [
       { label: "معلّب", value: "معلّب" },
     ],
   },
-  {
-    key: "city",
-    label: "المدينة",
-    type: "select",
-    required: true,
-    searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
-  },
+  locationEmirateField,
+  locationCityField,
 ];
 
 export const DYNAMIC_CATEGORY_IDS = [

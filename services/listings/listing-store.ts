@@ -232,7 +232,7 @@ export async function createListingFromAdmin(
 
 export async function patchListingRecord(
   id: string,
-  patch: AdminListingPatch,
+  patch: AdminListingPatch & Partial<Pick<Listing, "featuredRequested" | "status" | "isFeatured">>,
 ): Promise<Listing | undefined> {
   const listings = await loadListingsUncached();
   const index = listings.findIndex((item) => item.id === id);

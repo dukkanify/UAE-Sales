@@ -77,6 +77,8 @@ export type Listing = {
   condition: ListingCondition;
   status: ListingStatus;
   isFeatured: boolean;
+  /** User chose the paid featured package; stays true until payment completes. */
+  featuredRequested?: boolean;
   views: number;
   imageUrl?: string;
   seller: ListingSeller;

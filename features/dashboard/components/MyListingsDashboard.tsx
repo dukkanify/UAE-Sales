@@ -18,6 +18,10 @@ import {
   saveLocalListing,
 } from "@/services/storage";
 
+function needsFeaturedPayment(listing: Listing): boolean {
+  return Boolean(listing.featuredRequested) && !listing.isFeatured;
+}
+
 type MyListingsDashboardProps = {
   categories: Category[];
   listings: Listing[];
@@ -31,9 +35,14 @@ const statusOrder: ListingStatus[] = [
   "rejected",
 ];
 
-function readFeaturedSuccessFlag(): boolean {
-  if (typeof window === "undefined") return false;
-  return new URLSearchParams(window.location.search).get("featured") === "1";
+function readDashboardFlag(): "featured" | "pay" | "submitted" | "cancelled" | "" {
+  if (typeof window === "undefined") return "";
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("featured") === "1") return "featured";
+  if (params.get("featured") === "pay") return "pay";
+  if (params.get("featured") === "cancelled") return "cancelled";
+  if (params.get("submitted") === "1") return "submitted";
+  return "";
 }
 
 export function MyListingsDashboard({
@@ -46,7 +55,7 @@ export function MyListingsDashboard({
   const [actionMessage, setActionMessage] = useState("");
   const [actionError, setActionError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [featuredSuccess] = useState(readFeaturedSuccessFlag);
+  const dashboardFlag = readDashboardFlag();
 
   const allListings = useMemo(() => {
     const byId = new Map<string, Listing>();
@@ -54,7 +63,9 @@ export function MyListingsDashboard({
       byId.set(listing.id, overrides[listing.id] ?? listing);
     }
     for (const listing of localListings) {
-      byId.set(listing.id, overrides[listing.id] ?? listing);
+      if (!byId.has(listing.id)) {
+        byId.set(listing.id, overrides[listing.id] ?? listing);
+      }
     }
     return Array.from(byId.values());
   }, [listings, localListings, overrides]);
@@ -88,7 +99,21 @@ export function MyListingsDashboard({
 
   const successMessage =
     actionMessage ||
-    (featuredSuccess ? "تم تمييز الإعلان بنجاح." : "");
+    (dashboardFlag === "featured"
+      ? "تم تأكيد الدفع. إعلانك المميز قيد المراجعة."
+      : dashboardFlag === "submitted"
+        ? "تم استلام إعلانك وهو قيد المراجعة."
+        : dashboardFlag === "pay"
+          ? "أكمل الدفع لتمييز الإعلان قبل إرساله للمراجعة."
+          : dashboardFlag === "cancelled"
+            ? "تم إلغاء الدفع. الإعلان محفوظ في إعلاناتي — يمكنك إكمال الدفع لاحقاً."
+            : "");
+
+  useEffect(() => {
+    for (const listing of listings) {
+      saveLocalListing(listing);
+    }
+  }, [listings]);
 
   useEffect(() => {
     const syncLocalListings = () => {
@@ -105,11 +130,28 @@ export function MyListingsDashboard({
     };
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    if (dashboardFlag !== "featured" || !sessionId) return;
+    void fetch("/api/listings/confirm-featured", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ sessionId }),
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data?.listing) {
+          applyListingUpdate(data.listing as Listing);
+        }
+      })
+      .catch(() => undefined);
+  }, [dashboardFlag]);
+
   function applyListingUpdate(updated: Listing) {
     setOverrides((prev) => ({ ...prev, [updated.id]: updated }));
-    if (updated.id.startsWith("local-")) {
-      saveLocalListing(updated);
-    }
+    saveLocalListing(updated);
   }
 
   async function handleRenew(listing: Listing) {
@@ -134,20 +176,25 @@ export function MyListingsDashboard({
     }
   }
 
-  async function handleFeature(listing: Listing) {
+  async function handleFeature(listing: Listing, confirmMock = false) {
     setBusyId(listing.id);
     setActionError("");
     setActionMessage("");
     try {
       const response = await fetch(`/api/listings/${listing.id}/feature`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ confirmMock }),
       });
       const data = await response.json();
       if (!response.ok) {
         setActionError(
           data.error === "ALREADY_FEATURED"
             ? "هذا الإعلان مميز بالفعل."
-            : "تعذر بدء تمييز الإعلان.",
+            : data.error === "STRIPE_NOT_CONFIGURED"
+              ? "الدفع غير متاح حالياً. حاول لاحقاً."
+              : "تعذر بدء تمييز الإعلان.",
         );
         return;
       }
@@ -155,10 +202,19 @@ export function MyListingsDashboard({
         window.location.href = data.checkoutUrl as string;
         return;
       }
+      if (data.needsPayment && !confirmMock) {
+        setActionMessage("أكمل الدفع لتمييز الإعلان قبل إرساله للمراجعة.");
+        if (data.listing) applyListingUpdate(data.listing as Listing);
+        return;
+      }
       if (data.listing) {
         applyListingUpdate(data.listing as Listing);
       }
-      setActionMessage("تم تمييز الإعلان بنجاح.");
+      setActionMessage(
+        data.listing?.status === "pending_review"
+          ? "تم تأكيد الدفع. إعلانك المميز قيد المراجعة."
+          : "تم تمييز الإعلان بنجاح.",
+      );
     } catch {
       setActionError("تعذر بدء تمييز الإعلان.");
     } finally {
@@ -268,7 +324,20 @@ export function MyListingsDashboard({
                     تجديد
                   </Button>
                 ) : null}
-                {!listing.isFeatured && listing.status !== "expired" ? (
+                {needsFeaturedPayment(listing) ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleFeature(listing, true)}
+                    size="sm"
+                    variant="accent"
+                  >
+                    إكمال الدفع
+                  </Button>
+                ) : null}
+                {!listing.isFeatured &&
+                !needsFeaturedPayment(listing) &&
+                listing.status !== "expired" &&
+                listing.status !== "draft" ? (
                   <Button
                     loading={busyId === listing.id}
                     onClick={() => handleFeature(listing)}

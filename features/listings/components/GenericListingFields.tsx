@@ -65,15 +65,31 @@ export function GenericListingFields({ errors, listing }: GenericListingFieldsPr
               { label: "ممتاز", value: "excellent" },
             ]}
           />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
           <Select
-            defaultValue={cities.find((city) => city.name === listing.city)?.id}
-            label="الإمارة / المدينة"
-            name="city"
+            defaultValue={listing.emirate ?? listing.city}
+            label="الإمارة"
+            name="emirate"
             options={cities.map((city) => ({
               label: city.name,
-              value: city.id,
+              value: city.name,
             }))}
           />
+          <div>
+            <Input
+              defaultValue={listing.city}
+              label="المدينة / المنطقة"
+              name="city"
+              placeholder="مثال: دبي مارينا"
+            />
+            {errors.emirate ? (
+              <FormMessage variant="error">{errors.emirate}</FormMessage>
+            ) : null}
+            {errors.city ? (
+              <FormMessage variant="error">{errors.city}</FormMessage>
+            ) : null}
+          </div>
         </div>
       </div>
     </Card>

@@ -6,6 +6,7 @@ import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { FormMessage } from "@/shared/ui/FormMessage";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
 import { CategoryFieldsStep } from "./add-listing/CategoryFieldsStep";
 import { CategorySelectionStep } from "./add-listing/CategorySelectionStep";
@@ -111,12 +112,15 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
           <p className="font-medium">
-            بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث.
+            الإعلان العادي يُرسل للمراجعة مباشرة. الباقة المميزة تتطلب إتمام الدفع أولاً.
           </p>
           <Button className="shrink-0" loading={isSubmitting} type="submit">
             إرسال للمراجعة
           </Button>
         </Card>
+        {errors.submit ? (
+          <FormMessage variant="error">{errors.submit}</FormMessage>
+        ) : null}
       </div>
 
       <ListingPreviewPanel

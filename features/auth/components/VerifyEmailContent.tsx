@@ -12,11 +12,7 @@ import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 import Link from "next/link";
 
-type VerifyEmailContentProps = {
-  initialOtp?: string | null;
-};
-
-export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProps) {
+export function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailOtpEnabled = isEmailOtpEnabled();
@@ -53,7 +49,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
     [email, nextPath, purpose, router],
   );
 
-  if (!emailOtpEnabled && purpose !== "REGISTER") {
+  if (!emailOtpEnabled) {
     return (
       <div className="grid gap-3">
         <FormMessage variant="error">التحقق بالرمز غير متاح حاليًا.</FormMessage>
@@ -82,7 +78,6 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
   return (
     <OtpVerification
       email={email}
-      initialOtp={initialOtp}
       maskedEmail={maskedEmail}
       nextPath={nextPath}
       onBack={() => router.push(purpose === "REGISTER" ? "/register" : "/login")}
