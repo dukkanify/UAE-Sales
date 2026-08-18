@@ -778,6 +778,10 @@ html[data-theme="dark"] .uae-hero-sand-wash {
   min-height: 0;
 }
 
+.market-header__lang {
+  margin: 0;
+}
+
 .market-header__icon-btn--desktop {
   display: none;
 }
@@ -1263,6 +1267,76 @@ button:disabled {
 
 .theme-toggle:hover .theme-toggle__icon--sun {
   transform: rotate(18deg) scale(1.06);
+}
+
+.language-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--color-surface-muted) 80%, transparent);
+}
+
+.language-switch__label {
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.language-switch__pills {
+  display: inline-flex;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+}
+
+.language-switch__pill {
+  min-width: 3.1rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-muted);
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.language-switch__pill.is-active {
+  background: #0b1628;
+  color: #fff;
+}
+
+.language-switch--compact {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  justify-content: flex-start;
+  gap: 0;
+}
+
+.language-switch--compact .language-switch__pill {
+  min-width: 2.4rem;
+  min-height: 2rem;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.68rem;
+}
+
+html[data-theme="dark"] .language-switch {
+  background: #1a2336;
+}
+
+html[data-theme="dark"] .language-switch__pill.is-active {
+  background: #d4b87a;
+  color: #0b1628;
+}
+
+html[data-theme="dark"] .language-switch--compact {
+  background: transparent;
 }
 
 .premium-chip {

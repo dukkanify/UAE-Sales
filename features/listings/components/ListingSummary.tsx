@@ -8,6 +8,7 @@ import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -50,7 +51,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
-        {listing.title}
+        <ListingTitle listing={listing} />
       </h1>
 
       <div className="mt-4">

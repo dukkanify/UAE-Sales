@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { BRAND } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
 import { Icon } from "@/shared/ui/Icon";
 
 const trustBadges = [
@@ -114,6 +115,7 @@ export function SiteFooter() {
 
         <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs font-medium text-muted">{BRAND.copyright}</p>
+          <LanguageSwitch className="!mt-0" variant="compact" />
           <div className="hidden items-center gap-2 sm:flex">
             {quickActions.map((action) => (
               <Link
