@@ -13,11 +13,9 @@
 }
 
 @media (min-width: 1024px) {
+  /* SiteHeader already has search + أضف إعلانك here — don't pin a FAB on top of them. */
   .sticky-search-dock {
-    top: 4.75rem;
-    bottom: auto;
-    justify-content: flex-end;
-    padding-inline: max(1.5rem, calc((100% - var(--container-width)) / 2 + 1.5rem));
+    display: none;
   }
 }
 
@@ -109,19 +107,6 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@media (min-width: 1024px) {
-  @keyframes sticky-search-in {
-    from {
-      opacity: 0;
-      transform: translateY(-8px) scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
   }
 }
 
