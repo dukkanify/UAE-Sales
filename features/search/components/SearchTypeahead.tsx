@@ -12,12 +12,9 @@ import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { searchTextMatches } from "@/shared/listings/search-text";
 import { Icon } from "@/shared/ui/Icon";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
+import type { SearchSuggestion } from "@/features/search/types";
 
-export type SearchSuggestion = {
-  href?: string;
-  label: string;
-  kind: "query" | "category" | "city" | "listing" | "recent" | "saved";
-};
+export type { SearchSuggestion };
 
 type SearchTypeaheadProps = {
   compact?: boolean;
@@ -35,6 +32,8 @@ function kindLabel(kind: SearchSuggestion["kind"]) {
   if (kind === "listing") return "إعلان";
   if (kind === "recent") return "سابق";
   if (kind === "saved") return "محفوظ";
+  if (kind === "brand") return "ماركة";
+  if (kind === "model") return "موديل";
   return "بحث";
 }
 
@@ -55,6 +54,7 @@ export function SearchTypeahead({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [recent, setRecent] = useState<string[]>([]);
   const [saved, setSaved] = useState<SavedSearch[]>([]);
+  const [remote, setRemote] = useState<SearchSuggestion[]>([]);
 
   if (syncedDefault !== defaultValue) {
     setSyncedDefault(defaultValue);
@@ -88,6 +88,34 @@ export function SearchTypeahead({
     return () => window.removeEventListener("mousedown", onPointerDown);
   }, []);
 
+  useEffect(() => {
+    const query = value.trim();
+    if (!query) return;
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams({ q: query });
+      if (selectedFilters.category) params.set("category", selectedFilters.category);
+      if (selectedFilters.city) params.set("city", selectedFilters.city);
+      void fetch(`/api/search/suggest?${params.toString()}`, {
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((data) => {
+          const items = Array.isArray(data?.items) ? data.items : [];
+          setRemote(items as SearchSuggestion[]);
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) setRemote([]);
+        });
+    }, 80);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [selectedFilters.category, selectedFilters.city, value]);
+
   const items = useMemo(() => {
     const normalized = value.trim().toLowerCase();
     const next: SearchSuggestion[] = [];
@@ -110,8 +138,7 @@ export function SearchTypeahead({
       return next;
     }
 
-    for (const suggestion of suggestions) {
-      if (!searchTextMatches(suggestion.label, normalized)) continue;
+    for (const suggestion of remote) {
       next.push({
         ...suggestion,
         href:
@@ -121,7 +148,21 @@ export function SearchTypeahead({
       if (next.length >= 8) break;
     }
 
-    if (next.length === 0 && normalized.length >= 2) {
+    if (next.length < 8) {
+      for (const suggestion of suggestions) {
+        if (!searchTextMatches(suggestion.label, normalized)) continue;
+        if (next.some((item) => item.label === suggestion.label)) continue;
+        next.push({
+          ...suggestion,
+          href:
+            suggestion.href ??
+            buildSearchUrl({ ...selectedFilters, query: suggestion.label }),
+        });
+        if (next.length >= 8) break;
+      }
+    }
+
+    if (next.length === 0 && normalized.length >= 1) {
       next.push({
         kind: "query",
         label: value.trim(),
@@ -130,7 +171,7 @@ export function SearchTypeahead({
     }
 
     return next;
-  }, [recent, saved, selectedFilters, suggestions, value]);
+  }, [recent, remote, saved, selectedFilters, suggestions, value]);
 
   function choose(item: SearchSuggestion) {
     setValue(item.label);
