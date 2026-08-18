@@ -6,6 +6,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { primaryNavigation } from "@/shared/constants/navigation";
+import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
@@ -50,6 +51,7 @@ export function MobileHomeHeader() {
 
   return (
     <header className="mobile-home-header">
+      <VerifyAccountBanner />
       <div className="mobile-home-header__bar">
         <div className="mobile-home-header__side mobile-home-header__side--start">
           <button

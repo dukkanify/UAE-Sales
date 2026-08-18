@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
+import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
@@ -68,6 +69,7 @@ export function MarketHeader() {
 
   return (
     <header className="market-header sticky top-0 z-50">
+      <VerifyAccountBanner />
       <div className="market-header__accent" aria-hidden />
       <div className="app-container">
         <div className="market-header__bar">
