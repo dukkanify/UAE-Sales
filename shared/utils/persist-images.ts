@@ -1,6 +1,5 @@
 const MAX_EDGE = 960;
 const JPEG_QUALITY = 0.72;
-const MAX_IMAGES = 6;
 
 function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -38,6 +37,5 @@ async function fileToDataUrl(file: File): Promise<string> {
 }
 
 export async function persistImageFiles(files: File[]): Promise<string[]> {
-  const selected = files.slice(0, MAX_IMAGES);
-  return Promise.all(selected.map((file) => fileToDataUrl(file)));
+  return Promise.all(files.map((file) => fileToDataUrl(file)));
 }

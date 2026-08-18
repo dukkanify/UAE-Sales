@@ -70,7 +70,7 @@ export function ListingMediaSection({
               <span className="mt-2 block text-xs font-medium text-muted">
                 {totalImages > 0
                   ? `${totalImages} صورة`
-                  : "اختر حتى 6 صور"}
+                  : "أضف صوراً بلا حد — الصورة الأولى هي الغلاف"}
               </span>
             </span>
           </label>

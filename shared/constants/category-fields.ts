@@ -306,6 +306,18 @@ const serviceFields: CategoryFieldDefinition[] = [
 
 const foodFields: CategoryFieldDefinition[] = [
   {
+    key: "saleType",
+    label: "نوع العرض",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "للبيع", value: "للبيع" },
+      { label: "الجملة", value: "الجملة" },
+    ],
+  },
+  {
     key: "cuisine",
     label: "نوع المطبخ",
     type: "select",
@@ -328,6 +340,7 @@ const foodFields: CategoryFieldDefinition[] = [
     label: "الحصة / الكمية",
     type: "text",
     required: true,
+    titlePart: true,
     searchable: true,
     placeholder: "مثال: وجبة لشخصين",
   },

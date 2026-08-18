@@ -141,13 +141,19 @@ export function MyListingsDashboard({
     try {
       const response = await fetch(`/api/listings/${listing.id}/feature`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing }),
       });
       const data = await response.json();
       if (!response.ok) {
         setActionError(
           data.error === "ALREADY_FEATURED"
             ? "هذا الإعلان مميز بالفعل."
-            : "تعذر بدء تمييز الإعلان.",
+            : data.error === "UNAUTHORIZED"
+              ? "سجّل الدخول من جديد لإتمام دفع الباقة."
+              : data.error === "STRIPE_NOT_CONFIGURED"
+                ? "بوابة الدفع غير مفعّلة حالياً."
+                : "تعذر بدء تمييز الإعلان.",
         );
         return;
       }

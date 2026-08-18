@@ -5,6 +5,7 @@ import { EscrowProtectionCard } from "@/features/listings/components/EscrowProte
 import { ListingPlatformNotice } from "@/features/listings/components/ListingPlatformNotice";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
+import { ListingVideoEmbed } from "@/features/listings/components/ListingVideoEmbed";
 import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
 import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
 import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
@@ -52,19 +53,7 @@ export function ListingDetailsView({
           <div className="min-w-0 lg:col-start-1">
             <ListingGallery listing={listing} />
 
-            {listing.videoUrl ? (
-              <div className="marketplace-panel mt-4 p-4">
-                <p className="text-sm font-semibold text-ink">فيديو الإعلان</p>
-                <a
-                  className="mt-1 block break-all text-sm font-medium text-primary underline-offset-2 hover:underline"
-                  href={listing.videoUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {listing.videoUrl}
-                </a>
-              </div>
-            ) : null}
+            {listing.videoUrl ? <ListingVideoEmbed url={listing.videoUrl} /> : null}
 
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">

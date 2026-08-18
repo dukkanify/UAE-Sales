@@ -3,6 +3,10 @@
 import type { Category, Listing } from "@/types";
 import { getCheckoutListingParam } from "@/shared/listings/listing-ownership";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
+import {
+  getListingOfferBadge,
+  listingShowsItemCondition,
+} from "@/shared/listings/listing-condition";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
 import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
@@ -24,12 +28,6 @@ const conditionVariants: Record<Listing["condition"], "new" | "muted" | "premium
   used: "muted",
 };
 
-const conditionLabels: Record<Listing["condition"], string> = {
-  excellent: "ممتاز",
-  new: "جديد",
-  used: "مستعمل",
-};
-
 export function ListingSummary({ category, listing }: ListingSummaryProps) {
   const locationLabel = listing.area
     ? `${listing.area}، ${listing.emirate ?? listing.city}`
@@ -41,9 +39,21 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
     <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
-        <Badge variant={conditionVariants[listing.condition]}>
-          {conditionLabels[listing.condition]}
-        </Badge>
+        {(() => {
+          const offer = getListingOfferBadge(listing);
+          if (!offer) return null;
+          return (
+            <Badge
+              variant={
+                listingShowsItemCondition(listing)
+                  ? conditionVariants[listing.condition]
+                  : "muted"
+              }
+            >
+              {offer}
+            </Badge>
+          );
+        })()}
         {showsEscrowProtection(listing) ? (
           <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}

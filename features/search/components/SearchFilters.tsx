@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Category, City } from "@/types";
+import { categoryUsesItemCondition } from "@/shared/listings/listing-condition";
 import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
@@ -59,6 +60,9 @@ export function SearchFilters({
 }: SearchFiltersProps) {
   const isSidebar = layout === "sidebar";
   const [mobileOpen, setMobileOpen] = useState(false);
+  const showCondition =
+    !selectedFilters.category ||
+    categoryUsesItemCondition(selectedFilters.category);
 
   useEffect(() => {
     const media = window.matchMedia("(min-width: 1024px)");
@@ -128,12 +132,14 @@ export function SearchFilters({
               ]}
             />
           ) : null}
-          <Select
-            defaultValue={selectedFilters.condition}
-            label="الحالة"
-            name="condition"
-            options={conditionOptions}
-          />
+          {showCondition ? (
+            <Select
+              defaultValue={selectedFilters.condition}
+              label="الحالة"
+              name="condition"
+              options={conditionOptions}
+            />
+          ) : null}
           <Input
             defaultValue={selectedFilters.minPrice}
             inputMode="numeric"
@@ -260,13 +266,15 @@ export function SearchFilters({
             </summary>
             <div className="grid gap-2 border-t border-border/70 px-3 pt-2.5">
               <div className={showCategory ? "grid grid-cols-2 gap-2" : ""}>
-                <Select
-                  compact
-                  defaultValue={selectedFilters.condition}
-                  label="الحالة"
-                  name="condition"
-                  options={conditionOptions}
-                />
+                {showCondition ? (
+                  <Select
+                    compact
+                    defaultValue={selectedFilters.condition}
+                    label="الحالة"
+                    name="condition"
+                    options={conditionOptions}
+                  />
+                ) : null}
                 {showCategory ? (
                   <Select
                     compact

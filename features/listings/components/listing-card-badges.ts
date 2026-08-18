@@ -1,4 +1,5 @@
 import type { Listing } from "@/types";
+import { listingShowsItemCondition } from "@/shared/listings/listing-condition";
 
 export type ListingCardBadgeKey = "urgent" | "featured" | "verified" | "new";
 
@@ -17,8 +18,7 @@ export function isListingVerified(listing: Listing): boolean {
 }
 
 export function isListingFresh(listing: Listing): boolean {
-  // Only use stable listing fields — Date.now() age checks cause SSR/client hydration mismatches.
-  return listing.condition === "new";
+  return listingShowsItemCondition(listing) && listing.condition === "new";
 }
 
 export function isListingUrgent(listing: Listing): boolean {

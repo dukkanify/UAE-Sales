@@ -17,6 +17,10 @@ import {
 import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
+import {
+  getListingOfferBadge,
+  listingShowsItemCondition,
+} from "@/shared/listings/listing-condition";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getCheckoutPath, getListingCanonicalUrl } from "@/shared/listings/listing-url";
 import {
@@ -43,12 +47,6 @@ const conditionVariants: Record<Listing["condition"], "new" | "muted" | "premium
   used: "muted",
 };
 
-const conditionLabels: Record<Listing["condition"], string> = {
-  excellent: "ممتاز",
-  new: "جديد",
-  used: "مستعمل",
-};
-
 export function ListingStickyPanel({ category, listing }: ListingStickyPanelProps) {
   const config = getListingActionConfig(listing);
   const user = typeof window !== "undefined" ? getSessionUser() : null;
@@ -64,9 +62,21 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
     <Card className="marketplace-panel w-full min-w-0 p-6">
         <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
-        <Badge variant={conditionVariants[listing.condition]}>
-          {conditionLabels[listing.condition]}
-        </Badge>
+        {(() => {
+          const offer = getListingOfferBadge(listing);
+          if (!offer) return null;
+          return (
+            <Badge
+              variant={
+                listingShowsItemCondition(listing)
+                  ? conditionVariants[listing.condition]
+                  : "muted"
+              }
+            >
+              {offer}
+            </Badge>
+          );
+        })()}
         {showsEscrowProtection(listing) ? (
           <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
         ) : null}

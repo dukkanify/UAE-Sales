@@ -34,18 +34,10 @@ function hasFieldValue(value: string | string[]): boolean {
 
 function normalizeCondition(value: string): ListingCondition {
   const normalized = value.trim().toLowerCase();
-  if (
-    normalized === "new" ||
-    value === "جديد" ||
-    value === "جديدة"
-  ) {
+  if (normalized === "new" || value === "جديد" || value === "جديدة") {
     return "new";
   }
-  if (
-    normalized === "excellent" ||
-    value === "ممتاز" ||
-    value === "ممتازة"
-  ) {
+  if (normalized === "excellent" || value === "ممتاز" || value === "ممتازة") {
     return "excellent";
   }
   return "used";
@@ -58,7 +50,6 @@ export function parseCategoryForm(
   const errors: Record<string, string> = {};
   const categorySpecs: CategorySpecs = {};
   let features: string[] = [];
-  let condition: ListingCondition = "used";
   let city = "";
   let emirate: string | undefined;
 
@@ -84,6 +75,8 @@ export function parseCategoryForm(
   }
 
   const fields = getCategoryFields(categoryId);
+  const hasConditionField = fields.some((field) => field.key === "condition");
+  let condition: ListingCondition = hasConditionField ? "used" : "new";
 
   for (const field of fields) {
     const raw = readFieldValue(formData, field);
@@ -92,6 +85,8 @@ export function parseCategoryForm(
       const values = raw as string[];
       if (field.key === "features" && values.length > 0) {
         features = values;
+      } else if (values.length > 0) {
+        categorySpecs[field.key] = values.join(" · ");
       }
       continue;
     }
@@ -106,11 +101,17 @@ export function parseCategoryForm(
 
     if (field.key === "condition") {
       condition = normalizeCondition(value);
-    } else if (field.key === "city") {
+      categorySpecs[field.key] = condition;
+      continue;
+    }
+
+    if (field.key === "city") {
       city = value;
     } else if (field.key === "emirate") {
       emirate = value;
-    } else if (field.type === "number") {
+    }
+
+    if (field.type === "number") {
       const numeric = Number(value);
       if (!Number.isFinite(numeric)) {
         errors[field.key] = `${field.label} يجب أن يكون رقماً.`;

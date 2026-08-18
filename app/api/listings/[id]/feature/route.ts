@@ -4,17 +4,28 @@ import {
   requireSessionUser,
 } from "@/services/auth/require-session";
 import { initiateFeaturedCheckout } from "@/services/payments/featured-checkout.service";
+import type { Listing } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function POST(_request: Request, { params }: RouteParams) {
+export async function POST(request: Request, { params }: RouteParams) {
   const user = await requireSessionUser();
   if (!isSessionUser(user)) return user;
 
   const { id } = await params;
+  let listingPayload: Listing | undefined;
+  try {
+    const text = await request.text();
+    if (text) {
+      const body = JSON.parse(text) as { listing?: Listing };
+      listingPayload = body.listing;
+    }
+  } catch {
+    listingPayload = undefined;
+  }
 
   try {
-    const result = await initiateFeaturedCheckout(id, user.id);
+    const result = await initiateFeaturedCheckout(id, user.id, listingPayload);
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";

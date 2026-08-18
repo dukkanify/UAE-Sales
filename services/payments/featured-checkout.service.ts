@@ -6,12 +6,14 @@ import {
 import {
   getListingById,
   setListingFeatured,
+  upsertListing,
 } from "@/services/listings/listing-store";
 import {
   isMockCheckoutAllowed,
   isStripeConfigured,
 } from "@/services/payments/payment-config";
 import { createFeaturedCheckoutSession } from "@/services/payments/stripe.service";
+import type { Listing } from "@/types";
 import { findUserById } from "@/services/auth/user-store";
 
 export type FeaturedCheckoutResult = {
@@ -25,8 +27,18 @@ export type FeaturedCheckoutResult = {
 export async function initiateFeaturedCheckout(
   listingId: string,
   userId: string,
+  listingPayload?: Listing,
 ): Promise<FeaturedCheckoutResult> {
-  const listing = await getListingById(listingId);
+  let listing = await getListingById(listingId);
+  if (!listing && listingPayload?.id === listingId) {
+    listing = await upsertListing({
+      ...listingPayload,
+      seller: {
+        ...listingPayload.seller,
+        id: userId,
+      },
+    });
+  }
   if (!listing) {
     throw new Error("LISTING_NOT_FOUND");
   }
@@ -81,6 +93,10 @@ export async function initiateFeaturedCheckout(
     status: "pending",
     stripeSessionId: session.sessionId,
   });
+
+  if (!session.checkoutUrl) {
+    throw new Error("CHECKOUT_URL_MISSING");
+  }
 
   return {
     mode: "checkout",
