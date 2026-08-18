@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/shared/ui/Icon";
+import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 
 /**
  * Pins a compact search control while scrolling once the hero search
@@ -57,13 +58,13 @@ export function StickySearchDock() {
       {expanded ? (
         <form action="/search" className="sticky-search-dock__form motion-rise">
           <Icon className="sticky-search-dock__icon" name="search" size={18} />
-          <input
+          <SearchTypeahead
             autoFocus
-            aria-label="كلمة البحث"
-            className="sticky-search-dock__input"
+            hideIcon
+            label=""
             name="q"
             placeholder="ابحث في سوقنا..."
-            type="search"
+            variant="dock"
           />
           <button className="sticky-search-dock__submit motion-press" type="submit">
             بحث

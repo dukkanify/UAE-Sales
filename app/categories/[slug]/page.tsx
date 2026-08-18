@@ -7,7 +7,6 @@ import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomN
 import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
-import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { ChipLink } from "@/shared/ui/ChipLink";
@@ -17,7 +16,6 @@ import {
   getCategories,
   getCategoryBySlug,
 } from "@/services/categories";
-import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
@@ -87,7 +85,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings, suggestionTitles] = await Promise.all([
+  const [categories, listings] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -108,15 +106,7 @@ export default async function CategoryPage({
           ? selectedFilters.sort
           : "newest",
     }),
-    getSearchSuggestionTitles(),
   ]);
-
-  const suggestions = buildSearchSuggestions({
-    categories,
-    cities,
-    listings: suggestionTitles,
-    selectedFilters,
-  });
 
   return (
     <>
@@ -154,7 +144,6 @@ export default async function CategoryPage({
                 layout="sidebar"
                 selectedFilters={selectedFilters}
                 showCategory={false}
-                suggestions={suggestions}
               />
             </aside>
 

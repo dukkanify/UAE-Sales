@@ -3,6 +3,7 @@
 import type { Category } from "@/types";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import {
   HOME_SEARCH_LABELS,
   HOME_SEARCH_PRICE_OPTIONS,
@@ -22,18 +23,15 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
       <div className="market-hero-search__accent" />
       <div className="p-4 sm:p-5 md:p-6">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1.35fr_0.9fr_0.9fr_0.9fr_auto] lg:items-end lg:gap-3">
-          <label className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
+          <div className="grid gap-1.5 sm:col-span-2 lg:col-span-1">
             <span className="market-hero-search__label">{HOME_SEARCH_LABELS.query}</span>
-            <div className="market-hero-search__field flex min-h-14 items-center gap-3 px-4">
-              <Icon className="shrink-0 text-[#B8955F]" name="search" size={20} />
-              <input
-                className="w-full bg-transparent text-base font-semibold text-ink outline-none placeholder:text-muted/50"
-                name="q"
-                placeholder={HOME_SEARCH_LABELS.queryPlaceholder}
-                type="search"
-              />
-            </div>
-          </label>
+            <SearchTypeahead
+              label=""
+              name="q"
+              placeholder={HOME_SEARCH_LABELS.queryPlaceholder}
+              variant="hero"
+            />
+          </div>
 
           <label className="grid gap-1.5">
             <span className="market-hero-search__label">{HOME_SEARCH_LABELS.category}</span>

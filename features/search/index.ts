@@ -1,3 +1,4 @@
+export type { SearchSuggestion, SearchSuggestionKind } from "./types";
 export { SavedSearches } from "./components/SavedSearches";
 export { SearchFilterChips } from "./components/SearchFilterChips";
 export { SearchFilters } from "./components/SearchFilters";
