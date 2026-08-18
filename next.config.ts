@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     imageSizes: [64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30,
+    qualities: [75, 78],
     remotePatterns: [
       {
         hostname: "images.unsplash.com",
