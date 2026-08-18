@@ -46,7 +46,8 @@ type IconName =
   | "sport"
   | "food"
   | "moon"
-  | "sun";
+  | "sun"
+  | "globe";
 
 export type { IconName };
 
@@ -122,6 +123,8 @@ const paths: Partial<Record<IconName, string>> = {
   food: "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
   moon: "M21 14.3A8.5 8.5 0 1 1 9.7 3 7 7 0 0 0 21 14.3Z",
   sun: "M12 4V2M12 22v-2M4.9 4.9 3.5 3.5M20.5 20.5 19.1 19.1M4 12H2M22 12h-2M4.9 19.1 3.5 20.5M20.5 3.5 19.1 4.9M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z",
+  globe:
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 4 9 15 15 0 0 1-4 9 15 15 0 0 1-4-9 15 15 0 0 1 4-9Z",
 };
 
 const MENU_LINES = ["M4 7h16", "M4 12h16", "M4 17h16"] as const;

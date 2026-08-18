@@ -5,8 +5,11 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
+import { LanguageSelect } from "@/shared/components/LanguageSelect";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { NotificationBell } from "@/shared/components/NotificationBell";
+import { useT } from "@/shared/i18n/useLocale";
+import type { MessageKey } from "@/shared/i18n/messages";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -14,12 +17,12 @@ import { getSessionUser } from "@/services/storage";
 import type { UserProfile } from "@/types";
 
 const nav = [
-  { href: "/", icon: "home" as const, label: "الرئيسية" },
-  { href: "/categories", icon: "grid" as const, label: "التصنيفات" },
-  { href: "/featured", icon: "star" as const, label: "المميزة" },
-  { href: "/escrow", icon: "shield" as const, label: "الضمان" },
-  { href: "/search", icon: "search" as const, label: "استكشف" },
-];
+  { href: "/", icon: "home" as const, labelKey: "nav.home" as const },
+  { href: "/categories", icon: "grid" as const, labelKey: "nav.categories" as const },
+  { href: "/featured", icon: "star" as const, labelKey: "nav.featured" as const },
+  { href: "/escrow", icon: "shield" as const, labelKey: "nav.escrow" as const },
+  { href: "/search", icon: "search" as const, labelKey: "nav.search" as const },
+] satisfies { href: string; icon: "home" | "grid" | "star" | "shield" | "search"; labelKey: MessageKey }[];
 
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
@@ -28,6 +31,7 @@ function isActivePath(pathname: string, href: string) {
 
 export function MarketHeader() {
   const pathname = usePathname();
+  const t = useT();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -74,7 +78,7 @@ export function MarketHeader() {
         <div className="market-header__bar">
           <BrandLogo showTagline={false} size="md" />
 
-          <nav aria-label="التنقل الرئيسي" className="market-header__nav">
+          <nav aria-label={t("drawer.nav")} className="market-header__nav">
             {nav.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
@@ -84,7 +88,7 @@ export function MarketHeader() {
                   className={`market-header__nav-link${active ? " is-active" : ""}`}
                   href={item.href}
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               );
             })}
@@ -96,11 +100,13 @@ export function MarketHeader() {
               variant="desktop"
             />
 
+            <LanguageSelect className="hidden lg:inline-flex" />
+
             <div className="market-header__cluster">
               <ThemeToggle className="market-header__icon-btn" />
 
               <Link
-                aria-label="بحث"
+                aria-label={t("action.search")}
                 className="market-header__icon-btn"
                 href="/search"
               >
@@ -111,7 +117,7 @@ export function MarketHeader() {
 
               {user ? (
                 <Link
-                  aria-label="حسابي"
+                  aria-label={t("action.account")}
                   className="market-header__icon-btn market-header__icon-btn--desktop"
                   href="/profile"
                 >
@@ -119,19 +125,19 @@ export function MarketHeader() {
                 </Link>
               ) : (
                 <Link className="market-header__join-link" href="/login">
-                  سجّل الدخول وانضم إلينا
+                  {t("action.join")}
                 </Link>
               )}
             </div>
 
             <Link className="market-header__cta hidden sm:inline-flex" href="/listings/new">
               <Icon name="plus" size={15} />
-              <span>أضف إعلانك</span>
+              <span>{t("action.addListing")}</span>
             </Link>
 
             <button
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "إغلاق القائمة" : "القائمة"}
+              aria-label={menuOpen ? t("action.closeMenu") : t("action.menu")}
               className="market-header__menu-btn lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
@@ -142,14 +148,16 @@ export function MarketHeader() {
         </div>
 
         {menuOpen ? (
-          <nav aria-label="قائمة الجوال" className="market-header__drawer lg:hidden">
+          <nav aria-label={t("drawer.mobileNav")} className="market-header__drawer lg:hidden">
             <div className="market-header__drawer-top">
               <div>
-                <p className="market-header__drawer-eyebrow">تصفّح سوقنا</p>
-                <p className="market-header__drawer-title">كل الأقسام في مكان واحد</p>
+                <p className="market-header__drawer-eyebrow">{t("drawer.browse")}</p>
+                <p className="market-header__drawer-title">{t("drawer.title")}</p>
               </div>
               <EmirateLocationSelect className="market-header__drawer-location" variant="mobile" />
             </div>
+
+            <LanguageSelect className="mb-3" variant="drawer" />
 
             <div className="market-header__drawer-grid">
               {nav.map((item) => {
@@ -164,9 +172,9 @@ export function MarketHeader() {
                     <span className="market-header__drawer-icon">
                       <Icon name={item.icon} size={17} />
                     </span>
-                    <span className="flex-1 text-start">{item.label}</span>
+                    <span className="flex-1 text-start">{t(item.labelKey)}</span>
                     {active ? (
-                      <span className="market-header__drawer-now">الحالي</span>
+                      <span className="market-header__drawer-now">{t("label.current")}</span>
                     ) : (
                       <Icon className="opacity-40" name="chevron-left" size={14} />
                     )}
@@ -182,7 +190,7 @@ export function MarketHeader() {
                 onClick={() => setMenuOpen(false)}
               >
                 <Icon name="user" size={16} />
-                {user ? user.fullName.split(" ")[0] : "سجّل الدخول وانضم إلينا"}
+                {user ? user.fullName.split(" ")[0] : t("action.join")}
               </Link>
               <Link
                 className="market-header__drawer-account"
@@ -190,7 +198,7 @@ export function MarketHeader() {
                 onClick={() => setMenuOpen(false)}
               >
                 <Icon name="bell" size={16} />
-                الإشعارات
+                {t("action.notifications")}
               </Link>
               <Button
                 className="sooqna-gold-gradient rounded-full"
@@ -201,7 +209,7 @@ export function MarketHeader() {
                 variant="accent"
               >
                 <Icon name="plus" size={16} />
-                أضف إعلانك
+                {t("action.addListing")}
               </Button>
             </div>
           </nav>

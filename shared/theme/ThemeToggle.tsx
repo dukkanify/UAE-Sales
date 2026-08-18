@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { useT } from "@/shared/i18n/useLocale";
 import { Icon } from "@/shared/ui/Icon";
 import {
   getResolvedTheme,
@@ -33,11 +34,12 @@ function getServerSnapshot(): ThemeMode {
 
 export function ThemeToggle({ className = "" }: ThemeToggleProps) {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const t = useT();
   const isDark = theme === "dark";
 
   return (
     <button
-      aria-label={isDark ? "التبديل إلى الوضع الفاتح" : "التبديل إلى الوضع الليلي"}
+      aria-label={isDark ? t("theme.toLight") : t("theme.toDark")}
       className={`theme-toggle motion-press focus-ring grid size-10 shrink-0 place-items-center rounded-[var(--radius-xl)] border border-border bg-surface text-ink shadow-[var(--shadow-xs)] transition hover:border-secondary/50 ${className}`}
       onClick={() => {
         toggleTheme();

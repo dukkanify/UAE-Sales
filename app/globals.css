@@ -197,6 +197,100 @@ textarea {
   border: 0;
 }
 
+.language-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.language-select__globe {
+  display: none;
+  flex-shrink: 0;
+  color: var(--color-secondary);
+}
+
+@media (min-width: 1024px) {
+  .language-select--header .language-select__globe {
+    display: block;
+  }
+}
+
+.language-select__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.language-select__track {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.14rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface-muted) 70%, var(--color-surface));
+}
+
+.language-select__btn {
+  display: inline-flex;
+  min-height: 1.7rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.55rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 160ms var(--ease-premium),
+    color 160ms var(--ease-premium);
+}
+
+.language-select__full {
+  display: none;
+}
+
+.language-select--drawer .language-select__full {
+  display: inline;
+}
+
+.language-select--drawer .language-select__short {
+  display: none;
+}
+
+.language-select--drawer {
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.language-select--drawer .language-select__btn {
+  min-height: 2rem;
+  padding-inline: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.language-select__btn.is-active {
+  background: #0b1628;
+  color: #e2c882;
+  box-shadow: 0 6px 14px rgb(11 22 40 / 18%);
+}
+
+html[data-theme="dark"] .language-select__btn.is-active {
+  background: #e2c882;
+  color: #0b1628;
+}
+
+html[data-locale="en"] body {
+  font-family: var(--font-latin), var(--font-arabic), system-ui, sans-serif;
+}
+
 .notification-bell {
   position: relative;
 }

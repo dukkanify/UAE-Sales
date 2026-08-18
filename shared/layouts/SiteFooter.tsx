@@ -1,22 +1,48 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { APP_STORE_LINKS, BRAND } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
+import { useT } from "@/shared/i18n/useLocale";
+import type { MessageKey } from "@/shared/i18n/messages";
 import { Icon } from "@/shared/ui/Icon";
 import "./site-footer.css";
 
 const trustBadges = [
-  { icon: "shield" as const, label: "ضمان مالي" },
-  { icon: "wallet" as const, label: "دفع آمن" },
-  { icon: "message" as const, label: "دعم 24/7" },
+  { icon: "shield" as const, labelKey: "footer.trustEscrow" as const },
+  { icon: "wallet" as const, labelKey: "footer.trustPay" as const },
+  { icon: "message" as const, labelKey: "footer.trustSupport" as const },
 ];
 
 const quickActions = [
-  { href: "/support", icon: "message" as const, label: "الدعم" },
-  { href: "/escrow", icon: "shield" as const, label: "الضمان المالي" },
-  { href: "/listings/new", icon: "plus" as const, label: "أضف إعلانك" },
+  { href: "/support", icon: "message" as const, labelKey: "footer.support" as const },
+  { href: "/escrow", icon: "shield" as const, labelKey: "footer.trustEscrow" as const },
+  { href: "/listings/new", icon: "plus" as const, labelKey: "action.addListing" as const },
 ];
+
+const groupKeys: Record<string, MessageKey> = {
+  السوق: "footer.group.market",
+  الإمارات: "footer.group.emirates",
+  حسابك: "footer.group.account",
+  "الدعم والسياسات": "footer.group.support",
+};
+
+const linkKeys: Record<string, MessageKey> = {
+  "/search": "footer.link.allAds",
+  "/categories": "footer.link.categories",
+  "/featured": "footer.link.featured",
+  "/listings/new": "footer.link.add",
+  "/login": "footer.link.login",
+  "/register": "footer.link.register",
+  "/dashboard/listings": "footer.link.myAds",
+  "/profile#notifications": "footer.link.notifications",
+  "/escrow": "footer.link.escrowHow",
+  "/support": "footer.link.contact",
+  "/terms": "footer.link.terms",
+  "/privacy": "footer.link.privacy",
+};
 
 type FooterGroup = (typeof footerLinks)[number];
 
@@ -79,12 +105,13 @@ function StoreBadge({
 }
 
 function FooterLinkList({ links }: { links: FooterGroup["links"] }) {
+  const t = useT();
   return (
     <ul className="site-footer__links">
       {links.map((link) => (
         <li key={`${link.href}-${link.label}`}>
           <Link className="site-footer__link" href={link.href}>
-            {link.label}
+            {linkKeys[link.href] ? t(linkKeys[link.href]) : link.label}
           </Link>
         </li>
       ))}
@@ -93,11 +120,13 @@ function FooterLinkList({ links }: { links: FooterGroup["links"] }) {
 }
 
 function FooterLinkGroup({ group }: { group: FooterGroup }) {
+  const t = useT();
+  const title = groupKeys[group.title] ? t(groupKeys[group.title]) : group.title;
   return (
     <>
       <details className="site-footer__accordion lg:hidden">
         <summary>
-          {group.title}
+          {title}
           <Icon className="site-footer__chevron" name="chevron-left" size={16} />
         </summary>
         <div className="pb-3.5">
@@ -106,7 +135,7 @@ function FooterLinkGroup({ group }: { group: FooterGroup }) {
       </details>
 
       <div className="hidden lg:block">
-        <h3 className="site-footer__group-title">{group.title}</h3>
+        <h3 className="site-footer__group-title">{title}</h3>
         <FooterLinkList links={group.links} />
       </div>
     </>
@@ -114,10 +143,11 @@ function FooterLinkGroup({ group }: { group: FooterGroup }) {
 }
 
 function TrustSeal() {
+  const t = useT();
   return (
-    <Link aria-label="الضمان المالي في سوقنا" className="site-footer-seal" href="/escrow">
+    <Link aria-label={t("footer.trustEscrow")} className="site-footer-seal" href="/escrow">
       <span>
-        <span className="site-footer-seal__label">ضمان مالي</span>
+        <span className="site-footer-seal__label">{t("footer.trustEscrow")}</span>
         <span className="site-footer-seal__sub">{BRAND.nameAr}</span>
       </span>
     </Link>
@@ -125,21 +155,22 @@ function TrustSeal() {
 }
 
 export function SiteFooter() {
+  const t = useT();
   return (
-    <footer aria-label={`تذييل ${BRAND.nameAr}`} className="site-footer">
+    <footer aria-label={`${BRAND.nameAr} footer`} className="site-footer">
       <div className="site-footer__gold-line" />
 
-      <section aria-label={`تطبيق ${BRAND.nameAr}`} className="site-footer__app">
+      <section aria-label={t("footer.appKicker")} className="site-footer__app">
         <div className="app-container site-footer__app-inner">
           <div>
             <p className="site-footer__app-kicker">
               <Icon name="phone" size={14} />
-              تطبيق {BRAND.nameAr}
+              {t("footer.appKicker")}
             </p>
             <p className="site-footer__app-title">
-              أفضل العروض في أي وقت وأي مكان.
+              {t("footer.appLead")}
               <br />
-              <em>حمّل تطبيق {BRAND.nameAr} الآن</em>
+              <em>{t("footer.appCta")}</em>
             </p>
           </div>
 
@@ -185,12 +216,12 @@ export function SiteFooter() {
         <div className="site-footer__grid">
           <div>
             <BrandLogo href="/" showTagline size="md" />
-            <p className="site-footer__brand-copy">{BRAND.description}</p>
+            <p className="site-footer__brand-copy">{t("brand.description")}</p>
             <div className="site-footer__trust">
               {trustBadges.map((badge) => (
-                <span className="site-footer__trust-chip" key={badge.label}>
+                <span className="site-footer__trust-chip" key={badge.labelKey}>
                   <Icon className="text-secondary" name={badge.icon} size={13} />
-                  {badge.label}
+                  {t(badge.labelKey)}
                 </span>
               ))}
             </div>
@@ -199,7 +230,7 @@ export function SiteFooter() {
               href="/listings/new"
             >
               <Icon name="plus" size={16} />
-              أضف إعلانك مجاناً
+              {t("action.addListingFree")}
             </Link>
             <p className="mt-4 text-xs text-muted">
               <Link className="hover:text-ink" href={`mailto:${BRAND.supportEmail}`}>
@@ -219,15 +250,15 @@ export function SiteFooter() {
       <div className="site-footer__legal">
         <div className="app-container site-footer__legal-inner">
           <div className="min-w-0">
-            <p className="site-footer__copyright">{BRAND.copyright}</p>
-            <p className="site-footer__credit">تطوير وتنفيذ: دكانيفاي</p>
+            <p className="site-footer__copyright">{t("footer.copyright")}</p>
+            <p className="site-footer__credit">{t("footer.credit")}</p>
           </div>
 
           <div className="site-footer__actions">
             {quickActions.map((action) => (
               <Link className="site-footer__action" href={action.href} key={action.href}>
                 <Icon className="text-secondary" name={action.icon} size={14} />
-                {action.label}
+                {t(action.labelKey)}
               </Link>
             ))}
           </div>

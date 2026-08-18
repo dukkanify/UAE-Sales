@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { cities } from "@/shared/constants/locations";
+import { useT } from "@/shared/i18n/useLocale";
 import { Icon } from "@/shared/ui/Icon";
 
 type LocationOption = { id: string; name: string };
@@ -19,6 +20,7 @@ export function EmirateLocationSelect({
   onCityChange,
   variant = "mobile",
 }: EmirateLocationSelectProps) {
+  const t = useT();
   const [city, setCity] = useState(defaultCity);
   const [options, setOptions] = useState<LocationOption[]>(cities);
 
@@ -54,7 +56,7 @@ export function EmirateLocationSelect({
         <Icon className="shrink-0 text-[#B8955F]" name="map" size={14} />
         <span className="min-w-0 truncate text-xs font-bold text-ink">{city}</span>
         <select
-          aria-label="الإمارة"
+          aria-label={t("label.emirate")}
           className="absolute inset-0 cursor-pointer opacity-0"
           onChange={(event) => handleChange(event.target.value)}
           value={city}
@@ -75,7 +77,7 @@ export function EmirateLocationSelect({
       <Icon className="mobile-home-header__location-icon" name="map" size={14} />
       <span className="mobile-home-header__location-value">{city}</span>
       <select
-        aria-label="الإمارة"
+        aria-label={t("label.emirate")}
         className="mobile-home-header__location-select"
         onChange={(event) => handleChange(event.target.value)}
         value={city}

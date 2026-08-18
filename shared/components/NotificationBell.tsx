@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { useT } from "@/shared/i18n/useLocale";
 import { Icon } from "@/shared/ui/Icon";
 
 type NotificationBellProps = {
@@ -22,6 +23,7 @@ export function NotificationBell({
   iconSize = 17,
   showRing = false,
 }: NotificationBellProps) {
+  const t = useT();
   const [unread, setUnread] = useState(0);
 
   const load = useCallback(() => {
@@ -46,7 +48,8 @@ export function NotificationBell({
     };
   }, [load]);
 
-  const label = unread > 0 ? `الإشعارات، ${unread} غير مقروء` : "الإشعارات";
+  const label =
+    unread > 0 ? t("notify.unread", { count: unread }) : t("notify.label");
 
   return (
     <Link
