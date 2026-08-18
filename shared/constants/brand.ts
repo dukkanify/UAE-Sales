@@ -5,9 +5,15 @@ export const BRAND = {
   taglineEn: "Our Marketplace",
   description:
     "منصة سوق إماراتية موثوقة — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
-  copyright: "© 2026 سوقنا Sooqna. جميع الحقوق محفوظة.",
+  copyright: "© 2026 Sooqna. جميع الحقوق محفوظة.",
   domain: "sooqna.site",
   supportEmail: "support@sooqna.site",
+} as const;
+
+export const DEVELOPER = {
+  nameAr: "شركة دكانيفاي للتكنولوجيا ذ.م.م",
+  nameEn: "Dukkanify Technology LLC",
+  url: "https://dukkanify.com/",
 } as const;
 
 export const BRAND_COLORS = {

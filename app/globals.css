@@ -666,12 +666,6 @@ html[data-theme="dark"] .uae-hero-sand-wash {
     radial-gradient(ellipse 40% 35% at 15% 85%, rgb(61 143 106 / 6%), transparent 62%);
 }
 
-/* Night navy panels — stay dark even when --color-primary flips in dark mode */
-.market-site-footer {
-  background-color: #0b1628 !important;
-  color: #ffffff;
-}
-
 /* ── Market header — polished glass bar for light & dark ── */
 .market-header {
   border-bottom: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
