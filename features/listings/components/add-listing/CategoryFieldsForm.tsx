@@ -189,7 +189,8 @@ export function CategoryFieldsForm({
 
       <div className={addListingDynamicFieldsGridClass}>
         {fields.map((field) => {
-          const spansFullWidth = field.type === "textarea";
+          const spansFullWidth =
+            field.type === "textarea" || field.type === "combobox";
 
           if (field.key === "condition" && conditionDefault) {
             return (

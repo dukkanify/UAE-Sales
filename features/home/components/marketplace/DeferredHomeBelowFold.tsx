@@ -1,24 +1,8 @@
-"use client";
-
-import dynamic from "next/dynamic";
 import type { Listing } from "@/types";
+import type { UaeEmirateCard } from "@/features/home/shared/uae-emirates";
 import { MarketCategorySection } from "@/features/home/components/marketplace/MarketCategorySection";
-
-const MarketEmirates = dynamic(
-  () =>
-    import("@/features/home/components/marketplace/MarketEmirates").then(
-      (mod) => mod.MarketEmirates,
-    ),
-  { ssr: true },
-);
-
-const MarketAppDownload = dynamic(
-  () =>
-    import("@/features/home/components/marketplace/MarketAppDownload").then(
-      (mod) => mod.MarketAppDownload,
-    ),
-  { ssr: true },
-);
+import { MarketEmirates } from "@/features/home/components/marketplace/MarketEmirates";
+import { MarketAppDownload } from "@/features/home/components/marketplace/MarketAppDownload";
 
 type HomeSection = {
   categoryId: string;
@@ -32,12 +16,14 @@ type HomeSection = {
 
 type DeferredHomeBelowFoldProps = {
   appPreviewListings: Listing[];
+  emirates: UaeEmirateCard[];
   sections: HomeSection[];
 };
 
-/** Below-fold desktop rails + heavy widgets, code-split for faster first paint. */
+/** Below-fold desktop rails. Receives awaited emirate cards so this tree never suspends. */
 export function DeferredHomeBelowFold({
   appPreviewListings,
+  emirates,
   sections,
 }: DeferredHomeBelowFoldProps) {
   return (
@@ -54,7 +40,7 @@ export function DeferredHomeBelowFold({
           variant={section.variant}
         />
       ))}
-      <MarketEmirates />
+      <MarketEmirates emirates={emirates} />
       <MarketAppDownload previewListings={appPreviewListings} />
     </>
   );

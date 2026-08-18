@@ -17,7 +17,7 @@ export function CategoryFieldsStep({ categoryId, errors }: CategoryFieldsStepPro
     <CategoryFieldsForm
       categoryId={categoryId}
       errors={errors}
-      heading="2. تفاصيل الإعلان"
+      heading="تفاصيل الإعلان"
       stepLabel="الخطوة 2"
     />
   );

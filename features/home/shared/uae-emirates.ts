@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { cities } from "@/shared/constants/locations";
 import {
   emirateLandmarkLabels,
@@ -20,7 +21,7 @@ export type UaeEmirateCard = {
   name: string;
 };
 
-export async function getUaeEmiratesCards(): Promise<UaeEmirateCard[]> {
+export const getUaeEmiratesCards = cache(async (): Promise<UaeEmirateCard[]> => {
   const [images, highlights] = await Promise.all([
     getMarketEmirateImages(),
     getHomeCityHighlights(),
@@ -39,4 +40,4 @@ export async function getUaeEmiratesCards(): Promise<UaeEmirateCard[]> {
       count: countMap.get(countKey) ?? 500,
     };
   });
-}
+});
