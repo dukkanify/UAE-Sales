@@ -101,7 +101,7 @@ export function SiteHeader() {
 
           <form
             action="/search"
-            className="relative hidden max-w-xs flex-1 md:block"
+            className="relative hidden min-w-0 max-w-xs flex-1 md:block"
           >
             <SearchTypeahead
               compact
@@ -111,7 +111,7 @@ export function SiteHeader() {
             />
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle className="shrink-0" />
             {user ? (
               <Link
