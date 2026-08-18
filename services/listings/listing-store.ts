@@ -1,4 +1,3 @@
-import { cache } from "react";
 import {
   marketplaceListings,
   marketplaceUserListings,
@@ -18,9 +17,25 @@ import type {
 
 const FILE = "listings.json";
 
-let cacheRows: Listing[] | null = null;
-let inflight: Promise<Listing[]> | null = null;
-let expiryApplied = false;
+type CatalogMemory = {
+  cacheRows: Listing[] | null;
+  expiryApplied: boolean;
+  inflight: Promise<Listing[]> | null;
+};
+
+function catalogMemory(): CatalogMemory {
+  const globalState = globalThis as typeof globalThis & {
+    __sooqnaListingCatalog?: CatalogMemory;
+  };
+  if (!globalState.__sooqnaListingCatalog) {
+    globalState.__sooqnaListingCatalog = {
+      cacheRows: null,
+      expiryApplied: false,
+      inflight: null,
+    };
+  }
+  return globalState.__sooqnaListingCatalog;
+}
 
 function hydrateCatalogPhones(listings: Listing[]): Listing[] {
   const phones = new Map(
@@ -75,13 +90,15 @@ function cloneListings(listings: Listing[]) {
 }
 
 function setCache(listings: Listing[]) {
-  cacheRows = cloneListings(listings);
-  return cacheRows;
+  const memory = catalogMemory();
+  memory.cacheRows = cloneListings(listings);
+  return memory.cacheRows;
 }
 
 async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
-  if (expiryApplied) return listings;
-  expiryApplied = true;
+  const memory = catalogMemory();
+  if (memory.expiryApplied) return listings;
+  memory.expiryApplied = true;
   const settings = await getAdminSettings();
   const changed = expireStaleListings(listings, settings.listingActiveDays);
   if (changed > 0) {
@@ -91,13 +108,9 @@ async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
 }
 
 async function loadListingsUncached(): Promise<Listing[]> {
-  if (cacheRows) {
-    await applyListingExpiry(cacheRows);
-    return cacheRows;
-  }
-
-  if (!inflight) {
-    inflight = (async () => {
+  const memory = catalogMemory();
+  if (!memory.inflight) {
+    memory.inflight = (async () => {
       const stored = await loadCollection<Listing>(FILE).catch(
         () => [] as Listing[],
       );
@@ -118,21 +131,22 @@ async function loadListingsUncached(): Promise<Listing[]> {
       await applyListingExpiry(merged);
       return setCache(merged);
     })().finally(() => {
-      inflight = null;
+      catalogMemory().inflight = null;
     });
   }
 
-  return await inflight;
+  return await memory.inflight;
 }
 
-/** Request-deduped catalog read for RSC trees. */
-export const getAllListings = cache(async (): Promise<Listing[]> => {
+/** Shared catalog read. Always goes through the persisted store so API writes show on pages. */
+export async function getAllListings(): Promise<Listing[]> {
   return loadListingsUncached();
-});
+}
 
 /** Sync read for checkout resolvers — uses cache or mock seed fallback. */
 export function getListingSync(idOrSlug: string): Listing | undefined {
-  const source = cacheRows ?? [...marketplaceListings, ...marketplaceUserListings];
+  const source =
+    catalogMemory().cacheRows ?? [...marketplaceListings, ...marketplaceUserListings];
   return source.find(
     (listing) => listing.id === idOrSlug || listing.slug === idOrSlug,
   );
@@ -148,18 +162,58 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
   return listings.find((listing) => listing.slug === slug);
 }
 
+function allocateServerListingId(existing: Listing[]): string {
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const id = `lst_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    if (!existing.some((item) => item.id === id)) return id;
+  }
+  return `lst_${Date.now()}_${existing.length}`;
+}
+
+function allocateUniqueSlug(title: string, existing: Listing[], currentId?: string): string {
+  const base = slugifyTitle(title) || `listing-${Date.now()}`;
+  if (!existing.some((item) => item.slug === base && item.id !== currentId)) {
+    return base;
+  }
+  return `${base}-${Date.now().toString(36).slice(-6)}`;
+}
+
 export async function upsertListing(listing: Listing): Promise<Listing> {
   const listings = await loadListingsUncached();
   const settings = await getAdminSettings();
   const postedAt = listing.postedAt ?? new Date().toISOString();
-  const next: Listing = {
+  let next: Listing = {
     ...listing,
     postedAt,
     expiresAt:
       listing.expiresAt ??
       computeExpiresAt(postedAt, settings.listingActiveDays),
   };
-  const index = listings.findIndex((item) => item.id === listing.id);
+
+  let index = listings.findIndex((item) => item.id === listing.id);
+  if (index < 0 && listing.id.startsWith("local-")) {
+    const bySlug = listings.findIndex(
+      (item) => item.slug === listing.slug && item.seller.id === listing.seller.id,
+    );
+    if (bySlug >= 0) {
+      index = bySlug;
+      next = { ...listings[index], ...next, id: listings[index].id };
+    } else {
+      const preferredSlug = listing.slug?.trim();
+      const slugTaken = listings.some(
+        (item) => item.slug === preferredSlug && item.id !== listing.id,
+      );
+      next = {
+        ...next,
+        id: allocateServerListingId(listings),
+        slug:
+          preferredSlug && !slugTaken
+            ? preferredSlug
+            : allocateUniqueSlug(listing.title, listings),
+      };
+    }
+  }
+
   if (index >= 0) listings[index] = next;
   else listings.unshift(next);
   await saveCollection(FILE, listings);

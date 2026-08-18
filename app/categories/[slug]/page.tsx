@@ -20,6 +20,8 @@ import {
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
   "electronics",

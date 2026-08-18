@@ -67,11 +67,7 @@ export async function initiateFeaturedCheckout(
   const days = settings.featuredListingDays;
 
   if (!isStripeConfigured()) {
-    if (!isMockCheckoutAllowed()) {
-      throw new Error("STRIPE_NOT_CONFIGURED");
-    }
-
-    if (!options?.confirmMock) {
+    if (!options?.confirmMock || !isMockCheckoutAllowed()) {
       await recordFeaturedPayment({
         listingId,
         userId,

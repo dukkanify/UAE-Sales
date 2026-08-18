@@ -1,12 +1,30 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const DEFAULT_DATA_DIR = path.join(process.cwd(), ".data");
 const SERVERLESS_DATA_DIR = path.join("/tmp", "sooqna-data");
-const memoryStore = new Map<string, unknown>();
 
-let resolvedDataDir: string | null = null;
-let fsAvailable: boolean | null = null;
+type DataStoreState = {
+  fsAvailable: boolean | null;
+  memoryStore: Map<string, unknown>;
+  mtimes: Map<string, number>;
+  resolvedDataDir: string | null;
+};
+
+function getStoreState(): DataStoreState {
+  const globalState = globalThis as typeof globalThis & {
+    __sooqnaDataStore?: DataStoreState;
+  };
+  if (!globalState.__sooqnaDataStore) {
+    globalState.__sooqnaDataStore = {
+      fsAvailable: null,
+      memoryStore: new Map(),
+      mtimes: new Map(),
+      resolvedDataDir: null,
+    };
+  }
+  return globalState.__sooqnaDataStore;
+}
 
 function getCandidateDataDirs(): string[] {
   const configured = process.env.DATA_DIR?.trim();
@@ -21,27 +39,29 @@ function getCandidateDataDirs(): string[] {
 }
 
 async function resolveDataDir(): Promise<string | null> {
-  if (resolvedDataDir) {
-    return resolvedDataDir;
+  const state = getStoreState();
+  if (state.resolvedDataDir) {
+    return state.resolvedDataDir;
   }
 
   for (const candidate of getCandidateDataDirs()) {
     try {
       await mkdir(candidate, { recursive: true });
-      resolvedDataDir = candidate;
-      fsAvailable = true;
+      state.resolvedDataDir = candidate;
+      state.fsAvailable = true;
       return candidate;
     } catch {
       // Try the next writable location.
     }
   }
 
-  fsAvailable = false;
+  state.fsAvailable = false;
   return null;
 }
 
 async function canUseFilesystem(): Promise<boolean> {
-  if (fsAvailable === false) {
+  const state = getStoreState();
+  if (state.fsAvailable === false) {
     return false;
   }
 
@@ -53,40 +73,50 @@ function getFilePath(filename: string, dataDir: string): string {
 }
 
 async function readJsonFile<T>(filename: string, fallback: T): Promise<T> {
-  const cached = memoryStore.get(filename);
+  const state = getStoreState();
+  const dataDir = await resolveDataDir();
+
+  if (dataDir) {
+    const filePath = getFilePath(filename, dataDir);
+    try {
+      const fileStat = await stat(filePath);
+      const cached = state.memoryStore.get(filename);
+      if (cached !== undefined && state.mtimes.get(filename) === fileStat.mtimeMs) {
+        return cached as T;
+      }
+      const raw = await readFile(filePath, "utf8");
+      const parsed = JSON.parse(raw) as T;
+      state.memoryStore.set(filename, parsed);
+      state.mtimes.set(filename, fileStat.mtimeMs);
+      return parsed;
+    } catch {
+      // Missing file or unreadable JSON — fall through to memory/fallback.
+    }
+  }
+
+  const cached = state.memoryStore.get(filename);
   if (cached !== undefined) {
     return cached as T;
   }
-
-  const dataDir = await resolveDataDir();
-  if (!dataDir) {
-    return fallback;
-  }
-
-  const filePath = getFilePath(filename, dataDir);
-  try {
-    const raw = await readFile(filePath, "utf8");
-    const parsed = JSON.parse(raw) as T;
-    memoryStore.set(filename, parsed);
-    return parsed;
-  } catch {
-    return fallback;
-  }
+  return fallback;
 }
 
 async function writeJsonFile<T>(filename: string, data: T): Promise<void> {
-  memoryStore.set(filename, data);
+  const state = getStoreState();
+  state.memoryStore.set(filename, data);
 
-  if (!(await canUseFilesystem()) || !resolvedDataDir) {
+  if (!(await canUseFilesystem()) || !state.resolvedDataDir) {
     return;
   }
 
-  const filePath = getFilePath(filename, resolvedDataDir);
+  const filePath = getFilePath(filename, state.resolvedDataDir);
   try {
     await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+    const fileStat = await stat(filePath);
+    state.mtimes.set(filename, fileStat.mtimeMs);
   } catch {
-    fsAvailable = false;
-    resolvedDataDir = null;
+    state.fsAvailable = false;
+    state.resolvedDataDir = null;
   }
 }
 

@@ -10,6 +10,8 @@ import { getCategories } from "@/services/categories";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = Record<string, string | string[] | undefined>;
 
 function getParam(params: SearchParams, key: string) {

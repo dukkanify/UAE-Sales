@@ -6,6 +6,8 @@ import { getCategories } from "@/services/categories";
 import { getMyListings } from "@/services/listings";
 import { requireCurrentUser } from "@/services/profile";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardListingsPage() {
   const user = await requireCurrentUser("/dashboard/listings");
   const [categories, listings] = await Promise.all([

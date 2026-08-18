@@ -13,6 +13,8 @@ import {
   getRelatedListings,
 } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+
 type ListingPageProps = {
   params: Promise<{ slug: string }>;
 };

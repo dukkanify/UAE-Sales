@@ -22,6 +22,10 @@ export function proxy(request: NextRequest) {
   const forwardedProto = request.headers.get("x-forwarded-proto");
   const isProduction = process.env.NODE_ENV === "production";
   const { pathname } = request.nextUrl;
+  const isLocalHost =
+    host.startsWith("localhost") ||
+    host.startsWith("127.0.0.1") ||
+    host.startsWith("[::1]");
 
   if (isProduction && host.startsWith("www.")) {
     const url = request.nextUrl.clone();
@@ -31,7 +35,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  if (isProduction && forwardedProto === "http") {
+  if (isProduction && forwardedProto === "http" && !isLocalHost) {
     const url = request.nextUrl.clone();
     url.protocol = "https:";
     return NextResponse.redirect(url, 308);
