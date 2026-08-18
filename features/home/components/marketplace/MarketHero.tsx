@@ -59,7 +59,10 @@ export async function MarketHero({ categories }: MarketHeroProps) {
               <MarketHeroSearch categories={categories} />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <div
+              aria-label="الأكثر تداولاً في السوق"
+              className="mt-5 flex flex-wrap items-center justify-center gap-2"
+            >
               {quickSearches.map((tag) => (
                 <Link
                   key={tag.href}
