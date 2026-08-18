@@ -20,7 +20,8 @@ export function getMaskedPhone(listing: Listing): string | null {
   if (!phone) return null;
   const local = phone.startsWith("971") ? `0${phone.slice(3)}` : phone;
   if (local.length < 6) return null;
-  return `${local.slice(0, 3)} *** ${local.slice(-2)}`;
+  // NBSP keeps the LTR digit groups from splitting in an RTL sentence.
+  return `${local.slice(0, 3)}\u00A0***\u00A0${local.slice(-2)}`;
 }
 
 export function getTelHref(listing: Listing): string | null {

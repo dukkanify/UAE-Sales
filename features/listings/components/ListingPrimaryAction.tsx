@@ -186,8 +186,10 @@ export function ListingPrimaryAction({
         <div className="mt-2 rounded-[var(--radius-xl)] border border-border bg-surface-muted p-4">
           <p className="text-sm font-semibold text-ink">هل تريد الاتصال بالبائع؟</p>
           {masked ? (
-            <p className="mt-1 text-xs text-muted" dir="ltr">
-              {masked}
+            <p className="mt-1 text-xs font-semibold text-muted">
+              <bdi dir="ltr" className="inline-block tracking-wide">
+                {masked}
+              </bdi>
             </p>
           ) : null}
           <div className="mt-3 flex gap-2">
@@ -305,11 +307,10 @@ export function SellerContactActions({
           <FormMessage variant="success">
             {masked ? (
               <>
-                هل تريد الاتصال بالبائع؟ (
-                <span dir="ltr" className="inline-block font-semibold tracking-wide">
-                  {masked}
-                </span>
-                )
+                هل تريد الاتصال بالبائع؟{" "}
+                <bdi dir="ltr" className="inline-block font-semibold tracking-wide">
+                  ({masked})
+                </bdi>
               </>
             ) : (
               "هل تريد الاتصال بالبائع؟"
