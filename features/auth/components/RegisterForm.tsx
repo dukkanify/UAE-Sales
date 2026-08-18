@@ -109,7 +109,7 @@ export function RegisterForm() {
           setSessionUser(data.user);
           await persistSessionCookie(data.user);
         }
-        trackAuthEventClient("registration_completed");
+        trackAuthEventClient("registration_verified");
         router.push(
           getSafeNextPath(
             data.redirectTo,

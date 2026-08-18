@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     if (!isEmailOtpEnabled()) {
       const { approved, user } = await completePersonVerification(stored.id);
       await setSessionCookie(user);
-      trackAuthEvent("registration_completed", { autoApproved: approved });
+      trackAuthEvent("registration_verified", { autoApproved: approved });
       return NextResponse.json({
         ok: true,
         needsVerification: false,
