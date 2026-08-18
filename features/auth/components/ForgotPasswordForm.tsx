@@ -3,13 +3,12 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
-import { OtpVerification } from "@/features/auth/components/OtpVerification";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 
-type Step = "email" | "otp" | "password" | "done";
+type Step = "email" | "sent" | "password" | "done";
 
 function isStrongPassword(value: string) {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value);
@@ -24,7 +23,7 @@ export function ForgotPasswordForm() {
   const [step, setStep] = useState<Step>(initialStep as Step);
   const [email, setEmail] = useState(initialEmail);
   const [maskedEmail, setMaskedEmail] = useState("");
-  const [resetToken, setResetToken] = useState(initialToken);
+  const [resetToken] = useState(initialToken);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -40,31 +39,25 @@ export function ForgotPasswordForm() {
         return;
       }
 
-      const response = await fetch("/api/auth/password/reset/request-otp", {
+      const response = await fetch("/api/auth/password/reset/request-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
 
-      if (!response.ok && response.status !== 429) {
-        throw new Error("تعذر إرسال رمز التحقق. حاول مرة أخرى.");
+      if (!response.ok) {
+        throw new Error("تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.");
       }
 
       const data = await response.json();
       setMaskedEmail(data.maskedEmail ?? email);
-      setStep("otp");
+      setMessage(
+        data.message ??
+          "إذا كان البريد مسجلاً، ستصلك رسالة برابط آمن لإعادة تعيين كلمة المرور.",
+      );
+      setStep("sent");
     }, [email]),
   );
-
-  const handleOtpVerified = useCallback((data?: { resetToken?: string }) => {
-    if (!data?.resetToken) {
-      setError("تعذر التحقق من الرمز.");
-      return;
-    }
-    setResetToken(data.resetToken);
-    setStep("password");
-    setError("");
-  }, []);
 
   const { isLoading: isResetting, run: handleResetPassword } = useAsyncAction(
     useCallback(async (event: React.FormEvent<HTMLFormElement>) => {
@@ -77,6 +70,10 @@ export function ForgotPasswordForm() {
       }
       if (password !== confirmPassword) {
         setError("كلمة المرور وتأكيدها غير متطابقين.");
+        return;
+      }
+      if (!resetToken) {
+        setError("رابط إعادة التعيين غير صالح. اطلب رابطاً جديداً.");
         return;
       }
 
@@ -100,15 +97,23 @@ export function ForgotPasswordForm() {
     }, [confirmPassword, email, password, resetToken]),
   );
 
-  if (step === "otp") {
+  if (step === "sent") {
     return (
-      <OtpVerification
-        email={email}
-        maskedEmail={maskedEmail}
-        onBack={() => setStep("email")}
-        onVerified={handleOtpVerified}
-        purpose="PASSWORD_RESET"
-      />
+      <div className="grid gap-4">
+        <div>
+          <h2 className="text-xl font-black text-ink">تحقق من بريدك</h2>
+          <p className="mt-1.5 text-sm font-medium text-muted">
+            أرسلنا رابطاً آمناً إلى {maskedEmail || email} إن كان الحساب موجوداً. الرابط صالح لمدة ساعة.
+          </p>
+        </div>
+        {message ? <FormMessage variant="success">{message}</FormMessage> : null}
+        <Button fullWidth onClick={() => setStep("email")} type="button" variant="secondary">
+          استخدام بريد آخر
+        </Button>
+        <Link className="text-center text-sm font-medium text-muted transition hover:text-ink" href="/login">
+          العودة لتسجيل الدخول
+        </Link>
+      </div>
     );
   }
 
@@ -126,6 +131,14 @@ export function ForgotPasswordForm() {
           <h2 className="text-xl font-black text-ink">كلمة مرور جديدة</h2>
           <p className="mt-1.5 text-sm font-medium text-muted">أنشئ كلمة مرور جديدة لحسابك.</p>
         </div>
+        <Input
+          autoComplete="email"
+          label="البريد الإلكتروني"
+          name="email"
+          onChange={(event) => setEmail(event.target.value)}
+          type="email"
+          value={email}
+        />
         <Input
           autoComplete="new-password"
           label="كلمة المرور الجديدة"
@@ -173,7 +186,7 @@ export function ForgotPasswordForm() {
       <div>
         <h2 className="text-xl font-black text-ink">نسيت كلمة المرور؟</h2>
         <p className="mt-1.5 text-sm font-medium text-muted">
-          أدخل بريدك الإلكتروني وسنرسل لك رمز تحقق لإعادة تعيين كلمة المرور.
+          أدخل بريدك الإلكتروني وسنرسل لك رابطاً آمناً لإعادة تعيين كلمة المرور. لن نرسل رمزاً عبر البريد.
         </p>
       </div>
       <Input
@@ -185,7 +198,7 @@ export function ForgotPasswordForm() {
       />
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
       <Button fullWidth loading={isLoading} type="submit" variant="primary">
-        إرسال رمز التحقق
+        إرسال رابط إعادة التعيين
       </Button>
       <Link className="text-center text-sm font-medium text-muted transition hover:text-ink" href="/login">
         العودة لتسجيل الدخول

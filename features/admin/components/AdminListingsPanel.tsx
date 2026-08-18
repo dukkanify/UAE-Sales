@@ -142,7 +142,9 @@ export function AdminListingsPanel() {
 
   async function patchListing(
     id: string,
-    patch: Partial<Pick<AdminListingRecord, "status" | "isFeatured">>,
+    patch: Partial<Pick<AdminListingRecord, "status" | "isFeatured">> & {
+      rejectReason?: string;
+    },
   ) {
     const session = getSessionUser();
     if (!session) return;
@@ -529,9 +531,13 @@ export function AdminListingsPanel() {
               {listing.status !== "rejected" ? (
                 <Button
                   loading={busyId === listing.id}
-                  onClick={() =>
-                    patchListing(listing.id, { status: "rejected" })
-                  }
+                  onClick={() => {
+                    const reason = window.prompt("سبب الرفض (اختياري)")?.trim();
+                    void patchListing(listing.id, {
+                      status: "rejected",
+                      rejectReason: reason || undefined,
+                    });
+                  }}
                   size="sm"
                   variant="ghost"
                 >

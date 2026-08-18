@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getSessionFromCookie } from "@/services/auth/session-cookie";
 import { isMarketplaceAccountReady } from "@/services/auth/account-access";
-import { upsertListing } from "@/services/listings/listing-store";
+import { notifyListingSubmitted } from "@/services/listings/listing-notifications";
+import { getListingById, upsertListing } from "@/services/listings/listing-store";
 import type { Listing } from "@/types";
 
 /** Authenticated upsert used by listing create/edit forms to sync site data into the catalog store. */
@@ -26,6 +27,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
     }
 
+    const existing = await getListingById(body.listing.id);
     const listing = await upsertListing({
       ...body.listing,
       seller: {
@@ -34,6 +36,11 @@ export async function POST(request: Request) {
         name: body.listing.seller?.name || session.fullName,
       },
     });
+
+    if (!existing) {
+      void notifyListingSubmitted(listing);
+    }
+
     return NextResponse.json({ listing }, { status: 201 });
   } catch {
     return NextResponse.json({ error: "SAVE_FAILED" }, { status: 500 });

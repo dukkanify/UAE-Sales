@@ -237,7 +237,11 @@ export async function patchListingRecord(
   const listings = await loadListingsUncached();
   const index = listings.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  listings[index] = { ...listings[index], ...patch };
+  const listingPatch = {
+    ...(patch.status ? { status: patch.status } : {}),
+    ...(typeof patch.isFeatured === "boolean" ? { isFeatured: patch.isFeatured } : {}),
+  };
+  listings[index] = { ...listings[index], ...listingPatch };
   await saveCollection(FILE, listings);
   setCache(listings);
   return { ...listings[index] };

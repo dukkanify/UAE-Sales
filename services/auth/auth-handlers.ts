@@ -168,7 +168,7 @@ export function createResetToken(email: string): string {
     .digest("hex");
 }
 
-const RESET_TOKEN_TTL_MS = 10 * 60 * 1000;
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
 
 export async function storeResetToken(email: string, token: string) {
   const { saveCollection, loadCollection } = await import("@/services/payments/data-store");

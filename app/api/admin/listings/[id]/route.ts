@@ -5,6 +5,11 @@ import { requireAdminPermission } from "@/services/auth/admin-permissions";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
 import {
+  notifyListingApproved,
+  notifyListingRejected,
+} from "@/services/listings/listing-notifications";
+import {
+  getListingById,
   patchListingRecord,
   toAdminListingRecord,
 } from "@/services/listings/listing-store";
@@ -20,10 +25,20 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   const { id } = await context.params;
   const body = (await request.json()) as AdminListingPatch;
-  const listing = await patchListingRecord(id, body);
+  const { rejectReason, ...patch } = body;
+  const previous = await getListingById(id);
+  const listing = await patchListingRecord(id, patch);
 
   if (!listing) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  }
+
+  if (body.status && previous && previous.status !== body.status) {
+    if (body.status === "active") {
+      void notifyListingApproved(listing);
+    } else if (body.status === "rejected") {
+      void notifyListingRejected(listing, rejectReason);
+    }
   }
 
   await logAdminAction({
