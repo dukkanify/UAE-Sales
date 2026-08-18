@@ -665,6 +665,7 @@ html[data-theme="dark"] .mobile-home-hero__badge {
 }
 
 .mobile-home-search-card__panel {
+  overflow: visible;
   border: 1px solid var(--mh-border);
   border-radius: var(--mh-radius-lg);
   background: rgb(248 250 252 / 88%);

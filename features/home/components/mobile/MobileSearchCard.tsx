@@ -3,6 +3,7 @@
 import type { Category } from "@/types";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import {
   HOME_SEARCH_LABELS,
   HOME_SEARCH_PRICE_OPTIONS,
@@ -16,16 +17,13 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
   return (
     <section aria-label="البحث" className="mobile-home-search-card" data-search-anchor>
       <form action="/search" className="mobile-home-search-card__panel">
-        <label className="mobile-home-search-card__input-row">
-          <span className="sr-only">{HOME_SEARCH_LABELS.query}</span>
-          <input
-            className="mobile-home-search-card__input"
-            name="q"
-            placeholder={HOME_SEARCH_LABELS.queryPlaceholder}
-            type="search"
-          />
-          <Icon className="mobile-home-search-card__search-icon" name="search" size={16} />
-        </label>
+        <SearchTypeahead
+          hideIcon
+          label=""
+          name="q"
+          placeholder={HOME_SEARCH_LABELS.queryPlaceholder}
+          variant="mobile"
+        />
 
         <div className="mobile-home-search-card__filters">
           <div className="mobile-home-search-card__filter-row">

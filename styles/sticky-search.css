@@ -44,6 +44,8 @@
 }
 
 .sticky-search-dock__form {
+  position: relative;
+  overflow: visible;
   display: flex;
   width: min(100%, 28rem);
   align-items: center;

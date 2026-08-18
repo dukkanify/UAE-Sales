@@ -1,5 +1,5 @@
 import type { Category, City, Listing } from "@/types";
-import type { SearchSuggestion } from "./SearchTypeahead";
+import type { SearchSuggestion } from "@/features/search/types";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
 
 /** Builds typeahead rows from categories, cities, and listing titles. */

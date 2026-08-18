@@ -487,7 +487,9 @@ textarea {
 }
 
 .market-hero-search {
-  overflow: hidden;
+  position: relative;
+  z-index: 8;
+  overflow: visible;
   border: 1px solid rgb(255 255 255 / 0.72);
   border-radius: 1.65rem;
   background: rgb(255 255 255 / 0.72);

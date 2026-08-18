@@ -3,11 +3,9 @@ import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomN
 import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
-import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
-import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -63,7 +61,7 @@ export default async function SearchPage({
     sort: getParam(params, "sort") ?? "newest",
   };
 
-  const [categories, listings, suggestionTitles] = await Promise.all([
+  const [categories, listings] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: selectedFilters.category || undefined,
@@ -84,15 +82,7 @@ export default async function SearchPage({
           ? selectedFilters.sort
           : "newest",
     }),
-    getSearchSuggestionTitles(),
   ]);
-
-  const suggestions = buildSearchSuggestions({
-    categories,
-    cities,
-    listings: suggestionTitles,
-    selectedFilters,
-  });
 
   return (
     <>
@@ -121,7 +111,6 @@ export default async function SearchPage({
                 countries={countries}
                 layout="sidebar"
                 selectedFilters={selectedFilters}
-                suggestions={suggestions}
               />
             </aside>
 
