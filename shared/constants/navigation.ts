@@ -1,3 +1,5 @@
+import { cities } from "@/shared/constants/locations";
+
 export const primaryNavigation = [
   { label: "الرئيسية", href: "/" },
   { label: "التصنيفات", href: "/categories" },
@@ -11,7 +13,15 @@ export const footerLinks = [
       { label: "كل الإعلانات", href: "/search" },
       { label: "التصنيفات", href: "/categories" },
       { label: "الإعلانات المميزة", href: "/featured" },
+      { label: "أضف إعلانك", href: "/listings/new" },
     ],
+  },
+  {
+    title: "الإمارات",
+    links: cities.map((city) => ({
+      label: city.name,
+      href: `/search?city=${encodeURIComponent(city.name)}`,
+    })),
   },
   {
     title: "حسابك",

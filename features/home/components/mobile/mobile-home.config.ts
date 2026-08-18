@@ -1,4 +1,5 @@
 import type { Category, Listing } from "@/types";
+import { APP_STORE_LINKS } from "@/shared/constants/brand";
 
 /** Reference order: cars, electronics, jobs, furniture, watches */
 export const MOBILE_MAIN_CATEGORY_ORDER = [
@@ -36,10 +37,7 @@ export const MOBILE_NEARBY_DISTANCES = [
   "5.2 كم",
 ] as const;
 
-export const MOBILE_APP_LINKS = {
-  appStore: "https://apps.apple.com/",
-  playStore: "https://play.google.com/store",
-} as const;
+export const MOBILE_APP_LINKS = APP_STORE_LINKS;
 
 /** @deprecated Kept for legacy section — not used on mobile homepage v3 */
 export const MOBILE_TRENDING_SEARCHES = [

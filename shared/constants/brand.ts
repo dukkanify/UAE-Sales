@@ -10,6 +10,11 @@ export const BRAND = {
   supportEmail: "support@sooqna.site",
 } as const;
 
+export const APP_STORE_LINKS = {
+  appStore: "https://apps.apple.com/",
+  playStore: "https://play.google.com/store",
+} as const;
+
 export const BRAND_COLORS = {
   navy: "#0B1628",
   navySoft: "#152238",

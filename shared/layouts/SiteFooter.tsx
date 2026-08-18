@@ -1,8 +1,10 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/shared/components/BrandLogo";
-import { BRAND } from "@/shared/constants/brand";
+import { APP_STORE_LINKS, BRAND } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
 import { Icon } from "@/shared/ui/Icon";
+import "./site-footer.css";
 
 const trustBadges = [
   { icon: "shield" as const, label: "ضمان مالي" },
@@ -18,15 +20,70 @@ const quickActions = [
 
 type FooterGroup = (typeof footerLinks)[number];
 
+function AppleGlyph() {
+  return (
+    <svg aria-hidden viewBox="0 0 24 24">
+      <path
+        d="M16.34 12.2c.02 2.14 1.88 2.86 1.9 2.87-.02.06-.29.98-.96 1.94-.58.83-1.18 1.65-2.12 1.67-.93.02-1.23-.55-2.3-.55-1.07 0-1.4.53-2.28.57-.92.04-1.62-.92-2.21-1.75-1.2-1.74-2.12-4.92-.87-7.07.62-1.08 1.73-1.76 2.94-1.78 1.02-.02 1.98.68 2.3.68.32 0 1.32-.84 2.22-.72.38.02 1.45.15 2.14 1.14-.05.03-1.28.75-1.26 2.24ZM13.9 4.4c.56-.68.94-1.62.84-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.5.9.07 1.82-.46 2.38-1.16Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function PlayGlyph() {
+  return (
+    <svg aria-hidden viewBox="0 0 28.99 31.99">
+      <path d="M13.54 15.28.12 29.34a3.66 3.66 0 0 0 5.33 2.16l15.1-8.6Z" fill="#EA4335" />
+      <path
+        d="m27.11 12.89-6.53-3.74-7.35 6.45 7.38 7.28 6.48-3.7a3.54 3.54 0 0 0 1.5-4.79 3.62 3.62 0 0 0-1.5-1.5z"
+        fill="#FBBC04"
+      />
+      <path d="M.12 2.66a3.57 3.57 0 0 0-.12.92v24.84a3.57 3.57 0 0 0 .12.92L14 15.64Z" fill="#4285F4" />
+      <path
+        d="m13.64 16 6.94-6.85L5.5.51A3.73 3.73 0 0 0 3.63 0 3.64 3.64 0 0 0 .12 2.65Z"
+        fill="#34A853"
+      />
+    </svg>
+  );
+}
+
+function StoreBadge({
+  eyebrow,
+  href,
+  icon,
+  label,
+  title,
+}: {
+  eyebrow: string;
+  href: string;
+  icon: ReactNode;
+  label: string;
+  title: string;
+}) {
+  return (
+    <Link
+      aria-label={label}
+      className="site-footer-store"
+      href={href}
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      <span className="site-footer-store__icon">{icon}</span>
+      <span className="site-footer-store__copy">
+        <span className="site-footer-store__eyebrow">{eyebrow}</span>
+        <span className="site-footer-store__title">{title}</span>
+      </span>
+    </Link>
+  );
+}
+
 function FooterLinkList({ links }: { links: FooterGroup["links"] }) {
   return (
-    <ul className="grid gap-2">
+    <ul className="site-footer__links">
       {links.map((link) => (
-        <li key={link.href}>
-          <Link
-            className="inline-flex min-h-9 items-center text-sm font-medium text-muted transition hover:text-ink"
-            href={link.href}
-          >
+        <li key={`${link.href}-${link.label}`}>
+          <Link className="site-footer__link" href={link.href}>
             {link.label}
           </Link>
         </li>
@@ -38,95 +95,144 @@ function FooterLinkList({ links }: { links: FooterGroup["links"] }) {
 function FooterLinkGroup({ group }: { group: FooterGroup }) {
   return (
     <>
-      <details className="group border-b border-border/60 lg:hidden">
-        <summary className="flex cursor-pointer list-none items-center justify-between py-3.5 text-sm font-bold text-ink [&::-webkit-details-marker]:hidden">
+      <details className="site-footer__accordion lg:hidden">
+        <summary>
           {group.title}
-          <Icon
-            className="text-muted transition duration-200 group-open:rotate-180"
-            name="chevron-left"
-            size={16}
-          />
+          <Icon className="site-footer__chevron" name="chevron-left" size={16} />
         </summary>
-        <div className="pb-4">
+        <div className="pb-3.5">
           <FooterLinkList links={group.links} />
         </div>
       </details>
 
       <div className="hidden lg:block">
-        <h3 className="text-sm font-bold text-ink">{group.title}</h3>
-        <div className="mt-4">
-          <FooterLinkList links={group.links} />
-        </div>
+        <h3 className="site-footer__group-title">{group.title}</h3>
+        <FooterLinkList links={group.links} />
       </div>
     </>
   );
 }
 
+function TrustSeal() {
+  return (
+    <Link aria-label="الضمان المالي في سوقنا" className="site-footer-seal" href="/escrow">
+      <span>
+        <span className="site-footer-seal__label">ضمان مالي</span>
+        <span className="site-footer-seal__sub">{BRAND.nameAr}</span>
+      </span>
+    </Link>
+  );
+}
+
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-border/70 bg-gradient-to-b from-surface-muted/50 to-surface">
-      <div className="app-container section-padding pb-6 pt-8 md:pt-10">
-        <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-border/70 bg-surface shadow-[var(--shadow-sm)]">
-          <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-[1.15fr_1.85fr] lg:gap-10">
-            <div className="space-y-5">
-              <BrandLogo href="/" showTagline={false} size="md" />
-              <p className="max-w-sm text-sm leading-7 text-muted">{BRAND.description}</p>
-              <div className="flex flex-wrap gap-2">
-                {trustBadges.map((badge) => (
-                  <span
-                    key={badge.label}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-surface-muted/80 px-3 py-1.5 text-xs font-semibold text-ink"
-                  >
-                    <Icon className="text-secondary" name={badge.icon} size={13} />
-                    {badge.label}
-                  </span>
-                ))}
-              </div>
-              <Link
-                className="focus-ring sooqna-gold-gradient inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-primary shadow-[0_8px_24px_rgb(201_169_98/28%)] transition hover:brightness-[1.03]"
-                href="/listings/new"
-              >
-                <Icon name="plus" size={16} />
-                أضف إعلانك مجاناً
-              </Link>
-            </div>
+    <footer aria-label={`تذييل ${BRAND.nameAr}`} className="site-footer">
+      <div className="site-footer__gold-line" />
 
-            <div className="grid gap-0 lg:grid-cols-3 lg:gap-8">
-              {footerLinks.map((group) => (
-                <FooterLinkGroup key={group.title} group={group} />
-              ))}
-            </div>
+      <section aria-label={`تطبيق ${BRAND.nameAr}`} className="site-footer__app">
+        <div className="app-container site-footer__app-inner">
+          <div>
+            <p className="site-footer__app-kicker">
+              <Icon name="phone" size={14} />
+              تطبيق {BRAND.nameAr}
+            </p>
+            <p className="site-footer__app-title">
+              أفضل العروض في أي وقت وأي مكان.
+              <br />
+              <em>حمّل تطبيق {BRAND.nameAr} الآن</em>
+            </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 border-t border-border/60 bg-surface-muted/40 px-6 py-4 md:px-8 lg:hidden">
+          <div aria-hidden className="site-footer__phones">
+            <span className="site-footer__phone site-footer__phone--back">
+              <span className="site-footer__phone-screen">
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+              </span>
+            </span>
+            <span className="site-footer__phone site-footer__phone--front">
+              <span className="site-footer__phone-screen">
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+                <span className="site-footer__phone-bar" />
+              </span>
+            </span>
+          </div>
+
+          <div className="site-footer__stores">
+            <StoreBadge
+              eyebrow="Download on the"
+              href={APP_STORE_LINKS.appStore}
+              icon={<AppleGlyph />}
+              label="حمّل من App Store"
+              title="App Store"
+            />
+            <StoreBadge
+              eyebrow="GET IT ON"
+              href={APP_STORE_LINKS.playStore}
+              icon={<PlayGlyph />}
+              label="متوفر على Google Play"
+              title="Google Play"
+            />
+          </div>
+        </div>
+      </section>
+
+      <div className="app-container site-footer__main">
+        <div className="site-footer__grid">
+          <div>
+            <BrandLogo href="/" showTagline size="md" />
+            <p className="site-footer__brand-copy">{BRAND.description}</p>
+            <div className="site-footer__trust">
+              {trustBadges.map((badge) => (
+                <span className="site-footer__trust-chip" key={badge.label}>
+                  <Icon className="text-secondary" name={badge.icon} size={13} />
+                  {badge.label}
+                </span>
+              ))}
+            </div>
+            <Link
+              className="focus-ring sooqna-gold-gradient site-footer__cta inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-primary shadow-[0_8px_24px_rgb(201_169_98/28%)] transition hover:brightness-[1.03]"
+              href="/listings/new"
+            >
+              <Icon name="plus" size={16} />
+              أضف إعلانك مجاناً
+            </Link>
+            <p className="mt-4 text-xs text-muted">
+              <Link className="hover:text-ink" href={`mailto:${BRAND.supportEmail}`}>
+                {BRAND.supportEmail}
+              </Link>
+            </p>
+          </div>
+
+          <nav aria-label="روابط التذييل" className="site-footer__nav">
+            {footerLinks.map((group) => (
+              <FooterLinkGroup group={group} key={group.title} />
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      <div className="site-footer__legal">
+        <div className="app-container site-footer__legal-inner">
+          <div className="min-w-0">
+            <p className="site-footer__copyright">{BRAND.copyright}</p>
+            <p className="site-footer__credit">تطوير وتنفيذ: دكانيفاي</p>
+          </div>
+
+          <div className="site-footer__actions">
             {quickActions.map((action) => (
-              <Link
-                key={action.href}
-                className="focus-ring inline-flex min-h-9 flex-1 items-center justify-center gap-1.5 rounded-full border border-border/70 bg-surface px-3 text-xs font-semibold text-ink transition hover:border-secondary/40 hover:bg-secondary-soft/50 sm:flex-none"
-                href={action.href}
-              >
+              <Link className="site-footer__action" href={action.href} key={action.href}>
                 <Icon className="text-secondary" name={action.icon} size={14} />
                 {action.label}
               </Link>
             ))}
           </div>
-        </div>
 
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs font-medium text-muted">{BRAND.copyright}</p>
-          <div className="hidden items-center gap-2 sm:flex">
-            {quickActions.map((action) => (
-              <Link
-                key={action.href}
-                className="focus-ring inline-flex min-h-9 items-center gap-1.5 rounded-full border border-border/70 bg-surface px-3.5 text-xs font-semibold text-muted transition hover:border-secondary/40 hover:text-ink"
-                href={action.href}
-              >
-                <Icon name={action.icon} size={14} />
-                {action.label}
-              </Link>
-            ))}
-          </div>
-          <p className="text-xs text-muted/80">تطوير وتنفيذ: دكانيفاي</p>
+          <TrustSeal />
         </div>
       </div>
     </footer>
