@@ -1,5 +1,6 @@
 import type { Listing } from "@/types";
 import { getCategoryFieldLabel, getCategoryFields } from "@/shared/constants/category-fields";
+import { formatStoredConditionValue } from "@/shared/listings/listing-condition";
 import {
   CATEGORY_SEARCH_KEYWORDS,
   searchTextMatches,
@@ -31,9 +32,16 @@ function hasValue(value: unknown): boolean {
   return false;
 }
 
-function formatValue(key: string, value: string | number | boolean): string {
+function formatValue(
+  categoryId: string,
+  key: string,
+  value: string | number | boolean,
+): string {
   if (typeof value === "boolean") {
     return value ? "نعم" : "لا";
+  }
+  if (key === "condition") {
+    return formatStoredConditionValue(categoryId, String(value));
   }
   if (key === "area" || key === "areaSqft") {
     return `${Number(value).toLocaleString("ar-AE")} قدم مربع`;
@@ -62,7 +70,7 @@ function getMockSpecEntries(listing: Listing): SpecEntry[] {
       entries.push({
         key,
         label: getCategoryFieldLabel("cars", key),
-        value: formatValue(key, value),
+        value: formatValue("cars", key, value),
       });
     }
   }
@@ -74,7 +82,7 @@ function getMockSpecEntries(listing: Listing): SpecEntry[] {
       entries.push({
         key,
         label: getCategoryFieldLabel("real-estate", key),
-        value: formatValue(key, value as string | number),
+        value: formatValue("real-estate", key, value as string | number),
       });
     }
     if (hasValue(amenities) && amenities.length > 0) {
@@ -112,6 +120,14 @@ function getUserSpecEntries(listing: Listing): SpecEntry[] {
   const fieldOrder = getCategoryFields(listing.categoryId).map((field) => field.key);
   const entries: SpecEntry[] = [];
 
+  if (listing.subcategory?.trim()) {
+    entries.push({
+      key: "subcategory",
+      label: "التصنيف الفرعي",
+      value: listing.subcategory.trim(),
+    });
+  }
+
   for (const key of fieldOrder) {
     if (key === "features") continue;
     const value = listing.categorySpecs[key];
@@ -119,17 +135,17 @@ function getUserSpecEntries(listing: Listing): SpecEntry[] {
     entries.push({
       key,
       label: getCategoryFieldLabel(listing.categoryId, key),
-      value: formatValue(key, value as string | number | boolean),
+      value: formatValue(listing.categoryId, key, value as string | number | boolean),
     });
   }
 
   for (const [key, value] of Object.entries(listing.categorySpecs)) {
-    if (fieldOrder.includes(key) || key === "features") continue;
+    if (fieldOrder.includes(key) || key === "features" || key === "subcategory") continue;
     if (!hasValue(value)) continue;
     entries.push({
       key,
       label: getCategoryFieldLabel(listing.categoryId, key),
-      value: formatValue(key, value as string | number | boolean),
+      value: formatValue(listing.categoryId, key, value as string | number | boolean),
     });
   }
 

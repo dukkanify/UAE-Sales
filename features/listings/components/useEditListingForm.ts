@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { useImagePreviews } from "./add-listing/useImagePreviews";
+import { ADD_LISTING_IMAGE_CAP, useImagePreviews } from "./add-listing/useImagePreviews";
 import { cities, countries } from "@/shared/constants/locations";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
@@ -72,10 +72,10 @@ export function useEditListingForm(listingId: string) {
       const existingImages = getListingImages(currentListing);
       const newImages =
         imageFiles.length > 0 ? await uploadListingImages(imageFiles) : [];
-      const mergedImages = [...existingImages, ...newImages].slice(0, 6);
+      const mergedImages = [...existingImages, ...newImages];
 
       const cityName = isDynamicCategory(categoryId)
-        ? parsed.city
+        ? parsed.city || currentListing.city
         : cities.find((city) => city.id === parsed.city)?.name ?? currentListing.city;
 
       const title = isDynamicCategory(categoryId)
@@ -118,12 +118,9 @@ export function useEditListingForm(listingId: string) {
 
   const handleImageChange = useCallback(
     (fileList: FileList | null, mode: "append" | "replace" = "replace") => {
-      const current = readListing(listingId);
-      const existingCount = current ? getListingImages(current).length : 0;
-      const maxNew = Math.max(0, 6 - existingCount);
-      setImagePreviewsFromFiles(fileList, maxNew, mode);
+      setImagePreviewsFromFiles(fileList, ADD_LISTING_IMAGE_CAP, mode);
     },
-    [listingId, setImagePreviewsFromFiles],
+    [setImagePreviewsFromFiles],
   );
 
   return {

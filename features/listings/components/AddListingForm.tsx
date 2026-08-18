@@ -6,6 +6,7 @@ import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { FormMessage } from "@/shared/ui/FormMessage";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
 import { CategoryFieldsStep } from "./add-listing/CategoryFieldsStep";
 import { CategorySelectionStep } from "./add-listing/CategorySelectionStep";
@@ -26,15 +27,19 @@ export function AddListingForm({ categories }: AddListingFormProps) {
   const {
     errors,
     handleImageChange,
+    handleVideoFileChange,
     imagePreviews,
     isAllowed,
     isSubmitting,
     preview,
+    removeImage,
     selectedCategory,
     selectedCategoryId,
+    setCoverIndex,
     setPreview,
     setSelectedCategoryId,
     submitListing,
+    videoPreview,
   } = useAddListingForm(categories);
 
   const handleSelectCategory = useCallback(
@@ -102,7 +107,15 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           errors={errors}
           imagePreviews={imagePreviews}
           onImageChange={handleImageChange}
+          onRemoveImage={removeImage}
+          onSetCover={setCoverIndex}
+          onVideoFileChange={handleVideoFileChange}
+          videoPreview={videoPreview}
         />
+
+        {errors.submit ? (
+          <FormMessage variant="error">{errors.submit}</FormMessage>
+        ) : null}
 
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
           <p className="font-medium">

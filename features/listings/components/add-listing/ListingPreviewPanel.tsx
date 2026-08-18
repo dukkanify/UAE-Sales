@@ -1,6 +1,7 @@
 import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { categoryUsesItemCondition } from "@/shared/listings/listing-condition";
 import { Card } from "@/shared/ui/Card";
 import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { Icon } from "@/shared/ui/Icon";
@@ -57,7 +58,11 @@ export function ListingPreviewPanel({
               <span className="text-sm font-medium text-muted">{preview.city}</span>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs font-medium text-muted">
-              <span>{conditionLabels[preview.condition]}</span>
+              <span>
+                {categoryUsesItemCondition(selectedCategory?.id ?? "")
+                  ? conditionLabels[preview.condition]
+                  : selectedCategory?.name ?? "قسم"}
+              </span>
               <span>{imagePreviews.length} صور</span>
             </div>
           </div>
