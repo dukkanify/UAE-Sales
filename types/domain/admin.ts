@@ -44,6 +44,10 @@ export type AdminListingRecord = {
   isFeatured: boolean;
   postedAt: string;
   city: string;
+  rejectionReason?: string;
+  submittedAt?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
 };
 
 export type AdminListingCreateInput = {
@@ -66,7 +70,7 @@ export type AdminListingCreateInput = {
 };
 
 export type AdminListingPatch = Partial<
-  Pick<AdminListingRecord, "status" | "isFeatured">
+  Pick<AdminListingRecord, "status" | "isFeatured" | "rejectionReason">
 >;
 
 export type AdminDisputeRecord = {

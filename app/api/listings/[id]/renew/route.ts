@@ -3,6 +3,7 @@ import {
   isSessionUser,
   requireSessionUser,
 } from "@/services/auth/require-session";
+import { notifyListingSubmitted } from "@/services/listings/listing-review";
 import {
   getListingById,
   renewListing,
@@ -27,6 +28,10 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
   const renewed = await renewListing(id);
   if (!renewed) {
     return NextResponse.json({ error: "RENEW_FAILED" }, { status: 500 });
+  }
+
+  if (renewed.status === "pending_review") {
+    await notifyListingSubmitted(renewed);
   }
 
   return NextResponse.json({ listing: renewed });

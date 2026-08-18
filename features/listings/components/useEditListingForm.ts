@@ -82,6 +82,11 @@ export function useEditListingForm(listingId: string) {
         ? parsed.title
         : String(formData.get("title") ?? "").trim();
 
+      const needsReview =
+        currentListing.status === "draft" ||
+        currentListing.status === "rejected" ||
+        currentListing.status === "expired";
+
       const updatedListing: Listing = {
         ...currentListing,
         title,
@@ -100,15 +105,32 @@ export function useEditListingForm(listingId: string) {
         contactPhone: contact,
         contactMethod: "both",
         videoUrl: videoUrl || undefined,
+        status: needsReview ? "pending_review" : currentListing.status,
+        rejectionReason: needsReview ? undefined : currentListing.rejectionReason,
+        submittedAt: needsReview
+          ? new Date().toISOString()
+          : currentListing.submittedAt,
       };
 
       saveLocalListing(updatedListing);
-      void fetch("/api/listings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ listing: updatedListing }),
-      }).catch(() => undefined);
-      setSaveMessage("تم حفظ التعديلات بنجاح.");
+      try {
+        const response = await fetch("/api/listings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ listing: updatedListing }),
+        });
+        const data = await response.json();
+        if (response.ok && data.listing) {
+          saveLocalListing(data.listing as Listing);
+        }
+      } catch {
+        // Local listing already saved; catalog sync is best-effort.
+      }
+      setSaveMessage(
+        needsReview || currentListing.status === "pending_review"
+          ? "تم إرسال التعديلات للمراجعة. يظهر الإعلان بعد الاعتماد."
+          : "تم حفظ التعديلات بنجاح.",
+      );
       router.push(`/listings/local/${currentListing.id}`);
     },
     [imageFiles, listingId, router],

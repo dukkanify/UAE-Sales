@@ -19,7 +19,7 @@ export default async function LocalListingEditPage({
       <SiteHeader />
       <main className="app-container page-padding">
         <PageHero
-          description="عدّل بيانات إعلانك المحفوظ محلياً. التغييرات ستظهر فوراً في إعلاناتي ونتائج البحث."
+          description="عدّل بيانات إعلانك. إن كان مرفوضاً أو مسودة يُعاد إرساله للمراجعة قبل النشر."
           eyebrow="إعلاناتي"
           title="تعديل الإعلان"
         />

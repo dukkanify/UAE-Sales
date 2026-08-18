@@ -50,10 +50,10 @@ export function MyListingsDashboard({
 
   const allListings = useMemo(() => {
     const byId = new Map<string, Listing>();
-    for (const listing of listings) {
+    for (const listing of localListings) {
       byId.set(listing.id, overrides[listing.id] ?? listing);
     }
-    for (const listing of localListings) {
+    for (const listing of listings) {
       byId.set(listing.id, overrides[listing.id] ?? listing);
     }
     return Array.from(byId.values());
@@ -134,6 +134,49 @@ export function MyListingsDashboard({
     }
   }
 
+  async function handleSubmitReview(listing: Listing) {
+    setBusyId(listing.id);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const sync = await fetch("/api/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ listing }),
+      });
+      const synced = await sync.json();
+      if (sync.ok && synced.listing) {
+        applyListingUpdate(synced.listing as Listing);
+        if (
+          synced.listing.status === "pending_review" ||
+          synced.listing.status === "active"
+        ) {
+          setActionMessage(
+            synced.listing.status === "active"
+              ? "تم نشر الإعلان."
+              : "تم إرسال الإعلان للمراجعة. نُخطرك عند الاعتماد أو طلب تعديل.",
+          );
+          return;
+        }
+      }
+
+      const response = await fetch(`/api/listings/${listing.id}/submit`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setActionError("تعذر إرسال الإعلان للمراجعة.");
+        return;
+      }
+      applyListingUpdate(data.listing as Listing);
+      setActionMessage("تم إرسال الإعلان للمراجعة. نُخطرك عند الاعتماد أو طلب تعديل.");
+    } catch {
+      setActionError("تعذر إرسال الإعلان للمراجعة.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function handleFeature(listing: Listing) {
     setBusyId(listing.id);
     setActionError("");
@@ -172,7 +215,7 @@ export function MyListingsDashboard({
         {[
           { icon: "check" as const, label: "نشطة", value: counts.active },
           { icon: "clock" as const, label: "قيد المراجعة", value: counts.pending_review },
-          { icon: "edit" as const, label: "مسودات", value: counts.draft },
+          { icon: "edit" as const, label: "مرفوضة", value: counts.rejected },
           { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("ar-AE") },
         ].map((stat) => (
           <div key={stat.label} className="marketplace-stat-card p-5">
@@ -221,6 +264,16 @@ export function MyListingsDashboard({
                 layout="row"
                 listing={listing}
               />
+              {listing.status === "rejected" && listing.rejectionReason ? (
+                <p className="rounded-[var(--radius-xl)] border border-error/20 bg-error-soft px-3 py-2 text-xs text-error">
+                  سبب الرفض: {listing.rejectionReason}
+                </p>
+              ) : null}
+              {listing.status === "pending_review" ? (
+                <p className="px-1 text-xs text-muted">
+                  بانتظار اعتماد فريق سوقنا قبل الظهور في البحث.
+                </p>
+              ) : null}
               <div className="flex flex-wrap items-center justify-between gap-2 px-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <ListingStatusBadge status={listing.status} />
@@ -266,6 +319,16 @@ export function MyListingsDashboard({
                     variant="accent"
                   >
                     تجديد
+                  </Button>
+                ) : null}
+                {listing.status === "draft" || listing.status === "rejected" ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleSubmitReview(listing)}
+                    size="sm"
+                    variant="accent"
+                  >
+                    إرسال للمراجعة
                   </Button>
                 ) : null}
                 {!listing.isFeatured && listing.status !== "expired" ? (

@@ -261,6 +261,10 @@ export async function renewListing(id: string): Promise<Listing | undefined> {
     postedAt,
     expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
     status: "pending_review",
+    submittedAt: postedAt,
+    rejectionReason: undefined,
+    reviewedAt: undefined,
+    reviewedBy: undefined,
   };
   await saveCollection(FILE, listings);
   setCache(listings);
@@ -306,6 +310,10 @@ export function toAdminListingRecord(listing: Listing): AdminListingRecord {
     isFeatured: listing.isFeatured,
     postedAt: listing.postedAt ?? "",
     city: listing.city,
+    rejectionReason: listing.rejectionReason,
+    submittedAt: listing.submittedAt,
+    reviewedAt: listing.reviewedAt,
+    reviewedBy: listing.reviewedBy,
   };
 }
 

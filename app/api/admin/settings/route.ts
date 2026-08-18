@@ -57,6 +57,10 @@ export async function PATCH(request: Request) {
       typeof body.listingActiveDays === "number"
         ? body.listingActiveDays
         : undefined,
+    listingReviewRequired:
+      typeof body.listingReviewRequired === "boolean"
+        ? body.listingReviewRequired
+        : undefined,
     featuredListingFeeAed:
       typeof body.featuredListingFeeAed === "number"
         ? body.featuredListingFeeAed

@@ -77,6 +77,12 @@ export type Listing = {
   condition: ListingCondition;
   status: ListingStatus;
   isFeatured: boolean;
+  /** Seller-visible note when the listing is rejected. */
+  rejectionReason?: string;
+  /** When the seller last submitted the listing for review. */
+  submittedAt?: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
   views: number;
   imageUrl?: string;
   seller: ListingSeller;
