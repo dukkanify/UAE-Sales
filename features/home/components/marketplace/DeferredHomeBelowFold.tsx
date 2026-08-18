@@ -1,24 +1,7 @@
-"use client";
-
-import dynamic from "next/dynamic";
 import type { Listing } from "@/types";
 import { MarketCategorySection } from "@/features/home/components/marketplace/MarketCategorySection";
-
-const MarketEmirates = dynamic(
-  () =>
-    import("@/features/home/components/marketplace/MarketEmirates").then(
-      (mod) => mod.MarketEmirates,
-    ),
-  { ssr: true },
-);
-
-const MarketAppDownload = dynamic(
-  () =>
-    import("@/features/home/components/marketplace/MarketAppDownload").then(
-      (mod) => mod.MarketAppDownload,
-    ),
-  { ssr: true },
-);
+import { MarketEmirates } from "@/features/home/components/marketplace/MarketEmirates";
+import { MarketAppDownload } from "@/features/home/components/marketplace/MarketAppDownload";
 
 type HomeSection = {
   categoryId: string;
@@ -35,7 +18,7 @@ type DeferredHomeBelowFoldProps = {
   sections: HomeSection[];
 };
 
-/** Below-fold desktop rails + heavy widgets, code-split for faster first paint. */
+/** Below-fold desktop rails. Stays a Server Component so async sections can await. */
 export function DeferredHomeBelowFold({
   appPreviewListings,
   sections,
