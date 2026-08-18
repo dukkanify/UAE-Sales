@@ -4,6 +4,8 @@ export {
   getChatConversationById,
   getChatConversations,
   getChatThreads,
+  getUnreadChatCount,
+  markConversationRead,
   openListingConversation,
   resolveOrCreateConversation,
 } from "./chat.service";

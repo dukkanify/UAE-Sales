@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { findDemoAccount } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import { findUserByEmail, toUserProfile, getRedirectAfterAuth, restoreUserWithPasswordProof } from "@/services/auth/user-store";
 import { verifyPassword } from "@/services/auth/password.service";
 import { readAccountProofCookie } from "@/services/auth/account-vault";
-import { getPostLoginPath } from "@/services/auth/auth.service";
-import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const schema = z.object({
   email: z.string().email(),
@@ -36,17 +34,6 @@ export async function POST(request: Request) {
 
     const email = parsed.data.email.trim().toLowerCase();
     const password = parsed.data.password.trim();
-
-    const demo = findDemoAccount(email, password);
-    if (demo) {
-      await setSessionCookie(demo.profile);
-      trackAuthEvent("login_verified");
-      const redirectTo = getSafeNextPath(
-        parsed.data.next,
-        getPostLoginPath(email, getRedirectAfterAuth(demo.profile)),
-      );
-      return NextResponse.json({ ok: true, user: demo.profile, redirectTo });
-    }
 
     let stored = await findUserByEmail(email);
     const credentialsMatch = Boolean(

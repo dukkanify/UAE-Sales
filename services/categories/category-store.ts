@@ -19,6 +19,7 @@ let inflight: Promise<StoredCategory[]> | null = null;
 function seedCategories(): StoredCategory[] {
   return mockCategories.map((category, index) => ({
     ...category,
+    listingCount: 0,
     enabled: true,
     sortOrder: index + 1,
   }));
@@ -87,7 +88,7 @@ export const getEnabledCategories = cache(async (): Promise<Category[]> => {
       name: category.name,
       slug: category.slug,
       icon: category.icon,
-      listingCount: counts.get(category.id) ?? category.listingCount ?? 0,
+      listingCount: counts.get(category.id) ?? 0,
       subcategories: [...category.subcategories],
     }));
 });

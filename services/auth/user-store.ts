@@ -1,6 +1,5 @@
-import { demoAccounts } from "@/mock/demo-accounts.mock";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
-import { hashPassword, verifyPassword } from "@/services/auth/password.service";
+import { verifyPassword } from "@/services/auth/password.service";
 import {
   findInAccountVault,
   readAccountVault,
@@ -11,6 +10,15 @@ import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const FILE = "users.json";
 
+function isPlaceholderUser(user: StoredUser): boolean {
+  const email = user.email.trim().toLowerCase();
+  return (
+    user.registrationSource === "DEMO" ||
+    email.endsWith("@sooqna.demo") ||
+    email.endsWith("@uaesales.demo")
+  );
+}
+
 function toProfile(user: StoredUser): UserProfile {
   const { passwordHash: _omit, ...profile } = user;
   void _omit;
@@ -18,74 +26,6 @@ function toProfile(user: StoredUser): UserProfile {
     ...profile,
     hasPassword: Boolean(user.passwordHash),
   };
-}
-
-function seedDemoUsers(users: StoredUser[]): StoredUser[] {
-  const emails = new Set(users.map((user) => user.email.toLowerCase()));
-  const seeded = [...users];
-
-  for (const account of demoAccounts) {
-    if (emails.has(account.profile.email.toLowerCase())) continue;
-    seeded.push({
-      ...account.profile,
-      role: account.role,
-      passwordHash: hashPassword(account.password),
-      accountStatus: "active",
-      emailVerifiedAt: account.profile.joinedAt,
-      registrationSource: "DEMO",
-      onboardingStatus:
-        account.profile.accountType === "company" ||
-        account.profile.accountType === "business"
-          ? "business_complete"
-          : "none",
-    });
-  }
-
-  return seeded;
-}
-
-function ensureDemoUsers(users: StoredUser[]): StoredUser[] {
-  const byEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
-  let changed = false;
-
-  for (const account of demoAccounts) {
-    const email = account.profile.email.toLowerCase();
-    const existing = byEmail.get(email);
-
-    if (!existing) {
-      byEmail.set(email, {
-        ...account.profile,
-        role: account.role,
-        passwordHash: hashPassword(account.password),
-        accountStatus: "active",
-        emailVerifiedAt: account.profile.joinedAt,
-        registrationSource: "DEMO",
-        onboardingStatus:
-          account.profile.accountType === "company" ||
-          account.profile.accountType === "business"
-            ? "business_complete"
-            : "none",
-      });
-      changed = true;
-      continue;
-    }
-
-    const needsPassword = !existing.passwordHash;
-    const needsRole = existing.role !== account.role;
-
-    if (needsPassword || needsRole) {
-      byEmail.set(email, {
-        ...existing,
-        role: account.role,
-        ...(needsPassword ? { passwordHash: hashPassword(account.password) } : {}),
-        accountStatus: existing.accountStatus ?? "active",
-        registrationSource: existing.registrationSource ?? "DEMO",
-      });
-      changed = true;
-    }
-  }
-
-  return changed ? Array.from(byEmail.values()) : users;
 }
 
 async function mergeVaultUsers(users: StoredUser[]): Promise<StoredUser[]> {
@@ -113,25 +53,18 @@ async function mergeVaultUsers(users: StoredUser[]): Promise<StoredUser[]> {
 
 export async function getAllUsers(): Promise<StoredUser[]> {
   const users = await loadCollection<StoredUser>(FILE);
-  let next = users;
-  if (next.length === 0) {
-    next = seedDemoUsers([]);
-    await saveCollection(FILE, next);
-  } else {
-    const ensured = ensureDemoUsers(next);
-    if (ensured !== next) {
-      next = ensured;
-      await saveCollection(FILE, next);
-    }
+  const live = users.filter((user) => !isPlaceholderUser(user));
+  if (live.length !== users.length) {
+    await saveCollection(FILE, live);
   }
 
-  const merged = await mergeVaultUsers(next);
-  if (merged !== next) {
+  const merged = await mergeVaultUsers(live);
+  if (merged !== live) {
     await saveCollection(FILE, merged);
     return merged;
   }
 
-  return next;
+  return live;
 }
 
 export async function findUserByEmail(email: string): Promise<StoredUser | null> {
@@ -415,11 +348,7 @@ export async function resolveLoginUser(email: string): Promise<UserProfile | nul
   if (stored && stored.accountStatus === "active") {
     return toProfile(stored);
   }
-
-  const demo = demoAccounts.find(
-    (account) => account.profile.email.toLowerCase() === email.trim().toLowerCase(),
-  );
-  return demo?.profile ?? null;
+  return null;
 }
 
 export function getRedirectAfterAuth(user: UserProfile, next?: string | null): string {

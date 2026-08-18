@@ -4,63 +4,22 @@ import type { AdminDisputePatch, AdminDisputeRecord } from "@/types/domain/admin
 
 const FILE = "disputes.json";
 
-const DEMO_DISPUTES: AdminDisputeRecord[] = [
-  {
-    id: "dispute-001",
-    orderId: "order-demo-1001",
-    listingTitle: "نيسان باترول بلاتينيوم 2022",
-    buyerName: "Ahmed Al Mansoori",
-    sellerName: "Emirates Motors LLC",
-    reason: "السيارة وصلت بحالة مختلفة عن الوصف — خدوش غير مذكورة في الإعلان.",
-    status: "open",
-    amount: 185000,
-    createdAt: "2026-07-18T09:30:00+04:00",
-  },
-  {
-    id: "dispute-002",
-    orderId: "order-demo-1002",
-    listingTitle: "آيفون 15 برو 128 جيجابايت",
-    buyerName: "Sara Al Nuaimi",
-    sellerName: "Ahmed Al Mansoori",
-    reason: "الجهاز لم يُشحن خلال المهلة المتفق عليها رغم الدفع عبر الضمان.",
-    status: "under_review",
-    amount: 4200,
-    createdAt: "2026-07-16T14:15:00+04:00",
-  },
-  {
-    id: "dispute-003",
-    orderId: "order-demo-1003",
-    listingTitle: "فيلا نخلة جميرا",
-    buyerName: "Khalid Al Suwaidi",
-    sellerName: "Palm Properties",
-    reason: "طلب استرداد عربون المعاينة بعد إلغاء البائع للموعد مرتين.",
-    status: "open",
-    amount: 5000,
-    createdAt: "2026-07-19T11:00:00+04:00",
-  },
-  {
-    id: "dispute-004",
-    orderId: "order-demo-1004",
-    listingTitle: "طاولة طعام عصرية 8 كراسي",
-    buyerName: "Mariam Hassan",
-    sellerName: "Home Studio Dubai",
-    reason: "قطعة مكسورة عند الاستلام — البائع يرفض الاستبدال.",
-    status: "resolved_buyer",
-    amount: 2800,
-    createdAt: "2026-07-10T16:45:00+04:00",
-    resolutionNote: "تم استرداد المبلغ للمشتري وإغلاق الضمان.",
-  },
-];
+function isPlaceholderDispute(row: AdminDisputeRecord): boolean {
+  return (
+    row.orderId.startsWith("order-demo-") ||
+    /^dispute-00\d$/.test(row.id)
+  );
+}
 
 async function loadDisputes(): Promise<AdminDisputeRecord[]> {
   const stored = await loadCollection<AdminDisputeRecord>(FILE).catch(
     () => [] as AdminDisputeRecord[],
   );
-  if (stored.length === 0) {
-    await saveCollection(FILE, DEMO_DISPUTES);
-    return DEMO_DISPUTES.map((row) => ({ ...row }));
+  const live = stored.filter((row) => !isPlaceholderDispute(row));
+  if (live.length !== stored.length) {
+    await saveCollection(FILE, live);
   }
-  return stored.map((row) => ({ ...row }));
+  return live.map((row) => ({ ...row }));
 }
 
 export async function createDispute(input: {

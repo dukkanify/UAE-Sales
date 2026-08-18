@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
-import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import {
   enforceRateLimit,
   genericOtpResponse,
@@ -33,19 +32,17 @@ export async function POST(request: Request) {
     }
 
     const stored = await findUserByEmail(email);
-    const demo = findDemoAccountByIdentifier(email);
-    const canLogin =
-      Boolean(
-        stored?.emailVerifiedAt &&
-          (stored.accountStatus === "active" || stored.accountStatus === "pending"),
-      ) || Boolean(demo);
+    const canLogin = Boolean(
+      stored?.emailVerifiedAt &&
+        (stored.accountStatus === "active" || stored.accountStatus === "pending"),
+    );
 
-    if (canLogin) {
+    if (canLogin && stored) {
       await sendOtpForPurpose({
         email,
-        fullName: stored?.fullName ?? demo?.profile.fullName ?? "مستخدم سوقنا",
+        fullName: stored.fullName,
         purpose: "LOGIN",
-        userId: stored?.id ?? demo?.profile.id,
+        userId: stored.id,
       });
       trackAuthEvent("login_otp_sent");
     }

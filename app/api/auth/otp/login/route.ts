@@ -2,13 +2,30 @@ import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { sendLoginVerificationEmail } from "@/services/email/email.service";
-import { findDemoAccount } from "@/mock/demo-accounts.mock";
+import { findUserByEmail } from "@/services/auth/user-store";
+import { verifyPassword } from "@/services/auth/password.service";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
 });
+
+function passwordMatches(storedHash: string, password: string): boolean {
+  try {
+    return verifyPassword(password, storedHash);
+  } catch {
+    return false;
+  }
+}
+
+function genericResponse(email: string) {
+  return NextResponse.json({
+    ok: true,
+    maskedEmail: maskEmail(email),
+    message: "إذا كان الحساب موجودًا، فسيتم إرسال رمز التحقق إلى بريدك الإلكتروني.",
+  });
+}
 
 export async function POST(request: Request) {
   const disabled = emailOtpDisabledResponse();
@@ -21,32 +38,27 @@ export async function POST(request: Request) {
     }
 
     const email = parsed.data.email.trim().toLowerCase();
-    const account = findDemoAccount(email, parsed.data.password);
-
-    if (!account) {
-      // Generic response — do not reveal whether email exists
-      return NextResponse.json({
-        ok: true,
-        maskedEmail: maskEmail(email),
-        message: "إذا كان الحساب موجودًا، فسيتم إرسال رمز التحقق إلى بريدك الإلكتروني.",
-      });
+    const stored = await findUserByEmail(email);
+    if (!stored?.passwordHash || !passwordMatches(stored.passwordHash, parsed.data.password)) {
+      return genericResponse(email);
     }
 
     const { code } = await createOtpRequest({
-      email: account.profile.email,
+      email: stored.email,
       purpose: "LOGIN",
+      userId: stored.id,
     });
 
     await sendLoginVerificationEmail({
-      email: account.profile.email,
-      name: account.profile.fullName,
+      email: stored.email,
+      name: stored.fullName,
       otp: code,
     });
 
     return NextResponse.json({
       ok: true,
-      maskedEmail: maskEmail(account.profile.email),
-      email: account.profile.email,
+      maskedEmail: maskEmail(stored.email),
+      email: stored.email,
     });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("RESEND_COOLDOWN:")) {
