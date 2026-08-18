@@ -11,6 +11,7 @@ export async function GET() {
       supportEmail: settings.supportEmail,
       escrowHoldDays: settings.escrowHoldDays,
       disputeWindowDays: settings.disputeWindowDays,
+      disputeResponseDays: settings.disputeResponseDays,
       listingActiveDays: settings.listingActiveDays,
       featuredListingFeeAed: settings.featuredListingFeeAed,
     },

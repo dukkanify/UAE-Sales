@@ -5,7 +5,7 @@ export default function AdminDisputesPage() {
   return (
     <AdminShell
       activePath="/admin/disputes"
-      description="فض النزاعات بين المشتري والبائع بقرار واضح."
+      description="راجع السبب والمهلة والأدلة ورد البائع، ثم أصدر قراراً يُشعر الطرفين."
       title="النزاعات"
     >
       <AdminDisputesPanel />

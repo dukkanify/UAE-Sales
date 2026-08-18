@@ -1,6 +1,7 @@
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -78,6 +79,17 @@ export default async function EscrowPage() {
                   ))}
                 </ul>
               )}
+            </Card>
+
+            <Card className="border-secondary/30 bg-secondary-soft/30 p-6" variant="flat">
+              <h2 className="text-sm font-semibold text-ink">فتح نزاع بسهولة</h2>
+              <p className="mt-2 text-sm leading-7 text-muted">
+                إذا لم تصل السلعة أو اختلفت عن الوصف، افتح النزاع من لوحة التحكم خلال المهلة.
+                يبقى المبلغ محجوزاً ويُخطر البائع والإدارة فوراً.
+              </p>
+              <Button className="mt-4" href="/dashboard/disputes" size="sm" variant="accent">
+                مركز النزاعات
+              </Button>
             </Card>
 
             <Card className="p-6" variant="flat">

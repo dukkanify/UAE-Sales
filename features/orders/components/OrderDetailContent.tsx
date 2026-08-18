@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Order } from "@/types";
+import type { DisputeWindow } from "@/services/payments/dispute-window";
+import { formatRemainingDays } from "@/services/payments/dispute-window";
 import { RateOrderForm } from "@/features/orders/components/RateOrderForm";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
@@ -11,6 +13,7 @@ import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
+import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
 import { PageHero } from "@/shared/ui/PageHero";
 import { Textarea } from "@/shared/ui/Textarea";
@@ -36,6 +39,7 @@ export function OrderDetailContent({
 }: OrderDetailContentProps) {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
+  const [disputeWindow, setDisputeWindow] = useState<DisputeWindow | null>(null);
   const [error, setError] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
   const [isMatching, setIsMatching] = useState(false);
@@ -53,8 +57,10 @@ export function OrderDetailContent({
     fetch(`/api/orders/${orderId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data.order) setOrder(data.order);
-        else setError("لم يتم العثور على الطلب.");
+        if (data.order) {
+          setOrder(data.order);
+          setDisputeWindow(data.disputeWindow ?? null);
+        } else setError("لم يتم العثور على الطلب.");
       })
       .catch(() => setError("تعذر تحميل الطلب."));
   }, [orderId]);
@@ -225,11 +231,6 @@ export function OrderDetailContent({
   const escrowActive =
     order.status === "paid_held_in_escrow" || order.status === "delivered";
   const canConfirm = isBuyer && escrowActive;
-  const canDispute =
-    isBuyer &&
-    (order.status === "paid_held_in_escrow" ||
-      order.status === "delivered" ||
-      order.status === "confirmed");
   const showSellerProofForm = isSeller && escrowActive && !order.sellerProofAt;
   const showBuyerMatch =
     isBuyer &&
@@ -390,12 +391,38 @@ export function OrderDetailContent({
           </p>
         ) : null}
 
-        {canDispute ? (
+        {isBuyer && disputeWindow?.canOpen ? (
+          <Card className="border-secondary/45 bg-secondary-soft/50 p-5" variant="flat">
+            <div className="flex items-start gap-3">
+              <span className="grid size-10 place-items-center rounded-2xl bg-[#0b1628] text-secondary">
+                <Icon name="shield" size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-black text-ink">حماية الضمان — افتح نزاعاً بسهولة</p>
+                <p className="mt-1 text-sm text-muted">
+                  متبقي {formatRemainingDays(disputeWindow.remainingDays)} حتى{" "}
+                  {new Date(disputeWindow.closesAt).toLocaleDateString("ar-AE")}. المبلغ يبقى
+                  محجوزاً ونُخطر البائع والإدارة فوراً.
+                </p>
+                <Button
+                  className="mt-3"
+                  href={`/dashboard/disputes?orderId=${encodeURIComponent(order.id)}`}
+                  size="md"
+                  variant="accent"
+                >
+                  فتح النزاع من لوحة التحكم
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : null}
+
+        {isBuyer && order.status === "disputed" ? (
           <Link
-            className="inline-flex items-center justify-center rounded-[var(--radius-xl)] border border-border bg-surface px-5 py-3 text-sm font-semibold text-ink transition hover:bg-surface-muted"
-            href={`/disputes/new?orderId=${encodeURIComponent(order.id)}`}
+            className="inline-flex items-center justify-center rounded-[var(--radius-xl)] border border-secondary/40 bg-secondary-soft px-5 py-3 text-sm font-bold text-ink"
+            href="/dashboard/disputes"
           >
-            فتح نزاع
+            متابعة النزاع في لوحة التحكم
           </Link>
         ) : null}
 

@@ -61,8 +61,9 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
         )}
       </Card>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { href: "/dashboard/disputes", icon: "shield" as const, label: "النزاعات" },
           { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
           { href: "/escrow", icon: "shield" as const, label: "الضمان المالي" },
           { href: "/chat", icon: "message" as const, label: "الرسائل" },

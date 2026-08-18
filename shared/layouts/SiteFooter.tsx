@@ -37,6 +37,7 @@ const linkKeys: Record<string, MessageKey> = {
   "/login": "footer.link.login",
   "/register": "footer.link.register",
   "/dashboard/listings": "footer.link.myAds",
+  "/dashboard/disputes": "footer.link.disputes",
   "/profile#notifications": "footer.link.notifications",
   "/escrow": "footer.link.escrowHow",
   "/support": "footer.link.contact",
