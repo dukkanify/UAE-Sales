@@ -80,11 +80,21 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
 
       <Card className="flex flex-wrap items-center justify-between gap-4 p-5">
         <p className="text-sm font-medium text-muted">
-          التغييرات ستظهر فوراً في صفحة الإعلان، إعلاناتي، ونتائج البحث.
+          {listing.status === "rejected"
+            ? "بعد الحفظ يُعاد إرسال الإعلان لفريق سوقنا مع سبب الرفض السابق."
+            : listing.status === "draft" || listing.status === "expired"
+              ? "الحفظ يرسل الإعلان للمراجعة قبل ظهوره في البحث."
+              : listing.status === "pending_review"
+                ? "الإعلان ما زال قيد المراجعة. التعديل يحدّث البيانات دون نشره."
+                : "تعديل الإعلان النشط يظهر للمشترين دون إخفائه من البحث."}
         </p>
         <div className="flex flex-wrap gap-3">
           <Button loading={isLoading} type="submit">
-            حفظ التعديلات
+            {listing.status === "draft" ||
+            listing.status === "rejected" ||
+            listing.status === "expired"
+              ? "حفظ وإرسال للمراجعة"
+              : "حفظ التعديلات"}
           </Button>
           <Button href={`/listings/local/${listing.id}`} variant="secondary">
             إلغاء

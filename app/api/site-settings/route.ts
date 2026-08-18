@@ -12,6 +12,7 @@ export async function GET() {
       escrowHoldDays: settings.escrowHoldDays,
       disputeWindowDays: settings.disputeWindowDays,
       listingActiveDays: settings.listingActiveDays,
+      listingReviewRequired: settings.listingReviewRequired,
       featuredListingFeeAed: settings.featuredListingFeeAed,
     },
   });

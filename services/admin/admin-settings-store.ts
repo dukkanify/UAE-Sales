@@ -9,6 +9,7 @@ export type AdminSiteSettings = {
   escrowHoldDays: number;
   disputeWindowDays: number;
   listingActiveDays: number;
+  listingReviewRequired: boolean;
   featuredListingFeeAed: number;
   featuredListingDays: number;
   supportEmail: string;
@@ -27,6 +28,7 @@ const DEFAULT_SETTINGS: AdminSiteSettings = {
   escrowHoldDays: 7,
   disputeWindowDays: 7,
   listingActiveDays: 30,
+  listingReviewRequired: true,
   featuredListingFeeAed: 49,
   featuredListingDays: 14,
   supportEmail: "support@sooqna.site",
@@ -73,6 +75,10 @@ export async function updateAdminSettings(
       1,
       Math.round(patch.listingActiveDays ?? current.listingActiveDays),
     ),
+    listingReviewRequired:
+      typeof patch.listingReviewRequired === "boolean"
+        ? patch.listingReviewRequired
+        : current.listingReviewRequired,
     featuredListingFeeAed: Math.max(
       0,
       Math.round(

@@ -8,10 +8,12 @@ import {
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
+import { canPreviewListing } from "@/services/listings/listing-review";
 import {
   getListingBySlug,
   getRelatedListings,
 } from "@/services/listings";
+import { getCurrentUser } from "@/services/profile";
 
 type ListingPageProps = {
   params: Promise<{ slug: string }>;
@@ -32,6 +34,9 @@ export async function generateMetadata({
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
   if (!listing) return { title: `الإعلان غير موجود | Sooqna` };
+  if (listing.status !== "active") {
+    return { title: `معاينة إعلان | Sooqna`, robots: { index: false, follow: false } };
+  }
   return {
     title: `${listing.title} | Sooqna`,
     description: listing.description,
@@ -42,6 +47,8 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
   if (!listing) notFound();
+  const viewer = await getCurrentUser();
+  if (!canPreviewListing(listing, viewer)) notFound();
 
   const [categories, relatedListings] = await Promise.all([
     getCategories(),

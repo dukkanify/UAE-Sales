@@ -10,7 +10,10 @@ export type NotificationType =
   | "escrow_held"
   | "job_application"
   | "viewing_booking"
-  | "quote_request";
+  | "quote_request"
+  | "listing_submitted"
+  | "listing_approved"
+  | "listing_rejected";
 
 export type AppNotification = {
   id: string;

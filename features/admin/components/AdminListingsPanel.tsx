@@ -75,8 +75,11 @@ const emptyForm = {
 export function AdminListingsPanel() {
   const [listings, setListings] = useState<AdminListingRecord[]>([]);
   const [categories, setCategories] = useState<AdminCategoryRecord[]>([]);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("pending_review");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [rejectId, setRejectId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectError, setRejectError] = useState("");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<CategoryFieldErrors>({});
@@ -125,6 +128,10 @@ export function AdminListingsPanel() {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
+  const pendingCount = listings.filter(
+    (listing) => listing.status === "pending_review",
+  ).length;
+
   const filtered = useMemo(() => {
     if (statusFilter === "all") return listings;
     return listings.filter((listing) => listing.status === statusFilter);
@@ -142,11 +149,14 @@ export function AdminListingsPanel() {
 
   async function patchListing(
     id: string,
-    patch: Partial<Pick<AdminListingRecord, "status" | "isFeatured">>,
+    patch: Partial<
+      Pick<AdminListingRecord, "status" | "isFeatured" | "rejectionReason">
+    >,
   ) {
     const session = getSessionUser();
     if (!session) return;
     setBusyId(id);
+    setRejectError("");
     try {
       const response = await adminFetch(`/api/admin/listings/${id}`, {
         method: "PATCH",
@@ -160,6 +170,12 @@ export function AdminListingsPanel() {
         setListings((prev) =>
           prev.map((listing) => (listing.id === id ? data.listing : listing)),
         );
+        setRejectId(null);
+        setRejectReason("");
+        return;
+      }
+      if (data.error === "REJECT_REASON_REQUIRED") {
+        setRejectError("اكتب سبب الرفض (٨ أحرف على الأقل) ليظهر للبائع.");
       }
     } finally {
       setBusyId(null);
@@ -466,7 +482,7 @@ export function AdminListingsPanel() {
         </form>
       </Card>
 
-      <Card className="p-4" variant="flat">
+      <Card className="border-secondary/30 bg-secondary-soft/30 p-4" variant="flat">
         <div className="flex flex-wrap items-end gap-3">
           <div className="min-w-[200px]">
             <Select
@@ -476,11 +492,14 @@ export function AdminListingsPanel() {
               value={statusFilter}
             />
           </div>
-          <p className="pb-2 text-xs text-muted">
-            <Icon className="ms-1 inline" name="package" size={14} />
-            {filtered.length} إعلان
+          <p className="pb-2 text-xs font-semibold text-ink">
+            <Icon className="ms-1 inline" name="shield" size={14} />
+            {pendingCount} بانتظار المراجعة · {filtered.length} معروض
           </p>
         </div>
+        <p className="mt-2 text-xs text-muted">
+          الاعتماد ينشر الإعلان في البحث ويُشعر البائع. الرفض يحتاج سبباً واضحاً لإعادة التعديل.
+        </p>
       </Card>
 
       {filtered.length === 0 ? (
@@ -505,6 +524,17 @@ export function AdminListingsPanel() {
                     <Badge variant="featured">مميّز</Badge>
                   ) : null}
                 </div>
+                {listing.submittedAt ? (
+                  <p className="mt-2 text-xs text-muted">
+                    أُرسل للمراجعة:{" "}
+                    {new Date(listing.submittedAt).toLocaleString("ar-AE")}
+                  </p>
+                ) : null}
+                {listing.rejectionReason ? (
+                  <p className="mt-2 text-xs text-error">
+                    سبب الرفض: {listing.rejectionReason}
+                  </p>
+                ) : null}
               </div>
               <div className="text-left">
                 <CurrencyAmount amount={listing.price} size="lg" />
@@ -529,9 +559,11 @@ export function AdminListingsPanel() {
               {listing.status !== "rejected" ? (
                 <Button
                   loading={busyId === listing.id}
-                  onClick={() =>
-                    patchListing(listing.id, { status: "rejected" })
-                  }
+                  onClick={() => {
+                    setRejectId(listing.id);
+                    setRejectReason("");
+                    setRejectError("");
+                  }}
                   size="sm"
                   variant="ghost"
                 >
@@ -558,6 +590,47 @@ export function AdminListingsPanel() {
                 عرض
               </Button>
             </div>
+            {rejectId === listing.id ? (
+              <div className="mt-3 grid gap-2">
+                <Textarea
+                  label="سبب الرفض (يظهر للبائع)"
+                  minLength={8}
+                  onChange={(event) => setRejectReason(event.target.value)}
+                  placeholder="مثال: الصور غير واضحة أو الوصف لا يطابق السلعة..."
+                  required
+                  value={rejectReason}
+                />
+                {rejectError ? (
+                  <FormMessage variant="error">{rejectError}</FormMessage>
+                ) : null}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() =>
+                      patchListing(listing.id, {
+                        status: "rejected",
+                        rejectionReason: rejectReason.trim(),
+                      })
+                    }
+                    size="sm"
+                    variant="primary"
+                  >
+                    تأكيد الرفض وإشعار البائع
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setRejectId(null);
+                      setRejectReason("");
+                      setRejectError("");
+                    }}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    إلغاء
+                  </Button>
+                </div>
+              </div>
+            ) : null}
           </Card>
         ))
       )}

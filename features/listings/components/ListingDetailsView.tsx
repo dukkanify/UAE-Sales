@@ -13,6 +13,7 @@ import {
   MobileStickyActionBar,
 } from "@/features/listings/components/ListingStickyPanel";
 import { ListingCard } from "@/features/listings/components/ListingCard";
+import { ListingReviewBanner } from "@/features/listings/components/ListingReviewBanner";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
@@ -47,6 +48,7 @@ export function ListingDetailsView({
     <>
       <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
+        <ListingReviewBanner listing={listing} />
 
         <div className="listing-details-grid grid w-full min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start lg:gap-x-8">
           <div className="min-w-0 lg:col-start-1">

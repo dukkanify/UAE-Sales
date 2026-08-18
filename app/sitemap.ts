@@ -33,7 +33,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${base}/categories/${category.slug}`,
   }));
 
-  const listingRoutes = listings.slice(0, 100).map((listing) => ({
+  const listingRoutes = listings
+    .filter((listing) => listing.status === "active")
+    .slice(0, 100)
+    .map((listing) => ({
     changeFrequency: "weekly" as const,
     lastModified: new Date(listing.postedAt ?? Date.now()),
     priority: 0.6,

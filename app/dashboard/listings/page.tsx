@@ -19,7 +19,7 @@ export default async function DashboardListingsPage() {
       <main>
         <DashboardShell
           activePath="/dashboard/listings"
-          description="متابعة الإعلانات النشطة، المنتهية، المسودات، قيد المراجعة، والمرفوضة من مكان واحد."
+          description="تابع حالة المراجعة والنشر: أرسل المسودة، عدّل المرفوض، واظهر للمشترين بعد اعتماد فريق سوقنا."
           title="إعلاناتي"
           user={user}
         >

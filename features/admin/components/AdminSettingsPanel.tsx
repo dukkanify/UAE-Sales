@@ -211,6 +211,19 @@ export function AdminSettingsPanel() {
             />
             <span>السماح بالشراء كضيف</span>
           </label>
+          <label className="admin-ops__toggle">
+            <input
+              checked={settings.listingReviewRequired ?? true}
+              type="checkbox"
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  listingReviewRequired: e.target.checked,
+                })
+              }
+            />
+            <span>مراجعة الإعلان قبل النشر (يظهر في البحث بعد الاعتماد فقط)</span>
+          </label>
         </div>
       </section>
 
