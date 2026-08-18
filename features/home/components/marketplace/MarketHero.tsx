@@ -4,7 +4,6 @@ import { AppImage } from "@/shared/components/AppImage";
 import {
   getMarketHeroBackground,
   getMarketQuickSearches,
-  getMarketTrustStats,
 } from "@/services/content/homepage-marketplace.content";
 import { MarketHeroSearch } from "./MarketHeroSearch";
 
@@ -13,10 +12,9 @@ type MarketHeroProps = {
 };
 
 export async function MarketHero({ categories }: MarketHeroProps) {
-  const [backgroundUrl, quickSearches, stats] = await Promise.all([
+  const [backgroundUrl, quickSearches] = await Promise.all([
     getMarketHeroBackground(),
     getMarketQuickSearches(),
-    getMarketTrustStats(),
   ]);
 
   return (
@@ -68,15 +66,6 @@ export async function MarketHero({ categories }: MarketHeroProps) {
                 >
                   {tag.label}
                 </Link>
-              ))}
-            </div>
-
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-              {stats.map((stat) => (
-                <div key={stat.label} className="market-hero-stat rounded-xl px-4 py-3 shadow-sm">
-                  <p className="market-hero-stat-value text-xl font-bold md:text-2xl">{stat.value}</p>
-                  <p className="market-hero-stat-label mt-0.5 text-xs font-semibold">{stat.label}</p>
-                </div>
               ))}
             </div>
           </div>
