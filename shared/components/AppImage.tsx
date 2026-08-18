@@ -106,7 +106,7 @@ function AppImageInner({
           onError={handleError}
           onLoad={() => setIsLoaded(true)}
           priority={priority}
-          quality={priority ? 78 : 70}
+          quality={priority ? 78 : 75}
           sizes={sizes}
           src={activeSrc}
           width={fill ? undefined : width}
