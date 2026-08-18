@@ -23,7 +23,7 @@ export function BrandCombobox({
   label,
   name,
   options,
-  placeholder = "ابحث عن الماركة (مثال: Toy… أو App…)",
+  placeholder = "ابحث عن الماركة",
   required = false,
 }: BrandComboboxProps) {
   const listId = useId();
@@ -100,7 +100,7 @@ export function BrandCombobox({
             aria-expanded={showList}
             aria-invalid={hasError || undefined}
             autoComplete="off"
-            className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${compact ? "min-h-9 rounded-lg pe-3 ps-8 text-xs font-medium" : "min-h-11 pe-4 ps-10 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"}`}
+            className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-start text-ink shadow-[var(--shadow-xs)] placeholder:overflow-visible placeholder:text-muted/70 placeholder:opacity-100 transition ${compact ? "min-h-10 rounded-lg pe-3 ps-9 text-sm font-medium" : "min-h-11 pe-4 ps-10 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"}`}
             onBlur={() => {
               // Delay so option click can register first.
               window.setTimeout(() => {

@@ -7,7 +7,7 @@ export const addListingStepTitleClass = "text-xl font-black text-ink sm:text-2xl
 export const addListingStepDescClass = "mt-1 text-xs font-medium text-muted sm:text-sm";
 export const addListingStepBodyClass = "mt-3 grid gap-3 sm:mt-4";
 export const addListingDynamicFieldsGridClass =
-  "mt-3 grid grid-cols-2 gap-x-2.5 gap-y-2.5 sm:mt-4 sm:gap-3";
+  "mt-3 grid grid-cols-1 gap-x-2.5 gap-y-2.5 sm:mt-4 sm:grid-cols-2 sm:gap-3";
 export const addListingStepFooterClass = "col-span-2 mt-3 grid gap-3 sm:mt-4";
 export const addListingCheckboxGroupClass =
   "grid gap-1 rounded-[var(--radius-lg)] border border-border p-2.5 sm:rounded-[var(--radius-xl)] sm:p-3";

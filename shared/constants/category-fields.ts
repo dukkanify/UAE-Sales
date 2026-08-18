@@ -56,7 +56,7 @@ const carFields: CategoryFieldDefinition[] = [
     titlePart: true,
     searchable: true,
     options: carBrandOptions,
-    placeholder: "ابحث عن الماركة (Toy… Nissan…)",
+    placeholder: "ابحث عن الماركة",
   },
   {
     key: "model",
@@ -66,7 +66,7 @@ const carFields: CategoryFieldDefinition[] = [
     titlePart: true,
     searchable: true,
     options: carModelOptions,
-    placeholder: "ابحث عن الموديل (Patrol… Camry…)",
+    placeholder: "ابحث عن الموديل",
   },
   {
     key: "condition",
@@ -190,7 +190,7 @@ const mobileFields: CategoryFieldDefinition[] = [
     titlePart: true,
     searchable: true,
     options: mobileBrandOptions,
-    placeholder: "ابحث عن الماركة (App… Sam…)",
+    placeholder: "ابحث عن الماركة",
   },
   {
     key: "model",
@@ -200,7 +200,7 @@ const mobileFields: CategoryFieldDefinition[] = [
     titlePart: true,
     searchable: true,
     options: mobileModelOptions,
-    placeholder: "ابحث عن الموديل (iPhone… Galaxy…)",
+    placeholder: "ابحث عن الموديل",
   },
   { key: "storage", label: "التخزين", type: "select", required: true, searchable: true, options: [
     { label: "64 GB", value: "64 GB" },
@@ -243,7 +243,7 @@ const electronicsFields: CategoryFieldDefinition[] = [
     titlePart: true,
     searchable: true,
     options: electronicsBrandOptions,
-    placeholder: "ابحث عن الماركة (App… Son…)",
+    placeholder: "ابحث عن الماركة",
   },
   {
     key: "model",
