@@ -18,36 +18,43 @@ export async function MarketHero({ categories }: MarketHeroProps) {
   ]);
 
   return (
-    <section className="market-hero relative overflow-hidden">
-      <div className="market-hero-bg absolute inset-0">
-        <AppImage
-          alt="أفق الإمارات ومطار دولي"
-          className="object-cover object-center"
-          fallback="emirates"
-          fill
-          priority
-          sizes="100vw"
-          src={backgroundUrl}
-        />
-        <div className="market-hero-overlay absolute inset-0" />
-        <div className="absolute inset-0 uae-hero-sand-wash opacity-70" />
-        <div className="absolute inset-0 uae-geometric-texture opacity-[0.03]" />
+    <section className="market-hero">
+      <div aria-hidden className="market-hero__scene">
+        <div className="market-hero__mesh" />
+        <span className="market-hero__orb market-hero__orb--gold" />
+        <span className="market-hero__orb market-hero__orb--navy" />
+        <span className="market-hero__orb market-hero__orb--mist" />
+        <div className="market-hero__photo">
+          <AppImage
+            alt="أفق دبي وبرج خليفة"
+            className="object-cover"
+            fallback="emirates"
+            fill
+            priority
+            sizes="100vw"
+            src={backgroundUrl}
+          />
+        </div>
+        <div className="market-hero__grid" />
+        <div className="market-hero__shine" />
+        <div className="market-hero__vignette" />
       </div>
 
-      <div className="relative z-10">
-        <div className="app-container px-4 py-12 md:py-16 lg:py-20">
+      <div className="market-hero__content">
+        <div className="app-container px-4">
           <div className="mx-auto max-w-4xl text-center">
             <div className="market-hero-copy">
-              <span className="market-hero-chip inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold shadow-sm">
-                <span className="inline-block h-3.5 w-5 overflow-hidden rounded-sm uae-flag-strip" />
+              <span className="market-hero-chip">
+                <span className="market-hero-chip__flag uae-flag-strip" />
                 من الإمارات إلى العالم
               </span>
 
-              <h1 className="market-hero-title mt-5 text-3xl font-bold leading-tight tracking-tight sm:text-4xl md:text-5xl md:leading-[1.1]">
-                بيع وشراء بثقة في الإمارات
+              <h1 className="market-hero-title">
+                بيع وشراء بثقة في{" "}
+                <span className="market-hero-title__accent">الإمارات</span>
               </h1>
 
-              <p className="market-hero-lead mx-auto mt-4 max-w-2xl text-base leading-8 md:text-lg">
+              <p className="market-hero-lead">
                 كل ما تحتاجه من سيارات، عقارات، إلكترونيات وخدمات في منصة إماراتية
                 واحدة مع ضمان مالي يحمي المشتري والبائع.
               </p>
@@ -57,11 +64,11 @@ export async function MarketHero({ categories }: MarketHeroProps) {
               <MarketHeroSearch categories={categories} />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <div className="market-hero-pills">
               {quickSearches.map((tag) => (
                 <Link
                   key={tag.href}
-                  className="market-hero-pill rounded-full px-3.5 py-1.5 text-xs font-bold transition"
+                  className="market-hero-pill"
                   href={tag.href}
                 >
                   {tag.label}
