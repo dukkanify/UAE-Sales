@@ -1,5 +1,6 @@
 import type { Listing } from "@/types";
 import { getCategoryFieldLabel, getCategoryFields } from "@/shared/constants/category-fields";
+import { getListingSpecMap } from "@/shared/listings/listing-spec-map";
 import {
   CATEGORY_SEARCH_KEYWORDS,
   searchTextMatches,
@@ -160,11 +161,9 @@ export function listingMatchesQuery(listing: Listing, query: string): boolean {
   const normalized = query.trim();
   if (!normalized) return true;
 
-  const specValues = listing.categorySpecs
-    ? Object.entries(listing.categorySpecs)
-        .filter(([key]) => key !== "features")
-        .map(([, value]) => String(value))
-    : [];
+  const specValues = Object.entries(getListingSpecMap(listing))
+    .filter(([key]) => key !== "features")
+    .map(([, value]) => String(value));
 
   const haystack = [
     listing.title,

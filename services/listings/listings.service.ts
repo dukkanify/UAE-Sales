@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { Listing, ListingSearchFilters } from "@/types";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
+import { listingMatchesSpecs } from "@/shared/listings/listing-spec-map";
 import {
   getAllListings,
   getListingBySlug as getStoredListingBySlug,
@@ -87,7 +88,8 @@ export async function searchListings(
     )
     .filter((listing) =>
       filters.premium ? listing.isPremium === true : true,
-    );
+    )
+    .filter((listing) => listingMatchesSpecs(listing, filters.specs));
 
   return [...results].sort((first, second) => {
     if (filters.sort === "price_asc") {

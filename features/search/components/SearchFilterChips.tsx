@@ -2,21 +2,15 @@
 
 import Link from "next/link";
 import type { Category } from "@/types";
+import { getCategoryFilterConfig } from "@/shared/constants/category-filters";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Icon } from "@/shared/ui/Icon";
+import { buildSearchUrl, type SearchFilterState } from "./search-url";
 
 type SearchFilterChipsProps = {
+  basePath?: string;
   categories: Category[];
-  selectedFilters: {
-    category?: string;
-    city?: string;
-    condition?: string;
-    country?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    query?: string;
-    sort?: string;
-  };
+  selectedFilters: SearchFilterState;
 };
 
 const conditionLabels: Record<string, string> = {
@@ -31,50 +25,18 @@ const sortLabels: Record<string, string> = {
   price_desc: "السعر ↓",
 };
 
-function buildSearchUrl(
-  filters: SearchFilterChipsProps["selectedFilters"],
-  omitKey?: keyof SearchFilterChipsProps["selectedFilters"],
-) {
-  const params = new URLSearchParams();
-
-  if (filters.query && omitKey !== "query") {
-    params.set("q", filters.query);
-  }
-  if (filters.country && omitKey !== "country") {
-    params.set("country", filters.country);
-  }
-  if (filters.city && omitKey !== "city") {
-    params.set("city", filters.city);
-  }
-  if (filters.category && omitKey !== "category") {
-    params.set("category", filters.category);
-  }
-  if (filters.condition && omitKey !== "condition") {
-    params.set("condition", filters.condition);
-  }
-  if (filters.minPrice && omitKey !== "minPrice") {
-    params.set("minPrice", filters.minPrice);
-  }
-  if (filters.maxPrice && omitKey !== "maxPrice") {
-    params.set("maxPrice", filters.maxPrice);
-  }
-  if (filters.sort && filters.sort !== "newest" && omitKey !== "sort") {
-    params.set("sort", filters.sort);
-  }
-
-  const query = params.toString();
-  return query ? `/search?${query}` : "/search";
-}
-
 export function SearchFilterChips({
+  basePath = "/search",
   categories,
   selectedFilters,
 }: SearchFilterChipsProps) {
   const categoryName = categories.find((c) => c.id === selectedFilters.category)?.name;
-  const chips: {
-    key: keyof SearchFilterChipsProps["selectedFilters"];
-    label: React.ReactNode;
-  }[] = [];
+  const config = getCategoryFilterConfig(selectedFilters.category);
+  const specLabels = Object.fromEntries(
+    [...config.primary, ...config.extra].map((field) => [field.key, field.label]),
+  );
+
+  const chips: { key: string; label: React.ReactNode }[] = [];
 
   if (selectedFilters.query) {
     chips.push({ key: "query", label: `"${selectedFilters.query}"` });
@@ -85,13 +47,20 @@ export function SearchFilterChips({
   if (selectedFilters.city) {
     chips.push({ key: "city", label: selectedFilters.city });
   }
-  if (categoryName) {
+  if (categoryName && basePath === "/search") {
     chips.push({ key: "category", label: categoryName });
   }
   if (selectedFilters.condition) {
     chips.push({
       key: "condition",
       label: conditionLabels[selectedFilters.condition] ?? selectedFilters.condition,
+    });
+  }
+  for (const [key, value] of Object.entries(selectedFilters.specs ?? {})) {
+    if (!value) continue;
+    chips.push({
+      key,
+      label: `${specLabels[key] ?? key}: ${value}`,
     });
   }
   if (selectedFilters.minPrice) {
@@ -125,6 +94,8 @@ export function SearchFilterChips({
     return null;
   }
 
+  const clearHref = basePath === "/search" ? "/search" : basePath;
+
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold text-muted">
@@ -134,7 +105,7 @@ export function SearchFilterChips({
         <Link
           key={chip.key}
           className="premium-chip interactive-lift gap-1.5 !py-1.5 !text-xs text-ink"
-          href={buildSearchUrl(selectedFilters, chip.key)}
+          href={buildSearchUrl(selectedFilters, chip.key, basePath)}
         >
           {chip.label}
           <Icon aria-hidden name="close" size={12} />
@@ -143,7 +114,7 @@ export function SearchFilterChips({
       ))}
       <Link
         className="text-xs font-semibold text-primary transition hover:text-primary-dark"
-        href="/search"
+        href={clearHref}
       >
         مسح الكل
       </Link>

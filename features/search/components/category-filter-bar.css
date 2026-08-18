@@ -1,0 +1,122 @@
+.category-filter-wrap {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.category-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  border-radius: 1.15rem;
+  background: var(--color-surface);
+  box-shadow: 0 10px 28px rgb(11 22 40 / 7%);
+}
+
+.category-filter-field {
+  display: grid;
+  min-width: 8.5rem;
+  flex: 1 1 8.5rem;
+  gap: 0.2rem;
+  padding: 0.7rem 0.95rem;
+  border-inline-end: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+}
+
+.category-filter-field span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.category-filter-field select,
+.category-filter-field input {
+  width: 100%;
+  min-height: 1.4rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.category-filter-field select:focus,
+.category-filter-field input:focus {
+  outline: none;
+  color: var(--color-ink);
+}
+
+.category-filter-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 5.5rem;
+  margin: 0.55rem;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, #d4b87a, #c9a962);
+  color: #0b1628;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.category-filter-extra {
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  border-radius: 1rem;
+  background: var(--color-surface);
+  padding: 0.15rem 0.85rem 0.85rem;
+}
+
+.category-filter-extra summary {
+  display: flex;
+  cursor: pointer;
+  list-style: none;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 0.1rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+
+.category-filter-extra summary::-webkit-details-marker {
+  display: none;
+}
+
+.category-filter-extra-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  padding-top: 0.2rem;
+}
+
+.category-filter-extra-grid .category-filter-field {
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+  border-radius: 0.9rem;
+}
+
+.category-filter-crumbs {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+@media (max-width: 720px) {
+  .category-filter-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .category-filter-field {
+    border-inline-end: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  }
+
+  .category-filter-submit {
+    grid-column: 1 / -1;
+  }
+}

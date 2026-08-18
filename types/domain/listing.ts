@@ -126,4 +126,5 @@ export type ListingSearchFilters = {
   premium?: boolean;
   query?: string;
   sort?: "newest" | "price_asc" | "price_desc";
+  specs?: Record<string, string>;
 };

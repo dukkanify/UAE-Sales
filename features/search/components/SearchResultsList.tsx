@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { listingMatchesEmirate } from "@/shared/listings/listing-ownership";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
+import { listingMatchesSpecs } from "@/shared/listings/listing-spec-map";
+import type { SearchFilterState } from "@/features/search/components/search-url";
 import type { Category, Listing } from "@/types";
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SearchResultsToolbar } from "@/features/search/components/SearchResultsToolbar";
@@ -17,22 +19,15 @@ import {
 const PAGE_SIZE = 12;
 
 type SearchResultsListProps = {
+  basePath?: string;
   categoryId?: string;
   categories: Category[];
   listings: Listing[];
-  selectedFilters?: {
-    category?: string;
-    city?: string;
-    condition?: string;
-    country?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    query?: string;
-    sort?: string;
-  };
+  selectedFilters?: SearchFilterState;
 };
 
 export function SearchResultsList({
+  basePath = "/search",
   categoryId,
   categories,
   listings,
@@ -96,7 +91,8 @@ export function SearchResultsList({
       .filter((listing) => {
         if (!normalizedQuery) return true;
         return listingMatchesQuery(listing, normalizedQuery);
-      });
+      })
+      .filter((listing) => listingMatchesSpecs(listing, selectedFilters.specs));
 
     return [...matchingLocalListings, ...listings].sort((a, b) => {
       if (selectedFilters.sort === "price_asc") return a.price - b.price;
@@ -126,6 +122,7 @@ export function SearchResultsList({
     return (
       <>
         <SearchResultsToolbar
+          basePath={basePath}
           categories={categories}
           resultCount={0}
           selectedFilters={selectedFilters}
@@ -148,6 +145,7 @@ export function SearchResultsList({
   return (
     <>
       <SearchResultsToolbar
+        basePath={basePath}
         categories={categories}
         resultCount={visibleListings.length}
         selectedFilters={selectedFilters}
