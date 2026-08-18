@@ -1,10 +1,7 @@
 import { BRAND } from "@/shared/constants/brand";
 import { getActiveListingCount, getEmirateListingHighlights } from "@/mock/catalog-metrics";
-import { getTrendingQuickSearches } from "@/services/search/trending-quick-searches";
 import type { HomeCityHighlight } from "@/types";
 import { getEmirateImageUrl, heroBackgroundUrl } from "@/shared/constants/image-fallbacks";
-
-export type { MarketQuickSearch } from "@/services/search/trending-quick-searches";
 
 export type MarketTrustStat = {
   label: string;
@@ -34,10 +31,6 @@ export async function getMarketTrustStats(): Promise<MarketTrustStat[]> {
     { label: "معاملة آمنة", value: "12,413" },
     { label: "تقييم المنصة", value: "4.8/5" },
   ];
-}
-
-export async function getMarketQuickSearches() {
-  return getTrendingQuickSearches();
 }
 
 export async function getMarketEscrowSteps(): Promise<MarketEscrowStep[]> {

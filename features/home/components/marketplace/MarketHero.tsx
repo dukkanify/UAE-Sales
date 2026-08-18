@@ -3,9 +3,9 @@ import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import {
   getMarketHeroBackground,
-  getMarketQuickSearches,
   getMarketTrustStats,
 } from "@/services/content/homepage-marketplace.content";
+import { getTrendingQuickSearches } from "@/services/search/trending-quick-searches";
 import { MarketHeroSearch } from "./MarketHeroSearch";
 
 type MarketHeroProps = {
@@ -15,7 +15,7 @@ type MarketHeroProps = {
 export async function MarketHero({ categories }: MarketHeroProps) {
   const [backgroundUrl, quickSearches, stats] = await Promise.all([
     getMarketHeroBackground(),
-    getMarketQuickSearches(),
+    getTrendingQuickSearches(),
     getMarketTrustStats(),
   ]);
 
