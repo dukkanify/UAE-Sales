@@ -18,6 +18,7 @@ import {
   getCategoryBySlug,
 } from "@/services/categories";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
+import { recordSearchQuery } from "@/services/search/search-trend-store";
 import { searchListings } from "@/services/listings";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
@@ -109,6 +110,7 @@ export default async function CategoryPage({
           : "newest",
     }),
     getSearchSuggestionTitles(),
+    selectedFilters.query ? recordSearchQuery(selectedFilters.query) : Promise.resolve(),
   ]);
 
   const suggestions = buildSearchSuggestions({

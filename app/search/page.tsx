@@ -7,6 +7,7 @@ import { buildSearchSuggestions } from "@/features/search/components/search-sugg
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
+import { recordSearchQuery } from "@/services/search/search-trend-store";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
@@ -85,6 +86,7 @@ export default async function SearchPage({
           : "newest",
     }),
     getSearchSuggestionTitles(),
+    selectedFilters.query ? recordSearchQuery(selectedFilters.query) : Promise.resolve(),
   ]);
 
   const suggestions = buildSearchSuggestions({

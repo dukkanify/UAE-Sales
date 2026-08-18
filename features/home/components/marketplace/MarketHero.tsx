@@ -3,9 +3,9 @@ import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import {
   getMarketHeroBackground,
-  getMarketQuickSearches,
   getMarketTrustStats,
 } from "@/services/content/homepage-marketplace.content";
+import { getTrendingQuickSearches } from "@/services/search/trending-quick-searches";
 import { MarketHeroSearch } from "./MarketHeroSearch";
 
 type MarketHeroProps = {
@@ -15,7 +15,7 @@ type MarketHeroProps = {
 export async function MarketHero({ categories }: MarketHeroProps) {
   const [backgroundUrl, quickSearches, stats] = await Promise.all([
     getMarketHeroBackground(),
-    getMarketQuickSearches(),
+    getTrendingQuickSearches(),
     getMarketTrustStats(),
   ]);
 
@@ -59,7 +59,10 @@ export async function MarketHero({ categories }: MarketHeroProps) {
               <MarketHeroSearch categories={categories} />
             </div>
 
-            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+            <div
+              aria-label="الأكثر تداولاً في السوق"
+              className="mt-5 flex flex-wrap items-center justify-center gap-2"
+            >
               {quickSearches.map((tag) => (
                 <Link
                   key={tag.href}

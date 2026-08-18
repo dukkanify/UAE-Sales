@@ -33,21 +33,6 @@ export async function getMarketTrustStats(): Promise<MarketTrustStat[]> {
   ];
 }
 
-export async function getMarketQuickSearches() {
-  return [
-    { href: "/search?q=Mercedes", label: "Mercedes" },
-    { href: "/search?q=Patrol", label: "Patrol" },
-    { href: "/search?q=نخلة+جميرا", label: "Palm Jumeirah" },
-    { href: "/search?q=داون+تاون", label: "Downtown Dubai" },
-    { href: "/search?q=شقة", label: "Apartment" },
-    { href: "/search?q=فيلا", label: "Villa" },
-    { href: "/search?q=iPhone", label: "iPhone" },
-    { href: "/listings/office-business-bay", label: "Office" },
-    { href: "/search?q=MacBook", label: "MacBook" },
-    { href: "/search?q=Land+Cruiser", label: "Land Cruiser" },
-  ];
-}
-
 export async function getMarketEscrowSteps(): Promise<MarketEscrowStep[]> {
   return [
     {
