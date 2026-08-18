@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendOtpEmail({
+    const delivered = await sendOtpEmail({
       email,
       name: parsed.data.fullName,
       otp: code,
@@ -46,6 +46,8 @@ export async function POST(request: Request) {
       ok: true,
       maskedEmail: maskEmail(email),
       email,
+      emailDelivered: delivered,
+      ...(delivered ? {} : { otp: code }),
     });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("RESEND_COOLDOWN:")) {

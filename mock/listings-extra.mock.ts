@@ -230,7 +230,7 @@ export function buildExtraListingSeeds(count: number): VerticalListingSeed[] {
       premium: index % 9 === 0,
       views: 120 + index * 37,
       postedAt: `2026-07-${String((index % 27) + 1).padStart(2, "0")}T10:00:00+04:00`,
-      contactMethod: (index % 2 === 0 ? "both" : "chat") as ContactMethod,
+      contactMethod: "both" as ContactMethod,
       deliveryOption: (index % 3 === 0
         ? "both"
         : index % 3 === 1

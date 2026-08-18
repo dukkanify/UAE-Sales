@@ -26,8 +26,7 @@ export function getMaskedPhone(listing: Listing): string | null {
 export function getTelHref(listing: Listing): string | null {
   const phone = getListingContactPhone(listing);
   if (!phone) return null;
-  const local = phone.startsWith("971") ? `0${phone.slice(3)}` : phone;
-  return `tel:${local}`;
+  return `tel:+${phone}`;
 }
 
 export function getWhatsAppHref(

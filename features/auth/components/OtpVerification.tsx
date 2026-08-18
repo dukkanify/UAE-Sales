@@ -8,6 +8,11 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { maskEmail } from "@/shared/utils/mask-email";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
+import {
+  clearOtpFallback,
+  readOtpFallback,
+  saveOtpFallback,
+} from "@/features/auth/lib/otp-fallback";
 
 type OtpVerificationProps = {
   email: string;
@@ -49,10 +54,19 @@ export function OtpVerification({
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [otpError, setOtpError] = useState("");
   const [cooldown, setCooldown] = useState(COOLDOWN_SECONDS);
+  const [fallbackEmail, setFallbackEmail] = useState(email);
+  const [fallbackOtp, setFallbackOtp] = useState<string | null>(() =>
+    readOtpFallback(email),
+  );
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const autoSubmittedRef = useRef("");
   const displayEmail = maskedEmail ?? maskEmail(email);
   const endpoint = verifyEndpoint ?? DEFAULT_VERIFY_ENDPOINTS[purpose] ?? "/api/auth/otp/verify";
+
+  if (fallbackEmail !== email) {
+    setFallbackEmail(email);
+    setFallbackOtp(readOtpFallback(email));
+  }
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -92,6 +106,7 @@ export function OtpVerification({
       }
 
       setOtpError("");
+      clearOtpFallback();
       await onVerified?.(data);
     }, [digits, email, endpoint, nextPath, onVerified, purpose]),
   );
@@ -130,6 +145,12 @@ export function OtpVerification({
       }
       setCooldown(COOLDOWN_SECONDS);
       setOtpError("");
+      if (typeof data.otp === "string") {
+        saveOtpFallback(email, data.otp);
+        setFallbackOtp(data.otp);
+      } else if (data.emailDelivered === false) {
+        setFallbackOtp(readOtpFallback(email));
+      }
       trackAuthEventClient("otp_resend", { purpose });
     }, [cooldown, email, fullName, purpose]),
   );
@@ -185,6 +206,21 @@ export function OtpVerification({
         <p className="mt-1 text-sm font-bold text-ink" dir="ltr">
           {displayEmail}
         </p>
+        {fallbackOtp ? (
+          <div className="mt-3 rounded-[var(--radius-xl)] border border-secondary/30 bg-secondary-soft/70 px-4 py-3">
+            <p className="text-xs font-bold text-[#8a7040]">لم يصل البريد — رمز هذه الجلسة</p>
+            <p className="mt-1 text-2xl font-black tracking-[0.35em] text-ink" dir="ltr">
+              {fallbackOtp}
+            </p>
+            <button
+              className="mt-2 text-xs font-bold text-primary"
+              onClick={() => applyDigits(fallbackOtp.split(""))}
+              type="button"
+            >
+              تعبئة الرمز
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-6 gap-2" dir="ltr" role="group" aria-label="رمز التحقق">

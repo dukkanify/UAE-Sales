@@ -22,6 +22,19 @@ let cacheRows: Listing[] | null = null;
 let inflight: Promise<Listing[]> | null = null;
 let expiryApplied = false;
 
+function hydrateCatalogPhones(listings: Listing[]): Listing[] {
+  const phones = new Map(
+    seedListings()
+      .filter((item) => item.contactPhone)
+      .map((item) => [item.id, item.contactPhone as string]),
+  );
+  return listings.map((listing) => {
+    if (listing.contactPhone?.trim()) return listing;
+    const phone = phones.get(listing.id);
+    return phone ? { ...listing, contactPhone: phone } : listing;
+  });
+}
+
 function seedListings(): Listing[] {
   const byId = new Map<string, Listing>();
   for (const listing of [...marketplaceListings, ...marketplaceUserListings]) {
@@ -94,7 +107,14 @@ async function loadListingsUncached(): Promise<Listing[]> {
         await saveCollection(FILE, seeded);
         return setCache(seeded);
       }
-      const merged = await mergeMissingSeedListings(stored);
+      const merged = hydrateCatalogPhones(await mergeMissingSeedListings(stored));
+      const phonesAdded = merged.some((listing) => {
+        const before = stored.find((item) => item.id === listing.id);
+        return Boolean(listing.contactPhone) && !before?.contactPhone;
+      });
+      if (phonesAdded) {
+        await saveCollection(FILE, merged);
+      }
       await applyListingExpiry(merged);
       return setCache(merged);
     })().finally(() => {

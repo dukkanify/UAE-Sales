@@ -36,6 +36,7 @@ export type AdminPath =
   | "/admin/job-applications"
   | "/admin/viewing-bookings"
   | "/admin/quote-requests"
+  | "/admin/listing-reports"
   | "/admin/settings"
   | "/admin/audit";
 
@@ -197,6 +198,14 @@ const adminLinks: {
     label: "عروض الأسعار",
     group: "leads",
     keywords: "خدمات",
+    permission: "listings",
+  },
+  {
+    href: "/admin/listing-reports",
+    icon: "shield",
+    label: "بلاغات الإعلانات",
+    group: "moderation",
+    keywords: "بلاغ إبلاغ report guest",
     permission: "listings",
   },
   {

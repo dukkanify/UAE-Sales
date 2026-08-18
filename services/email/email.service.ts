@@ -110,26 +110,21 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
   }
 }
 
-async function deliverEmail(input: SendEmailInput): Promise<void> {
-  const sent = await sendWithResend(input);
-
-  if (sent) {
-    return;
-  }
-
-  if (process.env.NODE_ENV !== "production") {
-    console.info("[Sooqna Email:dev]", input.to, input.subject);
-    return;
-  }
-
-  throw new Error("EMAIL_SEND_FAILED");
+async function deliverEmail(input: SendEmailInput): Promise<boolean> {
+  return sendWithResend(input);
 }
 
 /** Delivers email without throwing when provider is unavailable. */
 export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean> {
   try {
-    await deliverEmail(input);
-    return true;
+    const sent = await deliverEmail(input);
+    if (!sent) {
+      console.warn("[Sooqna Email] not delivered", {
+        to: input.to,
+        subject: input.subject,
+      });
+    }
+    return sent;
   } catch (error) {
     console.error("[Sooqna Email] delivery failed", {
       to: input.to,
@@ -175,8 +170,8 @@ async function sendPurposeOtp(input: {
   intro: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await deliverEmail({
+}): Promise<boolean> {
+  return deliverEmailSafely({
     to: input.email,
     subject: "رمز التحقق الخاص بك في سوقنا",
     html: buildOtpEmailHtml(input.name, input.otp, input.intro),
@@ -188,8 +183,8 @@ export async function sendRegistrationOtp(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPurposeOtp({
+}): Promise<boolean> {
+  return sendPurposeOtp({
     ...input,
     intro: "استخدم رمز التحقق التالي لإكمال التسجيل في سوقنا:",
   });
@@ -199,8 +194,8 @@ export async function sendLoginOtp(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPurposeOtp({
+}): Promise<boolean> {
+  return sendPurposeOtp({
     ...input,
     intro: "استخدم رمز التحقق التالي لتسجيل الدخول إلى سوقنا:",
   });
@@ -210,8 +205,8 @@ export async function sendSetPasswordOtp(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPurposeOtp({
+}): Promise<boolean> {
+  return sendPurposeOtp({
     ...input,
     intro: "استخدم رمز التحقق التالي لإضافة كلمة مرور لحسابك في سوقنا:",
   });
@@ -221,8 +216,8 @@ export async function sendPasswordResetOtp(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPurposeOtp({
+}): Promise<boolean> {
+  return sendPurposeOtp({
     ...input,
     intro: "استخدم رمز التحقق التالي لإعادة تعيين كلمة المرور في سوقنا:",
   });
@@ -232,8 +227,8 @@ export async function sendEmailChangeOtp(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPurposeOtp({
+}): Promise<boolean> {
+  return sendPurposeOtp({
     ...input,
     intro: "استخدم رمز التحقق التالي لتأكيد تغيير بريدك الإلكتروني في سوقنا:",
   });
@@ -300,24 +295,24 @@ export async function sendOtpEmail(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendRegistrationOtp(input);
+}): Promise<boolean> {
+  return sendRegistrationOtp(input);
 }
 
 export async function sendPasswordResetEmail(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendPasswordResetOtp(input);
+}): Promise<boolean> {
+  return sendPasswordResetOtp(input);
 }
 
 export async function sendLoginVerificationEmail(input: {
   email: string;
   name: string;
   otp: string;
-}): Promise<void> {
-  await sendLoginOtp(input);
+}): Promise<boolean> {
+  return sendLoginOtp(input);
 }
 
 type EmailParty = {

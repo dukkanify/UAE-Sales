@@ -12,6 +12,7 @@ import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import { saveAccountProof } from "@/services/storage";
+import { saveOtpFallback } from "@/features/auth/lib/otp-fallback";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import {
   isStrongPassword,
@@ -104,6 +105,9 @@ export function RegisterForm() {
             accountType,
           });
         }
+        if (typeof data.otp === "string") {
+          saveOtpFallback(nextEmail, data.otp);
+        }
         trackAuthEventClient("registration_otp_sent");
         router.push(
           getSafeNextPath(
@@ -133,6 +137,9 @@ export function RegisterForm() {
         );
       }
 
+      if (typeof data.otp === "string") {
+        saveOtpFallback(nextEmail, data.otp);
+      }
       trackAuthEventClient("registration_otp_sent");
       const params = new URLSearchParams({
         email: data.email ?? nextEmail,

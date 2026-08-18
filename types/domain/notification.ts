@@ -13,7 +13,8 @@ export type NotificationType =
   | "quote_request"
   | "account_verified"
   | "account_approved"
-  | "account_pending_approval";
+  | "account_pending_approval"
+  | "listing_report";
 
 export type AppNotification = {
   id: string;

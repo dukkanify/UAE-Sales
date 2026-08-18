@@ -2,6 +2,7 @@
 
 import { ShareButton } from "@/shared/components/ShareButton";
 import type { Listing } from "@/types";
+import { ReportListingModal } from "@/features/listings/components/ReportListingModal";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
@@ -12,15 +13,11 @@ type ListingDetailToolbarProps = {
 };
 
 export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
+  const [reportOpen, setReportOpen] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
 
   function handlePrint() {
     window.print();
-  }
-
-  function handleReport() {
-    setReportMessage("تم استلام بلاغك. سيراجعه فريق الثقة خلال 24 ساعة.");
-    window.setTimeout(() => setReportMessage(""), 4000);
   }
 
   return (
@@ -30,7 +27,12 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
         <Icon name="photo" size={14} />
         طباعة
       </Button>
-      <Button className="!min-h-9" onClick={handleReport} size="sm" variant="ghost">
+      <Button
+        className="!min-h-9"
+        onClick={() => setReportOpen(true)}
+        size="sm"
+        variant="ghost"
+      >
         <Icon name="shield" size={14} />
         إبلاغ عن الإعلان
       </Button>
@@ -39,6 +41,19 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
           <FormMessage variant="success">{reportMessage}</FormMessage>
         </div>
       ) : null}
+      <ReportListingModal
+        listing={listing}
+        onClose={() => setReportOpen(false)}
+        onSuccess={(guest) => {
+          setReportOpen(false);
+          setReportMessage(
+            guest
+              ? "تم استلام بلاغك. سيظهر لفريق الثقة مع اسمك وبريدك وهاتفك في بلاغات الإعلانات."
+              : "تم استلام بلاغك. سيراجعه فريق الثقة وستصلك نسخة في الإشعارات.",
+          );
+        }}
+        open={reportOpen}
+      />
     </div>
   );
 }

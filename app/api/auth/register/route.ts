@@ -70,32 +70,47 @@ export async function POST(request: Request) {
     trackAuthEvent("registration_started", { accountType: profile.accountType });
 
     try {
-      await sendRegistrationVerifyOtp({
+      const sent = await sendRegistrationVerifyOtp({
         email,
         fullName,
         userId: stored.id,
         accountType: parsed.data.accountType,
       });
+      trackAuthEvent("registration_otp_sent");
+      const params = new URLSearchParams({
+        email,
+        purpose: "REGISTER",
+        masked: maskEmail(email),
+      });
+
+      return NextResponse.json({
+        ok: true,
+        needsVerification: true,
+        email,
+        maskedEmail: maskEmail(email),
+        emailDelivered: sent.delivered,
+        ...(sent.delivered ? {} : { otp: sent.code }),
+        redirectTo: `/verify-email?${params.toString()}`,
+        accountProof: stored.passwordHash,
+      });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
+      const params = new URLSearchParams({
+        email,
+        purpose: "REGISTER",
+        masked: maskEmail(email),
+      });
+      return NextResponse.json({
+        ok: true,
+        needsVerification: true,
+        email,
+        maskedEmail: maskEmail(email),
+        emailDelivered: false,
+        redirectTo: `/verify-email?${params.toString()}`,
+        accountProof: stored.passwordHash,
+      });
     }
-
-    trackAuthEvent("registration_otp_sent");
-    const params = new URLSearchParams({
-      email,
-      purpose: "REGISTER",
-      masked: maskEmail(email),
-    });
-
-    return NextResponse.json({
-      ok: true,
-      needsVerification: true,
-      email,
-      maskedEmail: maskEmail(email),
-      redirectTo: `/verify-email?${params.toString()}`,
-      accountProof: stored.passwordHash,
-    });
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
       return NextResponse.json(
