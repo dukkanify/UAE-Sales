@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
 import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { NotificationBell } from "@/shared/components/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -106,6 +107,8 @@ export function MarketHeader() {
                 <Icon name="search" size={18} />
               </Link>
 
+              <NotificationBell className="market-header__icon-btn" iconSize={18} />
+
               {user ? (
                 <Link
                   aria-label="حسابي"
@@ -180,6 +183,14 @@ export function MarketHeader() {
               >
                 <Icon name="user" size={16} />
                 {user ? user.fullName.split(" ")[0] : "سجّل الدخول وانضم إلينا"}
+              </Link>
+              <Link
+                className="market-header__drawer-account"
+                href={user ? "/profile#notifications" : "/login"}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon name="bell" size={16} />
+                الإشعارات
               </Link>
               <Button
                 className="sooqna-gold-gradient rounded-full"

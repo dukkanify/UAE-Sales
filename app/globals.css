@@ -197,6 +197,30 @@ textarea {
   border: 0;
 }
 
+.notification-bell {
+  position: relative;
+}
+
+.notification-bell__badge {
+  position: absolute;
+  top: -0.15rem;
+  inset-inline-end: -0.15rem;
+  z-index: 2;
+  display: grid;
+  min-width: 1rem;
+  height: 1rem;
+  place-items: center;
+  border: 1.5px solid var(--color-surface);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 100%);
+  padding-inline: 0.2rem;
+  box-shadow: 0 2px 6px rgb(239 68 68 / 35%);
+  font-size: 0.5625rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #fff;
+}
+
 /* ── Layout ── */
 .app-container {
   width: min(100% - 1.5rem, var(--container-width));

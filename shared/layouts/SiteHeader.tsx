@@ -8,6 +8,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { primaryNavigation } from "@/shared/constants/navigation";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
+import { NotificationBell } from "@/shared/components/NotificationBell";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
@@ -111,6 +112,10 @@ export function SiteHeader() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <NotificationBell
+              className="focus-ring relative grid size-10 shrink-0 place-items-center rounded-[var(--radius-xl)] border border-border bg-surface text-ink shadow-[var(--shadow-xs)] transition hover:border-secondary/50"
+              iconSize={18}
+            />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
@@ -218,6 +223,13 @@ export function SiteHeader() {
                     onClick={() => setMenuOpen(false)}
                   >
                     حسابي
+                  </Link>
+                  <Link
+                    className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
+                    href="/profile#notifications"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    الإشعارات
                   </Link>
                   <Button
                     className="w-full justify-start"

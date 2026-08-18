@@ -29,6 +29,7 @@ export const footerLinks = [
       { label: "تسجيل الدخول", href: "/login" },
       { label: "إنشاء حساب", href: "/register" },
       { label: "إعلاناتي", href: "/dashboard/listings" },
+      { label: "الإشعارات", href: "/profile#notifications" },
     ],
   },
   {
