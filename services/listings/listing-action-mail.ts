@@ -1,11 +1,11 @@
 import { findUserById } from "@/services/auth/user-store";
-import { getAppUrl } from "@/shared/constants/site";
+import { EMAIL_SITE_URL } from "@/services/email/sooqna-email-template";
 
 export function listingPublicUrl(input: {
   listingId?: string;
   listingSlug?: string;
 }): string {
-  const base = getAppUrl();
+  const base = EMAIL_SITE_URL;
   if (input.listingId?.startsWith("local-")) {
     return `${base}/listings/local/${input.listingId}`;
   }

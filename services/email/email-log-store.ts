@@ -13,7 +13,8 @@ export type EmailEventType =
   | "seller_proof"
   | "chat_message"
   | "password_reset"
-  | "featured_paid";
+  | "featured_paid"
+  | "system_test";
 
 export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
 
@@ -22,9 +23,11 @@ export type EmailLogRecord = {
   dedupeKey: string;
   entityId: string;
   error?: string;
+  html?: string;
   id: string;
   status: EmailDeliveryStatus;
   subject: string;
+  text?: string;
   to: string;
   type: EmailEventType;
   userId?: string;
@@ -43,6 +46,20 @@ export function buildEmailDedupeKey(input: {
 
 export async function getEmailLogs(): Promise<EmailLogRecord[]> {
   return loadCollection<EmailLogRecord>(FILE);
+}
+
+export async function getEmailLogById(
+  id: string,
+): Promise<EmailLogRecord | undefined> {
+  const logs = await getEmailLogs();
+  return logs.find((item) => item.id === id);
+}
+
+export async function listFailedEmailLogs(): Promise<EmailLogRecord[]> {
+  const logs = await getEmailLogs();
+  return logs.filter(
+    (item) => item.status === "failed" || item.status === "pending",
+  );
 }
 
 export async function findRecentEmailLog(

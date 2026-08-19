@@ -22,6 +22,7 @@ export async function emailListingReceived(listing: Listing): Promise<void> {
     to: seller.email,
     userId: seller.id,
     entityId: listing.id,
+    dedupeWindowMs: 10 * 60 * 1000,
     subject: `تم استلام إعلانك — ${listing.title}`,
     title: "إعلانك قيد المراجعة",
     bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">استلمنا إعلان «${escapeEmailHtml(listing.title)}» وهو الآن قيد مراجعة فريق سوقنا. سنراسلك فور الموافقة أو إذا احتجنا تعديلاً.</p>`,

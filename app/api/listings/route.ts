@@ -37,7 +37,11 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!existing) {
+    const isResubmit =
+      Boolean(existing) &&
+      existing?.status === "rejected" &&
+      listing.status === "pending_review";
+    if (!existing || isResubmit) {
       void notifyListingSubmitted(listing);
     }
 

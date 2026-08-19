@@ -1,14 +1,26 @@
 const PRODUCTION_SITE_URL = "https://sooqna.site";
 const DEVELOPMENT_SITE_URL = "http://localhost:3000";
 
+function isLocalUrl(value: string): boolean {
+  return /localhost|127\.0\.0\.1/i.test(value);
+}
+
 /** Canonical public site URL — never localhost in production builds. */
 export function getAppUrl(): string {
-  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (configured) {
-    return configured.replace(/\/$/, "");
+  const configured = process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "");
+  const isProd =
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production";
+
+  if (isProd) {
+    if (!configured || isLocalUrl(configured)) {
+      return PRODUCTION_SITE_URL;
+    }
+    return configured;
   }
-  if (process.env.NODE_ENV === "production") {
-    return PRODUCTION_SITE_URL;
+
+  if (configured) {
+    return configured;
   }
   return DEVELOPMENT_SITE_URL;
 }
@@ -27,5 +39,8 @@ export function getSiteOrigin(): string {
 }
 
 export function isProductionDeployment(): boolean {
-  return process.env.NODE_ENV === "production";
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production"
+  );
 }
