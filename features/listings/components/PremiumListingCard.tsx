@@ -155,7 +155,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         <span className="truncate">{location}</span>
       </p>
 
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-[0.65rem] font-medium text-muted sm:text-xs">
+      <div className="mt-auto flex min-w-0 flex-wrap items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-[0.65rem] font-medium text-muted sm:text-xs">
         <span className="inline-flex items-center gap-1">
           <Icon className="marketplace-card-meta-icon" name="clock" size={13} />
           {formatPostedTime(listing.postedAt)}

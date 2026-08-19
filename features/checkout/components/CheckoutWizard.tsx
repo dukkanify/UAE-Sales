@@ -591,7 +591,7 @@ export function CheckoutWizard({
               </>
             ) : null}
 
-            <div className="sticky bottom-0 z-10 -mx-2 flex gap-2 border-t border-border bg-surface/95 p-4 backdrop-blur-sm supports-[backdrop-filter]:bg-surface/90 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
+            <div className="sticky bottom-0 z-10 mx-0 flex gap-2 border-t border-border bg-surface/95 p-4 backdrop-blur-sm supports-[backdrop-filter]:bg-surface/90 md:static md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none">
               <Button
                 className="flex-1 md:flex-none"
                 loading={isContinuing}

@@ -90,7 +90,7 @@ export function DashboardShell({
 
   return (
     <section className="app-container page-padding">
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+      <div className="mb-5 flex max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-1 lg:hidden">
         {dashboardLinks.map((link) => (
           <Link
             key={link.href}

@@ -36,10 +36,10 @@ export function ListingSpecifications({ listing }: ListingSpecificationsProps) {
           {specEntries.map((entry) => (
             <div
               key={entry.key}
-              className="flex items-center justify-between rounded-[var(--radius-xl)] border border-border bg-surface-muted px-4 py-3 text-sm"
+              className="flex min-w-0 items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border bg-surface-muted px-4 py-3 text-sm"
             >
-              <dt className="font-medium text-muted">{entry.label}</dt>
-              <dd className="font-semibold text-ink">{entry.value}</dd>
+              <dt className="min-w-0 shrink-0 font-medium text-muted">{entry.label}</dt>
+              <dd className="min-w-0 break-words text-end font-semibold text-ink">{entry.value}</dd>
             </div>
           ))}
         </dl>

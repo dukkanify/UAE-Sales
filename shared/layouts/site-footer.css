@@ -52,7 +52,8 @@
 .site-footer__store {
   display: inline-flex;
   min-height: 3rem;
-  min-width: 9.25rem;
+  min-width: min(9.25rem, 100%);
+  max-width: 100%;
   align-items: center;
   gap: 0.5rem;
   padding: 0.4rem 0.85rem 0.4rem 0.7rem;

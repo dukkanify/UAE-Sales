@@ -3,13 +3,15 @@
 /* ── Page container ── */
 .mobile-home-shell {
   width: 100%;
-  overflow-x: hidden;
+  max-width: 100%;
+  min-width: 0;
   background: var(--mh-bg);
 }
 
 .mobile-home-page {
   width: 100%;
   max-width: var(--mh-page-max);
+  min-width: 0;
   margin-inline: auto;
 }
 
@@ -33,8 +35,11 @@
 /* Drag-to-scroll rails (mouse/pen) */
 .drag-scroll-row {
   cursor: grab;
+  max-width: 100%;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
+  touch-action: pan-x pan-y;
 }
 
 .drag-scroll-row.is-dragging {
@@ -82,6 +87,7 @@
 
 .mobile-home-header__side--start {
   justify-content: flex-start;
+  min-width: 0;
 }
 
 .mobile-home-header__side--end {
@@ -92,7 +98,8 @@
 .mobile-home-header__actions,
 .mobile-home-header__cluster {
   display: inline-flex;
-  flex-shrink: 0;
+  min-width: 0;
+  flex-shrink: 1;
   align-items: center;
   gap: 0.2rem;
   padding: 0.15rem;
@@ -114,6 +121,11 @@
 
 .mobile-home-header__brand a {
   max-width: 100%;
+  min-width: 0;
+}
+
+.mobile-home-header__brand .font-latin {
+  display: none;
 }
 
 .mobile-home-header__smart-row {
@@ -919,6 +931,8 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   flex: 1;
   gap: 0.5rem;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x pan-y;
 }
 
 .mobile-home-trending__pill {
@@ -965,7 +979,7 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   overflow-x: auto;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
   scroll-snap-type: x proximity;
   direction: ltr;
 }
@@ -1163,13 +1177,13 @@ html[data-theme="dark"] .mobile-home-hero__badge {
 /* ── Featured ── */
 .mobile-home-featured {
   min-width: 0;
-  overflow: visible;
 }
 
 .mobile-home-featured__track {
   display: flex;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   flex-wrap: nowrap;
   align-items: stretch;
   gap: 0.75rem;
@@ -1177,6 +1191,7 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
   padding-inline: var(--mh-page-x);
   padding-bottom: 0.25rem;
   scroll-snap-type: x mandatory;
@@ -1303,19 +1318,20 @@ html[data-theme="dark"] .mobile-home-hero__badge {
 /* ── Nearby ── */
 .mobile-home-nearby {
   min-width: 0;
-  overflow: visible;
 }
 
 .mobile-home-nearby__track {
   display: flex;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   flex-wrap: nowrap;
   gap: 0.625rem;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
   padding-inline: var(--mh-page-x);
   padding-bottom: 0.25rem;
   scroll-snap-type: x mandatory;
@@ -2294,6 +2310,25 @@ html[data-theme="dark"] .mobile-home-hero__badge {
   line-height: 1;
   color: #fff;
   box-shadow: 0 2px 6px rgb(239 68 68 / 32%);
+}
+
+@media (max-width: 359px) {
+  .mobile-home-header__icon-btn,
+  .mobile-home-header__icon-btn--ghost {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .mobile-home-header__theme-toggle {
+    width: 2rem !important;
+    min-width: 2rem !important;
+    height: 2rem !important;
+  }
+
+  .mobile-home-header__bar {
+    gap: 0.35rem;
+    padding-inline: 0.65rem;
+  }
 }
 
 /* ── Breakpoints: fluid width scaling (360 → tablet) ── */

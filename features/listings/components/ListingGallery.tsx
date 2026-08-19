@@ -171,7 +171,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
       </div>
 
       {galleryImages.length > 1 ? (
-        <div className="mt-2 flex gap-1.5 overflow-x-auto pb-0.5 lg:hidden">
+        <div className="mt-2 flex max-w-full gap-1.5 overflow-x-auto overscroll-x-contain pb-0.5 lg:hidden">
           {galleryImages.map((url, index) => (
             <button
               key={`mobile-${url}-${index}`}

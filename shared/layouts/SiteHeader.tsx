@@ -85,7 +85,7 @@ export function SiteHeader() {
       <VerifyAccountBanner />
       <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
-        <div className="flex min-h-[4rem] items-center justify-between gap-4">
+        <div className="flex min-h-[4rem] min-w-0 items-center justify-between gap-2 sm:gap-4">
           <BrandLogo showTagline={false} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
@@ -119,7 +119,7 @@ export function SiteHeader() {
             />
           </form>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
             <LanguageSwitch variant="compact" />
             <NotificationBell
               badgeClassName="notify-bell__badge"
@@ -156,7 +156,7 @@ export function SiteHeader() {
             <button
               aria-expanded={menuOpen}
               aria-label={menuOpen ? copy.closeMenu : copy.menu}
-              className="focus-ring motion-press grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
+              className="focus-ring motion-press grid size-10 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 sm:size-11 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
