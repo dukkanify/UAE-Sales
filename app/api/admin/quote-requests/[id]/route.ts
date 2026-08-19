@@ -4,12 +4,20 @@ import {
 } from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { logAdminAction } from "@/services/admin/admin-audit-store";
+import { notifyQuoteRequestStatusChanged } from "@/services/notifications/notification-events";
 import { updateQuoteRequestStatus } from "@/services/quote-requests/quote-request-store";
 import type { QuoteRequest } from "@/types/domain/quote-request";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-const ALLOWED: QuoteRequest["status"][] = ["submitted", "quoted", "accepted"];
+const ALLOWED: QuoteRequest["status"][] = [
+  "submitted",
+  "quoted",
+  "accepted",
+  "rejected",
+  "expired",
+  "converted",
+];
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   const admin = await requireAdminUser();
@@ -32,6 +40,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   if (!quoteRequest) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }
+
+  void notifyQuoteRequestStatusChanged(quoteRequest);
 
   await logAdminAction({
     actorId: body.actorId ?? "admin",

@@ -27,6 +27,16 @@ export type RegistrationSource =
 
 export type OnboardingStatus = "none" | "business_pending" | "business_complete";
 
+export type NotificationPreferenceKey =
+  | "email"
+  | "bookingUpdates"
+  | "orderUpdates"
+  | "messages"
+  | "marketing"
+  | "savedSearches";
+
+export type NotificationPreferences = Record<NotificationPreferenceKey, boolean>;
+
 export type BusinessProfile = {
   businessName?: string;
   tradeLicenseNumber?: string;
@@ -64,6 +74,8 @@ export type UserProfile = {
   subscription?: string;
   walletBalance?: number;
   businessProfile?: BusinessProfile;
+  locale?: "ar" | "en";
+  notificationPreferences?: NotificationPreferences;
 };
 
 export type StoredUser = UserProfile & {

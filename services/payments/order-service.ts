@@ -11,11 +11,14 @@ import {
   validateLocalListingSnapshot,
 } from "@/services/payments/listing-resolver";
 import { resolveCheckoutShipping } from "@/services/shipping/shipping.service";
-import { createNotification } from "@/services/payments/notification-store";
 import {
-  emailOrderPaid,
-  emailOrderStatusToUser,
-} from "@/services/email/notification-emails";
+  notifyEscrowReleased,
+  notifyFavoriteSold,
+  notifyOrderPaid,
+  notifyOrderRefunded,
+  notifyOrderStatus,
+  notifyPaymentFailed,
+} from "@/services/notifications/notification-events";
 import {
   createOrder,
   findPendingOrder,
@@ -41,7 +44,6 @@ import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
 import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
-import { formatCurrencyLabel } from "@/shared/utils/currency";
 import { normalizeUaePhone } from "@/shared/utils/phone";
 
 type ListingCheckoutContext = {
@@ -277,26 +279,15 @@ export async function completeMockPayment(orderId: string): Promise<{
 }
 
 async function sendOrderNotifications(order: Order): Promise<void> {
-  if (!order.buyerId) return;
-
-  await createNotification({
-    userId: order.buyerId,
-    orderId: order.id,
-    type: "order_paid",
-    title: "تم الدفع بنجاح",
-    body: `تم دفع مبلغ ${formatCurrencyLabel(order.fees.total)} لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
+  void notifyOrderPaid(order).catch((error) => {
+    console.error("[Sooqna Notify] order paid failed", error);
   });
-
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "escrow_held",
-    title: "دفعة جديدة محجوزة",
-    body: `تم حجز ${formatCurrencyLabel(order.fees.productPrice)} في الضمان لطلب «${order.listingTitle}».`,
-  });
-
-  void emailOrderPaid(order).catch((error) => {
-    console.error("[Sooqna Email] order paid email failed", error);
+  void notifyFavoriteSold({
+    listingId: order.listingId,
+    slug: order.listingSlug ?? order.listingId,
+    title: order.listingTitle,
+  }).catch((error) => {
+    console.error("[Sooqna Notify] favorite sold failed", error);
   });
 }
 
@@ -427,6 +418,10 @@ export async function handlePaymentIntentFailed(
       metadata: { paymentIntentId },
     },
   );
+  const failed = await getOrderById(orderId);
+  if (failed) {
+    void notifyPaymentFailed(failed);
+  }
 }
 
 /** Shared escrow release path used by buyer confirm / match flows. */
@@ -501,41 +496,9 @@ async function releaseEscrowToSeller(
     status: "completed",
   });
 
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_released",
-    title: "تم تحويل المبلغ",
-    body: `تم تحويل ${formatCurrencyLabel(sellerNet)} إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
+  void notifyEscrowReleased(order).catch((error) => {
+    console.error("[Sooqna Notify] escrow release failed", error);
   });
-
-  if (order.buyerId) {
-    await createNotification({
-      userId: order.buyerId,
-      orderId: order.id,
-      type: "order_confirmed",
-      title: "تم تأكيد الاستلام",
-      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
-    });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "order_confirmed",
-      title: "تم تأكيد الاستلام",
-      subject: `تحديث الطلب — ${order.listingTitle}`,
-      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
-    }).catch((error) => console.error("[Sooqna Email] order confirmed email failed", error));
-  }
-
-  void emailOrderStatusToUser({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_released",
-    title: "تم تحويل المبلغ",
-    subject: `تم تحويل مبلغ الطلب — ${order.listingTitle}`,
-    body: `تم تحويل المبلغ إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
-  }).catch((error) => console.error("[Sooqna Email] order released email failed", error));
 
   if (working.status === "released") {
     return working;
@@ -583,22 +546,18 @@ export async function submitSellerProof(
   if (!updated) return undefined;
 
   if (order.buyerId) {
-    await createNotification({
-      userId: order.buyerId,
-      orderId: order.id,
-      type: "seller_proof",
-      title: "إثبات من البائع",
-      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
-    });
-    void emailOrderStatusToUser({
+    void notifyOrderStatus({
+      order,
       userId: order.buyerId,
       fallbackEmail: order.buyerEmail,
-      orderId: order.id,
       type: "seller_proof",
+      emailType: "seller_proof",
       title: "إثبات من البائع",
-      subject: `إثبات تسليم — ${order.listingTitle}`,
-      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
-    }).catch((error) => console.error("[Sooqna Email] seller proof email failed", error));
+      titleEn: "Seller submitted proof",
+      body: `رفع البائع إثباتًا لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+      bodyEn: `The seller uploaded proof for “${order.listingTitle}”. Review it and confirm the match.`,
+      idempotencyKey: `SELLER_PROOF:${order.id}`,
+    });
   }
 
   return updated;
@@ -637,12 +596,17 @@ export async function confirmBuyerMatch(
   );
 
   if (released && order.buyerId) {
-    await createNotification({
+    void notifyOrderStatus({
+      order,
       userId: order.buyerId,
-      orderId: order.id,
+      fallbackEmail: order.buyerEmail,
       type: "buyer_match",
+      emailType: "order_confirmed",
       title: "تم تأكيد المطابقة",
+      titleEn: "Match confirmed",
       body: `تم تأكيد مطابقة طلب «${order.listingTitle}» وتحرير الضمان.`,
+      bodyEn: `You confirmed the match for “${order.listingTitle}” and escrow was released.`,
+      idempotencyKey: `BUYER_MATCH:${order.id}`,
     });
   }
 
@@ -722,40 +686,9 @@ export async function refundOrder(
     });
   }
 
-  if (order.buyerId) {
-    await createNotification({
-      userId: order.buyerId,
-      orderId: order.id,
-      type: "order_refunded",
-      title: "تم استرداد المبلغ",
-      body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
-    });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "order_refunded",
-      title: "تم استرداد المبلغ",
-      subject: `استرداد الطلب — ${order.listingTitle}`,
-      body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
-    }).catch((error) => console.error("[Sooqna Email] refund buyer email failed", error));
-  }
-
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_refunded",
-    title: "تم استرداد الطلب",
-    body: `تم استرداد الطلب «${order.listingTitle}».`,
+  void notifyOrderRefunded(order).catch((error) => {
+    console.error("[Sooqna Notify] refund notify failed", error);
   });
-  void emailOrderStatusToUser({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_refunded",
-    title: "تم استرداد الطلب",
-    subject: `استرداد الطلب — ${order.listingTitle}`,
-    body: `تم استرداد الطلب «${order.listingTitle}».`,
-  }).catch((error) => console.error("[Sooqna Email] refund seller email failed", error));
 
   return updated;
 }
@@ -865,21 +798,9 @@ export async function adminReleaseEscrow(
       status: "completed",
     });
 
-    await createNotification({
-      userId: order.sellerId,
-      orderId: order.id,
-      type: "order_released",
-      title: "تم تحويل المبلغ",
-      body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+    void notifyEscrowReleased(order).catch((error) => {
+      console.error("[Sooqna Notify] admin release failed", error);
     });
-    void emailOrderStatusToUser({
-      userId: order.sellerId,
-      orderId: order.id,
-      type: "order_released",
-      title: "تم تحويل المبلغ",
-      subject: `تحرير الضمان — ${order.listingTitle}`,
-      body: `حرّرت الإدارة المبلغ إلى رصيدك لطلب «${order.listingTitle}».`,
-    }).catch((error) => console.error("[Sooqna Email] admin release email failed", error));
 
     return releasedMid;
   } else {
@@ -895,21 +816,9 @@ export async function adminReleaseEscrow(
     status: "completed",
   });
 
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_released",
-    title: "تم تحويل المبلغ",
-    body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+  void notifyEscrowReleased(order).catch((error) => {
+    console.error("[Sooqna Notify] admin release failed", error);
   });
-  void emailOrderStatusToUser({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_released",
-    title: "تم تحويل المبلغ",
-    subject: `تحرير الضمان — ${order.listingTitle}`,
-    body: `حرّرت الإدارة المبلغ إلى رصيدك لطلب «${order.listingTitle}».`,
-  }).catch((error) => console.error("[Sooqna Email] admin release email failed", error));
 
   const released = await updateOrder(orderId, { status: "released" });
   return released;

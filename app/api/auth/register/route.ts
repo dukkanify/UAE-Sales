@@ -7,7 +7,6 @@ import {
   otpCooldownResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import {
   createStandardUser,
   toUserProfile,
@@ -18,29 +17,22 @@ import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { maskEmail } from "@/shared/utils/mask-email";
 
 function registerOtpResponse(input: {
-  accountProof?: string | null;
   email: string;
   emailDelivered: boolean;
-  otp?: string;
 }) {
   const params = new URLSearchParams({
     email: input.email,
     purpose: "REGISTER",
     masked: maskEmail(input.email),
   });
-  const response = NextResponse.json({
+  return NextResponse.json({
     ok: true,
     needsVerification: true,
     email: input.email,
     maskedEmail: maskEmail(input.email),
     emailDelivered: input.emailDelivered,
-    ...(input.otp ? { otp: input.otp } : {}),
     redirectTo: `/verify-email?${params.toString()}`,
   });
-  if (input.otp) {
-    attachOtpDisplayCookie(response, input.email, input.otp);
-  }
-  return response;
 }
 
 const schema = z.object({
@@ -109,7 +101,6 @@ export async function POST(request: Request) {
       return registerOtpResponse({
         email,
         emailDelivered: sent.delivered,
-        otp: sent.code,
       });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);

@@ -92,12 +92,34 @@
 }
 
 .notify-bell__item {
-  display: grid;
-  gap: 0.15rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
   border-radius: 0.85rem;
   padding: 0.7rem 0.75rem;
   color: inherit;
   text-align: start;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.notify-bell__item-icon {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--color-surface-muted);
+  color: var(--color-ink);
+}
+
+.notify-bell__item-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
 }
 
 .notify-bell__item--unread {

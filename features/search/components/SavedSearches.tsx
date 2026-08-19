@@ -37,6 +37,22 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
   function handleSave() {
     const result = saveCurrentSearch({ label: currentLabel, url: currentUrl });
     setSaved(result.items);
+    if (!result.alreadySaved) {
+      const created = result.items[0];
+      if (created) {
+        void fetch("/api/saved-searches", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: created.id,
+            label: created.label,
+            url: created.url,
+            query: currentLabel,
+          }),
+        }).catch(() => undefined);
+      }
+    }
     if (result.alreadySaved) {
       setMessage("هذا البحث محفوظ مسبقاً في القائمة أسفل الزر.");
     } else {
@@ -51,6 +67,10 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
 
   function handleRemove(id: string) {
     setSaved(removeSavedSearch(id));
+    void fetch(`/api/saved-searches?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      credentials: "include",
+    }).catch(() => undefined);
   }
 
   return (

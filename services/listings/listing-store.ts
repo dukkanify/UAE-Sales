@@ -6,6 +6,7 @@ import {
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
 import {
   computeExpiresAt,
+  expireFeaturedListings,
   expireStaleListings,
 } from "@/services/listings/listing-expiry";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
@@ -84,8 +85,17 @@ async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
   expiryApplied = true;
   const settings = await getAdminSettings();
   const changed = expireStaleListings(listings, settings.listingActiveDays);
-  if (changed > 0) {
+  const featuredExpired = expireFeaturedListings(listings);
+  if (changed > 0 || featuredExpired.length > 0) {
     await saveCollection(FILE, listings);
+  }
+  if (featuredExpired.length > 0) {
+    const { notifyListingFeaturedExpired } = await import(
+      "@/services/notifications/notification-events"
+    );
+    for (const listing of featuredExpired) {
+      void notifyListingFeaturedExpired(listing);
+    }
   }
   return listings;
 }
@@ -160,10 +170,23 @@ export async function upsertListing(listing: Listing): Promise<Listing> {
       computeExpiresAt(postedAt, settings.listingActiveDays),
   };
   const index = listings.findIndex((item) => item.id === listing.id);
+  const previous = index >= 0 ? listings[index] : undefined;
   if (index >= 0) listings[index] = next;
   else listings.unshift(next);
   await saveCollection(FILE, listings);
   setCache(listings);
+  if (previous && previous.price !== next.price) {
+    const { notifyFavoritePriceChanged } = await import(
+      "@/services/notifications/notification-events"
+    );
+    void notifyFavoritePriceChanged({
+      listingId: next.id,
+      slug: next.slug,
+      title: next.title,
+      oldPrice: previous.price,
+      newPrice: next.price,
+    });
+  }
   return { ...next };
 }
 

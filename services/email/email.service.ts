@@ -1,5 +1,10 @@
 import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import {
+  buildSooqnaEmailHtml,
+  buildSooqnaEmailText,
+  escapeEmailHtml,
+} from "@/services/email/sooqna-email-template";
 
 type SendEmailInput = {
   html: string;
@@ -150,33 +155,25 @@ export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean
 }
 
 function buildOtpEmailHtml(name: string, otp: string, intro: string): string {
-  return `
-    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
-      </div>
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${name}،</p>
-      <p style="font-size:16px;line-height:1.8;">${intro}</p>
-      <p style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:24px 0;color:#0B1628;">${otp}</p>
-      <p style="font-size:14px;line-height:1.8;color:#555;">تنتهي صلاحية الرمز خلال 10 دقائق.<br/>إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.<br/>لا تشارك رمز التحقق مع أي شخص.</p>
-      <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
-    </div>
-  `.trim();
+  return buildSooqnaEmailHtml({
+    title: "رمز التحقق",
+    preview: "رمز التحقق الخاص بك في سوقنا",
+    bodyHtml: `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">مرحبًا ${escapeEmailHtml(name)}،</p><p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(intro)}</p><p style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:24px 0;color:${BRAND_COLORS.navy};">${escapeEmailHtml(otp)}</p><p style="font-size:14px;line-height:1.8;margin:0;color:#6b6560;">تنتهي صلاحية الرمز خلال 10 دقائق. إذا لم تطلب هذا الرمز، تجاهل الرسالة. لا تشارك الرمز مع أي شخص.</p>`,
+  });
 }
 
 function buildOtpEmailText(name: string, otp: string, intro: string): string {
-  return [
-    `مرحبًا ${name}،`,
-    "",
-    intro,
-    otp,
-    "",
-    "تنتهي صلاحية الرمز خلال 10 دقائق.",
-    "إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.",
-    "لا تشارك رمز التحقق مع أي شخص.",
-    "",
-    "فريق سوقنا",
-  ].join("\n");
+  return buildSooqnaEmailText({
+    title: "رمز التحقق",
+    bodyLines: [
+      `مرحبًا ${name}،`,
+      intro,
+      otp,
+      "تنتهي صلاحية الرمز خلال 10 دقائق.",
+      "إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.",
+      "لا تشارك رمز التحقق مع أي شخص.",
+    ],
+  });
 }
 
 async function sendPurposeOtp(input: {

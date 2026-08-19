@@ -1,3 +1,10 @@
+export type ViewingBookingStatus =
+  | "pending"
+  | "confirmed"
+  | "rescheduled"
+  | "cancelled"
+  | "completed";
+
 export type ViewingBooking = {
   id: string;
   listingId: string;
@@ -13,6 +20,7 @@ export type ViewingBooking = {
   notes?: string;
   sellerId: string;
   sellerName: string;
-  status: "confirmed" | "cancelled";
+  status: ViewingBookingStatus;
+  statusVersion?: number;
   createdAt: string;
 };

@@ -11,15 +11,18 @@ const statusLabel: Record<QuoteRequest["status"], string> = {
   submitted: "مقدّم",
   quoted: "تم التسعير",
   accepted: "مقبول",
+  rejected: "مرفوض",
+  expired: "منتهٍ",
+  converted: "تحول إلى حجز",
 };
 
-const nextStatus: Record<
-  QuoteRequest["status"],
-  QuoteRequest["status"] | null
-> = {
+const nextStatus: Record<QuoteRequest["status"], QuoteRequest["status"] | null> = {
   submitted: "quoted",
   quoted: "accepted",
-  accepted: null,
+  accepted: "converted",
+  rejected: null,
+  expired: null,
+  converted: null,
 };
 
 export function AdminQuoteRequestsPanel() {

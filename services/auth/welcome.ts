@@ -1,5 +1,4 @@
-import { sendWelcomeEmail } from "@/services/email/email.service";
-import { createNotification } from "@/services/payments/notification-store";
+import { notifyWelcome } from "@/services/notifications/notification-events";
 
 /** Sends the welcome email and records an in-app notification after signup. */
 export async function completeRegistrationWelcome(input: {
@@ -7,23 +6,11 @@ export async function completeRegistrationWelcome(input: {
   name: string;
   userId: string;
 }): Promise<{ emailed: boolean }> {
-  const name = input.name.trim() || "عميل سوقنا";
-  const emailed = await sendWelcomeEmail({
-    email: input.email,
-    name,
-  });
-
   try {
-    await createNotification({
-      userId: input.userId,
-      type: "welcome",
-      title: "أهلاً بك في سوقنا",
-      body: `مرحباً ${name}، حسابك في سوقنا نشط الآن. ابدأ بنشر إعلان أو تصفّح العروض.`,
-      href: "/search",
-    });
+    const result = await notifyWelcome(input);
+    return { emailed: result.emailStatus === "sent" };
   } catch (error) {
-    console.error("[Sooqna Welcome] in-app notification failed", error);
+    console.error("[Sooqna Welcome] notification failed", error);
+    return { emailed: false };
   }
-
-  return { emailed };
 }

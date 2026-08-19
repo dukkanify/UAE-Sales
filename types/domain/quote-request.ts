@@ -21,6 +21,13 @@ export type QuoteRequest = {
   attachmentName?: string;
   providerId: string;
   providerName: string;
-  status: "submitted" | "quoted" | "accepted";
+  status:
+    | "submitted"
+    | "quoted"
+    | "accepted"
+    | "rejected"
+    | "expired"
+    | "converted";
+  statusVersion?: number;
   createdAt: string;
 };

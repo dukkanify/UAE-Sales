@@ -11,29 +11,12 @@ function notifyOtpFallback() {
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-export function saveOtpFallback(email: string, otp: string) {
-  if (typeof window === "undefined") return;
-  if (!/^\d{6}$/.test(otp)) return;
-  const payload: OtpFallback = {
-    email: email.trim().toLowerCase(),
-    otp,
-  };
-  sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-  notifyOtpFallback();
+export function saveOtpFallback(_email: string, _otp: string) {
+  return;
 }
 
-export function readOtpFallback(email: string): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = sessionStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as OtpFallback;
-    if (parsed.email !== email.trim().toLowerCase()) return null;
-    if (!/^\d{6}$/.test(parsed.otp)) return null;
-    return parsed.otp;
-  } catch {
-    return null;
-  }
+export function readOtpFallback(_email: string): string | null {
+  return null;
 }
 
 export function clearOtpFallback() {

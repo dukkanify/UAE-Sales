@@ -11,7 +11,7 @@ import {
   listPersistedUsers,
   persistUser,
 } from "@/services/auth/user-persistence";
-import type { AccountStatus, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
+import type { AccountStatus, NotificationPreferences, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 function isPlaceholderUser(user: StoredUser): boolean {
@@ -79,6 +79,31 @@ export async function findUserById(id: string): Promise<StoredUser | null> {
 
 export async function saveUser(user: StoredUser): Promise<StoredUser> {
   return persistUser(user);
+}
+
+export async function updateNotificationPreferences(
+  userId: string,
+  patch: Partial<NotificationPreferences> & { locale?: "ar" | "en" },
+): Promise<UserProfile> {
+  const user = await findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
+  const updated: StoredUser = {
+    ...user,
+    locale: patch.locale ?? user.locale,
+    notificationPreferences: {
+      email: patch.email ?? user.notificationPreferences?.email ?? true,
+      bookingUpdates:
+        patch.bookingUpdates ?? user.notificationPreferences?.bookingUpdates ?? true,
+      orderUpdates:
+        patch.orderUpdates ?? user.notificationPreferences?.orderUpdates ?? true,
+      messages: patch.messages ?? user.notificationPreferences?.messages ?? true,
+      marketing: patch.marketing ?? user.notificationPreferences?.marketing ?? false,
+      savedSearches:
+        patch.savedSearches ?? user.notificationPreferences?.savedSearches ?? true,
+    },
+  };
+  await saveUser(updated);
+  return toProfile(updated);
 }
 
 export async function createStandardUser(input: {
@@ -260,6 +285,14 @@ export async function restoreUserWithPasswordProof(input: {
         ? "business"
         : "user",
     walletBalance: 0,
+    notificationPreferences: {
+      email: true,
+      bookingUpdates: true,
+      orderUpdates: true,
+      messages: true,
+      marketing: false,
+      savedSearches: true,
+    },
   });
 }
 

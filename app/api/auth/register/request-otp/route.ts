@@ -69,8 +69,6 @@ export async function POST(request: Request) {
       trackAuthEvent("registration_otp_sent");
       return genericOtpResponse(email, {
         emailDelivered: sent.delivered,
-        otp: sent.code,
-        revealOtp: true,
       });
     } catch (sendError) {
       await deletePendingUser(pending.id);

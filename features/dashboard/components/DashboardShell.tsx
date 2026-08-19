@@ -25,7 +25,11 @@ type DashboardShellProps = {
 
 const dashboardLinks = [
   { href: "/profile", icon: "user" as const, label: "الملف الشخصي" },
+  { href: "/notifications", icon: "bell" as const, label: "الإشعارات" },
   { href: "/orders", icon: "package" as const, label: "طلباتي" },
+  { href: "/dashboard/bookings", icon: "map" as const, label: "الحجوزات" },
+  { href: "/dashboard/quotes", icon: "wrench" as const, label: "الخدمات" },
+  { href: "/dashboard/applications", icon: "briefcase" as const, label: "الوظائف" },
   { href: "/dashboard/listings", icon: "grid" as const, label: "إعلاناتي" },
   { href: "/listings/new", icon: "plus" as const, label: "إضافة إعلان" },
   { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },

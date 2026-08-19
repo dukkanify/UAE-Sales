@@ -5,7 +5,6 @@ import {
   OTP_VERIFY_MESSAGES,
   RESEND_COOLDOWN_MESSAGE,
 } from "@/services/auth/auth-messages";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
@@ -19,25 +18,18 @@ export async function enforceRateLimit(request: Request, email: string): Promise
 
 export function genericOtpResponse(
   email: string,
-  extras?: { emailDelivered?: boolean; otp?: string; revealOtp?: boolean },
+  extras?: { emailDelivered?: boolean },
 ) {
   const emailDelivered = extras?.emailDelivered ?? true;
-  const revealOtp =
-    Boolean(extras?.otp) && Boolean(extras?.revealOtp || !emailDelivered);
-  const response = NextResponse.json({
+  return NextResponse.json({
     ok: true,
     message: emailDelivered
       ? GENERIC_OTP_SENT_MESSAGE
-      : "تعذر وصول الرسالة إلى البريد. استخدم الرمز الظاهر على الشاشة لإكمال التحقق.",
+      : OTP_SEND_FAILED_MESSAGE,
     maskedEmail: maskEmail(email),
     email,
     emailDelivered,
-    ...(revealOtp ? { otp: extras?.otp } : {}),
   });
-  if (revealOtp && extras?.otp) {
-    attachOtpDisplayCookie(response, email, extras.otp);
-  }
-  return response;
 }
 
 export function otpSendFailedResponse() {
@@ -107,7 +99,7 @@ export async function sendRegistrationVerifyOtp(input: {
   });
 
   if (!delivered) {
-    console.warn("[Sooqna OTP] email not delivered; code available on verify screen", {
+    console.warn("[Sooqna OTP] registration email not delivered", {
       email: input.email,
     });
   }

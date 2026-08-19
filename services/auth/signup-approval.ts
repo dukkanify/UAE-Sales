@@ -1,11 +1,7 @@
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
-import { getAllUsers } from "@/services/auth/user-store";
-import {
-  approveRegisteredUser,
-  markPersonVerified,
-} from "@/services/auth/user-store";
+import { approveRegisteredUser, markPersonVerified } from "@/services/auth/user-store";
 import { completeRegistrationWelcome } from "@/services/auth/welcome";
-import { createNotification } from "@/services/payments/notification-store";
+import { notify, notifyAdmins } from "@/services/notifications/notification.service";
 import type { UserProfile } from "@/types";
 
 export async function completePersonVerification(
@@ -26,12 +22,16 @@ export async function completePersonVerification(
   }
 
   try {
-    await createNotification({
+    await notify({
       userId: verified.id,
       type: "account_verified",
       title: "تم التحقق من حسابك",
+      titleEn: "Your account was verified",
       body: "تحققنا من بريدك. حسابك بانتظار اعتماد سريع من الإدارة.",
+      bodyEn: "Your email is verified. An admin will approve your account shortly.",
       href: "/register/pending",
+      idempotencyKey: `ACCOUNT_VERIFIED:${verified.id}`,
+      critical: true,
     });
     await notifyAdminsPendingApproval(verified);
   } catch (error) {
@@ -52,16 +52,14 @@ export async function approvePendingUser(userId: string): Promise<UserProfile> {
 }
 
 async function notifyAdminsPendingApproval(user: UserProfile): Promise<void> {
-  const admins = (await getAllUsers()).filter((item) => item.role === "admin");
-  await Promise.all(
-    admins.map((admin) =>
-      createNotification({
-        userId: admin.id,
-        type: "account_pending_approval",
-        title: "حساب بانتظار الاعتماد",
-        body: `تم التحقق من ${user.fullName} (${user.email}). اعتمد الحساب بضغطة واحدة.`,
-        href: "/admin/users",
-      }),
-    ),
-  );
+  await notifyAdmins({
+    type: "account_pending_approval",
+    title: "حساب بانتظار الاعتماد",
+    titleEn: "Account awaiting approval",
+    body: `تم التحقق من ${user.fullName} (${user.email}). اعتمد الحساب بضغطة واحدة.`,
+    bodyEn: `${user.fullName} (${user.email}) is verified and waiting for approval.`,
+    href: "/admin/users",
+    idempotencyKey: `ADMIN_PENDING_USER:${user.id}`,
+    channels: ["in_app"],
+  });
 }

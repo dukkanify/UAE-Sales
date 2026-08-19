@@ -11,6 +11,7 @@ import {
   buildSooqnaEmailHtml,
   buildSooqnaEmailText,
 } from "@/services/email/sooqna-email-template";
+import type { AppLocale } from "@/shared/i18n/locale";
 
 const DEFAULT_DEDUPE_MS = 24 * 60 * 60 * 1000;
 
@@ -21,6 +22,7 @@ export async function sendTransactionalEmail(input: {
   ctaLabel?: string;
   dedupeWindowMs?: number;
   entityId: string;
+  locale?: AppLocale;
   subject: string;
   title: string;
   to: string;
@@ -67,6 +69,7 @@ export async function sendTransactionalEmail(input: {
       bodyHtml: input.bodyHtml,
       ctaHref: input.ctaHref,
       ctaLabel: input.ctaLabel,
+      locale: input.locale,
       preview: input.subject,
     });
     const text = buildSooqnaEmailText({
@@ -74,14 +77,23 @@ export async function sendTransactionalEmail(input: {
       bodyLines: input.bodyLines,
       ctaHref: input.ctaHref,
       ctaLabel: input.ctaLabel,
+      locale: input.locale,
     });
 
-    const sent = await deliverEmailSafely({
+    let sent = await deliverEmailSafely({
       to,
       subject: input.subject,
       html,
       text,
     });
+    if (!sent) {
+      sent = await deliverEmailSafely({
+        to,
+        subject: input.subject,
+        html,
+        text,
+      });
+    }
 
     await updateEmailLog(pending.id, {
       error: sent ? undefined : "delivery_failed",

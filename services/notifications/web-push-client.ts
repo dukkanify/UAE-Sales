@@ -67,7 +67,7 @@ export async function dispatchWebPush(notification: AppNotification): Promise<vo
     id: notification.id,
     title: notification.title,
     body: notification.body,
-    href: notification.href || "/profile#notifications",
+    href: notification.href || "/notifications",
   });
 
   await Promise.all(

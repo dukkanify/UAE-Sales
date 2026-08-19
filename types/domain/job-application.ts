@@ -14,6 +14,13 @@ export type JobApplication = {
   cvFileName: string;
   employerId: string;
   employerName: string;
-  status: "submitted" | "reviewed";
+  status:
+    | "submitted"
+    | "reviewed"
+    | "viewed"
+    | "shortlisted"
+    | "rejected"
+    | "accepted";
+  statusVersion?: number;
   createdAt: string;
 };

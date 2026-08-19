@@ -41,6 +41,8 @@ export type {
 export type {
   AccountType,
   AdminPermission,
+  NotificationPreferenceKey,
+  NotificationPreferences,
   UserProfile,
   UserRole,
 } from "./domain/user";
@@ -77,6 +79,9 @@ export type {
 
 export type {
   AppNotification,
+  EmailChannelStatus,
+  NotificationPreferenceKey as InAppNotificationPreferenceKey,
+  NotificationPreferences as InAppNotificationPreferences,
   NotificationType,
   PushSubscriptionRecord,
 } from "./domain/notification";
