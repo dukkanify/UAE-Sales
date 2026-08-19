@@ -77,13 +77,12 @@ function tokenFilePath(): string {
 }
 
 async function readJsonTokens(): Promise<StoredResetToken[]> {
-  if (jsonCache) return jsonCache;
   try {
     const raw = await readFile(tokenFilePath(), "utf8");
     const parsed = JSON.parse(raw) as unknown;
     jsonCache = Array.isArray(parsed) ? (parsed as StoredResetToken[]) : [];
   } catch {
-    jsonCache = [];
+    jsonCache = jsonCache ?? [];
   }
   return jsonCache;
 }
