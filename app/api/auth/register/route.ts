@@ -5,7 +5,6 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
-  otpSendFailedResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
 import { canRevealOtpToClient } from "@/services/otp/otp-config";
@@ -112,11 +111,11 @@ export async function POST(request: Request) {
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
-      if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
-        trackAuthEvent("registration_failed");
-        return otpSendFailedResponse();
-      }
-      return otpSendFailedResponse();
+      trackAuthEvent("registration_failed");
+      return registerOtpResponse({
+        email,
+        emailDelivered: false,
+      });
     }
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
