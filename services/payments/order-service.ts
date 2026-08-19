@@ -125,11 +125,11 @@ export async function initiateCheckout(
   }
 
   let buyerEmirate: string | undefined;
-  if (input.addressId && input.buyer.id) {
+  if (input.deliveryAddress?.emirate) {
+    buyerEmirate = input.deliveryAddress.emirate;
+  } else if (input.addressId && input.buyer.id) {
     const addresses = await getAddressesForUser(input.buyer.id);
     buyerEmirate = addresses.find((item) => item.id === input.addressId)?.emirate;
-  } else if (input.deliveryAddress?.emirate) {
-    buyerEmirate = input.deliveryAddress.emirate;
   }
 
   const shipping = resolveCheckoutShipping({
@@ -176,6 +176,9 @@ export async function initiateCheckout(
           landmark: input.deliveryAddress.landmark,
           notes: input.deliveryAddress.notes,
           companyName: input.deliveryAddress.companyName,
+          latitude: input.deliveryAddress.latitude,
+          longitude: input.deliveryAddress.longitude,
+          formattedAddress: input.deliveryAddress.formattedAddress,
         }
       : undefined,
     saveAddress: input.deliveryAddress?.saveAddress,

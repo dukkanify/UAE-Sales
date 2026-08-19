@@ -81,6 +81,9 @@ export type Order = {
     landmark?: string;
     notes?: string;
     companyName?: string;
+    latitude?: number;
+    longitude?: number;
+    formattedAddress?: string;
   };
   saveAddress?: boolean;
   stripeCheckoutSessionId?: string;

@@ -35,6 +35,8 @@ import { PageHero } from "@/shared/ui/PageHero";
 import { AppImage } from "@/shared/components/AppImage";
 import { getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { cities } from "@/shared/constants/locations";
+import { CheckoutLiveLocation } from "@/features/checkout/components/CheckoutLiveLocation";
+import type { CheckoutLiveLocationValue } from "@/features/checkout/lib/checkout-live-location";
 
 type CheckoutWizardProps = {
   catalogListing?: Listing;
@@ -125,9 +127,12 @@ export function CheckoutWizard({
   const shippable = listing ? isCategoryShippable(listing.categoryId) : false;
   const requiresAddress = shippable && shippingMethod !== "pickup";
 
+  const hasLiveLocation =
+    typeof guestInfo.latitude === "number" && typeof guestInfo.longitude === "number";
+
   const shippingMethods = useMemo(() => {
     if (!listing || !shippable) return [];
-    const buyerEmirate = sessionUser?.city ?? guestInfo.emirate;
+    const buyerEmirate = guestInfo.emirate || sessionUser?.city;
     return getAvailableShippingMethods(
       listing.categoryId,
       listing.emirate ?? listing.city,
@@ -135,7 +140,9 @@ export function CheckoutWizard({
     );
   }, [listing, shippable, sessionUser?.city, guestInfo.emirate]);
 
-  const shippingFee = shippable ? calculateShippingFee(shippingMethod) : 0;
+  const resolvedShippingMethod =
+    shippingMethods.some((method) => method.id === shippingMethod) ? shippingMethod : "standard";
+  const shippingFee = shippable ? calculateShippingFee(resolvedShippingMethod) : 0;
   const totals = listing ? calculateTotals(listing.price, shippingFee) : null;
 
   function scrollPanelToTop() {
@@ -247,10 +254,15 @@ export function CheckoutWizard({
     const deliveryInfo: GuestDeliveryInfo = {
       ...guestInfo,
       ...normalizeGuestBuyer(guestInfo),
-      shippingMethod,
+      shippingMethod: resolvedShippingMethod,
     };
 
-    if (buyer && shippable && requiresAddress && addresses.length > 0) {
+    const liveLocationReady =
+      typeof deliveryInfo.latitude === "number" &&
+      typeof deliveryInfo.longitude === "number" &&
+      Boolean(deliveryInfo.formattedAddress || deliveryInfo.addressLine);
+
+    if (buyer && shippable && requiresAddress && addresses.length > 0 && !liveLocationReady) {
       if (!selectedAddressId) {
         setError(CHECKOUT_ERRORS.savedAddressRequired);
         scrollPanelToTop();
@@ -288,7 +300,7 @@ export function CheckoutWizard({
       const deliveryInfo: GuestDeliveryInfo = {
         ...guestInfo,
         ...normalized,
-        shippingMethod,
+        shippingMethod: resolvedShippingMethod,
       };
 
       if (isGuest) {
@@ -303,6 +315,9 @@ export function CheckoutWizard({
       }
 
       const selectedAddress = addresses.find((item) => item.id === selectedAddressId);
+      const useLiveLocation =
+        typeof deliveryInfo.latitude === "number" &&
+        typeof deliveryInfo.longitude === "number";
 
       const response = await fetch("/api/checkout/session", {
         method: "POST",
@@ -330,11 +345,12 @@ export function CheckoutWizard({
                 seller: { id: listing.seller.id, name: listing.seller.name },
               }
             : undefined,
-          shippingMethod: shippable ? shippingMethod : undefined,
+          shippingMethod: shippable ? resolvedShippingMethod : undefined,
           shippingFee: shippable ? shippingFee : 0,
-          addressId: sessionUser && selectedAddressId ? selectedAddressId : undefined,
+          addressId:
+            sessionUser && selectedAddressId && !useLiveLocation ? selectedAddressId : undefined,
           deliveryAddress:
-            requiresAddress && (!sessionUser || !selectedAddress)
+            requiresAddress && (useLiveLocation || !sessionUser || !selectedAddress)
               ? buildDeliveryAddressInput(deliveryInfo, normalized)
               : undefined,
         }),
@@ -515,7 +531,7 @@ export function CheckoutWizard({
                   {shippingMethods.map((method) => (
                     <label
                       key={method.id}
-                      className={`flex cursor-pointer items-center justify-between rounded-[var(--radius-xl)] border px-4 py-3 ${shippingMethod === method.id ? "border-secondary bg-secondary-soft" : "border-border"}`}
+                      className={`flex cursor-pointer items-center justify-between rounded-[var(--radius-xl)] border px-4 py-3 ${resolvedShippingMethod === method.id ? "border-secondary bg-secondary-soft" : "border-border"}`}
                     >
                       <span>
                         <span className="block text-sm font-semibold">{method.label}</span>
@@ -524,7 +540,7 @@ export function CheckoutWizard({
                       <span className="flex items-center gap-2">
                         <CurrencyAmount amount={method.fee} size="sm" />
                         <input
-                          checked={shippingMethod === method.id}
+                          checked={resolvedShippingMethod === method.id}
                           name="shipping"
                           onChange={() => setShippingMethod(method.id)}
                           type="radio"
@@ -537,7 +553,33 @@ export function CheckoutWizard({
                 {requiresAddress ? (
                   <>
                     <h3 className="font-black text-ink">عنوان التوصيل</h3>
-                    {sessionUser && addresses.length > 0 ? (
+                    <CheckoutLiveLocation
+                      confirmed={
+                        hasLiveLocation
+                          ? {
+                              latitude: guestInfo.latitude as number,
+                              longitude: guestInfo.longitude as number,
+                              formattedAddress: guestInfo.formattedAddress || guestInfo.addressLine || "",
+                              emirate: guestInfo.emirate || "",
+                              city: guestInfo.city || guestInfo.emirate || "",
+                              area: guestInfo.area || guestInfo.addressLine || "",
+                            }
+                          : null
+                      }
+                      onConfirm={(value: CheckoutLiveLocationValue) => {
+                        setGuestInfo((prev) => ({
+                          ...prev,
+                          emirate: value.emirate || prev.emirate,
+                          addressLine: value.formattedAddress,
+                          city: value.city,
+                          area: value.area,
+                          latitude: value.latitude,
+                          longitude: value.longitude,
+                          formattedAddress: value.formattedAddress,
+                        }));
+                      }}
+                    />
+                    {sessionUser && addresses.length > 0 && !hasLiveLocation ? (
                       <Select
                         label="عنوان محفوظ"
                         name="addressId"
@@ -549,7 +591,7 @@ export function CheckoutWizard({
                         value={selectedAddressId}
                       />
                     ) : null}
-                    {(!sessionUser || addresses.length === 0) && (
+                    {(!sessionUser || addresses.length === 0 || hasLiveLocation) && (
                       <div className="grid gap-3">
                         <Select
                           label="الإمارة"
