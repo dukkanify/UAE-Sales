@@ -218,18 +218,19 @@ export async function emailPasswordResetLink(input: {
   name?: string;
   token: string;
 }): Promise<void> {
-  const href = `${EMAIL_SITE_URL}/forgot-password?step=password&email=${encodeURIComponent(input.email)}&token=${encodeURIComponent(input.token)}`;
+  const href = `${EMAIL_SITE_URL}/reset-password?token=${encodeURIComponent(input.token)}`;
   await sendTransactionalEmail({
     type: "password_reset",
     to: input.email,
     entityId: input.email,
-    dedupeWindowMs: 2 * 60 * 1000,
-    subject: "إعادة تعيين كلمة المرور — سوقنا",
-    title: "رابط آمن لإعادة تعيين كلمة المرور",
-    bodyHtml: `${greet(input.name || "عميل سوقنا")}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور. الرابط صالح لمدة ساعة واحدة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.</p>`,
+    dedupeWindowMs: 0,
+    subject: "Reset your Sooqna password | إعادة تعيين كلمة المرور في سوقنا",
+    title: "إعادة تعيين كلمة المرور في سوقنا",
+    bodyHtml: `${greet(input.name || "عميل سوقنا")}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور لحسابك في سوقنا.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">اضغط الزر أدناه لاختيار كلمة مرور جديدة. الرابط صالح لمدة <strong>60 دقيقة</strong> ويُستخدم مرة واحدة فقط.</p><p style="font-size:15px;line-height:1.8;margin:16px 0 0;color:#6b6560;">إذا لم تطلب إعادة تعيين كلمة المرور، تجاهل هذه الرسالة. لن نغيّر حسابك ما لم تفتح الرابط وتعيّن كلمة مرور جديدة. لن نطلب منك كلمة المرور عبر البريد.</p>`,
     bodyLines: [
-      "استخدم الرابط التالي لإعادة تعيين كلمة المرور. صالح لمدة ساعة.",
-      "إذا لم تطلب ذلك، تجاهل الرسالة.",
+      "طلبت إعادة تعيين كلمة المرور لحسابك في سوقنا.",
+      "الرابط صالح لمدة 60 دقيقة ويُستخدم مرة واحدة فقط.",
+      "إذا لم تطلب ذلك، تجاهل هذه الرسالة. لن نرسل كلمة المرور عبر البريد.",
     ],
     ctaHref: href,
     ctaLabel: "تعيين كلمة مرور جديدة",

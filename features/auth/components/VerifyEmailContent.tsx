@@ -32,10 +32,8 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
       resetToken?: string;
       user?: UserProfile;
     }) => {
-      if (purpose === "PASSWORD_RESET" && data?.resetToken) {
-        router.push(
-          `/forgot-password?step=password&email=${encodeURIComponent(email)}&token=${encodeURIComponent(data.resetToken)}`,
-        );
+      if (purpose === "PASSWORD_RESET") {
+        router.push("/login");
         return;
       }
 
@@ -50,7 +48,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
 
       router.push(nextPath ?? "/profile");
     },
-    [email, nextPath, purpose, router],
+    [nextPath, purpose, router],
   );
 
   if (!emailOtpEnabled && purpose !== "REGISTER") {

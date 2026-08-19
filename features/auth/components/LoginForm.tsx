@@ -222,7 +222,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
               أو أكمل الشراء كضيف.
             </p>
           )}
-          {variant !== "admin" && emailOtpEnabled ? (
+          {variant !== "admin" ? (
             <Link className="text-primary" href="/forgot-password">
               نسيت كلمة المرور؟
             </Link>

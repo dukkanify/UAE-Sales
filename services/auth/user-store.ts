@@ -209,7 +209,12 @@ export async function setUserPassword(userId: string, passwordHash: string): Pro
   const user = await findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const updated: StoredUser = { ...user, passwordHash };
+  const updated: StoredUser = {
+    ...user,
+    passwordHash,
+    passwordUpdatedAt: new Date().toISOString(),
+    sessionVersion: (user.sessionVersion ?? 0) + 1,
+  };
   await saveUser(updated);
   return toProfile(updated);
 }
