@@ -6,6 +6,7 @@ import { verifyPassword } from "@/services/auth/password.service";
 import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { INVALID_CREDENTIALS_MESSAGE } from "@/services/auth/auth-messages";
+import { AuthStoreError } from "@/services/auth/user-persistence";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const schema = z.object({
@@ -103,7 +104,13 @@ export async function POST(request: Request) {
       { error: "INVALID_CREDENTIALS", message: INVALID_CREDENTIALS_MESSAGE },
       { status: 401 },
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof AuthStoreError) {
+      return NextResponse.json(
+        { error: "LOGIN_FAILED", message: "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا." },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { error: "LOGIN_FAILED", message: "تعذر تسجيل الدخول حاليًا. حاول مرة أخرى." },
       { status: 500 },

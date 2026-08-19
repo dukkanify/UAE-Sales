@@ -7,6 +7,7 @@ import {
 } from "@/services/auth/auth-messages";
 import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
@@ -23,12 +24,14 @@ export function genericOtpResponse(
 ) {
   const emailDelivered = extras?.emailDelivered ?? true;
   const revealOtp =
-    Boolean(extras?.otp) && Boolean(extras?.revealOtp || !emailDelivered);
+    Boolean(extras?.otp) &&
+    canRevealOtpToClient(emailDelivered) &&
+    Boolean(extras?.revealOtp || !emailDelivered);
   const response = NextResponse.json({
     ok: true,
     message: emailDelivered
       ? GENERIC_OTP_SENT_MESSAGE
-      : "تعذر وصول الرسالة إلى البريد. استخدم الرمز الظاهر على الشاشة لإكمال التحقق.",
+      : OTP_SEND_FAILED_MESSAGE,
     maskedEmail: maskEmail(email),
     email,
     emailDelivered,
@@ -88,7 +91,7 @@ export async function sendRegistrationVerifyOtp(input: {
   userId: string;
   accountType: string;
 }): Promise<{ delivered: boolean; code: string }> {
-  const { code } = await createOtpRequest({
+  const { record, code } = await createOtpRequest({
     email: input.email,
     purpose: "REGISTER",
     userId: input.userId,
@@ -106,10 +109,9 @@ export async function sendRegistrationVerifyOtp(input: {
     otp: code,
   });
 
-  if (!delivered) {
-    console.warn("[Sooqna OTP] email not delivered; code available on verify screen", {
-      email: input.email,
-    });
+  if (!delivered && !canRevealOtpToClient(false)) {
+    await invalidateOtpRecord(record.id);
+    throw new Error("EMAIL_SEND_FAILED");
   }
 
   return { delivered, code };
@@ -151,6 +153,11 @@ export async function sendOtpForPurpose(input: {
       break;
     default:
       delivered = await senders.sendLoginOtp(payload);
+  }
+
+  if (!delivered && input.purpose === "REGISTER" && !canRevealOtpToClient(false)) {
+    await invalidateOtpRecord(record.id);
+    throw new Error("EMAIL_SEND_FAILED");
   }
 
   if (!delivered && input.purpose !== "REGISTER") {

@@ -70,7 +70,6 @@ export async function POST(request: Request) {
       return genericOtpResponse(email, {
         emailDelivered: sent.delivered,
         otp: sent.code,
-        revealOtp: true,
       });
     } catch (sendError) {
       await deletePendingUser(pending.id);

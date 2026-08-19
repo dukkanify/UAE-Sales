@@ -9,6 +9,7 @@ import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { maskEmail } from "@/shared/utils/mask-email";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import { useToast } from "@/shared/components/ToastProvider";
+import { isDemoOtpClientEnabled } from "@/shared/constants/feature-flags";
 import {
   clearOtpFallback,
   readOtpFallback,
@@ -62,13 +63,14 @@ export function OtpVerification({
   verifyEndpoint,
 }: OtpVerificationProps) {
   const { showToast } = useToast();
-  const serverOtp = normalizeOtp(initialOtp);
+  const demoOtpEnabled = isDemoOtpClientEnabled();
+  const serverOtp = demoOtpEnabled ? normalizeOtp(initialOtp) : null;
   const storedOtp = useSyncExternalStore(
     subscribeOtpFallback,
-    () => readOtpFallback(email) ?? serverOtp,
+    () => (demoOtpEnabled ? readOtpFallback(email) ?? serverOtp : null),
     () => serverOtp,
   );
-  const fallbackOtp = storedOtp ?? serverOtp;
+  const fallbackOtp = demoOtpEnabled ? storedOtp ?? serverOtp : null;
   const [digits, setDigits] = useState(() =>
     serverOtp ? serverOtp.split("") : ["", "", "", "", "", ""],
   );
@@ -81,14 +83,14 @@ export function OtpVerification({
   const endpoint = verifyEndpoint ?? DEFAULT_VERIFY_ENDPOINTS[purpose] ?? "/api/auth/otp/verify";
 
   useEffect(() => {
-    if (serverOtp) saveOtpFallback(email, serverOtp);
-  }, [email, serverOtp]);
+    if (demoOtpEnabled && serverOtp) saveOtpFallback(email, serverOtp);
+  }, [demoOtpEnabled, email, serverOtp]);
 
   useEffect(() => {
-    if (!fallbackOtp || toastedRef.current) return;
+    if (!demoOtpEnabled || !fallbackOtp || toastedRef.current) return;
     toastedRef.current = true;
     showToast(`رمز التحقق: ${fallbackOtp}`);
-  }, [fallbackOtp, showToast]);
+  }, [demoOtpEnabled, fallbackOtp, showToast]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -168,14 +170,14 @@ export function OtpVerification({
       }
       setCooldown(COOLDOWN_SECONDS);
       setOtpError("");
-      if (typeof data.otp === "string" && /^\d{6}$/.test(data.otp)) {
+      if (demoOtpEnabled && typeof data.otp === "string" && /^\d{6}$/.test(data.otp)) {
         saveOtpFallback(email, data.otp);
         toastedRef.current = false;
         autoSubmittedRef.current = data.otp;
         setDigits(data.otp.split(""));
       }
       trackAuthEventClient("otp_resend", { purpose });
-    }, [cooldown, email, fullName, purpose]),
+    }, [cooldown, demoOtpEnabled, email, fullName, purpose]),
   );
 
   function applyDigits(nextDigits: string[]) {

@@ -17,7 +17,7 @@ export const SESSION_FAILED_MESSAGE =
   "تعذر إنشاء الجلسة. يرجى المحاولة مرة أخرى.";
 
 export const EMAIL_ALREADY_REGISTERED_MESSAGE =
-  "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل. يمكنك تسجيل الدخول.";
+  "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل. سجل الدخول أو استخدم نسيت كلمة المرور.";
 
 export const INVALID_CREDENTIALS_MESSAGE = "بيانات الدخول غير صحيحة.";
 

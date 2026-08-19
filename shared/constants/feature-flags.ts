@@ -8,6 +8,11 @@ export function isEmailOtpEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_EMAIL_OTP === "true";
 }
 
+/** Client-side demo OTP fallback — must stay false in production builds. */
+export function isDemoOtpClientEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_ENABLE_DEMO_OTP === "true";
+}
+
 /** Env kill-switch for guest checkout (build-time). */
 export function isGuestCheckoutEnvEnabled(): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_GUEST_CHECKOUT !== "false";
