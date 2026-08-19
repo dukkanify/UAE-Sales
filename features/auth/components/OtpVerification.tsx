@@ -20,6 +20,7 @@ import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type OtpVerificationProps = {
   email: string;
+  emailDeliveryFailed?: boolean;
   fullName?: string;
   initialOtp?: string | null;
   maskedEmail?: string;
@@ -53,6 +54,7 @@ const DEFAULT_VERIFY_ENDPOINTS: Partial<Record<OtpPurpose, string>> = {
 
 export function OtpVerification({
   email,
+  emailDeliveryFailed = false,
   fullName,
   initialOtp = null,
   maskedEmail,
@@ -155,6 +157,10 @@ export function OtpVerification({
       });
       const data = await response.json();
       if (!response.ok) {
+        if (response.status === 503 || data.error === "EMAIL_SEND_FAILED") {
+          setOtpError(data.message ?? "تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.");
+          return;
+        }
         if (response.status === 429 && data.retryAfterSeconds) {
           const waitMsg = data.message
             ? String(data.message)
@@ -170,6 +176,11 @@ export function OtpVerification({
       }
       setCooldown(COOLDOWN_SECONDS);
       setOtpError("");
+      if (data.emailDelivered === false) {
+        setOtpError(
+          data.message ?? "تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.",
+        );
+      }
       if (demoOtpEnabled && typeof data.otp === "string" && /^\d{6}$/.test(data.otp)) {
         saveOtpFallback(email, data.otp);
         toastedRef.current = false;
@@ -257,6 +268,12 @@ export function OtpVerification({
           </div>
         ) : null}
       </div>
+
+      {emailDeliveryFailed ? (
+        <FormMessage variant="error">
+          تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.
+        </FormMessage>
+      ) : null}
 
       <div className="grid grid-cols-6 gap-2" dir="ltr" role="group" aria-label="رمز التحقق">
         {digits.map((digit, index) => (

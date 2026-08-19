@@ -44,8 +44,13 @@ export function isGuestConvertible(user: StoredUser): boolean {
   );
 }
 
+export function isPendingEmailVerification(user: StoredUser): boolean {
+  return user.accountStatus === "pending" && !user.emailVerifiedAt;
+}
+
 export function isRegisteredAccount(user: StoredUser): boolean {
   if (isGuestConvertible(user)) return false;
+  if (isPendingEmailVerification(user)) return false;
   return Boolean(user.passwordHash) || Boolean(user.emailVerifiedAt);
 }
 

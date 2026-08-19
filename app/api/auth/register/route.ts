@@ -8,6 +8,7 @@ import {
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
 import { canRevealOtpToClient } from "@/services/otp/otp-config";
+import { OTP_SEND_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import {
   createStandardUser,
   toUserProfile,
@@ -27,6 +28,9 @@ function registerOtpResponse(input: {
     purpose: "REGISTER",
     masked: maskEmail(input.email),
   });
+  if (!input.emailDelivered) {
+    params.set("emailDelivered", "0");
+  }
   const revealOtp = Boolean(input.otp) && canRevealOtpToClient(input.emailDelivered);
   const response = NextResponse.json({
     ok: true,
@@ -34,6 +38,9 @@ function registerOtpResponse(input: {
     email: input.email,
     maskedEmail: maskEmail(input.email),
     emailDelivered: input.emailDelivered,
+    ...(!input.emailDelivered
+      ? { message: OTP_SEND_FAILED_MESSAGE }
+      : {}),
     ...(revealOtp ? { otp: input.otp } : {}),
     redirectTo: `/verify-email?${params.toString()}`,
   });
@@ -106,7 +113,7 @@ export async function POST(request: Request) {
       return registerOtpResponse({
         email,
         emailDelivered: sent.delivered,
-        otp: sent.code,
+        ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
       });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);

@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import type { StoredUser } from "@/types/domain/user";
+import { logProductionConfigIssues } from "@/services/auth/production-config";
 
 const USERS_FILE = "users.json";
 const JSON_STORE_FILE = "sooqna-auth-users.json";
@@ -290,6 +291,8 @@ async function initAuthStore(): Promise<void> {
 
 async function doInitAuthStore(): Promise<void> {
   if (initialized && driver) return;
+
+  logProductionConfigIssues("auth-store-init");
 
   const postgresUrl = getPostgresUrl();
   if (postgresUrl.startsWith("postgres")) {

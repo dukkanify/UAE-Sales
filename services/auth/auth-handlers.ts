@@ -9,6 +9,7 @@ import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
 import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
+import { logProductionConfigIssues } from "@/services/auth/production-config";
 import type { OtpPurpose } from "@/types/domain/otp";
 
 export async function enforceRateLimit(request: Request, email: string): Promise<boolean> {
@@ -84,13 +85,14 @@ export async function handleOtpVerify(input: {
   return result;
 }
 
-/** Register verification stays easy even if inbox delivery fails. */
+/** Sends registration OTP. Keeps OTP record when email fails so resend can recover. */
 export async function sendRegistrationVerifyOtp(input: {
   email: string;
   fullName: string;
   userId: string;
   accountType: string;
 }): Promise<{ delivered: boolean; code: string }> {
+  logProductionConfigIssues("registration-otp");
   const { code } = await createOtpRequest({
     email: input.email,
     purpose: "REGISTER",

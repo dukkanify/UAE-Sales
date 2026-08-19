@@ -5,17 +5,16 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
-  otpSendFailedResponse,
   sendOtpForPurpose,
 } from "@/services/auth/auth-handlers";
-import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE, OTP_SEND_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import {
   createPendingUser,
-  deletePendingUser,
   findUserByEmail,
   isRegisteredAccount,
 } from "@/services/auth/user-store";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 
 const schema = z.object({
   accountType: z.enum(["individual", "company"]),
@@ -69,11 +68,13 @@ export async function POST(request: Request) {
       trackAuthEvent("registration_otp_sent");
       return genericOtpResponse(email, {
         emailDelivered: sent.delivered,
-        otp: sent.code,
+        ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
       });
     } catch (sendError) {
-      await deletePendingUser(pending.id);
-      throw sendError;
+      const cooldown = otpCooldownResponse(sendError);
+      if (cooldown) return cooldown;
+      trackAuthEvent("registration_failed");
+      return genericOtpResponse(email, { emailDelivered: false });
     }
   } catch (error) {
     const cooldown = otpCooldownResponse(error);
@@ -84,11 +85,10 @@ export async function POST(request: Request) {
         { status: 409 },
       );
     }
-    if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
-      trackAuthEvent("registration_failed");
-      return otpSendFailedResponse();
-    }
     trackAuthEvent("registration_failed");
-    return otpSendFailedResponse();
+    return NextResponse.json(
+      { error: "EMAIL_SEND_FAILED", message: OTP_SEND_FAILED_MESSAGE },
+      { status: 503 },
+    );
   }
 }

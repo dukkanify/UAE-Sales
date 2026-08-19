@@ -21,6 +21,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
   const searchParams = useSearchParams();
   const emailOtpEnabled = isEmailOtpEnabled();
   const email = searchParams.get("email") ?? "";
+  const emailDeliveryFailed = searchParams.get("emailDelivered") === "0";
   const purpose = (searchParams.get("purpose") ?? "LOGIN") as OtpPurpose;
   const maskedEmail = searchParams.get("masked") ?? undefined;
   const nextPath = searchParams.get("next") ?? undefined;
@@ -80,6 +81,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
   return (
     <OtpVerification
       email={email}
+      emailDeliveryFailed={emailDeliveryFailed}
       initialOtp={initialOtp}
       maskedEmail={maskedEmail}
       nextPath={nextPath}

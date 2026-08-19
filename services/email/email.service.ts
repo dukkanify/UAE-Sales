@@ -1,5 +1,6 @@
 import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import { logProductionConfigIssues } from "@/services/auth/production-config";
 import {
   buildSooqnaEmailHtml,
   buildSooqnaEmailText,
@@ -68,7 +69,8 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
 
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
-    console.warn("[Sooqna Email] RESEND_API_KEY is not set; email not sent", {
+    logProductionConfigIssues("email-send");
+    console.error("[Sooqna Email] RESEND_API_KEY is not set; email not sent", {
       to: input.to,
       subject: input.subject,
     });
