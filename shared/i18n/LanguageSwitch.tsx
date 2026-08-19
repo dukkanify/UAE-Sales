@@ -45,7 +45,7 @@ export function LanguageSwitch({
         <span className="language-switch__label">{copy.language}</span>
       )}
       <div className="language-switch__pills" role="group" aria-label={copy.language}>
-        <Pill active={locale === "ar"} label={compact ? "ع" : copy.arabic} locale="ar" />
+        <Pill active={locale === "ar"} label={copy.arabic} locale="ar" />
         <Pill active={locale === "en"} label={copy.english} locale="en" />
       </div>
     </div>

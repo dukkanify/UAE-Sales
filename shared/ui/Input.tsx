@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type InputHTMLAttributes, type MouseEvent } from "react";
+import { useTx } from "@/shared/i18n/useTx";
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   compact?: boolean;
@@ -16,12 +17,19 @@ export function Input({
   hint,
   label,
   onClick,
+  placeholder,
   type,
   ...props
 }: InputProps) {
+  const t = useTx();
   const inputRef = useRef<HTMLInputElement>(null);
   const hasError = Boolean(error);
   const isPickerType = type === "date" || type === "time";
+  const translatedLabel = label ? t(label) : label;
+  const translatedError = error ? t(error) : error;
+  const translatedHint = hint ? t(hint) : hint;
+  const translatedPlaceholder =
+    typeof placeholder === "string" ? t(placeholder) : placeholder;
 
   function openPicker() {
     const input = inputRef.current;
@@ -62,7 +70,7 @@ export function Input({
               : "text-sm font-medium text-ink"
           }
         >
-          {label}
+          {translatedLabel}
         </span>
       ) : null}
       <input
@@ -70,15 +78,16 @@ export function Input({
         aria-invalid={hasError || undefined}
         className={`focus-ring w-full min-w-0 rounded-[var(--radius-xl)] border bg-surface text-ink shadow-[var(--shadow-xs)] placeholder:text-muted/60 transition ${compact ? "min-h-9 rounded-lg px-3 text-xs font-medium" : "min-h-11 px-4 text-sm font-medium"} ${hasError ? "border-error bg-error-soft/30" : "border-border"} ${isPickerType ? "cursor-pointer" : ""} ${className}`}
         onClick={handleInputClick}
+        placeholder={translatedPlaceholder}
         type={type}
         {...props}
       />
-      {error ? (
+      {translatedError ? (
         <span className="text-xs font-medium text-error" role="alert">
-          {error}
+          {translatedError}
         </span>
-      ) : hint ? (
-        <span className="text-xs font-medium text-muted">{hint}</span>
+      ) : translatedHint ? (
+        <span className="text-xs font-medium text-muted">{translatedHint}</span>
       ) : null}
     </label>
   );

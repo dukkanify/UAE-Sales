@@ -7,6 +7,7 @@ import {
 } from "@/features/listings/lib/listing-map-location";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingLocationMapProps = {
   listing: Listing;
@@ -23,6 +24,7 @@ export function ListingLocationMap({ listing }: ListingLocationMapProps) {
   const osmUrl = buildOsmBrowseUrl(point);
 
   return (
+    <LocalizedTree>
     <Card className="mt-8 overflow-hidden p-0 marketplace-panel">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-4">
         <div className="min-w-0">
@@ -82,5 +84,6 @@ export function ListingLocationMap({ listing }: ListingLocationMapProps) {
         </div>
       </div>
     </Card>
+    </LocalizedTree>
   );
 }

@@ -8,6 +8,7 @@ import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBan
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
@@ -71,6 +72,7 @@ export function MarketHeader() {
   }, [menuOpen]);
 
   return (
+    <LocalizedTree>
     <header className="market-header sticky top-0 z-50">
       <VerifyAccountBanner />
       <div className="market-header__accent" aria-hidden />
@@ -201,5 +203,6 @@ export function MarketHeader() {
         ) : null}
       </div>
     </header>
+    </LocalizedTree>
   );
 }

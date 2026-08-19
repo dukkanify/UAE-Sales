@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 
 type BadgeVariant =
   | "verified"
@@ -41,7 +42,7 @@ export function Badge({
       className={`inline-flex items-center rounded-[var(--radius-lg)] border px-2.5 py-0.5 text-xs font-semibold ${variantClasses[variant]} ${className}`}
       {...props}
     >
-      {children}
+      {typeof children === "string" ? <Copy text={children} /> : children}
     </span>
   );
 }

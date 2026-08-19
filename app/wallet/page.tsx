@@ -9,6 +9,7 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { requireCurrentUser } from "@/services/profile";
 import { getWalletSummary } from "@/services/walletService";
+import { getRequestLocale, intlLocale } from "@/shared/i18n/locale";
 
 const activityLabels = {
   deposit: "إيداع",
@@ -24,6 +25,8 @@ const activityLabels = {
 export default async function WalletPage() {
   const user = await requireCurrentUser("/wallet");
   const wallet = await getWalletSummary(user.id);
+  const locale = await getRequestLocale();
+  const dateLocale = intlLocale(locale);
 
   return (
     <>
@@ -67,7 +70,7 @@ export default async function WalletPage() {
                         </p>
                         <p className="mt-0.5 text-xs text-muted">
                           {activityLabels[item.type]} ·{" "}
-                          {new Date(item.date).toLocaleDateString("ar-AE", {
+                          {new Date(item.date).toLocaleDateString(dateLocale, {
                             day: "numeric",
                             month: "short",
                           })}

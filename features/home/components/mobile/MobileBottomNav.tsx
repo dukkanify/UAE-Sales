@@ -7,6 +7,7 @@ import { getUnreadChatCount } from "@/services/chat";
 import { getSessionUser } from "@/services/storage";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const items = [
   { href: "/", icon: "home" as const, label: "الرئيسية" },
@@ -56,6 +57,7 @@ export function MobileBottomNav() {
   }, []);
 
   return (
+    <LocalizedTree>
     <nav
       aria-label="التنقل السفلي"
       className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[60] lg:hidden"
@@ -125,5 +127,6 @@ export function MobileBottomNav() {
         </div>
       </div>
     </nav>
+    </LocalizedTree>
   );
 }

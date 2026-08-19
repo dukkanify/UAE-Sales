@@ -21,6 +21,7 @@ export async function sendTransactionalEmail(input: {
   ctaLabel?: string;
   dedupeWindowMs?: number;
   entityId: string;
+  locale?: "ar" | "en";
   subject: string;
   title: string;
   to: string;
@@ -68,12 +69,14 @@ export async function sendTransactionalEmail(input: {
       ctaHref: input.ctaHref,
       ctaLabel: input.ctaLabel,
       preview: input.subject,
+      locale: input.locale,
     });
     const text = buildSooqnaEmailText({
       title: input.title,
       bodyLines: input.bodyLines,
       ctaHref: input.ctaHref,
       ctaLabel: input.ctaLabel,
+      locale: input.locale,
     });
 
     const sent = await deliverEmailSafely({

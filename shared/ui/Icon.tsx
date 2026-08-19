@@ -232,6 +232,7 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
     <svg
       aria-hidden
       className={className}
+      data-icon={name}
       fill={isFilledIcon ? "currentColor" : "none"}
       height={size}
       stroke={hideStroke ? "none" : "currentColor"}

@@ -6,6 +6,7 @@ import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SellerPanelProps = {
   listing: Listing;
@@ -68,6 +69,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
     typeof listing.seller.completedTransactions === "number";
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel w-full min-w-0 p-6">
       <h2 className="text-base font-black text-ink">البائع</h2>
       <div className="mt-4 flex items-center gap-3">
@@ -88,7 +90,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-ink">{listing.seller.name}</p>
+          <p className="font-semibold text-ink" data-ugc>{listing.seller.name}</p>
           {showRating ? (
             <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
               <Icon className="text-secondary" name="star" size={14} />
@@ -96,7 +98,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
               {showReviews ? (
                 <>
                   <span className="text-border">·</span>
-                  {reviewCount!.toLocaleString("ar-AE")} تقييم
+                  {reviewCount!.toLocaleString("en-AE")} تقييم
                 </>
               ) : null}
             </p>
@@ -130,12 +132,13 @@ export function SellerPanel({ listing }: SellerPanelProps) {
             <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
               <span className="font-medium text-muted">معاملات مكتملة</span>
               <span className="font-semibold text-ink">
-                {listing.seller.completedTransactions!.toLocaleString("ar-AE")}
+                {listing.seller.completedTransactions!.toLocaleString("en-AE")}
               </span>
             </div>
           ) : null}
         </div>
       ) : null}
     </Card>
+    </LocalizedTree>
   );
 }

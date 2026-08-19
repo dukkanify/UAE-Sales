@@ -5,11 +5,15 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { BRAND } from "@/shared/constants/brand";
 import { Card } from "@/shared/ui/Card";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { localizedMetadata } from "@/shared/i18n/localized-metadata";
 
-export const metadata: Metadata = {
-  title: "الشروط والأحكام",
-  description: `شروط استخدام منصة ${BRAND.nameAr}`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: "الشروط والأحكام",
+    description: `شروط استخدام منصة ${BRAND.nameAr}`,
+  });
+}
 
 const sections = [
   {
@@ -42,6 +46,7 @@ export default function TermsPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding">
           <PageHero
@@ -66,6 +71,7 @@ export default function TermsPage() {
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

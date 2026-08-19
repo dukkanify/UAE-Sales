@@ -9,16 +9,21 @@ import {
   escrowProtectionSteps,
   listingSafetyTips,
 } from "@/services/content/homepage-marketplace.content";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { localizedMetadata } from "@/shared/i18n/localized-metadata";
 
-export const metadata: Metadata = {
-  title: "الأمان",
-  description: `نصائح الأمان والضمان المالي على ${BRAND.nameAr} لحماية المشترين والبائعين.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: "الأمان",
+    description: `نصائح الأمان والضمان المالي على ${BRAND.nameAr} لحماية المشترين والبائعين.`,
+  });
+}
 
 export default function SafetyPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding">
           <PageHero
@@ -61,6 +66,7 @@ export default function SafetyPage() {
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

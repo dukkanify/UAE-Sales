@@ -17,6 +17,7 @@ import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { listingDescription } from "@/shared/i18n/listing-copy";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useLocale } from "@/shared/i18n/useLocale";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
@@ -48,6 +49,7 @@ export function ListingDetailsView({
       : listing.city;
 
   return (
+    <LocalizedTree>
     <>
       <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
@@ -107,7 +109,7 @@ export function ListingDetailsView({
 
             <div className="marketplace-panel mt-6 p-6">
               <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
-              <p className="mt-4 text-sm font-medium leading-8 text-muted">
+              <p className="mt-4 text-sm font-medium leading-8 text-muted" data-ugc>
                 {listingDescription(listing, locale)}
               </p>
             </div>
@@ -165,5 +167,6 @@ export function ListingDetailsView({
 
       <MobileStickyActionBar listing={listing} />
     </>
+    </LocalizedTree>
   );
 }

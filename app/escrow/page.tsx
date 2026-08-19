@@ -7,6 +7,7 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { getEscrowSummary, getEscrowTransactions } from "@/services/escrowService";
 import { requireCurrentUser } from "@/services/profile";
+import { getRequestLocale, intlLocale } from "@/shared/i18n/locale";
 
 const statusLabels = {
   held: "محجوز",
@@ -16,6 +17,8 @@ const statusLabels = {
 
 export default async function EscrowPage() {
   const user = await requireCurrentUser("/escrow");
+  const locale = await getRequestLocale();
+  const dateLocale = intlLocale(locale);
   const [transactions, summary, steps] = await Promise.all([
     getEscrowTransactions(user.id),
     getEscrowSummary(user.id),
@@ -62,12 +65,12 @@ export default async function EscrowPage() {
                       className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border px-4 py-3"
                     >
                       <div>
-                        <p className="text-sm font-semibold text-ink">
+                        <p className="text-sm font-semibold text-ink" data-ugc>
                           {txn.listingTitle}
                         </p>
                         <p className="mt-0.5 text-xs text-muted">
                           مع {txn.buyer} ·{" "}
-                          {new Date(txn.createdAt).toLocaleDateString("ar-AE")}
+                          {new Date(txn.createdAt).toLocaleDateString(dateLocale)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">

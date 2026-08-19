@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/shared/ui/Icon";
+import { useTx } from "@/shared/i18n/useTx";
 
 type CardShareButtonProps = {
   ariaLabel?: string;
@@ -25,7 +26,9 @@ export function CardShareButton({
   title,
   url,
 }: CardShareButtonProps) {
+  const t = useTx();
   const [shared, setShared] = useState(false);
+  const label = t(ariaLabel);
 
   async function handleClick(event: React.MouseEvent) {
     event.preventDefault();
@@ -51,14 +54,14 @@ export function CardShareButton({
 
   return (
     <button
-      aria-label={ariaLabel}
+      aria-label={label}
       className={`card-media-action focus-ring grid size-8 place-items-center rounded-full transition ${className}`}
       onClick={handleClick}
-      title={ariaLabel}
+      title={label}
       type="button"
     >
       <Icon name="share-2" size={15} />
-      <span className="sr-only">{shared ? "تمت المشاركة" : ariaLabel}</span>
+      <span className="sr-only">{shared ? t("تمت المشاركة") : label}</span>
     </button>
   );
 }

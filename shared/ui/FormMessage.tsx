@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 
 type FormMessageProps = {
   children: ReactNode;
@@ -16,7 +17,7 @@ export function FormMessage({ children, variant }: FormMessageProps) {
       className={`rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium ${styles}`}
       role={variant === "error" ? "alert" : "status"}
     >
-      {children}
+      {typeof children === "string" ? <Copy text={children} /> : children}
     </p>
   );
 }

@@ -7,6 +7,7 @@ import { ReportListingModal } from "@/features/listings/components/ReportListing
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -28,6 +29,7 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
       : null;
 
   return (
+    <LocalizedTree>
     <div className="mt-4 flex flex-wrap items-center gap-2">
       <ShareButton className="!min-h-9" listing={listing} />
       <Button className="!min-h-9" onClick={handlePrint} size="sm" variant="secondary">
@@ -73,5 +75,6 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
         open={reportOpen}
       />
     </div>
+    </LocalizedTree>
   );
 }

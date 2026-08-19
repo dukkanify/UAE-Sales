@@ -1,5 +1,10 @@
 import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import {
+  buildSooqnaEmailHtml,
+  buildSooqnaEmailText,
+} from "@/services/email/sooqna-email-template";
+import { resolveEmailLocale } from "@/shared/i18n/email-locale";
 
 type SendEmailInput = {
   html: string;
@@ -149,47 +154,68 @@ export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean
   }
 }
 
-function buildOtpEmailHtml(name: string, otp: string, intro: string): string {
-  return `
-    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
-      </div>
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${name}،</p>
-      <p style="font-size:16px;line-height:1.8;">${intro}</p>
-      <p style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:24px 0;color:#0B1628;">${otp}</p>
-      <p style="font-size:14px;line-height:1.8;color:#555;">تنتهي صلاحية الرمز خلال 10 دقائق.<br/>إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.<br/>لا تشارك رمز التحقق مع أي شخص.</p>
-      <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
-    </div>
-  `.trim();
+function buildOtpEmailHtml(
+  name: string,
+  otp: string,
+  intro: string,
+  locale: "ar" | "en",
+): string {
+  const english = locale === "en";
+  const expiry = english
+    ? "The code expires in 10 minutes.<br/>If you did not request this code, you can ignore this email.<br/>Do not share this verification code with anyone."
+    : "تنتهي صلاحية الرمز خلال 10 دقائق.<br/>إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.<br/>لا تشارك رمز التحقق مع أي شخص.";
+  return buildSooqnaEmailHtml({
+    locale,
+    title: english ? "Your verification code" : "رمز التحقق",
+    bodyHtml: `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">${english ? "Hello" : "مرحبًا"} ${name}${english ? "," : "،"}</p>
+      <p style="font-size:16px;line-height:1.8;margin:0;">${intro}</p>
+      <p style="font-size:32px;font-weight:700;letter-spacing:6px;text-align:center;margin:24px 0;direction:ltr;">${otp}</p>
+      <p style="font-size:14px;line-height:1.8;color:#555;">${expiry}</p>`,
+  });
 }
 
-function buildOtpEmailText(name: string, otp: string, intro: string): string {
-  return [
-    `مرحبًا ${name}،`,
-    "",
-    intro,
-    otp,
-    "",
-    "تنتهي صلاحية الرمز خلال 10 دقائق.",
-    "إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.",
-    "لا تشارك رمز التحقق مع أي شخص.",
-    "",
-    "فريق سوقنا",
-  ].join("\n");
+function buildOtpEmailText(
+  name: string,
+  otp: string,
+  intro: string,
+  locale: "ar" | "en",
+): string {
+  const english = locale === "en";
+  return buildSooqnaEmailText({
+    locale,
+    title: english ? "Your verification code" : "رمز التحقق",
+    bodyLines: [
+      `${english ? "Hello" : "مرحبًا"} ${name}${english ? "," : "،"}`,
+      intro,
+      otp,
+      english
+        ? "The code expires in 10 minutes."
+        : "تنتهي صلاحية الرمز خلال 10 دقائق.",
+      english
+        ? "If you did not request this code, you can ignore this email."
+        : "إذا لم تطلب هذا الرمز، يمكنك تجاهل هذه الرسالة.",
+    ],
+  });
 }
 
 async function sendPurposeOtp(input: {
   email: string;
-  intro: string;
+  introAr: string;
+  introEn: string;
   name: string;
   otp: string;
 }): Promise<boolean> {
+  const locale = await resolveEmailLocale({ email: input.email });
+  const intro = locale === "en" ? input.introEn : input.introAr;
+  const safeName = escapeHtml(input.name.trim() || (locale === "en" ? "Sooqna customer" : "عميل سوقنا"));
   return deliverEmailSafely({
     to: input.email,
-    subject: "رمز التحقق الخاص بك في سوقنا",
-    html: buildOtpEmailHtml(input.name, input.otp, input.intro),
-    text: buildOtpEmailText(input.name, input.otp, input.intro),
+    subject:
+      locale === "en"
+        ? "Your Sooqna verification code"
+        : "رمز التحقق الخاص بك في سوقنا",
+    html: buildOtpEmailHtml(safeName, input.otp, intro, locale),
+    text: buildOtpEmailText(safeName, input.otp, intro, locale),
   });
 }
 
@@ -200,7 +226,8 @@ export async function sendRegistrationOtp(input: {
 }): Promise<boolean> {
   return sendPurposeOtp({
     ...input,
-    intro: "استخدم رمز التحقق التالي لإكمال التسجيل في سوقنا:",
+    introAr: "استخدم رمز التحقق التالي لإكمال التسجيل في سوقنا:",
+    introEn: "Use the following code to complete your Sooqna registration:",
   });
 }
 
@@ -211,7 +238,8 @@ export async function sendLoginOtp(input: {
 }): Promise<boolean> {
   return sendPurposeOtp({
     ...input,
-    intro: "استخدم رمز التحقق التالي لتسجيل الدخول إلى سوقنا:",
+    introAr: "استخدم رمز التحقق التالي لتسجيل الدخول إلى سوقنا:",
+    introEn: "Use the following code to sign in to Sooqna:",
   });
 }
 
@@ -222,7 +250,8 @@ export async function sendSetPasswordOtp(input: {
 }): Promise<boolean> {
   return sendPurposeOtp({
     ...input,
-    intro: "استخدم رمز التحقق التالي لإضافة كلمة مرور لحسابك في سوقنا:",
+    introAr: "استخدم رمز التحقق التالي لإضافة كلمة مرور لحسابك في سوقنا:",
+    introEn: "Use the following code to add a password to your Sooqna account:",
   });
 }
 
@@ -233,7 +262,8 @@ export async function sendPasswordResetOtp(input: {
 }): Promise<boolean> {
   return sendPurposeOtp({
     ...input,
-    intro: "استخدم رمز التحقق التالي لإعادة تعيين كلمة المرور في سوقنا:",
+    introAr: "استخدم رمز التحقق التالي لإعادة تعيين كلمة المرور في سوقنا:",
+    introEn: "Use the following code to reset your Sooqna password:",
   });
 }
 
@@ -244,63 +274,80 @@ export async function sendEmailChangeOtp(input: {
 }): Promise<boolean> {
   return sendPurposeOtp({
     ...input,
-    intro: "استخدم رمز التحقق التالي لتأكيد تغيير بريدك الإلكتروني في سوقنا:",
+    introAr: "استخدم رمز التحقق التالي لتأكيد تغيير بريدك الإلكتروني في سوقنا:",
+    introEn: "Use the following code to confirm your email change on Sooqna:",
   });
 }
 
-function buildWelcomeEmailHtml(name: string, appUrl: string): string {
+async function buildWelcomeEmailHtml(
+  name: string,
+  appUrl: string,
+  locale: "ar" | "en",
+): Promise<string> {
   const safeName = escapeHtml(name);
   const browseUrl = `${appUrl}/search`;
-  const postUrl = `${appUrl}/listings/new`;
   const profileUrl = `${appUrl}/profile`;
-  const navy = BRAND_COLORS.navy;
-  const gold = BRAND_COLORS.gold;
-  const cream = BRAND_COLORS.white;
-
-  return `
-    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:${cream};color:${navy};direction:rtl;text-align:right;">
-      <div style="text-align:center;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid ${gold};">
-        <strong style="font-size:24px;color:${navy};">${BRAND.nameAr} ${BRAND.nameEn}</strong>
-        <p style="margin:8px 0 0;font-size:13px;color:#555;">${BRAND.taglineAr}</p>
-      </div>
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${safeName}،</p>
-      <p style="font-size:16px;line-height:1.8;">تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.</p>
-      <p style="font-size:16px;line-height:1.8;">يمكنك الآن تصفّح العروض، نشر إعلانك، أو إدارة حسابك من لوحة التحكم.</p>
-      <div style="margin:28px 0;text-align:center;">
-        <a href="${browseUrl}" style="display:inline-block;margin:6px;padding:12px 22px;background:${gold};color:${navy};text-decoration:none;border-radius:12px;font-weight:700;">تصفّح العروض</a>
-        <a href="${postUrl}" style="display:inline-block;margin:6px;padding:12px 22px;background:${navy};color:#ffffff;text-decoration:none;border-radius:12px;font-weight:700;">أضف إعلانك</a>
-      </div>
-      <p style="font-size:14px;line-height:1.8;color:#555;">حسابك: <a href="${profileUrl}" style="color:${navy};">${profileUrl}</a></p>
-      <p style="font-size:14px;margin-top:32px;color:#555;">فريق ${BRAND.nameAr}</p>
-    </div>
-  `.trim();
+  const english = locale === "en";
+  const body = english
+    ? `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">Hello ${safeName},</p>
+      <p style="font-size:16px;line-height:1.8;margin:0 0 12px;">Your Sooqna account is ready. Welcome to a trusted UAE marketplace for buying and selling.</p>
+      <p style="font-size:16px;line-height:1.8;margin:0;">You can now browse listings, post an ad, or manage your account from the dashboard.</p>
+      <p style="font-size:14px;line-height:1.8;margin:20px 0 0;color:#555;">Your account: <a href="${profileUrl}">${profileUrl}</a></p>`
+    : `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">مرحبًا ${safeName}،</p>
+      <p style="font-size:16px;line-height:1.8;margin:0 0 12px;">تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.</p>
+      <p style="font-size:16px;line-height:1.8;margin:0;">يمكنك الآن تصفّح العروض، نشر إعلانك، أو إدارة حسابك من لوحة التحكم.</p>
+      <p style="font-size:14px;line-height:1.8;margin:20px 0 0;color:#555;">حسابك: <a href="${profileUrl}">${profileUrl}</a></p>`;
+  return buildSooqnaEmailHtml({
+    locale,
+    title: english ? "Welcome to Sooqna" : `مرحبًا بك في ${BRAND.nameAr}`,
+    bodyHtml: body,
+    ctaHref: browseUrl,
+    ctaLabel: english ? "Browse listings" : "تصفّح العروض",
+  }) + (english
+    ? ""
+    : "");
 }
 
-function buildWelcomeEmailText(name: string, appUrl: string): string {
-  return [
-    `مرحبًا ${name}،`,
-    "",
-    `تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.`,
-    "",
-    `تصفّح العروض: ${appUrl}/search`,
-    `أضف إعلانك: ${appUrl}/listings/new`,
-    `حسابك: ${appUrl}/profile`,
-    "",
-    `فريق ${BRAND.nameAr}`,
-  ].join("\n");
+function buildWelcomeEmailText(name: string, appUrl: string, locale: "ar" | "en"): string {
+  const english = locale === "en";
+  return buildSooqnaEmailText({
+    locale,
+    title: english ? "Welcome to Sooqna" : `مرحبًا بك في ${BRAND.nameAr}`,
+    bodyLines: english
+      ? [
+          `Hello ${name},`,
+          "Your Sooqna account is ready. Welcome to a trusted UAE marketplace for buying and selling.",
+          `Browse listings: ${appUrl}/search`,
+          `Post an ad: ${appUrl}/listings/new`,
+          `Your account: ${appUrl}/profile`,
+        ]
+      : [
+          `مرحبًا ${name}،`,
+          `تم إنشاء حسابك بنجاح في ${BRAND.nameAr}. يسعدنا انضمامك إلى سوق الإمارات للبيع والشراء بثقة.`,
+          `تصفّح العروض: ${appUrl}/search`,
+          `أضف إعلانك: ${appUrl}/listings/new`,
+          `حسابك: ${appUrl}/profile`,
+        ],
+    ctaHref: `${appUrl}/listings/new`,
+    ctaLabel: english ? "Post an Ad" : "أضف إعلانك",
+  });
 }
 
 export async function sendWelcomeEmail(input: {
   email: string;
   name: string;
 }): Promise<boolean> {
-  const name = input.name.trim() || "عميل سوقنا";
+  const locale = await resolveEmailLocale({ email: input.email });
+  const name = input.name.trim() || (locale === "en" ? "Sooqna customer" : "عميل سوقنا");
   const appUrl = getAppUrl();
   return deliverEmailSafely({
     to: input.email,
-    subject: `مرحبًا بك في ${BRAND.nameAr} — حسابك جاهز`,
-    html: buildWelcomeEmailHtml(name, appUrl),
-    text: buildWelcomeEmailText(name, appUrl),
+    subject:
+      locale === "en"
+        ? "Welcome to Sooqna — your account is ready"
+        : `مرحبًا بك في ${BRAND.nameAr} — حسابك جاهز`,
+    html: await buildWelcomeEmailHtml(name, appUrl, locale),
+    text: buildWelcomeEmailText(name, appUrl, locale),
   });
 }
 
@@ -334,20 +381,17 @@ type EmailParty = {
   name: string;
 };
 
-function buildTransactionalHtml(body: string): string {
-  return `
-    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
-      </div>
-      ${body}
-      <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
-    </div>
-  `.trim();
+function buildTransactionalHtml(body: string, locale: "ar" | "en" = "ar"): string {
+  return buildSooqnaEmailHtml({
+    locale,
+    title: locale === "en" ? "Sooqna" : "سوقنا",
+    bodyHtml: body,
+  });
 }
 
-function listingLinkHtml(url: string): string {
-  return `<p style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:12px 22px;background:${BRAND_COLORS.gold};color:${BRAND_COLORS.navy};text-decoration:none;border-radius:12px;font-weight:700;">عرض الإعلان</a></p>`;
+function listingLinkHtml(url: string, locale: "ar" | "en" = "ar"): string {
+  const label = locale === "en" ? "View listing" : "عرض الإعلان";
+  return `<p style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:12px 22px;background:${BRAND_COLORS.gold};color:${BRAND_COLORS.navy};text-decoration:none;border-radius:12px;font-weight:700;">${label}</a></p>`;
 }
 
 export async function sendViewingBookingEmails(input: {
@@ -360,6 +404,8 @@ export async function sendViewingBookingEmails(input: {
   phone?: string;
   visitors?: number;
 }): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const locale = await resolveEmailLocale({ email: input.buyer.email });
+  const english = locale === "en";
   const title = escapeHtml(input.listingTitle);
   const buyerName = escapeHtml(input.buyer.name);
   const date = escapeHtml(input.date);
@@ -367,45 +413,76 @@ export async function sendViewingBookingEmails(input: {
   const visitors =
     typeof input.visitors === "number" ? String(input.visitors) : "";
   const phone = input.phone ? escapeHtml(input.phone) : "";
+  const details = english
+    ? `Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong>${visitors ? `<br/>Visitors: <strong>${visitors}</strong>` : ""}${phone ? `<br/>Contact: <strong dir="ltr">${phone}</strong>` : ""}`
+    : `التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${visitors ? `<br/>عدد الزوار: <strong>${visitors}</strong>` : ""}${phone ? `<br/>رقم التواصل: <strong dir="ltr">${phone}</strong>` : ""}`;
 
-  const buyerHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+  const buyerHtml = buildTransactionalHtml(
+    english
+      ? `<p style="font-size:16px;line-height:1.8;">Hello ${buyerName},</p>
+      <p style="font-size:16px;line-height:1.8;">A property viewing has been confirmed for “${title}”.</p>
+      <p style="font-size:16px;line-height:1.8;">${details}</p>
+      ${listingLinkHtml(input.listingUrl, locale)}`
+      : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
       <p style="font-size:16px;line-height:1.8;">تم تأكيد حجز معاينة لعقار «${title}».</p>
-      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${visitors ? `<br/>عدد الزوار: <strong>${visitors}</strong>` : ""}${phone ? `<br/>رقم التواصل: <strong dir="ltr">${phone}</strong>` : ""}</p>
-      ${listingLinkHtml(input.listingUrl)}
-    `);
+      <p style="font-size:16px;line-height:1.8;">${details}</p>
+      ${listingLinkHtml(input.listingUrl, locale)}`,
+    locale,
+  );
 
   const buyerEmailed = await deliverEmailSafely({
     to: input.buyer.email,
-    subject: `تأكيد معاينة — ${input.listingTitle}`,
+    subject: english
+      ? `Viewing confirmed — ${input.listingTitle}`
+      : `تأكيد معاينة — ${input.listingTitle}`,
     html: buyerHtml,
-    text: [
-      `مرحبًا ${input.buyer.name}،`,
-      `تم تأكيد معاينة «${input.listingTitle}».`,
-      `التاريخ: ${input.date}`,
-      `الوقت: ${input.time}`,
-      input.listingUrl,
-      "فريق سوقنا",
-    ].join("\n"),
+    text: english
+      ? [
+          `Hello ${input.buyer.name},`,
+          `A viewing was confirmed for “${input.listingTitle}”.`,
+          `Date: ${input.date}`,
+          `Time: ${input.time}`,
+          input.listingUrl,
+        ].join("\n")
+      : [
+          `مرحبًا ${input.buyer.name}،`,
+          `تم تأكيد معاينة «${input.listingTitle}».`,
+          `التاريخ: ${input.date}`,
+          `الوقت: ${input.time}`,
+          input.listingUrl,
+          "فريق سوقنا",
+        ].join("\n"),
   });
 
   if (!input.seller?.email) {
     return { buyerEmailed, sellerEmailed: false };
   }
 
+  const sellerLocale = await resolveEmailLocale({ email: input.seller.email });
+  const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
-  const sellerHtml = buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+  const sellerHtml = buildTransactionalHtml(
+    sellerEnglish
+      ? `<p style="font-size:16px;line-height:1.8;">Hello ${sellerName},</p>
+      <p style="font-size:16px;line-height:1.8;">${buyerName} booked a viewing on “${title}”.</p>
+      <p style="font-size:16px;line-height:1.8;">Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong></p>
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`
+      : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
       <p style="font-size:16px;line-height:1.8;">حجز معاينة جديد على إعلانك «${title}» من ${buyerName}.</p>
       <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong></p>
-      ${listingLinkHtml(input.listingUrl)}
-    `);
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`,
+    sellerLocale,
+  );
 
   const sellerEmailed = await deliverEmailSafely({
     to: input.seller.email,
-    subject: `حجز معاينة جديد — ${input.listingTitle}`,
+    subject: sellerEnglish
+      ? `New viewing request — ${input.listingTitle}`
+      : `حجز معاينة جديد — ${input.listingTitle}`,
     html: sellerHtml,
-    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\n${input.listingUrl}\nفريق سوقنا`,
+    text: sellerEnglish
+      ? `Hello ${input.seller.name},\n${input.buyer.name} booked a viewing for “${input.listingTitle}” on ${input.date} at ${input.time}.\n${input.listingUrl}`
+      : `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\n${input.listingUrl}\nفريق سوقنا`,
   });
 
   return { buyerEmailed, sellerEmailed };
@@ -417,34 +494,56 @@ export async function sendJobApplicationEmails(input: {
   listingTitle: string;
   listingUrl: string;
 }): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const locale = await resolveEmailLocale({ email: input.buyer.email });
+  const english = locale === "en";
   const title = escapeHtml(input.listingTitle);
   const buyerName = escapeHtml(input.buyer.name);
 
   const buyerEmailed = await deliverEmailSafely({
     to: input.buyer.email,
-    subject: `تأكيد طلب التوظيف — ${input.listingTitle}`,
-    html: buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+    subject: english
+      ? `Job application confirmation — ${input.listingTitle}`
+      : `تأكيد طلب التوظيف — ${input.listingTitle}`,
+    html: buildTransactionalHtml(
+      english
+        ? `<p style="font-size:16px;line-height:1.8;">Hello ${buyerName},</p>
+      <p style="font-size:16px;line-height:1.8;">We received your application for “${title}”. We will notify you when the status changes.</p>
+      ${listingLinkHtml(input.listingUrl, locale)}`
+        : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
       <p style="font-size:16px;line-height:1.8;">تم استلام طلبك على وظيفة «${title}» بنجاح. سنُعلمك عند تحديث الحالة.</p>
-      ${listingLinkHtml(input.listingUrl)}
-    `),
-    text: `مرحبًا ${input.buyer.name}،\nتم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.\n${input.listingUrl}\nفريق سوقنا`,
+      ${listingLinkHtml(input.listingUrl, locale)}`,
+      locale,
+    ),
+    text: english
+      ? `Hello ${input.buyer.name},\nYour application for “${input.listingTitle}” was sent.\n${input.listingUrl}`
+      : `مرحبًا ${input.buyer.name}،\nتم إرسال طلبك على وظيفة «${input.listingTitle}» بنجاح.\n${input.listingUrl}\nفريق سوقنا`,
   });
 
   if (!input.seller?.email) {
     return { buyerEmailed, sellerEmailed: false };
   }
 
+  const sellerLocale = await resolveEmailLocale({ email: input.seller.email });
+  const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
   const sellerEmailed = await deliverEmailSafely({
     to: input.seller.email,
-    subject: `طلب توظيف جديد — ${input.listingTitle}`,
-    html: buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+    subject: sellerEnglish
+      ? `New job application — ${input.listingTitle}`
+      : `طلب توظيف جديد — ${input.listingTitle}`,
+    html: buildTransactionalHtml(
+      sellerEnglish
+        ? `<p style="font-size:16px;line-height:1.8;">Hello ${sellerName},</p>
+      <p style="font-size:16px;line-height:1.8;">${buyerName} applied for “${title}”.</p>
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`
+        : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
       <p style="font-size:16px;line-height:1.8;">طلب توظيف جديد من ${buyerName} على وظيفة «${title}».</p>
-      ${listingLinkHtml(input.listingUrl)}
-    `),
-    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} قدّم على وظيفة «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`,
+      sellerLocale,
+    ),
+    text: sellerEnglish
+      ? `Hello ${input.seller.name},\n${input.buyer.name} applied for “${input.listingTitle}”.\n${input.listingUrl}`
+      : `مرحبًا ${input.seller.name}،\n${input.buyer.name} قدّم على وظيفة «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
   });
 
   return { buyerEmailed, sellerEmailed };
@@ -459,44 +558,72 @@ export async function sendQuoteRequestEmails(input: {
   preferredDate?: string;
   preferredTime?: string;
 }): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
+  const locale = await resolveEmailLocale({ email: input.buyer.email });
+  const english = locale === "en";
   const title = escapeHtml(input.listingTitle);
   const buyerName = escapeHtml(input.buyer.name);
   const isBooking = input.kind === "service_booking";
-  const buyerSubject = isBooking
-    ? `تأكيد طلب حجز الخدمة — ${input.listingTitle}`
-    : `تأكيد طلب عرض السعر — ${input.listingTitle}`;
+  const buyerSubject = english
+    ? isBooking
+      ? `Service booking confirmation — ${input.listingTitle}`
+      : `Quote request confirmation — ${input.listingTitle}`
+    : isBooking
+      ? `تأكيد طلب حجز الخدمة — ${input.listingTitle}`
+      : `تأكيد طلب عرض السعر — ${input.listingTitle}`;
   const schedule =
     input.preferredDate && input.preferredTime
-      ? `<p style="font-size:16px;line-height:1.8;">الموعد المفضل: <strong>${escapeHtml(input.preferredDate)}</strong> الساعة <strong>${escapeHtml(input.preferredTime)}</strong></p>`
+      ? english
+        ? `<p style="font-size:16px;line-height:1.8;">Preferred time: <strong>${escapeHtml(input.preferredDate)}</strong> at <strong>${escapeHtml(input.preferredTime)}</strong></p>`
+        : `<p style="font-size:16px;line-height:1.8;">الموعد المفضل: <strong>${escapeHtml(input.preferredDate)}</strong> الساعة <strong>${escapeHtml(input.preferredTime)}</strong></p>`
       : "";
 
   const buyerEmailed = await deliverEmailSafely({
     to: input.buyer.email,
     subject: buyerSubject,
-    html: buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
+    html: buildTransactionalHtml(
+      english
+        ? `<p style="font-size:16px;line-height:1.8;">Hello ${buyerName},</p>
+      <p style="font-size:16px;line-height:1.8;">${isBooking ? "We received your service booking" : "We received your quote request"} for “${title}”. The provider will contact you shortly.</p>
+      ${schedule}
+      ${listingLinkHtml(input.listingUrl, locale)}`
+        : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
       <p style="font-size:16px;line-height:1.8;">${isBooking ? "تم استلام طلب حجز الخدمة" : "تم استلام طلب عرض السعر"} لـ «${title}». سيتواصل مزود الخدمة معك قريبًا.</p>
       ${schedule}
-      ${listingLinkHtml(input.listingUrl)}
-    `),
-    text: `مرحبًا ${input.buyer.name}،\nتم استلام طلبك لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+      ${listingLinkHtml(input.listingUrl, locale)}`,
+      locale,
+    ),
+    text: english
+      ? `Hello ${input.buyer.name},\nWe received your request for “${input.listingTitle}”.\n${input.listingUrl}`
+      : `مرحبًا ${input.buyer.name}،\nتم استلام طلبك لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
   });
 
   if (!input.seller?.email) {
     return { buyerEmailed, sellerEmailed: false };
   }
 
+  const sellerLocale = await resolveEmailLocale({ email: input.seller.email });
+  const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
   const sellerEmailed = await deliverEmailSafely({
     to: input.seller.email,
-    subject: `طلب خدمة جديد — ${input.listingTitle}`,
-    html: buildTransactionalHtml(`
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
+    subject: sellerEnglish
+      ? `New service request — ${input.listingTitle}`
+      : `طلب خدمة جديد — ${input.listingTitle}`,
+    html: buildTransactionalHtml(
+      sellerEnglish
+        ? `<p style="font-size:16px;line-height:1.8;">Hello ${sellerName},</p>
+      <p style="font-size:16px;line-height:1.8;">${buyerName} sent a request for “${title}”.</p>
+      ${schedule}
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`
+        : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
       <p style="font-size:16px;line-height:1.8;">${buyerName} أرسل طلبًا على «${title}».</p>
       ${schedule}
-      ${listingLinkHtml(input.listingUrl)}
-    `),
-    text: `مرحبًا ${input.seller.name}،\n${input.buyer.name} طلب خدمة لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}`,
+      sellerLocale,
+    ),
+    text: sellerEnglish
+      ? `Hello ${input.seller.name},\n${input.buyer.name} requested a service for “${input.listingTitle}”.\n${input.listingUrl}`
+      : `مرحبًا ${input.seller.name}،\n${input.buyer.name} طلب خدمة لـ «${input.listingTitle}».\n${input.listingUrl}\nفريق سوقنا`,
   });
 
   return { buyerEmailed, sellerEmailed };

@@ -52,6 +52,15 @@ html {
     color var(--duration-normal) var(--ease-premium);
 }
 
+html[dir="ltr"] {
+  direction: ltr;
+}
+
+html[dir="ltr"] svg[data-icon="chevron-left"],
+html[dir="ltr"] svg[data-icon="arrow-left"] {
+  transform: scaleX(-1);
+}
+
 body {
   margin: 0;
   min-height: 100vh;

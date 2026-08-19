@@ -14,6 +14,7 @@ import {
   getSessionUser,
 } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type DashboardShellProps = {
   activePath?: string;
@@ -80,15 +81,18 @@ export function DashboardShell({
 
   if (!isAllowed) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm font-medium text-muted">جاري التحقق من الجلسة...</p>
         </Card>
       </section>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
         {dashboardLinks.map((link) => (
@@ -161,5 +165,6 @@ export function DashboardShell({
         </div>
       </div>
     </section>
+    </LocalizedTree>
   );
 }

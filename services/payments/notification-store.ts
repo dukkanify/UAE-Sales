@@ -1,3 +1,4 @@
+import { tx } from "@/shared/i18n/tx";
 import { dispatchWebPush } from "@/services/notifications/web-push-client";
 import type { AppNotification } from "@/types/domain/notification";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
@@ -10,6 +11,8 @@ export async function createNotification(
   const notifications = await loadCollection<AppNotification>(NOTIFICATIONS_FILE);
   const notification: AppNotification = {
     ...input,
+    titleEn: input.titleEn ?? tx("en", input.title),
+    bodyEn: input.bodyEn ?? tx("en", input.body),
     id: `ntf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     read: false,
     createdAt: new Date().toISOString(),

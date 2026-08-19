@@ -5,11 +5,15 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { BRAND } from "@/shared/constants/brand";
 import { Card } from "@/shared/ui/Card";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { localizedMetadata } from "@/shared/i18n/localized-metadata";
 
-export const metadata: Metadata = {
-  title: "من نحن",
-  description: `تعرّف على ${BRAND.nameAr} — منصة سوق إماراتية موثوقة للبيع والشراء.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: "من نحن",
+    description: `تعرّف على ${BRAND.nameAr} — منصة سوق إماراتية موثوقة للبيع والشراء.`,
+  });
+}
 
 const values = [
   {
@@ -30,6 +34,7 @@ export default function AboutPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding">
           <PageHero
@@ -66,6 +71,7 @@ export default function AboutPage() {
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

@@ -15,6 +15,7 @@ import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { getAccountProof, saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type LoginErrors = {
   email?: string;
@@ -148,6 +149,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
   const authError = submitError;
 
   return (
+    <LocalizedTree>
     <form
       className="auth-form"
       method="post"
@@ -237,5 +239,6 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
             : "إرسال رمز الدخول"}
         </Button>
       </form>
+    </LocalizedTree>
   );
 }
