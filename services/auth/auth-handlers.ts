@@ -93,7 +93,6 @@ export async function sendRegistrationVerifyOtp(input: {
   accountType: string;
 }): Promise<{ delivered: boolean; code: string }> {
   logProductionConfigIssues("registration-otp");
-
   const { code } = await createOtpRequest({
     email: input.email,
     purpose: "REGISTER",
@@ -113,6 +112,7 @@ export async function sendRegistrationVerifyOtp(input: {
   });
 
   if (!delivered && !canRevealOtpToClient(false)) {
+    // Keep OTP so the user can resend after RESEND_API_KEY is configured.
     return { delivered: false, code };
   }
 

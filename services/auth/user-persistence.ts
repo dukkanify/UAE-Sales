@@ -43,6 +43,7 @@ function getPostgresUrl(): string {
     "";
   if (direct.startsWith("postgres")) return direct;
 
+  // Vercel Neon integration exposes split PG* vars instead of DATABASE_URL.
   const host =
     process.env.DATABASE_PGHOST?.trim() ||
     process.env.DATABASE_PGHOST_UNPOOLED?.trim() ||
