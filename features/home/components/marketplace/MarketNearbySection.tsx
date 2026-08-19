@@ -28,7 +28,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         {nearby.map(({ distance, listing }) => {
           const href = getListingHref(listing);
-          const imageUrl = getListingImageUrl(listing);
+          const imageUrl = getListingImageUrl(listing, 400);
 
           return (
             <Link
@@ -42,6 +42,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
                   className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   fallbackCategory={listing.categoryId}
                   fill
+                  quality={58}
                   sizes="(max-width: 768px) 50vw, 16vw"
                   src={imageUrl}
                 />

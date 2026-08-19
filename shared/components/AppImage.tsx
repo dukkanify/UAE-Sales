@@ -17,6 +17,7 @@ type AppImageProps = {
   height?: number;
   loading?: "eager" | "lazy";
   priority?: boolean;
+  quality?: number;
   sizes?: string;
   src?: string;
   width?: number;
@@ -48,6 +49,7 @@ function AppImageInner({
   height = 600,
   loading,
   priority = false,
+  quality,
   sizes = "(max-width: 768px) 100vw, 50vw",
   src,
   width = 800,
@@ -106,7 +108,7 @@ function AppImageInner({
           onError={handleError}
           onLoad={() => setIsLoaded(true)}
           priority={priority}
-          quality={priority ? 78 : 70}
+          quality={quality ?? (priority ? 78 : 68)}
           sizes={sizes}
           src={activeSrc}
           width={fill ? undefined : width}

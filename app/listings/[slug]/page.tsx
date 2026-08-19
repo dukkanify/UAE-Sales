@@ -13,18 +13,12 @@ import {
   getRelatedListings,
 } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type ListingPageProps = {
   params: Promise<{ slug: string }>;
 };
-
-export async function generateStaticParams() {
-  const { getListings, getMyListings } = await import("@/services/listings");
-  const [listings, userListings] = await Promise.all([
-    getListings(),
-    getMyListings(),
-  ]);
-  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
-}
 
 export async function generateMetadata({
   params,

@@ -54,9 +54,13 @@ export async function syncFavoritesAfterLogin(userId: string) {
 
   syncInFlight = (async () => {
     const { STORAGE_KEYS, STORAGE_EVENTS } = await import("@/shared/constants/brand");
+    const { ensureClientStorageMigrated } = await import(
+      "@/services/storage/migrate-storage"
+    );
     const { invalidateFavoritesSnapshot } = await import(
       "@/services/storage/external-store"
     );
+    ensureClientStorageMigrated();
     const localRaw = window.localStorage.getItem(STORAGE_KEYS.favorites);
     const local = localRaw ? (JSON.parse(localRaw) as FavoriteRecord[]) : [];
 

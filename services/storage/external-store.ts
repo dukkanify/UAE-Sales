@@ -3,6 +3,7 @@
 import type { UserProfile } from "@/types";
 import type { FavoriteRecord } from "@/services/storage/client-storage";
 import { STORAGE_EVENTS, STORAGE_KEYS } from "@/shared/constants/brand";
+import { ensureClientStorageMigrated } from "@/services/storage/migrate-storage";
 
 const EMPTY_FAVORITES: FavoriteRecord[] = [];
 
@@ -36,6 +37,7 @@ export function getFavoritesSnapshot(): FavoriteRecord[] {
     return EMPTY_FAVORITES;
   }
 
+  ensureClientStorageMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.favorites) ?? "";
   if (raw === favoritesSnapshot.serialized) {
     return favoritesSnapshot.value;
@@ -51,6 +53,7 @@ export function getSessionSnapshot(): UserProfile | null {
     return null;
   }
 
+  ensureClientStorageMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.session) ?? "";
   if (raw === sessionSnapshot.serialized) {
     return sessionSnapshot.value;

@@ -58,10 +58,16 @@ export const STORAGE_KEYS = {
   accountProofs: "sooqna-account-proofs",
 } as const;
 
-/** Legacy keys migrated on read */
-export const LEGACY_STORAGE_KEYS = {
+/** Legacy keys migrated on read, then removed so stale values cannot win. */
+export const LEGACY_STORAGE_KEYS: Record<keyof typeof STORAGE_KEYS, string> = {
   session: "uae-sales-session",
   localListings: "uae-sales-local-listings",
   recentlyViewed: "uae-sales-recently-viewed",
   savedSearches: "uae-sales-saved-searches",
-} as const;
+  recentSearches: "uae-sales-recent-searches",
+  chatConversations: "uae-sales-chat-conversations",
+  favorites: "uae-sales-favorites",
+  theme: "uae-sales-theme",
+  locale: "uae-sales-locale",
+  accountProofs: "uae-sales-account-proofs",
+};

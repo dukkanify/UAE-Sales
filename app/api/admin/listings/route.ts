@@ -8,6 +8,7 @@ import {
   getAdminListingRecords,
   upsertListing,
 } from "@/services/listings/listing-store";
+import { revalidateCatalogSurfaces } from "@/shared/lib/revalidate-catalog";
 import type { AdminListingCreateInput, Listing } from "@/types";
 
 export async function GET() {
@@ -15,7 +16,10 @@ export async function GET() {
   if (!isSessionUser(admin)) {
     return admin;
   }
-  return NextResponse.json({ listings: await getAdminListingRecords() });
+  return NextResponse.json(
+    { listings: await getAdminListingRecords() },
+    { headers: { "Cache-Control": "private, no-store" } },
+  );
 }
 
 /**
@@ -44,6 +48,7 @@ export async function POST(request: Request) {
     }
 
     const listing = await createListingFromAdmin(create);
+    await revalidateCatalogSurfaces(listing);
     return NextResponse.json(
       {
         listing: (await getAdminListingRecords()).find(
@@ -65,6 +70,8 @@ export async function POST(request: Request) {
     if (!listing?.id || !listing?.title) continue;
     saved.push(await upsertListing(listing));
   }
+
+  await revalidateCatalogSurfaces(saved[0]);
 
   return NextResponse.json({
     imported: saved.length,

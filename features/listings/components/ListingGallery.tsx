@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Listing } from "@/types";
-import { getListingImages } from "@/features/listings/components/listing-card.utils";
+import { getListingImages, withImageWidth } from "@/features/listings/components/listing-card.utils";
 import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
@@ -60,7 +60,8 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
     );
   }
 
-  const activeImage = galleryImages[activeIndex];
+  const activeImage = withImageWidth(galleryImages[activeIndex], 1400);
+  const preloadHero = activeIndex === 0;
 
   return (
     <>
@@ -77,7 +78,9 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               className="object-cover"
               fallbackCategory={listing.categoryId}
               fill
-              priority
+              loading={preloadHero ? undefined : "lazy"}
+              priority={preloadHero}
+              quality={preloadHero ? 78 : 70}
               sizes="(max-width: 1024px) 100vw, 60vw"
               src={activeImage}
             />
@@ -161,8 +164,9 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                   fallbackCategory={listing.categoryId}
                   fill
                   loading="lazy"
+                  quality={50}
                   sizes="76px"
-                  src={url}
+                  src={withImageWidth(url, 160)}
                 />
               </button>
             ))}
@@ -187,8 +191,9 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                 fallbackCategory={listing.categoryId}
                 fill
                 loading="lazy"
+                quality={50}
                 sizes="56px"
-                src={url}
+                src={withImageWidth(url, 160)}
               />
             </button>
           ))}
@@ -223,6 +228,8 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
               className="object-contain"
               fallbackCategory={listing.categoryId}
               fill
+              loading="lazy"
+              quality={78}
               sizes="(max-width: 1024px) min(100vw, 64rem), 60vw"
               src={activeImage}
             />

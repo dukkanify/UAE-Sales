@@ -1,12 +1,24 @@
 import {
+  LEGACY_STORAGE_KEYS,
   STORAGE_EVENTS,
   STORAGE_KEYS,
 } from "@/shared/constants/brand";
 
 export type ThemeMode = "light" | "dark";
 
+function migrateThemeKey() {
+  if (typeof window === "undefined") return;
+  const current = window.localStorage.getItem(STORAGE_KEYS.theme);
+  const legacy = window.localStorage.getItem(LEGACY_STORAGE_KEYS.theme);
+  if (!current && legacy) {
+    window.localStorage.setItem(STORAGE_KEYS.theme, legacy);
+  }
+  if (legacy) window.localStorage.removeItem(LEGACY_STORAGE_KEYS.theme);
+}
+
 export function getStoredTheme(): ThemeMode | null {
   if (typeof window === "undefined") return null;
+  migrateThemeKey();
   const raw = window.localStorage.getItem(STORAGE_KEYS.theme);
   if (raw === "dark" || raw === "light") return raw;
   return null;
@@ -42,4 +54,4 @@ export function toggleTheme(): ThemeMode {
 }
 
 /** Inline boot script — keeps first paint aligned with stored/system theme. */
-export const THEME_BOOT_SCRIPT = `(function(){try{var k=${JSON.stringify(STORAGE_KEYS.theme)};var t=localStorage.getItem(k);if(t!=="dark"&&t!=="light"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
+export const THEME_BOOT_SCRIPT = `(function(){try{var k=${JSON.stringify(STORAGE_KEYS.theme)};var t=localStorage.getItem(k);if(t!=="dark"&&t!=="light"){var l=localStorage.getItem(${JSON.stringify(LEGACY_STORAGE_KEYS.theme)});if(l==="dark"||l==="light"){t=l;localStorage.setItem(k,l)}else{t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}}localStorage.removeItem(${JSON.stringify(LEGACY_STORAGE_KEYS.theme)});document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;

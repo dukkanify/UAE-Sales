@@ -17,6 +17,9 @@ import { getHomeFeed } from "@/services/listings/home-feed";
 import { headers } from "next/headers";
 import { userAgent } from "next/server";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Home() {
   const ua = userAgent({ headers: await headers() });
   const preferMobile =

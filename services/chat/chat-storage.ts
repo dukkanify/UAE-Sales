@@ -1,4 +1,5 @@
 import { STORAGE_EVENTS, STORAGE_KEYS } from "@/shared/constants/brand";
+import { ensureClientStorageMigrated } from "@/services/storage/migrate-storage";
 import type { Listing } from "@/types";
 
 export type ChatMessage = {
@@ -29,6 +30,7 @@ function canUseStorage() {
 
 function readConversations(): ChatConversation[] {
   if (!canUseStorage()) return [];
+  ensureClientStorageMigrated();
   try {
     const raw = window.localStorage.getItem(STORAGE_KEYS.chatConversations);
     return raw ? (JSON.parse(raw) as ChatConversation[]) : [];

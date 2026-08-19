@@ -20,6 +20,9 @@ import {
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
   "electronics",
@@ -49,11 +52,6 @@ function getNumberParam(params: SearchParams, key: string) {
   if (!value) return undefined;
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : undefined;
-}
-
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({

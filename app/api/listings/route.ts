@@ -3,6 +3,7 @@ import { getSessionFromCookie } from "@/services/auth/session-cookie";
 import { isMarketplaceAccountReady } from "@/services/auth/account-access";
 import { notifyListingSubmitted } from "@/services/listings/listing-notifications";
 import { getListingById, upsertListing } from "@/services/listings/listing-store";
+import { revalidateCatalogSurfaces } from "@/shared/lib/revalidate-catalog";
 import type { Listing } from "@/types";
 
 /** Authenticated upsert used by listing create/edit forms to sync site data into the catalog store. */
@@ -40,6 +41,8 @@ export async function POST(request: Request) {
     if (!existing) {
       void notifyListingSubmitted(listing);
     }
+
+    await revalidateCatalogSurfaces(listing);
 
     return NextResponse.json({ listing }, { status: 201 });
   } catch {

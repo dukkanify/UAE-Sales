@@ -21,3 +21,5 @@ export {
   type FavoriteRecord,
   type SavedSearch,
 } from "./client-storage";
+
+export { ensureClientStorageMigrated } from "./migrate-storage";
