@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { Button } from "@/shared/ui/Button";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type RouteErrorFallbackProps = {
   error: Error & { digest?: string };
@@ -49,6 +50,7 @@ export function RouteErrorFallback({
   }
 
   return (
+<LocalizedTree>
     <ErrorState
       description={USER_MESSAGE}
       onRetry={canRetry ? handleRetry : undefined}
@@ -66,5 +68,6 @@ export function RouteErrorFallback({
         </p>
       ) : null}
     </ErrorState>
-  );
+  </LocalizedTree>
+);
 }

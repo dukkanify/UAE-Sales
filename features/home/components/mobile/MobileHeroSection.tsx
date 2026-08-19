@@ -1,10 +1,12 @@
 import { AppImage } from "@/shared/components/AppImage";
 import { getMarketHeroBackground } from "@/services/content/homepage-marketplace.content";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export async function MobileHeroSection() {
   const backgroundUrl = await getMarketHeroBackground();
 
   return (
+<LocalizedTree>
     <section className="mobile-home-hero">
       <div className="mobile-home-hero__media">
         <div className="mobile-home-hero__bg">
@@ -38,5 +40,6 @@ export async function MobileHeroSection() {
         </p>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

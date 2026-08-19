@@ -11,6 +11,7 @@ import {
   addListingStepCardClass,
   addListingStepTitleClass,
 } from "./utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingDetailsStepProps = {
   errors: AddListingErrors;
@@ -22,6 +23,7 @@ export function ListingDetailsStep({
   onPreviewChange,
 }: ListingDetailsStepProps) {
   return (
+<LocalizedTree>
     <Card className={addListingStepCardClass}>
       <h2 className={addListingStepTitleClass}>2. تفاصيل الإعلان</h2>
       <div className={addListingStepBodyClass}>
@@ -119,5 +121,6 @@ export function ListingDetailsStep({
         </div>
       </div>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

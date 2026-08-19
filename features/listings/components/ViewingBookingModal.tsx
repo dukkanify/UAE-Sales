@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { getSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ViewingBookingModalProps = {
   listing: Listing;
@@ -131,6 +132,7 @@ export function ViewingBookingModal({
   const user = typeof window !== "undefined" ? getSessionUser() : null;
 
   return (
+<LocalizedTree>
     <Modal
       description={`حجز معاينة: ${listing.title}`}
       onClose={onClose}
@@ -228,5 +230,6 @@ export function ViewingBookingModal({
         </form>
       )}
     </Modal>
-  );
+  </LocalizedTree>
+);
 }

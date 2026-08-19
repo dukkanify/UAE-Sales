@@ -7,6 +7,7 @@ import {
   mergeSearchFilters,
   type SearchFilterState,
 } from "./search-url";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SearchQuickFiltersProps = {
   categories: Category[];
@@ -88,6 +89,7 @@ export function SearchQuickFilters({
   ];
 
   return (
+<LocalizedTree>
     <div className="mb-1">
       <p className="mb-2 text-[0.7rem] font-bold text-muted">فلاتر سريعة</p>
       <div className="flex flex-wrap gap-2">
@@ -106,5 +108,6 @@ export function SearchQuickFilters({
         ))}
       </div>
     </div>
-  );
+  </LocalizedTree>
+);
 }

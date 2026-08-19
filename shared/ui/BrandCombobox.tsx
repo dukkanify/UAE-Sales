@@ -5,6 +5,7 @@ import type { CategoryFieldOption } from "@/types";
 import { filterBrandOptions } from "@/shared/constants/product-brands";
 import { Icon } from "@/shared/ui/Icon";
 import { useTx } from "@/shared/i18n/useTx";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type BrandComboboxProps = {
   compact?: boolean;
@@ -76,6 +77,7 @@ export function BrandCombobox({
   const showList = open && filtered.length > 0;
 
   return (
+<LocalizedTree>
     <div ref={rootRef} className={`relative grid min-w-0 ${compact ? "gap-1" : "gap-1.5"}`}>
       <label className={`grid min-w-0 ${compact ? "gap-1" : "gap-1.5"}`}>
         <span
@@ -195,6 +197,10 @@ export function BrandCombobox({
         <span className="text-xs font-medium text-error" role="alert">
           {t(error)}
         </span>
+      ) : null}
+    </div>
+  </LocalizedTree>
+an>
       ) : null}
     </div>
   );

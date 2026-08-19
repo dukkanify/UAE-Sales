@@ -7,6 +7,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import { BRAND } from "@/shared/constants/brand";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function SupportContactForm() {
   const [error, setError] = useState("");
@@ -46,15 +47,18 @@ export function SupportContactForm() {
 
   if (sent) {
     return (
+<LocalizedTree>
       <FormMessage variant="success">
         {emailed
           ? `استلمنا رسالتك وأرسلنا تأكيدًا إلى بريدك. يمكنك أيضًا مراسلتنا على ${BRAND.supportEmail}.`
           : `استلمنا رسالتك. إذا احتجت تواصلًا أسرع راسلنا على ${BRAND.supportEmail}.`}
       </FormMessage>
-    );
+    </LocalizedTree>
+);
   }
 
   return (
+<LocalizedTree>
     <form className="grid gap-3" onSubmit={handleSubmit}>
       {error ? <FormMessage variant="error">{error}</FormMessage> : null}
       <Input label="الاسم" name="name" required />
@@ -76,5 +80,6 @@ export function SupportContactForm() {
         إرسال الرسالة
       </Button>
     </form>
-  );
+  </LocalizedTree>
+);
 }

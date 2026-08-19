@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/shared/ui/Icon";
 import { useTx } from "@/shared/i18n/useTx";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CardShareButtonProps = {
   ariaLabel?: string;
@@ -53,6 +54,7 @@ export function CardShareButton({
   }
 
   return (
+<LocalizedTree>
     <button
       aria-label={label}
       className={`card-media-action focus-ring grid size-8 place-items-center rounded-full transition ${className}`}
@@ -63,5 +65,6 @@ export function CardShareButton({
       <Icon name="share-2" size={15} />
       <span className="sr-only">{shared ? t("تمت المشاركة") : label}</span>
     </button>
-  );
+  </LocalizedTree>
+);
 }

@@ -10,6 +10,7 @@ import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type LocalListingEditProps = {
   listingId: string;
@@ -35,6 +36,7 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
 
   if (!listing) {
     return (
+<LocalizedTree>
       <EmptyState
         actionHref="/dashboard/listings"
         actionLabel="العودة إلى إعلاناتي"
@@ -42,12 +44,14 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         icon="search"
         title="الإعلان غير موجود"
       />
-    );
+    </LocalizedTree>
+);
   }
 
   const showContactInMedia = !isDynamicCategory(listing.categoryId);
 
   return (
+<LocalizedTree>
     <form className="grid gap-6" noValidate onSubmit={handleSubmit}>
       {isDynamic ? (
         <CategoryFieldsForm
@@ -92,5 +96,6 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         </div>
       </Card>
     </form>
-  );
+  </LocalizedTree>
+);
 }

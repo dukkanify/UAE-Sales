@@ -7,6 +7,7 @@ import {
   getFallbackUrl,
   type ImageFallbackCategory,
 } from "@/shared/constants/image-fallbacks";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AppImageProps = {
   alt: string;
@@ -77,6 +78,7 @@ function AppImageInner({
   const visibleClass = priority || isLoaded ? "opacity-100" : "opacity-0";
 
   return (
+<LocalizedTree>
     <span className={wrapperClassName}>
       {!isLoaded && !priority ? (
         <span
@@ -116,7 +118,8 @@ function AppImageInner({
         <span className="sr-only">صورة بديلة لـ {alt}</span>
       ) : null}
     </span>
-  );
+  </LocalizedTree>
+);
 }
 
 export function AppImage(props: AppImageProps) {

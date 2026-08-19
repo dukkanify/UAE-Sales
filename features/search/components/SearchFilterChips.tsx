@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Category } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SearchFilterChipsProps = {
   categories: Category[];
@@ -126,6 +127,7 @@ export function SearchFilterChips({
   }
 
   return (
+<LocalizedTree>
     <div className="mb-4 flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold text-muted">
         {chips.length.toLocaleString("ar-AE")} فلتر نشط
@@ -148,5 +150,6 @@ export function SearchFilterChips({
         مسح الكل
       </Link>
     </div>
-  );
+  </LocalizedTree>
+);
 }

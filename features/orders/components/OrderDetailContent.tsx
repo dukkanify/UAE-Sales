@@ -14,6 +14,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { PageHero } from "@/shared/ui/PageHero";
 import { Textarea } from "@/shared/ui/Textarea";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type OrderDetailContentProps = {
   orderId: string;
@@ -204,20 +205,24 @@ export function OrderDetailContent({
 
   if (!order && !error) {
     return (
+<LocalizedTree>
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm text-muted">جاري تحميل الطلب...</p>
         </Card>
       </section>
-    );
+    </LocalizedTree>
+);
   }
 
   if (!order) {
     return (
+<LocalizedTree>
       <section className="app-container page-padding">
         <FormMessage variant="error">{error || "لم يتم العثور على الطلب."}</FormMessage>
       </section>
-    );
+    </LocalizedTree>
+);
   }
 
   const isBuyer = Boolean(sessionUserId && order.buyerId === sessionUserId);
@@ -241,6 +246,7 @@ export function OrderDetailContent({
     (order.sellerProofUrls && order.sellerProofUrls.length > 0);
 
   return (
+<LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description={`طلب رقم ${order.id}`}
@@ -430,5 +436,6 @@ export function OrderDetailContent({
         </Card>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

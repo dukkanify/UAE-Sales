@@ -5,6 +5,7 @@ import { MobileAppDevicePreview } from "./MobileAppDevicePreview";
 import { resolveAppPreviewListings } from "./mobile-app-preview.config";
 import { MOBILE_APP_LINKS } from "./mobile-home.config";
 import { AppStoreBadgeLink, GooglePlayBadgeLink } from "./MobileStoreBadges";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileAppDownloadProps = {
   previewListings?: Listing[];
@@ -16,6 +17,7 @@ export function MobileAppDownload({
   const previews = resolveAppPreviewListings(previewListings);
 
   return (
+<LocalizedTree>
     <section aria-label="تطبيق سوقنا" className="mobile-home-app">
       <div className="mobile-home-app__panel">
         <span aria-hidden className="mobile-home-app__mesh" />
@@ -59,5 +61,6 @@ export function MobileAppDownload({
         </div>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

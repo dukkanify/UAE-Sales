@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { getSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type QuoteRequestModalProps = {
   kind?: QuoteRequestKind;
@@ -125,6 +126,7 @@ export function QuoteRequestModal({
   }
 
   return (
+<LocalizedTree>
     <Modal
       description={listing.title}
       onClose={onClose}
@@ -201,5 +203,6 @@ export function QuoteRequestModal({
         </form>
       )}
     </Modal>
-  );
+  </LocalizedTree>
+);
 }

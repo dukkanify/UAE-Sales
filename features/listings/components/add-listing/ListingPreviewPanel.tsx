@@ -6,6 +6,7 @@ import { CategoryIcon } from "@/shared/ui/CategoryIcon";
 import { Icon } from "@/shared/ui/Icon";
 import type { ListingPreview } from "./types";
 import { conditionLabels } from "./utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingPreviewPanelProps = {
   imagePreviews: string[];
@@ -19,6 +20,7 @@ export function ListingPreviewPanel({
   selectedCategory,
 }: ListingPreviewPanelProps) {
   return (
+<LocalizedTree>
     <aside className="lg:sticky lg:top-28 lg:self-start">
       <Card className="p-5">
         <p className="text-sm font-semibold text-muted">معاينة الإعلان</p>
@@ -64,5 +66,6 @@ export function ListingPreviewPanel({
         </div>
       </Card>
     </aside>
-  );
+  </LocalizedTree>
+);
 }

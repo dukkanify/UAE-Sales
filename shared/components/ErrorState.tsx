@@ -3,6 +3,7 @@
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ErrorStateProps = {
   children?: React.ReactNode;
@@ -29,6 +30,7 @@ export function ErrorState({
   variant = "server",
 }: ErrorStateProps) {
   return (
+<LocalizedTree>
     <Card className="p-10 text-center" role="alert" variant="flat">
       <span className="mx-auto grid size-14 place-items-center rounded-[var(--radius-2xl)] bg-accent-soft text-accent">
         <Icon name={iconMap[variant]} size={24} />
@@ -44,5 +46,6 @@ export function ErrorState({
       ) : null}
       {children}
     </Card>
-  );
+  </LocalizedTree>
+);
 }

@@ -4,6 +4,7 @@ import type { Category } from "@/types";
 import { SavedSearches } from "./SavedSearches";
 import { SearchFilterChips } from "./SearchFilterChips";
 import { SearchQuickFilters } from "./SearchQuickFilters";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SearchResultsToolbarProps = {
   categories: Category[];
@@ -52,6 +53,7 @@ export function SearchResultsToolbar({
   const currentUrl = buildCurrentUrl(selectedFilters);
 
   return (
+<LocalizedTree>
     <div className="mb-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm font-semibold text-ink">
@@ -65,5 +67,6 @@ export function SearchResultsToolbar({
       <SearchFilterChips categories={categories} selectedFilters={selectedFilters} />
       <SavedSearches currentLabel={buildLabel(selectedFilters, categories)} currentUrl={currentUrl} />
     </div>
-  );
+  </LocalizedTree>
+);
 }

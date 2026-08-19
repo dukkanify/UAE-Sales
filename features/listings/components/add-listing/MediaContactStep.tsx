@@ -11,6 +11,7 @@ import {
   addListingStepCardClass,
   addListingStepTitleClass,
 } from "./utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const MAX_IMAGES = 12;
 
@@ -37,6 +38,7 @@ export function MediaContactStep({
   const hasImages = imagePreviews.length > 0;
 
   return (
+<LocalizedTree>
     <Card className={addListingStepCardClass}>
       <h2 className={addListingStepTitleClass}>3. الصور والتواصل</h2>
       <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
@@ -164,5 +166,6 @@ export function MediaContactStep({
         </div>
       </div>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

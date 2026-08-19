@@ -13,6 +13,7 @@ import {
   getLocalListingsForSeller,
   getSessionUser,
 } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const PAGE_SIZE = 12;
 
@@ -124,6 +125,7 @@ export function SearchResultsList({
 
   if (visibleListings.length === 0) {
     return (
+<LocalizedTree>
       <>
         <SearchResultsToolbar
           categories={categories}
@@ -139,13 +141,15 @@ export function SearchResultsList({
           title="لم نجد إعلانات مطابقة"
         />
       </>
-    );
+    </LocalizedTree>
+);
   }
 
   const pageItems = visibleListings.slice(0, visibleCount);
   const hasMore = visibleCount < visibleListings.length;
 
   return (
+<LocalizedTree>
     <>
       <SearchResultsToolbar
         categories={categories}
@@ -173,5 +177,6 @@ export function SearchResultsList({
         </div>
       ) : null}
     </>
-  );
+  </LocalizedTree>
+);
 }

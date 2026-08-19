@@ -10,6 +10,7 @@ import {
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function ProfileSavedSearches() {
   const [saved, setSaved] = useState<SavedSearch[]>([]);
@@ -27,6 +28,7 @@ export function ProfileSavedSearches() {
 
   if (saved.length === 0) {
     return (
+<LocalizedTree>
       <EmptyState
         actionHref="/search"
         actionLabel="ابحث في السوق"
@@ -34,10 +36,12 @@ export function ProfileSavedSearches() {
         icon="search"
         title="لا توجد عمليات بحث محفوظة"
       />
-    );
+    </LocalizedTree>
+);
   }
 
   return (
+<LocalizedTree>
     <ul className="grid gap-2">
       {saved.map((item) => (
         <li
@@ -58,5 +62,6 @@ export function ProfileSavedSearches() {
         </li>
       ))}
     </ul>
-  );
+  </LocalizedTree>
+);
 }

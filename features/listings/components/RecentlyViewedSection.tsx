@@ -6,6 +6,7 @@ import { ListingCard } from "@/features/listings/components/ListingCard";
 import { STORAGE_EVENTS, STORAGE_KEYS } from "@/shared/constants/brand";
 import { SectionHeader } from "@/shared/ui/SectionHeader";
 import { getLocalListings } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const STORAGE_KEY = STORAGE_KEYS.recentlyViewed;
 
@@ -91,6 +92,7 @@ export function RecentlyViewedSection({
   const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
 
   return (
+<LocalizedTree>
     <section className="app-container page-padding">
       <SectionHeader
         description="إعلانات شاهدتها مؤخراً في هذه الجلسة."
@@ -107,5 +109,6 @@ export function RecentlyViewedSection({
         ))}
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

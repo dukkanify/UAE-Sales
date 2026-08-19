@@ -1,7 +1,9 @@
 import { Skeleton } from "@/shared/ui/Skeleton";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function MobileFeaturedCardSkeleton() {
   return (
+<LocalizedTree>
     <article
       aria-busy="true"
       aria-label="جاري تحميل الإعلان"
@@ -19,5 +21,6 @@ export function MobileFeaturedCardSkeleton() {
         </div>
       </div>
     </article>
-  );
+  </LocalizedTree>
+);
 }

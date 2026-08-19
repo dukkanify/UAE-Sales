@@ -7,6 +7,7 @@ import {
   HOME_SEARCH_LABELS,
   HOME_SEARCH_PRICE_OPTIONS,
 } from "@/features/home/shared/home-search-fields";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileSearchCardProps = {
   categories: Category[];
@@ -14,6 +15,7 @@ type MobileSearchCardProps = {
 
 export function MobileSearchCard({ categories }: MobileSearchCardProps) {
   return (
+<LocalizedTree>
     <section aria-label="البحث" className="mobile-home-search-card" data-search-anchor>
       <form action="/search" className="mobile-home-search-card__panel">
         <label className="mobile-home-search-card__input-row">
@@ -104,5 +106,6 @@ export function MobileSearchCard({ categories }: MobileSearchCardProps) {
         </div>
       </form>
     </section>
-  );
+  </LocalizedTree>
+);
 }

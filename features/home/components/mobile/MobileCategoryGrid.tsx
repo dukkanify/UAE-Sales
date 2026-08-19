@@ -12,6 +12,7 @@ import {
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "./mobile-home.config";
 import { MobileCategoryTile } from "./MobileCategoryTile";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileCategoryGridProps = {
   categories: Category[];
@@ -60,6 +61,7 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
   };
 
   return (
+<LocalizedTree>
     <section aria-label="التصنيفات" className="mobile-home-categories">
       <DragScrollRow
         ref={trackRef}
@@ -103,5 +105,6 @@ export function MobileCategoryGrid({ categories }: MobileCategoryGridProps) {
         </div>
       ) : null}
     </section>
-  );
+  </LocalizedTree>
+);
 }

@@ -3,6 +3,7 @@ import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { getNearbyListings } from "./mobile-home.config";
 import { MobileNearbyCard } from "./MobileNearbyCard";
 import { MobileSectionHeader } from "./MobileSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileNearbyRailProps = {
   listings: Listing[];
@@ -14,6 +15,7 @@ export function MobileNearbyRail({ listings }: MobileNearbyRailProps) {
   if (nearby.length === 0) return null;
 
   return (
+<LocalizedTree>
     <section aria-label="القريبة منك" className="mobile-home-nearby">
       <MobileSectionHeader actionHref="/search" icon="map" title="القريبة منك" />
       <DragScrollRow className="mobile-home-nearby__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
@@ -26,5 +28,6 @@ export function MobileNearbyRail({ listings }: MobileNearbyRailProps) {
         ))}
       </DragScrollRow>
     </section>
-  );
+  </LocalizedTree>
+);
 }

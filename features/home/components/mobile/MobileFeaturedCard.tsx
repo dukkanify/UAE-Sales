@@ -18,6 +18,7 @@ import {
   getListingImages,
   getListingLocation,
 } from "@/features/listings/components/listing-card.utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileFeaturedCardProps = {
   imageFit?: "contain" | "cover";
@@ -37,6 +38,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
   const isVerified = isListingVerified(listing);
 
   return (
+<LocalizedTree>
     <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
       <div className="mobile-home-featured-card__media">
         <Link aria-hidden className="absolute inset-0" href={href} tabIndex={-1}>
@@ -101,5 +103,6 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
         </div>
       </div>
     </article>
-  );
+  </LocalizedTree>
+);
 });

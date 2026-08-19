@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Textarea } from "@/shared/ui/Textarea";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type RateOrderFormProps = {
   orderId: string;
@@ -53,6 +54,7 @@ export function RateOrderForm({ orderId, onRated }: RateOrderFormProps) {
   }
 
   return (
+<LocalizedTree>
     <form
       className="grid gap-4 rounded-[var(--radius-2xl)] border border-border bg-surface p-5"
       onSubmit={handleSubmit}
@@ -101,5 +103,6 @@ export function RateOrderForm({ orderId, onRated }: RateOrderFormProps) {
         </Button>
       ) : null}
     </form>
-  );
+  </LocalizedTree>
+);
 }

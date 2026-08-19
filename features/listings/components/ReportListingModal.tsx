@@ -12,6 +12,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { getSessionUser } from "@/services/storage";
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ReportListingModalProps = {
   listing: Listing;
@@ -92,6 +93,7 @@ export function ReportListingModal({
       : null;
 
   return (
+<LocalizedTree>
     <Modal
       onClose={handleClose}
       open={open}
@@ -196,5 +198,6 @@ export function ReportListingModal({
         </form>
       )}
     </Modal>
-  );
+  </LocalizedTree>
+);
 }

@@ -1,4 +1,5 @@
 import { EmptyState } from "@/shared/ui/EmptyState";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ComingSoonPageProps = {
   actionHref?: string;
@@ -18,6 +19,7 @@ export function ComingSoonPage({
   title,
 }: ComingSoonPageProps) {
   return (
+<LocalizedTree>
     <section className="app-container page-padding">
       <EmptyState
         actionHref={actionHref}
@@ -28,5 +30,6 @@ export function ComingSoonPage({
         title={title}
       />
     </section>
-  );
+  </LocalizedTree>
+);
 }

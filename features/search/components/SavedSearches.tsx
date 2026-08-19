@@ -12,6 +12,7 @@ import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SavedSearchesProps = {
   currentUrl: string;
@@ -54,6 +55,7 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
   }
 
   return (
+<LocalizedTree>
     <div className="mt-4 rounded-[var(--radius-2xl)] border border-border bg-surface-muted/40 p-4">
       <div className="flex items-center justify-between gap-2">
         <div>
@@ -110,5 +112,6 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
         </p>
       )}
     </div>
-  );
+  </LocalizedTree>
+);
 }

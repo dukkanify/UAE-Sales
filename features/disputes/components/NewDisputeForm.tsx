@@ -8,6 +8,7 @@ import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Textarea } from "@/shared/ui/Textarea";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type NewDisputeFormProps = {
   orderId: string;
@@ -80,15 +81,18 @@ export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
 
   if (!orderId) {
     return (
+<LocalizedTree>
       <Card className="p-6" variant="flat">
         <FormMessage variant="error">
           أضف رقم الطلب عبر الرابط، مثال: /disputes/new?orderId=...
         </FormMessage>
       </Card>
-    );
+    </LocalizedTree>
+);
   }
 
   return (
+<LocalizedTree>
     <Card className="p-6" variant="flat">
       <form className="grid gap-4" onSubmit={handleSubmit}>
         <Input
@@ -120,5 +124,6 @@ export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
         </Button>
       </form>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

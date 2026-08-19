@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { useTx } from "@/shared/i18n/useTx";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ModalProps = {
   children: ReactNode;
@@ -42,6 +43,7 @@ export function Modal({
   if (!open || typeof document === "undefined") return null;
 
   return createPortal(
+<LocalizedTree>
     <div
       aria-labelledby={titleId}
       aria-modal="true"
@@ -73,6 +75,6 @@ export function Modal({
         <div className="mt-5">{children}</div>
       </div>
     </div>,
-    document.body,
+    document.body</LocalizedTree>,
   );
 }

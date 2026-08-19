@@ -3,12 +3,14 @@
 import { useSearchParams } from "next/navigation";
 import { NewDisputeForm } from "@/features/disputes/components/NewDisputeForm";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function NewDisputePageClient() {
   const searchParams = useSearchParams();
   const orderId = (searchParams.get("orderId") ?? "").trim();
 
   return (
+<LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description="افتح نزاعاً على طلب مدفوع عبر الضمان خلال المهلة المحددة."
@@ -19,5 +21,6 @@ export function NewDisputePageClient() {
         <NewDisputeForm orderId={orderId} />
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

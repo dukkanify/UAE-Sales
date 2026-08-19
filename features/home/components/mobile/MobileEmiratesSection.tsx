@@ -3,11 +3,13 @@ import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
 import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
 import { MobileSectionHeader } from "./MobileSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export async function MobileEmiratesSection() {
   const emirates = await getUaeEmiratesCards();
 
   return (
+<LocalizedTree>
     <section aria-label="الإمارات الأكثر شعبية" className="mobile-home-emirates">
       <MobileSectionHeader title="الإمارات الأكثر شعبية" />
       <p className="mobile-home-emirates__desc">
@@ -45,5 +47,6 @@ export async function MobileEmiratesSection() {
         ))}
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

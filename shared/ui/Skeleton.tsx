@@ -1,4 +1,5 @@
 import type { HTMLAttributes } from "react";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type SkeletonProps = HTMLAttributes<HTMLDivElement> & {
   height?: string;
@@ -12,17 +13,20 @@ export function Skeleton({
   ...props
 }: SkeletonProps) {
   return (
+<LocalizedTree>
     <div
       aria-hidden
       className={`skeleton ${className}`}
       style={{ height, width }}
       {...props}
     />
-  );
+  </LocalizedTree>
+);
 }
 
 export function ListingCardSkeleton() {
   return (
+<LocalizedTree>
     <div aria-busy="true" aria-label="جاري تحميل الإعلان" className="marketplace-card flex h-full flex-col overflow-hidden">
       <div className="aspect-[4/3]">
         <Skeleton className="h-full w-full !rounded-none" />
@@ -42,11 +46,13 @@ export function ListingCardSkeleton() {
         </div>
       </div>
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 export function ListingDetailSkeleton() {
   return (
+<LocalizedTree>
     <div aria-busy="true" aria-label="جاري تحميل الإعلان" className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <div className="grid gap-3">
         <Skeleton className="aspect-[4/3] w-full !rounded-[var(--radius-2xl)] lg:min-h-[28rem]" />
@@ -58,5 +64,6 @@ export function ListingDetailSkeleton() {
       </div>
       <Skeleton className="h-40 w-full !rounded-[var(--radius-2xl)] lg:col-span-2" />
     </div>
-  );
+  </LocalizedTree>
+);
 }

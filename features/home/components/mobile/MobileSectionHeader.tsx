@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Icon, type IconName } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobileSectionHeaderProps = {
   actionHref?: string;
@@ -16,6 +17,7 @@ export function MobileSectionHeader({
   title,
 }: MobileSectionHeaderProps) {
   return (
+<LocalizedTree>
     <div className="mobile-home-section-header">
       <h2 className="mobile-home-section-header__title">
         {icon ? <Icon className="text-[var(--mh-gold)]" name={icon} size={16} /> : null}
@@ -28,7 +30,8 @@ export function MobileSectionHeader({
         </Link>
       ) : null}
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 type MobileSectionProps = {
@@ -39,8 +42,10 @@ type MobileSectionProps = {
 
 export function MobileSection({ ariaLabel, children, className = "" }: MobileSectionProps) {
   return (
+<LocalizedTree>
     <section aria-label={ariaLabel} className={className}>
       {children}
     </section>
-  );
+  </LocalizedTree>
+);
 }

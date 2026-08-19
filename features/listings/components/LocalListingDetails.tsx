@@ -6,6 +6,7 @@ import { Button } from "@/shared/ui/Button";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
 import { getLocalListingById } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type LocalListingDetailsProps = {
   categories: Category[];
@@ -24,6 +25,7 @@ export function LocalListingDetails({
 
   if (!listing) {
     return (
+<LocalizedTree>
       <EmptyState
         actionHref="/dashboard/listings"
         actionLabel="إعلاناتي"
@@ -31,12 +33,14 @@ export function LocalListingDetails({
         icon="package"
         title="الإعلان غير موجود"
       />
-    );
+    </LocalizedTree>
+);
   }
 
   const category = categories.find((item) => item.id === listing.categoryId);
 
   return (
+<LocalizedTree>
     <>
       <ListingDetailsView
         breadcrumbs={[
@@ -57,5 +61,6 @@ export function LocalListingDetails({
         </Button>
       </div>
     </>
-  );
+  </LocalizedTree>
+);
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type StoreBadgeLinkProps = {
   className?: string;
@@ -7,17 +8,20 @@ type StoreBadgeLinkProps = {
 
 function AppleIcon() {
   return (
+<LocalizedTree>
     <svg aria-hidden className="mobile-home-app__store-btn-graphic" viewBox="0 0 24 24">
       <path
         d="M16.34 12.2c.02 2.14 1.88 2.86 1.9 2.87-.02.06-.29.98-.96 1.94-.58.83-1.18 1.65-2.12 1.67-.93.02-1.23-.55-2.3-.55-1.07 0-1.4.53-2.28.57-.92.04-1.62-.92-2.21-1.75-1.2-1.74-2.12-4.92-.87-7.07.62-1.08 1.73-1.76 2.94-1.78 1.02-.02 1.98.68 2.3.68.32 0 1.32-.84 2.22-.72.38.02 1.45.15 2.14 1.14-.05.03-1.28.75-1.26 2.24ZM13.9 4.4c.56-.68.94-1.62.84-2.56-.81.03-1.79.54-2.37 1.22-.52.6-.97 1.57-.85 2.5.9.07 1.82-.46 2.38-1.16Z"
         fill="currentColor"
       />
     </svg>
-  );
+  </LocalizedTree>
+);
 }
 
 function GooglePlayIcon() {
   return (
+<LocalizedTree>
     <svg
       aria-hidden
       className="mobile-home-app__store-btn-graphic"
@@ -41,11 +45,13 @@ function GooglePlayIcon() {
         fill="#34A853"
       />
     </svg>
-  );
+  </LocalizedTree>
+);
 }
 
 export function AppStoreBadgeLink({ className = "", href }: StoreBadgeLinkProps) {
   return (
+<LocalizedTree>
     <Link
       aria-label="حمّل من App Store"
       className={`mobile-home-app__store-btn ${className}`.trim()}
@@ -61,11 +67,13 @@ export function AppStoreBadgeLink({ className = "", href }: StoreBadgeLinkProps)
         <span className="mobile-home-app__store-btn-title">App Store</span>
       </span>
     </Link>
-  );
+  </LocalizedTree>
+);
 }
 
 export function GooglePlayBadgeLink({ className = "", href }: StoreBadgeLinkProps) {
   return (
+<LocalizedTree>
     <Link
       aria-label="متوفر على Google Play"
       className={`mobile-home-app__store-btn ${className}`.trim()}
@@ -81,5 +89,6 @@ export function GooglePlayBadgeLink({ className = "", href }: StoreBadgeLinkProp
         <span className="mobile-home-app__store-btn-title">Google Play</span>
       </span>
     </Link>
-  );
+  </LocalizedTree>
+);
 }

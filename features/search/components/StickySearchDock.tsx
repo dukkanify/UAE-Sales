@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 /**
  * Pins a compact search control while scrolling once the hero search
@@ -63,6 +64,7 @@ export function StickySearchDock() {
   if (hideDock || !visible || footerInView) return null;
 
   return (
+<LocalizedTree>
     <div
       aria-label="بحث ثابت"
       className="sticky-search-dock"
@@ -103,5 +105,6 @@ export function StickySearchDock() {
         </button>
       )}
     </div>
-  );
+  </LocalizedTree>
+);
 }

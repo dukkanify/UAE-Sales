@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type LocationOption = { id: string; name: string };
 
@@ -48,6 +49,7 @@ export function EmirateLocationSelect({
 
   if (variant === "desktop") {
     return (
+<LocalizedTree>
       <label
         className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5 ${className}`.trim()}
       >
@@ -67,10 +69,12 @@ export function EmirateLocationSelect({
         </select>
         <Icon className="shrink-0 text-muted" name="chevron-left" size={11} />
       </label>
-    );
+    </LocalizedTree>
+);
   }
 
   return (
+<LocalizedTree>
     <label className={`mobile-home-header__location ${className}`.trim()}>
       <Icon className="mobile-home-header__location-icon" name="map" size={14} />
       <span className="mobile-home-header__location-value">{city}</span>
@@ -88,5 +92,6 @@ export function EmirateLocationSelect({
       </select>
       <Icon className="mobile-home-header__chevron" name="chevron-left" size={11} />
     </label>
-  );
+  </LocalizedTree>
+);
 }

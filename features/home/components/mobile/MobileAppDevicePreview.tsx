@@ -13,6 +13,7 @@ import { getAppPreviewImageUrl } from "./mobile-app-preview.config";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
 import "./app-phone-mock.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AppPhoneMockupProps = {
   listings: Listing[];
@@ -35,6 +36,7 @@ function Cover({
   priority?: boolean;
 }) {
   return (
+<LocalizedTree>
     <AppImage
       alt=""
       aria-hidden
@@ -46,11 +48,13 @@ function Cover({
       sizes={sizes}
       src={coverUrl(listing)}
     />
-  );
+  </LocalizedTree>
+);
 }
 
 function StatusBar() {
   return (
+<LocalizedTree>
     <div className="app-phone__status">
       <span>9:41</span>
       <span className="app-phone__status-icons">
@@ -59,11 +63,13 @@ function StatusBar() {
         <span />
       </span>
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 function TabBar({ active }: { active: "home" | "search" | "listing" }) {
   return (
+<LocalizedTree>
     <nav className="app-phone__tabs">
       <span className={`app-phone__tab${active === "home" ? " is-active" : ""}`}>
         <Icon name="home" size={13} />
@@ -85,7 +91,8 @@ function TabBar({ active }: { active: "home" | "search" | "listing" }) {
         <b>حسابي</b>
       </span>
     </nav>
-  );
+  </LocalizedTree>
+);
 }
 
 function HomeScreen({ listings }: { listings: Listing[] }) {
@@ -93,6 +100,7 @@ function HomeScreen({ listings }: { listings: Listing[] }) {
   const next = listings[1];
 
   return (
+<LocalizedTree>
     <div className="app-phone__screen">
       <StatusBar />
       <header className="app-phone__header">
@@ -151,13 +159,15 @@ function HomeScreen({ listings }: { listings: Listing[] }) {
 
       <TabBar active="home" />
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 function ListingScreen({ listing }: { listing?: Listing }) {
   if (!listing) return null;
 
   return (
+<LocalizedTree>
     <div className="app-phone__screen">
       <StatusBar />
       <div className="app-phone__detail-photo">
@@ -187,11 +197,13 @@ function ListingScreen({ listing }: { listing?: Listing }) {
       </div>
       <TabBar active="listing" />
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 function SearchScreen({ listings }: { listings: Listing[] }) {
   return (
+<LocalizedTree>
     <div className="app-phone__screen">
       <StatusBar />
       <div className="app-phone__search app-phone__search--filled">
@@ -217,7 +229,8 @@ function SearchScreen({ listings }: { listings: Listing[] }) {
       </div>
       <TabBar active="search" />
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 export function AppPhoneMockup({ listings }: AppPhoneMockupProps) {
@@ -235,6 +248,7 @@ export function AppPhoneMockup({ listings }: AppPhoneMockupProps) {
   }, [slides]);
 
   return (
+<LocalizedTree>
     <div aria-hidden className="app-phone">
       <div className={`app-phone__slide${active === 0 ? " is-visible" : ""}`}>
         <HomeScreen listings={listings} />
@@ -251,7 +265,8 @@ export function AppPhoneMockup({ listings }: AppPhoneMockupProps) {
         ))}
       </div>
     </div>
-  );
+  </LocalizedTree>
+);
 }
 
 export { AppPhoneMockup as MobileAppDevicePreview };

@@ -2,6 +2,7 @@ import type { Listing } from "@/types";
 import { DragScrollRow } from "@/shared/components/DragScrollRow";
 import { MobileFeaturedCard } from "./MobileFeaturedCard";
 import { MobileSectionHeader } from "./MobileSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MobilePreviewStripProps = {
   listings: Listing[];
@@ -13,6 +14,7 @@ export function MobilePreviewStrip({ listings }: MobilePreviewStripProps) {
   if (previews.length === 0) return null;
 
   return (
+<LocalizedTree>
     <section aria-label="معاينة السوق" className="mobile-home-featured">
       <MobileSectionHeader actionHref="/featured" icon="grid" title="معاينة السوق" />
       <p className="px-[var(--mh-page-x)] pb-1 text-xs font-medium text-[var(--mh-muted)]">
@@ -24,5 +26,6 @@ export function MobilePreviewStrip({ listings }: MobilePreviewStripProps) {
         ))}
       </DragScrollRow>
     </section>
-  );
+  </LocalizedTree>
+);
 }

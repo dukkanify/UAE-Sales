@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function MobilePromoBanner() {
   return (
+<LocalizedTree>
     <section aria-label="بيع سيارتك" className="mobile-home-promo">
       <div className="mobile-home-promo__panel">
         <span aria-hidden className="mobile-home-promo__verified">
@@ -33,5 +35,6 @@ export function MobilePromoBanner() {
         </div>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

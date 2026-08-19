@@ -3,6 +3,7 @@ import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import type { AddListingErrors } from "./add-listing/types";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingMediaSectionProps = {
   errors: AddListingErrors;
@@ -28,6 +29,7 @@ export function ListingMediaSection({
   const totalImages = existingImages.length + imagePreviews.length;
 
   return (
+<LocalizedTree>
     <Card className="p-6">
       <h2 className="text-2xl font-black text-ink">{title}</h2>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -136,5 +138,6 @@ export function ListingMediaSection({
         ) : null}
       </div>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

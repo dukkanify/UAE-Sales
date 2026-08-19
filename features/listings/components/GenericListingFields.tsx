@@ -6,6 +6,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import type { CategoryFieldErrors } from "./add-listing/CategoryFieldsForm";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type GenericListingFieldsProps = {
   errors: CategoryFieldErrors;
@@ -14,6 +15,7 @@ type GenericListingFieldsProps = {
 
 export function GenericListingFields({ errors, listing }: GenericListingFieldsProps) {
   return (
+<LocalizedTree>
     <Card className="p-6">
       <h2 className="text-2xl font-black text-ink">تفاصيل الإعلان</h2>
       <div className="mt-5 grid gap-4">
@@ -77,5 +79,6 @@ export function GenericListingFields({ errors, listing }: GenericListingFieldsPr
         </div>
       </div>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

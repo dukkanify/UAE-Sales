@@ -6,6 +6,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { Button } from "@/shared/ui/Button";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function WalletBalanceCard() {
   const [available, setAvailable] = useState(0);
@@ -30,6 +31,7 @@ export function WalletBalanceCard() {
   }, []);
 
   return (
+<LocalizedTree>
     <Card className="p-5" variant="flat">
       <p className="text-xs font-medium text-muted">الرصيد المتاح</p>
       <div className="mt-1">
@@ -39,5 +41,6 @@ export function WalletBalanceCard() {
         المحفظة
       </Button>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

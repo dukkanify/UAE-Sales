@@ -10,6 +10,7 @@ import { getSessionSnapshot } from "@/services/storage/external-store";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 function isStrongPassword(value: string) {
   return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(value);
@@ -84,6 +85,7 @@ export function SecuritySettingsPanel() {
   if (!user) return null;
 
   return (
+<LocalizedTree>
     <Card className="p-6" variant="flat">
       <h3 className="text-lg font-black text-ink">الأمان</h3>
       <p className="mt-2 text-sm text-muted">
@@ -127,5 +129,6 @@ export function SecuritySettingsPanel() {
         </div>
       )}
     </Card>
-  );
+  </LocalizedTree>
+);
 }

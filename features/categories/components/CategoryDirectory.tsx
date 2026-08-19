@@ -3,6 +3,7 @@ import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CategoryDirectoryProps = {
   categories: Category[];
@@ -10,6 +11,7 @@ type CategoryDirectoryProps = {
 
 export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
   return (
+<LocalizedTree>
     <div className="grid gap-4 md:grid-cols-2">
       {categories.map((category) => (
         <Card key={category.id} className="overflow-hidden p-0" interactive>
@@ -69,5 +71,6 @@ export function CategoryDirectory({ categories }: CategoryDirectoryProps) {
         </Card>
       ))}
     </div>
-  );
+  </LocalizedTree>
+);
 }

@@ -1,8 +1,10 @@
 import { Card } from "@/shared/ui/Card";
 import { ADD_LISTING_STEPS } from "./utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AddListingStepProgress() {
   return (
+<LocalizedTree>
     <Card className="p-3 sm:p-4" variant="flat">
       <ol aria-label="خطوات إضافة الإعلان" className="grid grid-cols-4 gap-1.5 sm:gap-2">
         {ADD_LISTING_STEPS.map((step, index) => (
@@ -20,5 +22,6 @@ export function AddListingStepProgress() {
         ))}
       </ol>
     </Card>
-  );
+  </LocalizedTree>
+);
 }

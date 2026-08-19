@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CheckoutSuccessContentProps = {
   orderId?: string;
@@ -147,20 +148,24 @@ export function CheckoutSuccessContent({
 
   if (error) {
     return (
+<LocalizedTree>
       <section className="app-container page-padding">
         <FormMessage variant="error">{error}</FormMessage>
       </section>
-    );
+    </LocalizedTree>
+);
   }
 
   if (!order) {
     return (
+<LocalizedTree>
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm text-muted">جاري تأكيد الدفع مع Stripe...</p>
         </Card>
       </section>
-    );
+    </LocalizedTree>
+);
   }
 
   const shippingLabel = order.shippingMethod
@@ -175,6 +180,7 @@ export function CheckoutSuccessContent({
   const isPending = order.status === "pending_payment";
 
   return (
+<LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description={
@@ -278,5 +284,6 @@ export function CheckoutSuccessContent({
         </div>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

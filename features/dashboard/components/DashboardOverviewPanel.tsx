@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ActivityDashboardSummary } from "@/features/activity/components/ActivityDashboardSummary";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const quickActions = [
   { href: "/listings/new", icon: "plus" as const, label: "إضافة إعلان" },
@@ -14,6 +15,7 @@ const quickActions = [
 
 export function DashboardOverviewPanel() {
   return (
+<LocalizedTree>
     <div className="grid gap-5">
       <div>
         <h2 className="text-sm font-bold text-ink">ملخص النشاط</h2>
@@ -48,5 +50,6 @@ export function DashboardOverviewPanel() {
         إدارة إعلاناتي
       </Link>
     </div>
-  );
+  </LocalizedTree>
+);
 }

@@ -9,6 +9,7 @@ import {
   addListingStepDescClass,
   addListingStepTitleClass,
 } from "./utils";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CategorySelectionStepProps = {
   categories: Category[];
@@ -26,6 +27,7 @@ export function CategorySelectionStep({
   selectedCategoryId,
 }: CategorySelectionStepProps) {
   return (
+<LocalizedTree>
     <Card className={addListingStepCardClass}>
       <h2 className={addListingStepTitleClass}>1. اختر القسم</h2>
       <p className={addListingStepDescClass}>
@@ -75,6 +77,10 @@ export function CategorySelectionStep({
             }))}
           />
         </div>
+      ) : null}
+    </Card>
+  </LocalizedTree>
+v>
       ) : null}
     </Card>
   );

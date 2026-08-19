@@ -4,6 +4,7 @@ import { PremiumListingCard } from "@/features/listings/components/PremiumListin
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
 import { getListingBySlug } from "@/services/listings";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CategoryHeroProps = {
   category: Category;
@@ -15,6 +16,7 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
     : undefined;
 
   return (
+<LocalizedTree>
     <div className="mb-8 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-white shadow-[var(--shadow-card)]">
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
         <div className="relative min-h-[12rem] lg:min-h-[16rem]">
@@ -58,5 +60,6 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
         )}
       </div>
     </div>
-  );
+  </LocalizedTree>
+);
 }

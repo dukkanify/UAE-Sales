@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function MobileTrustSection() {
   return (
+<LocalizedTree>
     <section aria-label="الضمان المالي" className="mobile-home-trust">
       <div className="mobile-home-trust__panel">
         <span aria-hidden className="mobile-home-trust__icon-wrap">
@@ -22,5 +24,6 @@ export function MobileTrustSection() {
         </div>
       </div>
     </section>
-  );
+  </LocalizedTree>
+);
 }

@@ -2,6 +2,7 @@ import type { CategoryFieldsDefaults, CategoryFieldErrors } from "./CategoryFiel
 import { CategoryFieldsForm } from "./CategoryFieldsForm";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import type { AddListingErrors } from "./types";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CategoryFieldsStepProps = {
   categoryId: string;
@@ -14,13 +15,15 @@ export function CategoryFieldsStep({ categoryId, errors }: CategoryFieldsStepPro
   }
 
   return (
+<LocalizedTree>
     <CategoryFieldsForm
       categoryId={categoryId}
       errors={errors}
       heading="2. تفاصيل الإعلان"
       stepLabel="الخطوة 2"
     />
-  );
+  </LocalizedTree>
+);
 }
 
 export type { CategoryFieldsDefaults, CategoryFieldErrors };

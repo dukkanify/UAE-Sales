@@ -10,6 +10,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type JobApplicationModalProps = {
   listing: Listing;
@@ -106,6 +107,7 @@ export function JobApplicationModal({
   const user = typeof window !== "undefined" ? getSessionUser() : null;
 
   return (
+<LocalizedTree>
     <Modal
       description={`التقديم على: ${listing.title}`}
       onClose={onClose}
@@ -191,5 +193,6 @@ export function JobApplicationModal({
         </form>
       )}
     </Modal>
-  );
+  </LocalizedTree>
+);
 }
