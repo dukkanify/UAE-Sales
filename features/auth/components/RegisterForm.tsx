@@ -18,6 +18,7 @@ import {
   isStrongPassword,
   STRONG_PASSWORD_HINT,
 } from "@/shared/utils/password-rules";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type RegisterErrors = {
   email?: string;
@@ -152,6 +153,7 @@ export function RegisterForm() {
   );
 
   return (
+    <LocalizedTree>
     <form
       className="auth-form"
       method="post"
@@ -269,5 +271,6 @@ export function RegisterForm() {
         </p>
       ) : null}
     </form>
+    </LocalizedTree>
   );
 }

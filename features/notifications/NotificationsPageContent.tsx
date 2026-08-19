@@ -7,6 +7,7 @@ import {
   formatNotificationTime,
   markNotificationsRead,
 } from "@/features/notifications/notification-client";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
@@ -47,6 +48,7 @@ export function NotificationsPageContent() {
   }
 
   return (
+    <LocalizedTree>
     <Card className="p-5" variant="flat">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
@@ -104,5 +106,6 @@ export function NotificationsPageContent() {
         </ul>
       )}
     </Card>
+    </LocalizedTree>
   );
 }

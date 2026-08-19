@@ -7,6 +7,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { Badge } from "@/shared/ui/Badge";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const statusLabels: Record<Order["status"], string> = {
   pending_payment: "بانتظار الدفع",
@@ -32,20 +33,23 @@ export function OrdersListContent() {
 
   if (orders.length === 0) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">لا توجد طلبات بعد.</p>
       </Card>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <ul className="grid gap-3">
       {orders.map((order) => (
         <li key={order.id}>
           <Link href={`/orders/${order.id}`}>
             <Card className="flex flex-wrap items-center justify-between gap-3 p-4 transition hover:border-primary/30" variant="flat">
               <div>
-                <p className="font-semibold text-ink">{order.listingTitle}</p>
+                <p className="font-semibold text-ink" data-ugc>{order.listingTitle}</p>
                 <p className="mt-0.5 text-xs text-muted">{order.id}</p>
               </div>
               <div className="flex items-center gap-3">
@@ -57,5 +61,6 @@ export function OrdersListContent() {
         </li>
       ))}
     </ul>
+    </LocalizedTree>
   );
 }

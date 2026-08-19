@@ -25,12 +25,34 @@ export function applyLocale(locale: AppLocale) {
   document.documentElement.dir = locale === "en" ? "ltr" : "rtl";
 }
 
+export function isAppLocale(value: string | null | undefined): value is AppLocale {
+  return value === "ar" || value === "en";
+}
+
+export function intlLocale(locale: AppLocale): string {
+  return locale === "en" ? "en-AE" : "ar-AE";
+}
+
+export async function getRequestLocale(): Promise<AppLocale> {
+  const { cookies } = await import("next/headers");
+  const value = (await cookies()).get(LOCALE_COOKIE)?.value;
+  return value === "en" ? "en" : "ar";
+}
+
 export function setLocale(locale: AppLocale) {
   applyLocale(locale);
   if (typeof window === "undefined") return;
   window.localStorage.setItem(STORAGE_KEYS.locale, locale);
   document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=31536000; samesite=lax`;
   window.dispatchEvent(new Event(STORAGE_EVENTS.localeChange));
+  void fetch("/api/locale", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ locale }),
+  }).catch(() => {
+    /* cookie persistence is enough for guests */
+  });
 }
 
 /** Inline boot script — keeps first paint aligned with stored locale. */

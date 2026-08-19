@@ -2,6 +2,7 @@
 
 import { useEffect, useId, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useTx } from "@/shared/i18n/useTx";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -20,6 +21,7 @@ export function Modal({
   open,
   title,
 }: ModalProps) {
+  const t = useTx();
   const titleId = useId();
   const descriptionId = useId();
 
@@ -47,7 +49,7 @@ export function Modal({
       role="dialog"
     >
       <button
-        aria-label="إغلاق"
+        aria-label={t("إغلاق")}
         className="absolute inset-0 bg-ink/50"
         onClick={onClose}
         type="button"
@@ -56,15 +58,15 @@ export function Modal({
         <div className="flex items-start justify-between gap-4">
           <div>
             <h2 className="text-lg font-black text-ink" id={titleId}>
-              {title}
+              {t(title)}
             </h2>
             {description ? (
               <p className="mt-1 text-sm text-muted" id={descriptionId}>
-                {description}
+                {t(description)}
               </p>
             ) : null}
           </div>
-          <Button aria-label="إغلاق" onClick={onClose} size="sm" variant="ghost">
+          <Button aria-label={t("إغلاق")} onClick={onClose} size="sm" variant="ghost">
             <Icon name="close" size={18} />
           </Button>
         </div>

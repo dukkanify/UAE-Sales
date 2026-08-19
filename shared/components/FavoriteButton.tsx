@@ -12,6 +12,7 @@ import { getSessionSnapshot, subscribeSession } from "@/services/storage/externa
 import { useSyncExternalStore } from "react";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { toggleFavoriteWithApi } from "@/services/favorites/favorites-sync";
 
 type FavoriteButtonProps = {
@@ -83,6 +84,7 @@ export function FavoriteButton({
     : `${baseClass} ${isFavorite ? "border-accent/40 bg-accent-soft text-accent" : ""} ${className}`;
 
   return (
+    <LocalizedTree>
     <button
       aria-label={isFavorite ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
       aria-pressed={isFavorite}
@@ -97,6 +99,7 @@ export function FavoriteButton({
       />
       {!iconOnly ? (isFavorite ? "محفوظ" : "مفضلة") : null}
     </button>
+    </LocalizedTree>
   );
 }
 

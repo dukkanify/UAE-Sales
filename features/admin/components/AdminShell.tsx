@@ -7,6 +7,9 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { UserProfile } from "@/types";
 import type { AdminPermission } from "@/types/domain/user";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { tx } from "@/shared/i18n/tx";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
@@ -289,6 +292,7 @@ export function AdminShell({
     return permitted.filter(
       (link) =>
         link.label.includes(query.trim()) ||
+        tx("en", link.label).toLowerCase().includes(q) ||
         link.keywords.toLowerCase().includes(q) ||
         link.href.includes(q),
     );
@@ -302,6 +306,7 @@ export function AdminShell({
 
   if (authState !== "admin") {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm font-medium text-muted">
@@ -309,10 +314,12 @@ export function AdminShell({
           </p>
         </Card>
       </section>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="admin-ops">
       <div className="admin-ops__shell">
         <aside className="admin-ops__sidebar" aria-label="تنقل الإدارة">
@@ -411,6 +418,7 @@ export function AdminShell({
               </div>
             </div>
             <div className="admin-ops__top-actions">
+              <LanguageSwitch variant="compact" />
               <span className="admin-ops__live" aria-live="polite">
                 <span className="admin-ops__live-dot" aria-hidden />
                 مباشر
@@ -471,5 +479,6 @@ export function AdminShell({
         </div>
       </div>
     </div>
+    </LocalizedTree>
   );
 }

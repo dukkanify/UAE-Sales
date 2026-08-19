@@ -17,6 +17,7 @@ import {
   getSessionUser,
   saveLocalListing,
 } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MyListingsDashboardProps = {
   categories: Category[];
@@ -167,13 +168,14 @@ export function MyListingsDashboard({
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { icon: "check" as const, label: "نشطة", value: counts.active },
           { icon: "clock" as const, label: "قيد المراجعة", value: counts.pending_review },
           { icon: "edit" as const, label: "مسودات", value: counts.draft },
-          { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("ar-AE") },
+          { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("en-AE") },
         ].map((stat) => (
           <div key={stat.label} className="marketplace-stat-card p-5">
             <div className="flex items-center justify-between">
@@ -297,5 +299,6 @@ export function MyListingsDashboard({
         </div>
       )}
     </div>
+    </LocalizedTree>
   );
 }

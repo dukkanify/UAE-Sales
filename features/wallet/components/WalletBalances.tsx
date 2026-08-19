@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type WalletBalancesProps = {
   defaultAvailable?: number;
@@ -51,6 +52,7 @@ export function WalletBalances({
   ];
 
   return (
+    <LocalizedTree>
     <div className="grid gap-3 sm:grid-cols-3">
       {cards.map((card) => (
         <div
@@ -65,5 +67,6 @@ export function WalletBalances({
         </div>
       ))}
     </div>
+    </LocalizedTree>
   );
 }

@@ -5,7 +5,10 @@ export const BRAND = {
   taglineEn: "Our Marketplace",
   description:
     "منصة سوق إماراتية موثوقة — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
+  descriptionEn:
+    "A trusted UAE marketplace — buy and sell with confidence, with escrow protection, a secure wallet, and support around the clock.",
   copyright: "© 2026 Sooqna. جميع الحقوق محفوظة.",
+  copyrightEn: "© 2026 Sooqna. All rights reserved.",
   domain: "sooqna.site",
   supportEmail: "support@sooqna.site",
 } as const;

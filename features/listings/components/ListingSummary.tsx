@@ -13,6 +13,7 @@ import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingSummaryProps = {
   category?: Category;
@@ -39,6 +40,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       : listing.city;
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
@@ -103,5 +105,6 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         <ShareButton className="w-full" listing={listing} />
       </div>
     </Card>
+    </LocalizedTree>
   );
 }

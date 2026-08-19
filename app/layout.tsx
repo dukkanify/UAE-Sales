@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { BrandJsonLd } from "@/shared/components/BrandJsonLd";
 import { DeferredOfflineBanner } from "@/shared/components/DeferredOfflineBanner";
@@ -8,7 +7,9 @@ import { MaintenanceGate } from "@/shared/components/MaintenanceGate";
 import { ToastProvider } from "@/shared/components/ToastProvider";
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
-import { LOCALE_BOOT_SCRIPT, LOCALE_COOKIE } from "@/shared/i18n/locale";
+import { LiveLocalizer } from "@/shared/i18n/LiveLocalizer";
+import { LocaleProvider } from "@/shared/i18n/useLocale";
+import { getRequestLocale, LOCALE_BOOT_SCRIPT } from "@/shared/i18n/locale";
 import { THEME_BOOT_SCRIPT } from "@/shared/theme/theme";
 import "./globals.css";
 
@@ -29,43 +30,48 @@ const inter = Inter({
 
 const siteUrl = getAppUrl();
 
-export const metadata: Metadata = {
-  description: BRAND.description,
-  metadataBase: new URL(siteUrl),
-  alternates: {
-    canonical: "/",
-  },
-  icons: {
-    apple: "/apple-icon",
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
-  },
-  openGraph: {
-    description: BRAND.description,
-    images: [{ url: "/brand/og-image.svg", width: 1200, height: 630 }],
-    locale: "ar_AE",
-    siteName: BRAND.nameEn,
-    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
-    type: "website",
-    url: siteUrl,
-  },
-  title: {
-    default: `${BRAND.nameEn} | ${BRAND.nameAr}`,
-    template: `%s | ${BRAND.nameEn}`,
-  },
-  twitter: {
-    card: "summary_large_image",
-    description: BRAND.description,
-    images: ["/brand/og-image.svg"],
-    title: `${BRAND.nameEn} | ${BRAND.nameAr}`,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getRequestLocale();
+  const description = locale === "en" ? BRAND.descriptionEn : BRAND.description;
+  const title = `${BRAND.nameEn} | ${BRAND.nameAr}`;
+  return {
+    description,
+    metadataBase: new URL(siteUrl),
+    alternates: {
+      canonical: "/",
+    },
+    icons: {
+      apple: "/apple-icon",
+      icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    },
+    openGraph: {
+      description,
+      images: [{ url: "/brand/og-image.svg", width: 1200, height: 630 }],
+      locale: locale === "en" ? "en_AE" : "ar_AE",
+      siteName: BRAND.nameEn,
+      title,
+      type: "website",
+      url: siteUrl,
+    },
+    title: {
+      default: title,
+      template: `%s | ${BRAND.nameEn}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      description,
+      images: ["/brand/og-image.svg"],
+      title,
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = (await cookies()).get(LOCALE_COOKIE)?.value === "en" ? "en" : "ar";
+  const locale = await getRequestLocale();
 
   return (
     <html
@@ -80,12 +86,15 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: LOCALE_BOOT_SCRIPT }} />
       </head>
       <body className={ibmPlexArabic.className}>
-        <ToastProvider>
-          <NotificationPushRegistrar />
-          <BrandJsonLd />
-          <DeferredOfflineBanner />
-          <MaintenanceGate>{children}</MaintenanceGate>
-        </ToastProvider>
+        <LocaleProvider initialLocale={locale}>
+          <LiveLocalizer />
+          <ToastProvider>
+            <NotificationPushRegistrar />
+            <BrandJsonLd />
+            <DeferredOfflineBanner />
+            <MaintenanceGate>{children}</MaintenanceGate>
+          </ToastProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

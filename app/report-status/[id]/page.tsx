@@ -56,7 +56,7 @@ export default async function ReportStatusPage({
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted">المُبلِغ</dt>
-              <dd className="text-left font-semibold text-ink">
+              <dd className="text-start font-semibold text-ink">
                 {report.reporterName}
                 {report.guest ? " (زائر)" : ""}
               </dd>

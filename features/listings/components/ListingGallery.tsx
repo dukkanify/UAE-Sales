@@ -10,6 +10,7 @@ import { ShareButton } from "@/shared/components/ShareButton";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingGalleryProps = {
   listing: Listing;
@@ -63,6 +64,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
   const activeImage = galleryImages[activeIndex];
 
   return (
+    <LocalizedTree>
     <>
       <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-2">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border shadow-[var(--shadow-lg)]">
@@ -243,5 +245,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         </div>
       ) : null}
     </>
+    </LocalizedTree>
   );
 }

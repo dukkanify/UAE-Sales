@@ -36,7 +36,7 @@ function formatValue(key: string, value: string | number | boolean): string {
     return value ? "نعم" : "لا";
   }
   if (key === "area" || key === "areaSqft") {
-    return `${Number(value).toLocaleString("ar-AE")} قدم مربع`;
+    return `${Number(value).toLocaleString("en-AE")} قدم مربع`;
   }
   if (key === "mileage") {
     return `${value} كم`;

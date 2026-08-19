@@ -25,7 +25,9 @@ export async function notifyListingSubmitted(listing: Listing): Promise<void> {
         userId: sellerId,
         type: "listing_received",
         title: "تم استلام إعلانك",
+        titleEn: "We received your listing",
         body: `إعلان «${listing.title}» قيد المراجعة وسيظهر بعد الموافقة.`,
+        bodyEn: `“${listing.title}” is under review and will go live after approval.`,
         href: `/listings/${listing.slug}`,
       }),
     "listing_received in-app",
@@ -44,7 +46,9 @@ export async function notifyListingApproved(listing: Listing): Promise<void> {
         userId: sellerId,
         type: "listing_approved",
         title: "تمت الموافقة على إعلانك",
+        titleEn: "Your listing has been approved",
         body: `إعلان «${listing.title}» منشور الآن ويمكن للمشترين مشاهدته.`,
+        bodyEn: `Your listing has been approved and is now live.`,
         href: `/listings/${listing.slug}`,
       }),
     "listing_approved in-app",
@@ -66,9 +70,13 @@ export async function notifyListingRejected(
         userId: sellerId,
         type: "listing_rejected",
         title: "يحتاج إعلانك إلى تعديل",
+        titleEn: "Your listing needs changes",
         body: reason
           ? `لم ننشر «${listing.title}»: ${reason}`
           : `لم ننشر إعلان «${listing.title}» بوضعه الحالي. عدّله ثم أعد الإرسال.`,
+        bodyEn: reason
+          ? `We could not publish “${listing.title}”: ${reason}`
+          : `We could not publish “${listing.title}” in its current form. Edit it and resubmit.`,
         href: "/dashboard/listings",
       }),
     "listing_rejected in-app",
@@ -90,7 +98,9 @@ export async function notifyListingFeaturedPaid(listing: Listing): Promise<void>
         userId: sellerId,
         type: "listing_featured",
         title: "تم تمييز إعلانك",
+        titleEn: "Your listing is now featured",
         body: `تم تأكيد دفع تمييز «${listing.title}» وسيظهر في الأقسام المميزة.`,
+        bodyEn: `Featured payment for “${listing.title}” is confirmed. It will appear in featured sections.`,
         href: `/listings/${listing.slug}`,
       }),
     "listing_featured in-app",

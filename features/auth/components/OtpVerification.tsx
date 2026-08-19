@@ -15,6 +15,7 @@ import {
   saveOtpFallback,
   subscribeOtpFallback,
 } from "@/features/auth/lib/otp-fallback";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type OtpVerificationProps = {
   email: string;
@@ -214,6 +215,7 @@ export function OtpVerification({
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <div>
         <p className="text-xs font-medium tracking-wide text-secondary uppercase">
@@ -308,5 +310,6 @@ export function OtpVerification({
         </button>
       </div>
     </div>
+    </LocalizedTree>
   );
 }

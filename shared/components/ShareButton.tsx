@@ -6,6 +6,7 @@ import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { useToast } from "@/shared/components/ToastProvider";
 import { getListingCanonicalUrl } from "@/shared/listings/listing-url";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ShareButtonProps = {
   className?: string;
@@ -75,6 +76,7 @@ export function ShareButton({
     : `${baseClass} ${className}`;
 
   return (
+    <LocalizedTree>
     <>
       <button
         aria-label="مشاركة الإعلان"
@@ -107,7 +109,7 @@ export function ShareButton({
                 <Icon name="close" size={18} />
               </button>
             </div>
-            <p className="mt-2 text-sm font-semibold text-ink">{listing.title}</p>
+            <p className="mt-2 text-sm font-semibold text-ink" data-ugc>{listing.title}</p>
             <p className="mt-1 text-sm text-muted">{locationLabel}</p>
             <p className="mt-2">
               <CurrencyAmount amount={listing.price} size="md" />
@@ -152,5 +154,6 @@ export function ShareButton({
         </div>
       ) : null}
     </>
+    </LocalizedTree>
   );
 }

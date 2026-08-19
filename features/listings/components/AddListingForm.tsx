@@ -4,6 +4,7 @@ import type { Category } from "@/types";
 import { useCallback, useRef, useState } from "react";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
 import { getSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
@@ -58,6 +59,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
   if (!isAllowed) {
     return (
+      <LocalizedTree>
       <Card className="overflow-hidden p-8 text-center">
         <h1 className="text-2xl font-black text-ink">
           {blockReason === "pending" ? "الحساب بانتظار الاعتماد" : "يلزم تسجيل الدخول"}
@@ -68,12 +70,14 @@ export function AddListingForm({ categories }: AddListingFormProps) {
             : "سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد."}
         </p>
       </Card>
+      </LocalizedTree>
     );
   }
 
   const useDynamicFields = isDynamicCategory(selectedCategoryId);
 
   return (
+    <LocalizedTree>
     <form
       className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6"
       noValidate
@@ -141,5 +145,6 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         selectedCategory={selectedCategory}
       />
     </form>
+    </LocalizedTree>
   );
 }

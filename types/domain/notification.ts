@@ -26,7 +26,9 @@ export type AppNotification = {
   orderId?: string;
   type: NotificationType;
   title: string;
+  titleEn?: string;
   body: string;
+  bodyEn?: string;
   href?: string;
   read: boolean;
   createdAt: string;

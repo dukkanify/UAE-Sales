@@ -6,6 +6,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import {
   addListingCheckboxGridClass,
   addListingCheckboxGroupClass,
@@ -174,6 +175,7 @@ export function CategoryFieldsForm({
       : defaults?.condition;
 
   return (
+    <LocalizedTree>
     <Card key={categoryId} className={addListingStepCardClass}>
       {stepLabel ? (
         <p className="text-xs font-bold uppercase tracking-wide text-secondary">
@@ -287,5 +289,6 @@ export function CategoryFieldsForm({
         ) : null}
       </div>
     </Card>
+    </LocalizedTree>
   );
 }

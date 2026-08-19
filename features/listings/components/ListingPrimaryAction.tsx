@@ -18,6 +18,7 @@ import { isGuestCheckoutEnabled } from "@/shared/constants/feature-flags";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { Icon, type IconName } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { getSessionUser } from "@/services/storage";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
@@ -85,6 +86,7 @@ export function ListingPrimaryAction({
 
   if (action === "CONTACT_SELLER") {
     return (
+      <LocalizedTree>
       <Button
         className={className}
         fullWidth={fullWidth}
@@ -97,6 +99,7 @@ export function ListingPrimaryAction({
           {ACTION_LABELS.CONTACT_SELLER}
         </span>
       </Button>
+      </LocalizedTree>
     );
   }
 
@@ -160,6 +163,7 @@ export function ListingPrimaryAction({
   }
 
   return (
+    <LocalizedTree>
     <>
       <Button
         className={className}
@@ -236,6 +240,7 @@ export function ListingPrimaryAction({
         />
       ) : null}
     </>
+    </LocalizedTree>
   );
 }
 
@@ -255,6 +260,7 @@ export function SellerContactActions({
   const gridClass = stacked ? "grid gap-2" : "grid gap-2 sm:grid-cols-2";
 
   return (
+    <LocalizedTree>
     <div className={gridClass}>
       {hidePhone ? null : (
         <Button href={tel} variant="secondary">
@@ -273,5 +279,6 @@ export function SellerContactActions({
       </a>
       <StartChatButton listing={listing} variant="secondary" />
     </div>
+    </LocalizedTree>
   );
 }

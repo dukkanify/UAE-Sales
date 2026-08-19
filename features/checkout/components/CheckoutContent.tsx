@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CheckoutContentProps = {
   catalogListing?: Listing;
@@ -136,6 +137,7 @@ export function CheckoutContent({
 
   if (!listing) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <PageHero
           description="لم نتمكن من العثور على الإعلان المطلوب."
@@ -144,10 +146,12 @@ export function CheckoutContent({
         />
         <Button href="/search">تصفح الإعلانات</Button>
       </section>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description={
@@ -171,7 +175,7 @@ export function CheckoutContent({
               <Badge variant="verified">محمي بالضمان</Badge>
             </div>
           ) : null}
-          <h2 className="mt-4 text-xl font-black text-ink">{listing.title}</h2>
+          <h2 className="mt-4 text-xl font-black text-ink" data-ugc>{listing.title}</h2>
           <p className="mt-2 text-sm text-muted">
             البائع: {listing.seller.name}
           </p>
@@ -213,5 +217,6 @@ export function CheckoutContent({
         </div>
       </div>
     </section>
+    </LocalizedTree>
   );
 }
