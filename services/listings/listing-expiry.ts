@@ -29,6 +29,20 @@ export function expireStaleListings(listings: Listing[], days: number): number {
   return changed;
 }
 
+export function expireFeaturedListings(listings: Listing[]): Listing[] {
+  const now = Date.now();
+  const expired: Listing[] = [];
+  for (const listing of listings) {
+    if (!listing.isFeatured || !listing.featuredUntil) continue;
+    const until = new Date(listing.featuredUntil).getTime();
+    if (!Number.isFinite(until) || until > now) continue;
+    expired.push({ ...listing });
+    listing.isFeatured = false;
+    listing.featuredUntil = undefined;
+  }
+  return expired;
+}
+
 export function computeExpiresAt(postedAt: string, days: number): string {
   return addDaysIso(postedAt, Math.max(1, days));
 }

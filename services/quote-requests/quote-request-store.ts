@@ -9,11 +9,20 @@ export async function getQuoteRequestsForUser(
   userId: string,
 ): Promise<QuoteRequest[]> {
   const all = await loadCollection<QuoteRequest>(FILE);
-  return all.filter((item) => item.requesterId === userId);
+  return all.filter(
+    (item) => item.requesterId === userId || item.providerId === userId,
+  );
 }
 
 export async function getAllQuoteRequests(): Promise<QuoteRequest[]> {
   return loadCollection<QuoteRequest>(FILE);
+}
+
+export async function getQuoteRequestById(
+  id: string,
+): Promise<QuoteRequest | undefined> {
+  const all = await loadCollection<QuoteRequest>(FILE);
+  return all.find((item) => item.id === id);
 }
 
 export async function findRecentQuoteRequest(
@@ -38,6 +47,7 @@ export async function createQuoteRequest(
     ...input,
     id: `quote-${Date.now()}`,
     status: "submitted",
+    statusVersion: 1,
     createdAt: new Date().toISOString(),
   };
   all.unshift(request);
@@ -52,7 +62,11 @@ export async function updateQuoteRequestStatus(
   const all = await loadCollection<QuoteRequest>(FILE);
   const index = all.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  all[index] = { ...all[index], status };
+  all[index] = {
+    ...all[index],
+    status,
+    statusVersion: (all[index].statusVersion ?? 1) + 1,
+  };
   await saveCollection(FILE, all);
   return all[index];
 }

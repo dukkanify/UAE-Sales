@@ -8,11 +8,13 @@ import {
   otpSendFailedResponse,
   sendOtpForPurpose,
 } from "@/services/auth/auth-handlers";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import {
   createPendingUser,
   deletePendingUser,
   findUserByEmail,
+  isRegisteredAccount,
 } from "@/services/auth/user-store";
 
 const schema = z.object({
@@ -39,8 +41,11 @@ export async function POST(request: Request) {
     }
 
     const existing = await findUserByEmail(email);
-    if (existing?.accountStatus === "active" && existing.emailVerifiedAt) {
-      return genericOtpResponse(email);
+    if (existing && isRegisteredAccount(existing)) {
+      return NextResponse.json(
+        { error: "EMAIL_ALREADY_REGISTERED", message: EMAIL_ALREADY_REGISTERED_MESSAGE },
+        { status: 409 },
+      );
     }
 
     const pending = await createPendingUser({
@@ -64,8 +69,6 @@ export async function POST(request: Request) {
       trackAuthEvent("registration_otp_sent");
       return genericOtpResponse(email, {
         emailDelivered: sent.delivered,
-        otp: sent.code,
-        revealOtp: true,
       });
     } catch (sendError) {
       await deletePendingUser(pending.id);
@@ -74,6 +77,12 @@ export async function POST(request: Request) {
   } catch (error) {
     const cooldown = otpCooldownResponse(error);
     if (cooldown) return cooldown;
+    if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
+      return NextResponse.json(
+        { error: "EMAIL_ALREADY_REGISTERED", message: EMAIL_ALREADY_REGISTERED_MESSAGE },
+        { status: 409 },
+      );
+    }
     if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
       trackAuthEvent("registration_failed");
       return otpSendFailedResponse();

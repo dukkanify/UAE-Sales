@@ -5,10 +5,13 @@ import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore }
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
+import { useLocale } from "@/shared/i18n/useLocale";
+import { notificationIcon } from "@/services/notifications/notification-icons";
 import {
   fetchNotifications,
   formatNotificationTime,
   markNotificationsRead,
+  notificationCopy,
 } from "@/features/notifications/notification-client";
 import { enableBrowserNotifications } from "@/features/notifications/NotificationPushRegistrar";
 import type { AppNotification } from "@/types/domain/notification";
@@ -45,6 +48,7 @@ export function NotificationBell({
   iconSize = 17,
 }: NotificationBellProps) {
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
+  const locale = useLocale();
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -130,12 +134,30 @@ export function NotificationBell({
     setPushUi(readPushUi());
     const data = await fetchNotifications();
     setItems(data.notifications);
+    setUnread(data.unread);
     setFreshIds(new Set(data.notifications.filter((item) => !item.read).map((item) => item.id)));
-    if (data.unread > 0) {
-      const nextUnread = await markNotificationsRead();
-      setUnread(nextUnread);
-      lastUnread.current = nextUnread;
-    }
+  }
+
+  async function markOne(id: string) {
+    const nextUnread = await markNotificationsRead([id]);
+    setUnread(nextUnread);
+    lastUnread.current = nextUnread;
+    setItems((current) =>
+      current.map((item) => (item.id === id ? { ...item, read: true } : item)),
+    );
+    setFreshIds((current) => {
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  async function markAll() {
+    const nextUnread = await markNotificationsRead();
+    setUnread(nextUnread);
+    lastUnread.current = nextUnread;
+    setItems((current) => current.map((item) => ({ ...item, read: true })));
+    setFreshIds(new Set());
   }
 
   if (!user) {
@@ -144,7 +166,7 @@ export function NotificationBell({
         <Link
           aria-label="الإشعارات"
           className={`${className} notify-bell__trigger`}
-          href="/login?next=/profile#notifications"
+          href="/login?next=/notifications"
         >
           <span className="mobile-home-header__notify-ring" aria-hidden />
           <Icon className={iconClassName} name="bell" size={iconSize} />
@@ -181,29 +203,39 @@ export function NotificationBell({
       {open ? (
         <div className="notify-bell__panel" id={panelId} role="dialog" aria-label="الإشعارات">
           <div className="notify-bell__head">
-            <p className="notify-bell__title">الإشعارات</p>
-            {freshIds.size > 0 ? (
+            <p className="notify-bell__title">{locale === "en" ? "Notifications" : "الإشعارات"}</p>
+            {unread > 0 ? (
               <button
                 className="notify-bell__action notify-bell__action--ghost"
-                onClick={() => setFreshIds(new Set())}
+                onClick={() => void markAll()}
                 type="button"
               >
-                إخفاء التحديد
+                {locale === "en" ? "Mark all read" : "تعليم الكل كمقروء"}
               </button>
             ) : null}
           </div>
 
           {items.length === 0 ? (
-            <p className="notify-bell__empty">لا إشعارات حتى الآن.</p>
+            <p className="notify-bell__empty">
+              {locale === "en" ? "No notifications yet." : "لا إشعارات حتى الآن."}
+            </p>
           ) : (
             <ul className="notify-bell__list">
               {items.map((item) => {
-                const isFresh = freshIds.has(item.id);
+                const isFresh = freshIds.has(item.id) || !item.read;
+                const copy = notificationCopy(item, locale);
                 const content = (
                   <>
-                    <p className="notify-bell__item-title">{item.title}</p>
-                    <p className="notify-bell__item-body">{item.body}</p>
-                    <p className="notify-bell__item-time">{formatNotificationTime(item.createdAt)}</p>
+                    <span className="notify-bell__item-icon" aria-hidden>
+                      <Icon name={notificationIcon(item.type)} size={14} />
+                    </span>
+                    <span className="notify-bell__item-copy">
+                      <p className="notify-bell__item-title">{copy.title}</p>
+                      <p className="notify-bell__item-body">{copy.body}</p>
+                      <p className="notify-bell__item-time">
+                        {formatNotificationTime(item.createdAt, locale)}
+                      </p>
+                    </span>
                   </>
                 );
                 return (
@@ -214,19 +246,21 @@ export function NotificationBell({
                         href={item.href}
                         onClick={() => {
                           setOpen(false);
-                          setFreshIds((current) => {
-                            const next = new Set(current);
-                            next.delete(item.id);
-                            return next;
-                          });
+                          if (!item.read) void markOne(item.id);
                         }}
                       >
                         {content}
                       </Link>
                     ) : (
-                      <div className={`notify-bell__item${isFresh ? " notify-bell__item--unread" : ""}`}>
+                      <button
+                        className={`notify-bell__item${isFresh ? " notify-bell__item--unread" : ""}`}
+                        onClick={() => {
+                          if (!item.read) void markOne(item.id);
+                        }}
+                        type="button"
+                      >
                         {content}
-                      </div>
+                      </button>
                     )}
                   </li>
                 );
@@ -256,10 +290,10 @@ export function NotificationBell({
             ) : null}
             <Link
               className="notify-bell__action"
-              href="/profile#notifications"
+              href="/notifications"
               onClick={() => setOpen(false)}
             >
-              عرض الكل في الملف الشخصي
+              {locale === "en" ? "Open notification center" : "فتح مركز الإشعارات"}
             </Link>
           </div>
         </div>

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { sendOtpEmail } from "@/services/email/email.service";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 
@@ -30,7 +29,6 @@ export async function POST(request: Request) {
       purpose: "REGISTER",
       metadata: {
         fullName: parsed.data.fullName,
-        password: parsed.data.password,
         accountType: parsed.data.accountType,
         city: parsed.data.city,
         phone: parsed.data.phone ?? "",
@@ -43,15 +41,12 @@ export async function POST(request: Request) {
       otp: code,
     });
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       ok: true,
       maskedEmail: maskEmail(email),
       email,
       emailDelivered: delivered,
-      otp: code,
     });
-    attachOtpDisplayCookie(response, email, code);
-    return response;
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("RESEND_COOLDOWN:")) {
       const seconds = Number(error.message.split(":")[1] ?? 60);

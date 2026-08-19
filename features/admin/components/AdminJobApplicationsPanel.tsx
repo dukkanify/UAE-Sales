@@ -10,6 +10,10 @@ import { Card } from "@/shared/ui/Card";
 const statusLabel: Record<JobApplication["status"], string> = {
   submitted: "مقدّم",
   reviewed: "تمت المراجعة",
+  viewed: "تمت المشاهدة",
+  shortlisted: "قائمة مختصرة",
+  rejected: "مرفوض",
+  accepted: "مقبول",
 };
 
 export function AdminJobApplicationsPanel() {
@@ -77,23 +81,34 @@ export function AdminJobApplicationsPanel() {
                 </p>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <span
-                  className={`admin-ops__status-chip${
-                    item.status === "reviewed"
-                      ? " admin-ops__status-chip--ok"
-                      : ""
-                  }`}
-                >
+                  <span
+                    className={`admin-ops__status-chip${
+                      item.status === "accepted" || item.status === "shortlisted"
+                        ? " admin-ops__status-chip--ok"
+                        : item.status === "rejected"
+                          ? " admin-ops__status-chip--warn"
+                          : ""
+                    }`}
+                  >
                   {statusLabel[item.status]}
                 </span>
                 {item.status === "submitted" ? (
                   <Button
                     loading={busyId === item.id}
-                    onClick={() => patchStatus(item.id, "reviewed")}
+                    onClick={() => patchStatus(item.id, "viewed")}
                     size="sm"
                     type="button"
                   >
-                    تعليم كمراجع
+                    تمت المشاهدة
+                  </Button>
+                ) : item.status === "viewed" || item.status === "reviewed" ? (
+                  <Button
+                    loading={busyId === item.id}
+                    onClick={() => patchStatus(item.id, "shortlisted")}
+                    size="sm"
+                    type="button"
+                  >
+                    قائمة مختصرة
                   </Button>
                 ) : (
                   <Button

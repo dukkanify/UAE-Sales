@@ -8,8 +8,11 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
 const statusLabel: Record<ViewingBooking["status"], string> = {
+  pending: "بانتظار التأكيد",
   confirmed: "مؤكد",
+  rescheduled: "تم تغيير الموعد",
   cancelled: "ملغى",
+  completed: "مكتمل",
 };
 
 export function AdminViewingBookingsPanel() {
@@ -86,7 +89,16 @@ export function AdminViewingBookingsPanel() {
                 >
                   {statusLabel[item.status]}
                 </span>
-                {item.status === "confirmed" ? (
+                {item.status === "pending" || item.status === "rescheduled" ? (
+                  <Button
+                    loading={busyId === item.id}
+                    onClick={() => patchStatus(item.id, "confirmed")}
+                    size="sm"
+                    type="button"
+                  >
+                    تأكيد
+                  </Button>
+                ) : item.status === "confirmed" ? (
                   <Button
                     loading={busyId === item.id}
                     onClick={() => patchStatus(item.id, "cancelled")}

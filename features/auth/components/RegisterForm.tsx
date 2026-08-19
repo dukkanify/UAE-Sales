@@ -12,7 +12,7 @@ import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import { saveAccountProof } from "@/services/storage";
-import { saveOtpFallback } from "@/features/auth/lib/otp-fallback";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import {
   isStrongPassword,
@@ -93,7 +93,7 @@ export function RegisterForm() {
           throw new Error(
             data.message ??
               (data.error === "EMAIL_ALREADY_REGISTERED"
-                ? "هذا البريد مسجّل مسبقًا. سجّل الدخول بنفس البيانات."
+                ? EMAIL_ALREADY_REGISTERED_MESSAGE
                 : "تعذر إنشاء الحساب."),
           );
         }
@@ -104,9 +104,6 @@ export function RegisterForm() {
             fullName,
             accountType,
           });
-        }
-        if (typeof data.otp === "string") {
-          saveOtpFallback(nextEmail, data.otp);
         }
         trackAuthEventClient("registration_otp_sent");
         router.push(
@@ -138,9 +135,6 @@ export function RegisterForm() {
         );
       }
 
-      if (typeof data.otp === "string") {
-        saveOtpFallback(nextEmail, data.otp);
-      }
       trackAuthEventClient("registration_otp_sent");
       const params = new URLSearchParams({
         email: data.email ?? nextEmail,

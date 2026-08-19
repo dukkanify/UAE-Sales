@@ -1,14 +1,18 @@
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { randomBytes } from "node:crypto";
 import { verifyPassword } from "@/services/auth/password.service";
 import {
   findInAccountVault,
   readAccountVault,
-  upsertAccountVault,
 } from "@/services/auth/account-vault";
-import type { AccountStatus, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
+import {
+  deletePersistedUser,
+  findPersistedUserByEmail,
+  findPersistedUserById,
+  listPersistedUsers,
+  persistUser,
+} from "@/services/auth/user-persistence";
+import type { AccountStatus, NotificationPreferences, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
-
-const FILE = "users.json";
 
 function isPlaceholderUser(user: StoredUser): boolean {
   const email = user.email.trim().toLowerCase();
@@ -28,76 +32,78 @@ function toProfile(user: StoredUser): UserProfile {
   };
 }
 
-async function mergeVaultUsers(users: StoredUser[]): Promise<StoredUser[]> {
-  const vault = await readAccountVault();
-  if (vault.length === 0) return users;
+export function normalizeAuthEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
 
-  const byEmail = new Map(users.map((user) => [user.email.toLowerCase(), user]));
-  let changed = false;
-  for (const account of vault) {
-    const email = account.email.toLowerCase();
-    const existing = byEmail.get(email);
-    if (!existing) {
-      byEmail.set(email, account);
-      changed = true;
-      continue;
-    }
-    if (!existing.passwordHash && account.passwordHash) {
-      byEmail.set(email, { ...existing, ...account, id: existing.id });
-      changed = true;
-    }
-  }
+export function isGuestConvertible(user: StoredUser): boolean {
+  return (
+    user.registrationSource === "GUEST_CHECKOUT" &&
+    !user.passwordHash &&
+    !user.isGuestConverted
+  );
+}
 
-  return changed ? Array.from(byEmail.values()) : users;
+export function isRegisteredAccount(user: StoredUser): boolean {
+  if (isGuestConvertible(user)) return false;
+  return Boolean(user.passwordHash) || Boolean(user.emailVerifiedAt);
+}
+
+function newUserId(): string {
+  return `user-${Date.now()}-${randomBytes(4).toString("hex")}`;
 }
 
 export async function getAllUsers(): Promise<StoredUser[]> {
-  const users = await loadCollection<StoredUser>(FILE);
-  const live = users.filter((user) => !isPlaceholderUser(user));
-  if (live.length !== users.length) {
-    await saveCollection(FILE, live);
-  }
-
-  const merged = await mergeVaultUsers(live);
-  if (merged !== live) {
-    await saveCollection(FILE, merged);
-    return merged;
-  }
-
-  return live;
+  const users = await listPersistedUsers();
+  return users.filter((user) => !isPlaceholderUser(user));
 }
 
 export async function findUserByEmail(email: string): Promise<StoredUser | null> {
-  const normalized = email.trim().toLowerCase();
-  const users = await getAllUsers();
-  const found = users.find((user) => user.email.toLowerCase() === normalized);
+  const normalized = normalizeAuthEmail(email);
+  const found = await findPersistedUserByEmail(normalized);
   if (found) return found;
 
   const vaulted = await findInAccountVault(normalized);
   if (!vaulted) return null;
-  return saveUser(vaulted);
+  return persistUser(vaulted);
 }
 
 export async function findUserById(id: string): Promise<StoredUser | null> {
-  const users = await getAllUsers();
-  const found = users.find((user) => user.id === id);
+  const found = await findPersistedUserById(id);
   if (found) return found;
   const vault = await readAccountVault();
   const vaulted = vault.find((user) => user.id === id);
   if (!vaulted) return null;
-  return saveUser(vaulted);
+  return persistUser(vaulted);
 }
 
 export async function saveUser(user: StoredUser): Promise<StoredUser> {
-  const users = await getAllUsers();
-  const next = users.filter(
-    (item) =>
-      item.id !== user.id && item.email.toLowerCase() !== user.email.toLowerCase(),
-  );
-  next.unshift(user);
-  await saveCollection(FILE, next);
-  await upsertAccountVault(user);
-  return user;
+  return persistUser(user);
+}
+
+export async function updateNotificationPreferences(
+  userId: string,
+  patch: Partial<NotificationPreferences> & { locale?: "ar" | "en" },
+): Promise<UserProfile> {
+  const user = await findUserById(userId);
+  if (!user) throw new Error("USER_NOT_FOUND");
+  const updated: StoredUser = {
+    ...user,
+    locale: patch.locale ?? user.locale,
+    notificationPreferences: {
+      email: patch.email ?? user.notificationPreferences?.email ?? true,
+      bookingUpdates:
+        patch.bookingUpdates ?? user.notificationPreferences?.bookingUpdates ?? true,
+      orderUpdates:
+        patch.orderUpdates ?? user.notificationPreferences?.orderUpdates ?? true,
+      messages: patch.messages ?? user.notificationPreferences?.messages ?? true,
+      marketing: patch.marketing ?? user.notificationPreferences?.marketing ?? false,
+      savedSearches:
+        patch.savedSearches ?? user.notificationPreferences?.savedSearches ?? true,
+    },
+  };
+  await saveUser(updated);
+  return toProfile(updated);
 }
 
 export async function createStandardUser(input: {
@@ -107,29 +113,31 @@ export async function createStandardUser(input: {
   accountType: StoredUser["accountType"];
   phone?: string;
 }): Promise<StoredUser> {
-  const email = input.email.trim().toLowerCase();
+  const email = normalizeAuthEmail(input.email);
   const existing = await findUserByEmail(email);
 
-  if (existing?.accountStatus === "active") {
+  if (existing && isRegisteredAccount(existing)) {
     throw new Error("EMAIL_ALREADY_REGISTERED");
   }
 
   const now = new Date().toISOString();
+  const convertingGuest = Boolean(existing && isGuestConvertible(existing));
   const user: StoredUser = {
-    id: existing?.id ?? `user-${Date.now()}`,
+    id: existing?.id ?? newUserId(),
     fullName: input.fullName.trim(),
     email,
     normalizedEmail: email,
-    phone: input.phone?.trim() ?? "",
-    city: existing?.city ?? "دبي",
+    phone: input.phone?.trim() ?? existing?.phone ?? "",
+    city: existing?.city || "دبي",
     accountType: input.accountType,
     isVerified: false,
-    joinedAt: now.slice(0, 10),
+    joinedAt: existing?.joinedAt ?? now.slice(0, 10),
+    createdAt: existing?.createdAt ?? now,
     accountStatus: "pending",
     emailVerifiedAt: undefined,
     passwordHash: input.passwordHash,
-    registrationSource: "STANDARD",
-    isGuestConverted: false,
+    registrationSource: convertingGuest ? "GUEST_CHECKOUT" : "STANDARD",
+    isGuestConverted: convertingGuest,
     onboardingStatus:
       input.accountType === "company" ? ("business_pending" as OnboardingStatus) : "none",
     role:
@@ -148,22 +156,26 @@ export async function createPendingUser(input: {
   accountType: StoredUser["accountType"];
   passwordHash?: string;
 }): Promise<StoredUser> {
-  const email = input.email.trim().toLowerCase();
+  const email = normalizeAuthEmail(input.email);
   const existing = await findUserByEmail(email);
 
-  if (existing?.accountStatus === "active" && existing.emailVerifiedAt) {
+  if (existing && isRegisteredAccount(existing) && !isGuestConvertible(existing)) {
     throw new Error("EMAIL_ALREADY_REGISTERED");
   }
 
+  const now = new Date().toISOString();
+  const convertingGuest = Boolean(existing && isGuestConvertible(existing));
   const user: StoredUser = {
-    id: existing?.id ?? `user-${Date.now()}`,
+    id: existing?.id ?? newUserId(),
     fullName: input.fullName,
     email,
+    normalizedEmail: email,
     phone: existing?.phone ?? "",
-    city: existing?.city ?? "دبي",
+    city: existing?.city || "دبي",
     accountType: input.accountType,
     isVerified: false,
-    joinedAt: existing?.joinedAt ?? new Date().toISOString().slice(0, 10),
+    joinedAt: existing?.joinedAt ?? now.slice(0, 10),
+    createdAt: existing?.createdAt ?? now,
     accountStatus: "pending" as AccountStatus,
     onboardingStatus:
       input.accountType === "company" ? ("business_pending" as OnboardingStatus) : "none",
@@ -173,19 +185,18 @@ export async function createPendingUser(input: {
         : "user",
     walletBalance: existing?.walletBalance ?? 0,
     passwordHash: input.passwordHash ?? existing?.passwordHash,
+    registrationSource: convertingGuest ? "GUEST_CHECKOUT" : existing?.registrationSource ?? "OTP",
+    isGuestConverted: convertingGuest,
   };
 
   return saveUser(user);
 }
 
 export async function deletePendingUser(userId: string): Promise<void> {
-  const users = await getAllUsers();
-  const user = users.find((item) => item.id === userId);
+  const user = await findPersistedUserById(userId);
   if (!user || user.accountStatus !== "pending") return;
-  await saveCollection(
-    FILE,
-    users.filter((item) => item.id !== userId),
-  );
+  if (isRegisteredAccount(user) && user.passwordHash) return;
+  await deletePersistedUser(userId);
 }
 
 export async function markPersonVerified(userId: string): Promise<UserProfile> {
@@ -223,12 +234,17 @@ export async function setUserPassword(userId: string, passwordHash: string): Pro
   const user = await findUserById(userId);
   if (!user) throw new Error("USER_NOT_FOUND");
 
-  const updated: StoredUser = { ...user, passwordHash };
+  const updated: StoredUser = {
+    ...user,
+    passwordHash,
+    passwordUpdatedAt: new Date().toISOString(),
+    sessionVersion: (user.sessionVersion ?? 0) + 1,
+  };
   await saveUser(updated);
   return toProfile(updated);
 }
 
-/** Recreate a registered account on this instance from a client/device password proof. */
+/** Import a missing account into the durable store from a client/device password proof. */
 export async function restoreUserWithPasswordProof(input: {
   email: string;
   password: string;
@@ -240,18 +256,15 @@ export async function restoreUserWithPasswordProof(input: {
     return null;
   }
 
-  const email = input.email.trim().toLowerCase();
+  const email = normalizeAuthEmail(input.email);
   const existing = await findUserByEmail(email);
   if (existing) {
-    return saveUser({
-      ...existing,
-      passwordHash: input.passwordHash,
-      accountStatus: existing.accountStatus ?? "active",
-    });
+    return existing;
   }
 
+  const now = new Date().toISOString();
   return saveUser({
-    id: `user-${Date.now()}`,
+    id: newUserId(),
     fullName: input.fullName?.trim() || email.split("@")[0],
     email,
     normalizedEmail: email,
@@ -259,9 +272,10 @@ export async function restoreUserWithPasswordProof(input: {
     city: "دبي",
     accountType: input.accountType ?? "individual",
     isVerified: true,
-    joinedAt: new Date().toISOString().slice(0, 10),
+    joinedAt: now.slice(0, 10),
+    createdAt: now,
     accountStatus: "active",
-    emailVerifiedAt: new Date().toISOString(),
+    emailVerifiedAt: now,
     passwordHash: input.passwordHash,
     registrationSource: "STANDARD",
     isGuestConverted: false,
@@ -271,6 +285,14 @@ export async function restoreUserWithPasswordProof(input: {
         ? "business"
         : "user",
     walletBalance: 0,
+    notificationPreferences: {
+      email: true,
+      bookingUpdates: true,
+      orderUpdates: true,
+      messages: true,
+      marketing: false,
+      savedSearches: true,
+    },
   });
 }
 

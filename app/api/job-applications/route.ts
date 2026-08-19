@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { sendJobApplicationEmails } from "@/services/email/email.service";
-import { findStoredEmail, listingPublicUrl } from "@/services/listings/listing-action-mail";
+import { notifyJobApplicationCreated } from "@/services/notifications/notification-events";
 import {
   createJobApplication,
   findJobApplication,
   getJobApplicationsForUser,
 } from "@/services/job-applications/job-application-store";
-import { createNotification } from "@/services/payments/notification-store";
 import {
   assertNotOwnListing,
   resolveServerListing,
@@ -77,46 +75,9 @@ export async function POST(request: Request) {
   }
 
   const application = await createJobApplication(payload);
+  void notifyJobApplicationCreated(application);
 
-  const listingHref = listing
-    ? listing.id.startsWith("local-")
-      ? `/listings/local/${listing.id}`
-      : `/listings/${listing.slug}`
-    : payload.listingSlug
-      ? `/listings/${payload.listingSlug}`
-      : "/search";
-
-  await Promise.all([
-    createNotification({
-      userId: payload.applicantId,
-      type: "job_application",
-      title: "تم إرسال طلب التوظيف",
-      body: `تم إرسال طلبك على وظيفة «${payload.listingTitle}» بنجاح.`,
-      href: listingHref,
-    }),
-    createNotification({
-      userId: payload.employerId,
-      type: "job_application",
-      title: "طلب توظيف جديد",
-      body: `${payload.applicantName} قدّم على وظيفة «${payload.listingTitle}».`,
-      href: listingHref,
-    }),
-  ]);
-
-  const employerEmail = await findStoredEmail(payload.employerId);
-  const emailed = await sendJobApplicationEmails({
-    buyer: { email: payload.applicantEmail, name: payload.applicantName },
-    seller: employerEmail
-      ? { email: employerEmail, name: payload.employerName }
-      : undefined,
-    listingTitle: payload.listingTitle,
-    listingUrl: listingPublicUrl({
-      listingId: payload.listingId,
-      listingSlug: payload.listingSlug,
-    }),
-  });
-
-  return NextResponse.json({ application, emailed: emailed.buyerEmailed });
+  return NextResponse.json({ application });
 }
 
 export async function GET(request: Request) {

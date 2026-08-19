@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { createHash, randomBytes } from "node:crypto";
 import {
   GENERIC_OTP_SENT_MESSAGE,
   OTP_SEND_FAILED_MESSAGE,
   OTP_VERIFY_MESSAGES,
   RESEND_COOLDOWN_MESSAGE,
 } from "@/services/auth/auth-messages";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
@@ -20,25 +18,18 @@ export async function enforceRateLimit(request: Request, email: string): Promise
 
 export function genericOtpResponse(
   email: string,
-  extras?: { emailDelivered?: boolean; otp?: string; revealOtp?: boolean },
+  extras?: { emailDelivered?: boolean },
 ) {
   const emailDelivered = extras?.emailDelivered ?? true;
-  const revealOtp =
-    Boolean(extras?.otp) && Boolean(extras?.revealOtp || !emailDelivered);
-  const response = NextResponse.json({
+  return NextResponse.json({
     ok: true,
     message: emailDelivered
       ? GENERIC_OTP_SENT_MESSAGE
-      : "تعذر وصول الرسالة إلى البريد. استخدم الرمز الظاهر على الشاشة لإكمال التحقق.",
+      : OTP_SEND_FAILED_MESSAGE,
     maskedEmail: maskEmail(email),
     email,
     emailDelivered,
-    ...(revealOtp ? { otp: extras?.otp } : {}),
   });
-  if (revealOtp && extras?.otp) {
-    attachOtpDisplayCookie(response, email, extras.otp);
-  }
-  return response;
 }
 
 export function otpSendFailedResponse() {
@@ -108,7 +99,7 @@ export async function sendRegistrationVerifyOtp(input: {
   });
 
   if (!delivered) {
-    console.warn("[Sooqna OTP] email not delivered; code available on verify screen", {
+    console.warn("[Sooqna OTP] registration email not delivered", {
       email: input.email,
     });
   }
@@ -162,47 +153,3 @@ export async function sendOtpForPurpose(input: {
   return { delivered, code };
 }
 
-export function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
-
-const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
-
-export async function storeResetToken(email: string, token: string) {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const withoutStale = tokens.filter((item) => item.email !== email);
-  withoutStale.unshift({
-    email,
-    token,
-    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-  });
-  await saveCollection("password-reset-tokens.json", withoutStale);
-}
-
-export async function consumeResetToken(email: string, token: string): Promise<boolean> {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const match = tokens.find(
-    (item) =>
-      item.email === email &&
-      item.token === token &&
-      new Date(item.expiresAt).getTime() > Date.now(),
-  );
-  if (!match) return false;
-  await saveCollection(
-    "password-reset-tokens.json",
-    tokens.filter((item) => item.token !== match.token),
-  );
-  return true;
-}

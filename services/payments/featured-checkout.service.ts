@@ -14,7 +14,10 @@ import {
 } from "@/services/payments/payment-config";
 import { createFeaturedCheckoutSession } from "@/services/payments/stripe.service";
 import { findUserById } from "@/services/auth/user-store";
-import { notifyListingFeaturedPaid } from "@/services/listings/listing-notifications";
+import {
+  notifyListingFeaturedPaid,
+  notifyListingFeaturedPaymentRequired,
+} from "@/services/notifications/notification-events";
 
 export type FeaturedCheckoutResult = {
   mode: "checkout" | "mock";
@@ -86,6 +89,8 @@ export async function initiateFeaturedCheckout(
     status: "pending",
     stripeSessionId: session.sessionId,
   });
+
+  void notifyListingFeaturedPaymentRequired(listing, amountAed);
 
   return {
     mode: "checkout",

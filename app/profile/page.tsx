@@ -28,6 +28,17 @@ export default async function ProfilePage() {
           <div className="mt-6">
             <SecuritySettingsPanel />
           </div>
+          <Card className="mt-6 scroll-mt-24 p-5" id="notifications" variant="flat">
+            <h2 className="text-sm font-semibold text-ink">الإشعارات</h2>
+            <p className="mt-1 text-xs leading-6 text-muted">
+              مركز الإشعارات الكامل مع تعليم المقروء والتفضيلات.
+            </p>
+            <div className="mt-4">
+              <a className="text-sm font-bold text-primary" href="/notifications">
+                فتح مركز الإشعارات
+              </a>
+            </div>
+          </Card>
           <Card className="mt-6 scroll-mt-24 p-5" id="favorites" variant="flat">
             <h2 className="text-sm font-semibold text-ink">المفضلة</h2>
             <div className="mt-4">

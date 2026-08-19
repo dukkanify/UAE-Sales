@@ -3,6 +3,13 @@ import { loadCollection, saveCollection } from "@/services/payments/data-store";
 
 const FILE = "favorites.json";
 
+export async function getFavoritesForListing(
+  listingId: string,
+): Promise<ServerFavorite[]> {
+  const all = await loadCollection<ServerFavorite>(FILE);
+  return all.filter((item) => item.listingId === listingId);
+}
+
 export async function getFavoritesForUser(userId: string): Promise<ServerFavorite[]> {
   const all = await loadCollection<ServerFavorite>(FILE);
   return all.filter((item) => item.userId === userId);

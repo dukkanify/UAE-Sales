@@ -1,7 +1,6 @@
 import { createDispute } from "@/services/admin/dispute-store";
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
-import { createNotification } from "@/services/payments/notification-store";
-import { emailOrderStatusToUser } from "@/services/email/notification-emails";
+import { notifyDisputeOpened } from "@/services/notifications/notification-events";
 import {
   getOrderById,
   isValidOrderTransition,
@@ -9,7 +8,6 @@ import {
 } from "@/services/payments/order-store";
 import type { AdminDisputeRecord } from "@/types/domain/admin";
 import type { Order, OrderStatus } from "@/types/domain/order";
-import { formatCurrencyLabel } from "@/shared/utils/currency";
 
 const DISPUTE_ELIGIBLE: OrderStatus[] = [
   "paid_held_in_escrow",
@@ -72,40 +70,7 @@ export async function openDisputeFromOrder(
     evidenceUrls,
   });
 
-  if (order.buyerId) {
-    await createNotification({
-      userId: order.buyerId,
-      orderId: order.id,
-      type: "order_disputed",
-      title: "تم فتح النزاع",
-      body: `تم تسجيل نزاعك على طلب «${order.listingTitle}» وسيتم مراجعته.`,
-    });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "order_disputed",
-      title: "تم فتح النزاع",
-      subject: `نزاع على الطلب — ${order.listingTitle}`,
-      body: `تم تسجيل نزاعك على طلب «${order.listingTitle}» وسيتم مراجعته.`,
-    }).catch((error) => console.error("[Sooqna Email] dispute buyer email failed", error));
-  }
-
-  await createNotification({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_disputed",
-    title: "نزاع جديد على طلب",
-    body: `فتح المشتري نزاعاً على طلب «${order.listingTitle}» بمبلغ ${formatCurrencyLabel(order.fees.total)}.`,
-  });
-  void emailOrderStatusToUser({
-    userId: order.sellerId,
-    orderId: order.id,
-    type: "order_disputed",
-    title: "نزاع جديد على طلب",
-    subject: `نزاع على الطلب — ${order.listingTitle}`,
-    body: `فتح المشتري نزاعاً على طلب «${order.listingTitle}».`,
-  }).catch((error) => console.error("[Sooqna Email] dispute seller email failed", error));
+  void notifyDisputeOpened(order, dispute.id);
 
   return { order: updated, dispute };
 }

@@ -35,7 +35,11 @@ export async function getViewingBookingsForListing(
 ): Promise<ViewingBooking[]> {
   const all = await loadCollection<ViewingBooking>(FILE);
   return all.filter(
-    (item) => item.listingId === listingId && item.status === "confirmed",
+    (item) =>
+      item.listingId === listingId &&
+      (item.status === "pending" ||
+        item.status === "confirmed" ||
+        item.status === "rescheduled"),
   );
 }
 
@@ -54,11 +58,20 @@ export async function getViewingBookingsForUser(
   userId: string,
 ): Promise<ViewingBooking[]> {
   const all = await loadCollection<ViewingBooking>(FILE);
-  return all.filter((item) => item.buyerId === userId);
+  return all.filter(
+    (item) => item.buyerId === userId || item.sellerId === userId,
+  );
 }
 
 export async function getAllViewingBookings(): Promise<ViewingBooking[]> {
   return loadCollection<ViewingBooking>(FILE);
+}
+
+export async function getViewingBookingById(
+  id: string,
+): Promise<ViewingBooking | undefined> {
+  const all = await loadCollection<ViewingBooking>(FILE);
+  return all.find((item) => item.id === id);
 }
 
 export async function findViewingBooking(
@@ -74,7 +87,9 @@ export async function findViewingBooking(
       item.listingId === listingId &&
       item.date === date &&
       item.time === time &&
-      item.status === "confirmed",
+      item.status === "pending" ||
+      item.status === "confirmed" ||
+      item.status === "rescheduled",
   );
 }
 
@@ -85,7 +100,8 @@ export async function createViewingBooking(
   const booking: ViewingBooking = {
     ...input,
     id: `view-${Date.now()}`,
-    status: "confirmed",
+    status: "pending",
+    statusVersion: 1,
     createdAt: new Date().toISOString(),
   };
   all.unshift(booking);
@@ -93,14 +109,31 @@ export async function createViewingBooking(
   return booking;
 }
 
-export async function updateViewingBookingStatus(
+export async function updateViewingBooking(
   id: string,
-  status: ViewingBooking["status"],
+  patch: Partial<Pick<ViewingBooking, "status" | "date" | "time" | "notes">>,
 ): Promise<ViewingBooking | undefined> {
   const all = await loadCollection<ViewingBooking>(FILE);
   const index = all.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  all[index] = { ...all[index], status };
+  const current = all[index];
+  const nextStatus = patch.status ?? current.status;
+  const rescheduled =
+    (patch.date && patch.date !== current.date) ||
+    (patch.time && patch.time !== current.time);
+  all[index] = {
+    ...current,
+    ...patch,
+    status: rescheduled && nextStatus === "confirmed" ? "rescheduled" : nextStatus,
+    statusVersion: (current.statusVersion ?? 1) + 1,
+  };
   await saveCollection(FILE, all);
   return all[index];
+}
+
+export async function updateViewingBookingStatus(
+  id: string,
+  status: ViewingBooking["status"],
+): Promise<ViewingBooking | undefined> {
+  return updateViewingBooking(id, { status });
 }

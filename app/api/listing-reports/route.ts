@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getAllUsers } from "@/services/auth/user-store";
 import { getSessionFromCookie } from "@/services/auth/session-cookie";
+import { notify } from "@/services/notifications/notification.service";
+import { notifyListingReported } from "@/services/notifications/notification-events";
 import {
   createListingReport,
   listingReportReceipt,
 } from "@/services/listings/listing-report-store";
 import { resolveServerListing } from "@/services/listings/listing-action-resolver";
 import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
-import { createNotification } from "@/services/payments/notification-store";
 
 const schema = z.object({
   listingId: z.string().min(1),
@@ -51,26 +51,24 @@ export async function POST(request: Request) {
     guest: !session,
   });
 
-  const admins = (await getAllUsers()).filter((user) => user.role === "admin");
-  await Promise.all(
-    admins.map((admin) =>
-      createNotification({
-        userId: admin.id,
-        type: "listing_report",
-        title: "بلاغ جديد على إعلان",
-        body: `${report.reporterName} (${report.reporterPhone}) أبلغ عن «${listing.title}».`,
-        href: "/admin/listing-reports",
-      }),
-    ),
-  );
+  void notifyListingReported({
+    listingTitle: listing.title,
+    reportId: report.id,
+    reporterName: report.reporterName,
+    reporterPhone: report.reporterPhone,
+  });
 
   if (session) {
-    await createNotification({
+    void notify({
       userId: session.id,
       type: "listing_report",
       title: "تم استلام بلاغك",
+      titleEn: "We received your report",
       body: `استلمنا بلاغك على «${listing.title}». سيراجعه فريق الثقة.`,
-      href: "/profile#notifications",
+      bodyEn: `We received your report on “${listing.title}”.`,
+      href: "/notifications",
+      idempotencyKey: `LISTING_REPORT_RECEIPT:${report.id}`,
+      channels: ["in_app"],
     });
   }
 

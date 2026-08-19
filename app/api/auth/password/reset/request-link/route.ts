@@ -1,15 +1,12 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import {
-  createResetToken,
-  enforceRateLimit,
-  storeResetToken,
-} from "@/services/auth/auth-handlers";
+  PASSWORD_RESET_GENERIC_MESSAGE,
+} from "@/services/auth/auth-messages";
+import { enforceRateLimit } from "@/services/auth/auth-handlers";
+import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
+import { issuePasswordResetToken } from "@/services/auth/password-reset-token";
 import { findUserByEmail } from "@/services/auth/user-store";
-import {
-  buildEmailDedupeKey,
-  findRecentEmailLog,
-} from "@/services/email/email-log-store";
 import { emailPasswordResetLink } from "@/services/email/notification-emails";
 import { maskEmail } from "@/shared/utils/mask-email";
 
@@ -20,9 +17,17 @@ const schema = z.object({
 function genericResponse(email: string) {
   return NextResponse.json({
     ok: true,
-    message: "إذا كان البريد مسجلاً، ستصلك رسالة برابط آمن لإعادة تعيين كلمة المرور.",
+    message: PASSWORD_RESET_GENERIC_MESSAGE,
     maskedEmail: maskEmail(email),
   });
+}
+
+async function allowResetRequest(request: Request, email: string): Promise<boolean> {
+  if (!(await enforceRateLimit(request, email))) return false;
+  const ip = getClientIp(request);
+  const emailAllowed = await checkRateLimit(`password-reset:email:${email}`);
+  const ipAllowed = await checkRateLimit(`password-reset:ip:${ip}`);
+  return emailAllowed && ipAllowed;
 }
 
 export async function POST(request: Request) {
@@ -34,31 +39,23 @@ export async function POST(request: Request) {
     }
 
     const email = parsed.data.email.trim().toLowerCase();
-    if (!(await enforceRateLimit(request, email))) {
+    if (!(await allowResetRequest(request, email))) {
       return genericResponse(email);
     }
 
     const user = await findUserByEmail(email);
     if (user?.passwordHash) {
-      const recent = await findRecentEmailLog(
-        buildEmailDedupeKey({
-          type: "password_reset",
-          to: email,
-          entityId: email,
-        }),
-        2 * 60 * 1000,
-      );
-      if (!recent) {
-        const token = createResetToken(email);
-        await storeResetToken(email, token);
-        void emailPasswordResetLink({
-          email,
-          name: user.fullName,
-          token,
-        }).catch((error) => {
-          console.error("[Sooqna Email] password reset link failed", error);
-        });
-      }
+      const rawToken = await issuePasswordResetToken({
+        email: user.email,
+        userId: user.id,
+      });
+      void emailPasswordResetLink({
+        email: user.email,
+        name: user.fullName,
+        token: rawToken,
+      }).catch((error) => {
+        console.error("[Sooqna Email] password reset link failed", error);
+      });
     }
 
     return genericResponse(email);
@@ -66,7 +63,7 @@ export async function POST(request: Request) {
     console.error("[Sooqna Email] password reset request failed", error);
     return NextResponse.json({
       ok: true,
-      message: "إذا كان البريد مسجلاً، ستصلك رسالة برابط آمن لإعادة تعيين كلمة المرور.",
+      message: PASSWORD_RESET_GENERIC_MESSAGE,
     });
   }
 }
