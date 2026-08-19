@@ -19,6 +19,8 @@ import {
 } from "@/services/categories";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
+import { getRequestLocale } from "@/shared/i18n/locale";
+import { tx } from "@/shared/i18n/tx";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
@@ -61,10 +63,29 @@ export async function generateMetadata({
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return { title: `القسم غير موجود | Sooqna` };
+  const locale = await getRequestLocale();
+  if (!category) {
+    return { title: tx(locale, "القسم غير موجود") };
+  }
+  const name = tx(locale, category.name);
+  const description =
+    locale === "en"
+      ? `Browse ${name} listings on Sooqna.`
+      : `تصفح إعلانات ${category.name} في ${BRAND.nameAr}.`;
   return {
-    title: `${category.name} | Sooqna`,
-    description: `تصفح إعلانات ${category.name} في ${BRAND.nameAr}.`,
+    title: name,
+    description,
+    openGraph: {
+      description,
+      locale: locale === "en" ? "en_AE" : "ar_AE",
+      title: name,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title: name,
+    },
   };
 }
 

@@ -11,6 +11,7 @@ import {
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { searchTextMatches } from "@/shared/listings/search-text";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
 import type { SearchSuggestion } from "@/features/search/types";
 
@@ -183,6 +184,7 @@ export function SearchTypeahead({
   }
 
   return (
+    <LocalizedTree>
     <div ref={rootRef} className="relative grid min-w-0 gap-1.5">
       {label ? (
         <span
@@ -290,7 +292,18 @@ export function SearchTypeahead({
                       name={item.kind === "recent" ? "clock" : item.kind === "saved" ? "heart" : "search"}
                       size={14}
                     />
-                    <span className="truncate font-semibold">{item.label}</span>
+                    <span
+                      className="truncate font-semibold"
+                      data-ugc={
+                        item.kind === "listing" ||
+                        item.kind === "recent" ||
+                        item.kind === "saved"
+                          ? true
+                          : undefined
+                      }
+                    >
+                      {item.label}
+                    </span>
                   </span>
                   <span className="shrink-0 text-[0.65rem] font-bold text-muted">
                     {kindLabel(item.kind)}
@@ -302,5 +315,6 @@ export function SearchTypeahead({
         </div>
       ) : null}
     </div>
+    </LocalizedTree>
   );
 }

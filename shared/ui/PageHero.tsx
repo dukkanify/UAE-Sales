@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 
 type PageHeroProps = {
   children?: ReactNode;
@@ -25,7 +26,7 @@ export function PageHero({
     >
       {eyebrow ? (
         <p className="text-xs font-bold tracking-wide text-secondary">
-          {eyebrow}
+          <Copy text={eyebrow} />
         </p>
       ) : null}
       <h1
@@ -33,7 +34,7 @@ export function PageHero({
           compact ? "text-2xl md:text-3xl" : "mt-2 text-3xl md:text-4xl"
         }`}
       >
-        {title}
+        <Copy text={title} />
       </h1>
       {description ? (
         <p
@@ -41,7 +42,7 @@ export function PageHero({
             compact ? "mt-2" : "mt-3"
           }`}
         >
-          {description}
+          <Copy text={description} />
         </p>
       ) : null}
       {children ? <div className={compact ? "mt-3" : "mt-4"}>{children}</div> : null}

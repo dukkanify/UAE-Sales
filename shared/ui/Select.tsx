@@ -1,4 +1,7 @@
+"use client";
+
 import type { SelectHTMLAttributes } from "react";
+import { useTx } from "@/shared/i18n/useTx";
 
 type SelectOption = {
   label: string;
@@ -20,7 +23,10 @@ export function Select({
   options,
   ...props
 }: SelectProps) {
+  const t = useTx();
   const hasError = Boolean(error);
+  const translatedLabel = t(label);
+  const translatedError = error ? t(error) : error;
 
   return (
     <label className={`grid min-w-0 ${compact ? "gap-1" : "gap-1.5"}`}>
@@ -29,7 +35,7 @@ export function Select({
           compact ? "text-xs font-semibold text-muted" : "text-sm font-medium text-ink"
         }
       >
-        {label}
+        {translatedLabel}
       </span>
       <select
         aria-invalid={hasError || undefined}
@@ -38,13 +44,13 @@ export function Select({
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {t(option.label)}
           </option>
         ))}
       </select>
-      {error ? (
+      {translatedError ? (
         <span className="text-xs font-medium text-error" role="alert">
-          {error}
+          {translatedError}
         </span>
       ) : null}
     </label>

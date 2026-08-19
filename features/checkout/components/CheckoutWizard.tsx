@@ -5,6 +5,7 @@ import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DeliveryAddress, ShippingMethodId } from "@/types/domain/address";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { isGuestCheckoutEnabled, isMockCheckoutEnabled } from "@/shared/constants/feature-flags";
 import {
@@ -365,9 +366,11 @@ export function CheckoutWizard({
 
   if (!listing) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <FormMessage variant="error">{LISTING_ERRORS.listingUnavailable}</FormMessage>
       </section>
+      </LocalizedTree>
     );
   }
 
@@ -385,6 +388,7 @@ export function CheckoutWizard({
   const mockCheckoutEnabled = isMockCheckoutEnabled();
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description="خطوات سريعة وآمنة لإتمام الشراء عبر الضمان المالي."
@@ -425,7 +429,9 @@ export function CheckoutWizard({
                 />
               </div>
               <div>
-                <h2 className="font-black text-ink">{listing.title}</h2>
+                <h2 className="font-black text-ink" data-ugc>
+                  {listing.title}
+                </h2>
                 <p className="mt-1 text-sm text-muted">{listing.seller.name}</p>
                 <div className="mt-2">
                   <CurrencyAmount amount={listing.price} size="lg" />
@@ -666,5 +672,6 @@ export function CheckoutWizard({
         ) : null}
       </div>
     </section>
+    </LocalizedTree>
   );
 }

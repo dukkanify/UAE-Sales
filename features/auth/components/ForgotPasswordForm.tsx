@@ -7,6 +7,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type Step = "email" | "sent" | "password" | "done";
 
@@ -99,6 +100,7 @@ export function ForgotPasswordForm() {
 
   if (step === "sent") {
     return (
+      <LocalizedTree>
       <div className="grid gap-4">
         <div>
           <h2 className="text-xl font-black text-ink">تحقق من بريدك</h2>
@@ -114,11 +116,13 @@ export function ForgotPasswordForm() {
           العودة لتسجيل الدخول
         </Link>
       </div>
+      </LocalizedTree>
     );
   }
 
   if (step === "password") {
     return (
+      <LocalizedTree>
       <form
         className="grid gap-4"
         method="post"
@@ -160,21 +164,25 @@ export function ForgotPasswordForm() {
           حفظ كلمة المرور
         </Button>
       </form>
+      </LocalizedTree>
     );
   }
 
   if (step === "done") {
     return (
+      <LocalizedTree>
       <div className="grid gap-4">
         <FormMessage variant="success">{message}</FormMessage>
         <Button fullWidth href="/login" variant="primary">
           تسجيل الدخول
         </Button>
       </div>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <form
       className="grid gap-4"
       method="post"
@@ -204,5 +212,6 @@ export function ForgotPasswordForm() {
         العودة لتسجيل الدخول
       </Link>
     </form>
+    </LocalizedTree>
   );
 }

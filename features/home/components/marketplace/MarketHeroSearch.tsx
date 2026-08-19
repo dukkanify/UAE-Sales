@@ -3,6 +3,7 @@
 import type { Category } from "@/types";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import {
   HOME_SEARCH_LABELS,
   HOME_SEARCH_PRICE_OPTIONS,
@@ -14,6 +15,7 @@ type MarketHeroSearchProps = {
 
 export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
   return (
+    <LocalizedTree>
     <form
       action="/search"
       className="market-hero-search"
@@ -92,5 +94,6 @@ export function MarketHeroSearch({ categories }: MarketHeroSearchProps) {
         </div>
       </div>
     </form>
+    </LocalizedTree>
   );
 }

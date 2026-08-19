@@ -4,6 +4,7 @@ import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND, DEVELOPER } from "@/shared/constants/brand";
 import { footerLinks } from "@/shared/constants/navigation";
 import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Icon } from "@/shared/ui/Icon";
 import "./site-footer.css";
 
@@ -135,6 +136,7 @@ function StoreBadges() {
 
 export function SiteFooter() {
   return (
+    <LocalizedTree>
     <footer className="site-footer">
       <section aria-label="تطبيق سوقنا" className="site-footer__app">
         <div className="app-container site-footer__app-inner">
@@ -239,5 +241,6 @@ export function SiteFooter() {
         </div>
       </div>
     </footer>
+    </LocalizedTree>
   );
 }

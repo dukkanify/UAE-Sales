@@ -6,6 +6,9 @@ import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import type { Listing } from "@/types";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
+import { intlLocale } from "@/shared/i18n/locale";
 
 function getFavoriteHref(item: { listingId: string; slug: string }) {
   return item.listingId.startsWith("local-")
@@ -15,6 +18,7 @@ function getFavoriteHref(item: { listingId: string; slug: string }) {
 
 export function FavoritesPanel() {
   const favorites = useFavoritesList();
+  const locale = useLocale();
 
   if (favorites.length === 0) {
     return (
@@ -29,14 +33,17 @@ export function FavoritesPanel() {
   }
 
   return (
+    <LocalizedTree>
     <ul className="grid gap-3">
       {favorites.map((item) => (
         <li key={item.listingId}>
           <Card className="flex items-center justify-between gap-3 p-4" variant="flat">
             <Link className="min-w-0 flex-1" href={getFavoriteHref(item)}>
-              <p className="truncate font-semibold text-ink">{item.title}</p>
+              <p className="truncate font-semibold text-ink" data-ugc>
+                {item.title}
+              </p>
               <p className="mt-0.5 text-xs text-muted">
-                {new Date(item.savedAt).toLocaleDateString("ar-AE")}
+                {new Date(item.savedAt).toLocaleDateString(intlLocale(locale))}
               </p>
             </Link>
             <div className="flex items-center gap-2">
@@ -59,5 +66,6 @@ export function FavoritesPanel() {
         </li>
       ))}
     </ul>
+    </LocalizedTree>
   );
 }

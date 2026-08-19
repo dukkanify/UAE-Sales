@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { Copy } from "@/shared/i18n/LocalizedTree";
+import { useTx } from "@/shared/i18n/useTx";
 
 type BreadcrumbItem = {
   href?: string;
@@ -10,9 +14,10 @@ type BreadcrumbsProps = {
 };
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
+  const t = useTx();
   return (
     <nav
-      aria-label="مسار التنقل"
+      aria-label={t("مسار التنقل")}
       className="mb-6 flex flex-wrap items-center gap-2 text-sm font-medium text-muted"
     >
       {items.map((item, index) => {
@@ -27,10 +32,12 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
             ) : null}
             {item.href && !isLast ? (
               <Link className="transition hover:text-ink" href={item.href}>
-                {item.label}
+                <Copy text={item.label} />
               </Link>
             ) : (
-              <span className={isLast ? "text-ink" : undefined}>{item.label}</span>
+              <span className={isLast ? "text-ink" : undefined}>
+                <Copy text={item.label} />
+              </span>
             )}
           </span>
         );

@@ -10,6 +10,7 @@ import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
@@ -80,6 +81,7 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
+    <LocalizedTree>
     <>
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
       <VerifyAccountBanner />
@@ -264,6 +266,7 @@ export function SiteHeader() {
     </header>
     <StickySearchDock />
     </>
+    </LocalizedTree>
   );
 }
 

@@ -6,6 +6,7 @@ import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import {
   SearchTypeahead,
   type SearchSuggestion,
@@ -80,6 +81,7 @@ export function SearchFilters({
 
   if (!isSidebar) {
     return (
+      <LocalizedTree>
       <div className="marketplace-panel p-5 md:p-6">
         <form
           action={action}
@@ -165,10 +167,12 @@ export function SearchFilters({
           </div>
         </form>
       </div>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="marketplace-panel flex max-h-none flex-col overflow-hidden p-0 lg:max-h-[calc(100vh-6.5rem)]">
       <button
         aria-expanded={mobileOpen}
@@ -315,5 +319,6 @@ export function SearchFilters({
         </div>
       </form>
     </div>
+    </LocalizedTree>
   );
 }

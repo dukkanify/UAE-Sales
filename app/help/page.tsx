@@ -5,11 +5,15 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { BRAND } from "@/shared/constants/brand";
 import { Card } from "@/shared/ui/Card";
 import { PageHero } from "@/shared/ui/PageHero";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { localizedMetadata } from "@/shared/i18n/localized-metadata";
 
-export const metadata: Metadata = {
-  title: "مركز المساعدة",
-  description: `إجابات سريعة حول استخدام ${BRAND.nameAr}، نشر الإعلانات، والشراء الآمن.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return localizedMetadata({
+    title: "مركز المساعدة",
+    description: `إجابات سريعة حول استخدام ${BRAND.nameAr}، نشر الإعلانات، والشراء الآمن.`,
+  });
+}
 
 const topics = [
   {
@@ -41,6 +45,7 @@ export default function HelpPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding">
           <PageHero
@@ -80,6 +85,7 @@ export default function HelpPage() {
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

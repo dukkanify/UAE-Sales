@@ -12,6 +12,9 @@ import {
 } from "@/features/notifications/notification-client";
 import { enableBrowserNotifications } from "@/features/notifications/NotificationPushRegistrar";
 import type { AppNotification } from "@/types/domain/notification";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { tx } from "@/shared/i18n/tx";
+import { useLocale } from "@/shared/i18n/useLocale";
 import "./notification-bell.css";
 
 type NotificationBellProps = {
@@ -45,6 +48,7 @@ export function NotificationBell({
   iconSize = 17,
 }: NotificationBellProps) {
   const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
+  const locale = useLocale();
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
@@ -140,6 +144,7 @@ export function NotificationBell({
 
   if (!user) {
     return (
+      <LocalizedTree>
       <div className="notify-bell">
         <Link
           aria-label="الإشعارات"
@@ -150,10 +155,12 @@ export function NotificationBell({
           <Icon className={iconClassName} name="bell" size={iconSize} />
         </Link>
       </div>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="notify-bell" ref={rootRef}>
       <button
         aria-controls={panelId}
@@ -201,9 +208,15 @@ export function NotificationBell({
                 const isFresh = freshIds.has(item.id);
                 const content = (
                   <>
-                    <p className="notify-bell__item-title">{item.title}</p>
-                    <p className="notify-bell__item-body">{item.body}</p>
-                    <p className="notify-bell__item-time">{formatNotificationTime(item.createdAt)}</p>
+                    <p className="notify-bell__item-title">
+                      {locale === "en" ? item.titleEn || tx(locale, item.title) : item.title}
+                    </p>
+                    <p className="notify-bell__item-body">
+                      {locale === "en" ? item.bodyEn || tx(locale, item.body) : item.body}
+                    </p>
+                    <p className="notify-bell__item-time">
+                      {formatNotificationTime(item.createdAt, locale)}
+                    </p>
                   </>
                 );
                 return (
@@ -265,5 +278,6 @@ export function NotificationBell({
         </div>
       ) : null}
     </div>
+    </LocalizedTree>
   );
 }

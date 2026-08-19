@@ -26,6 +26,8 @@ import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
+import { intlLocale } from "@/shared/i18n/locale";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 const statusFilterOptions: { label: string; value: string }[] = [
   { label: "كل الحالات", value: "all" },
@@ -73,6 +75,7 @@ const emptyForm = {
 };
 
 export function AdminListingsPanel() {
+  const locale = useLocale();
   const [listings, setListings] = useState<AdminListingRecord[]>([]);
   const [categories, setCategories] = useState<AdminCategoryRecord[]>([]);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -511,7 +514,7 @@ export function AdminListingsPanel() {
               <div className="text-left">
                 <CurrencyAmount amount={listing.price} size="lg" />
                 <p className="mt-1 text-xs text-muted">
-                  {new Date(listing.postedAt).toLocaleDateString("ar-AE")}
+                    {new Date(listing.postedAt).toLocaleDateString(intlLocale(locale))}
                 </p>
               </div>
             </div>

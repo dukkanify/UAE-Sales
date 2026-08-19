@@ -17,6 +17,7 @@ import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ChatConversationViewProps = {
   conversationId: string;
@@ -46,6 +47,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
 
   if (!conversation) {
     return (
+      <LocalizedTree>
       <EmptyState
         actionHref="/chat"
         actionLabel="العودة للرسائل"
@@ -53,6 +55,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
         icon="message"
         title="المحادثة غير موجودة"
       />
+      </LocalizedTree>
     );
   }
 
@@ -106,11 +109,14 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-ink">{conversation.listingTitle}</p>
+            <p className="text-sm font-semibold text-ink" data-ugc>
+              {conversation.listingTitle}
+            </p>
             <p className="mt-1 text-xs text-muted">
               مع {conversation.sellerName}
             </p>
@@ -134,7 +140,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
                     : "bg-surface-muted text-ink"
                 }`}
               >
-                <p>{item.body}</p>
+                <p data-ugc>{item.body}</p>
                 <p className={`mt-1 text-[0.65rem] ${isMine ? "text-white/70" : "text-muted"}`}>
                   {new Date(item.createdAt).toLocaleString("ar-AE", {
                     day: "numeric",
@@ -169,5 +175,6 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
         </form>
       </Card>
     </div>
+    </LocalizedTree>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { CategoryFieldOption } from "@/types";
 import { filterBrandOptions } from "@/shared/constants/product-brands";
 import { Icon } from "@/shared/ui/Icon";
+import { useTx } from "@/shared/i18n/useTx";
 
 type BrandComboboxProps = {
   compact?: boolean;
@@ -26,6 +27,7 @@ export function BrandCombobox({
   placeholder = "ابحث عن الماركة (مثال: Toy… أو App…)",
   required = false,
 }: BrandComboboxProps) {
+  const t = useTx();
   const listId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState(defaultValue);
@@ -83,7 +85,7 @@ export function BrandCombobox({
               : "text-sm font-medium text-ink"
           }
         >
-          {label}
+          {t(label)}
           {required ? <span className="text-error"> *</span> : null}
         </span>
 
@@ -142,7 +144,7 @@ export function BrandCombobox({
                 setActiveIndex(-1);
               }
             }}
-            placeholder={placeholder}
+            placeholder={t(placeholder)}
             role="combobox"
             type="text"
             value={query}
@@ -177,7 +179,7 @@ export function BrandCombobox({
           })}
           {filtered.length > 12 ? (
             <li className="px-3 py-1.5 text-xs text-muted">
-              اكتب المزيد من الحروف لتضييق النتائج…
+              {t("اكتب المزيد من الحروف لتضييق النتائج…")}
             </li>
           ) : null}
         </ul>
@@ -185,13 +187,13 @@ export function BrandCombobox({
 
       {open && query.trim() && filtered.length === 0 ? (
         <p className="absolute inset-x-0 top-full z-30 mt-1 rounded-xl border border-border bg-surface px-3 py-2 text-xs font-medium text-muted shadow-[0_12px_32px_rgb(15_20_25/14%)]">
-          لا توجد ماركة مطابقة — سيتم حفظ «{query.trim()}» كما كتبتها.
+          {t(`لا توجد ماركة مطابقة — سيتم حفظ «${query.trim()}» كما كتبتها.`)}
         </p>
       ) : null}
 
       {error ? (
         <span className="text-xs font-medium text-error" role="alert">
-          {error}
+          {t(error)}
         </span>
       ) : null}
     </div>

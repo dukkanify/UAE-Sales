@@ -8,6 +8,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { tx } from "@/shared/i18n/tx";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 type ToastMessage = {
   id: string;
@@ -22,6 +24,7 @@ type ToastContextValue = {
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const locale = useLocale();
   const [messages, setMessages] = useState<ToastMessage[]>([]);
 
   const showToast = useCallback(
@@ -54,7 +57,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             }`}
             role="status"
           >
-            {message.text}
+            {tx(locale, message.text)}
           </p>
         ))}
       </div>

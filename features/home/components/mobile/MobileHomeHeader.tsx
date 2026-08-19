@@ -10,6 +10,7 @@ import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBan
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
 import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
@@ -53,6 +54,7 @@ export function MobileHomeHeader() {
   }, [menuOpen]);
 
   return (
+    <LocalizedTree>
     <header className="mobile-home-header">
       <VerifyAccountBanner />
       <div className="mobile-home-header__bar">
@@ -174,5 +176,6 @@ export function MobileHomeHeader() {
         </nav>
       ) : null}
     </header>
+    </LocalizedTree>
   );
 }

@@ -61,6 +61,7 @@ export type UserProfile = {
   subscription?: string;
   walletBalance?: number;
   businessProfile?: BusinessProfile;
+  preferredLocale?: "ar" | "en";
 };
 
 export type StoredUser = UserProfile & {

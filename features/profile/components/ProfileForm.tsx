@@ -12,6 +12,7 @@ import { Select } from "@/shared/ui/Select";
 import { getSessionUser, setSessionUser } from "@/services/storage";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { isUaePassEnabled } from "@/shared/constants/feature-flags";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ProfileFormProps = {
   user: UserProfile;
@@ -32,6 +33,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
   const [saveMessage, setSaveMessage] = useState("");
 
   return (
+    <LocalizedTree>
     <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
       <Card className="overflow-hidden p-0">
         <div className="luxury-gradient p-6 text-white">
@@ -174,5 +176,6 @@ export function ProfileForm({ user }: ProfileFormProps) {
         ) : null}
       </div>
     </div>
+    </LocalizedTree>
   );
 }

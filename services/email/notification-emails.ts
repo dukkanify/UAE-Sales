@@ -5,47 +5,74 @@ import {
   emailSiteUrl,
   escapeEmailHtml,
 } from "@/services/email/sooqna-email-template";
+import { resolveEmailLocale } from "@/shared/i18n/email-locale";
+import type { AppLocale } from "@/shared/i18n/locale";
+import { tx } from "@/shared/i18n/tx";
 import type { Listing } from "@/types";
 import type { Order } from "@/types/domain/order";
 
-function greet(name: string): string {
-  const safe = escapeEmailHtml(name.trim() || "عميل سوقنا");
+function greet(name: string, locale: AppLocale): string {
+  const fallback = locale === "en" ? "Sooqna customer" : "عميل سوقنا";
+  const safe = escapeEmailHtml(name.trim() || fallback);
+  if (locale === "en") {
+    return `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">Hello ${safe},</p>`;
+  }
   return `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">مرحبًا ${safe}،</p>`;
 }
 
 export async function emailListingReceived(listing: Listing): Promise<void> {
   const seller = await findUserById(listing.seller.id);
   if (!seller?.email) return;
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
   const href = emailSiteUrl(`/listings/${listing.slug}`);
+  const titleHtml = escapeEmailHtml(listing.title);
   await sendTransactionalEmail({
     type: "listing_received",
     to: seller.email,
     userId: seller.id,
     entityId: listing.id,
-    subject: `تم استلام إعلانك — ${listing.title}`,
-    title: "إعلانك قيد المراجعة",
-    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">استلمنا إعلان «${escapeEmailHtml(listing.title)}» وهو الآن قيد مراجعة فريق سوقنا. سنراسلك فور الموافقة أو إذا احتجنا تعديلاً.</p>`,
-    bodyLines: [`استلمنا إعلان «${listing.title}» وهو قيد المراجعة.`],
+    locale,
+    subject: english
+      ? `We received your listing — ${listing.title}`
+      : `تم استلام إعلانك — ${listing.title}`,
+    title: english ? "Your listing is under review" : "إعلانك قيد المراجعة",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">We received “${titleHtml}” and it is now under review by the Sooqna team. We will email you once it is approved or if changes are needed.</p>`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">استلمنا إعلان «${titleHtml}» وهو الآن قيد مراجعة فريق سوقنا. سنراسلك فور الموافقة أو إذا احتجنا تعديلاً.</p>`,
+    bodyLines: english
+      ? [`We received “${listing.title}” and it is under review.`]
+      : [`استلمنا إعلان «${listing.title}» وهو قيد المراجعة.`],
     ctaHref: href,
-    ctaLabel: "متابعة الإعلان",
+    ctaLabel: english ? "View listing" : "متابعة الإعلان",
   });
 }
 
 export async function emailListingApproved(listing: Listing): Promise<void> {
   const seller = await findUserById(listing.seller.id);
   if (!seller?.email) return;
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
   const href = emailSiteUrl(`/listings/${listing.slug}`);
+  const titleHtml = escapeEmailHtml(listing.title);
   await sendTransactionalEmail({
     type: "listing_approved",
     to: seller.email,
     userId: seller.id,
     entityId: listing.id,
-    subject: `تمت الموافقة على إعلانك — ${listing.title}`,
-    title: "إعلانك منشور الآن",
-    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">تمت الموافقة على إعلان «${escapeEmailHtml(listing.title)}» وأصبح ظاهرًا للمشترين على سوقنا.</p>`,
-    bodyLines: [`تمت الموافقة على إعلان «${listing.title}».`],
+    locale,
+    subject: english
+      ? `Your listing has been approved — ${listing.title}`
+      : `تمت الموافقة على إعلانك — ${listing.title}`,
+    title: english ? "Your listing is now live" : "إعلانك منشور الآن",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">“${titleHtml}” has been approved and is now visible to buyers on Sooqna.</p>`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">تمت الموافقة على إعلان «${titleHtml}» وأصبح ظاهرًا للمشترين على سوقنا.</p>`,
+    bodyLines: english
+      ? [`“${listing.title}” has been approved.`]
+      : [`تمت الموافقة على إعلان «${listing.title}».`],
     ctaHref: href,
-    ctaLabel: "عرض الإعلان",
+    ctaLabel: english ? "View listing" : "عرض الإعلان",
   });
 }
 
@@ -55,83 +82,136 @@ export async function emailListingRejected(
 ): Promise<void> {
   const seller = await findUserById(listing.seller.id);
   if (!seller?.email) return;
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
+  const titleHtml = escapeEmailHtml(listing.title);
   const reasonHtml = reason
-    ? `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">السبب: ${escapeEmailHtml(reason)}</p>`
+    ? english
+      ? `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">Reason: ${escapeEmailHtml(reason)}</p>`
+      : `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">السبب: ${escapeEmailHtml(reason)}</p>`
     : "";
   await sendTransactionalEmail({
     type: "listing_rejected",
     to: seller.email,
     userId: seller.id,
     entityId: listing.id,
-    subject: `يحتاج إعلانك إلى تعديل — ${listing.title}`,
-    title: "لم نتمكن من نشر الإعلان",
-    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">لم تتم الموافقة على إعلان «${escapeEmailHtml(listing.title)}» بوضعه الحالي. يمكنك تعديله وإعادة الإرسال.</p>${reasonHtml}`,
-    bodyLines: [
-      `لم تتم الموافقة على إعلان «${listing.title}».`,
-      reason ? `السبب: ${reason}` : "عدّل الإعلان ثم أعد إرساله.",
-    ],
+    locale,
+    subject: english
+      ? `Your listing needs changes — ${listing.title}`
+      : `يحتاج إعلانك إلى تعديل — ${listing.title}`,
+    title: english ? "We could not publish the listing" : "لم نتمكن من نشر الإعلان",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">We could not approve “${titleHtml}” in its current form. You can edit it and resubmit.</p>${reasonHtml}`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">لم تتم الموافقة على إعلان «${titleHtml}» بوضعه الحالي. يمكنك تعديله وإعادة الإرسال.</p>${reasonHtml}`,
+    bodyLines: english
+      ? [
+          `We could not approve “${listing.title}”.`,
+          reason ? `Reason: ${reason}` : "Edit the listing and resubmit.",
+        ]
+      : [
+          `لم تتم الموافقة على إعلان «${listing.title}».`,
+          reason ? `السبب: ${reason}` : "عدّل الإعلان ثم أعد إرساله.",
+        ],
     ctaHref: emailSiteUrl(`/listings/${listing.slug}/edit`),
-    ctaLabel: "تعديل الإعلان",
+    ctaLabel: english ? "Edit listing" : "تعديل الإعلان",
   });
 }
 
 export async function emailListingFeaturedPaid(listing: Listing): Promise<void> {
   const seller = await findUserById(listing.seller.id);
   if (!seller?.email) return;
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
   const href = emailSiteUrl(`/listings/${listing.slug}`);
+  const titleHtml = escapeEmailHtml(listing.title);
   await sendTransactionalEmail({
     type: "featured_paid",
     to: seller.email,
     userId: seller.id,
     entityId: listing.id,
-    subject: `تم تمييز إعلانك — ${listing.title}`,
-    title: "تم دفع باقة التمييز",
-    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">تم تأكيد دفع تمييز إعلان «${escapeEmailHtml(listing.title)}». سيظهر في الأقسام المميزة حسب مدة الباقة.</p>`,
-    bodyLines: [`تم تأكيد دفع تمييز إعلان «${listing.title}».`],
+    locale,
+    subject: english
+      ? `Your listing is now featured — ${listing.title}`
+      : `تم تمييز إعلانك — ${listing.title}`,
+    title: english ? "Featured package paid" : "تم دفع باقة التمييز",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">Featured payment for “${titleHtml}” is confirmed. It will appear in featured sections for the package duration.</p>`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">تم تأكيد دفع تمييز إعلان «${titleHtml}». سيظهر في الأقسام المميزة حسب مدة الباقة.</p>`,
+    bodyLines: english
+      ? [`Featured payment for “${listing.title}” is confirmed.`]
+      : [`تم تأكيد دفع تمييز إعلان «${listing.title}».`],
     ctaHref: href,
-    ctaLabel: "عرض الإعلان",
+    ctaLabel: english ? "View listing" : "عرض الإعلان",
   });
 }
 
 export async function emailOrderPaid(order: Order): Promise<void> {
   const href = emailSiteUrl(`/orders/${order.id}`);
   if (order.buyerEmail) {
+    const locale = await resolveEmailLocale({
+      userId: order.buyerId,
+      email: order.buyerEmail,
+    });
+    const english = locale === "en";
+    const titleHtml = escapeEmailHtml(order.listingTitle);
     await sendTransactionalEmail({
       type: "order_paid",
       to: order.buyerEmail,
       userId: order.buyerId ?? undefined,
       entityId: order.id,
-      subject: `تم الدفع بنجاح — طلب ${order.id}`,
-      title: "تم استلام الدفع",
-      bodyHtml: `${greet(order.buyerName)}<p style="font-size:16px;line-height:1.8;margin:0;">تم دفع طلب «${escapeEmailHtml(order.listingTitle)}» بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.</p>`,
-      bodyLines: [`تم دفع طلب «${order.listingTitle}».`, `رقم الطلب: ${order.id}`],
+      locale,
+      subject: english
+        ? `Payment successful — order ${order.id}`
+        : `تم الدفع بنجاح — طلب ${order.id}`,
+      title: english ? "Payment received" : "تم استلام الدفع",
+      bodyHtml: english
+        ? `${greet(order.buyerName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">Payment for “${titleHtml}” succeeded. The amount is held in escrow until receipt is confirmed.</p>`
+        : `${greet(order.buyerName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">تم دفع طلب «${titleHtml}» بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.</p>`,
+      bodyLines: english
+        ? [`Payment for “${order.listingTitle}” was received.`, `Order number: ${order.id}`]
+        : [`تم دفع طلب «${order.listingTitle}».`, `رقم الطلب: ${order.id}`],
       ctaHref: href,
-      ctaLabel: "متابعة الطلب",
+      ctaLabel: english ? "Track order" : "متابعة الطلب",
     });
   }
 
   const seller = await findUserById(order.sellerId);
   if (!seller?.email) return;
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
+  const titleHtml = escapeEmailHtml(order.listingTitle);
   await sendTransactionalEmail({
     type: "order_seller_new",
     to: seller.email,
     userId: seller.id,
     entityId: order.id,
-    subject: `طلب شراء جديد — ${order.listingTitle}`,
-    title: "طلب شراء جديد",
-    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">وصلك طلب جديد على إعلان «${escapeEmailHtml(order.listingTitle)}». المبلغ محجوز في الضمان.</p>`,
-    bodyLines: [`طلب جديد على «${order.listingTitle}».`, `رقم الطلب: ${order.id}`],
+    locale,
+    subject: english
+      ? `New purchase order — ${order.listingTitle}`
+      : `طلب شراء جديد — ${order.listingTitle}`,
+    title: english ? "New purchase order" : "طلب شراء جديد",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">You received a new order for “${titleHtml}”. The amount is held in escrow.</p>`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">وصلك طلب جديد على إعلان «${titleHtml}». المبلغ محجوز في الضمان.</p>`,
+    bodyLines: english
+      ? [`New order for “${order.listingTitle}”.`, `Order number: ${order.id}`]
+      : [`طلب جديد على «${order.listingTitle}».`, `رقم الطلب: ${order.id}`],
     ctaHref: href,
-    ctaLabel: "تفاصيل الطلب",
+    ctaLabel: english ? "Order details" : "تفاصيل الطلب",
   });
 }
 
 export async function emailOrderStatus(input: {
   body: string;
+  bodyEn?: string;
   ctaLabel?: string;
+  ctaLabelEn?: string;
   entityId: string;
+  locale?: AppLocale;
   subject: string;
+  subjectEn?: string;
   title: string;
+  titleEn?: string;
   to: string;
   type:
     | "order_confirmed"
@@ -142,26 +222,39 @@ export async function emailOrderStatus(input: {
   userId?: string;
 }): Promise<void> {
   if (!input.to) return;
+  const locale =
+    input.locale ??
+    (await resolveEmailLocale({ userId: input.userId, email: input.to }));
+  const english = locale === "en";
+  const subject = english ? input.subjectEn ?? tx("en", input.subject) : input.subject;
+  const title = english ? input.titleEn ?? tx("en", input.title) : input.title;
+  const body = english ? input.bodyEn ?? tx("en", input.body) : input.body;
   await sendTransactionalEmail({
     type: input.type,
     to: input.to,
     userId: input.userId,
     entityId: input.entityId,
-    subject: input.subject,
-    title: input.title,
-    bodyHtml: `<p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(input.body)}</p>`,
-    bodyLines: [input.body],
+    locale,
+    subject,
+    title,
+    bodyHtml: `<p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(body)}</p>`,
+    bodyLines: [body],
     ctaHref: emailSiteUrl(`/orders/${input.entityId}`),
-    ctaLabel: input.ctaLabel ?? "متابعة الطلب",
+    ctaLabel: english
+      ? input.ctaLabelEn ?? "Track order"
+      : input.ctaLabel ?? "متابعة الطلب",
   });
 }
 
 export async function emailOrderStatusToUser(input: {
   body: string;
+  bodyEn?: string;
   fallbackEmail?: string;
   orderId: string;
   subject: string;
+  subjectEn?: string;
   title: string;
+  titleEn?: string;
   type:
     | "order_confirmed"
     | "order_released"
@@ -177,9 +270,12 @@ export async function emailOrderStatusToUser(input: {
   if (!email) return;
   await emailOrderStatus({
     body: input.body,
+    bodyEn: input.bodyEn,
     entityId: input.orderId,
     subject: input.subject,
+    subjectEn: input.subjectEn,
     title: input.title,
+    titleEn: input.titleEn,
     to: email,
     type: input.type,
     userId: input.userId,
@@ -195,21 +291,36 @@ export async function emailChatMessage(input: {
 }): Promise<void> {
   const recipient = await findUserById(input.recipientUserId);
   if (!recipient?.email) return;
+  const locale = await resolveEmailLocale({
+    userId: recipient.id,
+    email: recipient.email,
+  });
+  const english = locale === "en";
   await sendTransactionalEmail({
     type: "chat_message",
     to: recipient.email,
     userId: recipient.id,
     entityId: input.conversationId,
+    locale,
     dedupeWindowMs: 30 * 60 * 1000,
-    subject: `رسالة جديدة حول «${input.listingTitle}»`,
-    title: "لديك رسالة جديدة",
-    bodyHtml: `${greet(recipient.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(input.senderName)} راسلك بخصوص «${escapeEmailHtml(input.listingTitle)}».</p><p style="font-size:15px;line-height:1.8;margin:12px 0 0;color:#6b6560;">${escapeEmailHtml(input.preview.slice(0, 180))}</p>`,
-    bodyLines: [
-      `${input.senderName} أرسل رسالة حول «${input.listingTitle}».`,
-      input.preview.slice(0, 180),
-    ],
+    subject: english
+      ? `New message about “${input.listingTitle}”`
+      : `رسالة جديدة حول «${input.listingTitle}»`,
+    title: english ? "You have a new message" : "لديك رسالة جديدة",
+    bodyHtml: english
+      ? `${greet(recipient.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(input.senderName)} messaged you about “${escapeEmailHtml(input.listingTitle)}”.</p><p style="font-size:15px;line-height:1.8;margin:12px 0 0;color:#6b6560;">${escapeEmailHtml(input.preview.slice(0, 180))}</p>`
+      : `${greet(recipient.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">${escapeEmailHtml(input.senderName)} راسلك بخصوص «${escapeEmailHtml(input.listingTitle)}».</p><p style="font-size:15px;line-height:1.8;margin:12px 0 0;color:#6b6560;">${escapeEmailHtml(input.preview.slice(0, 180))}</p>`,
+    bodyLines: english
+      ? [
+          `${input.senderName} sent a message about “${input.listingTitle}”.`,
+          input.preview.slice(0, 180),
+        ]
+      : [
+          `${input.senderName} أرسل رسالة حول «${input.listingTitle}».`,
+          input.preview.slice(0, 180),
+        ],
     ctaHref: emailSiteUrl(`/chat/${input.conversationId}`),
-    ctaLabel: "فتح المحادثة",
+    ctaLabel: english ? "Open conversation" : "فتح المحادثة",
   });
 }
 
@@ -218,20 +329,35 @@ export async function emailPasswordResetLink(input: {
   name?: string;
   token: string;
 }): Promise<void> {
+  const locale = await resolveEmailLocale({ email: input.email });
+  const english = locale === "en";
   const href = `${EMAIL_SITE_URL}/forgot-password?step=password&email=${encodeURIComponent(input.email)}&token=${encodeURIComponent(input.token)}`;
+  const name = input.name || (english ? "Sooqna customer" : "عميل سوقنا");
   await sendTransactionalEmail({
     type: "password_reset",
     to: input.email,
     entityId: input.email,
+    locale,
     dedupeWindowMs: 2 * 60 * 1000,
-    subject: "إعادة تعيين كلمة المرور — سوقنا",
-    title: "رابط آمن لإعادة تعيين كلمة المرور",
-    bodyHtml: `${greet(input.name || "عميل سوقنا")}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور. الرابط صالح لمدة ساعة واحدة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.</p>`,
-    bodyLines: [
-      "استخدم الرابط التالي لإعادة تعيين كلمة المرور. صالح لمدة ساعة.",
-      "إذا لم تطلب ذلك، تجاهل الرسالة.",
-    ],
+    subject: english
+      ? "Reset your password — Sooqna"
+      : "إعادة تعيين كلمة المرور — سوقنا",
+    title: english
+      ? "Secure link to reset your password"
+      : "رابط آمن لإعادة تعيين كلمة المرور",
+    bodyHtml: english
+      ? `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">You asked to reset your password. This link is valid for one hour. If you did not request this, ignore this email.</p>`
+      : `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور. الرابط صالح لمدة ساعة واحدة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.</p>`,
+    bodyLines: english
+      ? [
+          "Use the link below to reset your password. It is valid for one hour.",
+          "If you did not request this, ignore the email.",
+        ]
+      : [
+          "استخدم الرابط التالي لإعادة تعيين كلمة المرور. صالح لمدة ساعة.",
+          "إذا لم تطلب ذلك، تجاهل الرسالة.",
+        ],
     ctaHref: href,
-    ctaLabel: "تعيين كلمة مرور جديدة",
+    ctaLabel: english ? "Set a new password" : "تعيين كلمة مرور جديدة",
   });
 }

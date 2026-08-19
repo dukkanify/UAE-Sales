@@ -1,4 +1,6 @@
 import webpush from "web-push";
+import { findUserById } from "@/services/auth/user-store";
+import { tx } from "@/shared/i18n/tx";
 import { BRAND } from "@/shared/constants/brand";
 import { loadRecord, saveRecord } from "@/services/payments/data-store";
 import {
@@ -63,10 +65,16 @@ export async function dispatchWebPush(notification: AppNotification): Promise<vo
   if (subscriptions.length === 0) return;
 
   configureWebPush(keys);
+  const user = await findUserById(notification.userId);
+  const english = user?.preferredLocale === "en";
   const payload = JSON.stringify({
     id: notification.id,
-    title: notification.title,
-    body: notification.body,
+    title: english
+      ? notification.titleEn || tx("en", notification.title)
+      : notification.title,
+    body: english
+      ? notification.bodyEn || tx("en", notification.body)
+      : notification.body,
     href: notification.href || "/profile#notifications",
   });
 
