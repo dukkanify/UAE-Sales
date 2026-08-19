@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import Link from "next/link";
 import { Button } from "@/shared/ui/Button";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -7,6 +8,7 @@ export default function NotFoundPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="app-container page-padding">
         <section className="mx-auto max-w-lg text-center">
           <p className="text-xs font-medium tracking-wide text-secondary uppercase">
@@ -28,6 +30,7 @@ export default function NotFoundPage() {
           </Link>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

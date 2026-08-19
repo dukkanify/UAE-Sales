@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { RegisterPendingContent } from "@/features/auth/components/RegisterPendingContent";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -7,6 +8,7 @@ export default function RegisterPendingPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="auth-page">
         <AuthShell
           description="تحققنا منك أولاً. الاعتماد خطوة واحدة سهلة من الإدارة، وسنُعلمك فور تفعيل الحساب."
@@ -20,6 +22,7 @@ export default function RegisterPendingPage() {
           <RegisterPendingContent />
         </AuthShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

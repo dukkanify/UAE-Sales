@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { NotificationsPageContent } from "@/features/notifications/NotificationsPageContent";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -10,6 +11,7 @@ export default async function NotificationsPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/profile"
@@ -20,6 +22,7 @@ export default async function NotificationsPage() {
           <NotificationsPageContent />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

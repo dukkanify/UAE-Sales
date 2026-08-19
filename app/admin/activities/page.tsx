@@ -1,9 +1,11 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Suspense } from "react";
 import { AdminActivitiesPanel } from "@/features/admin/components/AdminActivitiesPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminActivitiesPage() {
   return (
+    <LocalizedTree>
     <AdminShell
       activePath="/admin/activities"
       description="إدارة موحدة لطلبات الوظائف والحجوزات والخدمات والطلبات والإعلانات."
@@ -13,5 +15,6 @@ export default function AdminActivitiesPage() {
         <AdminActivitiesPanel />
       </Suspense>
     </AdminShell>
+    </LocalizedTree>
   );
 }

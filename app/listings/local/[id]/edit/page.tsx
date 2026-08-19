@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { LocalListingEdit } from "@/features/listings/components/LocalListingEdit";
 import { PageHero } from "@/shared/ui/PageHero";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -17,6 +18,7 @@ export default async function LocalListingEditPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="app-container page-padding">
         <PageHero
           description="عدّل بيانات إعلانك المحفوظ محلياً. التغييرات ستظهر فوراً في إعلاناتي ونتائج البحث."
@@ -25,6 +27,7 @@ export default async function LocalListingEditPage({
         />
         <LocalListingEdit listingId={id} />
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

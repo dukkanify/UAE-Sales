@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { MyListingsDashboard } from "@/features/dashboard/components/MyListingsDashboard";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -16,6 +17,7 @@ export default async function DashboardListingsPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/dashboard/listings"
@@ -26,6 +28,7 @@ export default async function DashboardListingsPage() {
           <MyListingsDashboard categories={categories} listings={listings} />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

@@ -1,8 +1,10 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AdminListingsPanel } from "@/features/admin/components/AdminListingsPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminListingsPage() {
   return (
+    <LocalizedTree>
     <AdminShell
       activePath="/admin/listings"
       description="أضف إعلانات جديدة، وراجعها: اعتماد، رفض، وتمييز — مع اختيار القسم لكل إعلان."
@@ -10,5 +12,6 @@ export default function AdminListingsPage() {
     >
       <AdminListingsPanel />
     </AdminShell>
+    </LocalizedTree>
   );
 }

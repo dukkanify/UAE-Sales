@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { ChatInboxList } from "@/features/chat/components/ChatInboxList";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -10,6 +11,7 @@ export default async function ChatPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/chat"
@@ -20,6 +22,7 @@ export default async function ChatPage() {
           <ChatInboxList />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

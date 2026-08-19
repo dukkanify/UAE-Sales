@@ -1,5 +1,7 @@
 "use client";
 
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+
 import { useEffect, useState } from "react";
 import { ErrorState } from "@/shared/components/ErrorState";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -30,6 +32,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   return (
     <html dir={locale === "en" ? "ltr" : "rtl"} lang={locale}>
       <body>
+        <LocalizedTree>
         <SiteHeader />
         <main className="app-container page-padding">
           <ErrorState
@@ -40,6 +43,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           />
         </main>
         <SiteFooter />
+      </LocalizedTree>
       </body>
     </html>
   );

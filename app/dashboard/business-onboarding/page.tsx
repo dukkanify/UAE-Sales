@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { BusinessOnboardingForm } from "@/features/auth/components/BusinessOnboardingForm";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { requireCurrentUser } from "@/services/profile";
@@ -10,6 +11,7 @@ export default async function BusinessOnboardingPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/dashboard/business-onboarding"
@@ -20,6 +22,7 @@ export default async function BusinessOnboardingPage() {
           <BusinessOnboardingForm />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

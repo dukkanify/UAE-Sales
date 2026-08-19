@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { PageHero } from "@/shared/ui/PageHero";
@@ -18,6 +19,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="app-container page-padding section-padding">
         <PageHero
           description={
@@ -34,6 +36,7 @@ export default async function EditListingPage({ params }: EditListingPageProps) 
           </Button>
         </Card>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

@@ -1,8 +1,10 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AdminQuoteRequestsPanel } from "@/features/admin/components/AdminQuoteRequestsPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminQuoteRequestsPage() {
   return (
+    <LocalizedTree>
     <AdminShell
       activePath="/admin/quote-requests"
       description="طلبات عروض الأسعار من أقسام الخدمات."
@@ -10,5 +12,6 @@ export default function AdminQuoteRequestsPage() {
     >
       <AdminQuoteRequestsPanel />
     </AdminShell>
+    </LocalizedTree>
   );
 }

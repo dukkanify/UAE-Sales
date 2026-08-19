@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
@@ -13,6 +14,7 @@ export default async function FeaturedPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="bg-background">
         <section className="app-container page-padding">
           <div className="mb-8">
@@ -27,6 +29,7 @@ export default async function FeaturedPage() {
           <SearchResultsList categories={categories} listings={listings} />
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

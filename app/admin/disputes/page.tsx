@@ -1,8 +1,10 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AdminDisputesPanel } from "@/features/admin/components/AdminDisputesPanel";
 import { AdminShell } from "@/features/admin/components/AdminShell";
 
 export default function AdminDisputesPage() {
   return (
+    <LocalizedTree>
     <AdminShell
       activePath="/admin/disputes"
       description="فض النزاعات بين المشتري والبائع بقرار واضح."
@@ -10,5 +12,6 @@ export default function AdminDisputesPage() {
     >
       <AdminDisputesPanel />
     </AdminShell>
+    </LocalizedTree>
   );
 }

@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -42,6 +43,7 @@ export default function SupportPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding">
           <PageHero
@@ -97,6 +99,7 @@ export default function SupportPage() {
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

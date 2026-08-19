@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ListingDetailsView } from "@/features/listings/components/ListingDetailsView";
@@ -71,6 +72,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <RecentlyViewedTracker listing={listing} />
       <main>
         <ListingDetailsView
@@ -92,6 +94,7 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
           listings={[listing, ...relatedListings]}
         />
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

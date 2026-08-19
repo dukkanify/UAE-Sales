@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { ForgotPasswordForm } from "@/features/auth/components/ForgotPasswordForm";
@@ -8,6 +9,7 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="auth-page">
         <AuthShell
           description="أرسل رابطاً آمناً إلى بريدك لإعادة تعيين كلمة المرور دون استخدام رمز تحقق."
@@ -23,6 +25,7 @@ export default function ForgotPasswordPage() {
           </Suspense>
         </AuthShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

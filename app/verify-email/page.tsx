@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { VerifyEmailContent } from "@/features/auth/components/VerifyEmailContent";
@@ -27,6 +28,7 @@ export default async function VerifyEmailPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="auth-page">
         <AuthShell
           description="أدخل رمز التحقق المرسل إلى بريدك. بعد التحقق من الشخص يُعتمد حسابك بسهولة."
@@ -42,6 +44,7 @@ export default async function VerifyEmailPage({
           </Suspense>
         </AuthShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

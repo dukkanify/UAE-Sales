@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -7,6 +8,7 @@ export default function RegisterPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="auth-page">
         <AuthShell
           description="أولاً نتحقق من الشخص برمز يصل إلى بريدك، ثم يُعتمد حسابك بسهولة لتبدأ البيع والشراء بثقة."
@@ -20,6 +22,7 @@ export default function RegisterPage() {
           <RegisterForm />
         </AuthShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

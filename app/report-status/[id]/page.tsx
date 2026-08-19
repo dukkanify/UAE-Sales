@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -30,6 +31,7 @@ export default async function ReportStatusPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="app-container page-padding py-10">
         <Card className="mx-auto max-w-lg p-6" variant="flat">
           <p className="text-xs font-bold tracking-wide text-secondary">ملخص البلاغ</p>
@@ -95,6 +97,7 @@ export default async function ReportStatusPage({
           </p>
         </Card>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

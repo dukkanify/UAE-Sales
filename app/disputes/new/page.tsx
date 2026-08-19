@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Suspense } from "react";
 import { NewDisputePageClient } from "@/features/disputes/components/NewDisputePageClient";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -8,6 +9,7 @@ export default function NewDisputePage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <Suspense
           fallback={
@@ -21,6 +23,7 @@ export default function NewDisputePage() {
           <NewDisputePageClient />
         </Suspense>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

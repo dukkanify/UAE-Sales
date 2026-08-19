@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Suspense } from "react";
 import { AdminLoginStage } from "@/features/auth/components/AdminLoginStage";
 import { AuthShell } from "@/features/auth/components/AuthShell";
@@ -29,6 +30,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main className="auth-page">
         <AuthShell
           description="منصة إماراتية موثوقة لبيع وشراء المنتجات والخدمات مع نظام ضمان مالي يحمي حقوق المشتري والبائع."
@@ -44,6 +46,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </Suspense>
         </AuthShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

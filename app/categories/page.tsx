@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { BRAND } from "@/shared/constants/brand";
 import { CategoryDirectory } from "@/features/categories/components/CategoryDirectory";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
@@ -12,6 +13,7 @@ export default async function CategoriesPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container page-padding pb-28 lg:pb-8">
           <PageHero
@@ -22,6 +24,7 @@ export default async function CategoriesPage() {
           <CategoryDirectory categories={categories} />
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
       <MobileBottomNav />
     </>

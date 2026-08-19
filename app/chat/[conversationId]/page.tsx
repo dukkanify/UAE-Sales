@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { ChatConversationView } from "@/features/chat/components/ChatConversationView";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -16,6 +17,7 @@ export default async function ChatConversationPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/chat"
@@ -26,6 +28,7 @@ export default async function ChatConversationPage({
           <ChatConversationView conversationId={conversationId} />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

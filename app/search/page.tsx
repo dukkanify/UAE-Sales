@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { cities, countries } from "@/shared/constants/locations";
 import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
 import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
@@ -97,6 +98,7 @@ export default async function SearchPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <RecordRecentSearch query={selectedFilters.query} />
       <main className="bg-background">
         <section className="app-container page-padding pb-28 lg:pb-8">
@@ -135,6 +137,7 @@ export default async function SearchPage({
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
       <MobileBottomNav />
     </>

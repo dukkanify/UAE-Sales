@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import Link from "next/link";
 import { WalletBalances } from "@/features/wallet/components/WalletBalances";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
@@ -31,6 +32,7 @@ export default async function WalletPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/wallet"
@@ -104,6 +106,7 @@ export default async function WalletPage() {
           </div>
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

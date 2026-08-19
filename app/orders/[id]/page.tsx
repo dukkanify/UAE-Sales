@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { OrderDetailContent } from "@/features/orders/components/OrderDetailContent";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -17,6 +18,7 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <DashboardShell
           activePath="/profile"
@@ -30,6 +32,7 @@ export default async function OrderPage({ params, searchParams }: OrderPageProps
           />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

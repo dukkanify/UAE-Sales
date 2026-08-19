@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { FavoritesPanel } from "@/features/profile/components/FavoritesPanel";
 import { ProfileSavedSearches } from "@/features/profile/components/ProfileSavedSearches";
@@ -16,6 +17,7 @@ export default async function ProfilePage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <ProfileHashScroll />
         <DashboardShell
@@ -46,6 +48,7 @@ export default async function ProfilePage() {
           <ProfileActivityPanel userId={user.id} />
         </DashboardShell>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

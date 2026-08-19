@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { AddListingForm } from "@/features/listings/components/AddListingForm.lazy";
 import { PageHero } from "@/shared/ui/PageHero";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
@@ -10,6 +11,7 @@ export default async function NewListingPage() {
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <main>
         <section className="app-container px-3 pb-8 pt-4 md:page-padding">
           <PageHero
@@ -21,6 +23,7 @@ export default async function NewListingPage() {
           <AddListingForm categories={categories} />
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

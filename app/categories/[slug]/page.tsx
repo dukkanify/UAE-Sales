@@ -1,3 +1,4 @@
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import type { Metadata } from "next";
 import { BRAND } from "@/shared/constants/brand";
 import { notFound } from "next/navigation";
@@ -142,6 +143,7 @@ export default async function CategoryPage({
   return (
     <>
       <SiteHeader />
+      <LocalizedTree>
       <RecordRecentSearch query={selectedFilters.query} />
       <main>
         <section className="app-container page-padding pb-28 lg:pb-8">
@@ -201,6 +203,7 @@ export default async function CategoryPage({
           </div>
         </section>
       </main>
+      </LocalizedTree>
       <SiteFooter />
       <MobileBottomNav />
     </>
