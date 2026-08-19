@@ -9,7 +9,7 @@
 Customer flows that are live in this codebase:
 
 - Register, login (including after logout), profile, and in-app notifications
-- Welcome email and viewing/job/quote confirmation emails (needs `RESEND_API_KEY`)
+- Welcome email, listing/order emails, and viewing/job/quote confirmation emails (needs `RESEND_API_KEY`)
 - Browse, search, listing details, add/edit listings
 - Checkout + Stripe escrow, orders, disputes, wallet (real zeros until payments exist)
 - Admin cockpit, support form, chat
@@ -19,7 +19,7 @@ Production env checklist: `STRIPE_*` per [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md
 | Document | Purpose |
 |----------|---------|
 | [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md) | Stripe keys and webhook |
-| [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md) | Remaining infra limits |
+| [EMAIL_NOTIFICATIONS_PRODUCTION_REPORT.md](./EMAIL_NOTIFICATIONS_PRODUCTION_REPORT.md) | In-app + email channel |
 
 ## Setup
 

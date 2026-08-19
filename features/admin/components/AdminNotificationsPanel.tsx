@@ -8,6 +8,7 @@ import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
 
 const emailStatusLabel: Record<EmailLogRecord["status"], string> = {
+  pending: "قيد الإرسال",
   sent: "أُرسل",
   failed: "فشل",
   skipped: "مكرر",
@@ -21,6 +22,7 @@ export function AdminNotificationsPanel() {
     unread: 0,
     emailsSent: 0,
     emailsFailed: 0,
+    emailsPending: 0,
   });
 
   useEffect(() => {
@@ -37,6 +39,7 @@ export function AdminNotificationsPanel() {
             unread: data.summary.unread ?? 0,
             emailsSent: data.summary.emailsSent ?? 0,
             emailsFailed: data.summary.emailsFailed ?? 0,
+            emailsPending: data.summary.emailsPending ?? 0,
           });
         }
       })
@@ -61,6 +64,10 @@ export function AdminNotificationsPanel() {
         <div className="admin-ops__kpi">
           <p className="admin-ops__kpi-label">بريد فشل</p>
           <p className="admin-ops__kpi-value">{summary.emailsFailed}</p>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">بريد قيد الإرسال</p>
+          <p className="admin-ops__kpi-value">{summary.emailsPending}</p>
         </div>
       </div>
 

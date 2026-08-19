@@ -70,8 +70,26 @@ export async function emailListingRejected(
       `لم تتم الموافقة على إعلان «${listing.title}».`,
       reason ? `السبب: ${reason}` : "عدّل الإعلان ثم أعد إرساله.",
     ],
-    ctaHref: emailSiteUrl("/dashboard/listings"),
-    ctaLabel: "إدارة إعلاناتي",
+    ctaHref: emailSiteUrl(`/listings/${listing.slug}/edit`),
+    ctaLabel: "تعديل الإعلان",
+  });
+}
+
+export async function emailListingFeaturedPaid(listing: Listing): Promise<void> {
+  const seller = await findUserById(listing.seller.id);
+  if (!seller?.email) return;
+  const href = emailSiteUrl(`/listings/${listing.slug}`);
+  await sendTransactionalEmail({
+    type: "featured_paid",
+    to: seller.email,
+    userId: seller.id,
+    entityId: listing.id,
+    subject: `تم تمييز إعلانك — ${listing.title}`,
+    title: "تم دفع باقة التمييز",
+    bodyHtml: `${greet(seller.fullName)}<p style="font-size:16px;line-height:1.8;margin:0;">تم تأكيد دفع تمييز إعلان «${escapeEmailHtml(listing.title)}». سيظهر في الأقسام المميزة حسب مدة الباقة.</p>`,
+    bodyLines: [`تم تأكيد دفع تمييز إعلان «${listing.title}».`],
+    ctaHref: href,
+    ctaLabel: "عرض الإعلان",
   });
 }
 

@@ -12,9 +12,10 @@ export type EmailEventType =
   | "order_disputed"
   | "seller_proof"
   | "chat_message"
-  | "password_reset";
+  | "password_reset"
+  | "featured_paid";
 
-export type EmailDeliveryStatus = "sent" | "failed" | "skipped";
+export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
 
 export type EmailLogRecord = {
   createdAt: string;
@@ -50,12 +51,27 @@ export async function findRecentEmailLog(
 ): Promise<EmailLogRecord | undefined> {
   const logs = await getEmailLogs();
   const cutoff = Date.now() - windowMs;
-  return logs.find(
-    (item) =>
-      item.dedupeKey === dedupeKey &&
-      item.status === "sent" &&
-      new Date(item.createdAt).getTime() >= cutoff,
-  );
+  return logs.find((item) => {
+    if (item.dedupeKey !== dedupeKey) return false;
+    const created = new Date(item.createdAt).getTime();
+    if (created < cutoff) return false;
+    if (item.status === "sent") return true;
+    if (item.status === "pending" && Date.now() - created < 2 * 60 * 1000) {
+      return true;
+    }
+    return false;
+  });
+}
+
+export async function updateEmailLog(
+  id: string,
+  patch: Partial<Pick<EmailLogRecord, "status" | "error">>,
+): Promise<void> {
+  const logs = await getEmailLogs();
+  const index = logs.findIndex((item) => item.id === id);
+  if (index < 0) return;
+  logs[index] = { ...logs[index], ...patch };
+  await saveCollection(FILE, logs);
 }
 
 export async function recordEmailLog(

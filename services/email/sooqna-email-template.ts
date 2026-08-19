@@ -25,13 +25,14 @@ export function buildSooqnaEmailHtml(input: {
   const navy = BRAND_COLORS.navy;
   const gold = BRAND_COLORS.gold;
   const cream = BRAND_COLORS.white;
+  const logoSrc = `${EMAIL_SITE_URL}/apple-icon`;
   const preview = input.preview
     ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeEmailHtml(input.preview)}</div>`
     : "";
   const cta =
     input.ctaHref && input.ctaLabel
       ? `<p style="text-align:center;margin:28px 0 8px;">
-           <a href="${input.ctaHref}" style="display:inline-block;padding:13px 24px;background:${gold};color:${navy};text-decoration:none;border-radius:12px;font-weight:700;font-size:15px;">
+           <a href="${input.ctaHref}" style="display:inline-block;padding:13px 28px;background:${gold};color:${navy};text-decoration:none;border-radius:12px;font-weight:700;font-size:15px;">
              ${escapeEmailHtml(input.ctaLabel)}
            </a>
          </p>`
@@ -42,8 +43,9 @@ export function buildSooqnaEmailHtml(input: {
       ${preview}
       <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;width:100%;margin:0 auto;padding:28px 22px;background:${cream};color:${navy};direction:rtl;text-align:right;border-radius:18px;border:1px solid #e8e4de;">
         <div style="text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid ${gold};">
-          <strong style="display:block;font-size:24px;color:${navy};">${BRAND.nameAr}</strong>
-          <span style="display:block;margin-top:4px;font-size:13px;font-weight:700;color:${gold};letter-spacing:0.04em;">${BRAND.nameEn}</span>
+          <img src="${logoSrc}" alt="${BRAND.nameAr} ${BRAND.nameEn}" width="48" height="48" style="display:inline-block;width:48px;height:48px;border-radius:12px;" />
+          <strong style="display:block;margin-top:10px;font-size:24px;color:${navy};">${BRAND.nameAr}</strong>
+          <span style="display:block;margin-top:4px;font-size:13px;font-weight:700;color:${gold};letter-spacing:0.04em;">Sooqna | سوقنا</span>
         </div>
         <h1 style="margin:0 0 14px;font-size:20px;line-height:1.5;color:${navy};">${escapeEmailHtml(input.title)}</h1>
         ${input.bodyHtml}

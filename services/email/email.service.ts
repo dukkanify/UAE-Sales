@@ -20,7 +20,7 @@ function escapeHtml(value: string): string {
 }
 
 function getFromAddress(): string {
-  const name = process.env.EMAIL_FROM_NAME?.trim() || BRAND.nameEn;
+  const name = process.env.EMAIL_FROM_NAME?.trim() || "Sooqna | سوقنا";
   const address = process.env.EMAIL_FROM_ADDRESS?.trim() || "no-reply@sooqna.site";
   return `${name} <${address}>`;
 }
@@ -54,6 +54,13 @@ async function postResend(
 }
 
 async function sendWithResend(input: SendEmailInput): Promise<boolean> {
+  const provider = (process.env.EMAIL_PROVIDER ?? "resend").trim().toLowerCase();
+  if (provider && provider !== "resend") {
+    console.warn("[Sooqna Email] EMAIL_PROVIDER is not resend; using Resend", {
+      provider,
+    });
+  }
+
   const apiKey = process.env.RESEND_API_KEY?.trim();
   if (!apiKey) {
     console.warn("[Sooqna Email] RESEND_API_KEY is not set; email not sent", {

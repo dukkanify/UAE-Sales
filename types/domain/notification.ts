@@ -17,7 +17,8 @@ export type NotificationType =
   | "listing_report"
   | "listing_received"
   | "listing_approved"
-  | "listing_rejected";
+  | "listing_rejected"
+  | "listing_featured";
 
 export type AppNotification = {
   id: string;

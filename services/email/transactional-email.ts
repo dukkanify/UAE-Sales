@@ -3,6 +3,7 @@ import {
   buildEmailDedupeKey,
   findRecentEmailLog,
   recordEmailLog,
+  updateEmailLog,
   type EmailDeliveryStatus,
   type EmailEventType,
 } from "@/services/email/email-log-store";
@@ -51,6 +52,16 @@ export async function sendTransactionalEmail(input: {
       return "skipped";
     }
 
+    const pending = await recordEmailLog({
+      dedupeKey,
+      entityId: input.entityId,
+      status: "pending",
+      subject: input.subject,
+      to,
+      type: input.type,
+      userId: input.userId,
+    });
+
     const html = buildSooqnaEmailHtml({
       title: input.title,
       bodyHtml: input.bodyHtml,
@@ -72,15 +83,9 @@ export async function sendTransactionalEmail(input: {
       text,
     });
 
-    await recordEmailLog({
-      dedupeKey,
-      entityId: input.entityId,
+    await updateEmailLog(pending.id, {
       error: sent ? undefined : "delivery_failed",
       status: sent ? "sent" : "failed",
-      subject: input.subject,
-      to,
-      type: input.type,
-      userId: input.userId,
     });
 
     return sent ? "sent" : "failed";

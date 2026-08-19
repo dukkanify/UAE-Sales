@@ -1,6 +1,7 @@
 import { createNotification } from "@/services/payments/notification-store";
 import {
   emailListingApproved,
+  emailListingFeaturedPaid,
   emailListingReceived,
   emailListingRejected,
 } from "@/services/email/notification-emails";
@@ -76,5 +77,27 @@ export async function notifyListingRejected(
   await safeNotify(
     () => emailListingRejected(listing, reason),
     "listing_rejected email",
+  );
+}
+
+export async function notifyListingFeaturedPaid(listing: Listing): Promise<void> {
+  const sellerId = listing.seller.id;
+  if (!sellerId) return;
+
+  await safeNotify(
+    () =>
+      createNotification({
+        userId: sellerId,
+        type: "listing_featured",
+        title: "تم تمييز إعلانك",
+        body: `تم تأكيد دفع تمييز «${listing.title}» وسيظهر في الأقسام المميزة.`,
+        href: `/listings/${listing.slug}`,
+      }),
+    "listing_featured in-app",
+  );
+
+  await safeNotify(
+    () => emailListingFeaturedPaid(listing),
+    "listing_featured email",
   );
 }

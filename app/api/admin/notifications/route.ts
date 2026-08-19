@@ -20,6 +20,7 @@ export async function GET() {
       unread: notifications.filter((item) => !item.read).length,
       emailsSent: emailLogs.filter((item) => item.status === "sent").length,
       emailsFailed: emailLogs.filter((item) => item.status === "failed").length,
+      emailsPending: emailLogs.filter((item) => item.status === "pending").length,
     },
     notifications: notifications.slice(0, 100),
     emailLogs: emailLogs.slice(0, 80),

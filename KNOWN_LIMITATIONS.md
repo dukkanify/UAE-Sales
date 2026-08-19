@@ -9,7 +9,7 @@ Product flows (register, listings, checkout, orders, disputes, admin, support, e
 | Need | Variable | If missing |
 |------|----------|------------|
 | Card payments | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` | Checkout cannot charge; mock pay is blocked in production |
-| Emails | `RESEND_API_KEY`, verified `EMAIL_FROM_ADDRESS` | Welcome / booking / support mail stay in-app only |
+| Emails | `RESEND_API_KEY`, verified `EMAIL_FROM_ADDRESS=no-reply@sooqna.site` | In-app notifications still work; Resend mail is logged as failed |
 | Canonical URLs | `NEXT_PUBLIC_APP_URL=https://sooqna.site` | Email links may point at localhost |
 
 See [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
