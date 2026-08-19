@@ -5,6 +5,12 @@
   border-top: 1px solid var(--color-border);
 }
 
+@media (max-width: 1023px) {
+  .site-footer {
+    padding-bottom: var(--site-mobile-bottom-clearance);
+  }
+}
+
 .site-footer__app {
   position: relative;
   overflow: hidden;
@@ -286,7 +292,7 @@
 .site-footer__credit {
   display: grid;
   gap: 0.15rem;
-  padding-bottom: calc(1.15rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: 1.15rem;
   text-align: start;
 }
 
