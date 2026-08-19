@@ -33,7 +33,7 @@ export function getListingImages(listing: Listing): string[] {
     return [];
   }
 
-  const curated = imagesForSlug(listing.slug);
+  const curated = imagesForSlug(listing.slug, listing.categoryId);
   if (curated.length > 0) {
     return curated;
   }
