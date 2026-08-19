@@ -12,16 +12,16 @@ export function StickySearchDock() {
   const pathname = usePathname();
   const hideDock =
     pathname === "/search" ||
-    pathname.startsWith("/listings/new") ||
-    /\/listings\/[^/]+\/edit$/.test(pathname) ||
-    /\/listings\/local\/[^/]+\/edit$/.test(pathname);
+    pathname.startsWith("/listings/");
   const [visible, setVisible] = useState(false);
+  const [footerInView, setFooterInView] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [expandPath, setExpandPath] = useState(pathname);
 
   if (expandPath !== pathname) {
     setExpandPath(pathname);
     setExpanded(false);
+    setFooterInView(false);
   }
 
   useEffect(() => {
@@ -46,7 +46,21 @@ export function StickySearchDock() {
     };
   }, [hideDock, pathname]);
 
-  if (hideDock || !visible) return null;
+  useEffect(() => {
+    if (hideDock) return;
+
+    const footer = document.querySelector("[data-site-footer]");
+    if (!footer) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setFooterInView(entry.isIntersecting),
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.08 },
+    );
+    observer.observe(footer);
+    return () => observer.disconnect();
+  }, [hideDock, pathname]);
+
+  if (hideDock || !visible || footerInView) return null;
 
   return (
     <div

@@ -135,7 +135,7 @@ function StoreBadges() {
 
 export function SiteFooter() {
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" data-site-footer>
       <section aria-label="تطبيق سوقنا" className="site-footer__app">
         <div className="app-container site-footer__app-inner">
           <div className="site-footer__app-copy">

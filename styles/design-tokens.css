@@ -77,6 +77,10 @@
   /* Layout */
   --container-width: 1280px;
   --section-gap: clamp(3.5rem, 7vw, 6rem);
+  /* Clears listing call bar / bottom nav on mobile so footer copy stays visible. */
+  --site-mobile-bottom-clearance: calc(
+    7.25rem + env(safe-area-inset-bottom, 0px)
+  );
   --font-arabic: var(--font-ibm-plex-arabic), "IBM Plex Sans Arabic", system-ui, sans-serif;
   --font-latin: var(--font-inter), "Inter", system-ui, sans-serif;
 
