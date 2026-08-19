@@ -120,13 +120,15 @@ export function SiteHeader() {
           </form>
 
           <div className="flex shrink-0 items-center gap-2">
-            <LanguageSwitch variant="compact" />
+            <div className="hidden items-center gap-2 lg:flex">
+              <LanguageSwitch variant="compact" />
+              <ThemeToggle className="shrink-0" />
+            </div>
             <NotificationBell
               badgeClassName="notify-bell__badge"
               className="notify-bell__site-trigger"
               iconSize={18}
             />
-            <ThemeToggle className="shrink-0" />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
@@ -171,9 +173,8 @@ export function SiteHeader() {
 
         {menuOpen ? (
           <nav aria-label={copy.menu} className="border-t border-border py-3 lg:hidden">
-            <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
+            <div className="mb-3 rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
               <p className="text-sm font-bold text-ink">{copy.browse}</p>
-              <ThemeToggle />
             </div>
 
             <div className="grid gap-1.5">
@@ -206,7 +207,13 @@ export function SiteHeader() {
                 );
               })}
 
-              <LanguageSwitch />
+              <div className="mt-1 rounded-[1.1rem] border border-border bg-surface-muted/60 px-3 py-3">
+                <LanguageSwitch />
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-ink">{copy.nightMode}</span>
+                  <ThemeToggle className="shrink-0" />
+                </div>
+              </div>
 
               <form action="/search" className="mt-1 px-0.5">
                 <InputShell placeholder={copy.searchPlaceholder} />

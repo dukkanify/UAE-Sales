@@ -66,7 +66,6 @@ export function MobileHomeHeader() {
           >
             <Icon name={menuOpen ? "close" : "menu"} size={19} />
           </button>
-          <LanguageSwitch className="mobile-home-header__lang" variant="compact" />
         </div>
 
         <div className="mobile-home-header__brand">
@@ -82,8 +81,6 @@ export function MobileHomeHeader() {
             >
               <Icon name="search" size={17} />
             </Link>
-
-            <ThemeToggle className="mobile-home-header__icon-btn mobile-home-header__theme-toggle" />
 
             <NotificationBell />
           </div>

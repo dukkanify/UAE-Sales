@@ -95,8 +95,11 @@ export function MarketHeader() {
           </nav>
 
           <div className="market-header__actions">
-            <LanguageSwitch className="market-header__lang" variant="compact" />
-            <ThemeToggle className="market-header__icon-btn" />
+            <LanguageSwitch
+              className="market-header__lang market-header__bar-control--desktop"
+              variant="compact"
+            />
+            <ThemeToggle className="market-header__icon-btn market-header__bar-control--desktop" />
             <NotificationBell
               badgeClassName="notify-bell__badge"
               className="market-header__icon-btn"
@@ -137,11 +140,8 @@ export function MarketHeader() {
         {menuOpen ? (
           <nav aria-label={copy.menu} className="market-header__drawer lg:hidden">
             <div className="market-header__drawer-top">
-              <div>
-                <p className="market-header__drawer-eyebrow">{copy.browse}</p>
-                <p className="market-header__drawer-title">{copy.browseTitle}</p>
-              </div>
-              <ThemeToggle className="market-header__icon-btn" />
+              <p className="market-header__drawer-eyebrow">{copy.browse}</p>
+              <p className="market-header__drawer-title">{copy.browseTitle}</p>
             </div>
 
             <div className="market-header__drawer-grid">
@@ -168,7 +168,13 @@ export function MarketHeader() {
               })}
             </div>
 
-            <LanguageSwitch />
+            <div className="market-header__drawer-settings">
+              <LanguageSwitch />
+              <div className="market-header__drawer-theme">
+                <span>{copy.nightMode}</span>
+                <ThemeToggle className="market-header__icon-btn" />
+              </div>
+            </div>
 
             <div className="market-header__drawer-footer">
               <Link
