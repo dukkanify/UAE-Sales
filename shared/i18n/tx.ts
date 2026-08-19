@@ -38,6 +38,46 @@ const NAME_TEMPLATES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
     /^خلال ساعتين$/u,
     () => "Within 2 hours",
   ],
+  [
+    /^التقديم على: (.+)$/u,
+    (match) => `Apply for: ${match[1]}`,
+  ],
+  [
+    /^حجز معاينة: (.+)$/u,
+    (match) => `Viewing booking: ${match[1]}`,
+  ],
+  [
+    /^طلب رقم (.+)$/u,
+    (match) => `Order ${match[1]}`,
+  ],
+  [
+    /^حذف (.+)$/u,
+    (match) => `Delete ${match[1]}`,
+  ],
+  [
+    /^نتائج: (.+)$/u,
+    (match) => `Results: ${match[1]}`,
+  ],
+  [
+    /^(\d+) صورة$/u,
+    (match) => `${match[1]} images`,
+  ],
+  [
+    /^صورة محفوظة (\d+)$/u,
+    (match) => `Saved image ${match[1]}`,
+  ],
+  [
+    /^معاينة صورة جديدة (\d+)$/u,
+    (match) => `New image preview ${match[1]}`,
+  ],
+  [
+    /^معاينة صورة (\d+)$/u,
+    (match) => `Image preview ${match[1]}`,
+  ],
+  [
+    /^تم تأكيد حجز المعاينة وأرسلنا التفاصيل إلى (.+)\.$/u,
+    (match) => `Viewing confirmed and details sent to ${match[1]}.`,
+  ],
 ];
 
 const UNIT_SUFFIXES: Array<[RegExp, string]> = [
