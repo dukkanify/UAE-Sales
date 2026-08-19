@@ -105,7 +105,7 @@ export function RegisterForm() {
         router.push(
           getSafeNextPath(
             data.redirectTo,
-            `/verify-email?email=${encodeURIComponent(nextEmail)}&purpose=REGISTER`,
+            `/verify-email?email=${encodeURIComponent(nextEmail)}&purpose=REGISTER${data.emailDelivered === false ? "&emailDelivered=0" : ""}`,
           ),
         );
         return;
@@ -131,7 +131,7 @@ export function RegisterForm() {
         );
       }
 
-      if (typeof data.otp === "string") {
+      if (isDemoOtpClientEnabled() && typeof data.otp === "string") {
         saveOtpFallback(nextEmail, data.otp);
       }
       trackAuthEventClient("registration_otp_sent");
@@ -140,6 +140,9 @@ export function RegisterForm() {
         purpose: "REGISTER",
         masked: data.maskedEmail ?? nextEmail,
       });
+      if (data.emailDelivered === false) {
+        params.set("emailDelivered", "0");
+      }
       router.push(`/verify-email?${params.toString()}`);
     }, [router, emailOtpEnabled]),
   );

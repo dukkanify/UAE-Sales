@@ -11,6 +11,7 @@ import {
 } from "@/services/auth/auth-handlers";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { findUserByEmail } from "@/services/auth/user-store";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import type { OtpPurpose } from "@/types/domain/otp";
 
 const schema = z.object({
@@ -46,21 +47,23 @@ export async function POST(request: Request) {
 
     if (parsed.data.purpose === "REGISTER") {
       const stored = await findUserByEmail(email);
-      if (stored) {
-        const sent = await sendRegistrationVerifyOtp({
-          email,
-          fullName: parsed.data.fullName ?? stored.fullName,
-          userId: stored.id,
-          accountType: stored.accountType,
-        });
-        trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
-        return genericOtpResponse(email, {
-          emailDelivered: sent.delivered,
-          otp: sent.code,
-        });
+      if (!stored) {
+        return NextResponse.json(
+          { error: "NOT_FOUND", message: "لم يتم العثور على طلب تحقق نشط." },
+          { status: 404 },
+        );
       }
+      const sent = await sendRegistrationVerifyOtp({
+        email,
+        fullName: parsed.data.fullName ?? stored.fullName,
+        userId: stored.id,
+        accountType: stored.accountType,
+      });
       trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
-      return genericOtpResponse(email);
+      return genericOtpResponse(email, {
+        emailDelivered: sent.delivered,
+        ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
+      });
     }
 
     const sent = await sendOtpForPurpose({
@@ -72,7 +75,7 @@ export async function POST(request: Request) {
     trackAuthEvent("otp_resend", { purpose: parsed.data.purpose });
     return genericOtpResponse(email, {
       emailDelivered: sent.delivered,
-      otp: sent.code,
+      ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
     });
   } catch (error) {
     const cooldown = otpCooldownResponse(error);

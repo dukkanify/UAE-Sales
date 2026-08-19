@@ -5,10 +5,10 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
-  otpSendFailedResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
 import { canRevealOtpToClient } from "@/services/otp/otp-config";
+import { OTP_SEND_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import {
   createStandardUser,
   toUserProfile,
@@ -28,6 +28,9 @@ function registerOtpResponse(input: {
     purpose: "REGISTER",
     masked: maskEmail(input.email),
   });
+  if (!input.emailDelivered) {
+    params.set("emailDelivered", "0");
+  }
   const revealOtp = Boolean(input.otp) && canRevealOtpToClient(input.emailDelivered);
   const response = NextResponse.json({
     ok: true,
@@ -35,6 +38,9 @@ function registerOtpResponse(input: {
     email: input.email,
     maskedEmail: maskEmail(input.email),
     emailDelivered: input.emailDelivered,
+    ...(!input.emailDelivered
+      ? { message: OTP_SEND_FAILED_MESSAGE }
+      : {}),
     ...(revealOtp ? { otp: input.otp } : {}),
     redirectTo: `/verify-email?${params.toString()}`,
   });
@@ -107,16 +113,16 @@ export async function POST(request: Request) {
       return registerOtpResponse({
         email,
         emailDelivered: sent.delivered,
-        otp: sent.code,
+        ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
       });
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
-      if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
-        trackAuthEvent("registration_failed");
-        return otpSendFailedResponse();
-      }
-      return otpSendFailedResponse();
+      trackAuthEvent("registration_failed");
+      return registerOtpResponse({
+        email,
+        emailDelivered: false,
+      });
     }
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
