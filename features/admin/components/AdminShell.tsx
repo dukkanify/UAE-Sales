@@ -19,6 +19,7 @@ import "./admin-ops.css";
 
 export type AdminPath =
   | "/admin"
+  | "/admin/activities"
   | "/admin/analytics"
   | "/admin/reports"
   | "/admin/users"
@@ -175,6 +176,13 @@ const adminLinks: {
     group: "leads",
     keywords: "توصيل addresses",
     permission: "orders",
+  },
+  {
+    href: "/admin/activities",
+    icon: "clock",
+    label: "إدارة الأنشطة",
+    group: "leads",
+    keywords: "activity requests leads jobs bookings quotes",
   },
   {
     href: "/admin/job-applications",

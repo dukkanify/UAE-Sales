@@ -50,6 +50,13 @@ export async function getAvailableSlotsForListing(
   return TIME_SLOTS.filter((slot) => !taken.has(slot));
 }
 
+export async function getViewingBookingsForSeller(
+  sellerId: string,
+): Promise<ViewingBooking[]> {
+  const all = await loadCollection<ViewingBooking>(FILE);
+  return all.filter((item) => item.sellerId === sellerId);
+}
+
 export async function getViewingBookingsForUser(
   userId: string,
 ): Promise<ViewingBooking[]> {
@@ -82,11 +89,13 @@ export async function createViewingBooking(
   input: Omit<ViewingBooking, "id" | "status" | "createdAt">,
 ): Promise<ViewingBooking> {
   const all = await loadCollection<ViewingBooking>(FILE);
+  const now = new Date().toISOString();
   const booking: ViewingBooking = {
     ...input,
     id: `view-${Date.now()}`,
-    status: "confirmed",
-    createdAt: new Date().toISOString(),
+    status: "pending",
+    createdAt: now,
+    updatedAt: now,
   };
   all.unshift(booking);
   await saveCollection(FILE, all);
@@ -100,7 +109,7 @@ export async function updateViewingBookingStatus(
   const all = await loadCollection<ViewingBooking>(FILE);
   const index = all.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  all[index] = { ...all[index], status };
+  all[index] = { ...all[index], status, updatedAt: new Date().toISOString() };
   await saveCollection(FILE, all);
   return all[index];
 }

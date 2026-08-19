@@ -3,13 +3,10 @@ import {
   requireAdminUser,
 } from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
-import { logAdminAction } from "@/services/admin/admin-audit-store";
-import { updateJobApplicationStatus } from "@/services/job-applications/job-application-store";
+import { updateActivityStatus } from "@/services/activity/activity-status-update";
 import type { JobApplication } from "@/types/domain/job-application";
 
 type RouteParams = { params: Promise<{ id: string }> };
-
-const ALLOWED: JobApplication["status"][] = ["submitted", "reviewed"];
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   const admin = await requireAdminUser();
@@ -24,23 +21,24 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     actorName?: string;
   };
 
-  if (!body.status || !ALLOWED.includes(body.status)) {
+  if (!body.status) {
     return NextResponse.json({ error: "INVALID_STATUS" }, { status: 400 });
   }
 
-  const application = await updateJobApplicationStatus(id, body.status);
-  if (!application) {
-    return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  try {
+    const application = await updateActivityStatus({
+      kind: "job_application",
+      id,
+      status: body.status,
+      actorId: body.actorId ?? admin.id,
+      actorName: body.actorName ?? admin.fullName,
+      actorRole: "admin",
+    });
+    return NextResponse.json({ application });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    const status =
+      message === "NOT_FOUND" ? 404 : message === "FORBIDDEN" ? 403 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
-
-  await logAdminAction({
-    actorId: body.actorId ?? "admin",
-    actorName: body.actorName ?? "Admin",
-    action: "job_status",
-    targetType: "job_application",
-    targetId: id,
-    detail: `الحالة → ${body.status}`,
-  });
-
-  return NextResponse.json({ application });
 }

@@ -3,14 +3,45 @@
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { JobApplication } from "@/types/domain/job-application";
+import { jobStatusLabel } from "@/services/activity/activity-labels";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
-const statusLabel: Record<JobApplication["status"], string> = {
-  submitted: "مقدّم",
-  reviewed: "تمت المراجعة",
+const ADMIN_ACTIONS: Partial<
+  Record<JobApplication["status"], { value: JobApplication["status"]; label: string }[]>
+> = {
+  submitted: [
+    { value: "viewed", label: "تمت المشاهدة" },
+    { value: "shortlisted", label: "Shortlisted" },
+    { value: "accepted", label: "مقبول" },
+    { value: "rejected", label: "مرفوض" },
+  ],
+  viewed: [
+    { value: "shortlisted", label: "Shortlisted" },
+    { value: "accepted", label: "مقبول" },
+    { value: "rejected", label: "مرفوض" },
+  ],
+  reviewed: [
+    { value: "shortlisted", label: "Shortlisted" },
+    { value: "accepted", label: "مقبول" },
+    { value: "rejected", label: "مرفوض" },
+  ],
+  shortlisted: [
+    { value: "accepted", label: "مقبول" },
+    { value: "rejected", label: "مرفوض" },
+  ],
 };
+
+function statusChipClass(status: JobApplication["status"]): string {
+  if (status === "accepted" || status === "shortlisted") {
+    return " admin-ops__status-chip--ok";
+  }
+  if (status === "rejected") {
+    return " admin-ops__status-chip--warn";
+  }
+  return "";
+}
 
 export function AdminJobApplicationsPanel() {
   const [items, setItems] = useState<JobApplication[]>([]);
@@ -26,7 +57,8 @@ export function AdminJobApplicationsPanel() {
   }
 
   useEffect(() => {
-    load();
+    const timeoutId = window.setTimeout(load, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   async function patchStatus(id: string, status: JobApplication["status"]) {
@@ -64,51 +96,42 @@ export function AdminJobApplicationsPanel() {
         </Card>
       ) : (
         <ul className="admin-ops__queue">
-          {items.map((item) => (
-            <li key={item.id} className="admin-ops__queue-item">
-              <div>
-                <p className="admin-ops__queue-label">{item.listingTitle}</p>
-                <p className="admin-ops__queue-meta">
-                  {item.applicantName} · {item.applicantEmail} · {item.phone}
-                </p>
-                <p className="admin-ops__queue-meta">
-                  {item.currentCity} · خبرة {item.yearsOfExperience} سنة ·{" "}
-                  {new Date(item.createdAt).toLocaleString("ar-AE")}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <span
-                  className={`admin-ops__status-chip${
-                    item.status === "reviewed"
-                      ? " admin-ops__status-chip--ok"
-                      : ""
-                  }`}
-                >
-                  {statusLabel[item.status]}
-                </span>
-                {item.status === "submitted" ? (
-                  <Button
-                    loading={busyId === item.id}
-                    onClick={() => patchStatus(item.id, "reviewed")}
-                    size="sm"
-                    type="button"
+          {items.map((item) => {
+            const actions = ADMIN_ACTIONS[item.status] ?? [];
+            return (
+              <li key={item.id} className="admin-ops__queue-item">
+                <div>
+                  <p className="admin-ops__queue-label">{item.listingTitle}</p>
+                  <p className="admin-ops__queue-meta">
+                    {item.applicantName} · {item.applicantEmail} · {item.phone}
+                  </p>
+                  <p className="admin-ops__queue-meta">
+                    {item.currentCity} · خبرة {item.yearsOfExperience} سنة ·{" "}
+                    {new Date(item.createdAt).toLocaleString("ar-AE")}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span
+                    className={`admin-ops__status-chip${statusChipClass(item.status)}`}
                   >
-                    تعليم كمراجع
-                  </Button>
-                ) : (
-                  <Button
-                    loading={busyId === item.id}
-                    onClick={() => patchStatus(item.id, "submitted")}
-                    size="sm"
-                    type="button"
-                    variant="ghost"
-                  >
-                    إعادة لجديد
-                  </Button>
-                )}
-              </div>
-            </li>
-          ))}
+                    {jobStatusLabel(item.status)}
+                  </span>
+                  {actions.map((action) => (
+                    <Button
+                      key={action.value}
+                      loading={busyId === item.id}
+                      onClick={() => patchStatus(item.id, action.value)}
+                      size="sm"
+                      type="button"
+                      variant={action.value === "rejected" ? "ghost" : "secondary"}
+                    >
+                      {action.label}
+                    </Button>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

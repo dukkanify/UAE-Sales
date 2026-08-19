@@ -3,6 +3,13 @@ import { loadCollection, saveCollection } from "@/services/payments/data-store";
 
 const FILE = "job-applications.json";
 
+export async function getJobApplicationsForEmployer(
+  employerId: string,
+): Promise<JobApplication[]> {
+  const all = await loadCollection<JobApplication>(FILE);
+  return all.filter((item) => item.employerId === employerId);
+}
+
 export async function getJobApplicationsForUser(
   userId: string,
 ): Promise<JobApplication[]> {
@@ -28,11 +35,13 @@ export async function createJobApplication(
   input: Omit<JobApplication, "id" | "status" | "createdAt">,
 ): Promise<JobApplication> {
   const all = await loadCollection<JobApplication>(FILE);
+  const now = new Date().toISOString();
   const application: JobApplication = {
     ...input,
     id: `job-${Date.now()}`,
     status: "submitted",
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   };
   all.unshift(application);
   await saveCollection(FILE, all);
@@ -46,7 +55,7 @@ export async function updateJobApplicationStatus(
   const all = await loadCollection<JobApplication>(FILE);
   const index = all.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  all[index] = { ...all[index], status };
+  all[index] = { ...all[index], status, updatedAt: new Date().toISOString() };
   await saveCollection(FILE, all);
   return all[index];
 }

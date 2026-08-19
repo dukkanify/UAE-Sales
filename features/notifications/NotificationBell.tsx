@@ -144,7 +144,7 @@ export function NotificationBell({
         <Link
           aria-label="الإشعارات"
           className={`${className} notify-bell__trigger`}
-          href="/login?next=/profile#notifications"
+          href="/login?next=/notifications"
         >
           <span className="mobile-home-header__notify-ring" aria-hidden />
           <Icon className={iconClassName} name="bell" size={iconSize} />
@@ -256,10 +256,10 @@ export function NotificationBell({
             ) : null}
             <Link
               className="notify-bell__action"
-              href="/profile#notifications"
+              href="/notifications"
               onClick={() => setOpen(false)}
             >
-              عرض الكل في الملف الشخصي
+              عرض الكل
             </Link>
           </div>
         </div>
