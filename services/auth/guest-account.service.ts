@@ -1,4 +1,4 @@
-import { findUserByEmail, saveUser } from "@/services/auth/user-store";
+import { findUserByEmail, isGuestConvertible, saveUser } from "@/services/auth/user-store";
 import type { RegistrationSource, StoredUser } from "@/types/domain/user";
 import { normalizeUaePhone } from "@/shared/utils/phone";
 
@@ -29,6 +29,7 @@ export async function createProvisionalGuestAccount(input: {
     accountType: "individual",
     isVerified: false,
     joinedAt: now.slice(0, 10),
+    createdAt: now,
     accountStatus: "active",
     emailVerifiedAt: null,
     passwordHash: null,
@@ -63,5 +64,7 @@ export async function markGuestConverted(
 
 export async function emailHasActiveAccount(email: string): Promise<boolean> {
   const user = await findUserByEmail(normalizeEmail(email));
-  return Boolean(user?.accountStatus === "active");
+  if (!user || user.accountStatus !== "active") return false;
+  if (isGuestConvertible(user)) return false;
+  return Boolean(user.passwordHash || user.emailVerifiedAt);
 }
