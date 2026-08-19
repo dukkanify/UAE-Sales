@@ -33,8 +33,10 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     preview,
     selectedCategory,
     selectedCategoryId,
+    selectedPackage,
     setPreview,
     setSelectedCategoryId,
+    setSelectedPackage,
     submitListing,
   } = useAddListingForm(categories);
 
@@ -107,14 +109,28 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           errors={errors}
           imagePreviews={imagePreviews}
           onImageChange={handleImageChange}
+          onPackageChange={setSelectedPackage}
+          selectedPackage={selectedPackage}
         />
 
         <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
-          <p className="font-medium">
-            بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث.
-          </p>
+          <div>
+            <p className="font-medium">
+              {selectedPackage === "featured_pending"
+                ? "يُحفظ الإعلان ثم تُوجَّه لبوابة الدفع قبل تفعيل الباقة المميزة."
+                : "بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث."}
+            </p>
+            {errors.submit ? (
+              <p
+                className="mt-2 rounded-[var(--radius-md)] border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white"
+                role="alert"
+              >
+                {errors.submit}
+              </p>
+            ) : null}
+          </div>
           <Button className="shrink-0" loading={isSubmitting} type="submit">
-            إرسال للمراجعة
+            {selectedPackage === "featured_pending" ? "متابعة للدفع" : "إرسال للمراجعة"}
           </Button>
         </Card>
       </div>

@@ -22,6 +22,8 @@ type MediaContactStepProps = {
     fileList: FileList | null,
     mode?: "append" | "replace",
   ) => void;
+  onPackageChange?: (value: string) => void;
+  selectedPackage?: string;
 };
 
 export function MediaContactStep({
@@ -29,6 +31,8 @@ export function MediaContactStep({
   errors,
   imagePreviews,
   onImageChange,
+  onPackageChange,
+  selectedPackage = "free",
 }: MediaContactStepProps) {
   const hasImages = imagePreviews.length > 0;
 
@@ -142,6 +146,7 @@ export function MediaContactStep({
           <Select
             label="باقة الإعلان"
             name="package"
+            onChange={(event) => onPackageChange?.(event.target.value)}
             options={[
               { label: "مجانية", value: "free" },
               {
@@ -149,7 +154,13 @@ export function MediaContactStep({
                 value: "featured_pending",
               },
             ]}
+            value={selectedPackage}
           />
+          {selectedPackage === "featured_pending" ? (
+            <p className="text-xs text-muted">
+              بعد الإرسال ستُوجَّه مباشرة لبوابة الدفع — لا يُفعَّل التمييز قبل إتمام الدفع.
+            </p>
+          ) : null}
         </div>
       </div>
     </Card>

@@ -41,6 +41,60 @@ function buildSellerFromSession(user: NonNullable<ReturnType<typeof getSessionUs
   };
 }
 
+async function syncListingToServer(
+  listing: Listing,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const response = await fetch("/api/listings", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ listing }),
+    });
+    const data = (await response.json().catch(() => ({}))) as {
+      error?: string;
+      message?: string;
+    };
+
+    if (!response.ok) {
+      if (data.error === "ACCOUNT_NOT_READY") {
+        return {
+          ok: false,
+          error:
+            data.message ??
+            "أكمل التحقق من الشخص واعتماد الحساب قبل إضافة إعلان.",
+        };
+      }
+      return {
+        ok: false,
+        error: "تعذر حفظ الإعلان على الخادم. حاول مرة أخرى.",
+      };
+    }
+
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      error: "تعذر الاتصال بالخادم. تحقق من الشبكة وحاول مرة أخرى.",
+    };
+  }
+}
+
+function featuredCheckoutError(code?: string): string {
+  switch (code) {
+    case "STRIPE_NOT_CONFIGURED":
+      return "بوابة الدفع غير متاحة حالياً. اختر الباقة المجانية أو حاول لاحقاً.";
+    case "LISTING_NOT_FOUND":
+      return "تعذر بدء الدفع — لم يُحفظ الإعلان. حاول مرة أخرى.";
+    case "ALREADY_FEATURED":
+      return "هذا الإعلان مميز بالفعل.";
+    case "UNAUTHORIZED":
+      return "لا يمكن بدء الدفع لهذا الإعلان.";
+    default:
+      return "تعذر بدء الدفع للباقة المميزة. حاول مرة أخرى.";
+  }
+}
+
 export function useAddListingForm(categories: Category[]) {
   const router = useRouter();
   const [errors, setErrors] = useState<AddListingErrors & Record<string, string | undefined>>({});
@@ -57,6 +111,7 @@ export function useAddListingForm(categories: Category[]) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     categories[0]?.id ?? "",
   );
+  const [selectedPackage, setSelectedPackage] = useState("free");
   const [isAllowed] = useState(() => {
     if (typeof window === "undefined") return false;
     return isMarketplaceAccountReady(getSessionUser());
@@ -96,6 +151,8 @@ export function useAddListingForm(categories: Category[]) {
       const contact = String(formData.get("contact") ?? "").trim();
       const subcategory = String(formData.get("subcategory") ?? "").trim();
       const videoUrl = String(formData.get("videoUrl") ?? "").trim();
+      const listingPackage = String(formData.get("package") ?? "free");
+      const wantsFeatured = listingPackage === "featured_pending";
       const parsed = parseCategoryForm(formData, categoryId);
       const nextErrors: AddListingErrors & Record<string, string | undefined> = {
         ...parsed.errors,
@@ -128,7 +185,6 @@ export function useAddListingForm(categories: Category[]) {
 
       const id = `local-${Date.now()}`;
       const postedAt = new Date().toISOString();
-      const listingPackage = String(formData.get("package") ?? "free");
       const listing: Listing = {
         id,
         title: isDynamicCategory(categoryId)
@@ -165,34 +221,50 @@ export function useAddListingForm(categories: Category[]) {
       };
 
       saveLocalListing(listing);
-      try {
-        await fetch("/api/listings", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ listing }),
-        });
-      } catch {
-        // Local listing already saved; catalog sync is best-effort.
-      }
 
-      if (listingPackage === "featured_pending") {
+      const sync = await syncListingToServer(listing);
+
+      if (wantsFeatured) {
+        if (!sync.ok) {
+          publishedRef.current = false;
+          setErrors({ submit: sync.error });
+          return;
+        }
+
         try {
           const featureRes = await fetch(`/api/listings/${id}/feature`, {
             method: "POST",
+            credentials: "include",
           });
-          const featureData = await featureRes.json();
+          const featureData = (await featureRes.json()) as {
+            checkoutUrl?: string;
+            error?: string;
+            listing?: Listing;
+          };
+
           if (featureRes.ok && featureData.checkoutUrl) {
-            window.location.href = featureData.checkoutUrl as string;
+            window.location.href = featureData.checkoutUrl;
             return;
           }
+
           if (featureRes.ok && featureData.listing) {
-            saveLocalListing(featureData.listing as Listing);
-            router.push(`/listings/local/${id}`);
+            saveLocalListing(featureData.listing);
+            router.push("/dashboard/listings?featured=1");
             return;
           }
+
+          publishedRef.current = false;
+          setErrors({ submit: featuredCheckoutError(featureData.error) });
+          return;
         } catch {
-          // Fall through to local listing view if checkout fails.
+          publishedRef.current = false;
+          setErrors({ submit: featuredCheckoutError() });
+          return;
         }
+      }
+
+      if (!sync.ok) {
+        // Free listings can still proceed from local storage if sync fails.
       }
 
       router.push(`/listings/local/${id}`);
@@ -219,8 +291,10 @@ export function useAddListingForm(categories: Category[]) {
     preview,
     selectedCategory,
     selectedCategoryId,
+    selectedPackage,
     setPreview,
     setSelectedCategoryId,
+    setSelectedPackage,
     submitListing,
   };
 }
