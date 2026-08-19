@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createHash, randomBytes } from "node:crypto";
 import {
   GENERIC_OTP_SENT_MESSAGE,
   OTP_SEND_FAILED_MESSAGE,
@@ -162,47 +161,3 @@ export async function sendOtpForPurpose(input: {
   return { delivered, code };
 }
 
-export function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
-
-const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
-
-export async function storeResetToken(email: string, token: string) {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const withoutStale = tokens.filter((item) => item.email !== email);
-  withoutStale.unshift({
-    email,
-    token,
-    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-  });
-  await saveCollection("password-reset-tokens.json", withoutStale);
-}
-
-export async function consumeResetToken(email: string, token: string): Promise<boolean> {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const match = tokens.find(
-    (item) =>
-      item.email === email &&
-      item.token === token &&
-      new Date(item.expiresAt).getTime() > Date.now(),
-  );
-  if (!match) return false;
-  await saveCollection(
-    "password-reset-tokens.json",
-    tokens.filter((item) => item.token !== match.token),
-  );
-  return true;
-}

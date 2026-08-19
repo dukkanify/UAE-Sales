@@ -5,7 +5,7 @@ import type { StoredUser } from "@/types/domain/user";
 const USERS_FILE = "users.json";
 const JSON_STORE_FILE = "sooqna-auth-users.json";
 
-type AuthDriver = "postgres" | "json-file";
+export type AuthDriver = "postgres" | "json-file";
 
 export type AuthPersistenceInfo = {
   driver: AuthDriver;
@@ -430,6 +430,28 @@ export async function persistUser(user: StoredUser): Promise<StoredUser> {
     }
     return stored;
   });
+}
+
+export async function getAuthStoreDriver(): Promise<AuthDriver> {
+  await initAuthStore();
+  if (!driver) throw new AuthStoreError("AUTH_STORE_UNAVAILABLE");
+  return driver;
+}
+
+export async function queryAuthPostgres(
+  sql: string,
+  params?: unknown[],
+): Promise<{ rows: Record<string, unknown>[] }> {
+  await initAuthStore();
+  if (driver !== "postgres") {
+    throw new AuthStoreError("AUTH_STORE_UNAVAILABLE");
+  }
+  const pool = await getPostgresPool();
+  return pool.query(sql, params);
+}
+
+export function getDurableAuthDir(): string {
+  return resolveDurableJsonDir();
 }
 
 export async function deletePersistedUser(id: string): Promise<void> {

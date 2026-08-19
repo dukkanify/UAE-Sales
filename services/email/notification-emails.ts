@@ -331,14 +331,14 @@ export async function emailPasswordResetLink(input: {
 }): Promise<void> {
   const locale = await resolveEmailLocale({ email: input.email });
   const english = locale === "en";
-  const href = `${EMAIL_SITE_URL}/forgot-password?step=password&email=${encodeURIComponent(input.email)}&token=${encodeURIComponent(input.token)}`;
+  const href = `${EMAIL_SITE_URL}/reset-password?token=${encodeURIComponent(input.token)}`;
   const name = input.name || (english ? "Sooqna customer" : "عميل سوقنا");
   await sendTransactionalEmail({
     type: "password_reset",
     to: input.email,
     entityId: input.email,
     locale,
-    dedupeWindowMs: 2 * 60 * 1000,
+    dedupeWindowMs: 0,
     subject: english
       ? "Reset your password — Sooqna"
       : "إعادة تعيين كلمة المرور — سوقنا",
@@ -346,16 +346,18 @@ export async function emailPasswordResetLink(input: {
       ? "Secure link to reset your password"
       : "رابط آمن لإعادة تعيين كلمة المرور",
     bodyHtml: english
-      ? `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">You asked to reset your password. This link is valid for one hour. If you did not request this, ignore this email.</p>`
-      : `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور. الرابط صالح لمدة ساعة واحدة. إذا لم تطلب ذلك، تجاهل هذه الرسالة.</p>`,
+      ? `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">You asked to reset your password for your Sooqna account.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">Use the button below to choose a new password. The link is valid for <strong>60 minutes</strong> and can be used once.</p><p style="font-size:15px;line-height:1.8;margin:16px 0 0;color:#6b6560;">If you did not request a password reset, ignore this email. We will never ask for your password by email.</p>`
+      : `${greet(name, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">طلبت إعادة تعيين كلمة المرور لحسابك في سوقنا.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">اضغط الزر أدناه لاختيار كلمة مرور جديدة. الرابط صالح لمدة <strong>60 دقيقة</strong> ويُستخدم مرة واحدة فقط.</p><p style="font-size:15px;line-height:1.8;margin:16px 0 0;color:#6b6560;">إذا لم تطلب إعادة تعيين كلمة المرور، تجاهل هذه الرسالة. لن نغيّر حسابك ما لم تفتح الرابط وتعيّن كلمة مرور جديدة. لن نطلب منك كلمة المرور عبر البريد.</p>`,
     bodyLines: english
       ? [
-          "Use the link below to reset your password. It is valid for one hour.",
-          "If you did not request this, ignore the email.",
+          "You asked to reset your password for your Sooqna account.",
+          "The link is valid for 60 minutes and can be used once.",
+          "If you did not request this, ignore the email. We will never send your password by email.",
         ]
       : [
-          "استخدم الرابط التالي لإعادة تعيين كلمة المرور. صالح لمدة ساعة.",
-          "إذا لم تطلب ذلك، تجاهل الرسالة.",
+          "طلبت إعادة تعيين كلمة المرور لحسابك في سوقنا.",
+          "الرابط صالح لمدة 60 دقيقة ويُستخدم مرة واحدة فقط.",
+          "إذا لم تطلب ذلك، تجاهل هذه الرسالة. لن نرسل كلمة المرور عبر البريد.",
         ],
     ctaHref: href,
     ctaLabel: english ? "Set a new password" : "تعيين كلمة مرور جديدة",

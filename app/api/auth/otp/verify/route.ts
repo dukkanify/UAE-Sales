@@ -1,4 +1,3 @@
-import { createHash, randomBytes } from "node:crypto";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -8,11 +7,11 @@ import {
   sendOtpEmail,
 } from "@/services/email/email.service";
 import { completePersonVerification } from "@/services/auth/signup-approval";
+import { issuePasswordResetToken } from "@/services/auth/password-reset-token";
+import { emailPasswordResetLink } from "@/services/email/notification-emails";
 import { findUserByEmail, getRedirectAfterAuth, toUserProfile } from "@/services/auth/user-store";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
-
-const RESET_TOKEN_TTL_MS = 10 * 60 * 1000;
 
 const verifySchema = z.object({
   code: z.string().length(6),
@@ -26,11 +25,6 @@ const resendSchema = z.object({
   fullName: z.string().optional(),
 });
 
-function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -135,23 +129,21 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.purpose === "PASSWORD_RESET") {
-    const resetToken = createResetToken(email);
-    const { saveCollection, loadCollection } = await import(
-      "@/services/payments/data-store"
-    );
-    const tokens = await loadCollection<{
-      email: string;
-      expiresAt: string;
-      token: string;
-    }>("password-reset-tokens.json");
-    const withoutStale = tokens.filter((item) => item.email !== email);
-    withoutStale.unshift({
-      email,
-      token: resetToken,
-      expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-    });
-    await saveCollection("password-reset-tokens.json", withoutStale);
-    return NextResponse.json({ ok: true, resetToken, maskedEmail: maskEmail(email) });
+    const stored = await findUserByEmail(email);
+    if (stored?.passwordHash) {
+      const rawToken = await issuePasswordResetToken({
+        email: stored.email,
+        userId: stored.id,
+      });
+      void emailPasswordResetLink({
+        email: stored.email,
+        name: stored.fullName,
+        token: rawToken,
+      }).catch((error) => {
+        console.error("[Sooqna Email] password reset link failed", error);
+      });
+    }
+    return NextResponse.json({ ok: true, maskedEmail: maskEmail(email), redirectTo: "/login" });
   }
 
   return NextResponse.json({ ok: true, metadata: result.record.metadata });
