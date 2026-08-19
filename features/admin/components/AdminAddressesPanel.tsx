@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { DeliveryAddress } from "@/types/domain/address";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminAddressesPanel() {
   const [items, setItems] = useState<DeliveryAddress[]>([]);
@@ -23,6 +24,7 @@ export function AdminAddressesPanel() {
   }, []);
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <div className="admin-ops__kpi-grid">
         <div className="admin-ops__kpi">
@@ -60,5 +62,6 @@ export function AdminAddressesPanel() {
         </ul>
       )}
     </div>
+  </LocalizedTree>
   );
 }

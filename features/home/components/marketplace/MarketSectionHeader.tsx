@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketSectionHeaderProps = {
   actionHref?: string;
@@ -17,6 +18,7 @@ export function MarketSectionHeader({
   title,
 }: MarketSectionHeaderProps) {
   return (
+    <LocalizedTree>
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
         {eyebrow ? (
@@ -38,6 +40,7 @@ export function MarketSectionHeader({
         </Link>
       ) : null}
     </div>
+  </LocalizedTree>
   );
 }
 
@@ -49,10 +52,12 @@ export function MarketSectionShell({
   variant?: "sand" | "white";
 }) {
   return (
+    <LocalizedTree>
     <section
       className={`py-16 md:py-20 ${variant === "sand" ? "bg-background" : "bg-surface"}`}
     >
       <div className="app-container">{children}</div>
     </section>
+  </LocalizedTree>
   );
 }

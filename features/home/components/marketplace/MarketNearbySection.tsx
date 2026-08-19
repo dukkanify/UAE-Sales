@@ -5,6 +5,7 @@ import { getNearbyListings } from "@/features/home/components/mobile/mobile-home
 import { getListingHref, getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketNearbySectionProps = {
   listings: Listing[];
@@ -16,6 +17,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
   if (nearby.length === 0) return null;
 
   return (
+    <LocalizedTree>
     <MarketSectionShell variant="white">
       <MarketSectionHeader
         actionHref="/search"
@@ -57,5 +59,6 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
         })}
       </div>
     </MarketSectionShell>
+  </LocalizedTree>
   );
 }

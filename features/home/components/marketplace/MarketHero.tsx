@@ -6,6 +6,7 @@ import {
   getMarketQuickSearches,
 } from "@/services/content/homepage-marketplace.content";
 import { MarketHeroSearch } from "./MarketHeroSearch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketHeroProps = {
   categories: Category[];
@@ -18,6 +19,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
   ]);
 
   return (
+    <LocalizedTree>
     <section className="market-hero">
       <div aria-hidden className="market-hero__scene">
         <div className="market-hero__mesh" />
@@ -79,5 +81,6 @@ export async function MarketHero({ categories }: MarketHeroProps) {
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

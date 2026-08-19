@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function MarketPromoBanner() {
   return (
+    <LocalizedTree>
     <section aria-label="بيع سيارتك" className="border-b border-border/50 bg-surface py-8 md:py-10">
       <div className="app-container px-4">
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0b1628] via-[#1e293b] to-[#0b1628] p-6 shadow-[0_16px_40px_rgb(15_23_42/18%)] md:p-8">
@@ -43,5 +45,6 @@ export function MarketPromoBanner() {
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

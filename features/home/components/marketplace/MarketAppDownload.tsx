@@ -10,6 +10,7 @@ import {
   GooglePlayBadgeLink,
 } from "@/features/home/components/mobile/MobileStoreBadges";
 import "./market-app-download.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const APP_FEATURES = [
   { icon: "bell" as const, label: "إشعارات فورية لكل عرض جديد" },
@@ -25,6 +26,7 @@ export function MarketAppDownload({ previewListings = [] }: MarketAppDownloadPro
   const preview = resolveAppPreviewListings(previewListings);
 
   return (
+    <LocalizedTree>
     <section aria-label="تطبيق سوقنا" className="market-app-download">
       <div aria-hidden className="market-app-download__mesh" />
       <span aria-hidden className="market-app-download__orb market-app-download__orb--gold" />
@@ -87,5 +89,6 @@ export function MarketAppDownload({ previewListings = [] }: MarketAppDownloadPro
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

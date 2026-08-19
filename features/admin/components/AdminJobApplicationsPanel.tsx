@@ -7,6 +7,7 @@ import { jobStatusLabel } from "@/services/activity/activity-labels";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const ADMIN_ACTIONS: Partial<
   Record<JobApplication["status"], { value: JobApplication["status"]; label: string }[]>
@@ -89,6 +90,7 @@ export function AdminJobApplicationsPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-3">
       {items.length === 0 ? (
         <Card className="p-8 text-center" variant="flat">
@@ -135,5 +137,6 @@ export function AdminJobApplicationsPanel() {
         </ul>
       )}
     </div>
+  </LocalizedTree>
   );
 }

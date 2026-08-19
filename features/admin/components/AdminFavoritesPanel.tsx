@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { ServerFavorite } from "@/types/domain/server-favorite";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type FavoritesPayload = {
   favorites: ServerFavorite[];
@@ -28,13 +29,16 @@ export function AdminFavoritesPanel() {
 
   if (!data) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل المفضلة...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <div className="admin-ops__kpi-grid">
         <div className="admin-ops__kpi">
@@ -85,5 +89,6 @@ export function AdminFavoritesPanel() {
         ))}
       </ul>
     </div>
+  </LocalizedTree>
   );
 }

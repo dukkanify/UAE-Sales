@@ -4,9 +4,11 @@ import Link from "next/link";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminUnauthorized() {
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <Card className="mx-auto max-w-lg p-8 text-center" variant="flat">
         <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-[rgb(201_164_92_/_14%)] text-[#a88642]">
@@ -27,5 +29,6 @@ export function AdminUnauthorized() {
         </div>
       </Card>
     </section>
+  </LocalizedTree>
   );
 }

@@ -12,6 +12,7 @@ import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CompleteAccountContentProps = {
   token?: string;
@@ -60,15 +61,18 @@ export function CompleteAccountContent({ token }: CompleteAccountContentProps) {
 
   if (!token) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <FormMessage variant="error">
           رابط إعداد الحساب غير صالح. تحقق من بريدك الإلكتروني.
         </FormMessage>
       </section>
+    </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description="أنشئ كلمة مرور للوصول إلى حسابك ومتابعة طلباتك."
@@ -107,5 +111,6 @@ export function CompleteAccountContent({ token }: CompleteAccountContentProps) {
         </form>
       </Card>
     </section>
+  </LocalizedTree>
   );
 }

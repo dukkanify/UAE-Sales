@@ -9,6 +9,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type WalletRow = {
   availableBalance: number;
@@ -93,13 +94,16 @@ export function AdminWalletsPanel() {
 
   if (!data) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل المحافظ...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div className="admin-ops__kpi-grid">
         <div className="admin-ops__kpi">
@@ -213,5 +217,6 @@ export function AdminWalletsPanel() {
         عرض الضمان ←
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

@@ -28,6 +28,7 @@ import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import { intlLocale } from "@/shared/i18n/locale";
 import { useLocale } from "@/shared/i18n/useLocale";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const statusFilterOptions: { label: string; value: string }[] = [
   { label: "كل الحالات", value: "all" },
@@ -284,6 +285,7 @@ export function AdminListingsPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-5" variant="flat">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -575,5 +577,6 @@ export function AdminListingsPanel() {
         ← العودة للإدارة
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

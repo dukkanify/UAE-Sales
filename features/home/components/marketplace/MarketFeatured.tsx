@@ -1,6 +1,7 @@
 import type { Listing } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketFeaturedProps = {
   categories: { id: string; name: string }[];
@@ -16,6 +17,7 @@ export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
   }
 
   return (
+    <LocalizedTree>
     <MarketSectionShell variant="white">
       <MarketSectionHeader
         actionHref="/featured"
@@ -35,5 +37,6 @@ export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
         ))}
       </div>
     </MarketSectionShell>
+  </LocalizedTree>
   );
 }

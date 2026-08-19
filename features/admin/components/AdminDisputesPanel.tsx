@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Select } from "@/shared/ui/Select";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const statusLabels: Record<DisputeStatus, string> = {
   open: "مفتوح",
@@ -95,6 +96,7 @@ export function AdminDisputesPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-4" variant="flat">
         <div className="flex flex-wrap items-end gap-3">
@@ -206,5 +208,6 @@ export function AdminDisputesPanel() {
         ← العودة للإدارة
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

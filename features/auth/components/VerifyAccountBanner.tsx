@@ -7,6 +7,7 @@ import { getVerifyAccountPrompt } from "@/services/auth/account-access";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
 import "./verify-account-banner.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function VerifyAccountBanner() {
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export function VerifyAccountBanner() {
   if (!prompt) return null;
 
   return (
+    <LocalizedTree>
     <div className="verify-account-banner" role="status">
       <div className="verify-account-banner__inner app-container">
         <div className="verify-account-banner__copy">
@@ -38,5 +40,6 @@ export function VerifyAccountBanner() {
         </Link>
       </div>
     </div>
+  </LocalizedTree>
   );
 }

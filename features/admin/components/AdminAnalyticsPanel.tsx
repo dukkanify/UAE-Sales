@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AnalyticsPayload = {
   daily: {
@@ -48,15 +49,18 @@ export function AdminAnalyticsPanel() {
 
   if (!data) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل التحليلات...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
   const maxVolume = Math.max(...data.daily.map((d) => d.volume), 1);
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
         <div className="admin-ops__kpi">
@@ -160,5 +164,6 @@ export function AdminAnalyticsPanel() {
         </Link>
       </div>
     </div>
+  </LocalizedTree>
   );
 }

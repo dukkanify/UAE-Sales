@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AttentionItem = {
   alert?: boolean;
@@ -106,9 +107,11 @@ export function AdminOpsCockpit() {
 
   if (!summary) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل لوحة التحكم...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
@@ -118,6 +121,7 @@ export function AdminOpsCockpit() {
   const maxVolume = Math.max(...analytics.daily.map((d) => d.volume), 1);
 
   return (
+    <LocalizedTree>
     <div className="admin-ops__cockpit">
       <div className="admin-ops__status-row">
         <div
@@ -520,5 +524,6 @@ export function AdminOpsCockpit() {
         )}
       </section>
     </div>
+  </LocalizedTree>
   );
 }

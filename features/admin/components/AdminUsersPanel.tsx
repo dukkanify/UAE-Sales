@@ -14,6 +14,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const roleLabels: Record<AdminUserRecord["role"], string> = {
   user: "مستخدم",
@@ -124,6 +125,7 @@ export function AdminUsersPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-4" variant="flat">
         <div className="flex flex-wrap items-end gap-3">
@@ -289,5 +291,6 @@ export function AdminUsersPanel() {
         ← العودة للإدارة
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

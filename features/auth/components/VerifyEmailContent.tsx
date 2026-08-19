@@ -11,6 +11,7 @@ import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type VerifyEmailContentProps = {
   initialOtp?: string | null;
@@ -55,6 +56,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
 
   if (!emailOtpEnabled && purpose !== "REGISTER") {
     return (
+      <LocalizedTree>
       <div className="grid gap-3">
         <FormMessage variant="error">التحقق بالرمز غير متاح حاليًا.</FormMessage>
         <p className="text-sm text-muted">
@@ -65,21 +67,25 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
           أو متابعة الشراء كضيف.
         </p>
       </div>
+    </LocalizedTree>
     );
   }
 
   if (!email) {
     return (
+      <LocalizedTree>
       <p className="text-sm font-medium text-muted">
         لم يتم العثور على بريد للتحقق.{" "}
         <button className="text-primary" onClick={() => router.push("/login")} type="button">
           العودة لتسجيل الدخول
         </button>
       </p>
+    </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <OtpVerification
       email={email}
       initialOtp={initialOtp}
@@ -89,5 +95,6 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
       onVerified={handleVerified}
       purpose={purpose}
     />
+  </LocalizedTree>
   );
 }

@@ -8,6 +8,7 @@ import { LISTING_REPORT_REASON_LABELS } from "@/types/domain/listing-report";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 function toTelHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");
@@ -68,6 +69,7 @@ export function AdminListingReportsPanel() {
   const guestCount = items.filter((item) => item.guest).length;
 
   return (
+    <LocalizedTree>
     <div className="grid gap-3">
       <div className="admin-ops__kpi-grid">
         <div className="admin-ops__kpi">
@@ -164,5 +166,6 @@ export function AdminListingReportsPanel() {
         </ul>
       )}
     </div>
+  </LocalizedTree>
   );
 }

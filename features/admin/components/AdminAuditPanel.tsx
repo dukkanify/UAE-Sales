@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { AdminAuditEntry } from "@/services/admin/admin-audit-store";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminAuditPanel() {
   const [entries, setEntries] = useState<AdminAuditEntry[]>([]);
@@ -19,6 +20,7 @@ export function AdminAuditPanel() {
   }, []);
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       {entries.length === 0 ? (
         <Card className="p-8 text-center" variant="flat">
@@ -48,5 +50,6 @@ export function AdminAuditPanel() {
         </ul>
       )}
     </div>
+  </LocalizedTree>
   );
 }

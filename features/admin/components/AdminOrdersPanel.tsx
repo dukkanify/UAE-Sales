@@ -8,6 +8,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const customerTypeLabels: Record<NonNullable<Order["customerType"]>, string> = {
   registered: "مستخدم مسجّل",
@@ -73,6 +74,7 @@ export function AdminOrdersPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       {orders.length === 0 ? (
         <Card className="p-8 text-center" variant="flat">
@@ -157,5 +159,6 @@ export function AdminOrdersPanel() {
         غرفة التحكم
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

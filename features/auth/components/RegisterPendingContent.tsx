@@ -8,6 +8,7 @@ import { persistSessionCookie } from "@/services/auth/session-sync";
 import { getSessionUser, setSessionUser } from "@/services/storage";
 import type { UserProfile } from "@/types";
 import { Button } from "@/shared/ui/Button";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function RegisterPendingContent() {
   const router = useRouter();
@@ -61,6 +62,7 @@ export function RegisterPendingContent() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div>
         <p className="auth-form__eyebrow">حساب جديد</p>
@@ -103,5 +105,6 @@ export function RegisterPendingContent() {
         </Link>
       </div>
     </div>
+  </LocalizedTree>
   );
 }

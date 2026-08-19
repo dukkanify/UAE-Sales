@@ -10,6 +10,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminCategoriesPanel() {
   const [categories, setCategories] = useState<AdminCategoryRecord[]>([]);
@@ -103,6 +104,7 @@ export function AdminCategoriesPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-5" variant="flat">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -194,5 +196,6 @@ export function AdminCategoriesPanel() {
         ← العودة للإدارة
       </Link>
     </div>
+  </LocalizedTree>
   );
 }

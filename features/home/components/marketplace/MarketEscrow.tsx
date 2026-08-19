@@ -3,11 +3,13 @@ import { Icon } from "@/shared/ui/Icon";
 import type { IconName } from "@/shared/ui/Icon";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export async function MarketEscrow() {
   const steps = await getMarketEscrowSteps();
 
   return (
+    <LocalizedTree>
     <MarketSectionShell variant="white">
       <MarketSectionHeader
         description="نظام ضمان مالي يحمي المشتري والبائع — من الدفع حتى التسليم."
@@ -81,5 +83,6 @@ export async function MarketEscrow() {
         </div>
       </div>
     </MarketSectionShell>
+  </LocalizedTree>
   );
 }

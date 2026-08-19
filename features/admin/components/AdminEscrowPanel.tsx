@@ -8,6 +8,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminEscrowPanel() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -61,6 +62,7 @@ export function AdminEscrowPanel() {
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div className="admin-ops__kpi-grid">
         <div className="admin-ops__kpi">
@@ -146,5 +148,6 @@ export function AdminEscrowPanel() {
         </Link>
       </div>
     </div>
+  </LocalizedTree>
   );
 }

@@ -4,6 +4,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { Icon } from "@/shared/ui/Icon";
 import { getAuthTrustPoints } from "@/services/content";
 import "./auth.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AuthShellProps = {
   children: ReactNode;
@@ -27,6 +28,7 @@ export async function AuthShell({
   const hasBrandInTitle = title.includes("سوقنا");
 
   return (
+    <LocalizedTree>
     <section className="auth-shell app-container page-padding">
       <aside className="auth-shell__showcase">
         <div className="auth-shell__showcase-inner">
@@ -75,5 +77,6 @@ export async function AuthShell({
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

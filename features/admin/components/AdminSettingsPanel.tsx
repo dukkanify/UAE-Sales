@@ -7,6 +7,7 @@ import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminSettingsPanel() {
   const [settings, setSettings] = useState<AdminSiteSettings | null>(null);
@@ -57,13 +58,16 @@ export function AdminSettingsPanel() {
 
   if (!settings) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل الإعدادات...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">الرسوم والمدفوعات</h2>
@@ -239,5 +243,6 @@ export function AdminSettingsPanel() {
         آخر تحديث: {new Date(settings.updatedAt).toLocaleString("ar-AE")}
       </p>
     </div>
+  </LocalizedTree>
   );
 }

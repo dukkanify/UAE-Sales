@@ -7,6 +7,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type StripePayload = {
   counts: {
@@ -65,15 +66,18 @@ export function AdminStripePanel() {
 
   if (!data) {
     return (
+      <LocalizedTree>
       <Card className="p-8 text-center" variant="flat">
         <p className="text-sm text-muted">جاري تحميل حالة Stripe...</p>
       </Card>
+    </LocalizedTree>
     );
   }
 
   const { status, links, counts, recentStripeOrders, recentEvents } = data;
 
   return (
+    <LocalizedTree>
     <div className="grid gap-5">
       <div className="admin-ops__status-row">
         <div
@@ -295,5 +299,6 @@ export function AdminStripePanel() {
         </ul>
       </section>
     </div>
+  </LocalizedTree>
   );
 }

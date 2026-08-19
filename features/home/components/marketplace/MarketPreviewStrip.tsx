@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketPreviewStripProps = {
   categories: { id: string; name: string }[];
@@ -17,6 +18,7 @@ export function MarketPreviewStrip({
   if (previews.length === 0) return null;
 
   return (
+    <LocalizedTree>
     <section className="relative z-10 border-t border-secondary/10 bg-background py-10 md:py-14">
       <div className="app-container">
         <div className="mb-6 flex items-end justify-between gap-4">
@@ -45,5 +47,6 @@ export function MarketPreviewStrip({
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

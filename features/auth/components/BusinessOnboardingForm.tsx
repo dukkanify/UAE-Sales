@@ -12,6 +12,7 @@ import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const categories = [
   { label: "سيارات", value: "cars" },
@@ -62,6 +63,7 @@ export function BusinessOnboardingForm() {
   );
 
   return (
+    <LocalizedTree>
     <Card className="p-6" variant="flat">
       <h2 className="text-2xl font-black text-ink">إكمال بيانات النشاط التجاري</h2>
       <p className="mt-2 text-sm text-muted">
@@ -85,5 +87,6 @@ export function BusinessOnboardingForm() {
         </Button>
       </form>
     </Card>
+  </LocalizedTree>
   );
 }

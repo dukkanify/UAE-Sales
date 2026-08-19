@@ -6,6 +6,7 @@ import {
   MOBILE_CATEGORY_PAGE_ORDER,
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "@/features/home/components/mobile/mobile-home.config";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketCategoryGridProps = {
   categories: Category[];
@@ -24,6 +25,7 @@ export function MarketCategoryGrid({ categories }: MarketCategoryGridProps) {
   if (items.length === 0) return null;
 
   return (
+    <LocalizedTree>
     <section aria-label="التصنيفات" className="border-b border-border/50 bg-background py-8 md:py-10">
       <div className="app-container px-4">
         <div className="mb-6 flex items-end justify-between gap-4">
@@ -75,5 +77,6 @@ export function MarketCategoryGrid({ categories }: MarketCategoryGridProps) {
         </div>
       </div>
     </section>
+  </LocalizedTree>
   );
 }

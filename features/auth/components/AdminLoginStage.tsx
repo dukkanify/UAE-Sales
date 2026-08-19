@@ -6,9 +6,11 @@ import { Suspense } from "react";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { BRAND } from "@/shared/constants/brand";
 import "./admin-login.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminLoginStage() {
   return (
+    <LocalizedTree>
     <main className="admin-login">
       <div className="admin-login__glow admin-login__glow--a" aria-hidden />
       <div className="admin-login__glow admin-login__glow--b" aria-hidden />
@@ -43,5 +45,6 @@ export function AdminLoginStage() {
         </Link>
       </div>
     </main>
+  </LocalizedTree>
   );
 }
