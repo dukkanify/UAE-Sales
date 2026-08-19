@@ -88,7 +88,7 @@ Tests run via `curl` against current production (before this PR deploys):
 
 ```
 GET /api/auth/status
-→ HTTP 404 (endpoint not deployed yet)
+→ HTTP 404 (still missing after the claimed deploy)
 ```
 
 ### Registration (new email)
