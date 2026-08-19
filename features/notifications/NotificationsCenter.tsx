@@ -31,7 +31,10 @@ export function NotificationsCenter() {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    const initial = window.setTimeout(() => {
+      void refresh();
+    }, 0);
+    return () => window.clearTimeout(initial);
   }, [refresh]);
 
   async function markOne(id: string) {
@@ -82,7 +85,7 @@ export function NotificationsCenter() {
               ? "Order, booking, and listing updates will appear here."
               : "تظهر هنا تحديثات الطلبات والحجوزات والإعلانات."
           }
-          icon="bell"
+          icon="message"
           title={locale === "en" ? "No notifications yet" : "لا إشعارات حتى الآن"}
         />
       ) : (

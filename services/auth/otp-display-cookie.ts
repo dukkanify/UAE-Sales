@@ -15,11 +15,13 @@ function cookieOptions() {
 
 /** OTP must never be written to cookies, UI, or API responses. */
 export function attachOtpDisplayCookie(
-  _response: NextResponse,
-  _email: string,
-  _otp: string,
+  response: NextResponse,
+  email: string,
+  otp: string,
 ) {
-  return;
+  void response;
+  void email;
+  void otp;
 }
 
 export function clearOtpDisplayCookie(response: NextResponse) {
@@ -29,6 +31,7 @@ export function clearOtpDisplayCookie(response: NextResponse) {
   });
 }
 
-export async function readOtpDisplayCookie(_email: string): Promise<string | null> {
+export async function readOtpDisplayCookie(email: string): Promise<string | null> {
+  void email;
   return null;
 }

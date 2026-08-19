@@ -923,9 +923,9 @@ export async function notifyWelcome(input: {
   email: string;
   name: string;
   userId: string;
-}): Promise<void> {
+}): Promise<{ emailStatus: string }> {
   const name = input.name.trim() || "عميل سوقنا";
-  await notify({
+  return notify({
     userId: input.userId,
     recipientEmail: input.email,
     type: "welcome",

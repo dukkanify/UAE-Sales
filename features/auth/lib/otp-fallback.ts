@@ -1,21 +1,19 @@
 const STORAGE_KEY = "sooqna-otp-fallback";
 const CHANGE_EVENT = "sooqna-otp-fallback-change";
 
-type OtpFallback = {
-  email: string;
-  otp: string;
-};
-
 function notifyOtpFallback() {
   if (typeof window === "undefined") return;
   window.dispatchEvent(new Event(CHANGE_EVENT));
 }
 
-export function saveOtpFallback(_email: string, _otp: string) {
-  return;
+/** OTP must never be stored in the browser. */
+export function saveOtpFallback(email: string, otp: string) {
+  void email;
+  void otp;
 }
 
-export function readOtpFallback(_email: string): string | null {
+export function readOtpFallback(email: string): string | null {
+  void email;
   return null;
 }
 
