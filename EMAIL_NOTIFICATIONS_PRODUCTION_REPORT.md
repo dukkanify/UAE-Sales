@@ -119,8 +119,8 @@ Skipped attempts are logged as `skipped`.
 
 | Check | Result |
 |---|---|
-| `npm run lint` | See latest run in this PR |
-| `npm run build` | See latest run in this PR |
+| `npm run lint` | Pass |
+| `npm run build` | Pass |
 | Template RTL + `https://sooqna.site` links | Pass (source review) |
 | No localhost in production email builders | Pass |
 | Duplicate key + webhook claim | Pass (code) |

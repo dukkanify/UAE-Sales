@@ -31,9 +31,18 @@ export async function GET() {
       emailsPending: emailLogs.filter((item) => item.status === "pending").length,
     },
     notifications: notifications.slice(0, 100),
-    emailLogs: emailLogs
-      .slice(0, 80)
-      .map(({ html: _html, text: _text, ...rest }) => rest),
+    emailLogs: emailLogs.slice(0, 80).map((item) => ({
+      createdAt: item.createdAt,
+      dedupeKey: item.dedupeKey,
+      entityId: item.entityId,
+      error: item.error,
+      id: item.id,
+      status: item.status,
+      subject: item.subject,
+      to: item.to,
+      type: item.type,
+      userId: item.userId,
+    })),
   });
 }
 
