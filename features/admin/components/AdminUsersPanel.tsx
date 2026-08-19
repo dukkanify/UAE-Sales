@@ -191,7 +191,7 @@ export function AdminUsersPanel() {
                   )}
                 </div>
               </div>
-              <div className="text-left text-xs text-muted">
+              <div className="text-start text-xs text-muted">
                 <p>انضم: {user.joinedAt}</p>
                 <p className="mt-1">إعلانات: {user.listingsCount}</p>
               </div>

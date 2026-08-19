@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ActivitySummary } from "@/types/domain/activity";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Card } from "@/shared/ui/Card";
 
 type ActivityDashboardSummaryProps = {
@@ -38,6 +39,7 @@ export function ActivityDashboardSummary({ role = "user" }: ActivityDashboardSum
       : cards.filter((card) => card.key !== "receivedTotal" || summary.receivedTotal > 0);
 
   return (
+    <LocalizedTree>
     <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {visible.map((card) => {
         const value =
@@ -54,5 +56,6 @@ export function ActivityDashboardSummary({ role = "user" }: ActivityDashboardSum
         );
       })}
     </div>
+    </LocalizedTree>
   );
 }

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { ActivityKind, ActivityRecord, ActivityScope, ActivitySummary } from "@/types/domain/activity";
 import { activityKindLabel } from "@/services/activity/activity-labels";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
 import { EmptyState } from "@/shared/ui/EmptyState";
@@ -127,6 +128,7 @@ export function ActivityFeed({
   }
 
   return (
+    <LocalizedTree>
     <div>
       {showScopeTabs ? (
         <div className="mb-3 flex flex-wrap gap-1.5">
@@ -228,5 +230,6 @@ export function ActivityFeed({
         </p>
       ) : null}
     </div>
+    </LocalizedTree>
   );
 }

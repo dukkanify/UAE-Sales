@@ -143,7 +143,7 @@ export function DashboardShell({
                 </Link>
               ))}
               <button
-                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
+                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-start text-sm font-medium text-muted transition hover:bg-surface-muted"
                 onClick={() => {
                   clearSessionUser();
                   void removeSessionCookie();

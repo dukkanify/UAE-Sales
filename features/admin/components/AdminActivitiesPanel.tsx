@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import type { ActivityKind, ActivityRecord } from "@/types/domain/activity";
 import { activityKindLabel } from "@/services/activity/activity-labels";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -50,6 +51,7 @@ export function AdminActivitiesPanel() {
   }, [load]);
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-4" variant="flat">
         <div className="grid gap-3 md:grid-cols-4">
@@ -146,5 +148,6 @@ export function AdminActivitiesPanel() {
         </div>
       </div>
     </div>
+    </LocalizedTree>
   );
 }

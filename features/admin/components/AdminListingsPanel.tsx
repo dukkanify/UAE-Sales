@@ -511,7 +511,7 @@ export function AdminListingsPanel() {
                   ) : null}
                 </div>
               </div>
-              <div className="text-left">
+              <div className="text-start">
                 <CurrencyAmount amount={listing.price} size="lg" />
                 <p className="mt-1 text-xs text-muted">
                     {new Date(listing.postedAt).toLocaleDateString(intlLocale(locale))}

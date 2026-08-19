@@ -139,7 +139,7 @@ export function AdminDisputesPanel() {
                   </p>
                 ) : null}
               </div>
-              <div className="text-left">
+              <div className="text-start">
                 <CurrencyAmount amount={dispute.amount} size="lg" />
                 <p className="mt-1 text-xs text-muted">
                   {new Date(dispute.createdAt).toLocaleString("ar-AE")}
