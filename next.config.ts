@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["pg"],
   compress: true,
   devIndicators: {
     position: "bottom-right",

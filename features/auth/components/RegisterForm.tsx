@@ -14,6 +14,7 @@ import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import { saveAccountProof } from "@/services/storage";
 import { saveOtpFallback } from "@/features/auth/lib/otp-fallback";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
 import {
   isStrongPassword,
   STRONG_PASSWORD_HINT,
@@ -93,7 +94,7 @@ export function RegisterForm() {
           throw new Error(
             data.message ??
               (data.error === "EMAIL_ALREADY_REGISTERED"
-                ? "هذا البريد مسجّل مسبقًا. سجّل الدخول بنفس البيانات."
+                ? EMAIL_ALREADY_REGISTERED_MESSAGE
                 : "تعذر إنشاء الحساب."),
           );
         }

@@ -18,7 +18,7 @@ See [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 
 | Area | Limitation |
 |------|------------|
-| **Data storage** | File/`data-store` (Vercel `/tmp`). Accounts also persist via cookie vault + browser proof so login survives logout. High volume needs a durable DB. |
+| **Data storage** | Listings/orders still use file `data-store` (Vercel `/tmp`). **User accounts** use Postgres (`DATABASE_URL`) in production, or `.data/sooqna-auth-users.json` locally. Cookie/localStorage proofs are not the source of truth. |
 | **Seller payouts** | No Stripe Connect yet — escrow is an internal ledger; payouts are operational from the platform Stripe balance |
 | **Images** | Client-side compression / data URLs; no cloud object storage |
 | **UAE PASS** | Hidden until `NEXT_PUBLIC_ENABLE_UAE_PASS=true` |
