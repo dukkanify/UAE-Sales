@@ -1797,5 +1797,12 @@
   "معاينة صورة": "Image preview",
   "صورة محفوظة": "Saved image",
   "صورة": "Image",
-  "صور": "Images"
+  "صور": "Images",
+  "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.": "If an account exists for this email, a password reset link has been sent.",
+  "إن وُجد حساب، ستصل الرسالة إلى": "If an account exists, the message will be sent to",
+  "الرابط صالح لمدة 60 دقيقة ويُستخدم مرة واحدة.": "The link is valid for 60 minutes and can be used once.",
+  "أدخل بريدك الإلكتروني وسنرسل لك رابطاً آمناً لإعادة تعيين كلمة المرور إن وُجد حساب.": "Enter your email and we will send a secure password reset link if an account exists.",
+  "بريدك": "your inbox",
+  "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا.": "Could not reach the account database. Please try again later.",
+  "تعذر حفظ الحساب. حاول مرة أخرى.": "Could not save the account. Please try again."
 }
