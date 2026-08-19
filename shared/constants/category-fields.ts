@@ -9,7 +9,6 @@ import {
   carModelOptions,
   mobileModelOptions,
 } from "@/shared/constants/product-models";
-import { cities } from "@/shared/constants/locations";
 
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
@@ -20,11 +19,6 @@ const emirateOptions = [
   { label: "الفجيرة", value: "الفجيرة" },
   { label: "أم القيوين", value: "أم القيوين" },
 ];
-
-const cityOptions = cities.map((city) => ({
-  label: city.name,
-  value: city.name,
-}));
 
 const yesNoOptions = [
   { label: "نعم", value: "نعم" },
@@ -83,12 +77,12 @@ const carFields: CategoryFieldDefinition[] = [
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
   {
     key: "city",
-    label: "المدينة",
-    type: "select",
+    label: "المدينة / المنطقة",
+    type: "text",
     required: true,
     searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
+    placeholder: "مثال: جميرا، مردف، الكورنيش",
+    note: "اكتب الحي أو المنطقة داخل الإمارة المختارة.",
   },
   { key: "mileage", label: "العداد (كم)", type: "text", required: true, searchable: true },
   { key: "transmission", label: "ناقل الحركة", type: "select", required: true, options: [
@@ -172,12 +166,12 @@ const realEstateFields: CategoryFieldDefinition[] = [
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
   {
     key: "city",
-    label: "المدينة",
-    type: "select",
+    label: "المدينة / المنطقة",
+    type: "text",
     required: true,
     searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
+    placeholder: "مثال: جميرا، مردف، الكورنيش",
+    note: "اكتب الحي أو المنطقة داخل الإمارة المختارة.",
   },
 ];
 
@@ -356,12 +350,12 @@ const foodFields: CategoryFieldDefinition[] = [
   },
   {
     key: "city",
-    label: "المدينة",
-    type: "select",
+    label: "المدينة / المنطقة",
+    type: "text",
     required: true,
     searchable: true,
-    options: cityOptions,
-    note: "اختر المدينة ضمن إمارات الدولة.",
+    placeholder: "مثال: دبي — الخليج التجاري",
+    note: "اكتب الإمارة والمنطقة.",
   },
 ];
 
