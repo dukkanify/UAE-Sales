@@ -18,6 +18,7 @@ export {
   saveLocalListing,
   setSessionUser,
   toggleFavorite,
+  touchSavedSearch,
   type FavoriteRecord,
   type SavedSearch,
 } from "./client-storage";

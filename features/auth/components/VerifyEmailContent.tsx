@@ -9,6 +9,7 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
+import { syncSavedSearchesAfterLogin } from "@/services/saved-searches/client";
 import { setSessionUser } from "@/services/storage";
 import Link from "next/link";
 
@@ -44,6 +45,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
         setSessionUser(user);
         await persistSessionCookie(user);
         await syncFavoritesAfterLogin(user.id);
+        await syncSavedSearchesAfterLogin(user.id);
         router.push(data.redirectTo ?? "/profile");
         return;
       }

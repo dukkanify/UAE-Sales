@@ -11,6 +11,8 @@ import { Card } from "@/shared/ui/Card";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
+import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
+import { syncSavedSearchesAfterLogin } from "@/services/saved-searches/client";
 import { setSessionUser } from "@/services/storage";
 
 type CompleteAccountContentProps = {
@@ -52,6 +54,8 @@ export function CompleteAccountContent({ token }: CompleteAccountContentProps) {
 
         setSessionUser(data.user as UserProfile);
         await persistSessionCookie(data.user);
+        await syncFavoritesAfterLogin(data.user.id);
+        await syncSavedSearchesAfterLogin(data.user.id);
         router.push(data.redirectTo ?? "/orders");
       },
       [router, token],
