@@ -87,7 +87,7 @@ export function BrandLogo({
   return (
     <Link
       aria-label={`${BRAND.nameAr} — ${BRAND.nameEn}`}
-      className="inline-flex shrink-0 items-center"
+      className="inline-flex min-w-0 items-center"
       href={href}
     >
       {content}

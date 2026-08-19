@@ -26,11 +26,11 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               </span>
             ) : null}
             {item.href && !isLast ? (
-              <Link className="transition hover:text-ink" href={item.href}>
+              <Link className="max-w-full break-words transition hover:text-ink" href={item.href}>
                 {item.label}
               </Link>
             ) : (
-              <span className={isLast ? "text-ink" : undefined}>{item.label}</span>
+              <span className={isLast ? "max-w-full break-words text-ink" : undefined}>{item.label}</span>
             )}
           </span>
         );

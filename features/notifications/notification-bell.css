@@ -51,7 +51,8 @@
   inset-inline-end: 0;
   z-index: 70;
   display: grid;
-  width: min(20.5rem, calc(100vw - 1.5rem));
+  width: min(20.5rem, calc(100dvw - 1.5rem));
+  max-width: calc(100dvw - 1.5rem);
   overflow: hidden;
   border: 1px solid var(--color-border);
   border-radius: 1.15rem;

@@ -44,9 +44,11 @@
 
 html {
   direction: rtl;
+  max-width: 100%;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-x: none;
   transition:
     background-color var(--duration-normal) var(--ease-premium),
     color var(--duration-normal) var(--ease-premium);
@@ -54,12 +56,14 @@ html {
 
 body {
   margin: 0;
+  max-width: 100%;
   min-height: 100vh;
   background: var(--color-background);
   color: var(--color-ink);
   font-family: var(--font-arabic);
   line-height: 1.6;
   font-synthesis-weight: none;
+  overscroll-behavior-x: none;
 }
 
 /* Next.js dev overlay host — prevent layout shifts in development */
@@ -200,6 +204,8 @@ textarea {
 /* ── Layout ── */
 .app-container {
   width: min(100% - 1.5rem, var(--container-width));
+  max-width: 100%;
+  min-width: 0;
   margin-inline: auto;
 }
 
@@ -688,6 +694,7 @@ html[data-theme="dark"] .uae-hero-sand-wash {
 
 .market-header__bar {
   display: flex;
+  min-width: 0;
   min-height: 4.15rem;
   align-items: center;
   justify-content: space-between;
@@ -734,6 +741,8 @@ html[data-theme="dark"] .uae-hero-sand-wash {
 
 .market-header__actions {
   display: flex;
+  min-width: 0;
+  flex-shrink: 1;
   align-items: center;
   gap: 0.45rem;
 }
@@ -1318,6 +1327,14 @@ button:disabled {
   min-height: 2rem;
   padding: 0.15rem 0.45rem;
   font-size: 0.68rem;
+}
+
+@media (max-width: 379px) {
+  .language-switch--compact .language-switch__pill {
+    min-width: 1.7rem;
+    padding-inline: 0.28rem;
+    font-size: 0.62rem;
+  }
 }
 
 html[data-theme="dark"] .language-switch {
