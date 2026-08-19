@@ -40,7 +40,7 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
   );
 
   if (!ready || !maintenance || bypass) {
-    return <>{children}</>;
+    return <LocalizedTree>{children}</LocalizedTree>;
   }
 
   return (

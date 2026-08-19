@@ -7,7 +7,7 @@ import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
-import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { Copy, LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { PASSWORD_RESET_GENERIC_MESSAGE } from "@/services/auth/auth-messages";
 
 function isValidEmail(value: string) {
@@ -62,13 +62,18 @@ export function ForgotPasswordForm() {
           <div>
             <h2 className="text-xl font-black text-ink">تحقق من بريدك</h2>
             <p className="mt-1.5 text-sm font-medium text-muted">
-              {PASSWORD_RESET_GENERIC_MESSAGE}
+              <Copy text={PASSWORD_RESET_GENERIC_MESSAGE} />
             </p>
           </div>
-          <FormMessage variant="success">{PASSWORD_RESET_GENERIC_MESSAGE}</FormMessage>
+          <FormMessage variant="success">
+            <Copy text={PASSWORD_RESET_GENERIC_MESSAGE} />
+          </FormMessage>
           <p className="text-sm font-medium text-muted">
-            إن وُجد حساب، ستصل الرسالة إلى {maskedEmail || "بريدك"}. الرابط صالح لمدة 60 دقيقة ويُستخدم
-            مرة واحدة.
+            <Copy text="إن وُجد حساب، ستصل الرسالة إلى" />{" "}
+            <span className="font-semibold text-ink" dir="ltr">
+              {maskedEmail || "بريدك"}
+            </span>
+            . <Copy text="الرابط صالح لمدة 60 دقيقة ويُستخدم مرة واحدة." />
           </p>
           <Button
             fullWidth
