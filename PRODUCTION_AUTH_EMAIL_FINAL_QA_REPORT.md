@@ -3,13 +3,15 @@
 **Date:** 2026-08-19  
 **Branch:** `cursor/production-auth-resend-final-37ba`  
 **Target:** https://sooqna.site  
-**Status:** ⚠️ **NOT COMPLETE** — code fixes ready; real production email delivery not verified (RESEND_API_KEY missing on Vercel)
+**Status:** ⚠️ **NOT COMPLETE** — production is still on old code (`/api/auth/status` returns 404); email sending is still failing (`503 EMAIL_SEND_FAILED`)
 
 ---
 
 ## Root cause
 
-Production auth was blocked by **two independent issues**:
+Production auth was blocked by **multiple independent issues**:
+
+0. **PR #230 not deployed to production yet** — deployed production does not include `/api/auth/status` (returns `404`). That means the improved registration UX + config diagnostics from PR #230 are not active yet.
 
 1. **Neon/Postgres connected** — user accounts persist in `auth_users`, but legacy accounts from ephemeral `/tmp` storage were never migrated. Login correctly returns `401 INVALID_CREDENTIALS` for unknown credentials or `403 ACCOUNT_UNVERIFIED` for pending accounts.
 
@@ -25,14 +27,14 @@ Production auth was blocked by **two independent issues**:
 
 | Check | Result (production, pre-deploy) |
 |-------|----------------------------------|
-| Postgres driver | ✅ Active — login/register return auth errors, not `AUTH_STORE_NOT_DURABLE` |
-| Storage location | `postgres:auth_users` (Neon via Vercel integration) |
-| `/tmp` auth users | ❌ Not used when `DATABASE_URL` / Neon vars present |
-| localStorage for users | ❌ Not used — sessions via httpOnly cookies; users in Postgres |
+| Postgres driver | ✅ Likely active — even when registration email sending fails, the created user can login and returns `403 ACCOUNT_UNVERIFIED` (not `AUTH_STORE_NOT_DURABLE` / `REGISTER_FAILED` 503 storage errors) |
+| Storage location | Not directly confirmed — would be confirmed by `/api/auth/status` from PR #230, but that endpoint is currently missing in deployed production |
+| `/tmp` auth users | Not directly confirmed (requires `/api/auth/status`) |
+| localStorage for users | ❌ Not used — sessions via httpOnly cookies |
 
 **Code addition:** `getPostgresUrl()` now falls back to Vercel Neon split vars (`DATABASE_PGHOST`, `DATABASE_PGPASSWORD`, `DATABASE_PGDATABASE`, etc.) when `DATABASE_URL` is absent.
 
-**New diagnostic:** `GET /api/auth/status` returns `{ config, persistence }` with names only (no secrets).
+**Diagnostic (PR #230):** `GET /api/auth/status` should return `{ config, persistence }` with names only (no secrets) — but it is currently `404` on deployed production.
 
 ---
 
@@ -46,7 +48,7 @@ Verified against production behavior and Vercel Neon integration pattern:
 | `DATABASE_PGHOST` | Neon integration | ✅ Visible in Vercel dashboard |
 | `DATABASE_PGPASSWORD` | Neon integration | ✅ Visible in Vercel dashboard |
 | `DATABASE_PGDATABASE` | Neon integration | ✅ Visible in Vercel dashboard |
-| `RESEND_API_KEY` | Required | ❌ **Missing** — emails fail |
+| `RESEND_API_KEY` | Required | ❌ **Likely missing/invalid** — registration fails with `503 EMAIL_SEND_FAILED` |
 | `EMAIL_PROVIDER` | `resend` | ⚠️ Not confirmed |
 | `EMAIL_FROM_ADDRESS` | `no-reply@sooqna.site` | ⚠️ Not confirmed |
 | `EMAIL_FROM_NAME` | `Sooqna` | ⚠️ Not confirmed |
@@ -54,7 +56,7 @@ Verified against production behavior and Vercel Neon integration pattern:
 | `ENABLE_DEMO_OTP` | `false` | ✅ No demo OTP in API responses |
 | `NEXT_PUBLIC_ENABLE_DEMO_OTP` | `false` | ✅ No client OTP fallback in prod |
 
-**Server-side logging added:** `[Sooqna Auth] production configuration incomplete` with missing var names when `RESEND_API_KEY` or `DATABASE_URL` absent in production.
+**Server-side logging added (PR #230):** `[Sooqna Auth] production configuration incomplete` with missing var names — not yet verifiable from deployed production because PR #230 is not deployed.
 
 ---
 
@@ -81,6 +83,13 @@ Verified against production behavior and Vercel Neon integration pattern:
 ## Production QA results (live sooqna.site, pre-merge)
 
 Tests run via `curl` against current production (before this PR deploys):
+
+### Auth diagnostic endpoint
+
+```
+GET /api/auth/status
+→ HTTP 404 (endpoint not deployed yet)
+```
 
 ### Registration (new email)
 
@@ -153,14 +162,15 @@ Not testable until OTP verify completes — blocked by missing Resend.
 
 ## Remaining blockers
 
-1. **Add `RESEND_API_KEY` to Vercel Production** (and verify `sooqna.site` domain in Resend).
-2. **Redeploy** after env vars + this PR merge.
-3. **Manual E2E** with a real inbox:
+1. **Deploy PR #230 to production** (required because `/api/auth/status` is currently `404`).
+2. If `RESEND_API_KEY` is still missing after deploy: **add `RESEND_API_KEY` to Vercel Production** (and verify `sooqna.site` domain in Resend).
+3. **Redeploy** after env vars + this PR merge.
+4. **Manual E2E** with a real inbox:
    - Register → OTP email → verify → welcome email
    - Logout → login
    - Forgot password → reset link → new password → login
-4. **Pending account:** open `/verify-email?email=ismailabohashiesh@gmail.com&purpose=REGISTER` → resend OTP after Resend is live.
-5. **Optional:** set strong `OTP_PEPPER` and `PASSWORD_PEPPER` in production (defaults to dev pepper if unset).
+5. **Pending account:** open `/verify-email?email=ismailabohashiesh@gmail.com&purpose=REGISTER` → resend OTP after Resend is live.
+6. **Optional:** set strong `OTP_PEPPER` and `PASSWORD_PEPPER` in production (defaults to dev pepper if unset).
 
 ---
 
