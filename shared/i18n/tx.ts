@@ -26,6 +26,18 @@ const NAME_TEMPLATES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
     /^(.+) راسلك بخصوص «(.+)»\.$/u,
     (match) => `${match[1]} messaged you about “${match[2]}”.`,
   ],
+  [
+    /^خلال (\d+) (?:دقيقة|دقائق)$/u,
+    (match) => `Within ${match[1]} minutes`,
+  ],
+  [
+    /^خلال ساعة$/u,
+    () => "Within an hour",
+  ],
+  [
+    /^خلال ساعتين$/u,
+    () => "Within 2 hours",
+  ],
 ];
 
 const UNIT_SUFFIXES: Array<[RegExp, string]> = [

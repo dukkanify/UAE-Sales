@@ -14,6 +14,7 @@ import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type StartChatButtonProps = {
   className?: string;
@@ -94,6 +95,7 @@ export function StartChatButton({
 
   if (resolvedLayout === "icon") {
     return (
+      <LocalizedTree>
       <button
         aria-busy={isLoading}
         aria-label="محادثة البائع"
@@ -104,10 +106,12 @@ export function StartChatButton({
       >
         <Icon name="message" size={20} />
       </button>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className={fullWidth ? "w-full" : ""}>
       <Button
         className={className}
@@ -138,5 +142,6 @@ export function StartChatButton({
         </div>
       ) : null}
     </div>
+    </LocalizedTree>
   );
 }

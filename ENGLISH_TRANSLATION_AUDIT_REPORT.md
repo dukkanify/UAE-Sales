@@ -71,7 +71,7 @@ Listing and category `generateMetadata` follow the selected locale. Canonical UR
 
 `LocalizedTree` is applied on chrome that creates Arabic JSX, including:
 
-`SiteHeader`, `SiteFooter`, `MarketHeader`, `MobileHomeHeader`, `MobileBottomNav`, `MaintenanceGate`, `ListingDetailsView`, `ListingStickyPanel`, `ListingPrimaryAction`, `CheckoutWizard`, `CheckoutContent`, `AddListingForm`, `CategoryFieldsForm`, `SearchFilters`, `SearchTypeahead`, `MarketHeroSearch`, `PremiumListingCard`, `DashboardShell`, `MyListingsDashboard`, `AdminShell`, `ChatConversationView`, `ChatInboxList`, `FavoriteButton`, `LoginForm`, `RegisterForm`, `ForgotPasswordForm`, `OtpVerification`, `ProfileForm`, `FavoritesPanel`, `OrdersListContent`, `WalletBalances`, legal page mains.
+`SiteHeader`, `SiteFooter`, `MarketHeader`, `MobileHomeHeader`, `MobileBottomNav`, `MaintenanceGate`, `ListingDetailsView`, `ListingStickyPanel`, `ListingPrimaryAction`, `ListingSpecifications`, `ListingPlatformNotice`, `ListingGallery`, `ListingDetailToolbar`, `ListingSummary`, `ListingLocationMap`, `SellerPanel`, `ShareButton`, `ListingSafetyTips`, `StartChatButton`, `CheckoutWizard`, `CheckoutContent`, `AddListingForm`, `CategoryFieldsForm`, `SearchFilters`, `SearchTypeahead`, `MarketHeroSearch`, `PremiumListingCard`, `DashboardShell`, `MyListingsDashboard`, `AdminShell`, `ChatConversationView`, `ChatInboxList`, `FavoriteButton`, `LoginForm`, `RegisterForm`, `ForgotPasswordForm`, `OtpVerification`, `ProfileForm`, `FavoritesPanel`, `OrdersListContent`, `WalletBalances`, legal page mains.
 
 `LiveLocalizer` covers remaining client islands (other admin panels, extra listing modals) after hydration, before paint.
 
@@ -131,12 +131,11 @@ Listing approval body (English): **Your listing has been approved and is now liv
 
 These are **intentional** or **hydrate-time**:
 
-1. **User-generated content** — listing titles/descriptions, chat bodies, custom field values the seller typed.
-2. **Catalog listing titles** that have no `titleEnglish` stay in the seller’s language.
+1. **User-generated / catalog listing content** — listing titles/descriptions, chat bodies, seller names, area names the seller typed, custom field values.
+2. **Catalog listing titles** that have no `titleEnglish` stay in the seller’s language. Metadata uses `titleEnglish` when present (example: **Villa Palm Jumeirah | Sooqna**).
 3. **SSR of some nested client islands** may still contain Arabic in the HTML payload until `LiveLocalizer` runs (before paint).
 4. A few long legal/help paragraphs that were not extracted into `phrases.en.json` will show Arabic until the phrase is added; `LiveLocalizer` only translates keys present in the map.
 5. **Some admin panel body copy** still relies primarily on `LiveLocalizer` + AdminShell wrap, not a per-panel `LocalizedTree`.
-6. Interpolated strings that mix a UI phrase with a user name/title in one text node (for example `التقديم على: {listing.title}`) stay mixed unless a «…» template exists.
 
 No Arabic UI chrome was removed from the Arabic locale.
 
@@ -160,10 +159,11 @@ Cookie `sooqna-locale=en` / `ar` against a local production server:
 
 - Language cookie is read in `getRequestLocale()`; HTML `dir`/`lang` match.
 - `POST /api/locale` returns `{"locale":"en"}`.
-- Listing detail English SSR: **Book a viewing** present, **احجز معاينة** absent.
+- Listing detail English SSR: **Book a viewing**, **Bedrooms**, **Specifications and Features**, **Safety tips**; **احجز معاينة** / **غرف النوم** absent.
 - Category SEO: **Cars & Vehicles | Sooqna**.
-- Legal pages: English titles and far fewer Arabic characters than the Arabic locale (remaining Arabic is brand lockup / UGC).
-- Arabic locale still serves full Arabic chrome.
+- Login/register: **Sign in**, **Create a new account**, **Full name**, **Email**.
+- Search: **Filter results**.
+- Checkout chrome: **Checkout** without **إتمام الشراء**.
 
 `npm run lint` — pass  
 `npm run build` — pass  
