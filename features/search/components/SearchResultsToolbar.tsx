@@ -63,7 +63,11 @@ export function SearchResultsToolbar({
       </div>
       <SearchQuickFilters categories={categories} selectedFilters={selectedFilters} />
       <SearchFilterChips categories={categories} selectedFilters={selectedFilters} />
-      <SavedSearches currentLabel={buildLabel(selectedFilters, categories)} currentUrl={currentUrl} />
+      <SavedSearches
+        currentFilters={selectedFilters}
+        currentLabel={buildLabel(selectedFilters, categories)}
+        currentUrl={currentUrl}
+      />
     </div>
   );
 }

@@ -8,6 +8,15 @@ import {
   invalidateFavoritesSnapshot,
   invalidateSessionSnapshot,
 } from "@/services/storage/external-store";
+import {
+  buildSavedSearchUrl,
+  dedupeSavedSearches,
+  hydrateSavedSearch,
+  parseSavedSearchUrl,
+  savedSearchFingerprint,
+  savedSearchIdFromFingerprint,
+  type SavedSearch as SavedSearchRecord,
+} from "@/services/saved-searches/identity";
 
 function canUseStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
@@ -237,37 +246,36 @@ export function getAccountProof(email: string): AccountProofRecord | null {
   return getAccountProofs().find((item) => item.email === normalized) ?? null;
 }
 
-export type SavedSearch = {
-  id: string;
-  label: string;
-  url: string;
-};
+export type SavedSearch = SavedSearchRecord;
 
-const MAX_SAVED_SEARCHES = 8;
+const MAX_SAVED_SEARCHES = 20;
 
-export function getSavedSearches(): SavedSearch[] {
+function readSavedSearchesRaw(): unknown[] {
   if (!canUseStorage()) return [];
   ensureMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.savedSearches);
   if (!raw) return [];
   try {
     const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .map((item) => {
-        if (!item || typeof item !== "object") return null;
-        const record = item as Partial<SavedSearch>;
-        if (!record.id || !record.label || !record.url) return null;
-        return {
-          id: String(record.id),
-          label: String(record.label),
-          url: String(record.url),
-        };
-      })
-      .filter((item): item is SavedSearch => Boolean(item));
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
+}
+
+function savedSearchSignature(items: SavedSearch[]): string {
+  return items.map((item) => `${item.id}:${item.fingerprint}`).join("|");
+}
+
+export function getSavedSearches(): SavedSearch[] {
+  const hydrated = readSavedSearchesRaw()
+    .map(hydrateSavedSearch)
+    .filter((item): item is SavedSearch => Boolean(item));
+  const cleaned = dedupeSavedSearches(hydrated).slice(0, MAX_SAVED_SEARCHES);
+  if (savedSearchSignature(hydrated) !== savedSearchSignature(cleaned)) {
+    persistSavedSearches(cleaned);
+  }
+  return cleaned;
 }
 
 function persistSavedSearches(items: SavedSearch[]) {
@@ -276,20 +284,48 @@ function persistSavedSearches(items: SavedSearch[]) {
   window.dispatchEvent(new Event(STORAGE_EVENTS.savedSearchesChange));
 }
 
-export function saveCurrentSearch(input: { label: string; url: string }): {
+export function saveCurrentSearch(input: {
+  label: string;
+  url: string;
+  filters?: SavedSearch["filters"];
+}): {
   alreadySaved: boolean;
   items: SavedSearch[];
 } {
+  const fromUrl = parseSavedSearchUrl(input.url);
+  const filters = {
+    ...fromUrl,
+    ...(input.filters ?? {}),
+  };
+  const fingerprint = savedSearchFingerprint(filters);
+  const id = savedSearchIdFromFingerprint(fingerprint);
   const items = getSavedSearches();
-  if (items.some((item) => item.url === input.url)) {
-    return { alreadySaved: true, items };
+  const existing = items.find((item) => item.fingerprint === fingerprint || item.id === id);
+
+  if (existing) {
+    const now = new Date().toISOString();
+    const updated = [
+      { ...existing, lastUsedAt: now },
+      ...items.filter((item) => item.id !== existing.id),
+    ];
+    persistSavedSearches(updated);
+    return { alreadySaved: true, items: updated };
   }
 
-  const next: SavedSearch = {
-    id: `search-${Date.now()}`,
+  const now = new Date().toISOString();
+  const next = hydrateSavedSearch({
+    id,
     label: input.label.trim() || "بحث محفوظ",
-    url: input.url,
-  };
+    url: input.url || buildSavedSearchUrl(filters),
+    filters,
+    fingerprint,
+    createdAt: now,
+    lastUsedAt: now,
+  });
+  if (!next) {
+    return { alreadySaved: false, items };
+  }
+
   const updated = [next, ...items].slice(0, MAX_SAVED_SEARCHES);
   persistSavedSearches(updated);
   return { alreadySaved: false, items: updated };
@@ -297,6 +333,15 @@ export function saveCurrentSearch(input: { label: string; url: string }): {
 
 export function removeSavedSearch(id: string): SavedSearch[] {
   const updated = getSavedSearches().filter((item) => item.id !== id);
+  persistSavedSearches(updated);
+  return updated;
+}
+
+export function touchSavedSearch(id: string): SavedSearch[] {
+  const now = new Date().toISOString();
+  const updated = getSavedSearches().map((item) =>
+    item.id === id ? { ...item, lastUsedAt: now } : item,
+  );
   persistSavedSearches(updated);
   return updated;
 }

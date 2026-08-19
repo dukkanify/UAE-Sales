@@ -1,24 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { SavedSearchList } from "@/features/search/components/SavedSearchList";
 import {
   getSavedSearches,
   removeSavedSearch,
   saveCurrentSearch,
+  touchSavedSearch,
   type SavedSearch,
 } from "@/services/storage";
+import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
+import {
+  addServerSavedSearch,
+  removeServerSavedSearch,
+  syncSavedSearchesAfterLogin,
+} from "@/services/saved-searches/client";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { useToast } from "@/shared/components/ToastProvider";
 import { Button } from "@/shared/ui/Button";
-import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import type { SavedSearchFilters } from "@/services/saved-searches/identity";
 
 type SavedSearchesProps = {
   currentUrl: string;
   currentLabel: string;
+  currentFilters?: SavedSearchFilters;
 };
 
-export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) {
+export function SavedSearches({
+  currentLabel,
+  currentUrl,
+  currentFilters,
+}: SavedSearchesProps) {
+  const { showToast } = useToast();
+  const sessionUser = useSyncExternalStore(
+    subscribeSession,
+    () => getSessionSnapshot(),
+    () => null,
+  );
   const [saved, setSaved] = useState<SavedSearch[]>([]);
   const [message, setMessage] = useState("");
   const [justSavedId, setJustSavedId] = useState("");
@@ -34,31 +54,53 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
     };
   }, []);
 
+  useEffect(() => {
+    if (!sessionUser?.id) return;
+    void syncSavedSearchesAfterLogin(sessionUser.id);
+  }, [sessionUser?.id]);
+
   function handleSave() {
-    const result = saveCurrentSearch({ label: currentLabel, url: currentUrl });
+    const result = saveCurrentSearch({
+      label: currentLabel,
+      url: currentUrl,
+      filters: currentFilters,
+    });
     setSaved(result.items);
     if (result.alreadySaved) {
-      setMessage("هذا البحث محفوظ مسبقاً في القائمة أسفل الزر.");
+      setMessage("هذا البحث محفوظ بالفعل");
+      setJustSavedId("");
     } else {
       setJustSavedId(result.items[0]?.id ?? "");
       setMessage("تم الحفظ هنا أسفل الزر. تجده أيضاً في الملف الشخصي.");
+      if (sessionUser) {
+        void addServerSavedSearch({
+          label: currentLabel,
+          url: currentUrl,
+          query: currentFilters?.query,
+          filters: currentFilters,
+        });
+      }
     }
     window.setTimeout(() => {
       setMessage("");
       setJustSavedId("");
-    }, 4000);
+    }, 2800);
   }
 
-  function handleRemove(id: string) {
-    setSaved(removeSavedSearch(id));
+  function handleRemove(item: SavedSearch) {
+    setSaved(removeSavedSearch(item.id));
+    showToast("تم حذف البحث المحفوظ");
+    if (sessionUser) {
+      void removeServerSavedSearch(item.id);
+    }
   }
 
   return (
-    <div className="mt-4 rounded-[var(--radius-2xl)] border border-border bg-surface-muted/40 p-4">
+    <div className="mt-3 rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 p-3">
       <div className="flex items-center justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs font-bold text-ink">عمليات البحث المحفوظة</p>
-          <p className="mt-0.5 text-[11px] leading-5 text-muted">
+          <p className="mt-0.5 text-[11px] leading-4 text-muted">
             تُحفظ هنا على هذا الجهاز، وتظهر أيضاً في{" "}
             <Link className="font-semibold text-ink underline-offset-2 hover:underline" href="/profile#saved-searches">
               الملف الشخصي
@@ -73,39 +115,21 @@ export function SavedSearches({ currentLabel, currentUrl }: SavedSearchesProps) 
       </div>
 
       {message ? (
-        <div className="mt-2">
-          <FormMessage variant="success">{message}</FormMessage>
-        </div>
+        <p className="mt-1.5 text-[11px] font-medium text-muted" role="status">
+          {message}
+        </p>
       ) : null}
 
       {saved.length > 0 ? (
-        <ul className="mt-3 grid gap-2">
-          {saved.map((item) => (
-            <li
-              key={item.id}
-              className={`flex items-center justify-between gap-2 rounded-[var(--radius-xl)] bg-surface px-3 py-2 ${
-                item.id === justSavedId ? "ring-2 ring-secondary" : "border border-border/70"
-              }`}
-            >
-              <Link
-                className="min-w-0 flex-1 truncate text-xs font-semibold text-ink transition hover:text-primary"
-                href={item.url}
-              >
-                {item.label}
-              </Link>
-              <button
-                aria-label={`حذف ${item.label}`}
-                className="focus-ring grid size-7 shrink-0 place-items-center rounded-full text-muted transition hover:bg-surface-muted hover:text-error"
-                onClick={() => handleRemove(item.id)}
-                type="button"
-              >
-                <Icon name="close" size={12} />
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className={justSavedId ? "[&_li:first-child]:ring-1 [&_li:first-child]:ring-secondary" : ""}>
+          <SavedSearchList
+            items={saved}
+            onOpen={(item) => setSaved(touchSavedSearch(item.id))}
+            onRemove={handleRemove}
+          />
+        </div>
       ) : (
-        <p className="mt-3 text-xs font-medium text-muted">
+        <p className="mt-2 text-[11px] font-medium text-muted">
           بعد الحفظ يظهر البحث في هذه القائمة مباشرة — اضغط عليه للرجوع لنفس النتائج.
         </p>
       )}

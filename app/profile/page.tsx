@@ -39,7 +39,7 @@ export default async function ProfilePage() {
             <p className="mt-1 text-xs leading-6 text-muted">
               نفس القائمة التي تظهر تحت زر «حفظ البحث» في صفحة النتائج.
             </p>
-            <div className="mt-4">
+            <div className="mt-3">
               <ProfileSavedSearches />
             </div>
           </Card>

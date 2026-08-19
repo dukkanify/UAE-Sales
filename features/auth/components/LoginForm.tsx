@@ -12,6 +12,7 @@ import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
+import { syncSavedSearchesAfterLogin } from "@/services/saved-searches/client";
 import { getAccountProof, saveAccountProof, setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
@@ -89,6 +90,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       }
       await persistSessionCookie(data.user);
       await syncFavoritesAfterLogin(data.user.id);
+      await syncSavedSearchesAfterLogin(data.user.id);
       trackAuthEventClient("login_verified");
       router.push(getSafeNextPath(data.redirectTo ?? nextParam, "/profile"));
     },
