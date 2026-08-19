@@ -108,6 +108,7 @@ export async function GET() {
   const disabledCategories = categories.filter((c) => !c.enabled).length;
   const unreadNotifications = notifications.filter((n) => !n.read).length;
   const submittedJobs = jobs.filter((j) => j.status === "submitted").length;
+  const pendingBookings = bookings.filter((b) => b.status === "pending").length;
   const activeBookings = bookings.filter(
     (b) => b.status === "confirmed",
   ).length;
@@ -167,21 +168,21 @@ export async function GET() {
         failedPayments.filter((o) => Boolean(o.stripePaymentIntentId)).length > 0,
     },
     {
-      href: "/admin/job-applications",
+      href: "/admin/activities?kind=job_application&status=submitted",
       label: "طلبات توظيف جديدة",
       meta: "وارد",
       count: submittedJobs,
       alert: submittedJobs > 0,
     },
     {
-      href: "/admin/viewing-bookings",
-      label: "معاينات مؤكدة",
+      href: "/admin/activities?kind=viewing_booking&status=pending",
+      label: "معاينات بانتظار التأكيد",
       meta: "عقارات",
-      count: activeBookings,
-      alert: false,
+      count: pendingBookings,
+      alert: pendingBookings > 0,
     },
     {
-      href: "/admin/quote-requests",
+      href: "/admin/activities?kind=quote_request&status=submitted",
       label: "عروض أسعار جديدة",
       meta: "خدمات",
       count: openQuotes,
@@ -296,21 +297,29 @@ export async function GET() {
       count: addresses.length,
     },
     {
-      href: "/admin/job-applications",
+      href: "/admin/activities",
+      label: "إدارة الأنشطة",
+      meta: "طلبات، حجوزات، طلبات، نزاعات",
+      group: "leads",
+      count:
+        jobs.length + bookings.length + quotes.length + orders.length + openDisputes,
+    },
+    {
+      href: "/admin/activities?kind=job_application",
       label: "التوظيف",
       meta: "طلبات واردة",
       group: "leads",
       count: jobs.length,
     },
     {
-      href: "/admin/viewing-bookings",
+      href: "/admin/activities?kind=viewing_booking",
       label: "المعاينات",
-      meta: "عقارات",
+      meta: `${pendingBookings} بانتظار · ${activeBookings} مؤكدة`,
       group: "leads",
       count: bookings.length,
     },
     {
-      href: "/admin/quote-requests",
+      href: "/admin/activities?kind=quote_request",
       label: "عروض الأسعار",
       meta: "خدمات",
       group: "leads",

@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Card } from "@/shared/ui/Card";
 import { EmptyState } from "@/shared/ui/EmptyState";
-import { MarkNotificationsRead } from "@/features/notifications/MarkNotificationsRead";
 import { Icon } from "@/shared/ui/Icon";
+import { MarkNotificationsRead } from "@/features/notifications/MarkNotificationsRead";
+import { ActivityFeed } from "@/features/activity/components/ActivityFeed";
+import { ActivityDashboardSummary } from "@/features/activity/components/ActivityDashboardSummary";
+import { NotificationsList } from "@/features/notifications/NotificationsList";
 import { getNotifications } from "@/services/activityService";
 
 export async function ProfileActivityPanel({ userId }: { userId: string }) {
@@ -11,6 +15,27 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
 
   return (
     <div className="mt-6 grid gap-5">
+      <ActivityDashboardSummary />
+
+      <Card className="scroll-mt-24 p-5" id="activity" variant="flat">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold text-ink">طلباتي ونشاطاتي</h2>
+            <p className="mt-1 text-xs text-muted">
+              الوظائف، الحجوزات، الخدمات، الطلبات، والإعلانات — من الخادم مباشرة.
+            </p>
+          </div>
+          <Link className="text-xs font-semibold text-primary hover:underline" href="/notifications">
+            الإشعارات
+          </Link>
+        </div>
+        <div className="mt-4">
+          <Suspense fallback={<p className="text-sm text-muted">جاري تحميل النشاط...</p>}>
+            <ActivityFeed />
+          </Suspense>
+        </div>
+      </Card>
+
       <Card className="scroll-mt-24 p-5" id="notifications" variant="flat">
         <MarkNotificationsRead />
         <div className="flex items-center justify-between">
@@ -26,36 +51,18 @@ export async function ProfileActivityPanel({ userId }: { userId: string }) {
             <EmptyState
               actionHref="/search"
               actionLabel="استكشف السوق"
-              description="ستظهر هنا رسالة الترحيب بعد التحقق والاعتماد، وتنبيهات الطلبات والضمان عندما تحدث فعلاً. فعّل تنبيهات المتصفح من أيقونة الجرس للوصول الفوري."
+              description="ستظهر هنا رسالة الترحيب بعد التحقق والاعتماد، وتنبيهات الطلبات والضمان عندما تحدث فعلاً."
               icon="message"
               title="لا إشعارات حتى الآن"
             />
           </div>
         ) : (
-          <ul className="mt-4 grid gap-2">
-            {notifications.slice(0, 8).map((item) => {
-              const content = (
-                <>
-                  <p className="font-semibold text-ink">{item.title}</p>
-                  <p className="mt-0.5 text-xs">{item.body}</p>
-                </>
-              );
-              return (
-                <li
-                  key={item.id}
-                  className={`rounded-[var(--radius-xl)] px-4 py-3 text-sm ${item.read ? "bg-surface-muted text-muted" : "border border-primary/15 bg-primary-soft"}`}
-                >
-                  {item.href ? (
-                    <Link className="block" href={item.href}>
-                      {content}
-                    </Link>
-                  ) : (
-                    content
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <div className="mt-4">
+            <NotificationsList items={notifications.slice(0, 8)} />
+            <Link className="mt-3 inline-block text-xs font-semibold text-primary hover:underline" href="/notifications">
+              عرض كل الإشعارات
+            </Link>
+          </div>
         )}
       </Card>
 

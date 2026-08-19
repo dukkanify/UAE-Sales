@@ -8,16 +8,18 @@ import {
   markNotificationsRead,
 } from "@/services/payments/notification-store";
 
-export async function GET() {
+export async function GET(request: Request) {
   const user = await requireSessionUser();
   if (!isSessionUser(user)) {
     return user;
   }
 
+  const limit = Number(new URL(request.url).searchParams.get("limit") ?? "20");
   const notifications = await getNotificationsForUser(user.id);
+  const capped = Number.isFinite(limit) ? Math.min(Math.max(limit, 1), 200) : 20;
   return NextResponse.json({
     unread: notifications.filter((item) => !item.read).length,
-    notifications: notifications.slice(0, 20),
+    notifications: notifications.slice(0, capped),
   });
 }
 

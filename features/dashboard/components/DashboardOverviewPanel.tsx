@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ActivityDashboardSummary } from "@/features/activity/components/ActivityDashboardSummary";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -14,6 +15,15 @@ const quickActions = [
 export function DashboardOverviewPanel() {
   return (
     <div className="grid gap-5">
+      <div>
+        <h2 className="text-sm font-bold text-ink">ملخص النشاط</h2>
+        <p className="mt-1 text-xs text-muted">
+          طلباتك وحجوزاتك ومشترياتك — من الخادم مباشرة.
+        </p>
+        <div className="mt-3">
+          <ActivityDashboardSummary />
+        </div>
+      </div>
       <div className="marketplace-panel p-5">
         <h2 className="text-sm font-bold text-ink">إجراءات سريعة</h2>
         <div className="mt-4 grid grid-cols-2 gap-2">

@@ -5,6 +5,13 @@ const FILE = "quote-requests.json";
 
 const DUPLICATE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
+export async function getQuoteRequestsForProvider(
+  providerId: string,
+): Promise<QuoteRequest[]> {
+  const all = await loadCollection<QuoteRequest>(FILE);
+  return all.filter((item) => item.providerId === providerId);
+}
+
 export async function getQuoteRequestsForUser(
   userId: string,
 ): Promise<QuoteRequest[]> {
@@ -34,11 +41,13 @@ export async function createQuoteRequest(
   input: Omit<QuoteRequest, "id" | "status" | "createdAt">,
 ): Promise<QuoteRequest> {
   const all = await loadCollection<QuoteRequest>(FILE);
+  const now = new Date().toISOString();
   const request: QuoteRequest = {
     ...input,
     id: `quote-${Date.now()}`,
     status: "submitted",
-    createdAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   };
   all.unshift(request);
   await saveCollection(FILE, all);
@@ -52,7 +61,7 @@ export async function updateQuoteRequestStatus(
   const all = await loadCollection<QuoteRequest>(FILE);
   const index = all.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  all[index] = { ...all[index], status };
+  all[index] = { ...all[index], status, updatedAt: new Date().toISOString() };
   await saveCollection(FILE, all);
   return all[index];
 }

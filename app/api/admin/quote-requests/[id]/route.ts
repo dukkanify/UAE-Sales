@@ -3,13 +3,10 @@ import {
   requireAdminUser,
 } from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
-import { logAdminAction } from "@/services/admin/admin-audit-store";
-import { updateQuoteRequestStatus } from "@/services/quote-requests/quote-request-store";
+import { updateActivityStatus } from "@/services/activity/activity-status-update";
 import type { QuoteRequest } from "@/types/domain/quote-request";
 
 type RouteParams = { params: Promise<{ id: string }> };
-
-const ALLOWED: QuoteRequest["status"][] = ["submitted", "quoted", "accepted"];
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   const admin = await requireAdminUser();
@@ -24,23 +21,24 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     actorName?: string;
   };
 
-  if (!body.status || !ALLOWED.includes(body.status)) {
+  if (!body.status) {
     return NextResponse.json({ error: "INVALID_STATUS" }, { status: 400 });
   }
 
-  const quoteRequest = await updateQuoteRequestStatus(id, body.status);
-  if (!quoteRequest) {
-    return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
+  try {
+    const quoteRequest = await updateActivityStatus({
+      kind: "quote_request",
+      id,
+      status: body.status,
+      actorId: body.actorId ?? admin.id,
+      actorName: body.actorName ?? admin.fullName,
+      actorRole: "admin",
+    });
+    return NextResponse.json({ quoteRequest });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
+    const status =
+      message === "NOT_FOUND" ? 404 : message === "FORBIDDEN" ? 403 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
-
-  await logAdminAction({
-    actorId: body.actorId ?? "admin",
-    actorName: body.actorName ?? "Admin",
-    action: "quote_status",
-    targetType: "quote_request",
-    targetId: id,
-    detail: `الحالة → ${body.status}`,
-  });
-
-  return NextResponse.json({ quoteRequest });
 }

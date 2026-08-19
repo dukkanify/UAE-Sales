@@ -3,14 +3,35 @@
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { ViewingBooking } from "@/types/domain/viewing-booking";
+import { viewingStatusLabel } from "@/services/activity/activity-labels";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
-const statusLabel: Record<ViewingBooking["status"], string> = {
-  confirmed: "مؤكد",
-  cancelled: "ملغى",
+const ADMIN_ACTIONS: Partial<
+  Record<ViewingBooking["status"], { value: ViewingBooking["status"]; label: string }[]>
+> = {
+  pending: [
+    { value: "confirmed", label: "تأكيد" },
+    { value: "cancelled", label: "إلغاء" },
+  ],
+  confirmed: [
+    { value: "completed", label: "إكمال" },
+    { value: "cancelled", label: "إلغاء" },
+  ],
+  cancelled: [{ value: "confirmed", label: "إعادة تأكيد" }],
+  completed: [{ value: "confirmed", label: "إعادة فتح" }],
 };
+
+function statusChipClass(status: ViewingBooking["status"]): string {
+  if (status === "confirmed" || status === "completed") {
+    return " admin-ops__status-chip--ok";
+  }
+  if (status === "pending" || status === "cancelled") {
+    return " admin-ops__status-chip--warn";
+  }
+  return "";
+}
 
 export function AdminViewingBookingsPanel() {
   const [items, setItems] = useState<ViewingBooking[]>([]);
@@ -26,7 +47,8 @@ export function AdminViewingBookingsPanel() {
   }
 
   useEffect(() => {
-    load();
+    const timeoutId = window.setTimeout(load, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   async function patchStatus(id: string, status: ViewingBooking["status"]) {
@@ -64,51 +86,42 @@ export function AdminViewingBookingsPanel() {
         </Card>
       ) : (
         <ul className="admin-ops__queue">
-          {items.map((item) => (
-            <li key={item.id} className="admin-ops__queue-item">
-              <div>
-                <p className="admin-ops__queue-label">{item.listingTitle}</p>
-                <p className="admin-ops__queue-meta">
-                  {item.buyerName} · {item.phone} · {item.visitors} زائر
-                </p>
-                <p className="admin-ops__queue-meta">
-                  {item.date} — {item.time}
-                  {item.notes ? ` · ${item.notes}` : ""}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                <span
-                  className={`admin-ops__status-chip${
-                    item.status === "confirmed"
-                      ? " admin-ops__status-chip--ok"
-                      : " admin-ops__status-chip--warn"
-                  }`}
-                >
-                  {statusLabel[item.status]}
-                </span>
-                {item.status === "confirmed" ? (
-                  <Button
-                    loading={busyId === item.id}
-                    onClick={() => patchStatus(item.id, "cancelled")}
-                    size="sm"
-                    type="button"
-                    variant="ghost"
+          {items.map((item) => {
+            const actions = ADMIN_ACTIONS[item.status] ?? [];
+            return (
+              <li key={item.id} className="admin-ops__queue-item">
+                <div>
+                  <p className="admin-ops__queue-label">{item.listingTitle}</p>
+                  <p className="admin-ops__queue-meta">
+                    {item.buyerName} · {item.phone} · {item.visitors} زائر
+                  </p>
+                  <p className="admin-ops__queue-meta">
+                    {item.date} — {item.time}
+                    {item.notes ? ` · ${item.notes}` : ""}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <span
+                    className={`admin-ops__status-chip${statusChipClass(item.status)}`}
                   >
-                    إلغاء
-                  </Button>
-                ) : (
-                  <Button
-                    loading={busyId === item.id}
-                    onClick={() => patchStatus(item.id, "confirmed")}
-                    size="sm"
-                    type="button"
-                  >
-                    إعادة تأكيد
-                  </Button>
-                )}
-              </div>
-            </li>
-          ))}
+                    {viewingStatusLabel(item.status)}
+                  </span>
+                  {actions.map((action) => (
+                    <Button
+                      key={action.value}
+                      loading={busyId === item.id}
+                      onClick={() => patchStatus(item.id, action.value)}
+                      size="sm"
+                      type="button"
+                      variant={action.value === "cancelled" ? "ghost" : "secondary"}
+                    >
+                      {action.label}
+                    </Button>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

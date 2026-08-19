@@ -3,24 +3,36 @@
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useState } from "react";
 import type { QuoteRequest } from "@/types/domain/quote-request";
+import { quoteStatusLabel } from "@/services/activity/activity-labels";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
-const statusLabel: Record<QuoteRequest["status"], string> = {
-  submitted: "مقدّم",
-  quoted: "تم التسعير",
-  accepted: "مقبول",
+const ADMIN_ACTIONS: Partial<
+  Record<QuoteRequest["status"], { value: QuoteRequest["status"]; label: string }[]>
+> = {
+  submitted: [
+    { value: "quoted", label: "إرسال عرض" },
+    { value: "rejected", label: "رفض" },
+  ],
+  quoted: [
+    { value: "accepted", label: "قبول" },
+    { value: "rejected", label: "رفض" },
+  ],
+  accepted: [{ value: "completed", label: "إكمال" }],
+  rejected: [{ value: "quoted", label: "إعادة عرض" }],
+  completed: [{ value: "accepted", label: "إعادة فتح" }],
 };
 
-const nextStatus: Record<
-  QuoteRequest["status"],
-  QuoteRequest["status"] | null
-> = {
-  submitted: "quoted",
-  quoted: "accepted",
-  accepted: null,
-};
+function statusChipClass(status: QuoteRequest["status"]): string {
+  if (status === "accepted" || status === "completed") {
+    return " admin-ops__status-chip--ok";
+  }
+  if (status === "quoted" || status === "rejected") {
+    return " admin-ops__status-chip--warn";
+  }
+  return "";
+}
 
 export function AdminQuoteRequestsPanel() {
   const [items, setItems] = useState<QuoteRequest[]>([]);
@@ -36,7 +48,8 @@ export function AdminQuoteRequestsPanel() {
   }
 
   useEffect(() => {
-    load();
+    const timeoutId = window.setTimeout(load, 0);
+    return () => window.clearTimeout(timeoutId);
   }, []);
 
   async function patchStatus(id: string, status: QuoteRequest["status"]) {
@@ -75,7 +88,7 @@ export function AdminQuoteRequestsPanel() {
       ) : (
         <ul className="admin-ops__queue">
           {items.map((item) => {
-            const advance = nextStatus[item.status];
+            const actions = ADMIN_ACTIONS[item.status] ?? [];
             return (
               <li key={item.id} className="admin-ops__queue-item">
                 <div>
@@ -90,26 +103,22 @@ export function AdminQuoteRequestsPanel() {
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <span
-                    className={`admin-ops__status-chip${
-                      item.status === "accepted"
-                        ? " admin-ops__status-chip--ok"
-                        : item.status === "quoted"
-                          ? " admin-ops__status-chip--warn"
-                          : ""
-                    }`}
+                    className={`admin-ops__status-chip${statusChipClass(item.status)}`}
                   >
-                    {statusLabel[item.status]}
+                    {quoteStatusLabel(item.status)}
                   </span>
-                  {advance ? (
+                  {actions.map((action) => (
                     <Button
+                      key={action.value}
                       loading={busyId === item.id}
-                      onClick={() => patchStatus(item.id, advance)}
+                      onClick={() => patchStatus(item.id, action.value)}
                       size="sm"
                       type="button"
+                      variant={action.value === "rejected" ? "ghost" : "secondary"}
                     >
-                      → {statusLabel[advance]}
+                      {action.label}
                     </Button>
-                  ) : null}
+                  ))}
                 </div>
               </li>
             );
