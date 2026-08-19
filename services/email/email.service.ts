@@ -1,5 +1,5 @@
 import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
-import { getAppUrl } from "@/shared/constants/site";
+import { EMAIL_SITE_URL } from "@/services/email/sooqna-email-template";
 
 type SendEmailInput = {
   html: string;
@@ -295,7 +295,7 @@ export async function sendWelcomeEmail(input: {
   name: string;
 }): Promise<boolean> {
   const name = input.name.trim() || "عميل سوقنا";
-  const appUrl = getAppUrl();
+  const appUrl = EMAIL_SITE_URL;
   return deliverEmailSafely({
     to: input.email,
     subject: `مرحبًا بك في ${BRAND.nameAr} — حسابك جاهز`,

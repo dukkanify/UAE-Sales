@@ -2,6 +2,8 @@ import { deliverEmailSafely } from "@/services/email/email.service";
 import {
   buildEmailDedupeKey,
   findRecentEmailLog,
+  getEmailLogById,
+  listFailedEmailLogs,
   recordEmailLog,
   updateEmailLog,
   type EmailDeliveryStatus,
@@ -52,16 +54,6 @@ export async function sendTransactionalEmail(input: {
       return "skipped";
     }
 
-    const pending = await recordEmailLog({
-      dedupeKey,
-      entityId: input.entityId,
-      status: "pending",
-      subject: input.subject,
-      to,
-      type: input.type,
-      userId: input.userId,
-    });
-
     const html = buildSooqnaEmailHtml({
       title: input.title,
       bodyHtml: input.bodyHtml,
@@ -74,6 +66,18 @@ export async function sendTransactionalEmail(input: {
       bodyLines: input.bodyLines,
       ctaHref: input.ctaHref,
       ctaLabel: input.ctaLabel,
+    });
+
+    const pending = await recordEmailLog({
+      dedupeKey,
+      entityId: input.entityId,
+      html,
+      status: "pending",
+      subject: input.subject,
+      text,
+      to,
+      type: input.type,
+      userId: input.userId,
     });
 
     const sent = await deliverEmailSafely({
@@ -103,4 +107,48 @@ export async function sendTransactionalEmail(input: {
     console.error("[Sooqna Email] transactional send failed", error);
     return "failed";
   }
+}
+
+/** Re-sends a failed/pending log. Never throws to the business caller. */
+export async function retryEmailLog(
+  id: string,
+): Promise<EmailDeliveryStatus> {
+  try {
+    const item = await getEmailLogById(id);
+    if (!item) return "failed";
+    if (item.status === "sent" || item.status === "skipped") return "skipped";
+    if (!item.html || !item.text) return "failed";
+
+    await updateEmailLog(id, { error: undefined, status: "pending" });
+    const sent = await deliverEmailSafely({
+      to: item.to,
+      subject: item.subject,
+      html: item.html,
+      text: item.text,
+    });
+    await updateEmailLog(id, {
+      error: sent ? undefined : "delivery_failed",
+      status: sent ? "sent" : "failed",
+    });
+    return sent ? "sent" : "failed";
+  } catch (error) {
+    console.error("[Sooqna Email] retry failed", error);
+    return "failed";
+  }
+}
+
+export async function retryFailedEmails(limit = 20): Promise<{
+  retried: number;
+  sent: number;
+  failed: number;
+}> {
+  const failed = (await listFailedEmailLogs()).slice(0, limit);
+  let sent = 0;
+  let failedCount = 0;
+  for (const item of failed) {
+    const status = await retryEmailLog(item.id);
+    if (status === "sent") sent += 1;
+    else if (status === "failed") failedCount += 1;
+  }
+  return { retried: failed.length, sent, failed: failedCount };
 }

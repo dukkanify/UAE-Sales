@@ -295,9 +295,11 @@ async function sendOrderNotifications(order: Order): Promise<void> {
     body: `تم حجز ${formatCurrencyLabel(order.fees.productPrice)} في الضمان لطلب «${order.listingTitle}».`,
   });
 
-  void emailOrderPaid(order).catch((error) => {
-    console.error("[Sooqna Email] order paid email failed", error);
-  });
+  if (order.emailDeliveryStatus !== "sent") {
+    void emailOrderPaid(order).catch((error) => {
+      console.error("[Sooqna Email] order paid email failed", error);
+    });
+  }
 }
 
 async function markOrderPaid(
@@ -517,16 +519,16 @@ async function releaseEscrowToSeller(
       title: "تم تأكيد الاستلام",
       body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
     });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "order_confirmed",
-      title: "تم تأكيد الاستلام",
-      subject: `تحديث الطلب — ${order.listingTitle}`,
-      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
-    }).catch((error) => console.error("[Sooqna Email] order confirmed email failed", error));
   }
+  void emailOrderStatusToUser({
+    userId: order.buyerId ?? undefined,
+    fallbackEmail: order.buyerEmail,
+    orderId: order.id,
+    type: "order_confirmed",
+    title: "تم تأكيد الاستلام",
+    subject: `تحديث الطلب — ${order.listingTitle}`,
+    body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
+  }).catch((error) => console.error("[Sooqna Email] order confirmed email failed", error));
 
   void emailOrderStatusToUser({
     userId: order.sellerId,
@@ -590,16 +592,16 @@ export async function submitSellerProof(
       title: "إثبات من البائع",
       body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
     });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "seller_proof",
-      title: "إثبات من البائع",
-      subject: `إثبات تسليم — ${order.listingTitle}`,
-      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
-    }).catch((error) => console.error("[Sooqna Email] seller proof email failed", error));
   }
+  void emailOrderStatusToUser({
+    userId: order.buyerId ?? undefined,
+    fallbackEmail: order.buyerEmail,
+    orderId: order.id,
+    type: "seller_proof",
+    title: "إثبات من البائع",
+    subject: `إثبات تسليم — ${order.listingTitle}`,
+    body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+  }).catch((error) => console.error("[Sooqna Email] seller proof email failed", error));
 
   return updated;
 }
@@ -730,16 +732,16 @@ export async function refundOrder(
       title: "تم استرداد المبلغ",
       body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
     });
-    void emailOrderStatusToUser({
-      userId: order.buyerId,
-      fallbackEmail: order.buyerEmail,
-      orderId: order.id,
-      type: "order_refunded",
-      title: "تم استرداد المبلغ",
-      subject: `استرداد الطلب — ${order.listingTitle}`,
-      body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
-    }).catch((error) => console.error("[Sooqna Email] refund buyer email failed", error));
   }
+  void emailOrderStatusToUser({
+    userId: order.buyerId ?? undefined,
+    fallbackEmail: order.buyerEmail,
+    orderId: order.id,
+    type: "order_refunded",
+    title: "تم استرداد المبلغ",
+    subject: `استرداد الطلب — ${order.listingTitle}`,
+    body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
+  }).catch((error) => console.error("[Sooqna Email] refund buyer email failed", error));
 
   await createNotification({
     userId: order.sellerId,

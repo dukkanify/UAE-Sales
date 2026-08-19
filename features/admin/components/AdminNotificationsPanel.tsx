@@ -6,6 +6,7 @@ import type { AppNotification } from "@/types/domain/notification";
 import type { EmailLogRecord } from "@/services/email/email-log-store";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { Button } from "@/shared/ui/Button";
 
 const emailStatusLabel: Record<EmailLogRecord["status"], string> = {
   pending: "قيد الإرسال",
@@ -17,6 +18,8 @@ const emailStatusLabel: Record<EmailLogRecord["status"], string> = {
 export function AdminNotificationsPanel() {
   const [items, setItems] = useState<AppNotification[]>([]);
   const [emailLogs, setEmailLogs] = useState<EmailLogRecord[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
   const [summary, setSummary] = useState({
     total: 0,
     unread: 0,
@@ -25,7 +28,7 @@ export function AdminNotificationsPanel() {
     emailsPending: 0,
   });
 
-  useEffect(() => {
+  function load() {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
     adminFetch("/api/admin/notifications")
@@ -44,7 +47,40 @@ export function AdminNotificationsPanel() {
         }
       })
       .catch(() => undefined);
+  }
+
+  useEffect(() => {
+    load();
   }, []);
+
+  async function runAction(
+    action: "retry" | "retry_all" | "test",
+    id?: string,
+  ) {
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await adminFetch("/api/admin/notifications", {
+        method: "POST",
+        body: JSON.stringify({ action, id }),
+      });
+      const data = await response.json();
+      if (data.status === "sent") {
+        setMessage("تم إرسال البريد.");
+      } else if (data.sent != null) {
+        setMessage(`أُعيد الإرسال: ${data.sent} نجح، ${data.failed} فشل.`);
+      } else if (data.skipped) {
+        setMessage("تم التخطي لتجنب التكرار.");
+      } else {
+        setMessage("لم يصل البريد. تحقق من Resend والمجال.");
+      }
+      load();
+    } catch {
+      setMessage("تعذر تنفيذ العملية.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className="grid gap-4">
@@ -69,6 +105,26 @@ export function AdminNotificationsPanel() {
           <p className="admin-ops__kpi-label">بريد قيد الإرسال</p>
           <p className="admin-ops__kpi-value">{summary.emailsPending}</p>
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="primary"
+          disabled={busy}
+          onClick={() => void runAction("test")}
+        >
+          إرسال بريد تجريبي
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={busy}
+          onClick={() => void runAction("retry_all")}
+        >
+          إعادة إرسال الفاشل
+        </Button>
+        {message ? <p className="text-sm text-muted">{message}</p> : null}
       </div>
 
       <h2 className="text-base font-black text-ink">الإشعارات الداخلية</h2>
@@ -120,13 +176,25 @@ export function AdminNotificationsPanel() {
                   {item.error ? ` · ${item.error}` : ""}
                 </p>
               </div>
-              <span
-                className={`admin-ops__status-chip${
-                  item.status === "failed" ? " admin-ops__status-chip--warn" : ""
-                }`}
-              >
-                {emailStatusLabel[item.status]}
-              </span>
+              <div className="flex items-center gap-2">
+                {(item.status === "failed" || item.status === "pending") && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={busy}
+                    onClick={() => void runAction("retry", item.id)}
+                  >
+                    إعادة
+                  </Button>
+                )}
+                <span
+                  className={`admin-ops__status-chip${
+                    item.status === "failed" ? " admin-ops__status-chip--warn" : ""
+                  }`}
+                >
+                  {emailStatusLabel[item.status]}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
