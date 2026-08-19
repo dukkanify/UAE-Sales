@@ -34,12 +34,45 @@ export class AuthStoreError extends Error {
 }
 
 function getPostgresUrl(): string {
-  return (
+  const direct =
     process.env.DATABASE_URL?.trim() ||
+    process.env.DATABASE_URL_UNPOOLED?.trim() ||
     process.env.POSTGRES_URL?.trim() ||
     process.env.POSTGRES_PRISMA_URL?.trim() ||
-    ""
-  );
+    "";
+  if (direct.startsWith("postgres")) return direct;
+
+  // Vercel Neon integration exposes split PG* vars instead of DATABASE_URL.
+  const host =
+    process.env.DATABASE_PGHOST?.trim() ||
+    process.env.DATABASE_PGHOST_UNPOOLED?.trim() ||
+    process.env.PGHOST?.trim() ||
+    "";
+  const user =
+    process.env.DATABASE_PGUSER?.trim() ||
+    process.env.PGUSER?.trim() ||
+    "neondb_owner";
+  const password =
+    process.env.DATABASE_PGPASSWORD?.trim() ||
+    process.env.PGPASSWORD?.trim() ||
+    "";
+  const database =
+    process.env.DATABASE_PGDATABASE?.trim() ||
+    process.env.PGDATABASE?.trim() ||
+    "neondb";
+  const port =
+    process.env.DATABASE_PGPORT?.trim() ||
+    process.env.PGPORT?.trim() ||
+    "5432";
+
+  if (host && password) {
+    const encodedUser = encodeURIComponent(user);
+    const encodedPassword = encodeURIComponent(password);
+    const encodedDb = encodeURIComponent(database);
+    return `postgresql://${encodedUser}:${encodedPassword}@${host}:${port}/${encodedDb}?sslmode=require`;
+  }
+
+  return "";
 }
 
 function isServerlessRuntime(): boolean {

@@ -91,7 +91,7 @@ export async function sendRegistrationVerifyOtp(input: {
   userId: string;
   accountType: string;
 }): Promise<{ delivered: boolean; code: string }> {
-  const { record, code } = await createOtpRequest({
+  const { code } = await createOtpRequest({
     email: input.email,
     purpose: "REGISTER",
     userId: input.userId,
@@ -110,8 +110,8 @@ export async function sendRegistrationVerifyOtp(input: {
   });
 
   if (!delivered && !canRevealOtpToClient(false)) {
-    await invalidateOtpRecord(record.id);
-    throw new Error("EMAIL_SEND_FAILED");
+    // Keep OTP so the user can resend after RESEND_API_KEY is configured.
+    return { delivered: false, code };
   }
 
   return { delivered, code };
@@ -156,8 +156,7 @@ export async function sendOtpForPurpose(input: {
   }
 
   if (!delivered && input.purpose === "REGISTER" && !canRevealOtpToClient(false)) {
-    await invalidateOtpRecord(record.id);
-    throw new Error("EMAIL_SEND_FAILED");
+    return { delivered: false, code };
   }
 
   if (!delivered && input.purpose !== "REGISTER") {
