@@ -7,6 +7,7 @@ import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminSettingsPanel() {
   const [settings, setSettings] = useState<AdminSiteSettings | null>(null);

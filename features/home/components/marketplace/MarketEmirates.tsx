@@ -3,6 +3,7 @@ import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
 import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export async function MarketEmirates() {
   const emirates = await getUaeEmiratesCards();

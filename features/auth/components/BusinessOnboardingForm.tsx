@@ -12,6 +12,7 @@ import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const categories = [
   { label: "سيارات", value: "cars" },

@@ -14,6 +14,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const roleLabels: Record<AdminUserRecord["role"], string> = {
   user: "مستخدم",

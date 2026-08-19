@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketSectionHeaderProps = {
   actionHref?: string;

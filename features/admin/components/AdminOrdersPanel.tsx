@@ -8,6 +8,7 @@ import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const customerTypeLabels: Record<NonNullable<Order["customerType"]>, string> = {
   registered: "مستخدم مسجّل",

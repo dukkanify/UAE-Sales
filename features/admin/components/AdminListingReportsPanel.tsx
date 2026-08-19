@@ -8,6 +8,7 @@ import { LISTING_REPORT_REASON_LABELS } from "@/types/domain/listing-report";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 function toTelHref(phone: string): string {
   const digits = phone.replace(/\D/g, "");

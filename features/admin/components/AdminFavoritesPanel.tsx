@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { ServerFavorite } from "@/types/domain/server-favorite";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type FavoritesPayload = {
   favorites: ServerFavorite[];

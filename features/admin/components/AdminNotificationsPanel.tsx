@@ -6,6 +6,7 @@ import type { AppNotification } from "@/types/domain/notification";
 import type { EmailLogRecord } from "@/services/email/email-log-store";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const emailStatusLabel: Record<EmailLogRecord["status"], string> = {
   pending: "قيد الإرسال",

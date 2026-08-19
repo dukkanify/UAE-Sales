@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function MarketPromoBanner() {
   return (

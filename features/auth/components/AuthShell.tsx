@@ -4,6 +4,7 @@ import { BrandLogo } from "@/shared/components/BrandLogo";
 import { Icon } from "@/shared/ui/Icon";
 import { getAuthTrustPoints } from "@/services/content";
 import "./auth.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AuthShellProps = {
   children: ReactNode;

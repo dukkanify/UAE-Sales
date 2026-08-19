@@ -7,6 +7,7 @@ import { getVerifyAccountPrompt } from "@/services/auth/account-access";
 import { getSessionSnapshot, subscribeSession } from "@/services/storage/external-store";
 import { Icon } from "@/shared/ui/Icon";
 import "./verify-account-banner.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function VerifyAccountBanner() {
   const pathname = usePathname();

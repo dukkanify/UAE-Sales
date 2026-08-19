@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { BRAND } from "@/shared/constants/brand";
 import "./admin-login.css";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminLoginStage() {
   return (

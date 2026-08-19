@@ -11,6 +11,7 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Select } from "@/shared/ui/Select";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const statusLabels: Record<DisputeStatus, string> = {
   open: "مفتوح",

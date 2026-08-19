@@ -3,6 +3,7 @@ import type { Category } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
 import {
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
   MOBILE_CATEGORY_PAGE_ORDER,
   MOBILE_MAIN_CATEGORY_LABELS,
 } from "@/features/home/components/mobile/mobile-home.config";

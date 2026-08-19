@@ -5,6 +5,7 @@ import { getNearbyListings } from "@/features/home/components/mobile/mobile-home
 import { getListingHref, getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketNearbySectionProps = {
   listings: Listing[];

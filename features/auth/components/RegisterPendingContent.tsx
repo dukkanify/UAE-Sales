@@ -8,6 +8,7 @@ import { persistSessionCookie } from "@/services/auth/session-sync";
 import { getSessionUser, setSessionUser } from "@/services/storage";
 import type { UserProfile } from "@/types";
 import { Button } from "@/shared/ui/Button";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function RegisterPendingContent() {
   const router = useRouter();

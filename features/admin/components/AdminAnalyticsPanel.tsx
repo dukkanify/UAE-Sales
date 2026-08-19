@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type AnalyticsPayload = {
   daily: {

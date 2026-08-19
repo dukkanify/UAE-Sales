@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketPreviewStripProps = {
   categories: { id: string; name: string }[];

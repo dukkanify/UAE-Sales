@@ -1,6 +1,7 @@
 import type { Listing } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketFeaturedProps = {
   categories: { id: string; name: string }[];

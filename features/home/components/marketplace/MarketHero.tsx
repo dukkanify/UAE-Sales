@@ -6,6 +6,7 @@ import {
   getMarketQuickSearches,
 } from "@/services/content/homepage-marketplace.content";
 import { MarketHeroSearch } from "./MarketHeroSearch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MarketHeroProps = {
   categories: Category[];

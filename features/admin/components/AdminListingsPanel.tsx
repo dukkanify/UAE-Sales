@@ -28,6 +28,7 @@ import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import { intlLocale } from "@/shared/i18n/locale";
 import { useLocale } from "@/shared/i18n/useLocale";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 const statusFilterOptions: { label: string; value: string }[] = [
   { label: "كل الحالات", value: "all" },

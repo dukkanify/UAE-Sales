@@ -12,6 +12,7 @@ import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import type { UserProfile } from "@/types";
 import { persistSessionCookie } from "@/services/auth/session-sync";
 import { setSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type CompleteAccountContentProps = {
   token?: string;

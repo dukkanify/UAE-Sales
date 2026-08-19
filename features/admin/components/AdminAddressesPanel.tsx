@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { DeliveryAddress } from "@/types/domain/address";
 import { getSessionUser } from "@/services/storage";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 export function AdminAddressesPanel() {
   const [items, setItems] = useState<DeliveryAddress[]>([]);

@@ -11,6 +11,7 @@ import { persistSessionCookie } from "@/services/auth/session-sync";
 import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 import Link from "next/link";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type VerifyEmailContentProps = {
   initialOtp?: string | null;
