@@ -65,4 +65,5 @@ export type UserProfile = {
 
 export type StoredUser = UserProfile & {
   passwordHash?: string | null;
+  createdAt?: string;
 };
