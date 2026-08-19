@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createHash, randomBytes } from "node:crypto";
 import {
   GENERIC_OTP_SENT_MESSAGE,
   OTP_SEND_FAILED_MESSAGE,
@@ -8,6 +7,7 @@ import {
 } from "@/services/auth/auth-messages";
 import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
 
@@ -24,12 +24,14 @@ export function genericOtpResponse(
 ) {
   const emailDelivered = extras?.emailDelivered ?? true;
   const revealOtp =
-    Boolean(extras?.otp) && Boolean(extras?.revealOtp || !emailDelivered);
+    Boolean(extras?.otp) &&
+    canRevealOtpToClient(emailDelivered) &&
+    Boolean(extras?.revealOtp || !emailDelivered);
   const response = NextResponse.json({
     ok: true,
     message: emailDelivered
       ? GENERIC_OTP_SENT_MESSAGE
-      : "تعذر وصول الرسالة إلى البريد. استخدم الرمز الظاهر على الشاشة لإكمال التحقق.",
+      : OTP_SEND_FAILED_MESSAGE,
     maskedEmail: maskEmail(email),
     email,
     emailDelivered,
@@ -89,7 +91,7 @@ export async function sendRegistrationVerifyOtp(input: {
   userId: string;
   accountType: string;
 }): Promise<{ delivered: boolean; code: string }> {
-  const { code } = await createOtpRequest({
+  const { record, code } = await createOtpRequest({
     email: input.email,
     purpose: "REGISTER",
     userId: input.userId,
@@ -107,10 +109,9 @@ export async function sendRegistrationVerifyOtp(input: {
     otp: code,
   });
 
-  if (!delivered) {
-    console.warn("[Sooqna OTP] email not delivered; code available on verify screen", {
-      email: input.email,
-    });
+  if (!delivered && !canRevealOtpToClient(false)) {
+    await invalidateOtpRecord(record.id);
+    throw new Error("EMAIL_SEND_FAILED");
   }
 
   return { delivered, code };
@@ -154,6 +155,11 @@ export async function sendOtpForPurpose(input: {
       delivered = await senders.sendLoginOtp(payload);
   }
 
+  if (!delivered && input.purpose === "REGISTER" && !canRevealOtpToClient(false)) {
+    await invalidateOtpRecord(record.id);
+    throw new Error("EMAIL_SEND_FAILED");
+  }
+
   if (!delivered && input.purpose !== "REGISTER") {
     await invalidateOtpRecord(record.id);
     throw new Error("EMAIL_SEND_FAILED");
@@ -162,47 +168,3 @@ export async function sendOtpForPurpose(input: {
   return { delivered, code };
 }
 
-export function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
-
-const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
-
-export async function storeResetToken(email: string, token: string) {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const withoutStale = tokens.filter((item) => item.email !== email);
-  withoutStale.unshift({
-    email,
-    token,
-    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-  });
-  await saveCollection("password-reset-tokens.json", withoutStale);
-}
-
-export async function consumeResetToken(email: string, token: string): Promise<boolean> {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const match = tokens.find(
-    (item) =>
-      item.email === email &&
-      item.token === token &&
-      new Date(item.expiresAt).getTime() > Date.now(),
-  );
-  if (!match) return false;
-  await saveCollection(
-    "password-reset-tokens.json",
-    tokens.filter((item) => item.token !== match.token),
-  );
-  return true;
-}

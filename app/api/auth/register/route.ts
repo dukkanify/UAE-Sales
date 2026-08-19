@@ -5,18 +5,20 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
+  otpSendFailedResponse,
   sendRegistrationVerifyOtp,
 } from "@/services/auth/auth-handlers";
-import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import {
   createStandardUser,
   toUserProfile,
 } from "@/services/auth/user-store";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
+import { AuthStoreError } from "@/services/auth/user-persistence";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import { maskEmail } from "@/shared/utils/mask-email";
 
 function registerOtpResponse(input: {
-  accountProof?: string | null;
   email: string;
   emailDelivered: boolean;
   otp?: string;
@@ -26,19 +28,16 @@ function registerOtpResponse(input: {
     purpose: "REGISTER",
     masked: maskEmail(input.email),
   });
+  const revealOtp = Boolean(input.otp) && canRevealOtpToClient(input.emailDelivered);
   const response = NextResponse.json({
     ok: true,
     needsVerification: true,
     email: input.email,
     maskedEmail: maskEmail(input.email),
     emailDelivered: input.emailDelivered,
-    ...(input.otp ? { otp: input.otp } : {}),
+    ...(revealOtp ? { otp: input.otp } : {}),
     redirectTo: `/verify-email?${params.toString()}`,
-    accountProof: input.accountProof,
   });
-  if (input.otp) {
-    attachOtpDisplayCookie(response, input.email, input.otp);
-  }
   return response;
 }
 
@@ -106,7 +105,6 @@ export async function POST(request: Request) {
       });
       trackAuthEvent("registration_otp_sent");
       return registerOtpResponse({
-        accountProof: stored.passwordHash,
         email,
         emailDelivered: sent.delivered,
         otp: sent.code,
@@ -114,17 +112,23 @@ export async function POST(request: Request) {
     } catch (error) {
       const cooldown = otpCooldownResponse(error);
       if (cooldown) return cooldown;
-      return registerOtpResponse({
-        accountProof: stored.passwordHash,
-        email,
-        emailDelivered: false,
-      });
+      if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
+        trackAuthEvent("registration_failed");
+        return otpSendFailedResponse();
+      }
+      return otpSendFailedResponse();
     }
   } catch (error) {
     if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
       return NextResponse.json(
-        { error: "EMAIL_ALREADY_REGISTERED", message: "هذا البريد مسجّل مسبقًا." },
+        { error: "EMAIL_ALREADY_REGISTERED", message: EMAIL_ALREADY_REGISTERED_MESSAGE },
         { status: 409 },
+      );
+    }
+    if (error instanceof AuthStoreError) {
+      return NextResponse.json(
+        { error: "REGISTER_FAILED", message: "تعذر حفظ الحساب. حاول مرة أخرى." },
+        { status: 503 },
       );
     }
     return NextResponse.json({ error: "REGISTER_FAILED" }, { status: 500 });

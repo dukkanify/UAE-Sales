@@ -38,6 +38,7 @@ const HIDDEN_PATH_PREFIXES = [
   "/register",
   "/verify-email",
   "/forgot-password",
+  "/reset-password",
   "/complete-account",
   "/admin",
 ];

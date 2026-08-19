@@ -47,6 +47,9 @@ export type UserProfile = {
   joinedAt: string;
   emailVerifiedAt?: string | null;
   accountStatus?: AccountStatus;
+  /** Bumped on password reset so older session cookies stop working. */
+  sessionVersion?: number;
+  passwordUpdatedAt?: string | null;
   onboardingStatus?: OnboardingStatus;
   registrationSource?: RegistrationSource;
   isGuestConverted?: boolean;
@@ -66,4 +69,5 @@ export type UserProfile = {
 
 export type StoredUser = UserProfile & {
   passwordHash?: string | null;
+  createdAt?: string;
 };

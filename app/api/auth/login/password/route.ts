@@ -5,6 +5,8 @@ import { findUserByEmail, toUserProfile, getRedirectAfterAuth, restoreUserWithPa
 import { verifyPassword } from "@/services/auth/password.service";
 import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { INVALID_CREDENTIALS_MESSAGE } from "@/services/auth/auth-messages";
+import { AuthStoreError } from "@/services/auth/user-persistence";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const schema = z.object({
@@ -36,22 +38,18 @@ export async function POST(request: Request) {
     const password = parsed.data.password.trim();
 
     let stored = await findUserByEmail(email);
-    const credentialsMatch = Boolean(
-      stored?.passwordHash && passwordMatches(stored.passwordHash, password),
-    );
-    if (!credentialsMatch) {
+    if (!stored) {
       try {
         const cookieProof = await readAccountProofCookie(email);
         const passwordHash = parsed.data.accountProof ?? cookieProof?.passwordHash;
         if (passwordHash) {
-          stored =
-            (await restoreUserWithPasswordProof({
-              email,
-              password,
-              passwordHash,
-              fullName: parsed.data.fullName ?? cookieProof?.fullName,
-              accountType: parsed.data.accountType ?? cookieProof?.accountType,
-            })) ?? stored;
+          stored = await restoreUserWithPasswordProof({
+            email,
+            password,
+            passwordHash,
+            fullName: parsed.data.fullName ?? cookieProof?.fullName,
+            accountType: parsed.data.accountType ?? cookieProof?.accountType,
+          });
         }
       } catch {
         // Fall through to invalid-credentials if restore fails.
@@ -86,7 +84,6 @@ export async function POST(request: Request) {
           ok: true,
           user,
           redirectTo: "/register/pending",
-          accountProof: stored.passwordHash,
         });
       }
       const user = toUserProfile(stored);
@@ -100,15 +97,20 @@ export async function POST(request: Request) {
         ok: true,
         user,
         redirectTo,
-        accountProof: stored.passwordHash,
       });
     }
 
     return NextResponse.json(
-      { error: "INVALID_CREDENTIALS", message: "بيانات الدخول غير صحيحة." },
+      { error: "INVALID_CREDENTIALS", message: INVALID_CREDENTIALS_MESSAGE },
       { status: 401 },
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof AuthStoreError) {
+      return NextResponse.json(
+        { error: "LOGIN_FAILED", message: "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا." },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { error: "LOGIN_FAILED", message: "تعذر تسجيل الدخول حاليًا. حاول مرة أخرى." },
       { status: 500 },

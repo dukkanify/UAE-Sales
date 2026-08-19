@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
-import {
-  createResetToken,
-  handleOtpVerify,
-  storeResetToken,
-} from "@/services/auth/auth-handlers";
+import { handleOtpVerify } from "@/services/auth/auth-handlers";
+import { issuePasswordResetToken } from "@/services/auth/password-reset-token";
+import { emailPasswordResetLink } from "@/services/email/notification-emails";
+import { findUserByEmail } from "@/services/auth/user-store";
 import { maskEmail } from "@/services/otp/otp.service";
 
 const schema = z.object({
@@ -34,12 +33,24 @@ export async function POST(request: Request) {
     return verifyResult;
   }
 
-  const resetToken = createResetToken(email);
-  await storeResetToken(email, resetToken);
+  const user = await findUserByEmail(email);
+  if (user?.passwordHash) {
+    const rawToken = await issuePasswordResetToken({
+      email: user.email,
+      userId: user.id,
+    });
+    void emailPasswordResetLink({
+      email: user.email,
+      name: user.fullName,
+      token: rawToken,
+    }).catch((error) => {
+      console.error("[Sooqna Email] password reset link failed", error);
+    });
+  }
 
   return NextResponse.json({
     ok: true,
-    resetToken,
     maskedEmail: maskEmail(email),
+    redirectTo: "/login",
   });
 }

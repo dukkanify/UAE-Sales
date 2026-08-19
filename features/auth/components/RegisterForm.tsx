@@ -9,11 +9,11 @@ import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
-import { isEmailOtpEnabled } from "@/shared/constants/feature-flags";
+import { isEmailOtpEnabled, isDemoOtpClientEnabled } from "@/shared/constants/feature-flags";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
-import { saveAccountProof } from "@/services/storage";
 import { saveOtpFallback } from "@/features/auth/lib/otp-fallback";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE } from "@/services/auth/auth-messages";
 import {
   isStrongPassword,
   STRONG_PASSWORD_HINT,
@@ -94,19 +94,11 @@ export function RegisterForm() {
           throw new Error(
             data.message ??
               (data.error === "EMAIL_ALREADY_REGISTERED"
-                ? "هذا البريد مسجّل مسبقًا. سجّل الدخول بنفس البيانات."
+                ? EMAIL_ALREADY_REGISTERED_MESSAGE
                 : "تعذر إنشاء الحساب."),
           );
         }
-        if (typeof data.accountProof === "string") {
-          saveAccountProof({
-            email: nextEmail,
-            passwordHash: data.accountProof,
-            fullName,
-            accountType,
-          });
-        }
-        if (typeof data.otp === "string") {
+        if (isDemoOtpClientEnabled() && typeof data.otp === "string") {
           saveOtpFallback(nextEmail, data.otp);
         }
         trackAuthEventClient("registration_otp_sent");
