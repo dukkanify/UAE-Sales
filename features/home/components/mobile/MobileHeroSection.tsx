@@ -1,5 +1,9 @@
 import { AppImage } from "@/shared/components/AppImage";
 import { getMarketHeroBackground } from "@/services/content/homepage-marketplace.content";
+import {
+  MarketHeroBadge,
+  MarketHeroCopy,
+} from "@/features/home/components/marketplace/MarketHeroCopy";
 
 export async function MobileHeroSection() {
   const backgroundUrl = await getMarketHeroBackground();
@@ -19,23 +23,11 @@ export async function MobileHeroSection() {
           />
         </div>
         <div aria-hidden className="mobile-home-hero__media-overlay" />
-
-        <span className="mobile-home-hero__badge">
-          <span className="inline-block h-3 w-4 overflow-hidden rounded-sm uae-flag-strip" />
-          من الإمارات إلى العالم
-        </span>
+        <MarketHeroBadge />
       </div>
 
       <div className="mobile-home-hero__content">
-        <h1 className="mobile-home-hero__title">
-          بيع وشراء بثقة في{" "}
-          <span className="mobile-home-hero__title-accent">الإمارات</span>
-        </h1>
-
-        <p className="mobile-home-hero__desc">
-          بيع وشراء السيارات والعقارات والإلكترونيات والوظائف والخدمات — بضمان مالي
-          يحمي الطرفين.
-        </p>
+        <MarketHeroCopy variant="mobile" />
       </div>
     </section>
   );

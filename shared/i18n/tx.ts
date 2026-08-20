@@ -173,10 +173,13 @@ export function tx(locale: AppLocale, text: string): string {
       .join(" — ");
   }
   if (text.includes("، ")) {
-    return text
-      .split("، ")
-      .map((part) => lookup(part) ?? part)
-      .join(", ");
+    const parts = text.split("، ");
+    const translated = parts.map((part) => lookup(part));
+    // Only join when every segment has a full translation — otherwise
+    // partial hits create mixed Arabic/English (e.g. "Real Estate" mid-sentence).
+    if (translated.every((part): part is string => Boolean(part))) {
+      return translated.join(", ");
+    }
   }
   return text;
 }

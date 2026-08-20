@@ -5,6 +5,7 @@ import {
   getMarketHeroBackground,
   getMarketQuickSearches,
 } from "@/services/content/homepage-marketplace.content";
+import { MarketHeroCopy } from "./MarketHeroCopy";
 import { MarketHeroSearch } from "./MarketHeroSearch";
 
 type MarketHeroProps = {
@@ -43,22 +44,7 @@ export async function MarketHero({ categories }: MarketHeroProps) {
       <div className="market-hero__content">
         <div className="app-container px-4">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="market-hero-copy">
-              <span className="market-hero-chip">
-                <span className="market-hero-chip__flag uae-flag-strip" />
-                من الإمارات إلى العالم
-              </span>
-
-              <h1 className="market-hero-title">
-                بيع وشراء بثقة في{" "}
-                <span className="market-hero-title__accent">الإمارات</span>
-              </h1>
-
-              <p className="market-hero-lead">
-                كل ما تحتاجه من سيارات، عقارات، إلكترونيات وخدمات في منصة إماراتية
-                واحدة مع ضمان مالي يحمي المشتري والبائع.
-              </p>
-            </div>
+            <MarketHeroCopy variant="desktop" />
 
             <div className="mt-8 text-start md:mt-10">
               <MarketHeroSearch categories={categories} />
