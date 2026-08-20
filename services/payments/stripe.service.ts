@@ -217,8 +217,12 @@ export async function createFeaturedCheckoutSession(
     payload: { sessionId: session.id, listingId: input.listingId },
   });
 
+  if (!session.url) {
+    throw new Error("CHECKOUT_URL_MISSING");
+  }
+
   return {
-    checkoutUrl: session.url ?? undefined,
+    checkoutUrl: session.url,
     sessionId: session.id,
   };
 }

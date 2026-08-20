@@ -27,7 +27,9 @@ export async function POST(_request: Request, { params }: RouteParams) {
             ? 409
             : message === "STRIPE_NOT_CONFIGURED"
               ? 503
-              : 500;
+              : message === "CHECKOUT_URL_MISSING"
+                ? 502
+                : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }
