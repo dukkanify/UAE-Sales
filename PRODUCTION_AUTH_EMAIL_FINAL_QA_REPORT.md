@@ -95,14 +95,35 @@ GET /api/auth/status
 → no secrets in response
 ```
 
+### Auth diagnostic endpoint (2026-08-20, user confirmed live)
+
+```
+GET /api/auth/status
+→ HTTP 200
+→ driver: postgres
+→ resendConfigured: false
+→ missing: ["RESEND_API_KEY","EMAIL_FROM_ADDRESS","NEXT_PUBLIC_APP_URL"]
+→ no secrets in response
+```
+
 ### Registration (new email)
 
 ```
 POST /api/auth/register
-→ HTTP 503 EMAIL_SEND_FAILED
+→ ok: true, emailDelivered: false
+→ otp: null (no leak)
+→ redirectTo includes emailDelivered=0
 ```
 
-User may be saved in Neon; OTP email not sent.
+User saved in Postgres; OTP email **not sent** (Resend unavailable at runtime).
+
+### Pending account (`ismailabohashiesh@gmail.com`)
+
+```
+Re-register → ok: true, emailDelivered: false, otp: null ✅ (no duplicate block)
+Resend OTP  → ok: true, emailDelivered: false, otp: null
+Login wrong password → INVALID_CREDENTIALS ✅
+```
 
 ### OTP delivery
 
