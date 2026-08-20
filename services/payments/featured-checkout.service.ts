@@ -14,7 +14,10 @@ import {
 } from "@/services/payments/payment-config";
 import { createFeaturedCheckoutSession } from "@/services/payments/stripe.service";
 import { findUserById } from "@/services/auth/user-store";
-import { notifyListingFeaturedPaid } from "@/services/listings/listing-notifications";
+import {
+  notifyListingFeaturedPaid,
+  notifyListingSubmitted,
+} from "@/services/listings/listing-notifications";
 
 export type FeaturedCheckoutResult = {
   mode: "checkout" | "mock";
@@ -116,6 +119,9 @@ export async function markListingFeatured(
   }
   if (!alreadyCompleted) {
     void notifyListingFeaturedPaid(updated);
+    if (updated.status === "pending_review") {
+      void notifyListingSubmitted(updated);
+    }
   }
   return updated;
 }

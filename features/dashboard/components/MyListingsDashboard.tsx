@@ -236,6 +236,11 @@ export function MyListingsDashboard({
                       مميز
                     </span>
                   ) : null}
+                  {listing.status === "draft" ? (
+                    <span className="rounded-[var(--radius-md)] border border-border bg-surface-muted px-2 py-0.5 text-[11px] font-semibold text-muted">
+                      بانتظار الدفع
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-2">
                 <Button

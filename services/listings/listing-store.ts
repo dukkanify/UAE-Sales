@@ -262,15 +262,37 @@ export async function setListingFeatured(
     ? computeExpiresAt(new Date().toISOString(), featureDays)
     : undefined;
 
+  const current = listings[index];
+  // Featured payment completed: leave draft and enter moderation queue.
+  const nextStatus =
+    featured && current.status === "draft" ? "pending_review" : current.status;
+
   listings[index] = {
-    ...listings[index],
+    ...current,
+    status: nextStatus,
     isFeatured: featured,
-    isPremium: featured ? true : listings[index].isPremium,
+    isPremium: featured ? true : current.isPremium,
     featuredUntil,
   };
   await saveCollection(FILE, listings);
   setCache(listings);
   return { ...listings[index] };
+}
+
+export async function deleteListingById(
+  id: string,
+  sellerId?: string,
+): Promise<boolean> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return false;
+  if (sellerId && listings[index].seller.id !== sellerId) {
+    return false;
+  }
+  listings.splice(index, 1);
+  await saveCollection(FILE, listings);
+  setCache(listings);
+  return true;
 }
 
 export async function renewListing(id: string): Promise<Listing | undefined> {
