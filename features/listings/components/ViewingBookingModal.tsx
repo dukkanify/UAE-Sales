@@ -9,6 +9,10 @@ import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import {
+  buildGoogleDirectionsUrl,
+  resolveListingMapPoint,
+} from "@/features/listings/lib/listing-map-location";
 import { listingTitle } from "@/shared/i18n/listing-copy";
 import { useLocale } from "@/shared/i18n/useLocale";
 import { getSessionUser } from "@/services/storage";
@@ -34,6 +38,12 @@ export function ViewingBookingModal({
   open,
 }: ViewingBookingModalProps) {
   const displayTitle = listingTitle(listing, useLocale());
+  const mapPoint = resolveListingMapPoint({
+    area: listing.area,
+    emirate: listing.emirate,
+    city: listing.city,
+  });
+  const mapUrl = buildGoogleDirectionsUrl(mapPoint);
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -162,7 +172,14 @@ export function ViewingBookingModal({
                 {displayTitle}
               </dd>
             </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted">الموقع</dt>
+              <dd className="text-end font-semibold text-ink">{mapPoint.label}</dd>
+            </div>
           </dl>
+          <Button href={mapUrl} size="sm" variant="secondary">
+            فتح الموقع المباشر على الخريطة
+          </Button>
           <Button onClick={onClose} type="button">
             تم
           </Button>

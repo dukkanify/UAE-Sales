@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { sendViewingBookingEmails } from "@/services/email/email.service";
+import {
+  buildGoogleDirectionsUrl,
+  resolveListingMapPoint,
+} from "@/features/listings/lib/listing-map-location";
 import { findStoredEmail, listingPublicUrl } from "@/services/listings/listing-action-mail";
 import { createNotification } from "@/services/payments/notification-store";
 import {
@@ -113,6 +117,13 @@ export async function POST(request: Request) {
   ]);
 
   const sellerEmail = await findStoredEmail(payload.sellerId);
+  const mapPoint = listing
+    ? resolveListingMapPoint({
+        area: listing.area,
+        emirate: listing.emirate,
+        city: listing.city,
+      })
+    : null;
   const emailed = await sendViewingBookingEmails({
     buyer: { email: payload.buyerEmail, name: payload.buyerName },
     seller: sellerEmail
@@ -127,6 +138,8 @@ export async function POST(request: Request) {
     time: payload.time,
     phone: payload.phone,
     visitors: payload.visitors,
+    locationLabel: mapPoint?.label,
+    mapUrl: mapPoint ? buildGoogleDirectionsUrl(mapPoint) : undefined,
   });
 
   return NextResponse.json({ booking, emailed: emailed.buyerEmailed });

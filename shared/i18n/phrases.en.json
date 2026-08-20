@@ -1879,5 +1879,6 @@
   "بيانات الدخول غير صحيحة. إذا غيّرت كلمة المرور مؤخرًا، استخدم «نسيت كلمة المرور» ثم سجّل الدخول بالكلمة الجديدة.": "Incorrect login details. If you recently changed your password, use “Forgot password”, then sign in with the new password.",
   "تم تحديث كلمة المرور بنجاح. يمكنك تسجيل الدخول الآن.": "Password updated successfully. You can sign in now.",
   "رابط إعادة تعيين كلمة المرور غير صالح.": "This password reset link is invalid.",
-  "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل. سجل الدخول أو استخدم نسيت كلمة المرور.": "An account with this email already exists. Sign in or use Forgot password."
+  "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل. سجل الدخول أو استخدم نسيت كلمة المرور.": "An account with this email already exists. Sign in or use Forgot password.",
+  "فتح الموقع المباشر على الخريطة": "Open live location on Maps"
 }
