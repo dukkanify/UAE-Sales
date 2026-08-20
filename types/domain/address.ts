@@ -12,6 +12,9 @@ export type DeliveryAddress = {
   unit?: string;
   landmark?: string;
   notes?: string;
+  latitude?: number;
+  longitude?: number;
+  formattedAddress?: string;
   isDefault: boolean;
   createdAt: string;
   updatedAt: string;

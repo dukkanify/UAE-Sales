@@ -105,6 +105,9 @@ export function CheckoutSuccessContent({
             unit: data.order.deliveryAddressSnapshot.unit,
             landmark: data.order.deliveryAddressSnapshot.landmark,
             notes: data.order.deliveryAddressSnapshot.notes,
+            latitude: data.order.deliveryAddressSnapshot.latitude,
+            longitude: data.order.deliveryAddressSnapshot.longitude,
+            formattedAddress: data.order.deliveryAddressSnapshot.formattedAddress,
             isDefault: false,
             createdAt: "",
             updatedAt: "",
@@ -250,7 +253,14 @@ export function CheckoutSuccessContent({
             <p className="mt-1 text-sm text-muted">
               {address.area}، {address.city}، {address.emirate}
             </p>
-            <p className="mt-1 text-sm text-muted">{address.street}</p>
+            <p className="mt-1 text-sm text-muted">
+              {address.formattedAddress || address.street}
+            </p>
+            {typeof address.latitude === "number" && typeof address.longitude === "number" ? (
+              <p className="mt-1 text-xs text-muted" dir="ltr">
+                {address.latitude.toFixed(5)}, {address.longitude.toFixed(5)}
+              </p>
+            ) : null}
           </Card>
         ) : null}
 

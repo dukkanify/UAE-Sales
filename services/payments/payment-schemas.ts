@@ -27,6 +27,19 @@ export const deliveryAddressInputSchema = z.object({
   notes: z.string().optional(),
   companyName: z.string().optional(),
   saveAddress: z.boolean().optional(),
+  latitude: z.number().gte(-90).lte(90).optional(),
+  longitude: z.number().gte(-180).lte(180).optional(),
+  formattedAddress: z.string().optional(),
+}).superRefine((data, ctx) => {
+  const hasLat = data.latitude != null;
+  const hasLng = data.longitude != null;
+  if (hasLat !== hasLng) {
+    ctx.addIssue({
+      code: "custom",
+      message: "latitude and longitude must be sent together",
+      path: hasLat ? ["longitude"] : ["latitude"],
+    });
+  }
 });
 
 export const listingSnapshotSchema = z.object({

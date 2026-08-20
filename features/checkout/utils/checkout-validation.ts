@@ -34,6 +34,11 @@ export type GuestDeliveryInfo = GuestBuyerInfo & {
   emirate?: string;
   addressLine?: string;
   saveAddress?: boolean;
+  city?: string;
+  area?: string;
+  latitude?: number;
+  longitude?: number;
+  formattedAddress?: string;
 };
 
 function isValidEmail(value: string): boolean {
@@ -133,14 +138,21 @@ export function buildDeliveryAddressInput(
   const emirate = guestInfo.emirate?.trim() ?? "";
   const addressLine = guestInfo.addressLine?.trim() ?? "";
 
+  const formattedAddress = guestInfo.formattedAddress?.trim() || addressLine;
+  const city = guestInfo.city?.trim() || emirate;
+  const area = guestInfo.area?.trim() || addressLine;
+
   return {
     fullName: buyer.fullName,
     phone: buyer.phone,
     emirate,
-    city: emirate,
-    area: addressLine,
-    street: addressLine,
+    city,
+    area,
+    street: formattedAddress || addressLine,
     saveAddress: guestInfo.saveAddress,
+    latitude: guestInfo.latitude,
+    longitude: guestInfo.longitude,
+    formattedAddress: guestInfo.formattedAddress?.trim() || undefined,
   };
 }
 

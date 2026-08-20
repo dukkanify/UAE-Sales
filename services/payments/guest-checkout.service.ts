@@ -80,6 +80,9 @@ export async function finalizeGuestCheckoutAfterPayment(
       unit: options.deliveryAddress.unit,
       landmark: options.deliveryAddress.landmark,
       notes: options.deliveryAddress.notes,
+      latitude: options.deliveryAddress.latitude,
+      longitude: options.deliveryAddress.longitude,
+      formattedAddress: options.deliveryAddress.formattedAddress,
       isDefault: true,
     });
   }
