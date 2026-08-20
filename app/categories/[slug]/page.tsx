@@ -22,6 +22,9 @@ import { searchListings } from "@/services/listings";
 import { getRequestLocale } from "@/shared/i18n/locale";
 import { tx } from "@/shared/i18n/tx";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
   "electronics",
@@ -51,11 +54,6 @@ function getNumberParam(params: SearchParams, key: string) {
   if (!value) return undefined;
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : undefined;
-}
-
-export async function generateStaticParams() {
-  const categories = await getCategories();
-  return categories.map((category) => ({ slug: category.slug }));
 }
 
 export async function generateMetadata({

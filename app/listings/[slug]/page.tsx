@@ -13,18 +13,12 @@ import { listingDescription, listingTitle } from "@/shared/i18n/listing-copy";
 import { getRequestLocale } from "@/shared/i18n/locale";
 import { tx } from "@/shared/i18n/tx";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type ListingPageProps = {
   params: Promise<{ slug: string }>;
 };
-
-export async function generateStaticParams() {
-  const { getListings, getMyListings } = await import("@/services/listings");
-  const [listings, userListings] = await Promise.all([
-    getListings(),
-    getMyListings(),
-  ]);
-  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
-}
 
 export async function generateMetadata({
   params,

@@ -7,6 +7,7 @@ import {
   getListingById,
   renewListing,
 } from "@/services/listings/listing-store";
+import { revalidateCatalogSurfaces } from "@/shared/lib/revalidate-catalog";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -29,5 +30,6 @@ export async function PATCH(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "RENEW_FAILED" }, { status: 500 });
   }
 
+  await revalidateCatalogSurfaces(renewed);
   return NextResponse.json({ listing: renewed });
 }

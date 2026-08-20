@@ -5,6 +5,9 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getListingBySlug } from "@/services/listings";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type EditListingPageProps = {
   params: Promise<{
     slug: string;

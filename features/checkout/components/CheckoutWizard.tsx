@@ -425,7 +425,7 @@ export function CheckoutWizard({
                   fallbackCategory={listing.categoryId}
                   fill
                   sizes="96px"
-                  src={getListingImageUrl(listing)}
+                  src={getListingImageUrl(listing, 192)}
                 />
               </div>
               <div>

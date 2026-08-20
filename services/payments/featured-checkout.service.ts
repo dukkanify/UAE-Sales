@@ -15,6 +15,7 @@ import {
 import { createFeaturedCheckoutSession } from "@/services/payments/stripe.service";
 import { findUserById } from "@/services/auth/user-store";
 import { notifyListingFeaturedPaid } from "@/services/listings/listing-notifications";
+import { revalidateCatalogSurfaces } from "@/shared/lib/revalidate-catalog";
 
 export type FeaturedCheckoutResult = {
   mode: "checkout" | "mock";
@@ -59,6 +60,7 @@ export async function initiateFeaturedCheckout(
     const updated = await setListingFeatured(listingId, true, days);
     if (updated) {
       void notifyListingFeaturedPaid(updated);
+      await revalidateCatalogSurfaces(updated);
     }
     return {
       mode: "mock",
@@ -117,5 +119,6 @@ export async function markListingFeatured(
   if (!alreadyCompleted) {
     void notifyListingFeaturedPaid(updated);
   }
+  await revalidateCatalogSurfaces(updated);
   return updated;
 }

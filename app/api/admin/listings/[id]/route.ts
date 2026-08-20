@@ -13,6 +13,7 @@ import {
   patchListingRecord,
   toAdminListingRecord,
 } from "@/services/listings/listing-store";
+import { revalidateCatalogSurfaces } from "@/shared/lib/revalidate-catalog";
 import type { AdminListingPatch } from "@/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -58,6 +59,8 @@ export async function PATCH(request: Request, context: RouteParams) {
       .filter(Boolean)
       .join(" · "),
   });
+
+  await revalidateCatalogSurfaces(listing);
 
   return NextResponse.json({ listing: toAdminListingRecord(listing) });
 }

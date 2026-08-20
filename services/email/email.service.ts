@@ -89,7 +89,6 @@ async function sendWithResend(input: SendEmailInput): Promise<boolean> {
         );
         return false;
       }
-      console.info("[Sooqna Email] sent", { to: input.to, subject: input.subject });
       return true;
     }
 

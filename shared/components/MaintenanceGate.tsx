@@ -16,7 +16,7 @@ export function MaintenanceGate({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/site-settings")
+    fetch("/api/site-settings", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;

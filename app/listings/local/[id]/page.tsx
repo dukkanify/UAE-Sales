@@ -3,6 +3,9 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type LocalListingPageProps = {
   params: Promise<{
     id: string;

@@ -1,6 +1,5 @@
 import type { Listing, UserProfile } from "@/types";
 import {
-  LEGACY_STORAGE_KEYS,
   STORAGE_EVENTS,
   STORAGE_KEYS,
 } from "@/shared/constants/brand";
@@ -8,27 +7,14 @@ import {
   invalidateFavoritesSnapshot,
   invalidateSessionSnapshot,
 } from "@/services/storage/external-store";
+import { ensureClientStorageMigrated } from "@/services/storage/migrate-storage";
 
 function canUseStorage() {
   return typeof window !== "undefined" && Boolean(window.localStorage);
 }
 
-function migrateKey(newKey: string, legacyKey: string) {
-  if (!canUseStorage()) return;
-  const current = window.localStorage.getItem(newKey);
-  if (current) return;
-  const legacy = window.localStorage.getItem(legacyKey);
-  if (legacy) {
-    window.localStorage.setItem(newKey, legacy);
-    window.localStorage.removeItem(legacyKey);
-  }
-}
-
 function ensureMigrated() {
-  migrateKey(STORAGE_KEYS.session, LEGACY_STORAGE_KEYS.session);
-  migrateKey(STORAGE_KEYS.localListings, LEGACY_STORAGE_KEYS.localListings);
-  migrateKey(STORAGE_KEYS.recentlyViewed, LEGACY_STORAGE_KEYS.recentlyViewed);
-  migrateKey(STORAGE_KEYS.savedSearches, LEGACY_STORAGE_KEYS.savedSearches);
+  ensureClientStorageMigrated();
 }
 
 export function getSessionUser(): UserProfile | null {
@@ -132,6 +118,7 @@ export type FavoriteRecord = {
 
 export function getFavorites(): FavoriteRecord[] {
   if (!canUseStorage()) return [];
+  ensureMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.favorites);
   return raw ? (JSON.parse(raw) as FavoriteRecord[]) : [];
 }
@@ -157,6 +144,7 @@ const MAX_RECENT_SEARCHES = 8;
 
 export function getRecentSearches(): string[] {
   if (!canUseStorage()) return [];
+  ensureMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.recentSearches);
   if (!raw) return [];
   try {
@@ -202,6 +190,7 @@ type AccountProofRecord = {
 
 function getAccountProofs(): AccountProofRecord[] {
   if (!canUseStorage()) return [];
+  ensureMigrated();
   const raw = window.localStorage.getItem(STORAGE_KEYS.accountProofs);
   if (!raw) return [];
   try {

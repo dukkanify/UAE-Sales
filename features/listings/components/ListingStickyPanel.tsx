@@ -53,7 +53,7 @@ const conditionLabels: Record<Listing["condition"], string> = {
 
 export function ListingStickyPanel({ category, listing }: ListingStickyPanelProps) {
   const config = getListingActionConfig(listing);
-  const user = typeof window !== "undefined" ? getSessionUser() : null;
+  const user = useSyncExternalStore(subscribeSession, getSessionSnapshot, () => null);
   const isOwn = user ? isOwnListing(listing, user) : false;
 
   const locationLabel = listing.area

@@ -22,7 +22,7 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
   priority = false,
 }: MobileNearbyCardProps) {
   const href = getListingHref(listing);
-  const imageUrl = getListingImageUrl(listing);
+  const imageUrl = getListingImageUrl(listing, 280);
 
   return (
     <Link
@@ -37,6 +37,7 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
           fill
           loading={priority ? undefined : "lazy"}
           priority={priority}
+          quality={priority ? 70 : 55}
           sizes="140px"
           src={imageUrl}
         />

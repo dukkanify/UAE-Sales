@@ -31,7 +31,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
   priority = false,
 }: MobileFeaturedCardProps) {
   const href = getListingHref(listing);
-  const imageUrl = getListingImageUrl(listing);
+  const imageUrl = getListingImageUrl(listing, 560);
   const location = getListingLocation(listing);
   const photoCount = getListingImages(listing).length;
   const isVerified = isListingVerified(listing);
@@ -47,6 +47,7 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
             fill
             loading={priority ? undefined : "lazy"}
             priority={priority}
+            quality={priority ? 72 : 60}
             sizes="280px"
             src={imageUrl}
           />

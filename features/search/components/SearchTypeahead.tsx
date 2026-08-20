@@ -14,6 +14,12 @@ import { Icon } from "@/shared/ui/Icon";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
 import type { SearchSuggestion } from "@/features/search/types";
+import {
+  fetchSearchSuggestions,
+  getCachedSuggestions,
+  invalidateSuggestCache,
+  suggestCacheKey,
+} from "@/features/search/lib/suggest-cache";
 
 export type { SearchSuggestion };
 
@@ -70,10 +76,12 @@ export function SearchTypeahead({
     sync();
     window.addEventListener(STORAGE_EVENTS.recentSearchesChange, sync);
     window.addEventListener(STORAGE_EVENTS.savedSearchesChange, sync);
+    window.addEventListener(STORAGE_EVENTS.listingsChange, invalidateSuggestCache);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener(STORAGE_EVENTS.recentSearchesChange, sync);
       window.removeEventListener(STORAGE_EVENTS.savedSearchesChange, sync);
+      window.removeEventListener(STORAGE_EVENTS.listingsChange, invalidateSuggestCache);
       window.removeEventListener("storage", sync);
     };
   }, []);
@@ -93,26 +101,28 @@ export function SearchTypeahead({
     const query = value.trim();
     if (!query) return;
 
-    const controller = new AbortController();
+    const key = suggestCacheKey(
+      query,
+      selectedFilters.category,
+      selectedFilters.city,
+    );
+    const delay = getCachedSuggestions(key) ? 0 : 120;
+    let cancelled = false;
     const timer = window.setTimeout(() => {
       const params = new URLSearchParams({ q: query });
       if (selectedFilters.category) params.set("category", selectedFilters.category);
       if (selectedFilters.city) params.set("city", selectedFilters.city);
-      void fetch(`/api/search/suggest?${params.toString()}`, {
-        signal: controller.signal,
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((data) => {
-          const items = Array.isArray(data?.items) ? data.items : [];
-          setRemote(items as SearchSuggestion[]);
+      void fetchSearchSuggestions(key, `/api/search/suggest?${params.toString()}`)
+        .then((items) => {
+          if (!cancelled) setRemote(items);
         })
         .catch(() => {
-          if (!controller.signal.aborted) setRemote([]);
+          if (!cancelled) setRemote([]);
         });
-    }, 80);
+    }, delay);
 
     return () => {
-      controller.abort();
+      cancelled = true;
       window.clearTimeout(timer);
     };
   }, [selectedFilters.category, selectedFilters.city, value]);

@@ -37,11 +37,19 @@ export function StickySearchDock() {
       return () => observer.disconnect();
     }
 
-    const onScroll = () => setVisible(window.scrollY > 280);
-    const frame = window.requestAnimationFrame(onScroll);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setVisible(window.scrollY > 280);
+        ticking = false;
+      });
+    };
+
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
     };
   }, [hideDock, pathname]);
