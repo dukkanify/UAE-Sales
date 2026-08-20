@@ -1,9 +1,9 @@
 # Production Auth + Email Final QA Report
 
-**Date:** 2026-08-19  
-**Branch:** `cursor/production-auth-resend-final-37ba`  
+**Date:** 2026-08-20  
+**Branch:** `main` (PR #230 merged)  
 **Target:** https://sooqna.site  
-**Status:** ⚠️ **NOT COMPLETE** — production is still on old code (`/api/auth/status` returns 404); email sending is still failing (`503 EMAIL_SEND_FAILED`)
+**Status:** ⚠️ **NOT COMPLETE** — auth/Postgres live; Resend env vars still missing on Production runtime
 
 ---
 
@@ -11,7 +11,7 @@
 
 Production auth was blocked by **multiple independent issues**:
 
-0. **PR #230 not deployed to production yet** — deployed production does not include `/api/auth/status` (returns `404`). That means the improved registration UX + config diagnostics from PR #230 are not active yet.
+0. **PR #230 deployed** — `GET /api/auth/status` returns **HTTP 200** with `driver=postgres`. Registration returns `emailDelivered:false` (no OTP leak) when Resend is unavailable.
 
 1. **Neon/Postgres connected** — user accounts persist in `auth_users`, but legacy accounts from ephemeral `/tmp` storage were never migrated. Login correctly returns `401 INVALID_CREDENTIALS` for unknown credentials or `403 ACCOUNT_UNVERIFIED` for pending accounts.
 
@@ -80,15 +80,19 @@ Verified against production behavior and Vercel Neon integration pattern:
 
 ---
 
-## Production QA results (live sooqna.site, pre-merge)
+## Production QA results (live sooqna.site, 2026-08-20)
 
-Tests run via `curl` against current production (before this PR deploys):
+Tests run via `curl` against current production:
 
 ### Auth diagnostic endpoint
 
 ```
 GET /api/auth/status
-→ HTTP 404 (still missing after the claimed deploy)
+→ HTTP 200
+→ driver: postgres
+→ resendConfigured: false
+→ missing: ["RESEND_API_KEY","EMAIL_FROM_ADDRESS","NEXT_PUBLIC_APP_URL"]
+→ no secrets in response
 ```
 
 ### Registration (new email)
