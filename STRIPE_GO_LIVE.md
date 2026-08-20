@@ -1,8 +1,20 @@
 # تفعيل Stripe لسوقنا — قائمة جاهزية
 
-الكود جاهز لاستقبال مدفوعات حقيقية. بعد تفعيل حساب Stripe، نفّذ الخطوات التالية فقط.
+الكود جاهز لاستقبال مدفوعات حقيقية. يمكنك التفعيل من **لوحة الأدمن** أو من Vercel.
 
-## 1) مفاتيح Vercel / الإنتاج (`sooqna.site`)
+## أ) الأسرع: من لوحة الأدمن (`/admin/stripe`)
+
+1. Dashboard → API keys → انسخ `sk_live_...` و `pk_live_...`
+2. Webhooks → Add endpoint → `https://sooqna.site/api/webhooks/stripe`
+3. أحداث: `checkout.session.completed`, `payment_intent.*`, `charge.refunded`
+4. انسخ Signing secret `whsec_...`
+5. في `/admin/stripe` الصق المفاتيح الثلاثة واضغط **حفظ وتفعيل**
+
+المفاتيح تُحفظ مشفّرة في Postgres. لا تلصق مفاتيح في Git.
+
+> ملاحظة: إذا كان `STRIPE_SECRET_KEY` موجوداً في Vercel، الإدارة من الأدمن تُقفل حتى تحذف متغير البيئة.
+
+## ب) البديل: مفاتيح Vercel / الإنتاج
 
 أضف في Environment Variables (Production):
 
@@ -16,43 +28,19 @@
 | `NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT` | `false` |
 | `ALLOW_MOCK_CHECKOUT` | `false` أو احذفه |
 
-ثم **Redeploy** حتى تُبنى الواجهة بـ `NEXT_PUBLIC_*` الصحيحة.
+ثم **Redeploy**.
 
-## 2) Webhook في Stripe Dashboard
+## 2) تحقق سريع بعد التفعيل
 
-1. Developers → Webhooks → Add endpoint  
-2. URL: `https://sooqna.site/api/webhooks/stripe`  
-3. الأحداث:
-   - `checkout.session.completed` *(أساسي)*
-   - `payment_intent.succeeded`
-   - `payment_intent.payment_failed`
-   - `charge.refunded`
-4. انسخ Signing secret → `STRIPE_WEBHOOK_SECRET`
-5. أرسل test event وتأكد من HTTP 200
+1. `/admin/stripe` — Secret + Webhook = موجود، Mock = مغلق
+2. شراء تجريبي بمبلغ صغير
+3. بعد الدفع: الطلب يصبح `paid_held_in_escrow`
 
-تفاصيل إضافية: [STRIPE_WEBHOOK_SETUP.md](./STRIPE_WEBHOOK_SETUP.md)
+## 3) ما يفعله المنتج حالياً
 
-## 3) تحقق سريع بعد التفعيل
+- Stripe Checkout بعملة AED وواجهة عربية
+- حجز داخلي (escrow ledger) بعد الدفع
+- استرداد إداري عبر Stripe Refunds
+- لا يوجد Stripe Connect لصرف تلقائي للبائعين بعد
 
-1. `/admin/stripe` — Secret + Webhook = موجود، Mock = مغلق  
-2. شراء تجريبي بمبلغ صغير ببطاقة اختبار/حقيقية  
-3. بعد الدفع: الطلب يصبح `paid_held_in_escrow`  
-4. من الإدارة: تحرير ضمان أو استرداد يعملان  
-5. استرداد من Dashboard Stripe يزامن حالة الطلب محلياً
-
-## 4) ما يفعله المنتج حالياً
-
-- Stripe Checkout بعملة AED وواجهة عربية  
-- حجز داخلي (escrow ledger) بعد الدفع — الأموال في رصيد منصة Stripe  
-- استرداد إداري عبر Stripe Refunds  
-- لا يوجد Stripe Connect لصرف تلقائي للبائعين بعد — التحويل للبائع تشغيلي/يدوي من رصيد المنصة
-
-## 5) اختبار محلي قبل Live
-
-```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-# انسخ whsec_... إلى .env المحلي
-npm run dev
-```
-
-استخدم مفاتيح `sk_test_` / `pk_test_` فقط على localhost.
+تفاصيل الـ webhook: [STRIPE_WEBHOOK_SETUP.md](./STRIPE_WEBHOOK_SETUP.md)

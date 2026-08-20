@@ -1,4 +1,6 @@
 import {
+  ensureStripeConfigLoaded,
+  getStripePublishableKey,
   getStripeCurrency,
   isMockCheckoutAllowed,
   isStripeConfigured,
@@ -92,9 +94,7 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
   const demoOtpServerEnabled = process.env.ENABLE_DEMO_OTP === "true";
   const demoOtpClientEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_OTP === "true";
   const stripeConfigured = isStripeConfigured();
-  const stripePublishableConfigured = Boolean(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim(),
-  );
+  const stripePublishableConfigured = Boolean(getStripePublishableKey());
   const stripeWebhookConfigured = isStripeWebhookConfigured();
   const stripeCurrency = getStripeCurrency();
   const mockCheckoutAllowed = isMockCheckoutAllowed();
@@ -157,6 +157,11 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
 let configLogged = false;
 
 /** Logs missing production configuration once per process (names only, never secrets). */
+export async function getProductionConfigSnapshotAsync(): Promise<ProductionConfigSnapshot> {
+  await ensureStripeConfigLoaded();
+  return getProductionConfigSnapshot();
+}
+
 export function logProductionConfigIssues(context?: string): ProductionConfigSnapshot {
   const snapshot = getProductionConfigSnapshot();
 

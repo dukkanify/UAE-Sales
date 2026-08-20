@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { getProductionConfigSnapshot } from "@/services/auth/production-config";
+import { getProductionConfigSnapshotAsync } from "@/services/auth/production-config";
 import {
   AuthStoreError,
   getAuthPersistenceInfo,
 } from "@/services/auth/user-persistence";
 
 export async function GET() {
-  const config = getProductionConfigSnapshot();
+  const config = await getProductionConfigSnapshotAsync();
 
   try {
     const persistence = await getAuthPersistenceInfo();
@@ -30,7 +30,7 @@ export async function GET() {
         persistence: null,
         error: message,
       },
-      { status: config.databaseConfigured ? 503 : 503 },
+      { status: 503 },
     );
   }
 }

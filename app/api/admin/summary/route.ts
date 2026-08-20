@@ -30,6 +30,7 @@ import { getAllListingReports } from "@/services/listings/listing-report-store";
 import { getAllQuoteRequests } from "@/services/quote-requests/quote-request-store";
 import { getAllViewingBookings } from "@/services/viewing-bookings/viewing-booking-store";
 import {
+  ensureStripeConfigLoaded,
   getStripeCurrency,
   getStripePublishableKey,
   getStripeWebhookSecret,
@@ -42,6 +43,8 @@ export async function GET() {
   if (!isSessionUser(admin)) {
     return admin;
   }
+
+  await ensureStripeConfigLoaded();
 
   const settings = await getAdminSettings();
 

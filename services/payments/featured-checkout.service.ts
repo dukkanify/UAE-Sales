@@ -9,6 +9,7 @@ import {
   setListingFeatured,
 } from "@/services/listings/listing-store";
 import {
+  ensureStripeConfigLoaded,
   isMockCheckoutAllowed,
   isStripeConfigured,
 } from "@/services/payments/payment-config";
@@ -46,6 +47,7 @@ export async function initiateFeaturedCheckout(
   const amountAed = settings.featuredListingFeeAed;
   const days = settings.featuredListingDays;
 
+  await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     if (!isMockCheckoutAllowed()) {
       throw new Error("STRIPE_NOT_CONFIGURED");

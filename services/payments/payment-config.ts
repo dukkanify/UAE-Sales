@@ -1,7 +1,86 @@
 import { getAppUrl } from "@/shared/constants/site";
+import {
+  getCachedStripeCredentials,
+  loadStripeCredentials,
+  type StripeCredentialSource,
+} from "@/services/payments/stripe-credentials-store";
+
+export type ResolvedStripeConfig = {
+  secretKey?: string;
+  publishableKey?: string;
+  webhookSecret?: string;
+  source: StripeCredentialSource;
+  updatedAt?: string;
+};
+
+function fromEnv(): ResolvedStripeConfig {
+  return {
+    secretKey: process.env.STRIPE_SECRET_KEY?.trim() || undefined,
+    publishableKey:
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() || undefined,
+    webhookSecret: process.env.STRIPE_WEBHOOK_SECRET?.trim() || undefined,
+    source: "env",
+  };
+}
+
+function fromCacheOrEnv(): ResolvedStripeConfig {
+  const cached = getCachedStripeCredentials();
+  if (cached) {
+    return {
+      secretKey: process.env.STRIPE_SECRET_KEY?.trim() || cached.secretKey,
+      publishableKey:
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() ||
+        cached.publishableKey,
+      webhookSecret:
+        process.env.STRIPE_WEBHOOK_SECRET?.trim() || cached.webhookSecret,
+      source: process.env.STRIPE_SECRET_KEY?.trim()
+        ? "env"
+        : cached.secretKey
+          ? cached.source
+          : cached.source,
+      updatedAt: cached.updatedAt,
+    };
+  }
+  const env = fromEnv();
+  return {
+    ...env,
+    source: env.secretKey || env.publishableKey || env.webhookSecret ? "env" : "none",
+  };
+}
+
+/** Hydrate admin-stored Stripe keys (Postgres) when env vars are missing. */
+export async function ensureStripeConfigLoaded(
+  force = false,
+): Promise<ResolvedStripeConfig> {
+  const envSecret = process.env.STRIPE_SECRET_KEY?.trim();
+  if (envSecret && !force) {
+    return {
+      secretKey: envSecret,
+      publishableKey:
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() || undefined,
+      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET?.trim() || undefined,
+      source: "env",
+    };
+  }
+  const loaded = await loadStripeCredentials(force);
+  return {
+    secretKey: process.env.STRIPE_SECRET_KEY?.trim() || loaded.secretKey,
+    publishableKey:
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim() ||
+      loaded.publishableKey,
+    webhookSecret:
+      process.env.STRIPE_WEBHOOK_SECRET?.trim() || loaded.webhookSecret,
+    source: process.env.STRIPE_SECRET_KEY?.trim()
+      ? "env"
+      : loaded.secretKey
+        ? "admin"
+        : loaded.source,
+    updatedAt: loaded.updatedAt,
+  };
+}
 
 export function isStripeConfigured(): boolean {
-  return Boolean(process.env.STRIPE_SECRET_KEY?.trim());
+  return Boolean(fromCacheOrEnv().secretKey);
 }
 
 export function getStripeCurrency(): string {
@@ -9,15 +88,15 @@ export function getStripeCurrency(): string {
 }
 
 export function getStripeSecretKey(): string | undefined {
-  return process.env.STRIPE_SECRET_KEY?.trim();
+  return fromCacheOrEnv().secretKey;
 }
 
 export function getStripeWebhookSecret(): string | undefined {
-  return process.env.STRIPE_WEBHOOK_SECRET?.trim();
+  return fromCacheOrEnv().webhookSecret;
 }
 
 export function getStripePublishableKey(): string | undefined {
-  return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim();
+  return fromCacheOrEnv().publishableKey;
 }
 
 export function isStripeWebhookConfigured(): boolean {
