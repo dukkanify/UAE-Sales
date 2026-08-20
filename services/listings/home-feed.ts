@@ -5,14 +5,13 @@ import { getAllListings } from "@/services/listings/listing-store";
 
 export type HomeListingCard = Listing;
 
-/** Strip heavy fields so homepage RSC payload stays small. */
+/** Strip heavy fields so homepage RSC payload stays small. Keep bilingual titles. */
 export function slimListingForCard(listing: Listing): Listing {
   const cover = listing.images?.[0];
   return {
     ...listing,
     description: "",
     descriptionEnglish: undefined,
-    titleEnglish: undefined,
     features: undefined,
     categorySpecs: undefined,
     carSpecs: undefined,
@@ -61,11 +60,15 @@ export const getHomeFeed = cache(async (): Promise<HomeFeed> => {
 });
 
 export const getSearchSuggestionTitles = cache(
-  async (): Promise<Array<Pick<Listing, "slug" | "title">>> => {
+  async (): Promise<Array<Pick<Listing, "slug" | "title" | "titleEnglish">>> => {
     const listings = await getAllListings();
     return listings
       .filter((listing) => listing.status === "active")
       .slice(0, 40)
-      .map((listing) => ({ slug: listing.slug, title: listing.title }));
+      .map((listing) => ({
+        slug: listing.slug,
+        title: listing.title,
+        titleEnglish: listing.titleEnglish,
+      }));
   },
 );

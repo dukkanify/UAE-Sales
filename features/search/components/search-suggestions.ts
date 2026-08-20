@@ -1,17 +1,21 @@
 import type { Category, City, Listing } from "@/types";
 import type { SearchSuggestion } from "./SearchTypeahead";
 import { buildSearchUrl, type SearchFilterState } from "./search-url";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import type { AppLocale } from "@/shared/i18n/locale";
 
 /** Builds typeahead rows from categories, cities, and listing titles. */
 export function buildSearchSuggestions({
   categories,
   cities,
   listings,
+  locale = "ar",
   selectedFilters = {},
 }: {
   categories: Category[];
   cities: City[];
-  listings: Pick<Listing, "slug" | "title">[];
+  listings: Pick<Listing, "slug" | "title" | "titleEnglish">[];
+  locale?: AppLocale;
   selectedFilters?: SearchFilterState;
 }): SearchSuggestion[] {
   const categoryItems: SearchSuggestion[] = categories.map((category) => ({
@@ -28,7 +32,7 @@ export function buildSearchSuggestions({
 
   const listingItems: SearchSuggestion[] = listings.slice(0, 40).map((listing) => ({
     kind: "listing",
-    label: listing.title,
+    label: listingTitle(listing, locale),
     href: `/listings/${listing.slug}`,
   }));
 

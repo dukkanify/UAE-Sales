@@ -20,3 +20,13 @@ export function listingDescription(
   }
   return listing.description;
 }
+
+export function sellerName(
+  seller: Pick<Listing["seller"], "name" | "nameEnglish">,
+  locale: AppLocale,
+): string {
+  if (locale === "en") {
+    return seller.nameEnglish?.trim() || seller.name;
+  }
+  return seller.name;
+}

@@ -108,7 +108,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings, suggestionTitles] = await Promise.all([
+  const [categories, listings, suggestionTitles, locale] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -130,12 +130,14 @@ export default async function CategoryPage({
           : "newest",
     }),
     getSearchSuggestionTitles(),
+    getRequestLocale(),
   ]);
 
   const suggestions = buildSearchSuggestions({
     categories,
     cities,
     listings: suggestionTitles,
+    locale,
     selectedFilters,
   });
 

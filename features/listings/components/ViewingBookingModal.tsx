@@ -9,6 +9,8 @@ import { Select } from "@/shared/ui/Select";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { getSessionUser } from "@/services/storage";
 
 type ViewingBookingModalProps = {
@@ -31,6 +33,7 @@ export function ViewingBookingModal({
   onSuccess,
   open,
 }: ViewingBookingModalProps) {
+  const displayTitle = listingTitle(listing, useLocale());
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -132,7 +135,7 @@ export function ViewingBookingModal({
 
   return (
     <Modal
-      description={`حجز معاينة: ${listing.title}`}
+      description={`حجز معاينة: ${displayTitle}`}
       onClose={onClose}
       open={open}
       title="احجز معاينة"
@@ -155,7 +158,9 @@ export function ViewingBookingModal({
             </div>
             <div className="flex justify-between gap-3">
               <dt className="text-muted">العقار</dt>
-              <dd className="text-end font-semibold text-ink">{listing.title}</dd>
+              <dd className="text-end font-semibold text-ink" data-ugc>
+                {displayTitle}
+              </dd>
             </div>
           </dl>
           <Button onClick={onClose} type="button">

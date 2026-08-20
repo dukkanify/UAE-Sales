@@ -5,7 +5,11 @@ import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { DeliveryAddress, ShippingMethodId } from "@/types/domain/address";
 import type { Listing } from "@/types";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { SellerName } from "@/shared/i18n/SellerName";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
 import { isGuestCheckoutEnabled, isMockCheckoutEnabled } from "@/shared/constants/feature-flags";
 import {
@@ -111,6 +115,9 @@ export function CheckoutWizard({
     () => getSessionSnapshot(),
     () => null,
   );
+
+  const locale = useLocale();
+  const displayTitle = listing ? listingTitle(listing, locale) : "";
 
   const [step, setStep] = useState<CheckoutStep>("review");
   const [shippingMethod, setShippingMethod] = useState<ShippingMethodId>("standard");
@@ -420,7 +427,7 @@ export function CheckoutWizard({
             <div className="flex gap-4">
               <div className="relative size-24 shrink-0 overflow-hidden rounded-[var(--radius-xl)]">
                 <AppImage
-                  alt={listing.title}
+                  alt={displayTitle}
                   className="object-cover"
                   fallbackCategory={listing.categoryId}
                   fill
@@ -429,10 +436,12 @@ export function CheckoutWizard({
                 />
               </div>
               <div>
-                <h2 className="font-black text-ink" data-ugc>
-                  {listing.title}
+                <h2 className="font-black text-ink">
+                  <ListingTitle listing={listing} />
                 </h2>
-                <p className="mt-1 text-sm text-muted">{listing.seller.name}</p>
+                <p className="mt-1 text-sm text-muted">
+                  <SellerName seller={listing.seller} />
+                </p>
                 <div className="mt-2">
                   <CurrencyAmount amount={listing.price} size="lg" />
                 </div>

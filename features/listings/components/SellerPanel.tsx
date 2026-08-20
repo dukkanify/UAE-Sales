@@ -7,6 +7,9 @@ import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { SellerName } from "@/shared/i18n/SellerName";
+import { sellerName } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 type SellerPanelProps = {
   listing: Listing;
@@ -22,6 +25,8 @@ function isUserCreatedListing(listing: Listing): boolean {
 }
 
 export function SellerPanel({ listing }: SellerPanelProps) {
+  const locale = useLocale();
+  const displaySeller = sellerName(listing.seller, locale);
   const isUserListing = isUserCreatedListing(listing);
   const isVerified = isUserListing
     ? Boolean(listing.seller.isVerified || listing.verifiedSeller)
@@ -76,7 +81,7 @@ export function SellerPanel({ listing }: SellerPanelProps) {
         {listing.seller.avatarUrl ? (
           <span className="relative size-12 overflow-hidden rounded-[var(--radius-xl)]">
             <AppImage
-              alt={listing.seller.name}
+              alt={displaySeller}
               className="object-cover"
               fallback="avatar"
               fill
@@ -86,11 +91,13 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           </span>
         ) : (
           <span className="grid size-12 place-items-center rounded-[var(--radius-xl)] bg-primary text-sm font-semibold text-white">
-            {listing.seller.name.slice(0, 2)}
+            {displaySeller.slice(0, 2)}
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-ink" data-ugc>{listing.seller.name}</p>
+          <p className="font-semibold text-ink">
+            <SellerName seller={listing.seller} />
+          </p>
           {showRating ? (
             <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
               <Icon className="text-secondary" name="star" size={14} />

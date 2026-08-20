@@ -9,6 +9,7 @@ import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
+import { getRequestLocale } from "@/shared/i18n/locale";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -63,7 +64,7 @@ export default async function SearchPage({
     sort: getParam(params, "sort") ?? "newest",
   };
 
-  const [categories, listings, suggestionTitles] = await Promise.all([
+  const [categories, listings, suggestionTitles, locale] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: selectedFilters.category || undefined,
@@ -85,12 +86,14 @@ export default async function SearchPage({
           : "newest",
     }),
     getSearchSuggestionTitles(),
+    getRequestLocale(),
   ]);
 
   const suggestions = buildSearchSuggestions({
     categories,
     cities,
     listings: suggestionTitles,
+    locale,
     selectedFilters,
   });
 
