@@ -11,6 +11,7 @@ export type ProductionConfigSnapshot = {
   databaseConfigured: boolean;
   databaseSource: DatabaseSource;
   resendConfigured: boolean;
+  resendKeySource: string | null;
   emailProvider: string;
   emailFromAddress: string | null;
   emailFromName: string | null;
@@ -19,6 +20,22 @@ export type ProductionConfigSnapshot = {
   demoOtpClientEnabled: boolean;
   missing: string[];
 };
+
+/** Vercel Resend integration stores the key as RESEND_API_KEY. Aliases are read-only fallbacks. */
+const RESEND_KEY_CANDIDATES = [
+  "RESEND_API_KEY",
+  "RESEND_API_TOKEN",
+  "RESEND_TOKEN",
+  "EMAIL_RESEND_API_KEY",
+] as const;
+
+export function resolveResendApiKey(): { source: string | null; value: string } {
+  for (const name of RESEND_KEY_CANDIDATES) {
+    const value = process.env[name]?.trim() ?? "";
+    if (value) return { source: name, value };
+  }
+  return { source: null, value: "" };
+}
 
 function detectDatabaseSource(): { configured: boolean; source: DatabaseSource } {
   if (process.env.DATABASE_URL?.trim()) {
@@ -53,7 +70,8 @@ function detectDatabaseSource(): { configured: boolean; source: DatabaseSource }
 
 export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
   const database = detectDatabaseSource();
-  const resendConfigured = Boolean(process.env.RESEND_API_KEY?.trim());
+  const resendKey = resolveResendApiKey();
+  const resendConfigured = Boolean(resendKey.value);
   const emailProvider = (process.env.EMAIL_PROVIDER ?? "resend").trim().toLowerCase();
   const emailFromAddress = process.env.EMAIL_FROM_ADDRESS?.trim() || null;
   const emailFromName = process.env.EMAIL_FROM_NAME?.trim() || null;
@@ -89,6 +107,7 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
     databaseConfigured: database.configured,
     databaseSource: database.source,
     resendConfigured,
+    resendKeySource: resendKey.source,
     emailProvider,
     emailFromAddress,
     emailFromName,
@@ -116,6 +135,7 @@ export function logProductionConfigIssues(context?: string): ProductionConfigSna
       databaseConfigured: snapshot.databaseConfigured,
       databaseSource: snapshot.databaseSource,
       resendConfigured: snapshot.resendConfigured,
+      resendKeySource: snapshot.resendKeySource,
       emailProvider: snapshot.emailProvider,
       emailFromAddress: snapshot.emailFromAddress,
       appUrl: snapshot.appUrl,
@@ -127,6 +147,7 @@ export function logProductionConfigIssues(context?: string): ProductionConfigSna
     console.info("[Sooqna Auth] production configuration ok", {
       databaseSource: snapshot.databaseSource,
       resendConfigured: snapshot.resendConfigured,
+      resendKeySource: snapshot.resendKeySource,
       emailProvider: snapshot.emailProvider,
       emailFromAddress: snapshot.emailFromAddress,
       appUrl: snapshot.appUrl,
