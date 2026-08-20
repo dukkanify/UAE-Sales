@@ -80,6 +80,7 @@ export async function sendTransactionalEmail(input: {
     });
 
     const sent = await deliverEmailSafely({
+      eventType: input.type,
       to,
       subject: input.subject,
       html,

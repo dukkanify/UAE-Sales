@@ -16,6 +16,10 @@ import { setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
+
+const ADMIN_DEMO_EMAIL = "admin@sooqna.demo";
+const ADMIN_DEMO_PASSWORD = "Admin@123";
 
 type LoginErrors = {
   email?: string;
@@ -41,14 +45,19 @@ type LoginFormProps = {
 
 export function LoginForm({ variant = "default" }: LoginFormProps) {
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(() =>
+    variant === "admin" ? ADMIN_DEMO_EMAIL : "",
+  );
+  const [password, setPassword] = useState(() =>
+    variant === "admin" ? ADMIN_DEMO_PASSWORD : "",
+  );
   const emailOtpEnabled = isEmailOtpEnabled();
   const [usePassword, setUsePassword] = useState(!emailOtpEnabled || variant === "admin");
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const isAdminNext = variant === "admin" || Boolean(nextPath?.startsWith("/admin"));
+  const adminDemo = findDemoAccountByIdentifier(ADMIN_DEMO_EMAIL);
 
   const completePasswordLogin = useCallback(
     async (nextEmail: string, nextPassword: string) => {
@@ -162,6 +171,31 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
                 ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
                 : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
           </p>
+          {variant === "admin" ? (
+            <div className="mt-3 rounded-[var(--radius-lg)] border border-border bg-surface-muted/60 px-3 py-2 text-xs text-muted">
+              <p>
+                حساب المدير التجريبي:{" "}
+                <span className="font-semibold text-ink" dir="ltr">
+                  {ADMIN_DEMO_EMAIL}
+                </span>{" "}
+                /{" "}
+                <span className="font-semibold text-ink" dir="ltr">
+                  {ADMIN_DEMO_PASSWORD}
+                </span>
+              </p>
+              <button
+                className="mt-2 font-semibold text-primary"
+                onClick={() => {
+                  setEmail(ADMIN_DEMO_EMAIL);
+                  setPassword(adminDemo?.password ?? ADMIN_DEMO_PASSWORD);
+                  setErrors({});
+                }}
+                type="button"
+              >
+                تعبئة بيانات المدير
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <Input
@@ -170,7 +204,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
           label="البريد الإلكتروني"
           name="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="name@email.com"
+          placeholder={variant === "admin" ? ADMIN_DEMO_EMAIL : "name@email.com"}
           required
           type="email"
           value={email}
@@ -183,7 +217,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
             label="كلمة المرور"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="••••••••"
+            placeholder={variant === "admin" ? ADMIN_DEMO_PASSWORD : "••••••••"}
             required
             type="password"
             value={password}

@@ -1,5 +1,6 @@
 import { randomBytes } from "node:crypto";
-import { verifyPassword } from "@/services/auth/password.service";
+import { demoAccounts } from "@/mock/demo-accounts.mock";
+import { hashPassword, verifyPassword } from "@/services/auth/password.service";
 import {
   findInAccountVault,
   readAccountVault,
@@ -13,6 +14,73 @@ import {
 } from "@/services/auth/user-persistence";
 import type { AccountStatus, OnboardingStatus, StoredUser, UserProfile } from "@/types/domain/user";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
+
+let demoAccountsEnsured: Promise<void> | null = null;
+
+function buildDemoStoredUser(
+  account: (typeof demoAccounts)[number],
+  existing?: StoredUser | null,
+): StoredUser {
+  const now = new Date().toISOString();
+  return {
+    id: existing?.id ?? account.profile.id,
+    fullName: account.profile.fullName,
+    email: account.profile.email.toLowerCase(),
+    normalizedEmail: account.profile.email.toLowerCase(),
+    phone: account.profile.phone,
+    city: account.profile.city,
+    accountType: account.profile.accountType,
+    isVerified: true,
+    joinedAt: account.profile.joinedAt,
+    createdAt: existing?.createdAt ?? now,
+    accountStatus: "active",
+    emailVerifiedAt: existing?.emailVerifiedAt ?? account.profile.joinedAt,
+    passwordHash: hashPassword(account.password),
+    registrationSource: "DEMO",
+    isGuestConverted: false,
+    onboardingStatus:
+      account.profile.accountType === "company" ||
+      account.profile.accountType === "business"
+        ? "business_complete"
+        : "none",
+    role: account.role,
+    walletBalance: existing?.walletBalance ?? account.profile.walletBalance ?? 0,
+    adminPermissions: existing?.adminPermissions,
+    sessionVersion: existing?.sessionVersion,
+  };
+}
+
+/**
+ * Seeds / repairs demo accounts (including admin@sooqna.demo) in the durable store.
+ * Safe to call repeatedly — rehashes when the stored password no longer matches.
+ */
+export async function ensureDemoAccounts(): Promise<void> {
+  if (!demoAccountsEnsured) {
+    demoAccountsEnsured = (async () => {
+      for (const account of demoAccounts) {
+        const email = account.profile.email.toLowerCase();
+        const existing = await findPersistedUserByEmail(email);
+        const passwordOk = Boolean(
+          existing?.passwordHash &&
+            verifyPassword(account.password, existing.passwordHash),
+        );
+        const roleOk = existing?.role === account.role;
+        const statusOk = existing?.accountStatus === "active";
+
+        if (existing && passwordOk && roleOk && statusOk) {
+          continue;
+        }
+
+        await persistUser(buildDemoStoredUser(account, existing));
+      }
+    })().catch((error) => {
+      demoAccountsEnsured = null;
+      throw error;
+    });
+  }
+
+  await demoAccountsEnsured;
+}
 
 function isPlaceholderUser(user: StoredUser): boolean {
   const email = user.email.trim().toLowerCase();

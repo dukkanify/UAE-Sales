@@ -1,6 +1,10 @@
 import { BRAND, BRAND_COLORS } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
-import { logProductionConfigIssues } from "@/services/auth/production-config";
+import {
+  logProductionConfigIssues,
+  resolveResendApiKey,
+} from "@/services/auth/production-config";
+import { maskEmail } from "@/shared/utils/mask-email";
 import {
   buildSooqnaEmailHtml,
   buildSooqnaEmailText,
@@ -8,13 +12,13 @@ import {
 import { resolveEmailLocale } from "@/shared/i18n/email-locale";
 
 type SendEmailInput = {
+  eventType: string;
   html: string;
   subject: string;
   text: string;
   to: string;
 };
 
-const RESEND_ONBOARDING_FROM = `${BRAND.nameEn} <beth.t@example.com>`;
 const EMAIL_TIMEOUT_MS = 8_000;
 
 function escapeHtml(value: string): string {
@@ -59,73 +63,105 @@ async function postResend(
   return { body, ok: response.ok, status: response.status };
 }
 
+function parseResendProviderResult(body: string): {
+  id?: string;
+  message?: string;
+  name?: string;
+} {
+  try {
+    const parsed = JSON.parse(body) as {
+      id?: unknown;
+      message?: unknown;
+      name?: unknown;
+      error?: { message?: unknown; name?: unknown };
+    };
+    const message =
+      typeof parsed.message === "string"
+        ? parsed.message
+        : typeof parsed.error?.message === "string"
+          ? parsed.error.message
+          : undefined;
+    const name =
+      typeof parsed.name === "string"
+        ? parsed.name
+        : typeof parsed.error?.name === "string"
+          ? parsed.error.name
+          : undefined;
+    const id = typeof parsed.id === "string" ? parsed.id : undefined;
+    return { id, message, name };
+  } catch {
+    return {};
+  }
+}
+
+function emailLogBase(input: SendEmailInput, from: string) {
+  return {
+    eventType: input.eventType,
+    provider: "resend",
+    to: maskEmail(input.to),
+    subject: input.subject,
+    from,
+  };
+}
+
 async function sendWithResend(input: SendEmailInput): Promise<boolean> {
   const provider = (process.env.EMAIL_PROVIDER ?? "resend").trim().toLowerCase();
   if (provider && provider !== "resend") {
     console.warn("[Sooqna Email] EMAIL_PROVIDER is not resend; using Resend", {
+      eventType: input.eventType,
       provider,
     });
   }
 
-  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const { source, value: apiKey } = resolveResendApiKey();
   if (!apiKey) {
     logProductionConfigIssues("email-send");
     console.error("[Sooqna Email] RESEND_API_KEY is not set; email not sent", {
-      to: input.to,
+      eventType: input.eventType,
+      provider: "resend",
+      to: maskEmail(input.to),
       subject: input.subject,
+      resendKeySource: null,
     });
     return false;
   }
 
   const primaryFrom = getFromAddress();
+  const fromAddress = extractEmailAddress(primaryFrom);
+  if (fromAddress.endsWith("@resend.dev")) {
+    console.error("[Sooqna Email] production sender must use verified sooqna.site domain", {
+      ...emailLogBase(input, primaryFrom),
+    });
+    return false;
+  }
+
   try {
     const first = await postResend(primaryFrom, input, apiKey);
-    const primaryAddress = extractEmailAddress(primaryFrom);
+    const providerResult = parseResendProviderResult(first.body);
     if (first.ok) {
-      if (primaryAddress.endsWith("@resend.dev")) {
-        console.warn(
-          "[Sooqna Email] Resend onboarding sender cannot reach third-party inboxes",
-          { to: input.to, subject: input.subject, from: primaryFrom },
-        );
-        return false;
-      }
-      console.info("[Sooqna Email] sent", { to: input.to, subject: input.subject });
+      console.info("[Sooqna Email] Resend accepted", {
+        ...emailLogBase(input, primaryFrom),
+        status: first.status,
+        resendId: providerResult.id,
+        resendKeySource: source,
+      });
       return true;
     }
 
     console.error("[Sooqna Email] Resend rejected", {
-      to: input.to,
-      subject: input.subject,
-      from: primaryFrom,
+      ...emailLogBase(input, primaryFrom),
       status: first.status,
-      body: first.body.slice(0, 500),
-    });
-
-    if (primaryAddress.endsWith("@resend.dev")) {
-      return false;
-    }
-
-    const retry = await postResend(RESEND_ONBOARDING_FROM, input, apiKey);
-    if (retry.ok) {
-      console.warn(
-        "[Sooqna Email] Resend onboarding sender cannot reach third-party inboxes",
-        { to: input.to, subject: input.subject },
-      );
-      return false;
-    }
-
-    console.error("[Sooqna Email] Resend retry rejected", {
-      to: input.to,
-      subject: input.subject,
-      status: retry.status,
-      body: retry.body.slice(0, 500),
+      resendId: providerResult.id,
+      providerErrorName: providerResult.name,
+      providerErrorMessage: providerResult.message,
+      resendKeySource: source,
     });
     return false;
   } catch (error) {
     console.error("[Sooqna Email] Resend request failed", {
-      to: input.to,
-      subject: input.subject,
-      error: error instanceof Error ? error.message : error,
+      ...emailLogBase(input, primaryFrom),
+      error: error instanceof Error ? error.message : "unknown",
+      resendKeySource: source,
     });
     return false;
   }
@@ -141,14 +177,18 @@ export async function deliverEmailSafely(input: SendEmailInput): Promise<boolean
     const sent = await deliverEmail(input);
     if (!sent) {
       console.warn("[Sooqna Email] not delivered", {
-        to: input.to,
+        eventType: input.eventType,
+        provider: "resend",
+        to: maskEmail(input.to),
         subject: input.subject,
       });
     }
     return sent;
   } catch (error) {
     console.error("[Sooqna Email] delivery failed", {
-      to: input.to,
+      eventType: input.eventType,
+      provider: "resend",
+      to: maskEmail(input.to),
       subject: input.subject,
       error: error instanceof Error ? error.message : error,
     });
@@ -211,6 +251,7 @@ async function sendPurposeOtp(input: {
   const intro = locale === "en" ? input.introEn : input.introAr;
   const safeName = escapeHtml(input.name.trim() || (locale === "en" ? "Sooqna customer" : "عميل سوقنا"));
   return deliverEmailSafely({
+    eventType: "otp",
     to: input.email,
     subject:
       locale === "en"
@@ -343,6 +384,7 @@ export async function sendWelcomeEmail(input: {
   const name = input.name.trim() || (locale === "en" ? "Sooqna customer" : "عميل سوقنا");
   const appUrl = getAppUrl();
   return deliverEmailSafely({
+    eventType: "welcome",
     to: input.email,
     subject:
       locale === "en"
@@ -433,6 +475,7 @@ export async function sendViewingBookingEmails(input: {
   );
 
   const buyerEmailed = await deliverEmailSafely({
+    eventType: "viewing_booking",
     to: input.buyer.email,
     subject: english
       ? `Viewing confirmed — ${input.listingTitle}`
@@ -477,6 +520,7 @@ export async function sendViewingBookingEmails(input: {
   );
 
   const sellerEmailed = await deliverEmailSafely({
+    eventType: "viewing_booking",
     to: input.seller.email,
     subject: sellerEnglish
       ? `New viewing request — ${input.listingTitle}`
@@ -502,6 +546,7 @@ export async function sendJobApplicationEmails(input: {
   const buyerName = escapeHtml(input.buyer.name);
 
   const buyerEmailed = await deliverEmailSafely({
+    eventType: "job_application",
     to: input.buyer.email,
     subject: english
       ? `Job application confirmation — ${input.listingTitle}`
@@ -529,6 +574,7 @@ export async function sendJobApplicationEmails(input: {
   const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
   const sellerEmailed = await deliverEmailSafely({
+    eventType: "job_application",
     to: input.seller.email,
     subject: sellerEnglish
       ? `New job application — ${input.listingTitle}`
@@ -580,6 +626,7 @@ export async function sendQuoteRequestEmails(input: {
       : "";
 
   const buyerEmailed = await deliverEmailSafely({
+    eventType: isBooking ? "service_booking" : "quote_request",
     to: input.buyer.email,
     subject: buyerSubject,
     html: buildTransactionalHtml(
@@ -607,6 +654,7 @@ export async function sendQuoteRequestEmails(input: {
   const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
   const sellerEmailed = await deliverEmailSafely({
+    eventType: isBooking ? "service_booking" : "quote_request",
     to: input.seller.email,
     subject: sellerEnglish
       ? `New service request — ${input.listingTitle}`

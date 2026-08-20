@@ -38,6 +38,7 @@ export async function notifyActivityEvent(input: StatusNotifyInput): Promise<voi
 
   if (input.sendEmail && input.recipientEmail) {
     await deliverEmailSafely({
+      eventType: "activity_status",
       to: input.recipientEmail,
       subject: input.title,
       html: `<p>${input.body}</p>`,

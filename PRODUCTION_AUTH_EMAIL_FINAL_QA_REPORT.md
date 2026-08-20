@@ -1,9 +1,27 @@
 # Production Auth + Email Final QA Report
 
 **Date:** 2026-08-20  
-**Branch:** `main` (PR #230 merged)  
+**Branch:** `cursor/resend-otp-delivery-fix-37ba`  
 **Target:** https://sooqna.site  
-**Status:** ⚠️ **NOT COMPLETE** — Auth + Postgres live on production; **Resend still not active** at runtime (`resendConfigured=false`, emails not delivered)
+**Status:** ⚠️ **NOT COMPLETE** — exact production blocker identified: **`RESEND_API_KEY` is missing from Production runtime**. Other email env vars are present. Real inbox E2E cannot run until this key is on Production and the app is redeployed.
+
+### Live `/api/auth/status` (2026-08-20)
+
+```
+HTTP 200
+driver = postgres
+resendConfigured = false
+missing = ["RESEND_API_KEY"]
+EMAIL_FROM_ADDRESS = no-reply@sooqna.site
+EMAIL_FROM_NAME = Sooqna
+NEXT_PUBLIC_APP_URL = https://sooqna.site
+EMAIL_PROVIDER = resend
+ENABLE_DEMO_OTP = false
+```
+
+**Exact send failure:** registration never calls Resend. `process.env.RESEND_API_KEY` is empty at runtime, so OTP send returns `emailDelivered:false` and the UI shows «تعذر إرسال رمز التحقق حالياً».
+
+**Domain DNS (sooqna.site):** no SPF TXT, no `resend._domainkey` DKIM, no DMARC. After the API key is added, Resend will still reject `no-reply@sooqna.site` until the domain is verified — copy the exact records from the Resend Domains page (do not invent them).
 
 ---
 
