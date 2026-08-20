@@ -47,6 +47,7 @@ export async function POST(request: Request) {
     .replace(/\n/g, "<br/>");
 
   const emailed = await deliverEmailSafely({
+    eventType: "support_inbox",
     to: inbox,
     subject,
     text,
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
   });
 
   await deliverEmailSafely({
+    eventType: "support_ack",
     to: parsed.data.email,
     subject: `استلمنا رسالتك في ${BRAND.nameAr}`,
     text: `مرحبًا ${parsed.data.name}،\nاستلمنا رسالتك حول «${topic}» وسنعود إليك في أقرب وقت.\nفريق ${BRAND.nameAr}`,
