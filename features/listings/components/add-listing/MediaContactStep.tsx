@@ -161,7 +161,7 @@ export function MediaContactStep({
           {selectedPackage === "featured_pending" ? (
             <>
               <p className="text-xs text-muted">
-                بعد الإرسال ستُوجَّه مباشرة لبوابة الدفع — لا يُفعَّل التمييز قبل إتمام الدفع.
+                لن يُنشر الإعلان ولن يُفعَّل التمييز إلا بعد إتمام الدفع بنجاح.
               </p>
               {featuredCheckoutAvailable === false ? (
                 <FormMessage variant="error">

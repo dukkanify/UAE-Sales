@@ -126,7 +126,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           <div>
             <p className="font-medium">
               {selectedPackage === "featured_pending"
-                ? "يُحفظ الإعلان ثم تُوجَّه لبوابة الدفع قبل تفعيل الباقة المميزة."
+                ? "لا يُنشر الإعلان قبل إتمام الدفع — ستُوجَّه لبوابة Stripe مباشرة."
                 : "بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث."}
             </p>
             {errors.submit ? (

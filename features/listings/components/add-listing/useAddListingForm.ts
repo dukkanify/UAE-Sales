@@ -11,7 +11,7 @@ import {
   getAccountGatePath,
   isMarketplaceAccountReady,
 } from "@/services/auth/account-access";
-import { getSessionUser, saveLocalListing } from "@/services/storage";
+import { getSessionUser, saveLocalListing, deleteLocalListing } from "@/services/storage";
 import { uploadListingImages } from "@/services/upload";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import type { AddListingErrors, ListingPreview } from "./types";
@@ -118,6 +118,18 @@ function scrollToSubmitError() {
       block: "center",
     });
   });
+}
+
+async function discardListingDraft(listingId: string) {
+  deleteLocalListing(listingId);
+  try {
+    await fetch(`/api/listings/${encodeURIComponent(listingId)}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+  } catch {
+    // Best-effort rollback if checkout cannot start.
+  }
 }
 
 function featuredCheckoutError(code?: string): string {
@@ -271,7 +283,8 @@ export function useAddListingForm(categories: Category[]) {
         price,
         currency: "AED",
         condition: parsed.condition,
-        status: "pending_review",
+        // Featured package stays draft until Stripe payment succeeds.
+        status: wantsFeatured ? "draft" : "pending_review",
         isFeatured: false,
         views: 0,
         imageUrl: persistedImages[0],
@@ -289,7 +302,9 @@ export function useAddListingForm(categories: Category[]) {
         ...(videoUrl ? { videoUrl } : {}),
       };
 
-      saveLocalListing(listing);
+      if (!wantsFeatured) {
+        saveLocalListing(listing);
+      }
 
       const sync = await syncListingToServer(listing);
 
@@ -321,27 +336,32 @@ export function useAddListingForm(categories: Category[]) {
             featureData.error === "UNAUTHORIZED"
           ) {
             publishedRef.current = false;
+            await discardListingDraft(id);
             router.replace("/login?next=/listings/new");
             return;
           }
 
           if (featureRes.ok && featureData.checkoutUrl) {
+            // Leave draft on server; do not publish or navigate to listing.
             window.location.href = featureData.checkoutUrl;
             return;
           }
 
           if (featureRes.ok && featureData.listing) {
+            // Mock checkout (non-production only) — payment simulated as paid.
             saveLocalListing(featureData.listing);
             router.push("/dashboard/listings?featured=1");
             return;
           }
 
           publishedRef.current = false;
+          await discardListingDraft(id);
           setErrors({ submit: featuredCheckoutError(featureData.error) });
           scrollToSubmitError();
           return;
         } catch {
           publishedRef.current = false;
+          await discardListingDraft(id);
           setErrors({ submit: featuredCheckoutError() });
           scrollToSubmitError();
           return;

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!existing) {
+    if (!existing && listing.status !== "draft") {
       void notifyListingSubmitted(listing);
     }
 
