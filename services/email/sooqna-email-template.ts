@@ -27,7 +27,8 @@ export function buildSooqnaEmailHtml(input: {
   const gold = BRAND_COLORS.gold;
   const cream = BRAND_COLORS.white;
   // Hosted JPEG (not /apple-icon, not SVG) — Gmail blocks SVG and 404s break the logo.
-  const logoSrc = `${EMAIL_SITE_URL}/brand/email-logo.jpg`;
+  // Cache-bust query helps clients that cached a prior broken image URL.
+  const logoSrc = `${EMAIL_SITE_URL}/brand/email-logo.jpg?v=20260820`;
   const english = input.locale === "en";
   const dir = english ? "ltr" : "rtl";
   const align = english ? "left" : "right";

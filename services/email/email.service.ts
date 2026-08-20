@@ -438,6 +438,11 @@ function listingLinkHtml(url: string, locale: "ar" | "en" = "ar"): string {
   return `<p style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:12px 22px;background:${BRAND_COLORS.gold};color:${BRAND_COLORS.navy};text-decoration:none;border-radius:12px;font-weight:700;">${label}</a></p>`;
 }
 
+function mapLinkHtml(url: string, locale: "ar" | "en" = "ar"): string {
+  const label = locale === "en" ? "Open live location on Maps" : "فتح الموقع المباشر على الخريطة";
+  return `<p style="text-align:center;margin:12px 0 24px;"><a href="${url}" style="display:inline-block;padding:12px 22px;background:${BRAND_COLORS.navy};color:#fff;text-decoration:none;border-radius:12px;font-weight:700;">${label}</a></p>`;
+}
+
 export async function sendViewingBookingEmails(input: {
   buyer: EmailParty;
   seller?: EmailParty;
@@ -447,6 +452,10 @@ export async function sendViewingBookingEmails(input: {
   time: string;
   phone?: string;
   visitors?: number;
+  /** Human-readable property area (e.g. Downtown Dubai, Dubai). */
+  locationLabel?: string;
+  /** Google Maps / directions URL for the property pin. */
+  mapUrl?: string;
 }): Promise<{ buyerEmailed: boolean; sellerEmailed: boolean }> {
   const locale = await resolveEmailLocale({ email: input.buyer.email });
   const english = locale === "en";
@@ -457,20 +466,37 @@ export async function sendViewingBookingEmails(input: {
   const visitors =
     typeof input.visitors === "number" ? String(input.visitors) : "";
   const phone = input.phone ? escapeHtml(input.phone) : "";
+  const locationLabel = input.locationLabel?.trim()
+    ? escapeHtml(input.locationLabel.trim())
+    : "";
+  const mapUrl = input.mapUrl?.trim() || "";
+  const locationRow = locationLabel
+    ? english
+      ? `<br/>Location: <strong>${locationLabel}</strong>`
+      : `<br/>الموقع: <strong>${locationLabel}</strong>`
+    : "";
   const details = english
-    ? `Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong>${visitors ? `<br/>Visitors: <strong>${visitors}</strong>` : ""}${phone ? `<br/>Contact: <strong dir="ltr">${phone}</strong>` : ""}`
-    : `التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${visitors ? `<br/>عدد الزوار: <strong>${visitors}</strong>` : ""}${phone ? `<br/>رقم التواصل: <strong dir="ltr">${phone}</strong>` : ""}`;
+    ? `Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong>${visitors ? `<br/>Visitors: <strong>${visitors}</strong>` : ""}${phone ? `<br/>Contact: <strong dir="ltr">${phone}</strong>` : ""}${locationRow}`
+    : `التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${visitors ? `<br/>عدد الزوار: <strong>${visitors}</strong>` : ""}${phone ? `<br/>رقم التواصل: <strong dir="ltr">${phone}</strong>` : ""}${locationRow}`;
+  const mapBlock = mapUrl ? mapLinkHtml(mapUrl, locale) : "";
+  const mapTextLine = mapUrl
+    ? english
+      ? `Live location: ${mapUrl}`
+      : `الموقع المباشر: ${mapUrl}`
+    : "";
 
   const buyerHtml = buildTransactionalHtml(
     english
       ? `<p style="font-size:16px;line-height:1.8;">Hello ${buyerName},</p>
       <p style="font-size:16px;line-height:1.8;">A property viewing has been confirmed for “${title}”.</p>
       <p style="font-size:16px;line-height:1.8;">${details}</p>
-      ${listingLinkHtml(input.listingUrl, locale)}`
+      ${listingLinkHtml(input.listingUrl, locale)}
+      ${mapBlock}`
       : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${buyerName}،</p>
       <p style="font-size:16px;line-height:1.8;">تم تأكيد حجز معاينة لعقار «${title}».</p>
       <p style="font-size:16px;line-height:1.8;">${details}</p>
-      ${listingLinkHtml(input.listingUrl, locale)}`,
+      ${listingLinkHtml(input.listingUrl, locale)}
+      ${mapBlock}`,
     locale,
   );
 
@@ -487,16 +513,24 @@ export async function sendViewingBookingEmails(input: {
           `A viewing was confirmed for “${input.listingTitle}”.`,
           `Date: ${input.date}`,
           `Time: ${input.time}`,
+          input.locationLabel ? `Location: ${input.locationLabel}` : "",
+          mapTextLine,
           input.listingUrl,
-        ].join("\n")
+        ]
+          .filter(Boolean)
+          .join("\n")
       : [
           `مرحبًا ${input.buyer.name}،`,
           `تم تأكيد معاينة «${input.listingTitle}».`,
           `التاريخ: ${input.date}`,
           `الوقت: ${input.time}`,
+          input.locationLabel ? `الموقع: ${input.locationLabel}` : "",
+          mapTextLine,
           input.listingUrl,
           "فريق سوقنا",
-        ].join("\n"),
+        ]
+          .filter(Boolean)
+          .join("\n"),
   });
 
   if (!input.seller?.email) {
@@ -506,16 +540,24 @@ export async function sendViewingBookingEmails(input: {
   const sellerLocale = await resolveEmailLocale({ email: input.seller.email });
   const sellerEnglish = sellerLocale === "en";
   const sellerName = escapeHtml(input.seller.name);
+  const sellerMapBlock = mapUrl ? mapLinkHtml(mapUrl, sellerLocale) : "";
+  const sellerLocationRow = locationLabel
+    ? sellerEnglish
+      ? `<br/>Location: <strong>${locationLabel}</strong>`
+      : `<br/>الموقع: <strong>${locationLabel}</strong>`
+    : "";
   const sellerHtml = buildTransactionalHtml(
     sellerEnglish
       ? `<p style="font-size:16px;line-height:1.8;">Hello ${sellerName},</p>
       <p style="font-size:16px;line-height:1.8;">${buyerName} booked a viewing on “${title}”.</p>
-      <p style="font-size:16px;line-height:1.8;">Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong></p>
-      ${listingLinkHtml(input.listingUrl, sellerLocale)}`
+      <p style="font-size:16px;line-height:1.8;">Date: <strong>${date}</strong><br/>Time: <strong>${time}</strong>${sellerLocationRow}</p>
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}
+      ${sellerMapBlock}`
       : `<p style="font-size:16px;line-height:1.8;">مرحبًا ${sellerName}،</p>
       <p style="font-size:16px;line-height:1.8;">حجز معاينة جديد على إعلانك «${title}» من ${buyerName}.</p>
-      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong></p>
-      ${listingLinkHtml(input.listingUrl, sellerLocale)}`,
+      <p style="font-size:16px;line-height:1.8;">التاريخ: <strong>${date}</strong><br/>الوقت: <strong>${time}</strong>${sellerLocationRow}</p>
+      ${listingLinkHtml(input.listingUrl, sellerLocale)}
+      ${sellerMapBlock}`,
     sellerLocale,
   );
 
@@ -527,8 +569,25 @@ export async function sendViewingBookingEmails(input: {
       : `حجز معاينة جديد — ${input.listingTitle}`,
     html: sellerHtml,
     text: sellerEnglish
-      ? `Hello ${input.seller.name},\n${input.buyer.name} booked a viewing for “${input.listingTitle}” on ${input.date} at ${input.time}.\n${input.listingUrl}`
-      : `مرحبًا ${input.seller.name}،\n${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.\n${input.listingUrl}\nفريق سوقنا`,
+      ? [
+          `Hello ${input.seller.name},`,
+          `${input.buyer.name} booked a viewing for “${input.listingTitle}” on ${input.date} at ${input.time}.`,
+          input.locationLabel ? `Location: ${input.locationLabel}` : "",
+          mapTextLine,
+          input.listingUrl,
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : [
+          `مرحبًا ${input.seller.name}،`,
+          `${input.buyer.name} حجز معاينة لـ «${input.listingTitle}» بتاريخ ${input.date} الساعة ${input.time}.`,
+          input.locationLabel ? `الموقع: ${input.locationLabel}` : "",
+          mapTextLine,
+          input.listingUrl,
+          "فريق سوقنا",
+        ]
+          .filter(Boolean)
+          .join("\n"),
   });
 
   return { buyerEmailed, sellerEmailed };
