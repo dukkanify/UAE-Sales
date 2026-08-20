@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { getNearbyListings } from "@/features/home/components/mobile/mobile-home.config";
 import { getListingHref, getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
 type MarketNearbySectionProps = {
@@ -11,6 +15,7 @@ type MarketNearbySectionProps = {
 };
 
 export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
+  const locale = useLocale();
   const nearby = getNearbyListings(listings, 6);
 
   if (nearby.length === 0) return null;
@@ -38,7 +43,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
             >
               <div className="relative aspect-square overflow-hidden">
                 <AppImage
-                  alt={listing.title}
+                  alt={listingTitle(listing, locale)}
                   className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   fallbackCategory={listing.categoryId}
                   fill

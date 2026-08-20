@@ -9,6 +9,8 @@ import {
   getListingImageUrl,
   getListingLocation,
 } from "@/features/listings/components/listing-card.utils";
+import { listingTitle, sellerName } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { getAppPreviewImageUrl } from "./mobile-app-preview.config";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
@@ -20,6 +22,17 @@ type AppPhoneMockupProps = {
 
 const CHIPS = ["سيارات", "عقارات", "موبايلات", "إلكترونيات"] as const;
 const SLIDE_MS = 5200;
+
+function useListingCopy(listing: Listing | undefined) {
+  const locale = useLocale();
+  if (!listing) {
+    return { title: "", seller: "" };
+  }
+  return {
+    title: listingTitle(listing, locale),
+    seller: sellerName(listing.seller, locale),
+  };
+}
 
 function coverUrl(listing: Listing): string {
   return getAppPreviewImageUrl(listing.slug, getListingImageUrl(listing));
@@ -91,6 +104,8 @@ function TabBar({ active }: { active: "home" | "search" | "listing" }) {
 function HomeScreen({ listings }: { listings: Listing[] }) {
   const hero = listings[0];
   const next = listings[1];
+  const heroCopy = useListingCopy(hero);
+  const nextCopy = useListingCopy(next);
 
   return (
     <div className="app-phone__screen">
@@ -128,7 +143,7 @@ function HomeScreen({ listings }: { listings: Listing[] }) {
           <div className="app-phone__hero-meta">
             {hero.isFeatured ? <em>مميز</em> : null}
             <p dir="ltr">{formatCurrencyDisplay(hero.price, "ar-AE")}</p>
-            <b>{hero.title}</b>
+            <b data-ugc>{heroCopy.title}</b>
           </div>
         </article>
       ) : null}
@@ -140,7 +155,7 @@ function HomeScreen({ listings }: { listings: Listing[] }) {
           </div>
           <div className="app-phone__row-copy">
             <p dir="ltr">{formatCurrencyDisplay(next.price, "ar-AE")}</p>
-            <b>{next.title}</b>
+            <b data-ugc>{nextCopy.title}</b>
             <small>
               <Icon name="map" size={8} />
               {getListingLocation(next)}
@@ -155,6 +170,7 @@ function HomeScreen({ listings }: { listings: Listing[] }) {
 }
 
 function ListingScreen({ listing }: { listing?: Listing }) {
+  const copy = useListingCopy(listing);
   if (!listing) return null;
 
   return (
@@ -168,7 +184,7 @@ function ListingScreen({ listing }: { listing?: Listing }) {
       </div>
       <div className="app-phone__detail-body">
         <p className="app-phone__kicker">{listing.subcategory ?? "إعلان مميز"}</p>
-        <h3>{listing.title}</h3>
+        <h3 data-ugc>{copy.title}</h3>
         <p className="app-phone__price" dir="ltr">
           {formatCurrencyDisplay(listing.price, "ar-AE")}
         </p>
@@ -177,9 +193,9 @@ function ListingScreen({ listing }: { listing?: Listing }) {
           {getListingLocation(listing)}
         </small>
         <div className="app-phone__seller">
-          <span>{listing.seller.name.slice(0, 1)}</span>
+          <span>{copy.seller.slice(0, 1)}</span>
           <div>
-            <b>{listing.seller.name}</b>
+            <b data-ugc>{copy.seller}</b>
             <small>بائع موثّق</small>
           </div>
         </div>
@@ -191,6 +207,7 @@ function ListingScreen({ listing }: { listing?: Listing }) {
 }
 
 function SearchScreen({ listings }: { listings: Listing[] }) {
+  const locale = useLocale();
   return (
     <div className="app-phone__screen">
       <StatusBar />
@@ -206,7 +223,7 @@ function SearchScreen({ listings }: { listings: Listing[] }) {
             </div>
             <div className="app-phone__row-copy">
               <p dir="ltr">{formatCurrencyDisplay(listing.price, "ar-AE")}</p>
-              <b>{listing.title}</b>
+              <b data-ugc>{listingTitle(listing, locale)}</b>
               <small>
                 <Icon name="map" size={8} />
                 {getListingLocation(listing)}

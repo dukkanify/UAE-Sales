@@ -5,6 +5,8 @@ import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import {
   getListingHref,
   getListingImageUrl,
@@ -23,6 +25,7 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
 }: MobileNearbyCardProps) {
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
+  const alt = listingTitle(listing, useLocale());
 
   return (
     <Link
@@ -31,7 +34,7 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
     >
       <div className="mobile-home-nearby-card__media">
         <AppImage
-          alt={listing.title}
+          alt={alt}
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill

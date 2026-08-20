@@ -8,7 +8,10 @@ import { CardShareButton } from "@/shared/components/CardShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { SellerName } from "@/shared/i18n/SellerName";
+import { listingTitle, sellerName } from "@/shared/i18n/listing-copy";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
@@ -37,10 +40,13 @@ export const PremiumListingCard = memo(function PremiumListingCard({
   priority = false,
   showStatus = false,
 }: PremiumListingCardProps) {
+  const locale = useLocale();
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
   const shareUrl = href;
+  const displayTitle = listingTitle(listing, locale);
+  const displaySeller = sellerName(listing.seller, locale);
 
   const isVerified = isListingVerified(listing);
   const showEscrow = showsEscrowProtection(listing);
@@ -78,7 +84,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         />
         <CardShareButton
           className="card-media-action"
-          title={listing.title}
+          title={displayTitle}
           url={shareUrl}
         />
       </div>
@@ -117,7 +123,7 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         {listing.seller.avatarUrl ? (
           <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-2 ring-surface">
             <AppImage
-              alt={listing.seller.name}
+              alt={displaySeller}
               className="object-cover"
               fallback="avatar"
               fill
@@ -127,12 +133,12 @@ export const PremiumListingCard = memo(function PremiumListingCard({
           </span>
         ) : (
           <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary-soft text-[0.6rem] font-bold text-[#8a7040]">
-            {listing.seller.name.slice(0, 2)}
+            {displaySeller.slice(0, 2)}
           </span>
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-ink">
-            {listing.seller.name}
+            <SellerName seller={listing.seller} />
             {isVerified ? (
               <Icon
                 aria-label="بائع موثق"
