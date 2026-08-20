@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { findUserByEmail, toUserProfile, getRedirectAfterAuth, restoreUserWithPasswordProof } from "@/services/auth/user-store";
+import {
+  ensureDemoAccounts,
+  findUserByEmail,
+  toUserProfile,
+  getRedirectAfterAuth,
+  restoreUserWithPasswordProof,
+} from "@/services/auth/user-store";
 import { verifyPassword } from "@/services/auth/password.service";
 import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
@@ -36,6 +42,15 @@ export async function POST(request: Request) {
 
     const email = parsed.data.email.trim().toLowerCase();
     const password = parsed.data.password.trim();
+
+    // Keep demo operator accounts (admin@sooqna.demo, …) usable after DB resets.
+    if (email.endsWith("@sooqna.demo") || email.endsWith("@uaesales.demo")) {
+      try {
+        await ensureDemoAccounts();
+      } catch {
+        // Fall through — login still attempts against whatever is stored.
+      }
+    }
 
     let stored = await findUserByEmail(email);
     if (!stored) {
