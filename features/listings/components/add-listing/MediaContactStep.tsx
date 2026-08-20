@@ -17,6 +17,7 @@ const MAX_IMAGES = 12;
 type MediaContactStepProps = {
   defaultContact?: string;
   errors: AddListingErrors;
+  featuredCheckoutAvailable?: boolean | null;
   imagePreviews: string[];
   onImageChange: (
     fileList: FileList | null,
@@ -29,6 +30,7 @@ type MediaContactStepProps = {
 export function MediaContactStep({
   defaultContact = "",
   errors,
+  featuredCheckoutAvailable = null,
   imagePreviews,
   onImageChange,
   onPackageChange,
@@ -37,7 +39,7 @@ export function MediaContactStep({
   const hasImages = imagePreviews.length > 0;
 
   return (
-    <Card className={addListingStepCardClass}>
+    <Card className={addListingStepCardClass} id="add-listing-media">
       <h2 className={addListingStepTitleClass}>3. الصور والتواصل</h2>
       <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
         <div className="grid gap-3">
@@ -157,9 +159,19 @@ export function MediaContactStep({
             value={selectedPackage}
           />
           {selectedPackage === "featured_pending" ? (
-            <p className="text-xs text-muted">
-              بعد الإرسال ستُوجَّه مباشرة لبوابة الدفع — لا يُفعَّل التمييز قبل إتمام الدفع.
-            </p>
+            <>
+              <p className="text-xs text-muted">
+                بعد الإرسال ستُوجَّه مباشرة لبوابة الدفع — لا يُفعَّل التمييز قبل إتمام الدفع.
+              </p>
+              {featuredCheckoutAvailable === false ? (
+                <FormMessage variant="error">
+                  بوابة الدفع غير مفعّلة على الموقع حالياً. اختر الباقة المجانية أو حاول لاحقاً.
+                </FormMessage>
+              ) : null}
+            </>
+          ) : null}
+          {errors.package ? (
+            <FormMessage variant="error">{errors.package}</FormMessage>
           ) : null}
         </div>
       </div>

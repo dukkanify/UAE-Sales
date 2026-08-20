@@ -41,9 +41,13 @@ function buildSellerFromSession(user: NonNullable<ReturnType<typeof getSessionUs
   };
 }
 
+type SyncListingResult =
+  | { ok: true }
+  | { ok: false; code?: string; error: string };
+
 async function syncListingToServer(
   listing: Listing,
-): Promise<{ ok: true } | { ok: false; error: string }> {
+): Promise<SyncListingResult> {
   try {
     const response = await fetch("/api/listings", {
       method: "POST",
@@ -57,6 +61,13 @@ async function syncListingToServer(
     };
 
     if (!response.ok) {
+      if (response.status === 401 || data.error === "UNAUTHORIZED") {
+        return {
+          ok: false,
+          code: "UNAUTHORIZED",
+          error: "انتهت جلسة الدخول. سجّل الدخول ثم حاول مرة أخرى.",
+        };
+      }
       if (data.error === "ACCOUNT_NOT_READY") {
         return {
           ok: false,
@@ -80,16 +91,47 @@ async function syncListingToServer(
   }
 }
 
+function scrollToFirstError(
+  nextErrors: AddListingErrors & Record<string, string | undefined>,
+) {
+  window.requestAnimationFrame(() => {
+    const detailFields = new Set(["title", "description", "price"]);
+    const hasDetailError = Object.keys(nextErrors).some((key) => detailFields.has(key));
+    const targetId = hasDetailError
+      ? "add-listing-details"
+      : nextErrors.images
+        ? "add-listing-media"
+        : nextErrors.contact || nextErrors.package
+          ? "add-listing-media"
+          : "add-listing-submit";
+    document.getElementById(targetId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  });
+}
+
+function scrollToSubmitError() {
+  window.requestAnimationFrame(() => {
+    document.getElementById("add-listing-submit")?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  });
+}
+
 function featuredCheckoutError(code?: string): string {
   switch (code) {
     case "STRIPE_NOT_CONFIGURED":
-      return "بوابة الدفع غير متاحة حالياً. اختر الباقة المجانية أو حاول لاحقاً.";
+      return "بوابة الدفع غير مفعّلة على الموقع حالياً. اختر الباقة المجانية أو حاول لاحقاً.";
+    case "CHECKOUT_URL_MISSING":
+      return "تعذر فتح صفحة الدفع. حاول مرة أخرى أو تواصل مع الدعم.";
     case "LISTING_NOT_FOUND":
       return "تعذر بدء الدفع — لم يُحفظ الإعلان. حاول مرة أخرى.";
     case "ALREADY_FEATURED":
       return "هذا الإعلان مميز بالفعل.";
     case "UNAUTHORIZED":
-      return "لا يمكن بدء الدفع لهذا الإعلان.";
+      return "انتهت جلسة الدخول. سجّل الدخول ثم حاول مرة أخرى.";
     default:
       return "تعذر بدء الدفع للباقة المميزة. حاول مرة أخرى.";
   }
@@ -112,6 +154,9 @@ export function useAddListingForm(categories: Category[]) {
     categories[0]?.id ?? "",
   );
   const [selectedPackage, setSelectedPackage] = useState("free");
+  const [featuredCheckoutAvailable, setFeaturedCheckoutAvailable] = useState<
+    boolean | null
+  >(null);
   const [isAllowed] = useState(() => {
     if (typeof window === "undefined") return false;
     return isMarketplaceAccountReady(getSessionUser());
@@ -167,17 +212,41 @@ export function useAddListingForm(categories: Category[]) {
       if (imageFiles.length === 0) {
         nextErrors.images = "أضف صورة حقيقية واحدة على الأقل للمنتج.";
       }
+      if (
+        wantsFeatured &&
+        featuredCheckoutAvailable === false
+      ) {
+        nextErrors.package =
+          "بوابة الدفع غير متاحة حالياً. اختر الباقة المجانية أو حاول لاحقاً.";
+      }
 
-      setErrors(nextErrors);
       if (Object.keys(nextErrors).length > 0) {
+        nextErrors.submit = wantsFeatured
+          ? "أكمل الحقول المطلوبة أعلاه قبل متابعة الدفع."
+          : "أكمل الحقول المطلوبة أعلاه قبل الإرسال.";
+        setErrors(nextErrors);
+        scrollToFirstError(nextErrors);
         return;
       }
 
+      setErrors({});
       publishedRef.current = true;
 
       const price = Number(formData.get("price") ?? 0);
       const description = String(formData.get("description") ?? "").trim();
-      const persistedImages = await uploadListingImages(imageFiles);
+      let persistedImages: string[];
+      try {
+        persistedImages = await uploadListingImages(imageFiles);
+      } catch (uploadError) {
+        publishedRef.current = false;
+        const message =
+          uploadError instanceof Error
+            ? uploadError.message
+            : "تعذر معالجة الصور. حاول مرة أخرى.";
+        setErrors({ submit: message });
+        scrollToSubmitError();
+        return;
+      }
 
       const cityName = isDynamicCategory(categoryId)
         ? parsed.city
@@ -227,7 +296,12 @@ export function useAddListingForm(categories: Category[]) {
       if (wantsFeatured) {
         if (!sync.ok) {
           publishedRef.current = false;
+          if (sync.code === "UNAUTHORIZED") {
+            router.replace("/login?next=/listings/new");
+            return;
+          }
           setErrors({ submit: sync.error });
+          scrollToSubmitError();
           return;
         }
 
@@ -242,6 +316,15 @@ export function useAddListingForm(categories: Category[]) {
             listing?: Listing;
           };
 
+          if (
+            featureRes.status === 401 ||
+            featureData.error === "UNAUTHORIZED"
+          ) {
+            publishedRef.current = false;
+            router.replace("/login?next=/listings/new");
+            return;
+          }
+
           if (featureRes.ok && featureData.checkoutUrl) {
             window.location.href = featureData.checkoutUrl;
             return;
@@ -255,10 +338,12 @@ export function useAddListingForm(categories: Category[]) {
 
           publishedRef.current = false;
           setErrors({ submit: featuredCheckoutError(featureData.error) });
+          scrollToSubmitError();
           return;
         } catch {
           publishedRef.current = false;
           setErrors({ submit: featuredCheckoutError() });
+          scrollToSubmitError();
           return;
         }
       }
@@ -269,7 +354,7 @@ export function useAddListingForm(categories: Category[]) {
 
       router.push(`/listings/local/${id}`);
     },
-    [imageFiles, router, selectedCategoryId],
+    [featuredCheckoutAvailable, imageFiles, router, selectedCategoryId],
   );
 
   const { isLoading: isSubmitting, run: submitListing } =
@@ -281,9 +366,28 @@ export function useAddListingForm(categories: Category[]) {
     router.replace(user ? getAccountGatePath(user) : "/login?next=/listings/new");
   }, [isAllowed, router]);
 
+  useEffect(() => {
+    let cancelled = false;
+    void fetch("/api/site-settings")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !data?.settings) return;
+        setFeaturedCheckoutAvailable(
+          Boolean(data.settings.featuredCheckoutAvailable),
+        );
+      })
+      .catch(() => {
+        if (!cancelled) setFeaturedCheckoutAvailable(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return {
     blockReason,
     errors,
+    featuredCheckoutAvailable,
     handleImageChange,
     imagePreviews,
     isAllowed,

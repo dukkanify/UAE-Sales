@@ -27,6 +27,7 @@ export function AddListingForm({ categories }: AddListingFormProps) {
   const {
     blockReason,
     errors,
+    featuredCheckoutAvailable,
     handleImageChange,
     imagePreviews,
     isAllowed,
@@ -111,13 +112,17 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         <MediaContactStep
           defaultContact={defaultContact}
           errors={errors}
+          featuredCheckoutAvailable={featuredCheckoutAvailable}
           imagePreviews={imagePreviews}
           onImageChange={handleImageChange}
           onPackageChange={setSelectedPackage}
           selectedPackage={selectedPackage}
         />
 
-        <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
+        <Card
+          className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5"
+          id="add-listing-submit"
+        >
           <div>
             <p className="font-medium">
               {selectedPackage === "featured_pending"
