@@ -26,7 +26,8 @@ export function buildSooqnaEmailHtml(input: {
   const navy = BRAND_COLORS.navy;
   const gold = BRAND_COLORS.gold;
   const cream = BRAND_COLORS.white;
-  const logoSrc = `${EMAIL_SITE_URL}/apple-icon`;
+  // PNG (not SVG/apple-icon) — Gmail and many clients block SVG / dynamic icon routes.
+  const logoSrc = `${EMAIL_SITE_URL}/brand/email-logo.png`;
   const english = input.locale === "en";
   const dir = english ? "ltr" : "rtl";
   const align = english ? "left" : "right";
@@ -51,7 +52,7 @@ export function buildSooqnaEmailHtml(input: {
       ${preview}
       <div style="font-family:${font};max-width:560px;width:100%;margin:0 auto;padding:28px 22px;background:${cream};color:${navy};direction:${dir};text-align:${align};border-radius:18px;border:1px solid #e8e4de;">
         <div style="text-align:center;margin-bottom:22px;padding-bottom:16px;border-bottom:2px solid ${gold};">
-          <img src="${logoSrc}" alt="${BRAND.nameAr} ${BRAND.nameEn}" width="48" height="48" style="display:inline-block;width:48px;height:48px;border-radius:12px;" />
+          <img src="${logoSrc}" alt="${BRAND.nameAr} ${BRAND.nameEn}" width="48" height="48" style="display:inline-block;width:48px;height:48px;border:0;border-radius:12px;" />
           <strong style="display:block;margin-top:10px;font-size:24px;color:${navy};">${english ? BRAND.nameEn : BRAND.nameAr}</strong>
           <span style="display:block;margin-top:4px;font-size:13px;font-weight:700;color:${gold};letter-spacing:0.04em;">Sooqna | سوقنا</span>
         </div>
