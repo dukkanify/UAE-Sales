@@ -1,3 +1,10 @@
+import {
+  getStripeCurrency,
+  isMockCheckoutAllowed,
+  isStripeConfigured,
+  isStripeWebhookConfigured,
+} from "@/services/payments/payment-config";
+
 type DatabaseSource =
   | "DATABASE_URL"
   | "DATABASE_URL_UNPOOLED"
@@ -11,12 +18,19 @@ export type ProductionConfigSnapshot = {
   databaseConfigured: boolean;
   databaseSource: DatabaseSource;
   resendConfigured: boolean;
+  resendKeySource?: string;
   emailProvider: string;
   emailFromAddress: string | null;
   emailFromName: string | null;
   appUrl: string | null;
   demoOtpServerEnabled: boolean;
   demoOtpClientEnabled: boolean;
+  stripeConfigured: boolean;
+  stripePublishableConfigured: boolean;
+  stripeWebhookConfigured: boolean;
+  stripeCurrency: string;
+  mockCheckoutAllowed: boolean;
+  featuredCheckoutAvailable: boolean;
   missing: string[];
 };
 
@@ -51,15 +65,30 @@ function detectDatabaseSource(): { configured: boolean; source: DatabaseSource }
   return { configured: false, source: "none" };
 }
 
+function detectResendKeySource(): string | undefined {
+  if (process.env.RESEND_API_KEY?.trim()) return "RESEND_API_KEY";
+  if (process.env.RESEND_KEY?.trim()) return "RESEND_KEY";
+  return undefined;
+}
+
 export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
   const database = detectDatabaseSource();
-  const resendConfigured = Boolean(process.env.RESEND_API_KEY?.trim());
+  const resendConfigured = Boolean(detectResendKeySource());
+  const resendKeySource = detectResendKeySource();
   const emailProvider = (process.env.EMAIL_PROVIDER ?? "resend").trim().toLowerCase();
   const emailFromAddress = process.env.EMAIL_FROM_ADDRESS?.trim() || null;
   const emailFromName = process.env.EMAIL_FROM_NAME?.trim() || null;
   const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() || null;
   const demoOtpServerEnabled = process.env.ENABLE_DEMO_OTP === "true";
   const demoOtpClientEnabled = process.env.NEXT_PUBLIC_ENABLE_DEMO_OTP === "true";
+  const stripeConfigured = isStripeConfigured();
+  const stripePublishableConfigured = Boolean(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.trim(),
+  );
+  const stripeWebhookConfigured = isStripeWebhookConfigured();
+  const stripeCurrency = getStripeCurrency();
+  const mockCheckoutAllowed = isMockCheckoutAllowed();
+  const featuredCheckoutAvailable = stripeConfigured || mockCheckoutAllowed;
 
   const missing: string[] = [];
   if (!database.configured) {
@@ -83,18 +112,34 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
   if (process.env.NODE_ENV === "production" && demoOtpClientEnabled) {
     missing.push("NEXT_PUBLIC_ENABLE_DEMO_OTP=false");
   }
+  if (process.env.NODE_ENV === "production" && !stripeConfigured) {
+    missing.push("STRIPE_SECRET_KEY");
+  }
+  if (process.env.NODE_ENV === "production" && !stripePublishableConfigured) {
+    missing.push("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY");
+  }
+  if (process.env.NODE_ENV === "production" && !stripeWebhookConfigured) {
+    missing.push("STRIPE_WEBHOOK_SECRET");
+  }
 
   return {
     nodeEnv: process.env.NODE_ENV ?? "development",
     databaseConfigured: database.configured,
     databaseSource: database.source,
     resendConfigured,
+    resendKeySource,
     emailProvider,
     emailFromAddress,
     emailFromName,
     appUrl,
     demoOtpServerEnabled,
     demoOtpClientEnabled,
+    stripeConfigured,
+    stripePublishableConfigured,
+    stripeWebhookConfigured,
+    stripeCurrency,
+    mockCheckoutAllowed,
+    featuredCheckoutAvailable,
     missing,
   };
 }
@@ -119,6 +164,7 @@ export function logProductionConfigIssues(context?: string): ProductionConfigSna
       emailProvider: snapshot.emailProvider,
       emailFromAddress: snapshot.emailFromAddress,
       appUrl: snapshot.appUrl,
+      stripeConfigured: snapshot.stripeConfigured,
     });
     return snapshot;
   }
@@ -130,6 +176,7 @@ export function logProductionConfigIssues(context?: string): ProductionConfigSna
       emailProvider: snapshot.emailProvider,
       emailFromAddress: snapshot.emailFromAddress,
       appUrl: snapshot.appUrl,
+      stripeConfigured: snapshot.stripeConfigured,
     });
     configLogged = true;
   }
