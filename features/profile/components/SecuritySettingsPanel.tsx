@@ -60,7 +60,10 @@ export function SecuritySettingsPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ code: otpCode, newPassword: password }),
+        body: JSON.stringify({
+          code: otpCode,
+          newPassword: password.trim(),
+        }),
       });
       const data = await response.json();
       if (!response.ok) {

@@ -46,9 +46,10 @@ export async function POST(request: Request) {
     return verifyResult;
   }
 
+  const newPassword = parsed.data.newPassword.trim();
   const user = await setUserPassword(
     sessionUser.id,
-    hashPassword(parsed.data.newPassword),
+    hashPassword(newPassword),
   );
   await setSessionCookie(user);
   trackAuthEvent("password_added");

@@ -32,7 +32,10 @@ function isValidEmail(value: string) {
 
 function getLoginErrorMessage(data: { message?: string; error?: string }) {
   if (data.error === "INVALID_CREDENTIALS") {
-    return data.message ?? "بيانات الدخول غير صحيحة.";
+    return (
+      data.message ??
+      "بيانات الدخول غير صحيحة. إذا غيّرت كلمة المرور مؤخرًا، استخدم «نسيت كلمة المرور» ثم سجّل الدخول بالكلمة الجديدة."
+    );
   }
 
   return data.message ?? "بيانات الدخول غير صحيحة.";

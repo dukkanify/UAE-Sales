@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from "@/services/auth/password.service";
 import {
   findInAccountVault,
   readAccountVault,
+  upsertAccountVault,
 } from "@/services/auth/account-vault";
 import {
   deletePersistedUser,
@@ -137,7 +138,13 @@ export async function findUserByEmail(email: string): Promise<StoredUser | null>
   if (found) return found;
 
   const vaulted = await findInAccountVault(normalized);
-  if (!vaulted) return null;
+  if (!vaulted?.passwordHash) return null;
+
+  // Avoid clobbering a durable account that appeared between lookups
+  // (vault restore deletes other rows with the same email).
+  const existing = await findPersistedUserByEmail(normalized);
+  if (existing) return existing;
+
   return persistUser(vaulted);
 }
 
@@ -146,7 +153,15 @@ export async function findUserById(id: string): Promise<StoredUser | null> {
   if (found) return found;
   const vault = await readAccountVault();
   const vaulted = vault.find((user) => user.id === id);
-  if (!vaulted) return null;
+  if (!vaulted?.passwordHash) return null;
+
+  // If this email already belongs to another durable row, prefer that row
+  // instead of deleting it via persistUser's email takeover.
+  if (vaulted.email) {
+    const byEmail = await findPersistedUserByEmail(normalizeAuthEmail(vaulted.email));
+    if (byEmail) return byEmail;
+  }
+
   return persistUser(vaulted);
 }
 
@@ -288,8 +303,15 @@ export async function setUserPassword(userId: string, passwordHash: string): Pro
     passwordUpdatedAt: new Date().toISOString(),
     sessionVersion: (user.sessionVersion ?? 0) + 1,
   };
-  await saveUser(updated);
-  return toProfile(updated);
+  const saved = await saveUser(updated);
+  // Keep browser vault/proof cookies in sync so stale hashes cannot
+  // resurrect the previous password on the next login.
+  try {
+    await upsertAccountVault(saved);
+  } catch {
+    // Cookie writes can fail outside a request context.
+  }
+  return toProfile(saved);
 }
 
 /** Import a missing account into the durable store from a client/device password proof. */
