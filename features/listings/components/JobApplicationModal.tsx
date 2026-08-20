@@ -8,6 +8,8 @@ import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import { listingTitle as resolveListingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 
@@ -24,6 +26,7 @@ export function JobApplicationModal({
   onSuccess,
   open,
 }: JobApplicationModalProps) {
+  const displayTitle = resolveListingTitle(listing, useLocale());
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [emailed, setEmailed] = useState(false);
@@ -107,7 +110,7 @@ export function JobApplicationModal({
 
   return (
     <Modal
-      description={`التقديم على: ${listing.title}`}
+      description={`التقديم على: ${displayTitle}`}
       onClose={onClose}
       open={open}
       title="تقديم على الوظيفة"

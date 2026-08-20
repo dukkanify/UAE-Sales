@@ -20,6 +20,8 @@ export type DeliveryOption =
 export type ListingSeller = {
   id: string;
   name: string;
+  /** English display name when locale is English. */
+  nameEnglish?: string;
   rating?: number;
   avatarUrl?: string;
   isVerified?: boolean;

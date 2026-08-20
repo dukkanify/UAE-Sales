@@ -27,6 +27,7 @@ import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 import { intlLocale } from "@/shared/i18n/locale";
+import { listingCountLabel } from "@/shared/i18n/count-labels";
 import { useLocale } from "@/shared/i18n/useLocale";
 
 const statusFilterOptions: { label: string; value: string }[] = [
@@ -483,7 +484,7 @@ export function AdminListingsPanel() {
           </div>
           <p className="pb-2 text-xs text-muted">
             <Icon className="ms-1 inline" name="package" size={14} />
-            {filtered.length} إعلان
+            {listingCountLabel(filtered.length, locale)}
           </p>
         </div>
       </Card>

@@ -10,7 +10,9 @@ import { ShareButton } from "@/shared/components/ShareButton";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { listingTitle } from "@/shared/i18n/listing-copy";
 import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 type ListingGalleryProps = {
   listing: Listing;
@@ -21,6 +23,7 @@ const GALLERY_OVERLAY_BTN_CLASS =
 
 export function ListingGallery({ listing }: ListingGalleryProps) {
   const galleryImages = getListingImages(listing);
+  const displayTitle = listingTitle(listing, useLocale());
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -50,7 +53,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
     return (
       <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted">
         <AppImage
-          alt={listing.title}
+          alt={displayTitle}
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
@@ -75,7 +78,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             type="button"
           >
             <AppImage
-              alt={listing.title}
+              alt={displayTitle}
               className="object-cover"
               fallbackCategory={listing.categoryId}
               fill
@@ -221,7 +224,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           </button>
           <div className="relative aspect-[4/3] w-full max-w-5xl overflow-hidden rounded-[var(--radius-2xl)]">
             <AppImage
-              alt={listing.title}
+              alt={displayTitle}
               className="object-contain"
               fallbackCategory={listing.categoryId}
               fill

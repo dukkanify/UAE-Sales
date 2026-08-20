@@ -78,6 +78,22 @@ const NAME_TEMPLATES: Array<[RegExp, (match: RegExpMatchArray) => string]> = [
     /^تم تأكيد حجز المعاينة وأرسلنا التفاصيل إلى (.+)\.$/u,
     (match) => `Viewing confirmed and details sent to ${match[1]}.`,
   ],
+  [
+    /^([\d,]+)\s*إعلان$/u,
+    (match) => `${match[1]} listings`,
+  ],
+  [
+    /^([\d,]+)\s*إعلان نشط في هذا القسم$/u,
+    (match) => `${match[1]} active listings in this category`,
+  ],
+  [
+    /^([\d,]+)\s*إعلان نشط في الإمارات$/u,
+    (match) => `${match[1]} active listings across the UAE`,
+  ],
+  [
+    /^([\d,]+)\s*نتيجة$/u,
+    (match) => `${match[1]} results`,
+  ],
 ];
 
 const UNIT_SUFFIXES: Array<[RegExp, string]> = [

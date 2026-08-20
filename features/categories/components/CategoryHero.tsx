@@ -3,6 +3,9 @@ import type { Category } from "@/types";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
+import { activeListingCountLabel } from "@/shared/i18n/count-labels";
+import { getRequestLocale } from "@/shared/i18n/locale";
+import { tx } from "@/shared/i18n/tx";
 import { getListingBySlug } from "@/services/listings";
 
 type CategoryHeroProps = {
@@ -10,6 +13,8 @@ type CategoryHeroProps = {
 };
 
 export async function CategoryHero({ category }: CategoryHeroProps) {
+  const locale = await getRequestLocale();
+  const categoryName = tx(locale, category.name);
   const featuredListing = category.featuredListingSlug
     ? await getListingBySlug(category.featuredListingSlug)
     : undefined;
@@ -19,7 +24,7 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
         <div className="relative min-h-[12rem] lg:min-h-[16rem]">
           <AppImage
-            alt={category.name}
+            alt={categoryName}
             className="object-cover"
             fallbackCategory={category.id}
             fill
@@ -29,13 +34,12 @@ export async function CategoryHero({ category }: CategoryHeroProps) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 p-6 md:p-8">
-            <Badge variant="featured">{category.name}</Badge>
+            <Badge variant="featured">{categoryName}</Badge>
             <h1 className="mt-3 text-2xl font-bold text-white md:text-3xl">
-              {category.name}
+              {categoryName}
             </h1>
             <p className="mt-2 text-sm text-white/80">
-              {category.listingCount.toLocaleString("ar-AE")} إعلان نشط في هذا
-              القسم
+              {activeListingCountLabel(category.listingCount, locale)}
             </p>
           </div>
         </div>

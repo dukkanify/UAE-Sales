@@ -19,6 +19,7 @@ import {
 } from "@/services/categories";
 import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
+import { resultsCountLabel } from "@/shared/i18n/count-labels";
 import { getRequestLocale } from "@/shared/i18n/locale";
 import { tx } from "@/shared/i18n/tx";
 
@@ -108,7 +109,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings, suggestionTitles] = await Promise.all([
+  const [categories, listings, suggestionTitles, locale] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -130,12 +131,14 @@ export default async function CategoryPage({
           : "newest",
     }),
     getSearchSuggestionTitles(),
+    getRequestLocale(),
   ]);
 
   const suggestions = buildSearchSuggestions({
     categories,
     cities,
     listings: suggestionTitles,
+    locale,
     selectedFilters,
   });
 
@@ -182,7 +185,7 @@ export default async function CategoryPage({
             <div>
               <div className="mt-0 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-ink">
-                  {listings.length.toLocaleString("ar-AE")} نتيجة
+                  {resultsCountLabel(listings.length, locale)}
                 </p>
                 {ESCROW_CHECKOUT_CATEGORIES.has(category.id) ? (
                   <Badge variant="escrow">ضمان مالي على الإعلانات المؤهلة</Badge>

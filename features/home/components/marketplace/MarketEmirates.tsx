@@ -2,10 +2,15 @@ import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
 import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
+import { listingCountLabel } from "@/shared/i18n/count-labels";
+import { getRequestLocale } from "@/shared/i18n/locale";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
 export async function MarketEmirates() {
-  const emirates = await getUaeEmiratesCards();
+  const [emirates, locale] = await Promise.all([
+    getUaeEmiratesCards(),
+    getRequestLocale(),
+  ]);
 
   return (
     <MarketSectionShell variant="sand">
@@ -33,12 +38,12 @@ export async function MarketEmirates() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-5">
               <p className="text-xs font-semibold text-white/75">
-                {emirate.count.toLocaleString("ar-AE", { numberingSystem: "latn" })} إعلان
+                {listingCountLabel(emirate.count, locale)}
               </p>
               <div className="mt-1 flex items-center justify-between gap-2">
                 <h3 className="text-xl font-bold text-white">{emirate.name}</h3>
                 <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/15 text-white">
-                  <Icon name="arrow-left" size={15} />
+                  <Icon name="arrow-left" size={16} />
                 </span>
               </div>
             </div>

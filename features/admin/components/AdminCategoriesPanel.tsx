@@ -10,8 +10,11 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { listingCountLabel } from "@/shared/i18n/count-labels";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 export function AdminCategoriesPanel() {
+  const locale = useLocale();
   const [categories, setCategories] = useState<AdminCategoryRecord[]>([]);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -152,7 +155,7 @@ export function AdminCategoriesPanel() {
                     {category.enabled ? "مفعّلة" : "معطّلة"}
                   </Badge>
                   <Badge variant="muted">
-                    {category.listingCount.toLocaleString("ar-AE")} إعلان
+                    {listingCountLabel(category.listingCount, locale)}
                   </Badge>
                   <label className="flex items-center gap-1 text-xs text-muted">
                     ترتيب

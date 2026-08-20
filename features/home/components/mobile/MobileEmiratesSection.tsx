@@ -2,10 +2,15 @@ import Link from "next/link";
 import { AppImage } from "@/shared/components/AppImage";
 import { Icon } from "@/shared/ui/Icon";
 import { getUaeEmiratesCards } from "@/features/home/shared/uae-emirates";
+import { listingCountLabel } from "@/shared/i18n/count-labels";
+import { getRequestLocale } from "@/shared/i18n/locale";
 import { MobileSectionHeader } from "./MobileSectionHeader";
 
 export async function MobileEmiratesSection() {
-  const emirates = await getUaeEmiratesCards();
+  const [emirates, locale] = await Promise.all([
+    getUaeEmiratesCards(),
+    getRequestLocale(),
+  ]);
 
   return (
     <section aria-label="الإمارات الأكثر شعبية" className="mobile-home-emirates">
@@ -32,7 +37,7 @@ export async function MobileEmiratesSection() {
             <span aria-hidden className="mobile-home-emirates__overlay" />
             <span className="mobile-home-emirates__content">
               <span className="mobile-home-emirates__count">
-                {emirate.count.toLocaleString("ar-AE", { numberingSystem: "latn" })} إعلان
+                {listingCountLabel(emirate.count, locale)}
               </span>
               <span className="mobile-home-emirates__footer">
                 <span className="mobile-home-emirates__name">{emirate.name}</span>
