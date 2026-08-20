@@ -81,8 +81,8 @@ export function ResetPasswordForm() {
           credentials: "include",
           body: JSON.stringify({
             token,
-            newPassword: password,
-            confirmPassword,
+            newPassword: password.trim(),
+            confirmPassword: confirmPassword.trim(),
           }),
         });
         const data = await response.json().catch(() => ({}));

@@ -228,15 +228,24 @@ function rowToUser(row: Record<string, unknown>): StoredUser {
       : row.created_at instanceof Date
         ? row.created_at.toISOString()
         : payload.createdAt;
+
+  const columnHash =
+    typeof row.password_hash === "string" && row.password_hash.trim()
+      ? row.password_hash.trim()
+      : null;
+  const payloadHash =
+    typeof payload.passwordHash === "string" && payload.passwordHash.trim()
+      ? payload.passwordHash.trim()
+      : null;
+
   return normalizeStoredUser({
     ...payload,
     id: String(row.id ?? payload.id),
     email: payload.email,
     normalizedEmail: String(row.normalized_email ?? payload.normalizedEmail ?? payload.email),
-    passwordHash:
-      typeof row.password_hash === "string" || row.password_hash === null
-        ? (row.password_hash as string | null)
-        : payload.passwordHash,
+    // Prefer the column, but fall back to payload when the column is null/empty
+    // so a partial write cannot lock the user out after a password change.
+    passwordHash: columnHash ?? payloadHash,
     accountStatus: (row.account_status as StoredUser["accountStatus"]) ?? payload.accountStatus,
     accountType: (row.account_type as StoredUser["accountType"]) ?? payload.accountType,
     createdAt,

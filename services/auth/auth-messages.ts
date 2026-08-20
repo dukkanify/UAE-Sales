@@ -19,7 +19,8 @@ export const SESSION_FAILED_MESSAGE =
 export const EMAIL_ALREADY_REGISTERED_MESSAGE =
   "يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل. سجل الدخول أو استخدم نسيت كلمة المرور.";
 
-export const INVALID_CREDENTIALS_MESSAGE = "بيانات الدخول غير صحيحة.";
+export const INVALID_CREDENTIALS_MESSAGE =
+  "بيانات الدخول غير صحيحة. إذا غيّرت كلمة المرور مؤخرًا، استخدم «نسيت كلمة المرور» ثم سجّل الدخول بالكلمة الجديدة.";
 
 export const PASSWORD_RESET_GENERIC_MESSAGE =
   "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.";
