@@ -3,7 +3,7 @@
 **Date:** 2026-08-20  
 **Branch:** `main` (PR #230 merged)  
 **Target:** https://sooqna.site  
-**Status:** ⚠️ **NOT COMPLETE** — auth/Postgres live; Resend env vars still missing on Production runtime
+**Status:** ⚠️ **NOT COMPLETE** — Auth + Postgres live on production; **Resend still not active** at runtime (`resendConfigured=false`, emails not delivered)
 
 ---
 
