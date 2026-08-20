@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { isStripeConfigured } from "@/services/payments/payment-config";
+import {
+  ensureStripeConfigLoaded,
+  isStripeConfigured,
+} from "@/services/payments/payment-config";
 import {
   claimStripeWebhookEvent,
   logPaymentEvent,
@@ -16,6 +19,7 @@ import { getOrderById } from "@/services/payments/order-store";
 import { verifyStripeWebhook } from "@/services/payments/stripe.service";
 
 export async function POST(request: Request) {
+  await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     return NextResponse.json({ error: "STRIPE_NOT_CONFIGURED" }, { status: 503 });
   }
@@ -29,7 +33,7 @@ export async function POST(request: Request) {
 
   let event: Stripe.Event;
   try {
-    event = verifyStripeWebhook(payload, signature);
+    event = await verifyStripeWebhook(payload, signature);
   } catch {
     return NextResponse.json({ error: "INVALID_SIGNATURE" }, { status: 400 });
   }

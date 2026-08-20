@@ -28,6 +28,7 @@ import {
 } from "@/services/payments/order-store";
 import { logPaymentEvent } from "@/services/payments/payment-log";
 import {
+  ensureStripeConfigLoaded,
   isStripeConfigured,
   isMockCheckoutAllowed,
 } from "@/services/payments/payment-config";
@@ -89,6 +90,7 @@ function isGuestCheckout(input: CreateCheckoutInput): boolean {
 export async function initiateCheckout(
   input: CreateCheckoutInput,
 ): Promise<CheckoutSessionResult> {
+  await ensureStripeConfigLoaded();
   await hydrateListingCatalog();
   const context = resolveListingCheckoutContext(input);
   if (!context) {
@@ -211,6 +213,7 @@ async function resumeCheckoutForOrder(
   buyerEmail: string,
   listingTitle: string,
 ): Promise<CheckoutSessionResult> {
+  await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     if (!isMockCheckoutAllowed()) {
       throw new Error("STRIPE_NOT_CONFIGURED");

@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import type { Order } from "@/types/domain/order";
 import type { CheckoutSessionResult } from "@/types/domain/payment";
 import {
+  ensureStripeConfigLoaded,
   getAppUrl,
   getStripeCurrency,
   getStripeSecretKey,
@@ -11,17 +12,31 @@ import {
 import { logPaymentEvent } from "@/services/payments/payment-log";
 
 let stripeClient: Stripe | null = null;
+let stripeClientKeyFingerprint: string | null = null;
 
-function getStripeClient(): Stripe {
+function keyFingerprint(secret: string): string {
+  return `${secret.slice(0, 8)}:${secret.slice(-4)}:${secret.length}`;
+}
+
+async function getStripeClient(): Promise<Stripe> {
+  await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     throw new Error("STRIPE_NOT_CONFIGURED");
   }
-  if (!stripeClient) {
-    stripeClient = new Stripe(getStripeSecretKey()!, {
+  const secret = getStripeSecretKey()!;
+  const fingerprint = keyFingerprint(secret);
+  if (!stripeClient || stripeClientKeyFingerprint !== fingerprint) {
+    stripeClient = new Stripe(secret, {
       apiVersion: "2026-06-24.dahlia",
     });
+    stripeClientKeyFingerprint = fingerprint;
   }
   return stripeClient;
+}
+
+export function resetStripeClient(): void {
+  stripeClient = null;
+  stripeClientKeyFingerprint = null;
 }
 
 function orderMetadata(order: Order): Record<string, string> {
@@ -47,7 +62,7 @@ export type CreateCheckoutSessionInput = {
 export async function createCheckoutSession(
   input: CreateCheckoutSessionInput,
 ): Promise<CheckoutSessionResult> {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   const appUrl = getAppUrl();
   const currency = getStripeCurrency();
   const listingParam = input.order.listingSlug ?? input.order.listingId;
@@ -103,12 +118,12 @@ export async function createCheckoutSession(
 export async function retrieveCheckoutSession(
   sessionId: string,
 ): Promise<Stripe.Checkout.Session> {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   return stripe.checkout.sessions.retrieve(sessionId);
 }
 
 export async function createPaymentIntent(order: Order) {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   const currency = getStripeCurrency();
   const metadata = orderMetadata(order);
 
@@ -124,8 +139,9 @@ export async function createPaymentIntent(order: Order) {
   );
 }
 
-export function verifyStripeWebhook(payload: string, signature: string): Stripe.Event {
-  const stripe = getStripeClient();
+export async function verifyStripeWebhook(payload: string, signature: string): Promise<Stripe.Event> {
+  const stripe = await getStripeClient();
+  await ensureStripeConfigLoaded();
   const secret = getStripeWebhookSecret();
   if (!secret) {
     throw new Error("STRIPE_WEBHOOK_SECRET_MISSING");
@@ -136,7 +152,7 @@ export function verifyStripeWebhook(payload: string, signature: string): Stripe.
 export async function getStripePaymentStatus(
   paymentIntentId: string,
 ): Promise<Stripe.PaymentIntent.Status> {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   const intent = await stripe.paymentIntents.retrieve(paymentIntentId);
   return intent.status;
 }
@@ -145,7 +161,7 @@ export async function refundStripePayment(
   paymentIntentId: string,
   orderId: string,
 ): Promise<Stripe.Refund> {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   const refund = await stripe.refunds.create(
     { payment_intent: paymentIntentId },
     { idempotencyKey: `refund-${orderId}` },
@@ -171,7 +187,7 @@ export type CreateFeaturedCheckoutInput = {
 export async function createFeaturedCheckoutSession(
   input: CreateFeaturedCheckoutInput,
 ): Promise<{ checkoutUrl?: string; sessionId: string }> {
-  const stripe = getStripeClient();
+  const stripe = await getStripeClient();
   const appUrl = getAppUrl();
   const currency = getStripeCurrency();
   const metadata = {

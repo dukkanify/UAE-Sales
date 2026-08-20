@@ -6,7 +6,10 @@ import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { FormMessage } from "@/shared/ui/FormMessage";
+import { Input } from "@/shared/ui/Input";
 
 type StripePayload = {
   counts: {
@@ -42,26 +45,125 @@ type StripePayload = {
   status: {
     configured: boolean;
     currency: string;
+    envManaged: boolean;
     mockAllowed: boolean;
     publishableConfigured: boolean;
+    publishableKeyMasked: string | null;
+    secretKeyMasked: string | null;
     secretKeyPresent: boolean;
+    source: "env" | "admin" | "none";
+    updatedAt: string | null;
     webhookConfigured: boolean;
+    webhookEndpoint: string;
+    webhookSecretMasked: string | null;
   };
 };
 
 export function AdminStripePanel() {
   const [data, setData] = useState<StripePayload | null>(null);
+  const [secretKey, setSecretKey] = useState("");
+  const [publishableKey, setPublishableKey] = useState("");
+  const [webhookSecret, setWebhookSecret] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<{
+    text: string;
+    variant: "success" | "error";
+  } | null>(null);
 
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
+    let cancelled = false;
     adminFetch("/api/admin/stripe")
       .then((res) => res.json())
       .then((payload) => {
-        if (payload?.status) setData(payload as StripePayload);
+        if (!cancelled && payload?.status) setData(payload as StripePayload);
       })
       .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  async function saveCredentials(event: React.FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setMessage(null);
+    try {
+      const res = await adminFetch("/api/admin/stripe", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          secretKey: secretKey.trim() || undefined,
+          publishableKey: publishableKey.trim() || undefined,
+          webhookSecret: webhookSecret.trim() || undefined,
+          testConnection: true,
+        }),
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        const map: Record<string, string> = {
+          ENV_MANAGED:
+            "المفاتيح مضبوطة من Vercel. احذف STRIPE_SECRET_KEY من البيئة لإدارتها من هنا.",
+          INVALID_SECRET_KEY:
+            "Secret Key غير صالح. يجب أن يبدأ بـ sk_live_ أو sk_test_ (ليس mk_).",
+          INVALID_PUBLISHABLE_KEY:
+            "Publishable Key غير صالح. يجب أن يبدأ بـ pk_live_ أو pk_test_.",
+          INVALID_WEBHOOK_SECRET:
+            "Webhook Secret غير صالح. يجب أن يبدأ بـ whsec_.",
+        };
+        setMessage({
+          variant: "error",
+          text: map[payload.error] ?? payload.message ?? "تعذر حفظ المفاتيح.",
+        });
+        return;
+      }
+      if (payload?.status) setData(payload as StripePayload);
+      setSecretKey("");
+      setPublishableKey("");
+      setWebhookSecret("");
+      const connectionOk = payload.connection?.ok;
+      setMessage({
+        variant: connectionOk === false ? "error" : "success",
+        text:
+          connectionOk === false
+            ? `تم الحفظ لكن الاتصال فشل: ${payload.connection?.error ?? "تحقق من المفتاح"}`
+            : connectionOk
+              ? "تم تفعيل Stripe بنجاح والتحقق من الاتصال."
+              : "تم حفظ مفاتيح Stripe.",
+      });
+    } catch {
+      setMessage({ variant: "error", text: "تعذر حفظ المفاتيح." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function clearCredentials() {
+    if (!window.confirm("حذف مفاتيح Stripe المحفوظة من لوحة الأدمن؟")) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const res = await adminFetch("/api/admin/stripe", { method: "DELETE" });
+      const payload = await res.json();
+      if (!res.ok) {
+        setMessage({
+          variant: "error",
+          text:
+            payload.error === "ENV_MANAGED"
+              ? "المفاتيح مضبوطة من Vercel ولا يمكن حذفها من هنا."
+              : "تعذر الحذف.",
+        });
+        return;
+      }
+      if (payload?.status) setData(payload as StripePayload);
+      setMessage({ variant: "success", text: "تم حذف مفاتيح الأدمن." });
+    } catch {
+      setMessage({ variant: "error", text: "تعذر الحذف." });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   if (!data) {
     return (
@@ -100,6 +202,14 @@ export function AdminStripePanel() {
           Webhook: {status.webhookConfigured ? "موجود" : "ناقص"}
         </div>
         <div className="admin-ops__status-chip">
+          المصدر:{" "}
+          {status.source === "env"
+            ? "Vercel Env"
+            : status.source === "admin"
+              ? "لوحة الأدمن"
+              : "غير مضبوط"}
+        </div>
+        <div className="admin-ops__status-chip">
           العملة {status.currency.toUpperCase()}
         </div>
         <div className="admin-ops__status-chip">
@@ -108,21 +218,98 @@ export function AdminStripePanel() {
       </div>
 
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">تفعيل الحساب (Go-Live)</h2>
+        <h2 className="admin-ops__panel-title">ربط Stripe من لوحة الأدمن</h2>
         <p className="admin-ops__panel-sub">
-          الكود جاهز. بعد تفعيل Stripe ضع المفاتيح على Vercel واربط الـ webhook ثم
-          أعد النشر. الدليل الكامل:{" "}
-          <code className="text-xs">STRIPE_GO_LIVE.md</code>
+          الصق مفاتيح Live هنا لتفعيل الدفع مباشرة. تُحفظ مشفّرة في قاعدة البيانات.
+          لا تضع مفاتيح في الكود أو Git.
         </p>
-        <ol className="mt-3 grid gap-2 text-sm text-muted">
+
+        {message ? (
+          <div className="mt-3">
+            <FormMessage variant={message.variant}>{message.text}</FormMessage>
+          </div>
+        ) : null}
+
+        {status.envManaged ? (
+          <FormMessage variant="error">
+            المفاتيح مضبوطة حالياً عبر متغيرات Vercel. لإدارتها من هنا احذف{" "}
+            <code className="text-xs">STRIPE_SECRET_KEY</code> من Production ثم
+            Redeploy.
+          </FormMessage>
+        ) : (
+          <form className="mt-4 grid gap-3" onSubmit={saveCredentials}>
+            <Input
+              autoComplete="off"
+              disabled={busy}
+              label={`Secret Key ${status.secretKeyMasked ? `(${status.secretKeyMasked})` : ""}`}
+              onChange={(event) => setSecretKey(event.target.value)}
+              placeholder="sk_live_..."
+              type="password"
+              value={secretKey}
+            />
+            <Input
+              autoComplete="off"
+              disabled={busy}
+              label={`Publishable Key ${status.publishableKeyMasked ? `(${status.publishableKeyMasked})` : ""}`}
+              onChange={(event) => setPublishableKey(event.target.value)}
+              placeholder="pk_live_..."
+              type="password"
+              value={publishableKey}
+            />
+            <Input
+              autoComplete="off"
+              disabled={busy}
+              label={`Webhook Secret ${status.webhookSecretMasked ? `(${status.webhookSecretMasked})` : ""}`}
+              onChange={(event) => setWebhookSecret(event.target.value)}
+              placeholder="whsec_..."
+              type="password"
+              value={webhookSecret}
+            />
+            <p className="text-xs text-muted">
+              أنشئ Webhook على{" "}
+              <code className="text-[0.7rem]">{status.webhookEndpoint}</code> ثم
+              الصق Signing secret هنا. اترك الحقل فارغاً إذا لم تغيّره.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button loading={busy} type="submit">
+                حفظ وتفعيل
+              </Button>
+              <Button
+                disabled={busy || status.source !== "admin"}
+                onClick={clearCredentials}
+                type="button"
+                variant="ghost"
+              >
+                حذف مفاتيح الأدمن
+              </Button>
+              <a
+                className="admin-ops__chip-link"
+                href={links.apiKeys}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                فتح API Keys
+              </a>
+              <a
+                className="admin-ops__chip-link"
+                href={links.webhooks}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                فتح Webhooks
+              </a>
+            </div>
+          </form>
+        )}
+
+        <ol className="mt-4 grid gap-2 text-sm text-muted">
           <li>
-            1. Dashboard → API keys → انسخ{" "}
-            <strong className="text-ink">sk_live</strong> و{" "}
-            <strong className="text-ink">pk_live</strong>
+            1. انسخ <strong className="text-ink">sk_live_</strong> و{" "}
+            <strong className="text-ink">pk_live_</strong> من Stripe → API keys
           </li>
           <li>
-            2. Webhooks →{" "}
-            <code className="text-xs">https://sooqna.site/api/webhooks/stripe</code>
+            2. Webhooks → Add endpoint →{" "}
+            <code className="text-xs">{status.webhookEndpoint}</code>
           </li>
           <li>
             3. أحداث:{" "}
@@ -130,100 +317,35 @@ export function AdminStripePanel() {
             <code className="text-xs">payment_intent.*</code>،{" "}
             <code className="text-xs">charge.refunded</code>
           </li>
-          <li>
-            4. Vercel env: عطّل Mock (
-            <code className="text-xs">NEXT_PUBLIC_ENABLE_MOCK_CHECKOUT=false</code>)
-          </li>
-          <li>5. Redeploy ثم اشترِ بمبلغ صغير للتحقق</li>
+          <li>4. الصق Signing secret (`whsec_...`) واضغط حفظ وتفعيل</li>
         </ol>
-        <div
-          className="admin-ops__quick-links"
-          style={{ marginTop: "0.85rem" }}
-        >
-          <a
-            className="admin-ops__chip-link"
-            href={links.apiKeys}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            API Keys
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.webhooks}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Webhooks
-          </a>
-        </div>
       </section>
 
       <section className="admin-ops__panel">
         <h2 className="admin-ops__panel-title">روابط لوحة Stripe</h2>
-        <p className="admin-ops__panel-sub">
-          افتح حساب Stripe مباشرة للتحكم بالمدفوعات، المفاتيح، والنزاعات.
-        </p>
         <div
           className="admin-ops__quick-links"
           style={{ marginTop: "0.85rem" }}
         >
-          <a
-            className="admin-ops__chip-link"
-            href={links.dashboard}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Dashboard
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.payments}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Payments
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.webhooks}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Webhooks
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.customers}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Customers
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.balances}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Balance
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.disputes}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Disputes
-          </a>
-          <a
-            className="admin-ops__chip-link"
-            href={links.apiKeys}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            API Keys
-          </a>
+          {[
+            ["Dashboard", links.dashboard],
+            ["Payments", links.payments],
+            ["Webhooks", links.webhooks],
+            ["Customers", links.customers],
+            ["Balance", links.balances],
+            ["Disputes", links.disputes],
+            ["API Keys", links.apiKeys],
+          ].map(([label, href]) => (
+            <a
+              key={label}
+              className="admin-ops__chip-link"
+              href={href}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {label}
+            </a>
+          ))}
         </div>
       </section>
 

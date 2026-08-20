@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { getAdminSettings } from "@/services/admin/admin-settings-store";
 import {
+  ensureStripeConfigLoaded,
   isMockCheckoutAllowed,
   isStripeConfigured,
 } from "@/services/payments/payment-config";
 
 /** Public site flags used by storefront (no secrets). */
 export async function GET() {
+  await ensureStripeConfigLoaded();
   const settings = await getAdminSettings();
   return NextResponse.json({
     settings: {
