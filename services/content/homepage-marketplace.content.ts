@@ -13,10 +13,6 @@ export async function getMarketHeroBackground(): Promise<string> {
   return heroBackgroundUrl;
 }
 
-const trustStatNumber = new Intl.NumberFormat("ar-AE", {
-  numberingSystem: "latn",
-});
-
 export async function getMarketQuickSearches() {
   return [
     { href: "/search?q=Mercedes", label: "Mercedes" },
@@ -102,12 +98,15 @@ export async function getHomeCityHighlights(): Promise<HomeCityHighlight[]> {
 }
 
 export async function getAuthTrustPoints() {
+  const { getRequestLocale } = await import("@/shared/i18n/locale");
+  const { uaeActiveListingsLabel } = await import("@/shared/i18n/count-labels");
+  const locale = await getRequestLocale();
   const activeListings = getActiveListingCount();
 
   return [
     "ضمان مالي يحمي كل معاملة",
     "توثيق البائعين والمشترين",
     "دعم بالعربية على مدار الساعة",
-    `${trustStatNumber.format(activeListings)} إعلان نشط في الإمارات`,
+    uaeActiveListingsLabel(activeListings, locale),
   ];
 }
