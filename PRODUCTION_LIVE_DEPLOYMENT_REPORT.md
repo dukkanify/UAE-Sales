@@ -2,9 +2,9 @@
 
 **Date:** 2026-08-20  
 **Target:** https://sooqna.site  
-**Production commit (main):** `aedea1c` — docs(qa): confirm auth live but resend still missing on production runtime  
+**Production commit (main):** `95d0f08` (this report) / latest `main`  
 **PR #230:** merged (`92d770f`) — auth/Postgres/Resend code path live  
-**Overall status:** ⚠️ **NOT COMPLETE** — site is LIVE; email/Resend not active at runtime
+**Overall status:** ⚠️ **NOT COMPLETE** — site is LIVE; email/Resend still not active at runtime after MCP retry
 
 ---
 
@@ -17,7 +17,7 @@
 | `npm run build` | ✅ Pass |
 | Vercel Production deploy | ✅ Site serves latest routes (`/api/auth/status` returns 200) |
 | GitHub Deploy workflow | ✅ Runs on push to `main` (hook may warn if `VERCEL_DEPLOY_HOOK` unset) |
-| Agent can set Vercel env vars | ❌ Vercel MCP **needsAuth**; no `VERCEL_TOKEN` in agent environment |
+| Agent can set Vercel env vars | ❌ Cloud Agent Vercel MCP still `needsAuth`. Interactive MCP auth is **desktop IDE only** — this environment cannot complete `mcp_auth`. No `VERCEL_TOKEN` in the agent VM. |
 
 ---
 
@@ -147,19 +147,20 @@ Not fully automated in this run (requires browser/session): mobile layout, RTL/E
 
 ---
 
-## Remaining blocker — ONE required approval
+## Remaining blocker — ONE required click
 
-**The agent cannot write Vercel Production environment variables without authenticated Vercel access.**
+**Cloud Agent cannot write Vercel Production env vars.** Vercel MCP in this run remains `needsAuth`. Calling `mcp_auth` returns: *Interactive MCP authentication is only available in the Cursor desktop IDE.*
 
-### Single action required from you
+Production runtime (`GET /api/auth/status`, 2026-08-20 retry) still reports:
 
-> **In Cursor: Settings → MCP → Vercel → Connect/Authenticate**, then reply **"retry resend setup"**.
+`resendConfigured=false`  
+`missing=["RESEND_API_KEY","EMAIL_FROM_ADDRESS","NEXT_PUBLIC_APP_URL"]`
 
-This grants the agent permission to set Production env vars (`RESEND_API_KEY`, `EMAIL_FROM_ADDRESS`, `NEXT_PUBLIC_APP_URL`) via the connected integration **without you manually editing variables**.
+### Single action required
 
-If Vercel MCP auth is unavailable, the fallback single action is:
+> **Vercel → project `sooqna` → Settings → Environment Variables → Production:** add `RESEND_API_KEY` (from the installed Resend integration), `EMAIL_FROM_ADDRESS=no-reply@sooqna.site`, `NEXT_PUBLIC_APP_URL=https://sooqna.site` (plus `EMAIL_PROVIDER=resend`, `EMAIL_FROM_NAME=Sooqna`, `ENABLE_DEMO_OTP=false`, `NEXT_PUBLIC_ENABLE_DEMO_OTP=false`) **then Redeploy Production.**
 
-> **In Vercel Dashboard → sooqna → Settings → Environment Variables → add the three missing Production vars reported by `/api/auth/status` → Redeploy Production.**
+Do not add these to Preview-only. After Redeploy, `/api/auth/status` must show `resendConfigured=true` and `missing=[]`. Then reply **retry E2E**.
 
 ---
 
