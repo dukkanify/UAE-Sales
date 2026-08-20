@@ -1,0 +1,38 @@
+QA base: http://127.0.0.1:3000
+Output: /workspace/artifacts/qa/2026-08-03
+  [desktop] / ... ok
+  [desktop] /categories ... ok
+  [desktop] /categories/cars ... ok
+  [desktop] /search ... ok
+  [desktop] /featured ... ok
+  [desktop] /listings/mercedes-amg-g63-2024 ... ok
+  [desktop] /login ... ok
+  [desktop] /register ... ok
+  [desktop] /escrow ... ok
+  [desktop] /wallet ... ok
+  [desktop] /support ... ok
+  [desktop] /disputes/new ... ok
+  [desktop] /listings/new ... ok
+  [desktop] /profile ... ok
+  [desktop] /dashboard/listings ... ok
+  [desktop] /chat ... ok
+  [desktop] /checkout ... ok
+  [desktop] /orders ... ok
+  [desktop] /admin ... ok
+  [mobile] / ... ok
+  [mobile] /search ... ok
+  [mobile] /listings/mercedes-amg-g63-2024 ... ok
+  [mobile] /login ... ok
+  [mobile] /categories ... ok
+  [mobile] /admin ... ok
+  [admin] login ...
+ok
+  [admin] /admin ... ok
+  [admin] /admin/analytics ... ok
+  [admin] /admin/listings ... ok
+  [admin] /admin/users ... ok
+  [admin] /admin/orders ... ok
+  [admin] /admin/settings ... ok
+
+Findings: 0
+Wrote /workspace/artifacts/qa/2026-08-03/REPORT.md
