@@ -747,6 +747,46 @@ function PlatformSettingsShell() {
               })
             }
           />
+          <ToggleRow
+            label="15-minute class reminder"
+            description="Optional in-app/email reminder 15 minutes before live class."
+            checked={draft.notifications.classReminderFifteenMinutesEnabled}
+            onCheckedChange={(v) =>
+              setDraft({
+                ...draft,
+                notifications: {
+                  ...draft.notifications,
+                  classReminderFifteenMinutesEnabled: v,
+                },
+              })
+            }
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Class reminder offsets</CardTitle>
+              <CardDescription>
+                Minutes before start (comma-separated). Defaults: 1440 (24h), 120 (2h).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Input
+                value={(draft.notifications.classReminderOffsetsMinutes ?? []).join(", ")}
+                onChange={(e) => {
+                  const parts = e.target.value
+                    .split(",")
+                    .map((x) => Number(x.trim()))
+                    .filter((n) => Number.isFinite(n) && n > 0);
+                  setDraft({
+                    ...draft,
+                    notifications: {
+                      ...draft.notifications,
+                      classReminderOffsetsMinutes: parts.length ? parts : [1440, 120],
+                    },
+                  });
+                }}
+              />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="authentication" className="mt-6">
@@ -1238,6 +1278,80 @@ function PlatformSettingsShell() {
               }
             />
           ))}
+        </TabsContent>
+
+        <TabsContent value="zoom" className="mt-6 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Zoom integration</CardTitle>
+              <CardDescription>
+                Meeting defaults for live classes. API credentials are set via server env
+                (`ZOOM_ACCOUNT_ID`, `ZOOM_CLIENT_ID`, `ZOOM_CLIENT_SECRET`) and never shown here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ToggleRow
+                label="Enable Zoom automation"
+                description="When credentials are missing, the platform uses secure mock meetings."
+                checked={draft.zoom.enabled}
+                onCheckedChange={(v) =>
+                  setDraft({ ...draft, zoom: { ...draft.zoom, enabled: v } })
+                }
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Host account email">
+                  <Input
+                    value={draft.zoom.accountEmail}
+                    onChange={(e) =>
+                      setDraft({
+                        ...draft,
+                        zoom: { ...draft.zoom, accountEmail: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+                <Field label="Default meeting type">
+                  <Select
+                    value={draft.zoom.defaultMeetingType}
+                    onValueChange={(v) =>
+                      setDraft({
+                        ...draft,
+                        zoom: {
+                          ...draft.zoom,
+                          defaultMeetingType: v as "meeting" | "webinar",
+                        },
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="meeting">Meeting</SelectItem>
+                      <SelectItem value="webinar">Webinar</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <ToggleRow
+                label="Waiting room by default"
+                checked={draft.zoom.defaultWaitingRoom}
+                onCheckedChange={(v) =>
+                  setDraft({ ...draft, zoom: { ...draft.zoom, defaultWaitingRoom: v } })
+                }
+              />
+              <ToggleRow
+                label="Passcode by default"
+                checked={draft.zoom.defaultPasscode}
+                onCheckedChange={(v) =>
+                  setDraft({ ...draft, zoom: { ...draft.zoom, defaultPasscode: v } })
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                Credentials configured: {draft.zoom.credentialsConfigured ? "Yes" : "No (mock mode)"}
+              </p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

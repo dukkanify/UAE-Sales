@@ -1,17 +1,9 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Calendar" };
+import { LiveCalendarView } from "@/features/classes/components/live-calendar-view";
 
-export default function Page() {
+export default function InstructorCalendarPage() {
   return (
-    <ModulePlaceholder
-      title="Calendar"
-      description="Plan sessions and review your teaching schedule."
-      role="instructor"
-      href="/instructor/calendar"
-      icon="CalendarDays"
-      emptyTitle="Calendar module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
+    <LiveCalendarView roleLabel="Instructor" classesHref="/instructor/classes" />
   );
 }

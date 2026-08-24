@@ -47,6 +47,21 @@ export const ACTIVITY_ACTIONS = {
   CATEGORY_DELETED: "courses.category_deleted",
   INSTRUCTOR_ASSIGNED: "courses.instructor_assigned",
   MEDIA_UPLOADED: "courses.media_uploaded",
+  // Live classes / Zoom
+  CLASS_CREATED: "classes.created",
+  CLASS_UPDATED: "classes.updated",
+  CLASS_DELETED: "classes.deleted",
+  CLASS_CANCELLED: "classes.cancelled",
+  CLASS_RESCHEDULED: "classes.rescheduled",
+  CLASS_DUPLICATED: "classes.duplicated",
+  CLASS_STARTED: "classes.started",
+  ZOOM_MEETING_CREATED: "zoom.meeting_created",
+  ZOOM_MEETING_UPDATED: "zoom.meeting_updated",
+  ZOOM_MEETING_CANCELLED: "zoom.meeting_cancelled",
+  ATTENDANCE_UPDATED: "classes.attendance_updated",
+  REMINDER_QUEUED: "classes.reminder_queued",
+  REMINDER_SENT: "classes.reminder_sent",
+  RECORDING_REGISTERED: "classes.recording_registered",
 } as const;
 
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[keyof typeof ACTIVITY_ACTIONS];

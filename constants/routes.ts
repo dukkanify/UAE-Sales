@@ -55,6 +55,7 @@ export const protectedRoutePrefixes = [
   "/super-admin",
   "/dashboard",
   "/complete-profile",
+  "/join",
 ] as const;
 
 /** Routes accessible only when unauthenticated */

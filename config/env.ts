@@ -41,6 +41,10 @@ const serverEnvSchema = z.object({
   SUPER_ADMIN_EMAIL: z.string().email().default("superadmin@eagerpilots.com"),
   SUPER_ADMIN_FIRST_NAME: z.string().default("Super"),
   SUPER_ADMIN_LAST_NAME: z.string().default("Admin"),
+  /** Zoom Server-to-Server OAuth — never expose to client */
+  ZOOM_ACCOUNT_ID: z.string().optional(),
+  ZOOM_CLIENT_ID: z.string().optional(),
+  ZOOM_CLIENT_SECRET: z.string().optional(),
 });
 
 function parsePublicEnv() {
@@ -84,6 +88,9 @@ export function getServerEnv() {
     SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_FIRST_NAME: process.env.SUPER_ADMIN_FIRST_NAME,
     SUPER_ADMIN_LAST_NAME: process.env.SUPER_ADMIN_LAST_NAME,
+    ZOOM_ACCOUNT_ID: process.env.ZOOM_ACCOUNT_ID,
+    ZOOM_CLIENT_ID: process.env.ZOOM_CLIENT_ID,
+    ZOOM_CLIENT_SECRET: process.env.ZOOM_CLIENT_SECRET,
   });
 
   if (!result.success) {
