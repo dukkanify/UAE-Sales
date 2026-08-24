@@ -101,13 +101,20 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
   return { subject: payload.title, html, text };
 }
 
-export function otpEmailTemplate(code: string, purpose: string) {
+export function otpEmailTemplate(
+  code: string,
+  purpose: string,
+  options?: { expiresInMinutes?: number },
+) {
+  const expiresInMinutes = options?.expiresInMinutes ?? 10;
   return renderBrandedEmail({
     title: "Your verification code",
-    preheader: `Your AviatorPass code is ${code}`,
+    preheader: `Use your AviatorPass code within ${expiresInMinutes} minutes`,
     bodyHtml: `<p>Use this one-time code to ${purpose}:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#143048;">${code}</p>
-      <p>This code expires shortly. If you did not request it, you can ignore this email.</p>`,
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#143048;margin:24px 0;">${code}</p>
+      <p>This code expires in <strong>${expiresInMinutes} minutes</strong> and can only be used once.</p>
+      <p style="color:#64748b;font-size:13px;">If you did not request this code, you can ignore this email. Never share your code with anyone.</p>
+      <p style="color:#64748b;font-size:13px;margin-top:16px;">Need help? Contact support via the address in this email footer.</p>`,
   });
 }
 

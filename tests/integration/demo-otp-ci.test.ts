@@ -7,8 +7,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import { requestOtp } from "@/services/auth/auth-service";
+import { matchOtpCode } from "@/services/auth/otp-service";
 import { readAuthDb } from "@/services/auth/store";
-import { hashValue } from "@/lib/security/crypto";
 
 describe("demo OTP under production NODE_ENV (CI e2e)", () => {
   beforeAll(() => {
@@ -27,6 +27,6 @@ describe("demo OTP under production NODE_ENV (CI e2e)", () => {
 
     const challenge = readAuthDb().otps.find((o) => o.email === email && o.purpose === "login");
     expect(challenge).toBeTruthy();
-    expect(challenge!.codeHash).toBe(hashValue("123456"));
+    expect(matchOtpCode(challenge!.codeHash, "123456")).toBe(true);
   });
 });

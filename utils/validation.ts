@@ -101,7 +101,16 @@ export const registerSchema = z
 export const verifyOtpSchema = z.object({
   email: emailSchema,
   token: otpSchema,
-  purpose: z.enum(["login", "register", "reset_password", "verify_email", "booking"]),
+  purpose: z.enum([
+    "login",
+    "register",
+    "reset_password",
+    "verify_email",
+    "booking",
+    "change_email",
+    "two_factor",
+    "sensitive_action",
+  ]),
   deviceFingerprint: z.string().min(8).max(128).optional().nullable(),
   deviceLabel: z.string().max(120).optional().nullable(),
 });

@@ -920,6 +920,66 @@ function PlatformSettingsShell() {
                   }
                 />
               </Field>
+              <Field label="OTP max attempts">
+                <Input
+                  type="number"
+                  value={draft.authentication.otpMaxAttempts ?? 5}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      authentication: {
+                        ...draft.authentication,
+                        otpMaxAttempts: Number(e.target.value) || 0,
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="OTP resend cooldown (seconds)">
+                <Input
+                  type="number"
+                  value={draft.authentication.otpResendCooldownSeconds ?? 60}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      authentication: {
+                        ...draft.authentication,
+                        otpResendCooldownSeconds: Number(e.target.value) || 0,
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="OTP max resends">
+                <Input
+                  type="number"
+                  value={draft.authentication.otpMaxResends ?? 5}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      authentication: {
+                        ...draft.authentication,
+                        otpMaxResends: Number(e.target.value) || 0,
+                      },
+                    })
+                  }
+                />
+              </Field>
+              <Field label="OTP lockout (minutes)">
+                <Input
+                  type="number"
+                  value={draft.authentication.otpLockoutMinutes ?? 15}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      authentication: {
+                        ...draft.authentication,
+                        otpLockoutMinutes: Number(e.target.value) || 0,
+                      },
+                    })
+                  }
+                />
+              </Field>
               <Field label="Minimum password length">
                 <Input
                   type="number"
