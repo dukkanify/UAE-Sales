@@ -5,22 +5,22 @@
  */
 
 export const siteStatic = {
-  name: "AviatorPass",
-  shortName: "AviatorPass",
-  legalName: "AviatorPass",
+  name: "ATPL PASS",
+  shortName: "ATPL PASS",
+  legalName: "ATPL PASS",
   description:
-    "AviatorPass — your aviation journey starts here. ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery.",
+    "ATPL PASS — premium live instructor-led Airline Transport Pilot License training. One unified program, every ATPL subject, competency-based progression.",
   tagline: "YOUR AVIATION JOURNEY STARTS HERE",
   secondaryTagline: "UNLOCK YOUR PILOT LICENSE",
   locale: "en",
   direction: "ltr" as const,
-  contactEmail: "ME@ABDULAZIZALSHOAIL.COM",
-  supportEmail: "ME@ABDULAZIZALSHOAIL.COM",
-  locations: ["Kuwait", "Dubai"] as const,
-  socialHandle: "@ABDULAZIZ_ALSHOAIL",
+  contactEmail: "support@atplpass.com",
+  supportEmail: "support@atplpass.com",
+  locations: ["Kuwait", "UAE"] as const,
+  socialHandle: "",
   social: {
-    instagram: "https://instagram.com/ABDULAZIZ_ALSHOAIL",
-    twitter: "https://x.com/ABDULAZIZ_ALSHOAIL",
+    instagram: "",
+    twitter: "",
     linkedin: "",
     youtube: "",
   },

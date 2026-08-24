@@ -12,7 +12,7 @@ interface BrandLogoProps {
   className?: string;
   /** `null` disables linking; omit/`undefined` defaults to home. */
   href?: string | null;
-  variant?: "full" | "mark" | "dark" | "stacked";
+  variant?: "full" | "mark" | "dark" | "stacked" | "text";
   priority?: boolean;
   showWordmark?: boolean;
 }
@@ -31,6 +31,35 @@ function BrandLogo({
   const brand = useBrand();
   const name = brand.platformName || siteStatic.name;
 
+  const disableLink = href === null || href === "";
+  const resolvedHref = disableLink
+    ? null
+    : href === undefined
+      ? routes.home
+      : safeHref(href, routes.home);
+
+  if (variant === "text") {
+    const textLogo = (
+      <span
+        className={cn(
+          "font-display text-[1.15rem] font-bold tracking-[0.06em] sm:text-[1.25rem]",
+          className,
+        )}
+      >
+        <span className="text-white">ATPL</span>{" "}
+        <span className="bg-gradient-to-r from-[#f6c36c] via-[#cca04c] to-[#9e712e] bg-clip-text text-transparent">
+          PASS
+        </span>
+      </span>
+    );
+    if (!resolvedHref) return textLogo;
+    return (
+      <Link href={resolvedHref} className="inline-flex items-center" aria-label={name}>
+        {textLogo}
+      </Link>
+    );
+  }
+
   // Prefer official brand-guide PNG lockups (wing + book). SVG masters are
   // approximations kept only for favicon / edit — never override the PNGs.
   const src =
@@ -45,12 +74,6 @@ function BrandLogo({
   // Explicit null/"" = mark only. Omitted/`undefined` defaults to home silently
   // (JS default params do NOT apply when the caller passes `href={undefined}`).
   // Only invalid non-empty values go through safeHref (which warns in dev).
-  const disableLink = href === null || href === "";
-  const resolvedHref = disableLink
-    ? null
-    : href === undefined
-      ? routes.home
-      : safeHref(href, routes.home);
 
   const content = (
     <span className={cn("inline-flex items-center gap-2", className)}>

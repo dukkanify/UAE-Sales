@@ -3,11 +3,10 @@ import type { Permission } from "@/constants/permissions";
 import type { Role } from "@/constants/roles";
 
 export const NAV_ITEMS = [
-  { label: "Platform", href: "/" },
-  { label: "Courses", href: "/courses" },
-  { label: "Flightpath", href: "/flightpath" },
-  { label: "Live", href: "/live" },
-  { label: "Book", href: "/book" },
+  { label: "Program", href: "/courses" },
+  { label: "About", href: "/#about" },
+  { label: "Instructors", href: "/#instructors" },
+  { label: "Contact", href: "/#contact" },
 ] as const;
 
 export const DASHBOARD_NAV_BY_ROLE: Record<
@@ -54,9 +53,9 @@ export const DASHBOARD_NAV_BY_ROLE: Record<
 
 export const APP_METADATA = {
   title: {
-    default: "AviatorPass | Your Aviation Journey Starts Here",
-    template: "%s | AviatorPass",
+    default: "ATPL PASS | Premium Live ATPL Training Academy",
+    template: "%s | ATPL PASS",
   },
   description:
-    "YOUR AVIATION JOURNEY STARTS HERE. AviatorPass delivers ATPL theory, live Zoom instructor coaching, quizzes, and exam mastery for pilots in Kuwait and Dubai.",
+    "ATPL PASS — premium live instructor-led Airline Transport Pilot License training. One unified ATPL Program with every subject, competency-based progression, and certified instructors.",
 } as const;
