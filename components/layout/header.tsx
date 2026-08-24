@@ -48,7 +48,12 @@ function Header() {
     >
       <div className="container-app relative flex h-[4.5rem] items-center justify-between gap-3 sm:h-[4.85rem]">
         <div className="relative z-10 min-w-0 shrink-0">
-          <BrandLogo variant="text" href={routes.home} priority />
+          <BrandLogo
+            variant="dark"
+            href={routes.home}
+            priority
+            className="[&_img]:h-11 [&_img]:max-w-[360px] sm:[&_img]:h-12"
+          />
         </div>
 
         <nav
