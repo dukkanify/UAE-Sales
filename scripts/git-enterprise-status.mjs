@@ -19,7 +19,7 @@ function trySh(cmd) {
 
 const branch = trySh("git rev-parse --abbrev-ref HEAD") ?? "unknown";
 const detached = branch === "HEAD";
-const lastCommit = trySh("git log -1 --format=%h %s (%an, %ci)") ?? "n/a";
+const lastCommit = trySh("git log -1 --format=%h %s") ?? "n/a";
 const remoteUrl = trySh("git remote get-url origin") ?? "none";
 const upstream =
   trySh("git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null") ?? "(none)";
