@@ -99,6 +99,6 @@ Guides: `docs/MAINTENANCE.md`, `docs/POST_LAUNCH_SUPPORT.md`, `docs/BACKUP_DISAS
 
 ## 10. Closure statement
 
-Pending client signature on `docs/FINAL_PROJECT_ACCEPTANCE.md`, the development phase is complete and the product transitions to **warranty / long-term operation**.
+Development phase through Task 024 is complete. **Version 1.0 GA** packaging is in Task 025 (`docs/FINAL_RELEASE_025.md`). Client signature on `docs/CLIENT_ACCEPTANCE_025.md` (supersedes Task 023 form for GA) transitions the product to **warranty / long-term operation**.
 
 **Vendor contact:** dukkanify@gmail.com

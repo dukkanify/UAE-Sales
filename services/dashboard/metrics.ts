@@ -12,7 +12,7 @@ import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb } from "@/services/courses/store";
 import { getClassStats } from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
-import type { SeriesPoint } from "@/components/dashboard/charts";
+import type { SeriesPoint } from "@/components/dashboard/chart-types";
 import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
 import { format, addDays } from "date-fns";

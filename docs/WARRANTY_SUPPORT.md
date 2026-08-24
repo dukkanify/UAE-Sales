@@ -50,12 +50,12 @@ Configurable in Ops Center → SLA. Suggested defaults:
 
 ## Warranty scope (suggested)
 
-| Included                          | Excluded                                  |
-| --------------------------------- | ----------------------------------------- |
-| Defect fixes for accepted scope   | New feature development (`ROADMAP_V2.md`) |
-| Security patches for shipped code | Third-party outages (Stripe/Zoom/ESP)     |
-| Backup / restore guidance         | Content authoring / course writing        |
-| Ops assistance for env misconfig  | Hardware / client network issues          |
+| Included                          | Excluded                                                    |
+| --------------------------------- | ----------------------------------------------------------- |
+| Defect fixes for accepted scope   | New feature development (`V2_BACKLOG.md` / `ROADMAP_V2.md`) |
+| Security patches for shipped code | Third-party outages (Stripe/Zoom/ESP)                       |
+| Backup / restore guidance         | Content authoring / course writing                          |
+| Ops assistance for env misconfig  | Hardware / client network issues                            |
 
 ### Support period & channels
 
@@ -63,4 +63,7 @@ Default warranty window: **as defined in the client contract** (fill: ____ month
 Channels: in-app tickets, Ops Center, email (`dukkanify@gmail.com`), agreed incident channel.  
 Bug process: Ops Center → severity → SLA → fix → verify → close.
 
-Payment obligations for source/handover delivery are contractual — release production credentials and private repo access only after agreed payment milestones.
+**GA activation form:** complete `docs/WARRANTY_ACTIVATION_025.md` at Version 1.0 acceptance.  
+**90-day KPIs:** `docs/SUCCESS_METRICS_90D.md`.
+
+Payment obligations for source/handover delivery are contractual — release production credentials and private repo access only after agreed payment milestones (`docs/OWNERSHIP_TRANSFER_025.md`).

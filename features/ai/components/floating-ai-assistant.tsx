@@ -2,16 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import {
-  Bot,
-  History,
-  Loader2,
-  Send,
-  Sparkles,
-  ThumbsDown,
-  ThumbsUp,
-  X,
-} from "lucide-react";
+import { Bot, History, Loader2, Send, Sparkles, ThumbsDown, ThumbsUp, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { cn } from "@/lib/utils";
@@ -21,12 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/providers/auth-provider";
 import { aiFetch, aiJson } from "@/features/ai/lib/api";
-import type {
-  AiAssistantPersona,
-  AiConversation,
-  AiMessage,
-  AiUserContext,
-} from "@/types/ai";
+import type { AiAssistantPersona, AiConversation, AiMessage, AiUserContext } from "@/types/ai";
 
 type Bootstrap = {
   persona: AiAssistantPersona;
@@ -169,7 +155,9 @@ function FloatingAiAssistant() {
               ...m.filter((x) => x.id !== optimistic.id),
               {
                 ...optimistic,
-                id: String((event.data as { userMessageId?: string }).userMessageId ?? optimistic.id),
+                id: String(
+                  (event.data as { userMessageId?: string }).userMessageId ?? optimistic.id,
+                ),
                 conversationId: msg.conversationId,
               },
               msg,
@@ -229,11 +217,16 @@ function FloatingAiAssistant() {
                 </p>
               </div>
               <Button size="icon" variant="ghost" asChild>
-                <Link href={hubHref} title="Open AI hub">
+                <Link href={hubHref} aria-label="Open AI hub" title="Open AI hub">
                   <History className="size-4" />
                 </Link>
               </Button>
-              <Button size="icon" variant="ghost" onClick={() => setOpen(false)} aria-label="Close">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setOpen(false)}
+                aria-label="Close AI assistant"
+              >
                 <X className="size-4" />
               </Button>
             </div>
@@ -306,7 +299,8 @@ function FloatingAiAssistant() {
                     {!messages.length && !streaming ? (
                       <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">
-                          Ask about lessons, plans, quizzes, or platform search. I won’t invent enrollments or replace your instructor.
+                          Ask about lessons, plans, quizzes, or platform search. I won’t invent
+                          enrollments or replace your instructor.
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {(boot?.suggestions ?? []).slice(0, 6).map((s) => (
@@ -339,6 +333,7 @@ function FloatingAiAssistant() {
                               size="icon"
                               variant="ghost"
                               className="h-7 w-7"
+                              aria-label="Helpful response"
                               onClick={() => void feedback(m.id, "up")}
                             >
                               <ThumbsUp className="size-3.5" />
@@ -347,6 +342,7 @@ function FloatingAiAssistant() {
                               size="icon"
                               variant="ghost"
                               className="h-7 w-7"
+                              aria-label="Unhelpful response"
                               onClick={() => void feedback(m.id, "down")}
                             >
                               <ThumbsDown className="size-3.5" />
@@ -386,7 +382,11 @@ function FloatingAiAssistant() {
                     disabled={busy}
                   />
                   <Button type="submit" size="icon" disabled={busy || !input.trim()}>
-                    {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                    {busy ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Send className="size-4" />
+                    )}
                   </Button>
                 </form>
               </>
