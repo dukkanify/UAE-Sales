@@ -1,0 +1,470 @@
+/* ATPL PASS — premium homepage sections */
+
+.atpl-kicker {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.atpl-kicker-hero {
+  color: rgba(246, 195, 108, 0.85);
+}
+
+.atpl-heading {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: var(--landing-ink-soft);
+}
+
+.atpl-heading-light {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: white;
+}
+
+.atpl-subheading {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--landing-ink-soft);
+}
+
+/* —— Hero —— */
+.atpl-hero-bg {
+  background-size: cover, cover, cover;
+  background-position:
+    center 25%,
+    center 55%,
+    center top;
+  background-repeat: no-repeat;
+  filter: saturate(1.12) brightness(1.08) contrast(1.02);
+}
+
+.atpl-hero-overlay {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(13, 34, 53, 0.38) 0%,
+      rgba(20, 48, 72, 0.22) 42%,
+      rgba(13, 34, 53, 0.52) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(13, 34, 53, 0.08) 0%,
+      rgba(13, 34, 53, 0.62) 72%,
+      rgba(13, 34, 53, 0.82) 100%
+    );
+}
+
+.atpl-hero-glow {
+  background:
+    radial-gradient(ellipse 65% 50% at 78% 12%, rgba(204, 160, 76, 0.32), transparent 62%),
+    radial-gradient(ellipse 55% 45% at 8% 85%, rgba(122, 151, 173, 0.2), transparent 58%),
+    radial-gradient(ellipse 40% 30% at 50% 40%, rgba(255, 255, 255, 0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.atpl-hero-brand {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  filter: drop-shadow(0 8px 32px rgba(0, 0, 0, 0.35));
+}
+
+.atpl-hero-brand-pass {
+  background: linear-gradient(115deg, #f6c36c 0%, #cca04c 46%, #9e712e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.atpl-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(204, 160, 76, 0.35);
+  background: rgba(204, 160, 76, 0.08);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(246, 195, 108, 0.92);
+  backdrop-filter: blur(8px);
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.atpl-badge:hover {
+  border-color: rgba(246, 195, 108, 0.55);
+  background: rgba(204, 160, 76, 0.14);
+}
+
+/* —— Sections —— */
+.atpl-section {
+  padding-block: clamp(4rem, 8vw, 7rem);
+}
+
+.atpl-section-light {
+  background: linear-gradient(180deg, #f4f6f8 0%, #edf1f4 100%);
+}
+
+.atpl-section-dark {
+  background: linear-gradient(180deg, var(--landing-ink) 0%, var(--landing-ink-soft) 100%);
+}
+
+.atpl-section-about {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(244, 246, 248, 0.94) 0%, rgba(237, 241, 244, 0.98) 100%),
+    url("/images/marketing/section-runway.jpg") center / cover no-repeat;
+}
+
+.atpl-section-instructors {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(13, 34, 53, 0.92) 0%, rgba(20, 48, 72, 0.88) 100%),
+    url("/images/marketing/hero-cockpit.jpg") center / cover no-repeat;
+  color: white;
+}
+
+.atpl-section-instructors .atpl-instructor-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.atpl-section-instructors .atpl-heading-light,
+.atpl-section-instructors .atpl-kicker {
+  position: relative;
+  z-index: 1;
+}
+
+.atpl-section-instructors .container-app > p,
+.atpl-section-instructors .container-app > div {
+  position: relative;
+  z-index: 1;
+}
+
+.atpl-section-program {
+  background:
+    linear-gradient(135deg, rgba(13, 34, 53, 0.92) 0%, rgba(20, 48, 72, 0.88) 100%),
+    url("/images/marketing/hero-cockpit.jpg") center / cover no-repeat;
+  color: white;
+}
+
+.atpl-section-accent {
+  background: linear-gradient(180deg, #f8f1e4 0%, #f4f6f8 100%);
+  border-block: 1px solid rgba(204, 160, 76, 0.15);
+}
+
+.atpl-section-contact {
+  background: var(--landing-ink-soft);
+  padding-block: clamp(3.5rem, 6vw, 5rem);
+}
+
+.atpl-section-final {
+  background: linear-gradient(180deg, var(--landing-ink-soft) 0%, var(--landing-ink) 100%);
+  padding-block: clamp(4rem, 8vw, 6rem);
+}
+
+/* —— Content blocks —— */
+.atpl-prose-block p {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: hsl(var(--muted-foreground));
+}
+
+.atpl-value-card {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(20, 48, 72, 0.08);
+  background: white;
+  box-shadow: 0 4px 24px -12px rgba(20, 48, 72, 0.12);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.atpl-value-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px -16px rgba(20, 48, 72, 0.18);
+}
+
+.atpl-highlight-panel {
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(204, 160, 76, 0.2);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 241, 228, 0.6) 100%);
+  box-shadow: 0 8px 40px -20px rgba(20, 48, 72, 0.15);
+}
+
+/* —— Feature cards —— */
+.atpl-feature-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s ease,
+    background 0.35s ease;
+}
+
+.atpl-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(204, 160, 76, 0.35);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.atpl-feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: rgba(204, 160, 76, 0.12);
+  color: var(--landing-gold-bright);
+}
+
+.atpl-platform-card {
+  padding: 1.75rem;
+  border-radius: 1.125rem;
+  border: 1px solid rgba(20, 48, 72, 0.06);
+  background: white;
+  box-shadow: 0 4px 28px -14px rgba(20, 48, 72, 0.1);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+.atpl-platform-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -18px rgba(20, 48, 72, 0.16);
+}
+
+/* —— Program —— */
+.atpl-program-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.atpl-program-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(204, 160, 76, 0.25);
+}
+
+/* —— Subject modules —— */
+.atpl-subject-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(20, 48, 72, 0.07);
+  background: white;
+  box-shadow: 0 4px 24px -14px rgba(20, 48, 72, 0.1);
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.atpl-subject-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(204, 160, 76, 0.3);
+  box-shadow: 0 12px 36px -16px rgba(20, 48, 72, 0.14);
+}
+
+.atpl-subject-code {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.atpl-subject-badge {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(204, 160, 76, 0.1);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9e712e;
+}
+
+/* —— Learning method —— */
+.atpl-learning-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.875rem;
+  background: white;
+  border: 1px solid rgba(20, 48, 72, 0.06);
+  box-shadow: 0 2px 16px -8px rgba(20, 48, 72, 0.08);
+}
+
+/* —— Instructors —— */
+.atpl-instructor-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  transition:
+    transform 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.atpl-instructor-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(204, 160, 76, 0.35);
+}
+
+/* —— Payments —— */
+.atpl-payment-region {
+  padding: 2rem;
+  border-radius: 1.25rem;
+  border: 1px solid rgba(20, 48, 72, 0.08);
+  background: white;
+  box-shadow: 0 8px 32px -16px rgba(20, 48, 72, 0.1);
+}
+
+.atpl-payment-method {
+  padding: 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(20, 48, 72, 0.06);
+  background: #f8fafb;
+}
+
+.atpl-payment-badge {
+  display: inline-flex;
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, var(--landing-ink-soft) 0%, var(--landing-ink-mid) 100%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: white;
+}
+
+/* —— Contact —— */
+.atpl-contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 1rem 1.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(204, 160, 76, 0.35);
+  background: rgba(204, 160, 76, 0.08);
+  font-size: 1rem;
+  font-weight: 500;
+  color: white;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.atpl-contact-email:hover {
+  background: rgba(204, 160, 76, 0.16);
+  border-color: rgba(246, 195, 108, 0.5);
+  transform: translateY(-2px);
+}
+
+/* —— Reveal animation —— */
+.atpl-reveal {
+  animation: atpl-fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes atpl-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atpl-reveal {
+    animation: none;
+  }
+
+  .atpl-feature-card:hover,
+  .atpl-platform-card:hover,
+  .atpl-subject-card:hover,
+  .atpl-value-card:hover,
+  .atpl-instructor-card:hover {
+    transform: none;
+  }
+}
+
+.atpl-program-hero {
+  background: var(--landing-ink);
+  color: white;
+}
+
+.atpl-program-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.875rem;
+  border: 1px solid rgba(20, 48, 72, 0.07);
+  background: white;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: hsl(var(--foreground) / 0.85);
+  box-shadow: 0 2px 16px -8px rgba(20, 48, 72, 0.08);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.atpl-program-detail-item:hover {
+  border-color: rgba(204, 160, 76, 0.25);
+  box-shadow: 0 8px 24px -12px rgba(20, 48, 72, 0.12);
+}
+
+@media (max-width: 640px) {
+  .atpl-hero-bg {
+    background-position:
+      65% 20%,
+      center 70%,
+      center top;
+  }
+
+  .atpl-section {
+    padding-block: 3.5rem;
+  }
+}

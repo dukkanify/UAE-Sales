@@ -79,7 +79,7 @@ function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole
           <p>
             Already on the platform?{" "}
             <Link href={routes.login} className="font-medium text-primary hover:underline">
-              Enter
+              Log in
             </Link>
           </p>
           <p className="text-xs text-muted-foreground/90">
