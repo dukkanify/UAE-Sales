@@ -32,13 +32,16 @@ import {
 } from "@/services/auth/store";
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
+import {
+  finalizeEnterpriseRegistration,
+  matchRegistrationOtp,
+} from "@/services/auth/registration-service";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import {
   maxAllowedSessions,
   revokeExcessSessions,
   revokeSessionById,
 } from "@/services/auth/session-service";
-import { dispatchRoleAlert, emailRegistrationWelcome } from "@/services/email/automation-service";
 import { sendEmail } from "@/services/email/mailer";
 import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
@@ -305,11 +308,11 @@ export async function requestOtp(input: {
     };
   }
 
-  if (input.purpose === "register" && existing) {
+  if (input.purpose === "register") {
     return {
       success: false,
       data: null,
-      error: "An account with this email already exists. Please sign in.",
+      error: "Use the registration endpoint to create a new account.",
     };
   }
 
@@ -337,15 +340,16 @@ export async function requestOtp(input: {
     purpose: input.purpose,
     codeHash: hashValue(code),
     attempts: 0,
+    maxAttempts: 5,
     rememberMe: Boolean(input.rememberMe),
+    lockedUntil: null,
+    resendAvailableAt: addMinutes(1),
+    pendingRegistrationId: null,
     meta: {
       firstName: input.firstName ? sanitizeString(input.firstName) : null,
       lastName: input.lastName ? sanitizeString(input.lastName) : null,
       bookingId: input.bookingId ?? null,
-      role:
-        input.purpose === "register" && input.role === ROLES.INSTRUCTOR
-          ? ROLES.INSTRUCTOR
-          : ROLES.STUDENT,
+      role: ROLES.STUDENT,
     },
     expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
     createdAt: nowIso(),
@@ -357,20 +361,38 @@ export async function requestOtp(input: {
   });
 
   const purposeLabel =
-    input.purpose === "register"
-      ? "create your account"
-      : input.purpose === "reset_password"
-        ? "reset your password"
-        : input.purpose === "booking"
-          ? "confirm your booking"
-          : "sign in";
+    input.purpose === "reset_password"
+      ? "reset your password"
+      : input.purpose === "booking"
+        ? "confirm your booking"
+        : "sign in";
   const template = otpEmailTemplate(code, purposeLabel);
   const mail = await sendEmail({
     to: email,
     subject: template.subject,
     html: template.html,
     text: template.text,
-    meta: { kind: "otp", purpose: input.purpose },
+    meta: { kind: "otp", purpose: input.purpose, system: true },
+  });
+
+  if (mail.mode === "failed") {
+    writeAuthDb((db) => {
+      db.otps = db.otps.filter((o) => o.id !== challenge.id);
+    });
+    return {
+      success: false,
+      data: null,
+      error: "We could not send the verification email. Please try again in a moment.",
+    };
+  }
+
+  await logActivity({
+    actorId: existing?.id ?? null,
+    action: ACTIVITY_ACTIONS.OTP_SENT,
+    entityType: "otp",
+    entityId: challenge.id,
+    metadata: { email, purpose: input.purpose, emailMode: mail.mode },
+    ...input.ctx,
   });
 
   if (input.purpose === "reset_password") {
@@ -427,21 +449,59 @@ export async function verifyOtp(input: {
     return { success: false, data: null, error: "No active verification code. Request a new one." };
   }
 
+  if (challenge.lockedUntil && new Date(challenge.lockedUntil).getTime() > Date.now()) {
+    return {
+      success: false,
+      data: null,
+      error: "Too many invalid attempts. Request a new code after the lockout period.",
+    };
+  }
+
   if (new Date(challenge.expiresAt).getTime() <= Date.now()) {
     writeAuthDb((d) => {
       d.otps = d.otps.filter((o) => o.id !== challenge.id);
     });
+    await logActivity({
+      actorId: null,
+      action: ACTIVITY_ACTIONS.OTP_FAILED,
+      entityType: "otp",
+      entityId: challenge.id,
+      metadata: { email, purpose: input.purpose, reason: "expired" },
+      ...input.ctx,
+    });
     return { success: false, data: null, error: "Verification code expired. Request a new one." };
   }
 
-  if (challenge.attempts >= 5) {
+  const maxAttempts = challenge.maxAttempts ?? 5;
+  if (challenge.attempts >= maxAttempts) {
+    writeAuthDb((d) => {
+      const o = d.otps.find((x) => x.id === challenge.id);
+      if (o) o.lockedUntil = addMinutes(15);
+    });
     return { success: false, data: null, error: "Too many invalid attempts. Request a new code." };
   }
 
-  if (!constantTimeEqual(challenge.codeHash, hashValue(token))) {
+  const tokenValid =
+    input.purpose === "register"
+      ? matchRegistrationOtp(challenge.codeHash, token)
+      : constantTimeEqual(challenge.codeHash, hashValue(token));
+
+  if (!tokenValid) {
     writeAuthDb((d) => {
       const o = d.otps.find((x) => x.id === challenge.id);
-      if (o) o.attempts += 1;
+      if (o) {
+        o.attempts += 1;
+        if (o.attempts >= maxAttempts) o.lockedUntil = addMinutes(15);
+      }
+    });
+    await logActivity({
+      actorId: findUserByEmail(email)?.id ?? null,
+      action:
+        input.purpose === "login" ? ACTIVITY_ACTIONS.LOGIN_FAILED : ACTIVITY_ACTIONS.OTP_FAILED,
+      entityType: "otp",
+      entityId: challenge.id,
+      metadata: { email, purpose: input.purpose, reason: "invalid_code" },
+      ...input.ctx,
     });
     return { success: false, data: null, error: "Invalid verification code." };
   }
@@ -449,55 +509,23 @@ export async function verifyOtp(input: {
   let user = findUserByEmail(email);
 
   if (input.purpose === "register") {
-    const intendedRole =
-      challenge.meta.role === ROLES.INSTRUCTOR ? ROLES.INSTRUCTOR : ROLES.STUDENT;
-    const approvalRequired = Boolean(getPlatformSettings().users.instructorApprovalRequired);
-    const status =
-      intendedRole === ROLES.INSTRUCTOR && approvalRequired
-        ? ACCOUNT_STATUS.PENDING
-        : ACCOUNT_STATUS.ACTIVE;
-    const created = createUser({
-      email,
-      firstName: (challenge.meta.firstName as string | null) ?? null,
-      lastName: (challenge.meta.lastName as string | null) ?? null,
-      role: intendedRole,
-      status,
-    });
-    created.emailVerified = true;
-    created.profileComplete = isStudentProfileComplete(created);
-    writeAuthDb((d) => {
-      d.users.push(created);
-      d.otps = d.otps.filter((o) => o.id !== challenge.id);
-    });
-    user = created;
-    await logActivity({
-      actorId: created.id,
-      action: ACTIVITY_ACTIONS.USER_CREATED,
-      entityType: "user",
-      entityId: created.id,
-      metadata: { email, role: created.role, status: created.status },
-      ...input.ctx,
-    });
-    await logActivity({
-      actorId: created.id,
-      action: ACTIVITY_ACTIONS.EMAIL_VERIFIED,
-      entityType: "user",
-      entityId: created.id,
-      ...input.ctx,
-    });
-    await emailRegistrationWelcome({ userId: created.id, actorId: created.id });
-    const superAdmins = readAuthDb()
-      .users.filter((u) => u.role === ROLES.SUPER_ADMIN && u.status === "active")
-      .map((u) => u.id);
-    await dispatchRoleAlert({
-      event: "admin_alert",
-      title: "New student registered",
-      detail: `${created.email} created an AviatorPass account (${created.role}).`,
-      reference: created.id,
-      actorId: created.id,
-      userIds: superAdmins,
-      system: true,
-    });
+    try {
+      return await finalizeEnterpriseRegistration({
+        email,
+        challenge,
+        ctx: input.ctx,
+        issueSession,
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === "DUPLICATE_IDENTITY") {
+        return {
+          success: false,
+          data: null,
+          error: "An account already exists for this email or phone. Please sign in.",
+        };
+      }
+      throw error;
+    }
   } else if (input.purpose === "booking") {
     const bookingId =
       typeof challenge.meta.bookingId === "string" ? challenge.meta.bookingId : null;
@@ -625,7 +653,11 @@ export async function verifyOtp(input: {
         purpose: "reset_password",
         codeHash: hashValue(`reset:${generateToken(16)}`),
         attempts: 0,
+        maxAttempts: 5,
         rememberMe: false,
+        lockedUntil: null,
+        resendAvailableAt: null,
+        pendingRegistrationId: null,
         meta: { verified: true, resetToken: generateToken(24) },
         expiresAt: addMinutes(15),
         createdAt: nowIso(),

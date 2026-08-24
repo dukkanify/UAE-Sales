@@ -10,14 +10,24 @@ export function generateToken(bytes = 32): string {
   return randomBytes(bytes).toString("base64url");
 }
 
+/** Cryptographically uniform OTP digits (rejection sampling — no modulo bias). */
 export function generateOtp(length = 6): string {
-  const max = 10 ** length;
-  const num = randomBytes(4).readUInt32BE(0) % max;
-  return num.toString().padStart(length, "0");
+  const digits: string[] = [];
+  while (digits.length < length) {
+    const byte = randomBytes(1)[0]!;
+    if (byte >= 250) continue; // reject 250–255 to keep uniform 0–9
+    digits.push(String(byte % 10));
+  }
+  return digits.join("");
 }
 
 export function hashValue(value: string): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+/** Prefer HMAC for OTP codes when a server secret is available. */
+export function hashOtp(code: string, secret: string): string {
+  return createHmac("sha256", secret).update(`otp:${code}`).digest("hex");
 }
 
 export function hashPassword(password: string, salt?: string): { hash: string; salt: string } {
