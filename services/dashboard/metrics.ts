@@ -19,6 +19,8 @@ import { format, addDays } from "date-fns";
 import { getCalendarEventsForUser } from "@/services/classes/calendar-service";
 import { ensureLearningSeeded } from "@/services/learning/seed";
 import { getLearningDashboard } from "@/services/learning/learning-service";
+import { ensureCertificatesSeeded } from "@/services/certificates/seed";
+import { listCertificates } from "@/services/certificates/certificate-service";
 import type { UserProfile } from "@/types";
 
 export { ensureDemoUsersSeeded };
@@ -203,11 +205,13 @@ export function getStudentOverview() {
   );
   if (student) {
     const learning = getLearningDashboard(toUserProfile(student));
+    ensureCertificatesSeeded();
+    const certificates = listCertificates({ studentId: student.id, status: "issued" }).length;
     return {
       currentCourses: learning.activeCourses,
       nextLiveClass: learning.upcomingLiveClass ?? "None scheduled",
       progress: Math.round(learning.progressPercent),
-      certificates: 0,
+      certificates,
       notifications: learning.notifications,
       assignments: learning.assignments,
       quizzes: 0,
