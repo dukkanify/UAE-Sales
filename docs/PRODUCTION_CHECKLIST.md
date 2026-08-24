@@ -49,6 +49,11 @@ Use before promoting staging → production.
 - [ ] Analytics / reports
 - [ ] AI assistant FAB + hub
 - [ ] Run `npm run acceptance` against staging
+- [ ] Run `npm run uat` against staging (includes Ops Center checks)
+- [ ] Ops Center health dashboard loads (`/super-admin/ops-center`)
+- [ ] SLA policy reviewed
+- [ ] Maintenance page message/ETA configured for planned windows
+- [ ] Backup verification report generated
 
 ## Documentation
 
@@ -56,7 +61,25 @@ Use before promoting staging → production.
 - [ ] `docs/DEPLOYMENT.md` followed
 - [ ] `docs/BACKUP_DISASTER_RECOVERY.md` shared with ops
 - [ ] Admin manual available to operators
+- [ ] `docs/QA_REPORT.md` / `docs/UAT_APPROVAL.md` signed
+- [ ] `docs/HANDOVER.md` filled (URLs + contacts)
+
+## Post-launch checklist
+
+- [ ] No critical / high open bugs (`docs/BUG_TRACKER.md`)
+- [ ] No unexpected console errors on critical paths
+- [ ] No build / typecheck / lint errors on `main`
+- [ ] No database / store errors in monitoring
+- [ ] No permission escalation issues in UAT
+- [ ] No broken primary nav links for each role
+- [ ] Successful backup + restore test recorded
+- [ ] Monitoring active (uptime on `/api/health?ready=1`)
+- [ ] Logging active (system logs + activity logs)
+- [ ] Emails working (or documented mock limitation)
+- [ ] Zoom working (or documented stub limitation)
+- [ ] Payments working (mock or live Stripe)
+- [ ] Analytics dashboards loading for allowed roles
 
 ## Go / No-go
 
-**GO** only if all Security and Build quality boxes pass and backups exist.
+**GO** only if all Security and Build quality boxes pass, backups exist, and UAT is approved.

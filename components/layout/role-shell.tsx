@@ -41,6 +41,7 @@ import {
   Sparkles,
   Layers,
   UsersRound,
+  Server,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -111,6 +112,7 @@ const iconMap: Record<DashboardIcon, React.ComponentType<{ className?: string }>
   messages: MessageSquare,
   support: Headset,
   megaphone: Megaphone,
+  ops: Server,
 };
 
 interface RoleShellProps {

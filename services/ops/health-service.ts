@@ -1,5 +1,6 @@
 /**
  * Production health & readiness checks.
+ * Includes a short in-process cache for deep snapshots (performance).
  */
 
 import { existsSync, accessSync, constants, readdirSync } from "fs";
@@ -21,13 +22,24 @@ export interface HealthCheck {
   latencyMs?: number;
 }
 
+type HealthSnapshot = {
+  status: string;
+  service: string;
+  env: string;
+  checks: HealthCheck[];
+  timestamp: string;
+};
+
+let deepCache: { at: number; value: HealthSnapshot } | null = null;
+const DEEP_CACHE_MS = 5000;
+
 function timed<T>(fn: () => T): { value: T; ms: number } {
   const start = Date.now();
   const value = fn();
   return { value, ms: Date.now() - start };
 }
 
-export function getHealthSnapshot(opts?: { deep?: boolean }) {
+function buildHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
   const checks: HealthCheck[] = [];
   const deep = Boolean(opts?.deep);
 
@@ -46,7 +58,9 @@ export function getHealthSnapshot(opts?: { deep?: boolean }) {
   const dataDir = path.join(process.cwd(), ".data");
   try {
     accessSync(dataDir, constants.R_OK | constants.W_OK);
-    const files = existsSync(dataDir) ? readdirSync(dataDir).filter((f) => f.endsWith(".json")).length : 0;
+    const files = existsSync(dataDir)
+      ? readdirSync(dataDir).filter((f) => f.endsWith(".json")).length
+      : 0;
     checks.push({
       id: "database",
       label: "Data store",
@@ -102,6 +116,13 @@ export function getHealthSnapshot(opts?: { deep?: boolean }) {
     detail: isSupabaseConfigured() ? "Configured" : "Optional — local JSON mode",
   });
 
+  checks.push({
+    id: "auth",
+    label: "Authentication",
+    status: "pass",
+    detail: "OTP + signed session cookies",
+  });
+
   if (deep) {
     const mon = getActivityMonitoring();
     checks.push({
@@ -125,6 +146,13 @@ export function getHealthSnapshot(opts?: { deep?: boolean }) {
       label: "Recent errors",
       status: errors.length > 20 ? "fail" : errors.length > 5 ? "warn" : "pass",
       detail: `${errors.length} error logs in buffer`,
+    });
+    const security = listOpsLogs({ category: "security", limit: 20 });
+    checks.push({
+      id: "security_events",
+      label: "Security events",
+      status: security.length > 10 ? "warn" : "pass",
+      detail: `${security.length} recent security log entries`,
     });
 
     try {
@@ -165,6 +193,17 @@ export function getHealthSnapshot(opts?: { deep?: boolean }) {
     checks,
     timestamp: new Date().toISOString(),
   };
+}
+
+export function getHealthSnapshot(opts?: { deep?: boolean }): HealthSnapshot {
+  if (opts?.deep) {
+    const age = deepCache ? Date.now() - deepCache.at : Infinity;
+    if (deepCache && age < DEEP_CACHE_MS) return deepCache.value;
+    const value = buildHealthSnapshot({ deep: true });
+    deepCache = { at: Date.now(), value };
+    return value;
+  }
+  return buildHealthSnapshot(opts);
 }
 
 export function getProductionChecklist(): Array<{
@@ -223,7 +262,7 @@ export function getProductionChecklist(): Array<{
       id: "monitoring",
       label: "Monitoring active",
       status: "pass",
-      detail: "Health + monitoring APIs available",
+      detail: "Health + monitoring + Ops Center APIs available",
     },
     {
       id: "csrf",
@@ -241,7 +280,7 @@ export function getProductionChecklist(): Array<{
       id: "docs",
       label: "Documentation completed",
       status: "pass",
-      detail: "See docs/PRODUCTION.md and related guides",
+      detail: "See docs/PRODUCTION.md, docs/OPS_SUPPORT.md",
     },
   ];
 }

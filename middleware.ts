@@ -47,23 +47,30 @@ async function readClaims(request: NextRequest): Promise<{
   };
 }
 
+async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
+  if (publicEnv.NEXT_PUBLIC_MAINTENANCE_MODE) return true;
+  try {
+    const statusUrl = new URL("/api/public/maintenance", request.nextUrl.origin);
+    const res = await fetch(statusUrl, {
+      headers: { accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!res.ok) return false;
+    const json = (await res.json()) as { data?: { enabled?: boolean } };
+    return Boolean(json.data?.enabled);
+  } catch {
+    return false;
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  if (
-    publicEnv.NEXT_PUBLIC_MAINTENANCE_MODE &&
-    pathname !== routes.maintenance &&
-    !pathname.startsWith("/api/")
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = routes.maintenance;
-    return NextResponse.redirect(url);
-  }
 
   if (
     matchesPrefix(pathname, publicSystemRoutes) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/health") ||
+    pathname.startsWith("/api/public/") ||
     pathname.startsWith("/api/auth/") ||
     pathname.includes(".")
   ) {
@@ -71,6 +78,20 @@ export async function middleware(request: NextRequest) {
   }
 
   const claims = await readClaims(request);
+
+  // Settings- or env-driven maintenance — Super Admins may still access the console.
+  if (
+    pathname !== routes.maintenance &&
+    !pathname.startsWith("/api/") &&
+    claims?.role !== "super_admin"
+  ) {
+    const maintenanceOn = await isMaintenanceEnabled(request);
+    if (maintenanceOn) {
+      const url = request.nextUrl.clone();
+      url.pathname = routes.maintenance;
+      return NextResponse.redirect(url);
+    }
+  }
   const isProtected = matchesPrefix(pathname, protectedRoutePrefixes);
   const isAuthRoute = matchesPrefix(pathname, authRoutes);
 
