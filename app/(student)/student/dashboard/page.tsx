@@ -1,20 +1,7 @@
-import type { Metadata } from "next";
+"use client";
 
-import { StudentDashboardView } from "@/features/dashboard/student-dashboard-view";
-import {
-  getAttendanceSeries,
-  getDashboardCalendarEvents,
-  getStudentOverview,
-} from "@/services/dashboard/metrics";
-
-export const metadata: Metadata = { title: "Student Dashboard" };
+import { LearningDashboardView } from "@/features/learning";
 
 export default function StudentDashboardPage() {
-  return (
-    <StudentDashboardView
-      overview={getStudentOverview()}
-      calendar={getDashboardCalendarEvents()}
-      attendance={getAttendanceSeries()}
-    />
-  );
+  return <LearningDashboardView />;
 }

@@ -28,7 +28,14 @@ export type DashboardIcon =
   | "certificates"
   | "wallet"
   | "activity"
-  | "monitoring";
+  | "monitoring"
+  | "favorites"
+  | "notes"
+  | "resources"
+  | "planner"
+  | "history"
+  | "search"
+  | "bookmark";
 
 export interface DashboardNavItem {
   label: string;
@@ -43,6 +50,8 @@ export const SUPER_ADMIN_NAV: DashboardNavItem[] = [
   { label: "Instructors", href: "/super-admin/instructors", icon: "instructors" },
   { label: "Students", href: "/super-admin/students", icon: "students" },
   { label: "Courses", href: "/super-admin/courses", icon: "courses" },
+  { label: "Quizzes", href: "/super-admin/quizzes", icon: "quizzes" },
+  { label: "Certificates", href: "/super-admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/super-admin/classes", icon: "classes" },
   { label: "Communities", href: "/super-admin/communities", icon: "communities" },
   { label: "Blog", href: "/super-admin/blog", icon: "blog" },
@@ -61,6 +70,8 @@ export const ADMIN_NAV: DashboardNavItem[] = [
   { label: "Students", href: "/admin/students", icon: "students" },
   { label: "Instructors", href: "/admin/instructors", icon: "instructors" },
   { label: "Courses", href: "/admin/courses", icon: "courses" },
+  { label: "Quizzes", href: "/admin/quizzes", icon: "quizzes" },
+  { label: "Certificates", href: "/admin/certificates", icon: "certificates" },
   { label: "Classes", href: "/admin/classes", icon: "classes" },
   { label: "Communities", href: "/admin/communities", icon: "communities" },
   { label: "Blog", href: "/admin/blog", icon: "blog" },
@@ -76,6 +87,7 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Students", href: "/instructor/students", icon: "students" },
   { label: "Assignments", href: "/instructor/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/instructor/quizzes", icon: "quizzes" },
+  { label: "Certificates", href: "/instructor/certificates", icon: "certificates" },
   { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
   { label: "Live Classes", href: "/instructor/classes", icon: "classes" },
   { label: "Wallet", href: "/instructor/wallet", icon: "wallet" },
@@ -87,10 +99,18 @@ export const INSTRUCTOR_NAV: DashboardNavItem[] = [
 export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Dashboard", href: "/student/dashboard", icon: "dashboard" },
   { label: "My Courses", href: "/student/courses", icon: "courses" },
+  { label: "Resources", href: "/student/resources", icon: "resources" },
+  { label: "Notes", href: "/student/notes", icon: "notes" },
+  { label: "Favorites", href: "/student/favorites", icon: "favorites" },
+  { label: "Planner", href: "/student/planner", icon: "planner" },
   { label: "Calendar", href: "/student/calendar", icon: "calendar" },
+  { label: "History", href: "/student/history", icon: "history" },
+  { label: "Search", href: "/student/search", icon: "search" },
   { label: "Assignments", href: "/student/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/student/quizzes", icon: "quizzes" },
+  { label: "Progress", href: "/student/progress", icon: "activity" },
   { label: "Certificates", href: "/student/certificates", icon: "certificates" },
+  { label: "Transcript", href: "/student/transcript", icon: "reports" },
   { label: "Community", href: "/student/community", icon: "communities" },
   { label: "Notifications", href: "/student/notifications", icon: "notifications" },
   { label: "Profile", href: "/student/profile", icon: "profile" },
