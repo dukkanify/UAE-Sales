@@ -287,6 +287,31 @@ async function main() {
     await expectOk(sa.jar, "/api/ops?view=logs&limit=20");
   });
 
+  await check("superadmin support-ops center", async () => {
+    await expectOk(sa.jar, "/api/support-ops?view=dashboard");
+    await expectOk(sa.jar, "/api/support-ops?view=summary");
+    await expectOk(sa.jar, "/api/support-ops?view=sla");
+    await expectOk(sa.jar, "/api/support-ops?view=bugs");
+    await expectOk(sa.jar, "/api/support-ops?view=roadmap");
+    await expectOk(sa.jar, "/api/public/maintenance");
+    const bug = await api(sa.jar, "/api/support-ops", {
+      method: "POST",
+      body: JSON.stringify({
+        action: "create_bug",
+        title: "UAT ops bug",
+        description: "Created by uat-smoke",
+        priority: "low",
+        module: "ops",
+      }),
+    });
+    if (!bug.json?.success) throw new Error(bug.json?.error || "create bug failed");
+    const report = await api(sa.jar, "/api/support-ops", {
+      method: "POST",
+      body: JSON.stringify({ action: "backup_report", period: "ad_hoc", runRestoreTest: false }),
+    });
+    if (!report.json?.success) throw new Error(report.json?.error || "backup report failed");
+  });
+
   await check("superadmin backup create + test", async () => {
     const create = await api(sa.jar, "/api/ops", {
       method: "POST",
@@ -308,6 +333,7 @@ async function main() {
       "/super-admin/dashboard",
       "/super-admin/settings",
       "/super-admin/monitoring",
+      "/super-admin/ops-center",
       "/super-admin/system-logs",
       "/super-admin/analytics",
       "/super-admin/ai",

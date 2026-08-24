@@ -1,24 +1,23 @@
-# Release notes — ATPL PASS v1.0 (Task 016)
+# Release notes — ATPL PASS v1.1 (Task 017)
 
 ## Highlights
 
-- Final QA / UAT pass for public launch readiness.  
-- Instructor course listing RBAC corrected (`GET /api/courses` respects `COURSES_OWN`).  
-- Automated UAT harness: `npm run uat` (28 role/workflow checks).  
-- Handover documentation pack under `docs/` (QA, UAT, guides, limitations, roadmap).
+- **Ops Center** for post-launch support: health dashboard, alerts, SLA, bugs, change requests, releases, roadmap, incidents, backup verification, and maintenance control.
+- Settings-driven **maintenance mode** enforced in middleware (Super Admin bypass) with professional public page (ETA + contact).
+- Deep health checks add auth + security event monitoring; 5s cache for dashboard performance.
+- SQL twin migration `015_support_ops.sql` for future Supabase cutover.
 
-## Included platform capabilities (prior tasks)
+## Fixes / ops
 
-Authentication & RBAC · dashboards · course management · student learning · live classes/Zoom stubs · calendar · communication · quizzes · certificates · reports · analytics · payments & instructor wallet · AI assistant · platform settings · monitoring · backups.
+- Nav: Ops Center, Ops/Backups, and Activity Logs correctly separated for Super Admin.
 
-## Fixes in this release
+## Prior (v1.0 / Task 016)
 
-- **BUG-016-001 (High):** Instructors can list their own courses via `/api/courses` without needing global course-manage permission.
+- UAT harness (`npm run uat`), instructor course list RBAC fix, handover documentation pack.
 
 ## Upgrade notes
 
-1. Merge `cursor/aep-qa-launch-0987` after CI green.  
-2. Set production env from `.env.production.example`.  
-3. Run `npm run backup` and confirm restore test.  
-4. Complete `docs/PRODUCTION_CHECKLIST.md` including post-launch items.  
-5. Obtain client sign-off on `docs/UAT_APPROVAL.md`.
+1. Merge `cursor/aep-ops-support-0987`.  
+2. Review Ops Center SLA defaults and adjust for your support team.  
+3. Record release `1.1.0` as deployed after production ship.  
+4. Keep `docs/OPS_SUPPORT.md` synchronized with process changes.
