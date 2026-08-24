@@ -9,15 +9,12 @@ import {
   setSessionCookies,
 } from "@/lib/security/cookies";
 import {
-  constantTimeEqual,
   generateId,
-  generateOtp,
   generateToken,
   hashPassword,
   hashValue,
   verifyPassword,
 } from "@/lib/security/crypto";
-import { rateLimit } from "@/lib/security/rate-limit";
 import type { ApiResponse, UserProfile } from "@/types";
 import { sanitizeEmail, sanitizeString } from "@/utils/sanitize";
 import {
@@ -32,18 +29,19 @@ import {
 } from "@/services/auth/store";
 import { logActivity } from "@/services/auth/activity-log";
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
+import { finalizeEnterpriseRegistration } from "@/services/auth/registration-service";
 import {
-  finalizeEnterpriseRegistration,
-  matchRegistrationOtp,
-} from "@/services/auth/registration-service";
+  demoOtpEnabled,
+  issueAndSendOtp,
+  markOtpVerified,
+  validateOtpToken,
+} from "@/services/auth/otp-service";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import {
   maxAllowedSessions,
   revokeExcessSessions,
   revokeSessionById,
 } from "@/services/auth/session-service";
-import { sendEmail } from "@/services/email/mailer";
-import { otpEmailTemplate } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 import { describeDeviceFromUserAgent } from "@/lib/security/device-fingerprint";
 
@@ -64,16 +62,6 @@ function addMinutes(minutes: number): string {
 
 function addDays(days: number): string {
   return new Date(Date.now() + days * 86_400_000).toISOString();
-}
-
-function demoOtpEnabled(): boolean {
-  const env = getServerEnv();
-  if (!env.ENABLE_DEMO_OTP) return false;
-  // `next start` / CI e2e set NODE_ENV=production; still allow demo OTP for
-  // non-production app environments or explicit FORCE_DEMO_OTP.
-  if (process.env.NODE_ENV !== "production") return true;
-  if (process.env.FORCE_DEMO_OTP === "true") return true;
-  return process.env.NEXT_PUBLIC_APP_ENV !== "production";
 }
 
 function createUser(partial: {
@@ -283,6 +271,7 @@ export async function requestOtp(input: {
     email: string;
     demoOtp?: string;
     expiresInMinutes: number;
+    resendAvailableInSeconds?: number;
     emailDelivery?: "smtp" | "outbox" | "failed";
     emailOutboxId?: string;
   }>
@@ -292,12 +281,6 @@ export async function requestOtp(input: {
   if (demoOtpEnabled()) ensureDemoUsersSeeded();
 
   const email = sanitizeEmail(input.email);
-  const rl = rateLimit(`otp:${email}:${input.purpose}`, 5, 15 * 60_000);
-  if (!rl.allowed) {
-    return { success: false, data: null, error: "Too many OTP requests. Please try again later." };
-  }
-
-  const env = getServerEnv();
   const existing = findUserByEmail(email);
 
   if (input.purpose === "login" && !existing) {
@@ -333,67 +316,52 @@ export async function requestOtp(input: {
     return { success: false, data: null, error: "This account is inactive. Contact support." };
   }
 
-  const code = demoOtpEnabled() ? env.DEMO_OTP_CODE : generateOtp(6);
-  const challenge: OtpChallenge = {
-    id: generateId(),
+  if (
+    (input.purpose === "reset_password" ||
+      input.purpose === "verify_email" ||
+      input.purpose === "change_email" ||
+      input.purpose === "two_factor" ||
+      input.purpose === "sensitive_action") &&
+    !existing
+  ) {
+    // Avoid account enumeration on password reset; other purposes need an account.
+    if (input.purpose === "reset_password") {
+      return {
+        success: true,
+        data: {
+          email,
+          expiresInMinutes: getPlatformSettings().authentication.otpExpirationMinutes || 10,
+          resendAvailableInSeconds:
+            getPlatformSettings().authentication.otpResendCooldownSeconds || 60,
+        },
+        error: null,
+      };
+    }
+    return {
+      success: false,
+      data: null,
+      error: "No account found for this email.",
+    };
+  }
+
+  const issued = await issueAndSendOtp({
     email,
     purpose: input.purpose,
-    codeHash: hashValue(code),
-    attempts: 0,
-    maxAttempts: 5,
+    userId: existing?.id ?? null,
     rememberMe: Boolean(input.rememberMe),
-    lockedUntil: null,
-    resendAvailableAt: addMinutes(1),
-    pendingRegistrationId: null,
     meta: {
       firstName: input.firstName ? sanitizeString(input.firstName) : null,
       lastName: input.lastName ? sanitizeString(input.lastName) : null,
       bookingId: input.bookingId ?? null,
       role: ROLES.STUDENT,
     },
-    expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
-    createdAt: nowIso(),
-  };
-
-  writeAuthDb((db) => {
-    db.otps = db.otps.filter((o) => !(o.email === email && o.purpose === input.purpose));
-    db.otps.push(challenge);
+    failClosed: true,
+    ctx: input.ctx,
   });
 
-  const purposeLabel =
-    input.purpose === "reset_password"
-      ? "reset your password"
-      : input.purpose === "booking"
-        ? "confirm your booking"
-        : "sign in";
-  const template = otpEmailTemplate(code, purposeLabel);
-  const mail = await sendEmail({
-    to: email,
-    subject: template.subject,
-    html: template.html,
-    text: template.text,
-    meta: { kind: "otp", purpose: input.purpose, system: true },
-  });
-
-  if (mail.mode === "failed") {
-    writeAuthDb((db) => {
-      db.otps = db.otps.filter((o) => o.id !== challenge.id);
-    });
-    return {
-      success: false,
-      data: null,
-      error: "We could not send the verification email. Please try again in a moment.",
-    };
+  if (!issued.success || !issued.data) {
+    return { success: false, data: null, error: issued.error };
   }
-
-  await logActivity({
-    actorId: existing?.id ?? null,
-    action: ACTIVITY_ACTIONS.OTP_SENT,
-    entityType: "otp",
-    entityId: challenge.id,
-    metadata: { email, purpose: input.purpose, emailMode: mail.mode },
-    ...input.ctx,
-  });
 
   if (input.purpose === "reset_password") {
     await logActivity({
@@ -401,7 +369,11 @@ export async function requestOtp(input: {
       action: ACTIVITY_ACTIONS.PASSWORD_RESET_REQUEST,
       entityType: "user",
       entityId: existing?.id ?? email,
-      metadata: { email, emailMode: mail.mode, emailOutboxId: mail.outboxId },
+      metadata: {
+        email,
+        emailMode: issued.data.emailDelivery,
+        emailOutboxId: issued.data.emailOutboxId,
+      },
       ...input.ctx,
     });
   }
@@ -409,11 +381,12 @@ export async function requestOtp(input: {
   return {
     success: true,
     data: {
-      email,
-      expiresInMinutes: env.AUTH_OTP_EXPIRY_MINUTES,
-      emailDelivery: mail.mode,
-      emailOutboxId: mail.outboxId,
-      ...(demoOtpEnabled() ? { demoOtp: code } : {}),
+      email: issued.data.email,
+      expiresInMinutes: issued.data.expiresInMinutes,
+      resendAvailableInSeconds: issued.data.resendAvailableInSeconds,
+      emailDelivery: issued.data.emailDelivery,
+      emailOutboxId: issued.data.emailOutboxId,
+      ...(issued.data.demoOtp ? { demoOtp: issued.data.demoOtp } : {}),
     },
     error: null,
   };
@@ -436,75 +409,29 @@ export async function verifyOtp(input: {
   ensureSuperAdminSeeded();
 
   const email = sanitizeEmail(input.email);
-  const token = input.token.trim();
-  const rl = rateLimit(`otp-verify:${email}`, 10, 15 * 60_000);
-  if (!rl.allowed) {
-    return { success: false, data: null, error: "Too many verification attempts." };
+  const validated = await validateOtpToken({
+    email,
+    purpose: input.purpose,
+    token: input.token,
+    ctx: input.ctx,
+  });
+
+  if (!validated.ok) {
+    if (input.purpose === "login" && validated.reason === "invalid") {
+      await logActivity({
+        actorId: findUserByEmail(email)?.id ?? null,
+        action: ACTIVITY_ACTIONS.LOGIN_FAILED,
+        entityType: "otp",
+        entityId: validated.challenge?.id ?? null,
+        metadata: { email, purpose: input.purpose, reason: "invalid_code" },
+        ...input.ctx,
+      });
+    }
+    return { success: false, data: null, error: validated.error };
   }
 
-  const db = readAuthDb();
-  const challenge = db.otps.find((o) => o.email === email && o.purpose === input.purpose);
-
-  if (!challenge) {
-    return { success: false, data: null, error: "No active verification code. Request a new one." };
-  }
-
-  if (challenge.lockedUntil && new Date(challenge.lockedUntil).getTime() > Date.now()) {
-    return {
-      success: false,
-      data: null,
-      error: "Too many invalid attempts. Request a new code after the lockout period.",
-    };
-  }
-
-  if (new Date(challenge.expiresAt).getTime() <= Date.now()) {
-    writeAuthDb((d) => {
-      d.otps = d.otps.filter((o) => o.id !== challenge.id);
-    });
-    await logActivity({
-      actorId: null,
-      action: ACTIVITY_ACTIONS.OTP_FAILED,
-      entityType: "otp",
-      entityId: challenge.id,
-      metadata: { email, purpose: input.purpose, reason: "expired" },
-      ...input.ctx,
-    });
-    return { success: false, data: null, error: "Verification code expired. Request a new one." };
-  }
-
-  const maxAttempts = challenge.maxAttempts ?? 5;
-  if (challenge.attempts >= maxAttempts) {
-    writeAuthDb((d) => {
-      const o = d.otps.find((x) => x.id === challenge.id);
-      if (o) o.lockedUntil = addMinutes(15);
-    });
-    return { success: false, data: null, error: "Too many invalid attempts. Request a new code." };
-  }
-
-  const tokenValid =
-    input.purpose === "register"
-      ? matchRegistrationOtp(challenge.codeHash, token)
-      : constantTimeEqual(challenge.codeHash, hashValue(token));
-
-  if (!tokenValid) {
-    writeAuthDb((d) => {
-      const o = d.otps.find((x) => x.id === challenge.id);
-      if (o) {
-        o.attempts += 1;
-        if (o.attempts >= maxAttempts) o.lockedUntil = addMinutes(15);
-      }
-    });
-    await logActivity({
-      actorId: findUserByEmail(email)?.id ?? null,
-      action:
-        input.purpose === "login" ? ACTIVITY_ACTIONS.LOGIN_FAILED : ACTIVITY_ACTIONS.OTP_FAILED,
-      entityType: "otp",
-      entityId: challenge.id,
-      metadata: { email, purpose: input.purpose, reason: "invalid_code" },
-      ...input.ctx,
-    });
-    return { success: false, data: null, error: "Invalid verification code." };
-  }
+  const challenge = validated.challenge;
+  markOtpVerified(challenge.id);
 
   let user = findUserByEmail(email);
 
@@ -650,16 +577,24 @@ export async function verifyOtp(input: {
       d.otps.push({
         id: generateId(),
         email,
+        userId: user!.id,
         purpose: "reset_password",
         codeHash: hashValue(`reset:${generateToken(16)}`),
+        status: "verified",
         attempts: 0,
         maxAttempts: 5,
+        resendCount: 0,
         rememberMe: false,
         lockedUntil: null,
         resendAvailableAt: null,
         pendingRegistrationId: null,
         meta: { verified: true, resetToken: generateToken(24) },
+        ipAddress: input.ctx?.ipAddress ?? null,
+        userAgent: input.ctx?.userAgent ?? null,
+        deviceFingerprint: input.deviceFingerprint ?? null,
+        deviceLabel: input.deviceLabel ?? null,
         expiresAt: addMinutes(15),
+        verifiedAt: nowIso(),
         createdAt: nowIso(),
       });
     });

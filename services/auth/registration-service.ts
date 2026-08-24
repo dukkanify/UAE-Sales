@@ -4,16 +4,22 @@
  * security settings, and activity logs are created atomically.
  */
 
-import { getServerEnv } from "@/config/env";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { ROLE_DASHBOARD, ROLES, type Role } from "@/constants/roles";
-import { generateId, generateOtp, hashOtp, hashPassword, hashValue } from "@/lib/security/crypto";
+import { generateId, hashPassword } from "@/lib/security/crypto";
 import { rateLimit } from "@/lib/security/rate-limit";
 import type { ApiResponse, UserProfile } from "@/types";
 import { normalizePhone, sanitizeEmail, sanitizeString } from "@/utils/sanitize";
 import type { RegisterInput } from "@/utils/validation";
 import { logActivity } from "@/services/auth/activity-log";
+import {
+  demoOtpEnabled,
+  getOtpPolicy,
+  issueAndSendOtp,
+  matchOtpCode,
+  resendOtp,
+} from "@/services/auth/otp-service";
 import {
   defaultNotificationPreferences,
   defaultSecuritySettings,
@@ -33,7 +39,6 @@ import { dispatchRoleAlert, emailRegistrationWelcome } from "@/services/email/au
 import { sendEmail } from "@/services/email/mailer";
 import {
   accountCreatedEmailTemplate,
-  otpEmailTemplate,
   verificationSuccessEmailTemplate,
 } from "@/services/settings/email-templates";
 import { getPlatformSettings } from "@/services/settings/settings-service";
@@ -45,44 +50,14 @@ export interface RegistrationRequestContext {
   deviceLabel?: string | null;
 }
 
-const OTP_MAX_ATTEMPTS = 5;
-const OTP_RESEND_COOLDOWN_SECONDS = 60;
 const PENDING_REGISTRATION_HOURS = 2;
 
 function nowIso(): string {
   return new Date().toISOString();
 }
 
-function addMinutes(minutes: number): string {
-  return new Date(Date.now() + minutes * 60_000).toISOString();
-}
-
-function addSeconds(seconds: number): string {
-  return new Date(Date.now() + seconds * 1000).toISOString();
-}
-
 function addHours(hours: number): string {
   return new Date(Date.now() + hours * 3_600_000).toISOString();
-}
-
-function demoOtpEnabled(): boolean {
-  const env = getServerEnv();
-  if (!env.ENABLE_DEMO_OTP) return false;
-  if (process.env.NODE_ENV !== "production") return true;
-  if (process.env.FORCE_DEMO_OTP === "true") return true;
-  return process.env.NEXT_PUBLIC_APP_ENV !== "production";
-}
-
-function otpSecret(): string {
-  return getServerEnv().AUTH_SECRET || "aep-dev-auth-secret-change-me";
-}
-
-function hashRegistrationOtp(code: string): string {
-  try {
-    return hashOtp(code, otpSecret());
-  } catch {
-    return hashValue(code);
-  }
 }
 
 function defaultAvatarDataUri(initials: string): string {
@@ -146,12 +121,9 @@ export async function startEnterpriseRegistration(
     };
   }
 
-  const env = getServerEnv();
   const { hash, salt } = hashPassword(input.password);
   const role: Role = input.role === ROLES.INSTRUCTOR ? ROLES.INSTRUCTOR : ROLES.STUDENT;
   const pendingId = generateId();
-  const code = demoOtpEnabled() ? env.DEMO_OTP_CODE : generateOtp(6);
-  const expiresInMinutes = env.AUTH_OTP_EXPIRY_MINUTES;
 
   const pending: PendingRegistration = {
     id: pendingId,
@@ -174,34 +146,11 @@ export async function startEnterpriseRegistration(
     createdAt: nowIso(),
   };
 
-  const challenge: OtpChallenge = {
-    id: generateId(),
-    email,
-    purpose: "register",
-    codeHash: hashRegistrationOtp(code),
-    attempts: 0,
-    maxAttempts: OTP_MAX_ATTEMPTS,
-    rememberMe: Boolean(input.rememberMe),
-    lockedUntil: null,
-    resendAvailableAt: addSeconds(OTP_RESEND_COOLDOWN_SECONDS),
-    pendingRegistrationId: pendingId,
-    meta: {
-      firstName: pending.firstName,
-      lastName: pending.lastName,
-      role,
-      phone,
-    },
-    expiresAt: addMinutes(expiresInMinutes),
-    createdAt: nowIso(),
-  };
-
   writeAuthDb((db) => {
     db.pendingRegistrations = db.pendingRegistrations.filter(
       (p) => p.email.toLowerCase() !== email && new Date(p.expiresAt).getTime() > Date.now(),
     );
     db.pendingRegistrations.push(pending);
-    db.otps = db.otps.filter((o) => !(o.email === email && o.purpose === "register"));
-    db.otps.push(challenge);
   });
 
   await logActivity({
@@ -213,18 +162,23 @@ export async function startEnterpriseRegistration(
     ...ctx,
   });
 
-  const template = otpEmailTemplate(code, "create your account");
-  const mail = await sendEmail({
-    to: email,
-    subject: template.subject,
-    html: template.html,
-    text: template.text,
-    meta: { kind: "otp", purpose: "register", system: true },
+  const issued = await issueAndSendOtp({
+    email,
+    purpose: "register",
+    rememberMe: Boolean(input.rememberMe),
+    pendingRegistrationId: pendingId,
+    meta: {
+      firstName: pending.firstName,
+      lastName: pending.lastName,
+      role,
+      phone,
+    },
+    failClosed: true,
+    ctx,
   });
 
-  if (mail.mode === "failed") {
+  if (!issued.success || !issued.data) {
     writeAuthDb((db) => {
-      db.otps = db.otps.filter((o) => o.id !== challenge.id);
       db.pendingRegistrations = db.pendingRegistrations.filter((p) => p.id !== pendingId);
     });
     await logActivity({
@@ -238,27 +192,18 @@ export async function startEnterpriseRegistration(
     return {
       success: false,
       data: null,
-      error: "We could not send the verification email. Please try again in a moment.",
+      error: issued.error ?? "We could not send the verification email. Please try again.",
     };
   }
-
-  await logActivity({
-    actorId: null,
-    action: ACTIVITY_ACTIONS.OTP_SENT,
-    entityType: "otp",
-    entityId: challenge.id,
-    metadata: { email, purpose: "register", emailMode: mail.mode },
-    ...ctx,
-  });
 
   return {
     success: true,
     data: {
       email,
-      expiresInMinutes,
-      resendAvailableInSeconds: OTP_RESEND_COOLDOWN_SECONDS,
-      emailDelivery: mail.mode,
-      ...(demoOtpEnabled() ? { demoOtp: code } : {}),
+      expiresInMinutes: issued.data.expiresInMinutes,
+      resendAvailableInSeconds: issued.data.resendAvailableInSeconds,
+      emailDelivery: issued.data.emailDelivery,
+      ...(issued.data.demoOtp ? { demoOtp: issued.data.demoOtp } : {}),
     },
     error: null,
   };
@@ -276,15 +221,6 @@ export async function resendRegistrationOtp(
   }>
 > {
   const email = sanitizeEmail(emailRaw);
-  const rl = rateLimit(`otp-resend:${email}:register`, 5, 15 * 60_000);
-  if (!rl.allowed) {
-    return {
-      success: false,
-      data: null,
-      error: "Too many resend requests. Please try again later.",
-    };
-  }
-
   const pending = findPendingRegistrationByEmail(email);
   if (!pending) {
     return {
@@ -294,28 +230,10 @@ export async function resendRegistrationOtp(
     };
   }
 
-  const existing = readAuthDb().otps.find((o) => o.email === email && o.purpose === "register");
-  if (existing?.resendAvailableAt && new Date(existing.resendAvailableAt).getTime() > Date.now()) {
-    const wait = Math.ceil((new Date(existing.resendAvailableAt).getTime() - Date.now()) / 1000);
-    return {
-      success: false,
-      data: null,
-      error: `Please wait ${wait}s before requesting a new code.`,
-    };
-  }
-
-  const env = getServerEnv();
-  const code = demoOtpEnabled() ? env.DEMO_OTP_CODE : generateOtp(6);
-  const challenge: OtpChallenge = {
-    id: generateId(),
+  const issued = await resendOtp({
     email,
     purpose: "register",
-    codeHash: hashRegistrationOtp(code),
-    attempts: 0,
-    maxAttempts: OTP_MAX_ATTEMPTS,
     rememberMe: pending.rememberMe,
-    lockedUntil: null,
-    resendAvailableAt: addSeconds(OTP_RESEND_COOLDOWN_SECONDS),
     pendingRegistrationId: pending.id,
     meta: {
       firstName: pending.firstName,
@@ -323,58 +241,30 @@ export async function resendRegistrationOtp(
       role: pending.role,
       phone: pending.phone,
     },
-    expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
-    createdAt: nowIso(),
-  };
-
-  writeAuthDb((db) => {
-    db.otps = db.otps.filter((o) => !(o.email === email && o.purpose === "register"));
-    db.otps.push(challenge);
+    failClosed: true,
+    requireExisting: true,
+    ctx,
   });
 
-  const template = otpEmailTemplate(code, "create your account");
-  const mail = await sendEmail({
-    to: email,
-    subject: template.subject,
-    html: template.html,
-    text: template.text,
-    meta: { kind: "otp", purpose: "register", system: true },
-  });
-
-  if (mail.mode === "failed") {
-    return {
-      success: false,
-      data: null,
-      error: "We could not send the verification email. Please try again.",
-    };
+  if (!issued.success || !issued.data) {
+    return { success: false, data: null, error: issued.error };
   }
-
-  await logActivity({
-    actorId: null,
-    action: ACTIVITY_ACTIONS.OTP_RESENT,
-    entityType: "otp",
-    entityId: challenge.id,
-    metadata: { email, purpose: "register" },
-    ...ctx,
-  });
 
   return {
     success: true,
     data: {
       email,
-      expiresInMinutes: env.AUTH_OTP_EXPIRY_MINUTES,
-      resendAvailableInSeconds: OTP_RESEND_COOLDOWN_SECONDS,
-      ...(demoOtpEnabled() ? { demoOtp: code } : {}),
+      expiresInMinutes: issued.data.expiresInMinutes,
+      resendAvailableInSeconds: issued.data.resendAvailableInSeconds,
+      ...(issued.data.demoOtp ? { demoOtp: issued.data.demoOtp } : {}),
     },
     error: null,
   };
 }
 
+/** @deprecated Prefer matchOtpCode from otp-service — kept for test compatibility. */
 export function matchRegistrationOtp(codeHash: string, token: string): boolean {
-  const hashed = hashRegistrationOtp(token);
-  if (hashed === codeHash) return true;
-  // Backward-compatible: older challenges may use plain SHA-256.
-  return hashValue(token) === codeHash;
+  return matchOtpCode(codeHash, token);
 }
 
 export async function finalizeEnterpriseRegistration(input: {
@@ -459,7 +349,6 @@ export async function finalizeEnterpriseRegistration(input: {
   const prefs = defaultNotificationPreferences(created.id, pending.marketingConsent);
   const security = defaultSecuritySettings(created.id);
 
-  // Atomic commit — single write. On failure nothing partial is persisted.
   writeAuthDb((db) => {
     if (
       db.users.some(
@@ -595,4 +484,4 @@ export async function finalizeEnterpriseRegistration(input: {
   };
 }
 
-export { OTP_MAX_ATTEMPTS, OTP_RESEND_COOLDOWN_SECONDS, toUserProfile };
+export { demoOtpEnabled, getOtpPolicy, matchOtpCode, toUserProfile };

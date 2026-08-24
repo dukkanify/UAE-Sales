@@ -73,6 +73,10 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   },
   authentication: {
     otpExpirationMinutes: 10,
+    otpMaxAttempts: 5,
+    otpResendCooldownSeconds: 60,
+    otpMaxResends: 5,
+    otpLockoutMinutes: 15,
     passwordPolicyEnabled: true,
     minimumPasswordLength: 8,
     requireUppercase: true,

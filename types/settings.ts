@@ -100,6 +100,14 @@ export interface ZoomIntegrationSettings {
 
 export interface AuthenticationSettings {
   otpExpirationMinutes: number;
+  /** Max wrong OTP attempts before lockout (default 5). */
+  otpMaxAttempts: number;
+  /** Seconds before a new OTP can be resent (default 60). */
+  otpResendCooldownSeconds: number;
+  /** Max resends per challenge window (default 5). */
+  otpMaxResends: number;
+  /** Minutes to lock verification after max failed attempts (default 15). */
+  otpLockoutMinutes: number;
   passwordPolicyEnabled: boolean;
   minimumPasswordLength: number;
   requireUppercase: boolean;
