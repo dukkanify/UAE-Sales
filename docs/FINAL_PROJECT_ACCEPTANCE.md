@@ -1,7 +1,7 @@
 # Final project acceptance — Task 023
 
 **Product:** ATPL PASS  
-**Formal acceptance of project delivery and operational handover.**
+**Note (Task 025):** For **Version 1.0 GA** signatures, use `docs/CLIENT_ACCEPTANCE_025.md`. This Task 023 form remains for historical handover records.
 
 ## Acceptance checklist
 
