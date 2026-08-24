@@ -6,10 +6,12 @@ export {
   listMyBookings,
   listAllBookings,
   listBookableInstructors,
+  listBookableInstructorsForSession,
   updateBookingStatus,
   getBookingJoinInfo,
   ensureBookingZoom,
   getPublicBookingCatalog,
   createGuestBookingHold,
   finalizeGuestBooking,
+  confirmBookingPayment,
 } from "@/services/bookings/booking-service";

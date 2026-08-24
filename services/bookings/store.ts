@@ -34,25 +34,70 @@ export function defaultBookingSettings(): BookingSettings {
     instructorIds: [],
     sessionTypes: [
       {
+        id: "st_coaching",
+        name: "Private Coaching",
+        description: "One-to-one theory coaching tailored to your progress.",
+        durationMinutes: 60,
+        active: true,
+        priceAmountMinor: 25000,
+        currency: "KWD",
+        paymentRequired: true,
+        instructorIds: [],
+      },
+      {
+        id: "st_mock_exam",
+        name: "Mock Exam",
+        description: "Simulated ATPL exam under real conditions with expert feedback.",
+        durationMinutes: 90,
+        active: true,
+        priceAmountMinor: 35000,
+        currency: "KWD",
+        paymentRequired: true,
+        instructorIds: [],
+      },
+      {
+        id: "st_interview",
+        name: "Interview Preparation",
+        description: "Airline and cadet interview coaching with structured practice.",
+        durationMinutes: 60,
+        active: true,
+        priceAmountMinor: 30000,
+        currency: "KWD",
+        paymentRequired: true,
+        instructorIds: [],
+      },
+      {
+        id: "st_oral",
+        name: "Oral Assessment",
+        description: "Oral exam readiness review with a certified instructor.",
+        durationMinutes: 45,
+        active: true,
+        priceAmountMinor: 20000,
+        currency: "KWD",
+        paymentRequired: true,
+        instructorIds: [],
+      },
+      {
         id: "st_mentoring",
-        name: "1:1 Mentoring",
-        description: "Personal coaching with an instructor.",
+        name: "One-to-One Mentoring",
+        description: "Personal mentoring for your aviation career path.",
         durationMinutes: 60,
         active: true,
+        priceAmountMinor: 0,
+        currency: "KWD",
+        paymentRequired: false,
+        instructorIds: [],
       },
       {
-        id: "st_exam_prep",
-        name: "Exam prep",
-        description: "Focused ATPL exam readiness session.",
-        durationMinutes: 60,
-        active: true,
-      },
-      {
-        id: "st_office_hours",
-        name: "Office hours",
-        description: "Quick Q&A and progress check-in.",
+        id: "st_consultation",
+        name: "Aviation Consultation",
+        description: "Expert consultation on training, licensing, or career decisions.",
         durationMinutes: 30,
         active: true,
+        priceAmountMinor: 15000,
+        currency: "KWD",
+        paymentRequired: true,
+        instructorIds: [],
       },
     ],
     blackoutDates: [],
@@ -79,6 +124,14 @@ function normalizeBookingSettings(raw: Partial<BookingSettings> | undefined): Bo
   if (!Array.isArray(merged.blackoutDates)) merged.blackoutDates = [];
   if (!Array.isArray(merged.sessionTypes) || merged.sessionTypes.length === 0) {
     merged.sessionTypes = defaultBookingSettings().sessionTypes;
+  } else {
+    merged.sessionTypes = merged.sessionTypes.map((t) => ({
+      ...t,
+      priceAmountMinor: typeof t.priceAmountMinor === "number" ? t.priceAmountMinor : 0,
+      currency: t.currency || "KWD",
+      paymentRequired: Boolean(t.paymentRequired),
+      instructorIds: Array.isArray(t.instructorIds) ? t.instructorIds : [],
+    }));
   }
   return merged;
 }

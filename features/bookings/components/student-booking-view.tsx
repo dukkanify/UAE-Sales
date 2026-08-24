@@ -124,8 +124,26 @@ function StudentBookingView() {
 
   const activeTypes = settings?.sessionTypes.filter((t) => t.active) ?? [];
   const selectedType = activeTypes.find((t) => t.id === sessionTypeId);
-  const selectedInstructor = instructors.find((i) => i.id === instructorId);
-  const upcoming = myBookings.filter((b) => b.status === "pending" || b.status === "confirmed");
+  const serviceInstructors = React.useMemo(() => {
+    if (!selectedType) return instructors;
+    if (!selectedType.instructorIds.length) return instructors;
+    const allow = new Set(selectedType.instructorIds);
+    const filtered = instructors.filter((i) => allow.has(i.id));
+    return filtered.length > 0 ? filtered : instructors;
+  }, [selectedType, instructors]);
+  const selectedInstructor = serviceInstructors.find((i) => i.id === instructorId);
+
+  React.useEffect(() => {
+    if (!selectedType) return;
+    setInstructorId((prev) => {
+      if (serviceInstructors.some((i) => i.id === prev)) return prev;
+      return serviceInstructors[0]?.id || "";
+    });
+  }, [sessionTypeId, selectedType, serviceInstructors]);
+
+  const upcoming = myBookings.filter(
+    (b) => b.status === "pending" || b.status === "pending_payment" || b.status === "confirmed",
+  );
 
   async function handleBook() {
     if (!selectedSlot) {
@@ -298,7 +316,7 @@ function StudentBookingView() {
                 <div className="mt-8 space-y-3">
                   <Label>Instructor</Label>
                   <div className="grid gap-2 sm:grid-cols-2">
-                    {instructors.map((i) => (
+                    {serviceInstructors.map((i) => (
                       <button
                         key={i.id}
                         type="button"
