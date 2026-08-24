@@ -24,7 +24,6 @@ function Header() {
   const [open, setOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const isHome = pathname === "/";
-  const isBook = pathname === routes.book || pathname.startsWith(`${routes.book}/`);
   const solid = !(isHome && !scrolled && !open);
 
   React.useEffect(() => {
@@ -49,12 +48,7 @@ function Header() {
     >
       <div className="container-app relative flex h-[4.5rem] items-center justify-between gap-3 sm:h-[4.85rem]">
         <div className="relative z-10 min-w-0 shrink-0">
-          <BrandLogo
-            variant="dark"
-            href={routes.home}
-            priority
-            className="[&_img]:h-11 [&_img]:max-w-[360px] sm:[&_img]:h-12"
-          />
+          <BrandLogo variant="text" href={routes.home} priority />
         </div>
 
         <nav
@@ -89,15 +83,15 @@ function Header() {
             className="h-10 rounded-xl px-3.5 text-white/70 hover:bg-white/10 hover:text-white"
             asChild
           >
-            <Link href={routes.login}>Enter</Link>
+            <Link href={routes.login}>Log in</Link>
           </Button>
           <Button
             variant="accent"
             className="hero-cta-primary h-10 rounded-xl px-4 shadow-[0_12px_28px_-16px_rgba(204,160,76,0.85)]"
             asChild
           >
-            <Link href={isBook ? routes.register : routes.book}>
-              {isBook ? "Join" : "Book live"}
+            <Link href={routes.courses}>
+              ATPL Program
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </Button>
@@ -149,11 +143,11 @@ function Header() {
                 className="border-white/20 bg-transparent text-white hover:bg-white/10"
                 asChild
               >
-                <Link href={routes.login}>Enter platform</Link>
+                <Link href={routes.login}>Log in</Link>
               </Button>
               <Button variant="accent" className="hero-cta-primary" asChild>
-                <Link href={isBook ? routes.register : routes.book}>
-                  {isBook ? "Join AviatorPass" : "Book live"}
+                <Link href={routes.courses}>
+                  ATPL Program
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </Button>
