@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Presentation } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Presentation } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
+import { REGISTRATION_COUNTRIES } from "@/constants/countries";
 import { registerSchema } from "@/utils/validation";
-import { sanitizeEmail, sanitizeString } from "@/utils/sanitize";
+import { normalizePhone, sanitizeEmail, sanitizeString } from "@/utils/sanitize";
 import { authFetch } from "@/features/auth/services/auth-api";
 import { routes } from "@/constants/routes";
 
@@ -35,6 +36,24 @@ const ROLE_COPY: Record<
   },
 };
 
+function passwordStrength(password: string): { score: number; label: string } {
+  let score = 0;
+  if (password.length >= 8) score += 1;
+  if (/[a-z]/.test(password)) score += 1;
+  if (/[A-Z]/.test(password)) score += 1;
+  if (/[0-9]/.test(password)) score += 1;
+  if (/[^A-Za-z0-9]/.test(password)) score += 1;
+  const labels = ["Too weak", "Weak", "Fair", "Good", "Strong", "Excellent"];
+  return { score, label: labels[score] ?? "Too weak" };
+}
+
+function fieldError(
+  issues: { path: (string | number)[]; message: string }[],
+  key: string,
+): string | undefined {
+  return issues.find((i) => i.path[0] === key)?.message;
+}
+
 function RegisterForm({
   role: initialRole = "student",
   onRoleChange,
@@ -47,14 +66,32 @@ function RegisterForm({
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [countryCode, setCountryCode] = React.useState("KW");
+  const [nationality, setNationality] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirm, setShowConfirm] = React.useState(false);
+  const [acceptTerms, setAcceptTerms] = React.useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = React.useState(false);
+  const [marketingConsent, setMarketingConsent] = React.useState(false);
   const [rememberMe, setRememberMe] = React.useState(false);
+  const [honeypot, setHoneypot] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const firstNameRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     setRole(initialRole);
   }, [initialRole]);
 
+  React.useEffect(() => {
+    firstNameRef.current?.focus();
+  }, []);
+
   const copy = ROLE_COPY[role];
+  const strength = passwordStrength(password);
 
   const selectRole = (next: RegisterRole) => {
     setRole(next);
@@ -63,38 +100,60 @@ function RegisterForm({
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const timezone =
+      typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC";
+
     const parsed = registerSchema.safeParse({
       email: sanitizeEmail(email),
       firstName: sanitizeString(firstName),
       lastName: sanitizeString(lastName),
+      phone: normalizePhone(phone),
+      countryCode,
+      nationality: sanitizeString(nationality),
+      password,
+      confirmPassword,
+      acceptTerms,
+      acceptPrivacy,
+      marketingConsent,
       rememberMe,
       role,
+      timezone,
+      language: "en",
+      website: honeypot,
     });
 
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0]?.message ?? "Invalid input");
+      const next: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const key = String(issue.path[0] ?? "form");
+        if (!next[key]) next[key] = issue.message;
+      }
+      setErrors(next);
+      toast.error(parsed.error.issues[0]?.message ?? "Please fix the highlighted fields");
       return;
     }
 
+    setErrors({});
     setPending(true);
     try {
-      const result = await authFetch<{ email: string; demoOtp?: string }>(
-        routes.api.auth.requestOtp,
-        {
-          method: "POST",
-          body: JSON.stringify({ ...parsed.data, purpose: "register" }),
-        },
-      );
+      const result = await authFetch<{
+        email: string;
+        demoOtp?: string;
+        resendAvailableInSeconds?: number;
+      }>(routes.api.auth.requestOtp, {
+        method: "POST",
+        body: JSON.stringify({ ...parsed.data, purpose: "register" }),
+      });
 
       if (!result.success) {
-        toast.error(result.error ?? "Unable to send OTP");
+        toast.error(result.error ?? "Unable to start registration");
         return;
       }
 
       if (result.data?.demoOtp) {
         toast.message(`Demo OTP: ${result.data.demoOtp}`);
       } else {
-        toast.success("Check your email for a one-time code");
+        toast.success("Check your email for a one-time verification code");
       }
 
       const params = new URLSearchParams({
@@ -109,7 +168,20 @@ function RegisterForm({
   };
 
   return (
-    <form onSubmit={onSubmit} className="space-y-5">
+    <form onSubmit={onSubmit} className="relative space-y-5" noValidate>
+      {/* Honeypot — hidden from users, bots often fill it */}
+      <div className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
       <fieldset className="space-y-2.5">
         <legend className="text-sm font-medium text-foreground">Account type</legend>
         <div
@@ -119,12 +191,7 @@ function RegisterForm({
         >
           {(
             [
-              {
-                id: "student" as const,
-                label: "Student",
-                sub: "Learner",
-                icon: GraduationCap,
-              },
+              { id: "student" as const, label: "Student", sub: "Learner", icon: GraduationCap },
               {
                 id: "instructor" as const,
                 label: "Instructor",
@@ -173,13 +240,20 @@ function RegisterForm({
         <div className="space-y-2">
           <Label htmlFor="firstName">First name</Label>
           <Input
+            ref={firstNameRef}
             id="firstName"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             autoComplete="given-name"
             placeholder="Alex"
+            aria-invalid={Boolean(errors.firstName)}
             required
           />
+          {errors.firstName ? (
+            <p className="text-xs text-destructive" role="alert">
+              {errors.firstName}
+            </p>
+          ) : null}
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last name</Label>
@@ -189,8 +263,14 @@ function RegisterForm({
             onChange={(e) => setLastName(e.target.value)}
             autoComplete="family-name"
             placeholder="Reed"
+            aria-invalid={Boolean(errors.lastName)}
             required
           />
+          {errors.lastName ? (
+            <p className="text-xs text-destructive" role="alert">
+              {errors.lastName}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -203,21 +283,222 @@ function RegisterForm({
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          aria-invalid={Boolean(errors.email)}
           required
         />
+        {errors.email ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.email}
+          </p>
+        ) : null}
       </div>
 
-      <label className="flex items-center gap-2.5 text-sm text-muted-foreground">
-        <Checkbox checked={rememberMe} onCheckedChange={(v) => setRememberMe(v === true)} />
-        Remember me on this device
-      </label>
+      <div className="space-y-2">
+        <Label htmlFor="phone">Phone number</Label>
+        <Input
+          id="phone"
+          type="tel"
+          autoComplete="tel"
+          placeholder="+965********"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          aria-invalid={Boolean(errors.phone)}
+          required
+        />
+        {errors.phone ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.phone}
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Use international format with country code.
+          </p>
+        )}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="countryCode">Country</Label>
+          <select
+            id="countryCode"
+            value={countryCode}
+            onChange={(e) => setCountryCode(e.target.value)}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            required
+          >
+            {REGISTRATION_COUNTRIES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          {errors.countryCode ? (
+            <p className="text-xs text-destructive" role="alert">
+              {errors.countryCode}
+            </p>
+          ) : null}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="nationality">Nationality</Label>
+          <Input
+            id="nationality"
+            value={nationality}
+            onChange={(e) => setNationality(e.target.value)}
+            autoComplete="country-name"
+            placeholder="Kuwaiti"
+            aria-invalid={Boolean(errors.nationality)}
+            required
+          />
+          {errors.nationality ? (
+            <p className="text-xs text-destructive" role="alert">
+              {errors.nationality}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <div className="relative">
+          <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={Boolean(errors.password)}
+            className="pr-10"
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        <div className="space-y-1.5" aria-live="polite">
+          <div className="flex gap-1">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "h-1.5 flex-1 rounded-full",
+                  i < strength.score ? "bg-accent" : "bg-muted",
+                )}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Strength: <span className="font-medium text-foreground">{strength.label}</span>
+          </p>
+        </div>
+        {errors.password ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.password}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">Confirm password</Label>
+        <div className="relative">
+          <Input
+            id="confirmPassword"
+            type={showConfirm ? "text" : "password"}
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            aria-invalid={Boolean(errors.confirmPassword)}
+            className="pr-10"
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
+            onClick={() => setShowConfirm((v) => !v)}
+            aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
+          >
+            {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
+        </div>
+        {errors.confirmPassword ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.confirmPassword}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="space-y-3 rounded-xl border border-border/60 bg-[rgb(18_36_51_/0.03)] p-3.5">
+        <label className="flex items-start gap-2.5 text-sm text-foreground">
+          <Checkbox
+            checked={acceptTerms}
+            onCheckedChange={(v) => setAcceptTerms(v === true)}
+            className="mt-0.5"
+            aria-invalid={Boolean(errors.acceptTerms)}
+          />
+          <span>
+            I accept the{" "}
+            <a
+              href="/legal/terms"
+              className="font-medium text-primary underline-offset-2 hover:underline"
+            >
+              Terms of Service
+            </a>
+          </span>
+        </label>
+        {errors.acceptTerms ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.acceptTerms}
+          </p>
+        ) : null}
+
+        <label className="flex items-start gap-2.5 text-sm text-foreground">
+          <Checkbox
+            checked={acceptPrivacy}
+            onCheckedChange={(v) => setAcceptPrivacy(v === true)}
+            className="mt-0.5"
+            aria-invalid={Boolean(errors.acceptPrivacy)}
+          />
+          <span>
+            I accept the{" "}
+            <a
+              href="/legal/privacy"
+              className="font-medium text-primary underline-offset-2 hover:underline"
+            >
+              Privacy Policy
+            </a>
+          </span>
+        </label>
+        {errors.acceptPrivacy ? (
+          <p className="text-xs text-destructive" role="alert">
+            {errors.acceptPrivacy}
+          </p>
+        ) : null}
+
+        <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+          <Checkbox
+            checked={marketingConsent}
+            onCheckedChange={(v) => setMarketingConsent(v === true)}
+            className="mt-0.5"
+          />
+          <span>Send me product updates and aviation training tips (optional)</span>
+        </label>
+
+        <label className="flex items-center gap-2.5 text-sm text-muted-foreground">
+          <Checkbox checked={rememberMe} onCheckedChange={(v) => setRememberMe(v === true)} />
+          Remember me on this device
+        </label>
+      </div>
 
       <Button type="submit" variant="accent" className="hero-cta-primary w-full" disabled={pending}>
-        {pending ? "Sending code..." : copy.cta}
+        {pending ? "Creating secure account..." : copy.cta}
       </Button>
     </form>
   );
 }
 
-export { RegisterForm, ROLE_COPY };
+export { RegisterForm, ROLE_COPY, fieldError, passwordStrength };
 export type { RegisterRole };

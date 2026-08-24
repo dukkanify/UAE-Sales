@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OtpInput } from "@/components/ui/otp-input";
 import { verifyOtpSchema } from "@/utils/validation";
 import { sanitizeEmail } from "@/utils/sanitize";
 import { authFetch } from "@/features/auth/services/auth-api";
@@ -18,15 +19,27 @@ import {
 } from "@/lib/security/device-fingerprint";
 import type { UserProfile } from "@/types";
 
+const RESEND_DEFAULT_SECONDS = 60;
+
 function VerifyOtpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { refresh, setUser } = useAuth();
-  const [email, setEmail] = React.useState(searchParams.get("email") ?? "");
+  const lockedEmail = sanitizeEmail(searchParams.get("email") ?? "");
+  const [email] = React.useState(lockedEmail);
   const [token, setToken] = React.useState("");
   const [pending, setPending] = React.useState(false);
+  const [resending, setResending] = React.useState(false);
+  const [resendIn, setResendIn] = React.useState(RESEND_DEFAULT_SECONDS);
+  const [demoHint, setDemoHint] = React.useState<string | null>(null);
   const purpose = (searchParams.get("purpose") ?? "login") as
     "login" | "register" | "reset_password" | "verify_email";
+
+  React.useEffect(() => {
+    if (resendIn <= 0) return;
+    const id = window.setInterval(() => setResendIn((s) => Math.max(0, s - 1)), 1000);
+    return () => window.clearInterval(id);
+  }, [resendIn]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,14 +85,42 @@ function VerifyOtpForm() {
       }
 
       setUser(result.data.user);
-      toast.success("Signed in successfully");
-      // Navigate with the verified identity first — refresh in the background so a
-      // lingering prior cookie cannot overwrite the new student/instructor session
-      // before the role dashboard loads.
+      toast.success(
+        purpose === "register" ? "Account verified — welcome aboard" : "Signed in successfully",
+      );
       router.replace(result.data.redirectTo);
       void refresh();
     } finally {
       setPending(false);
+    }
+  };
+
+  const onResend = async () => {
+    if (purpose !== "register" || resendIn > 0 || !email) return;
+    setResending(true);
+    try {
+      const result = await authFetch<{
+        demoOtp?: string;
+        resendAvailableInSeconds?: number;
+      }>(routes.api.auth.resendOtp, {
+        method: "POST",
+        body: JSON.stringify({ email, purpose: "register" }),
+      });
+      if (!result.success) {
+        toast.error(result.error ?? "Unable to resend code");
+        return;
+      }
+      setToken("");
+      setResendIn(result.data?.resendAvailableInSeconds ?? RESEND_DEFAULT_SECONDS);
+      if (result.data?.demoOtp) {
+        setDemoHint(result.data.demoOtp);
+        toast.message(`Demo OTP: ${result.data.demoOtp}`);
+      } else {
+        setDemoHint(null);
+        toast.success("A new verification code was sent");
+      }
+    } finally {
+      setResending(false);
     }
   };
 
@@ -92,30 +133,59 @@ function VerifyOtpForm() {
           type="email"
           autoComplete="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
+          readOnly
+          aria-readonly="true"
+          className="bg-muted/40"
         />
+        {!email ? (
+          <p className="text-xs text-destructive" role="alert">
+            Missing email. Please restart from the registration page.
+          </p>
+        ) : null}
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="token">One-time code</Label>
-        <Input
-          id="token"
-          type="text"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          placeholder="000000"
-          maxLength={6}
+        <OtpInput
           value={token}
-          onChange={(e) => setToken(e.target.value.replace(/\D/g, "").slice(0, 6))}
-          required
+          onChange={setToken}
+          disabled={pending || !email}
+          aria-label="One-time verification code"
         />
-        <p className="text-xs text-muted-foreground">
-          Demo mode uses code <span className="font-medium text-foreground">123456</span>
-        </p>
+        <input id="token" type="hidden" value={token} readOnly />
+        {demoHint ? (
+          <p className="text-xs text-muted-foreground">
+            Demo mode code: <span className="font-medium text-foreground">{demoHint}</span>
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Enter the 6-digit code sent to your email. Codes expire after a few minutes.
+          </p>
+        )}
       </div>
-      <Button type="submit" className="w-full" disabled={pending}>
+
+      <Button type="submit" className="w-full" disabled={pending || token.length !== 6 || !email}>
         {pending ? "Verifying..." : "Verify and continue"}
       </Button>
+
+      {purpose === "register" ? (
+        <div className="text-center text-sm text-muted-foreground">
+          {resendIn > 0 ? (
+            <p>
+              Resend available in <span className="font-medium text-foreground">{resendIn}s</span>
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void onResend()}
+              disabled={resending}
+              className="font-medium text-primary underline-offset-2 hover:underline disabled:opacity-60"
+            >
+              {resending ? "Sending..." : "Resend verification code"}
+            </button>
+          )}
+        </div>
+      ) : null}
     </form>
   );
 }

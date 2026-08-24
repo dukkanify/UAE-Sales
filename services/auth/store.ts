@@ -51,16 +51,65 @@ export interface OtpChallenge {
   purpose: "login" | "register" | "reset_password" | "verify_email" | "booking";
   codeHash: string;
   attempts: number;
+  maxAttempts: number;
   rememberMe: boolean;
+  lockedUntil: string | null;
+  resendAvailableAt: string | null;
+  pendingRegistrationId: string | null;
   meta: Record<string, unknown>;
   expiresAt: string;
   createdAt: string;
+}
+
+/** Pre-verification registration payload — account is not active until OTP succeeds. */
+export interface PendingRegistration {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  countryCode: string;
+  nationality: string;
+  passwordHash: string;
+  passwordSalt: string;
+  role: Role;
+  acceptTermsAt: string;
+  acceptPrivacyAt: string;
+  marketingConsent: boolean;
+  timezone: string;
+  language: string;
+  rememberMe: boolean;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface NotificationPreferences {
+  userId: string;
+  emailTransactional: boolean;
+  emailMarketing: boolean;
+  emailProductUpdates: boolean;
+  inAppEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserSecuritySettings {
+  userId: string;
+  twoFactorEnabled: boolean;
+  loginAlertsEnabled: boolean;
+  failedLoginCount: number;
+  lockedUntil: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface AuthDatabase {
   users: StoredUser[];
   sessions: SessionRecord[];
   otps: OtpChallenge[];
+  pendingRegistrations: PendingRegistration[];
+  notificationPreferences: NotificationPreferences[];
+  securitySettings: UserSecuritySettings[];
   notifications: NotificationRecord[];
   activityLogs: ActivityLogRecord[];
   auditLogs: AuditLogRecord[];
@@ -73,6 +122,9 @@ const emptyDb = (): AuthDatabase => ({
   users: [],
   sessions: [],
   otps: [],
+  pendingRegistrations: [],
+  notificationPreferences: [],
+  securitySettings: [],
   notifications: [],
   activityLogs: [],
   auditLogs: [],
@@ -86,12 +138,27 @@ function ensureStore(): AuthDatabase {
   } as AuthDatabase;
   parsed.users = (parsed.users ?? []).map(normalizeStoredUser);
   parsed.sessions = (parsed.sessions ?? []).map(normalizeSession);
-  parsed.otps = parsed.otps ?? [];
+  parsed.otps = (parsed.otps ?? []).map(normalizeOtp);
+  parsed.pendingRegistrations = parsed.pendingRegistrations ?? [];
+  parsed.notificationPreferences = parsed.notificationPreferences ?? [];
+  parsed.securitySettings = parsed.securitySettings ?? [];
   parsed.notifications = parsed.notifications ?? [];
   parsed.activityLogs = parsed.activityLogs ?? [];
   parsed.auditLogs = parsed.auditLogs ?? [];
   parsed.seeded = Boolean(parsed.seeded);
   return parsed;
+}
+
+/** Backfill fields added after early auth JSON snapshots. */
+function normalizeOtp(otp: OtpChallenge): OtpChallenge {
+  return {
+    ...otp,
+    maxAttempts: otp.maxAttempts ?? 5,
+    lockedUntil: otp.lockedUntil ?? null,
+    resendAvailableAt: otp.resendAvailableAt ?? null,
+    pendingRegistrationId: otp.pendingRegistrationId ?? null,
+    meta: otp.meta ?? {},
+  };
 }
 
 /** Backfill fields added after early auth JSON snapshots. */
@@ -193,7 +260,63 @@ export function findUserByEmail(email: string): StoredUser | null {
   return db.users.find((u) => u.email.toLowerCase() === email.toLowerCase()) ?? null;
 }
 
+export function findUserByPhone(phone: string): StoredUser | null {
+  const normalized = phone.replace(/\s+/g, "");
+  if (!normalized) return null;
+  const db = readAuthDb();
+  return (
+    db.users.find((u) => {
+      if (!u.phone) return false;
+      return u.phone.replace(/\s+/g, "") === normalized;
+    }) ?? null
+  );
+}
+
 export function findUserById(id: string): StoredUser | null {
   const db = readAuthDb();
   return db.users.find((u) => u.id === id) ?? null;
+}
+
+export function findPendingRegistrationByEmail(email: string): PendingRegistration | null {
+  const db = readAuthDb();
+  const now = Date.now();
+  return (
+    db.pendingRegistrations.find(
+      (p) => p.email.toLowerCase() === email.toLowerCase() && new Date(p.expiresAt).getTime() > now,
+    ) ?? null
+  );
+}
+
+export function findPendingRegistrationById(id: string): PendingRegistration | null {
+  const db = readAuthDb();
+  return db.pendingRegistrations.find((p) => p.id === id) ?? null;
+}
+
+export function defaultNotificationPreferences(
+  userId: string,
+  marketingConsent: boolean,
+): NotificationPreferences {
+  const ts = new Date().toISOString();
+  return {
+    userId,
+    emailTransactional: true,
+    emailMarketing: Boolean(marketingConsent),
+    emailProductUpdates: Boolean(marketingConsent),
+    inAppEnabled: true,
+    createdAt: ts,
+    updatedAt: ts,
+  };
+}
+
+export function defaultSecuritySettings(userId: string): UserSecuritySettings {
+  const ts = new Date().toISOString();
+  return {
+    userId,
+    twoFactorEnabled: false,
+    loginAlertsEnabled: true,
+    failedLoginCount: 0,
+    lockedUntil: null,
+    createdAt: ts,
+    updatedAt: ts,
+  };
 }

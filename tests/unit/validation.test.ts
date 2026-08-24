@@ -5,6 +5,7 @@ import {
   loginSchema,
   otpSchema,
   passwordSchema,
+  registerSchema,
   verifyOtpSchema,
 } from "@/utils/validation";
 
@@ -23,9 +24,47 @@ describe("validators", () => {
   });
 
   it("enforces password rules", () => {
-    expect(passwordSchema.parse("Secret12")).toBe("Secret12");
+    expect(passwordSchema.parse("Secret12!")).toBe("Secret12!");
+    expect(() => passwordSchema.parse("Secret12")).toThrow();
     expect(() => passwordSchema.parse("short1")).toThrow();
     expect(() => passwordSchema.parse("nodigits")).toThrow();
+  });
+
+  it("parses enterprise registration payload", () => {
+    const parsed = registerSchema.parse({
+      firstName: "Amira",
+      lastName: "Hassan",
+      email: "amira@eagerpilots.com",
+      phone: "+971501234567",
+      countryCode: "AE",
+      nationality: "Emirati",
+      password: "Secret12!",
+      confirmPassword: "Secret12!",
+      acceptTerms: true,
+      acceptPrivacy: true,
+      marketingConsent: false,
+      role: "student",
+    });
+    expect(parsed.email).toBe("amira@eagerpilots.com");
+    expect(parsed.phone).toBe("+971501234567");
+  });
+
+  it("rejects disposable email domains for registration", () => {
+    expect(() =>
+      registerSchema.parse({
+        firstName: "Amira",
+        lastName: "Hassan",
+        email: "temp@mailinator.com",
+        phone: "+971501234567",
+        countryCode: "AE",
+        nationality: "Emirati",
+        password: "Secret12!",
+        confirmPassword: "Secret12!",
+        acceptTerms: true,
+        acceptPrivacy: true,
+        role: "student",
+      }),
+    ).toThrow();
   });
 
   it("parses login and verify schemas", () => {

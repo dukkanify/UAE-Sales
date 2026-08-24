@@ -111,6 +111,27 @@ export function otpEmailTemplate(code: string, purpose: string) {
   });
 }
 
+export function verificationSuccessEmailTemplate(input: { firstName: string; role: string }) {
+  const name = input.firstName || "Aviator";
+  return renderBrandedEmail({
+    title: "Email verified — account ready",
+    preheader: `Welcome to AviatorPass, ${name}`,
+    bodyHtml: `<p>Hi ${name},</p>
+      <p>Your email is verified and your <strong>${input.role}</strong> account is ready.</p>
+      <p>Sign in anytime to continue your aviation training journey.</p>`,
+  });
+}
+
+export function accountCreatedEmailTemplate(input: { firstName: string }) {
+  const name = input.firstName || "Aviator";
+  return renderBrandedEmail({
+    title: "Your AviatorPass account was created",
+    preheader: "Profile, security settings, and preferences are ready",
+    bodyHtml: `<p>Hi ${name},</p>
+      <p>Your AviatorPass profile, notification preferences, and security defaults are in place.</p>
+      <p>Complete your profile to unlock the full student dashboard.</p>`,
+  });
+}
 export function testEmailTemplate() {
   return renderBrandedEmail({
     title: "Test email from AviatorPass",
