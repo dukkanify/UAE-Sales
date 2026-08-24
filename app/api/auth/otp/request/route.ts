@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 
 import { requestOtp } from "@/services/auth/auth-service";
+import { startEnterpriseRegistration } from "@/services/auth/registration-service";
 import { getRequestContext } from "@/services/auth/guards";
-import { ensureCsrfToken, validateCsrfHeader } from "@/lib/security/cookies";
+import { ensureCsrfToken } from "@/lib/security/cookies";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 import { loginSchema, registerSchema, forgotPasswordSchema } from "@/utils/validation";
+import { writeOpsLog } from "@/services/ops/logging-service";
 
 export async function POST(request: Request) {
   await ensureCsrfToken();
-
-  if (!(await validateCsrfHeader(request.headers.get("x-csrf-token")))) {
-    // Allow first request without CSRF during bootstrap; set cookie for subsequent
-    // Still require CSRF in production for state-changing auth after cookie exists
-  }
+  const blocked = await enforceMutatingApiSecurity(request);
+  if (blocked) return blocked;
 
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") {
@@ -38,6 +38,12 @@ export async function POST(request: Request) {
       rememberMe: parsed.data.rememberMe,
       ctx,
     });
+    writeOpsLog({
+      level: result.success ? "info" : "warn",
+      category: "security",
+      message: result.success ? "Login OTP requested" : `Login OTP failed: ${result.error}`,
+      path: "/api/auth/otp/request",
+    });
     return NextResponse.json(result, { status: result.success ? 200 : 400 });
   }
 
@@ -49,14 +55,14 @@ export async function POST(request: Request) {
         { status: 400 },
       );
     }
-    const result = await requestOtp({
-      email: parsed.data.email,
-      purpose: "register",
-      rememberMe: parsed.data.rememberMe,
-      firstName: parsed.data.firstName,
-      lastName: parsed.data.lastName,
-      role: parsed.data.role,
-      ctx,
+    const result = await startEnterpriseRegistration(parsed.data, ctx);
+    writeOpsLog({
+      level: result.success ? "info" : "warn",
+      category: "security",
+      message: result.success
+        ? "Registration OTP requested"
+        : `Registration failed: ${result.error}`,
+      path: "/api/auth/otp/request",
     });
     return NextResponse.json(result, { status: result.success ? 200 : 400 });
   }

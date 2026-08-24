@@ -49,13 +49,19 @@ const serverEnvSchema = z.object({
 });
 
 function parsePublicEnv() {
+  const emptyToUndef = (value: string | undefined) => {
+    if (value == null) return undefined;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  };
+
   const result = publicEnvSchema.safeParse({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
     NEXT_PUBLIC_APP_ENV: process.env.NEXT_PUBLIC_APP_ENV,
-    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_AUTH_REDIRECT_URL: process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL,
+    NEXT_PUBLIC_SUPABASE_URL: emptyToUndef(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: emptyToUndef(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
+    NEXT_PUBLIC_AUTH_REDIRECT_URL: emptyToUndef(process.env.NEXT_PUBLIC_AUTH_REDIRECT_URL),
     NEXT_PUBLIC_MAINTENANCE_MODE: process.env.NEXT_PUBLIC_MAINTENANCE_MODE,
     NEXT_PUBLIC_ENABLE_REALTIME: process.env.NEXT_PUBLIC_ENABLE_REALTIME,
     NEXT_PUBLIC_STORAGE_BUCKET: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
@@ -77,10 +83,16 @@ export function getServerEnv() {
     throw new Error("getServerEnv() must only be called on the server");
   }
 
+  const emptyToUndef = (value: string | undefined) => {
+    if (value == null) return undefined;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  };
+
   const result = serverEnvSchema.safeParse({
-    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
-    DATABASE_URL: process.env.DATABASE_URL,
-    DIRECT_URL: process.env.DIRECT_URL,
+    SUPABASE_SERVICE_ROLE_KEY: emptyToUndef(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    DATABASE_URL: emptyToUndef(process.env.DATABASE_URL),
+    DIRECT_URL: emptyToUndef(process.env.DIRECT_URL),
     AUTH_OTP_EXPIRY_MINUTES: process.env.AUTH_OTP_EXPIRY_MINUTES,
     AUTH_SECRET: process.env.AUTH_SECRET,
     AUTH_SESSION_DAYS: process.env.AUTH_SESSION_DAYS,
@@ -90,9 +102,9 @@ export function getServerEnv() {
     SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL,
     SUPER_ADMIN_FIRST_NAME: process.env.SUPER_ADMIN_FIRST_NAME,
     SUPER_ADMIN_LAST_NAME: process.env.SUPER_ADMIN_LAST_NAME,
-    ZOOM_ACCOUNT_ID: process.env.ZOOM_ACCOUNT_ID,
-    ZOOM_CLIENT_ID: process.env.ZOOM_CLIENT_ID,
-    ZOOM_CLIENT_SECRET: process.env.ZOOM_CLIENT_SECRET,
+    ZOOM_ACCOUNT_ID: emptyToUndef(process.env.ZOOM_ACCOUNT_ID),
+    ZOOM_CLIENT_ID: emptyToUndef(process.env.ZOOM_CLIENT_ID),
+    ZOOM_CLIENT_SECRET: emptyToUndef(process.env.ZOOM_CLIENT_SECRET),
   });
 
   if (!result.success) {

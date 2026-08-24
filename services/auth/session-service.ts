@@ -201,6 +201,37 @@ export async function revokeOtherUserSessions(input: {
   return count;
 }
 
+/** Logout everywhere — revoke every active session for the user. */
+export async function revokeAllUserSessions(input: {
+  userId: string;
+  actorId: string | null;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}): Promise<number> {
+  let count = 0;
+  writeAuthDb((db) => {
+    const now = nowIso();
+    for (const session of db.sessions) {
+      if (session.userId !== input.userId || session.revokedAt) continue;
+      session.revokedAt = now;
+      count += 1;
+    }
+  });
+  if (count > 0) {
+    await logActivity({
+      actorId: input.actorId,
+      action: ACTIVITY_ACTIONS.SESSION_REVOKED,
+      entityType: "session",
+      entityId: null,
+      metadata: { revokedAll: count },
+      ipAddress: input.ipAddress,
+      userAgent: input.userAgent,
+    });
+  }
+  await clearSessionCookies();
+  return count;
+}
+
 export function getContentProtectionConfig(input: {
   fullName: string | null;
   email: string;

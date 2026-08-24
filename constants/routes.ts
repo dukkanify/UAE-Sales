@@ -44,6 +44,7 @@ export const routes = {
       me: "/api/auth/me",
       logout: "/api/auth/logout",
       requestOtp: "/api/auth/otp/request",
+      resendOtp: "/api/auth/otp/resend",
       verifyOtp: "/api/auth/otp/verify",
       forgotPassword: "/api/auth/forgot-password",
       resetPassword: "/api/auth/reset-password",

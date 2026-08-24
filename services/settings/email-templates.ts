@@ -101,16 +101,44 @@ export function renderBrandedEmail(payload: EmailTemplatePayload): {
   return { subject: payload.title, html, text };
 }
 
-export function otpEmailTemplate(code: string, purpose: string) {
+export function otpEmailTemplate(
+  code: string,
+  purpose: string,
+  options?: { expiresInMinutes?: number },
+) {
+  const expiresInMinutes = options?.expiresInMinutes ?? 10;
   return renderBrandedEmail({
     title: "Your verification code",
-    preheader: `Your AviatorPass code is ${code}`,
+    preheader: `Use your AviatorPass code within ${expiresInMinutes} minutes`,
     bodyHtml: `<p>Use this one-time code to ${purpose}:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#143048;">${code}</p>
-      <p>This code expires shortly. If you did not request it, you can ignore this email.</p>`,
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;color:#143048;margin:24px 0;">${code}</p>
+      <p>This code expires in <strong>${expiresInMinutes} minutes</strong> and can only be used once.</p>
+      <p style="color:#64748b;font-size:13px;">If you did not request this code, you can ignore this email. Never share your code with anyone.</p>
+      <p style="color:#64748b;font-size:13px;margin-top:16px;">Need help? Contact support via the address in this email footer.</p>`,
   });
 }
 
+export function verificationSuccessEmailTemplate(input: { firstName: string; role: string }) {
+  const name = input.firstName || "Aviator";
+  return renderBrandedEmail({
+    title: "Email verified — account ready",
+    preheader: `Welcome to AviatorPass, ${name}`,
+    bodyHtml: `<p>Hi ${name},</p>
+      <p>Your email is verified and your <strong>${input.role}</strong> account is ready.</p>
+      <p>Sign in anytime to continue your aviation training journey.</p>`,
+  });
+}
+
+export function accountCreatedEmailTemplate(input: { firstName: string }) {
+  const name = input.firstName || "Aviator";
+  return renderBrandedEmail({
+    title: "Your AviatorPass account was created",
+    preheader: "Profile, security settings, and preferences are ready",
+    bodyHtml: `<p>Hi ${name},</p>
+      <p>Your AviatorPass profile, notification preferences, and security defaults are in place.</p>
+      <p>Complete your profile to unlock the full student dashboard.</p>`,
+  });
+}
 export function testEmailTemplate() {
   return renderBrandedEmail({
     title: "Test email from AviatorPass",

@@ -73,8 +73,10 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
     };
   }
 
-  // Respect global notification kill-switch except for explicit system/test meta.
-  const isSystem = Boolean(input.meta?.system || input.meta?.kind === "test");
+  // Respect global notification kill-switch except for auth OTP / system mail.
+  const isSystem = Boolean(
+    input.meta?.system || input.meta?.kind === "test" || input.meta?.kind === "otp",
+  );
   if (!settings.notifications.emailNotifications && !isSystem) {
     const record = recordOutboundEmail({
       to,
