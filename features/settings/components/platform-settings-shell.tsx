@@ -21,8 +21,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { authFetch } from "@/features/auth/services/auth-api";
-import { SETTINGS_CATEGORIES, type PlatformSettings, type SettingsCategory } from "@/types/settings";
+import { authFetch, ensureBrowserCsrf, csrfHeaders } from "@/features/auth/services/auth-api";
+import {
+  SETTINGS_CATEGORIES,
+  type PlatformSettings,
+  type SettingsCategory,
+} from "@/types/settings";
 import { cn } from "@/lib/utils";
 
 function Field({
@@ -98,19 +102,14 @@ function BrandUpload({
           if (!file) return;
           setUploading(true);
           try {
-            const csrf =
-              document.cookie.match(/(?:^|; )aep_csrf=([^;]*)/)?.[1] ??
-              (await (async () => {
-                await fetch("/api/auth/me", { credentials: "include" });
-                return document.cookie.match(/(?:^|; )aep_csrf=([^;]*)/)?.[1];
-              })());
+            await ensureBrowserCsrf();
             const form = new FormData();
             form.append("file", file);
             form.append("key", brandKey);
             const res = await fetch("/api/admin/settings/branding", {
               method: "POST",
               credentials: "include",
-              headers: csrf ? { "x-csrf-token": decodeURIComponent(csrf) } : undefined,
+              headers: csrfHeaders(),
               body: form,
             });
             const json = (await res.json()) as {
@@ -231,7 +230,11 @@ function PlatformSettingsShell() {
         actions={
           <div className="flex items-center gap-2">
             {dirty ? <Badge variant="warning">Unsaved changes</Badge> : null}
-            <Button variant="outline" onClick={() => setDraft(structuredClone(settings))} disabled={!dirty || saving}>
+            <Button
+              variant="outline"
+              onClick={() => setDraft(structuredClone(settings))}
+              disabled={!dirty || saving}
+            >
               Discard
             </Button>
             <Button onClick={() => void save()} disabled={!dirty || saving}>
@@ -278,7 +281,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.platformName}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, platformName: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, platformName: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -286,7 +292,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.companyName}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, companyName: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, companyName: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -294,7 +303,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.websiteUrl}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, websiteUrl: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, websiteUrl: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -303,7 +315,10 @@ function PlatformSettingsShell() {
                   type="email"
                   value={draft.general.contactEmail}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, contactEmail: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, contactEmail: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -312,7 +327,10 @@ function PlatformSettingsShell() {
                   type="email"
                   value={draft.general.supportEmail}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, supportEmail: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, supportEmail: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -320,7 +338,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.contactPhone}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, contactPhone: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, contactPhone: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -361,7 +382,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.socialHandle}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, socialHandle: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, socialHandle: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -392,7 +416,10 @@ function PlatformSettingsShell() {
                 <Input
                   value={draft.general.dateFormat}
                   onChange={(e) =>
-                    setDraft({ ...draft, general: { ...draft.general, dateFormat: e.target.value } })
+                    setDraft({
+                      ...draft,
+                      general: { ...draft.general, dateFormat: e.target.value },
+                    })
                   }
                 />
               </Field>
@@ -401,7 +428,10 @@ function PlatformSettingsShell() {
                   <Textarea
                     value={draft.general.footerText}
                     onChange={(e) =>
-                      setDraft({ ...draft, general: { ...draft.general, footerText: e.target.value } })
+                      setDraft({
+                        ...draft,
+                        general: { ...draft.general, footerText: e.target.value },
+                      })
                     }
                   />
                 </Field>
@@ -425,7 +455,8 @@ function PlatformSettingsShell() {
             <CardHeader>
               <CardTitle>Branding</CardTitle>
               <CardDescription>
-                Official logo paths and interim colors. Brand guidelines from the client are still pending.
+                Official logo paths and interim colors. Brand guidelines from the client are still
+                pending.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -574,7 +605,9 @@ function PlatformSettingsShell() {
             <CardHeader className="flex flex-row items-start justify-between gap-4">
               <div>
                 <CardTitle>Email configuration</CardTitle>
-                <CardDescription>SMTP and future providers (SendGrid, Mailgun, SES).</CardDescription>
+                <CardDescription>
+                  SMTP and future providers (SendGrid, Mailgun, SES).
+                </CardDescription>
               </div>
               <Button
                 variant="outline"
@@ -599,7 +632,10 @@ function PlatformSettingsShell() {
                   onValueChange={(v) =>
                     setDraft({
                       ...draft,
-                      email: { ...draft.email, provider: v as PlatformSettings["email"]["provider"] },
+                      email: {
+                        ...draft.email,
+                        provider: v as PlatformSettings["email"]["provider"],
+                      },
                     })
                   }
                 >
@@ -1294,9 +1330,7 @@ function PlatformSettingsShell() {
                 label="Enable Zoom automation"
                 description="When credentials are missing, the platform uses secure mock meetings."
                 checked={draft.zoom.enabled}
-                onCheckedChange={(v) =>
-                  setDraft({ ...draft, zoom: { ...draft.zoom, enabled: v } })
-                }
+                onCheckedChange={(v) => setDraft({ ...draft, zoom: { ...draft.zoom, enabled: v } })}
               />
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Host account email">
@@ -1348,7 +1382,8 @@ function PlatformSettingsShell() {
                 }
               />
               <p className="text-xs text-muted-foreground">
-                Credentials configured: {draft.zoom.credentialsConfigured ? "Yes" : "No (mock mode)"}
+                Credentials configured:{" "}
+                {draft.zoom.credentialsConfigured ? "Yes" : "No (mock mode)"}
               </p>
             </CardContent>
           </Card>

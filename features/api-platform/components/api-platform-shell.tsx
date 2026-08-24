@@ -9,18 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { authFetch } from "@/features/auth/services/auth-api";
-
-function csrfHeaders(): HeadersInit {
-  const csrf = document.cookie
-    .split("; ")
-    .find((c) => c.startsWith("aep_csrf="))
-    ?.split("=")[1];
-  return {
-    "Content-Type": "application/json",
-    ...(csrf ? { "x-csrf-token": decodeURIComponent(csrf) } : {}),
-  };
-}
+import { authFetch, csrfHeaders } from "@/features/auth/services/auth-api";
 
 export function ApiPlatformShell() {
   const [keys, setKeys] = React.useState<Array<Record<string, unknown>>>([]);
@@ -57,7 +46,7 @@ export function ApiPlatformShell() {
     const res = await fetch(path, {
       method: "POST",
       credentials: "include",
-      headers: csrfHeaders(),
+      headers: { "Content-Type": "application/json", ...csrfHeaders() },
       body: JSON.stringify(body),
     });
     const json = (await res.json()) as {
@@ -67,9 +56,7 @@ export function ApiPlatformShell() {
     };
     if (!json.success) {
       const msg =
-        typeof json.error === "string"
-          ? json.error
-          : json.error?.message || "Request failed";
+        typeof json.error === "string" ? json.error : json.error?.message || "Request failed";
       setError(msg);
     } else if (json.data?.secret) {
       setSecretOnce(String(json.data.secret));
@@ -154,7 +141,9 @@ export function ApiPlatformShell() {
               <CardTitle className="flex items-center gap-2 text-base">
                 <KeyRound className="h-4 w-4" /> API keys
               </CardTitle>
-              <CardDescription>Hashed at rest · scopes · rate limits · IP allowlists</CardDescription>
+              <CardDescription>
+                Hashed at rest · scopes · rate limits · IP allowlists
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex flex-col gap-2 sm:flex-row">
@@ -190,7 +179,11 @@ export function ApiPlatformShell() {
                       variant="outline"
                       disabled={busy}
                       onClick={() =>
-                        void post("/api/v1/platform/keys", { action: "revoke", id: k.id, name: k.name })
+                        void post("/api/v1/platform/keys", {
+                          action: "revoke",
+                          id: k.id,
+                          name: k.name,
+                        })
                       }
                     >
                       Revoke
@@ -262,7 +255,10 @@ export function ApiPlatformShell() {
             </CardHeader>
             <CardContent className="space-y-2">
               {integrations.map((i) => (
-                <div key={String(i.id)} className="flex items-center justify-between rounded-md border p-3 text-sm">
+                <div
+                  key={String(i.id)}
+                  className="flex items-center justify-between rounded-md border p-3 text-sm"
+                >
                   <div>
                     <p className="font-medium">{String(i.label)}</p>
                     <p className="text-xs text-muted-foreground">{String(i.notes)}</p>

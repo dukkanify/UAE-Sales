@@ -10,12 +10,15 @@ import {
   listQuizzes,
 } from "@/services/quizzes/quiz-service";
 import { quizErrorResponse } from "@/app/api/quizzes/_utils";
+import { parsePagination } from "@/lib/api/envelope";
 
 export async function GET(request: Request) {
   try {
     ensureQuizzesSeeded();
     const user = await requireAuth();
-    const { searchParams } = new URL(request.url);
+    const url = new URL(request.url);
+    const { searchParams } = url;
+    const p = parsePagination(url);
 
     if (user.role === ROLES.STUDENT) {
       await requirePermission(PERMISSIONS.QUIZZES_OWN);
@@ -28,11 +31,11 @@ export async function GET(request: Request) {
 
     await requirePermission(PERMISSIONS.QUIZZES_MANAGE);
     const data = listQuizzes({
-      q: searchParams.get("q") ?? undefined,
+      q: p.q,
       status: (searchParams.get("status") as "draft" | "published" | "archived" | "all") ?? "all",
       courseId: searchParams.get("courseId") ?? undefined,
-      page: Number(searchParams.get("page") ?? 1),
-      pageSize: Number(searchParams.get("pageSize") ?? 20),
+      page: p.page,
+      pageSize: p.pageSize,
     });
     return NextResponse.json({ success: true, data, error: null });
   } catch (error) {
@@ -60,8 +63,7 @@ export async function POST(request: Request) {
       lessonId: (body.lessonId as string | null) ?? null,
       passingScore: body.passingScore != null ? Number(body.passingScore) : undefined,
       totalMarks: body.totalMarks != null ? Number(body.totalMarks) : undefined,
-      timeLimitMinutes:
-        body.timeLimitMinutes != null ? Number(body.timeLimitMinutes) : undefined,
+      timeLimitMinutes: body.timeLimitMinutes != null ? Number(body.timeLimitMinutes) : undefined,
       maxAttempts: body.maxAttempts != null ? Number(body.maxAttempts) : undefined,
       instructions: body.instructions ? String(body.instructions) : undefined,
     });

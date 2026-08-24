@@ -35,14 +35,16 @@ Suggested live session: **~90 minutes**. Pair with hands-on walkthrough on stagi
 
 ## Training materials (self-serve)
 
-| Audience           | Doc                                                   |
-| ------------------ | ----------------------------------------------------- |
-| Students           | `docs/STUDENT_GUIDE.md`                               |
-| Instructors        | `docs/INSTRUCTOR_GUIDE.md`                            |
-| Admins / operators | `docs/ADMINISTRATOR_GUIDE.md`, `docs/ADMIN_MANUAL.md` |
-| Ops / SLA          | `docs/OPS_SUPPORT.md`, `docs/SUPPORT.md`              |
-| Security incidents | `docs/SECURITY.md`                                    |
-| DR                 | `docs/BACKUP_DISASTER_RECOVERY.md`                    |
+| Audience           | Doc                                                       |
+| ------------------ | --------------------------------------------------------- |
+| Students           | `docs/STUDENT_GUIDE.md`                                   |
+| Instructors        | `docs/INSTRUCTOR_GUIDE.md`, `docs/INSTRUCTOR_TRAINING.md` |
+| Admins / operators | `docs/ADMINISTRATOR_GUIDE.md`, `docs/ADMIN_MANUAL.md`     |
+| Support team       | `docs/SUPPORT_TRAINING.md`, `docs/SUPPORT.md`             |
+| Ops / SLA          | `docs/OPS_SUPPORT.md`, `docs/POST_LAUNCH_SUPPORT.md`      |
+| Security incidents | `docs/SECURITY.md`                                        |
+| DR                 | `docs/BACKUP_DISASTER_RECOVERY.md`                        |
+| Full index         | `docs/DOCUMENTATION_INDEX.md`                             |
 
 ## Demo accounts (non-production only)
 

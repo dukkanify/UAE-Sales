@@ -1,13 +1,7 @@
 export { StatCard } from "./stat-card";
-export {
-  ChartCard,
-  AreaTrendChart,
-  LineTrendChart,
-  BarsChart,
-  DonutChart,
-  CHART_COLORS,
-} from "./charts";
-export type { SeriesPoint } from "./charts";
+export { ChartCard, AreaTrendChart, LineTrendChart, BarsChart, DonutChart } from "./lazy-charts";
+export { CHART_COLORS } from "./charts";
+export type { SeriesPoint } from "./chart-types";
 export { QuickActions } from "./quick-actions";
 export type { QuickAction } from "./quick-actions";
 export { RecentActivity } from "./recent-activity";

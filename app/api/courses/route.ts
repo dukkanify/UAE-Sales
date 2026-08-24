@@ -11,14 +11,17 @@ import {
 import { assertPermission, PermissionError } from "@/services/auth/permissions";
 import { createCourse, listCourses } from "@/services/courses/course-service";
 import { courseErrorResponse } from "@/app/api/courses/_utils";
+import { parsePagination } from "@/lib/api/envelope";
 import type { CourseFilters, CourseStatus, DifficultyLevel, EnrollmentMode } from "@/types/courses";
 
 export async function GET(request: Request) {
   try {
     const user = await requireAuth();
-    const { searchParams } = new URL(request.url);
+    const url = new URL(request.url);
+    const { searchParams } = url;
+    const p = parsePagination(url, { pageSize: 12 });
     const filters: CourseFilters = {
-      q: searchParams.get("q") ?? undefined,
+      q: p.q,
       instructorId: searchParams.get("instructorId") ?? undefined,
       categoryId: searchParams.get("categoryId") ?? undefined,
       status: (searchParams.get("status") as CourseStatus | "all" | null) ?? "all",
@@ -28,10 +31,10 @@ export async function GET(request: Request) {
       code: searchParams.get("code") ?? undefined,
       publishedFrom: searchParams.get("publishedFrom") ?? undefined,
       publishedTo: searchParams.get("publishedTo") ?? undefined,
-      page: Number(searchParams.get("page") ?? 1),
-      pageSize: Number(searchParams.get("pageSize") ?? 12),
-      sortBy: (searchParams.get("sortBy") as CourseFilters["sortBy"]) ?? "updatedAt",
-      sortDir: (searchParams.get("sortDir") as "asc" | "desc") ?? "desc",
+      page: p.page,
+      pageSize: p.pageSize,
+      sortBy: (p.sortBy as CourseFilters["sortBy"]) ?? "updatedAt",
+      sortDir: p.sortDir,
     };
 
     // Admins manage the full catalog; instructors only list courses they own.
@@ -74,9 +77,7 @@ export async function POST(request: Request) {
       difficulty: body.difficulty != null ? String(body.difficulty) : undefined,
       language: body.language != null ? String(body.language) : undefined,
       estimatedDurationMinutes:
-        body.estimatedDurationMinutes != null
-          ? Number(body.estimatedDurationMinutes)
-          : undefined,
+        body.estimatedDurationMinutes != null ? Number(body.estimatedDurationMinutes) : undefined,
       enrollmentMode: body.enrollmentMode != null ? String(body.enrollmentMode) : undefined,
       status: body.status != null ? String(body.status) : undefined,
       scheduledPublishAt: (body.scheduledPublishAt as string | null | undefined) ?? null,

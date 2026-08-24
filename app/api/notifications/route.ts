@@ -8,17 +8,22 @@ import {
 } from "@/services/notifications/notification-service";
 import { PERMISSIONS } from "@/constants/permissions";
 import { assertPermission } from "@/services/auth/permissions";
+import { parsePagination } from "@/lib/api/envelope";
 
 export async function GET(request: Request) {
   try {
     const user = await requireAuth();
     assertPermission(user, PERMISSIONS.NOTIFICATIONS_OWN);
 
-    const { searchParams } = new URL(request.url);
-    const page = Number(searchParams.get("page") ?? "1");
-    const unreadOnly = searchParams.get("unreadOnly") === "true";
+    const url = new URL(request.url);
+    const p = parsePagination(url);
+    const unreadOnly = url.searchParams.get("unreadOnly") === "true";
 
-    const result = listNotifications(user.id, { page, unreadOnly });
+    const result = listNotifications(user.id, {
+      page: p.page,
+      pageSize: p.pageSize,
+      unreadOnly,
+    });
     return NextResponse.json({ success: true, data: result, error: null });
   } catch (error) {
     return authErrorResponse(error);
