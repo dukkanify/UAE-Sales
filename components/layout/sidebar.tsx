@@ -7,15 +7,10 @@ import { LayoutDashboard, Settings, User, Plane } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { siteConfig } from "@/config/site";
 import { routes } from "@/constants/routes";
-import { DASHBOARD_NAV_ITEMS } from "@/constants/navigation";
+import { DASHBOARD_NAV_BY_ROLE } from "@/constants/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-
-const iconMap = {
-  LayoutDashboard,
-  User,
-  Settings,
-} as const;
+import { useAuth } from "@/providers/auth-provider";
 
 interface SidebarProps {
   className?: string;
@@ -23,6 +18,8 @@ interface SidebarProps {
 
 function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const items = user ? DASHBOARD_NAV_BY_ROLE[user.role] : [];
 
   return (
     <aside
@@ -45,12 +42,17 @@ function Sidebar({ className }: SidebarProps) {
 
       <ScrollArea className="flex-1 px-3 py-4">
         <nav className="space-y-1" aria-label="Dashboard">
-          {DASHBOARD_NAV_ITEMS.map((item) => {
-            const Icon = iconMap[item.icon as keyof typeof iconMap] ?? LayoutDashboard;
+          {items.map((item) => {
             const active =
               item.href === routes.dashboard
                 ? pathname === item.href
                 : pathname.startsWith(item.href);
+            const Icon =
+              item.label.toLowerCase().includes("profile")
+                ? User
+                : item.label.toLowerCase().includes("setting")
+                  ? Settings
+                  : LayoutDashboard;
 
             return (
               <Link

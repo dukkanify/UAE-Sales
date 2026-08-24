@@ -1,116 +1,641 @@
-import { isSupabaseConfigured } from "@/config/env";
-import type { LoginInput, RegisterInput, VerifyOtpInput } from "@/utils/validation";
-import type { ApiResponse } from "@/types";
+import { getServerEnv } from "@/config/env";
+import { ACCOUNT_STATUS, AUTHENTICATABLE_STATUSES } from "@/constants/account-status";
+import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
+import { getPermissionsForRole, ROLE_DASHBOARD, ROLES, type Role } from "@/constants/roles";
+import {
+  clearSessionCookies,
+  hashSessionToken,
+  readSessionCookie,
+  setSessionCookies,
+} from "@/lib/security/cookies";
+import {
+  constantTimeEqual,
+  generateId,
+  generateOtp,
+  generateToken,
+  hashPassword,
+  hashValue,
+  verifyPassword,
+} from "@/lib/security/crypto";
+import { rateLimit } from "@/lib/security/rate-limit";
+import type { ApiResponse, UserProfile } from "@/types";
+import { sanitizeEmail, sanitizeString } from "@/utils/sanitize";
+import {
+  findUserByEmail,
+  findUserById,
+  readAuthDb,
+  toUserProfile,
+  writeAuthDb,
+  type OtpChallenge,
+  type StoredUser,
+} from "@/services/auth/store";
+import { logActivity } from "@/services/auth/activity-log";
+import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 
-/**
- * Auth service layer — Email OTP via Supabase Auth.
- * Ready for wiring when Supabase credentials are configured.
- */
-
-export async function sendLoginOtp(input: LoginInput): Promise<ApiResponse<{ email: string }>> {
-  if (!isSupabaseConfigured()) {
-    return {
-      success: false,
-      data: null,
-      error: "Authentication is not configured. Set Supabase environment variables.",
-    };
-  }
-
-  const { createClient } = await import("@/lib/supabase/client");
-  const supabase = createClient();
-  if (!supabase) {
-    return { success: false, data: null, error: "Unable to initialize auth client." };
-  }
-
-  const { error } = await supabase.auth.signInWithOtp({
-    email: input.email,
-    options: { shouldCreateUser: false },
-  });
-
-  if (error) {
-    return { success: false, data: null, error: error.message };
-  }
-
-  return { success: true, data: { email: input.email }, error: null };
+export interface RequestContext {
+  ipAddress?: string | null;
+  userAgent?: string | null;
 }
 
-export async function sendRegisterOtp(
-  input: RegisterInput,
-): Promise<ApiResponse<{ email: string }>> {
-  if (!isSupabaseConfigured()) {
-    return {
-      success: false,
-      data: null,
-      error: "Authentication is not configured. Set Supabase environment variables.",
-    };
-  }
+function nowIso(): string {
+  return new Date().toISOString();
+}
 
-  const { createClient } = await import("@/lib/supabase/client");
-  const supabase = createClient();
-  if (!supabase) {
-    return { success: false, data: null, error: "Unable to initialize auth client." };
-  }
+function addMinutes(minutes: number): string {
+  return new Date(Date.now() + minutes * 60_000).toISOString();
+}
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email: input.email,
-    options: {
-      shouldCreateUser: true,
-      data: { full_name: input.fullName },
+function addDays(days: number): string {
+  return new Date(Date.now() + days * 86_400_000).toISOString();
+}
+
+function demoOtpEnabled(): boolean {
+  const env = getServerEnv();
+  return env.ENABLE_DEMO_OTP && process.env.NODE_ENV !== "production";
+}
+
+function createUser(partial: {
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  role?: Role;
+  status?: StoredUser["status"];
+}): StoredUser {
+  const ts = nowIso();
+  return {
+    id: generateId(),
+    email: sanitizeEmail(partial.email),
+    firstName: partial.firstName ?? null,
+    lastName: partial.lastName ?? null,
+    phone: null,
+    countryCode: null,
+    nationality: null,
+    avatarUrl: null,
+    timezone: "UTC",
+    language: "en",
+    role: partial.role ?? ROLES.STUDENT,
+    status: partial.status ?? ACCOUNT_STATUS.PENDING,
+    emailVerified: false,
+    profileComplete: false,
+    passwordHash: null,
+    passwordSalt: null,
+    lastLoginAt: null,
+    createdAt: ts,
+    updatedAt: ts,
+  };
+}
+
+async function issueSession(
+  user: StoredUser,
+  rememberMe: boolean,
+  ctx: RequestContext,
+): Promise<{ profile: UserProfile; expiresAt: string }> {
+  const env = getServerEnv();
+  const days = rememberMe ? env.AUTH_REMEMBER_ME_DAYS : env.AUTH_SESSION_DAYS;
+  const token = generateToken(32);
+  const sessionId = generateId();
+  const expiresAt = addDays(days);
+
+  writeAuthDb((db) => {
+    db.sessions.push({
+      id: sessionId,
+      userId: user.id,
+      tokenHash: hashSessionToken(token),
+      userAgent: ctx.userAgent ?? null,
+      ipAddress: ctx.ipAddress ?? null,
+      rememberMe,
+      expiresAt,
+      revokedAt: null,
+      createdAt: nowIso(),
+      lastActiveAt: nowIso(),
+    });
+
+    const target = db.users.find((u) => u.id === user.id);
+    if (target) {
+      target.lastLoginAt = nowIso();
+      target.updatedAt = nowIso();
+    }
+  });
+
+  const fresh = findUserById(user.id)!;
+  await setSessionCookies(
+    sessionId,
+    token,
+    {
+      userId: fresh.id,
+      role: fresh.role,
+      status: fresh.status,
+      profileComplete: fresh.profileComplete,
     },
-  });
+    days * 86_400,
+  );
 
-  if (error) {
-    return { success: false, data: null, error: error.message };
-  }
-
-  return { success: true, data: { email: input.email }, error: null };
+  return { profile: toUserProfile(fresh), expiresAt };
 }
 
-export async function verifyOtp(
-  input: VerifyOtpInput,
-): Promise<ApiResponse<{ verified: boolean }>> {
-  if (!isSupabaseConfigured()) {
+export async function getCurrentSession(): Promise<{
+  user: UserProfile | null;
+  permissions: ReturnType<typeof getPermissionsForRole>;
+}> {
+  ensureSuperAdminSeeded();
+
+  const parsed = await readSessionCookie();
+  if (!parsed) {
+    return { user: null, permissions: [] };
+  }
+
+  const db = readAuthDb();
+  const session = db.sessions.find((s) => s.id === parsed.payload.sid);
+  if (!session || session.revokedAt) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (new Date(session.expiresAt).getTime() <= Date.now()) {
+    writeAuthDb((d) => {
+      const s = d.sessions.find((x) => x.id === session.id);
+      if (s) s.revokedAt = nowIso();
+    });
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (session.tokenHash !== hashSessionToken(parsed.rawToken)) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (session.tokenHash !== parsed.payload.th) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  const user = findUserById(session.userId);
+  if (!user) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (user.status === ACCOUNT_STATUS.SUSPENDED || user.status === ACCOUNT_STATUS.INACTIVE) {
+    return { user: toUserProfile(user), permissions: [] };
+  }
+
+  writeAuthDb((d) => {
+    const s = d.sessions.find((x) => x.id === session.id);
+    if (s) s.lastActiveAt = nowIso();
+  });
+
+  return {
+    user: toUserProfile(user),
+    permissions: getPermissionsForRole(user.role),
+  };
+}
+
+export async function requestOtp(input: {
+  email: string;
+  purpose: OtpChallenge["purpose"];
+  rememberMe?: boolean;
+  firstName?: string;
+  lastName?: string;
+  ctx?: RequestContext;
+}): Promise<ApiResponse<{ email: string; demoOtp?: string; expiresInMinutes: number }>> {
+  ensureSuperAdminSeeded();
+
+  const email = sanitizeEmail(input.email);
+  const rl = rateLimit(`otp:${email}:${input.purpose}`, 5, 15 * 60_000);
+  if (!rl.allowed) {
+    return { success: false, data: null, error: "Too many OTP requests. Please try again later." };
+  }
+
+  const env = getServerEnv();
+  const existing = findUserByEmail(email);
+
+  if (input.purpose === "login" && !existing) {
+    return { success: false, data: null, error: "No account found for this email. Please register first." };
+  }
+
+  if (input.purpose === "register" && existing) {
+    return { success: false, data: null, error: "An account with this email already exists. Please sign in." };
+  }
+
+  if (existing && existing.status === ACCOUNT_STATUS.SUSPENDED) {
+    return { success: false, data: null, error: "This account has been suspended." };
+  }
+
+  if (existing && existing.status === ACCOUNT_STATUS.INACTIVE) {
+    return { success: false, data: null, error: "This account is inactive. Contact support." };
+  }
+
+  const code = demoOtpEnabled() ? env.DEMO_OTP_CODE : generateOtp(6);
+  const challenge: OtpChallenge = {
+    id: generateId(),
+    email,
+    purpose: input.purpose,
+    codeHash: hashValue(code),
+    attempts: 0,
+    rememberMe: Boolean(input.rememberMe),
+    meta: {
+      firstName: input.firstName ? sanitizeString(input.firstName) : null,
+      lastName: input.lastName ? sanitizeString(input.lastName) : null,
+    },
+    expiresAt: addMinutes(env.AUTH_OTP_EXPIRY_MINUTES),
+    createdAt: nowIso(),
+  };
+
+  writeAuthDb((db) => {
+    db.otps = db.otps.filter(
+      (o) => !(o.email === email && o.purpose === input.purpose),
+    );
+    db.otps.push(challenge);
+  });
+
+  if (input.purpose === "reset_password") {
+    await logActivity({
+      actorId: existing?.id ?? null,
+      action: ACTIVITY_ACTIONS.PASSWORD_RESET_REQUEST,
+      entityType: "user",
+      entityId: existing?.id ?? email,
+      metadata: { email },
+      ...input.ctx,
+    });
+  }
+
+  return {
+    success: true,
+    data: {
+      email,
+      expiresInMinutes: env.AUTH_OTP_EXPIRY_MINUTES,
+      ...(demoOtpEnabled() ? { demoOtp: code } : {}),
+    },
+    error: null,
+  };
+}
+
+export async function verifyOtp(input: {
+  email: string;
+  token: string;
+  purpose: OtpChallenge["purpose"];
+  ctx?: RequestContext;
+}): Promise<
+  ApiResponse<{
+    user: UserProfile;
+    redirectTo: string;
+    requiresProfile: boolean;
+  }>
+> {
+  ensureSuperAdminSeeded();
+
+  const email = sanitizeEmail(input.email);
+  const token = input.token.trim();
+  const rl = rateLimit(`otp-verify:${email}`, 10, 15 * 60_000);
+  if (!rl.allowed) {
+    return { success: false, data: null, error: "Too many verification attempts." };
+  }
+
+  const db = readAuthDb();
+  const challenge = db.otps.find(
+    (o) => o.email === email && o.purpose === input.purpose,
+  );
+
+  if (!challenge) {
+    return { success: false, data: null, error: "No active verification code. Request a new one." };
+  }
+
+  if (new Date(challenge.expiresAt).getTime() <= Date.now()) {
+    writeAuthDb((d) => {
+      d.otps = d.otps.filter((o) => o.id !== challenge.id);
+    });
+    return { success: false, data: null, error: "Verification code expired. Request a new one." };
+  }
+
+  if (challenge.attempts >= 5) {
+    return { success: false, data: null, error: "Too many invalid attempts. Request a new code." };
+  }
+
+  if (!constantTimeEqual(challenge.codeHash, hashValue(token))) {
+    writeAuthDb((d) => {
+      const o = d.otps.find((x) => x.id === challenge.id);
+      if (o) o.attempts += 1;
+    });
+    return { success: false, data: null, error: "Invalid verification code." };
+  }
+
+  let user = findUserByEmail(email);
+
+  if (input.purpose === "register") {
+    const created = createUser({
+      email,
+      firstName: (challenge.meta.firstName as string | null) ?? null,
+      lastName: (challenge.meta.lastName as string | null) ?? null,
+      role: ROLES.STUDENT,
+      status: ACCOUNT_STATUS.ACTIVE,
+    });
+    created.emailVerified = true;
+    created.profileComplete = Boolean(created.firstName && created.lastName);
+    if (created.profileComplete) {
+      created.status = ACCOUNT_STATUS.ACTIVE;
+    }
+    writeAuthDb((d) => {
+      d.users.push(created);
+      d.otps = d.otps.filter((o) => o.id !== challenge.id);
+    });
+    user = created;
+    await logActivity({
+      actorId: created.id,
+      action: ACTIVITY_ACTIONS.USER_CREATED,
+      entityType: "user",
+      entityId: created.id,
+      metadata: { email, role: created.role },
+      ...input.ctx,
+    });
+    await logActivity({
+      actorId: created.id,
+      action: ACTIVITY_ACTIONS.EMAIL_VERIFIED,
+      entityType: "user",
+      entityId: created.id,
+      ...input.ctx,
+    });
+  } else if (input.purpose === "login" || input.purpose === "verify_email") {
+    if (!user) {
+      return { success: false, data: null, error: "Account not found." };
+    }
+    if (!AUTHENTICATABLE_STATUSES.includes(user.status)) {
+      return { success: false, data: null, error: "Account cannot sign in in its current status." };
+    }
+    writeAuthDb((d) => {
+      const u = d.users.find((x) => x.id === user!.id);
+      if (u) {
+        u.emailVerified = true;
+        if (u.status === ACCOUNT_STATUS.PENDING) u.status = ACCOUNT_STATUS.ACTIVE;
+        u.updatedAt = nowIso();
+      }
+      d.otps = d.otps.filter((o) => o.id !== challenge.id);
+    });
+    user = findUserById(user.id)!;
+  } else if (input.purpose === "reset_password") {
+    // OTP verified — caller should proceed to set password with a short-lived reset token
+    if (!user) {
+      return { success: false, data: null, error: "Account not found." };
+    }
+    writeAuthDb((d) => {
+      d.otps = d.otps.filter((o) => o.id !== challenge.id);
+      // Create a follow-up reset challenge marked verified via meta
+      d.otps.push({
+        id: generateId(),
+        email,
+        purpose: "reset_password",
+        codeHash: hashValue(`reset:${generateToken(16)}`),
+        attempts: 0,
+        rememberMe: false,
+        meta: { verified: true, resetToken: generateToken(24) },
+        expiresAt: addMinutes(15),
+        createdAt: nowIso(),
+      });
+    });
+  }
+
+  if (!user) {
+    return { success: false, data: null, error: "Unable to complete verification." };
+  }
+
+  if (input.purpose === "reset_password") {
+    const resetChallenge = readAuthDb().otps.find(
+      (o) => o.email === email && o.purpose === "reset_password" && o.meta.verified,
+    );
     return {
-      success: false,
-      data: null,
-      error: "Authentication is not configured. Set Supabase environment variables.",
+      success: true,
+      data: {
+        user: toUserProfile(user),
+        redirectTo: `/reset-password?email=${encodeURIComponent(email)}&token=${resetChallenge?.meta.resetToken ?? ""}`,
+        requiresProfile: !user.profileComplete,
+      },
+      error: null,
     };
   }
 
-  const { createClient } = await import("@/lib/supabase/client");
-  const supabase = createClient();
-  if (!supabase) {
-    return { success: false, data: null, error: "Unable to initialize auth client." };
-  }
+  const { profile } = await issueSession(user, challenge.rememberMe, input.ctx ?? {});
 
-  const { error } = await supabase.auth.verifyOtp({
-    email: input.email,
-    token: input.token,
-    type: "email",
+  await logActivity({
+    actorId: profile.id,
+    action: ACTIVITY_ACTIONS.LOGIN,
+    entityType: "session",
+    entityId: profile.id,
+    metadata: { rememberMe: challenge.rememberMe },
+    ...input.ctx,
   });
 
-  if (error) {
-    return { success: false, data: null, error: error.message };
-  }
+  const redirectTo = profile.profileComplete
+    ? ROLE_DASHBOARD[profile.role]
+    : "/complete-profile";
 
-  return { success: true, data: { verified: true }, error: null };
+  return {
+    success: true,
+    data: {
+      user: profile,
+      redirectTo,
+      requiresProfile: !profile.profileComplete,
+    },
+    error: null,
+  };
 }
 
-export async function signOut(): Promise<ApiResponse<null>> {
-  if (!isSupabaseConfigured()) {
-    return { success: true, data: null, error: null };
+export async function resetPassword(input: {
+  email: string;
+  resetToken: string;
+  password: string;
+  ctx?: RequestContext;
+}): Promise<ApiResponse<{ email: string }>> {
+  const email = sanitizeEmail(input.email);
+  const db = readAuthDb();
+  const challenge = db.otps.find(
+    (o) =>
+      o.email === email &&
+      o.purpose === "reset_password" &&
+      o.meta.verified &&
+      o.meta.resetToken === input.resetToken,
+  );
+
+  if (!challenge || new Date(challenge.expiresAt).getTime() <= Date.now()) {
+    return { success: false, data: null, error: "Reset link expired. Request a new one." };
   }
 
-  const { createClient } = await import("@/lib/supabase/client");
-  const supabase = createClient();
-  if (!supabase) {
-    return { success: false, data: null, error: "Unable to initialize auth client." };
+  const user = findUserByEmail(email);
+  if (!user) {
+    return { success: false, data: null, error: "Account not found." };
   }
 
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    return { success: false, data: null, error: error.message };
+  const { hash, salt } = hashPassword(input.password);
+  writeAuthDb((d) => {
+    const u = d.users.find((x) => x.id === user.id);
+    if (u) {
+      u.passwordHash = hash;
+      u.passwordSalt = salt;
+      u.updatedAt = nowIso();
+    }
+    d.otps = d.otps.filter((o) => o.id !== challenge.id);
+    // Revoke all sessions
+    d.sessions.forEach((s) => {
+      if (s.userId === user.id && !s.revokedAt) s.revokedAt = nowIso();
+    });
+  });
+
+  await logActivity({
+    actorId: user.id,
+    action: ACTIVITY_ACTIONS.PASSWORD_RESET,
+    entityType: "user",
+    entityId: user.id,
+    ...input.ctx,
+  });
+
+  return { success: true, data: { email }, error: null };
+}
+
+export async function completeProfile(input: {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
+  countryCode?: string;
+  nationality?: string;
+  timezone?: string;
+  language?: string;
+  ctx?: RequestContext;
+}): Promise<ApiResponse<{ user: UserProfile; redirectTo: string }>> {
+  const user = findUserById(input.userId);
+  if (!user) {
+    return { success: false, data: null, error: "User not found." };
   }
 
+  writeAuthDb((d) => {
+    const u = d.users.find((x) => x.id === input.userId);
+    if (!u) return;
+    u.firstName = sanitizeString(input.firstName);
+    u.lastName = sanitizeString(input.lastName);
+    u.phone = input.phone ? sanitizeString(input.phone) : u.phone;
+    u.countryCode = input.countryCode ?? u.countryCode;
+    u.nationality = input.nationality ?? u.nationality;
+    u.timezone = input.timezone ?? u.timezone;
+    u.language = input.language ?? u.language;
+    u.profileComplete = Boolean(u.firstName && u.lastName);
+    u.status = ACCOUNT_STATUS.ACTIVE;
+    u.updatedAt = nowIso();
+  });
+
+  const profile = toUserProfile(findUserById(input.userId)!);
+
+  // Refresh JWT claims so middleware sees profileComplete
+  const parsed = await readSessionCookie();
+  if (parsed) {
+    const env = getServerEnv();
+    const days = env.AUTH_SESSION_DAYS;
+    await setSessionCookies(
+      parsed.payload.sid,
+      parsed.rawToken,
+      {
+        userId: profile.id,
+        role: profile.role,
+        status: profile.status,
+        profileComplete: profile.profileComplete,
+      },
+      days * 86_400,
+    );
+  }
+
+  await logActivity({
+    actorId: profile.id,
+    action: ACTIVITY_ACTIONS.PROFILE_COMPLETE,
+    entityType: "user",
+    entityId: profile.id,
+    ...input.ctx,
+  });
+
+  return {
+    success: true,
+    data: {
+      user: profile,
+      redirectTo: ROLE_DASHBOARD[profile.role],
+    },
+    error: null,
+  };
+}
+
+export async function updateProfile(
+  userId: string,
+  patch: Partial<{
+    firstName: string;
+    lastName: string;
+    phone: string;
+    countryCode: string;
+    nationality: string;
+    avatarUrl: string;
+    timezone: string;
+    language: string;
+  }>,
+  ctx?: RequestContext,
+): Promise<ApiResponse<{ user: UserProfile }>> {
+  const user = findUserById(userId);
+  if (!user) {
+    return { success: false, data: null, error: "User not found." };
+  }
+
+  writeAuthDb((d) => {
+    const u = d.users.find((x) => x.id === userId);
+    if (!u) return;
+    if (patch.firstName !== undefined) u.firstName = sanitizeString(patch.firstName);
+    if (patch.lastName !== undefined) u.lastName = sanitizeString(patch.lastName);
+    if (patch.phone !== undefined) u.phone = sanitizeString(patch.phone);
+    if (patch.countryCode !== undefined) u.countryCode = patch.countryCode;
+    if (patch.nationality !== undefined) u.nationality = patch.nationality;
+    if (patch.avatarUrl !== undefined) u.avatarUrl = patch.avatarUrl;
+    if (patch.timezone !== undefined) u.timezone = patch.timezone;
+    if (patch.language !== undefined) u.language = patch.language;
+    u.profileComplete = Boolean(u.firstName && u.lastName);
+    u.updatedAt = nowIso();
+  });
+
+  await logActivity({
+    actorId: userId,
+    action: ACTIVITY_ACTIONS.PROFILE_UPDATE,
+    entityType: "user",
+    entityId: userId,
+    metadata: { fields: Object.keys(patch) },
+    ...ctx,
+  });
+
+  return {
+    success: true,
+    data: { user: toUserProfile(findUserById(userId)!) },
+    error: null,
+  };
+}
+
+export async function signOut(ctx?: RequestContext): Promise<ApiResponse<null>> {
+  const parsed = await readSessionCookie();
+  if (parsed) {
+    const db = readAuthDb();
+    const session = db.sessions.find((s) => s.id === parsed.payload.sid);
+    writeAuthDb((d) => {
+      const s = d.sessions.find((x) => x.id === parsed.payload.sid);
+      if (s && !s.revokedAt) s.revokedAt = nowIso();
+    });
+    if (session) {
+      await logActivity({
+        actorId: session.userId,
+        action: ACTIVITY_ACTIONS.LOGOUT,
+        entityType: "session",
+        entityId: session.id,
+        ...ctx,
+      });
+    }
+  }
+  await clearSessionCookies();
   return { success: true, data: null, error: null };
 }
+
+export function verifyStoredPassword(userId: string, password: string): boolean {
+  const user = findUserById(userId);
+  if (!user?.passwordHash || !user.passwordSalt) return false;
+  return verifyPassword(password, user.passwordHash, user.passwordSalt);
+}
+
+export { ROLE_DASHBOARD };

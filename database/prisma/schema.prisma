@@ -1,5 +1,5 @@
 -- =============================================================================
--- AEP — Prisma schema (optional ORM layer over Supabase PostgreSQL)
+-- AEP — Prisma schema (optional ORM over Supabase PostgreSQL)
 -- Generate: npx prisma generate --schema=database/prisma/schema.prisma
 -- =============================================================================
 
@@ -22,17 +22,173 @@ enum UserRole {
   @@map("user_role")
 }
 
+enum AccountStatus {
+  pending
+  active
+  inactive
+  suspended
+
+  @@map("account_status")
+}
+
+enum NotificationChannel {
+  in_app
+  email
+
+  @@map("notification_channel")
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         UserRole @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  name        String
+  description String?
+  module      String
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String   @map("role_id") @db.Uuid
+  permissionId String   @map("permission_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
 model Profile {
-  id        String   @id @db.Uuid
-  email     String   @unique
-  fullName  String?  @map("full_name")
-  avatarUrl String?  @map("avatar_url")
-  role      UserRole @default(student)
-  phone     String?
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id              String        @id @db.Uuid
+  email           String        @unique
+  firstName       String?       @map("first_name")
+  lastName        String?       @map("last_name")
+  phone           String?
+  countryCode     String?       @map("country_code")
+  nationality     String?
+  avatarUrl       String?       @map("avatar_url")
+  timezone        String        @default("UTC")
+  language        String        @default("en")
+  role            UserRole      @default(student)
+  status          AccountStatus @default(pending)
+  emailVerified   Boolean       @default(false) @map("email_verified")
+  profileComplete Boolean       @default(false) @map("profile_complete")
+  lastLoginAt     DateTime?     @map("last_login_at") @db.Timestamptz(6)
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sessions      Session[]
+  notifications Notification[]
 
   @@index([role])
+  @@index([status])
   @@index([email])
   @@map("profiles")
+}
+
+model Session {
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @map("user_id") @db.Uuid
+  tokenHash    String    @unique @map("token_hash")
+  userAgent    String?   @map("user_agent")
+  ipAddress    String?   @map("ip_address")
+  rememberMe   Boolean   @default(false) @map("remember_me")
+  expiresAt    DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastActiveAt DateTime  @default(now()) @map("last_active_at") @db.Timestamptz(6)
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Country {
+  code     String  @id @db.Char(2)
+  name     String
+  dialCode String? @map("dial_code")
+  active   Boolean @default(true)
+
+  @@map("countries")
+}
+
+model Setting {
+  key         String   @id
+  value       Json     @default("{}")
+  category    String   @default("general")
+  description String?
+  updatedBy   String?  @map("updated_by") @db.Uuid
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("settings")
+}
+
+model Notification {
+  id        String              @id @default(uuid()) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  title     String
+  body      String
+  channel   NotificationChannel @default(in_app)
+  type      String              @default("system")
+  data      Json                @default("{}")
+  readAt    DateTime?           @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  actorId    String?  @map("actor_id") @db.Uuid
+  action     String
+  entityType String?  @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json     @default("{}")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("activity_logs")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  actorId     String?  @map("actor_id") @db.Uuid
+  action      String
+  resource    String
+  beforeState Json?    @map("before_state")
+  afterState  Json?    @map("after_state")
+  ipAddress   String?  @map("ip_address")
+  userAgent   String?  @map("user_agent")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("audit_logs")
 }

@@ -4,10 +4,10 @@
 
 import type { NextRequest } from "next/server";
 
-import { authRoutes, protectedRoutes } from "@/constants/routes";
+import { authRoutes, protectedRoutePrefixes } from "@/constants/routes";
 
 export function isProtectedPath(pathname: string): boolean {
-  return protectedRoutes.some(
+  return protectedRoutePrefixes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 }
