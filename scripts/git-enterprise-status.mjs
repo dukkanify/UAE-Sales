@@ -19,7 +19,7 @@ function trySh(cmd) {
 
 const branch = trySh("git rev-parse --abbrev-ref HEAD") ?? "unknown";
 const detached = branch === "HEAD";
-const lastCommit = trySh("git log -1 --format=%h %s") ?? "n/a";
+const lastCommit = trySh('git log -1 --format="%h %s"') ?? "n/a";
 const remoteUrl = trySh("git remote get-url origin") ?? "none";
 const upstream =
   trySh("git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null") ?? "(none)";
@@ -77,6 +77,7 @@ Generated: ${new Date().toISOString()}
 | Upstream tracking | \`${upstream}\` |
 | Last commit | ${lastCommit} |
 | Merge conflicts (working tree) | ${mergeConflict ? "⚠️ YES" : "✅ None"} |
+| Detached HEAD | ${detached ? "⚠️ YES" : "✅ No"} |
 
 ## Working tree
 
@@ -91,6 +92,8 @@ ${status}
 | PR checks (current branch) | ${ciStatus} |
 | Latest workflow run | ${latestRun} |
 
+Required checks on PRs: \`quality\`, \`e2e\`, \`merge-gate\` (see \`.github/workflows/ci.yml\`).
+
 ## Branch model (AviatorPass)
 
 | Branch | Role |
@@ -103,12 +106,26 @@ ${status}
 
 ## Deployment
 
-- **AviatorPass production:** push to \`aviatorpass\` → \`.github/workflows/deploy-aviatorpass-production.yml\`
-- **Sooqna production:** push to \`main\` → \`.github/workflows/deploy-main-production.yml\`
+| Trigger | Workflow | Status |
+|---------|----------|--------|
+| Push \`main\` | \`deploy-main-production.yml\` | Sooqna Vercel (requires \`VERCEL_SOOQNA_DEPLOY_HOOK\` or token) |
+| Push \`aviatorpass\` | \`deploy-aviatorpass-production.yml\` | AviatorPass Vercel (requires \`VERCEL_AVIATORPASS_DEPLOY_HOOK\` or token) |
+
+Production health (AviatorPass): \`${trySh("curl -sS -o /dev/null -w '%{http_code}' --max-time 15 https://aviatorpass.vercel.app/api/health 2>/dev/null") ?? "unknown"}\` on \`/api/health\`
 
 ## Safe push
 
-Pre-push hook runs \`scripts/git-safe-sync.sh\` (fetch + rebase) before tests and push.
+Pre-push hook runs \`scripts/git-safe-sync.sh\` (fetch + rebase) before typecheck and tests. Never force-pushes.
+
+\`\`\`bash
+npm run git:sync   # manual safe sync
+git push           # runs hook automatically
+npm run git:status # regenerate this report
+\`\`\`
+
+## Branch protection
+
+Configure via GitHub Settings or see [.github/BRANCH_PROTECTION.md](../.github/BRANCH_PROTECTION.md).
 
 `;
 
