@@ -1,2 +1,9 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# 1) Safe sync — fetch + rebase; stop on conflicts (never force-push).
+bash scripts/git-safe-sync.sh || exit 1
+
+# 2) Quality gate before push reaches GitHub.
 npm run typecheck
 npm run test

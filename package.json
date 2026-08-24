@@ -25,6 +25,8 @@
     "backup:monthly": "node scripts/backup-data.mjs monthly",
     "acceptance": "node scripts/acceptance-smoke.mjs",
     "uat": "node scripts/uat-smoke.mjs",
+    "git:sync": "bash scripts/git-safe-sync.sh",
+    "git:status": "node scripts/git-enterprise-status.mjs",
     "db:generate": "prisma generate --schema=database/prisma/schema.prisma",
     "db:push": "prisma db push --schema=database/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=database/prisma/schema.prisma"
