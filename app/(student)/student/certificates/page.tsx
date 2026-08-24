@@ -1,17 +1,7 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Certificates" };
+import { StudentCertificatesView } from "@/features/certificates";
 
-export default function Page() {
-  return (
-    <ModulePlaceholder
-      title="Certificates"
-      description="Earned credentials will be listed here."
-      role="student"
-      href="/student/certificates"
-      icon="Award"
-      emptyTitle="Certificates module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
-  );
+export default function StudentCertificatesPage() {
+  return <StudentCertificatesView />;
 }
