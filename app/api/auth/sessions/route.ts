@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { requireAuth, getRequestContext, authErrorResponse } from "@/services/auth/guards";
-import { listUserSessions, revokeOtherUserSessions } from "@/services/auth/session-service";
+import {
+  listUserSessions,
+  revokeAllUserSessions,
+  revokeOtherUserSessions,
+} from "@/services/auth/session-service";
 import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 
 export async function GET() {
@@ -14,7 +18,11 @@ export async function GET() {
   }
 }
 
-/** Revoke all other sessions for the current user. */
+/**
+ * DELETE /api/auth/sessions
+ * - default: revoke all other sessions
+ * - ?scope=all: logout everywhere (revoke all + clear cookies)
+ */
 export async function DELETE(request: Request) {
   try {
     const blocked = await enforceMutatingApiSecurity(request);
@@ -22,6 +30,21 @@ export async function DELETE(request: Request) {
 
     const user = await requireAuth();
     const ctx = getRequestContext(request);
+    const scope = new URL(request.url).searchParams.get("scope");
+
+    if (scope === "all") {
+      const count = await revokeAllUserSessions({
+        userId: user.id,
+        actorId: user.id,
+        ...ctx,
+      });
+      return NextResponse.json({
+        success: true,
+        data: { revoked: count, scope: "all" },
+        error: null,
+      });
+    }
+
     const count = await revokeOtherUserSessions({
       userId: user.id,
       actorId: user.id,
@@ -29,7 +52,7 @@ export async function DELETE(request: Request) {
     });
     return NextResponse.json({
       success: true,
-      data: { revoked: count },
+      data: { revoked: count, scope: "others" },
       error: null,
     });
   } catch (error) {
