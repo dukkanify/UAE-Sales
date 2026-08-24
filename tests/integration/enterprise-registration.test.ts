@@ -2,9 +2,10 @@
  * Integration: enterprise registration → OTP → atomic account creation.
  */
 
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
+import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
 import {
   finalizeEnterpriseRegistration,
   matchRegistrationOtp,
@@ -22,7 +23,7 @@ import { registerSchema } from "@/utils/validation";
 import type { UserProfile } from "@/types";
 
 function uniqueEmail(prefix: string) {
-  return `${prefix}.${Date.now()}.${Math.random().toString(16).slice(2)}@eagerpilots.com`;
+  return `${prefix}.${Date.now()}.${Math.random().toString(16).slice(2)}@eagerpilots.test`;
 }
 
 function uniquePhone() {
@@ -31,14 +32,35 @@ function uniquePhone() {
 }
 
 const strongPassword = "Secret12!";
+const TEST_EMAIL_SUFFIX = "@eagerpilots.test";
+
+function cleanupRegistrationTestArtifacts() {
+  writeAuthDb((db) => {
+    const removeIds = new Set(
+      db.users.filter((u) => u.email.endsWith(TEST_EMAIL_SUFFIX)).map((u) => u.id),
+    );
+    db.users = db.users.filter((u) => !removeIds.has(u.id));
+    db.notificationPreferences = db.notificationPreferences.filter((p) => !removeIds.has(p.userId));
+    db.securitySettings = db.securitySettings.filter((s) => !removeIds.has(s.userId));
+    db.sessions = db.sessions.filter((s) => !removeIds.has(s.userId));
+    db.pendingRegistrations = db.pendingRegistrations.filter(
+      (p) => !p.email.endsWith(TEST_EMAIL_SUFFIX),
+    );
+    db.otps = db.otps.filter(
+      (o) => !(o.purpose === "register" && o.email.endsWith(TEST_EMAIL_SUFFIX)),
+    );
+  });
+}
 
 describe("enterprise registration", () => {
   beforeEach(() => {
-    // Clean pending + OTP noise between cases without wiping seeded users.
-    writeAuthDb((db) => {
-      db.pendingRegistrations = [];
-      db.otps = db.otps.filter((o) => o.purpose !== "register");
-    });
+    ensureDemoUsersSeeded();
+    cleanupRegistrationTestArtifacts();
+  });
+
+  afterAll(() => {
+    cleanupRegistrationTestArtifacts();
+    ensureDemoUsersSeeded();
   });
 
   it("rejects weak passwords and honeypot fills at the schema boundary", () => {

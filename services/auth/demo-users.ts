@@ -4,12 +4,7 @@
  */
 
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
-import {
-  isStudentProfileComplete,
-  readAuthDb,
-  writeAuthDb,
-  type StoredUser,
-} from "@/services/auth/store";
+import { isStudentProfileComplete, writeAuthDb, type StoredUser } from "@/services/auth/store";
 import { ROLES, type Role } from "@/constants/roles";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { generateId } from "@/lib/security/crypto";
@@ -23,10 +18,8 @@ type DemoUser = Partial<StoredUser> & {
 
 export function ensureDemoUsersSeeded(): void {
   ensureSuperAdminSeeded();
-  const db = readAuthDb();
-  if (db.users.length <= 1) {
-    seedFreshDemoUsers();
-  }
+  // Always idempotent — seedFreshDemoUsers skips emails that already exist.
+  seedFreshDemoUsers();
   ensureCgiDemoUser();
   ensureCaptainInstructorDemo();
   ensureSecondaryInstructorDemo();
