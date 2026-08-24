@@ -14,6 +14,15 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error(error);
+    void fetch("/api/ops/client-error", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: error.message,
+        digest: error.digest,
+        path: typeof window !== "undefined" ? window.location.pathname : null,
+      }),
+    }).catch(() => undefined);
   }, [error]);
 
   return (

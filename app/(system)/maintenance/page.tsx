@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
 
-import { SystemPage } from "@/components/shared/system-page";
+import { MaintenanceStatusView } from "@/features/ops/components/maintenance-status-view";
+import { getMaintenancePublicStatus } from "@/services/support-ops";
 
 export const metadata: Metadata = {
   title: "Maintenance",
   robots: { index: false, follow: false },
 };
 
+export const dynamic = "force-dynamic";
+
 export default function MaintenancePage() {
-  return (
-    <SystemPage
-      title="We'll be right back"
-      description="ATPL PASS is undergoing scheduled maintenance. Please check again shortly."
-      actionLabel="Refresh home"
-    />
-  );
+  const status = getMaintenancePublicStatus();
+  return <MaintenanceStatusView status={status} />;
 }

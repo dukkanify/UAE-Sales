@@ -33,6 +33,7 @@ prisma/*.db-journal
 .vercel
 # Misc
 .data/
+.backups/
 .turbo/
 public/uploads/branding/*
 !public/uploads/branding/.gitkeep
