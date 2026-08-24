@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { REGISTRATION_COUNTRIES } from "@/constants/countries";
+import { validateRegistrationPhoneE164 } from "@/utils/registration-phone";
 
 const DISPOSABLE_EMAIL_DOMAINS = new Set([
   "mailinator.com",
@@ -32,6 +33,18 @@ export const nameSchema = z
   .max(80, "Must be at most 80 characters")
   .regex(/^[\p{L}\p{M}' -]+$/u, "Names may only include letters, spaces, apostrophes, and hyphens");
 
+/** Registration phone — Kuwait (+965) or UAE (+971) mobile only. */
+export const registrationPhoneSchema = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/[\s()-]/g, ""))
+  .superRefine((v, ctx) => {
+    const message = validateRegistrationPhoneE164(v);
+    if (message) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+    }
+  });
+
 /** International phone: optional leading +, 8–15 digits after country code. */
 export const internationalPhoneSchema = z
   .string()
@@ -61,7 +74,7 @@ export const registerSchema = z
     email: emailSchema,
     firstName: nameSchema,
     lastName: nameSchema,
-    phone: internationalPhoneSchema,
+    phone: registrationPhoneSchema,
     countryCode: z.enum(countryCodes, { message: "Select your country" }),
     nationality: z.string().trim().min(2, "Enter your nationality").max(80),
     password: passwordSchema,

@@ -22,7 +22,8 @@ import {
 import { useAuth } from "@/providers/auth-provider";
 
 function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole }) {
-  const [role, setRole] = React.useState<RegisterRole>(initialRole);
+  const instructorDeepLink = initialRole === "instructor";
+  const [role, setRole] = React.useState<RegisterRole>("student");
   const { user, isLoading, signOut } = useAuth();
   const copy = ROLE_COPY[role];
 
@@ -33,12 +34,17 @@ function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole
     void signOut();
   }, [isLoading, user, signOut]);
 
+  React.useEffect(() => {
+    if (instructorDeepLink && typeof window !== "undefined") {
+      window.history.replaceState(null, "", routes.register);
+    }
+  }, [instructorDeepLink]);
+
   const handleRoleChange = (next: RegisterRole) => {
+    if (next === "instructor") return;
     setRole(next);
-    // Sync deep-link URL without remounting (keeps typed form fields).
-    const href = next === "instructor" ? routes.registerInstructor : routes.register;
-    if (typeof window !== "undefined" && window.location.pathname !== href) {
-      window.history.replaceState(null, "", href);
+    if (typeof window !== "undefined" && window.location.pathname !== routes.register) {
+      window.history.replaceState(null, "", routes.register);
     }
   };
 
@@ -73,7 +79,11 @@ function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole
           </div>
         </CardHeader>
         <CardContent className="pt-2">
-          <RegisterForm role={role} onRoleChange={handleRoleChange} />
+          <RegisterForm
+            role={role}
+            onRoleChange={handleRoleChange}
+            showInstructorComingSoonOnMount={instructorDeepLink}
+          />
         </CardContent>
         <CardFooter className="flex flex-col gap-2 border-t border-border/50 bg-[rgb(18_36_51_/0.03)] py-5 text-center text-sm text-muted-foreground">
           <p>
