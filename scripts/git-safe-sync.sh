@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # Safe sync before push — fetch, rebase onto upstream, abort on conflicts.
-# Never force-pushes or overwrites remote without local verification.
-set -euo pipefail
+set -eu
 
 REMOTE="${GIT_SAFE_REMOTE:-origin}"
 BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
