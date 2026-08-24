@@ -194,3 +194,251 @@ model AuditLog {
   @@index([createdAt])
   @@map("audit_logs")
 }
+
+// ---------------------------------------------------------------------------
+// LMS / Course Management (migration 005)
+// ---------------------------------------------------------------------------
+
+enum CourseStatus {
+  draft
+  published
+  private
+  scheduled
+  archived
+
+  @@map("course_status")
+}
+
+enum DifficultyLevel {
+  beginner
+  intermediate
+  advanced
+  expert
+
+  @@map("difficulty_level")
+}
+
+enum EnrollmentMode {
+  open
+  private
+  invitation
+  manual
+
+  @@map("enrollment_mode")
+}
+
+enum EnrollmentStatus {
+  pending
+  approved
+  rejected
+  completed
+  dropped
+  suspended
+
+  @@map("enrollment_status")
+}
+
+enum ContentStatus {
+  draft
+  published
+  hidden
+
+  @@map("content_status")
+}
+
+enum ResourceType {
+  pdf
+  ppt
+  doc
+  image
+  audio
+  link
+  zip
+  video
+
+  @@map("resource_type")
+}
+
+enum InstructorRole {
+  primary
+  assistant
+
+  @@map("instructor_role")
+}
+
+model CourseCategory {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String   @default("")
+  parentId    String?  @map("parent_id") @db.Uuid
+  icon        String   @default("Folder")
+  sortOrder   Int      @default(0) @map("sort_order")
+  visible     Boolean  @default(true)
+  metadata    Json     @default("{}")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  parent   CourseCategory?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children CourseCategory[] @relation("CategoryTree")
+  courses  Course[]
+
+  @@map("course_categories")
+}
+
+model Course {
+  id                        String         @id @default(uuid()) @db.Uuid
+  title                     String
+  shortDescription          String         @default("") @map("short_description")
+  fullDescription           String         @default("") @map("full_description")
+  code                      String
+  categoryId                String?        @map("category_id") @db.Uuid
+  thumbnailUrl              String?        @map("thumbnail_url")
+  coverImageUrl             String?        @map("cover_image_url")
+  previewVideoUrl           String?        @map("preview_video_url")
+  difficulty                DifficultyLevel @default(intermediate)
+  language                  String         @default("en")
+  estimatedDurationMinutes  Int            @default(0) @map("estimated_duration_minutes")
+  enrollmentMode            EnrollmentMode @default(manual) @map("enrollment_mode")
+  status                    CourseStatus   @default(draft)
+  scheduledPublishAt        DateTime?      @map("scheduled_publish_at") @db.Timestamptz(6)
+  primaryInstructorId       String?        @map("primary_instructor_id") @db.Uuid
+  tags                      String[]       @default([])
+  metadata                  Json           @default("{}")
+  createdById               String?        @map("created_by_id") @db.Uuid
+  createdAt                 DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime       @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt                 DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  publishedAt               DateTime?      @map("published_at") @db.Timestamptz(6)
+  archivedAt                DateTime?      @map("archived_at") @db.Timestamptz(6)
+
+  category    CourseCategory?      @relation(fields: [categoryId], references: [id])
+  instructors CourseInstructor[]
+  modules     CourseModule[]
+  lessons     Lesson[]
+  enrollments Enrollment[]
+  progress    LessonProgress[]
+
+  @@index([status])
+  @@index([categoryId])
+  @@map("courses")
+}
+
+model CourseInstructor {
+  id         String         @id @default(uuid()) @db.Uuid
+  courseId   String         @map("course_id") @db.Uuid
+  userId     String         @map("user_id") @db.Uuid
+  role       InstructorRole @default(assistant)
+  assignedAt DateTime       @default(now()) @map("assigned_at") @db.Timestamptz(6)
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId, role])
+  @@map("course_instructors")
+}
+
+model CourseModule {
+  id                       String        @id @default(uuid()) @db.Uuid
+  courseId                 String        @map("course_id") @db.Uuid
+  title                    String
+  description              String        @default("")
+  sortOrder                Int           @default(0) @map("sort_order")
+  estimatedDurationMinutes Int           @default(0) @map("estimated_duration_minutes")
+  status                   ContentStatus @default(draft)
+  visible                  Boolean       @default(true)
+  createdAt                DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId])
+  @@map("course_modules")
+}
+
+model Lesson {
+  id                    String        @id @default(uuid()) @db.Uuid
+  courseId              String        @map("course_id") @db.Uuid
+  moduleId              String        @map("module_id") @db.Uuid
+  title                 String
+  description           String        @default("")
+  contentHtml           String        @default("") @map("content_html")
+  videoUrl              String?       @map("video_url")
+  durationMinutes       Int           @default(0) @map("duration_minutes")
+  estimatedStudyMinutes Int           @default(0) @map("estimated_study_minutes")
+  sortOrder             Int           @default(0) @map("sort_order")
+  previewAvailable      Boolean       @default(false) @map("preview_available")
+  status                ContentStatus @default(draft)
+  createdAt             DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  course    Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module    CourseModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  resources LessonResource[]
+  progress  LessonProgress[]
+
+  @@index([moduleId])
+  @@map("lessons")
+}
+
+model LessonResource {
+  id           String       @id @default(uuid()) @db.Uuid
+  lessonId     String       @map("lesson_id") @db.Uuid
+  title        String
+  type         ResourceType
+  url          String
+  fileName     String?      @map("file_name")
+  mimeType     String?      @map("mime_type")
+  sizeBytes    BigInt?      @map("size_bytes")
+  downloadable Boolean      @default(true)
+  sortOrder    Int          @default(0) @map("sort_order")
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime     @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_resources")
+}
+
+model Enrollment {
+  id           String           @id @default(uuid()) @db.Uuid
+  courseId     String           @map("course_id") @db.Uuid
+  studentId    String           @map("student_id") @db.Uuid
+  status       EnrollmentStatus @default(pending)
+  enrolledById String?          @map("enrolled_by_id") @db.Uuid
+  enrolledAt   DateTime         @default(now()) @map("enrolled_at") @db.Timestamptz(6)
+  approvedAt   DateTime?        @map("approved_at") @db.Timestamptz(6)
+  completedAt  DateTime?        @map("completed_at") @db.Timestamptz(6)
+  droppedAt    DateTime?        @map("dropped_at") @db.Timestamptz(6)
+  suspendedAt  DateTime?        @map("suspended_at") @db.Timestamptz(6)
+  notes        String?
+  updatedAt    DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  course   Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([studentId])
+  @@index([courseId, status])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id               String    @id @default(uuid()) @db.Uuid
+  enrollmentId     String    @map("enrollment_id") @db.Uuid
+  lessonId         String    @map("lesson_id") @db.Uuid
+  courseId         String    @map("course_id") @db.Uuid
+  studentId        String    @map("student_id") @db.Uuid
+  completed        Boolean   @default(false)
+  completedAt      DateTime? @map("completed_at") @db.Timestamptz(6)
+  timeSpentSeconds Int       @default(0) @map("time_spent_seconds")
+  lastAccessedAt   DateTime? @map("last_accessed_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson     Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  course     Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([enrollmentId, lessonId])
+  @@map("lesson_progress")
+}

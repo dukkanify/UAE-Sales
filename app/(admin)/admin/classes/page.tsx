@@ -1,17 +1,7 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "Classes" };
+import { ClassManagementView } from "@/features/classes/components/class-management-view";
 
-export default function Page() {
-  return (
-    <ModulePlaceholder
-      title="Classes"
-      description="Schedule and monitor live class operations."
-      role="admin"
-      href="/admin/classes"
-      icon="Video"
-      emptyTitle="Classes module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
-    />
-  );
+export default function AdminClassesPage() {
+  return <ClassManagementView basePath="/admin/classes" roleLabel="Admin" />;
 }

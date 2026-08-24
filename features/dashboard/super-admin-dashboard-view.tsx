@@ -69,7 +69,7 @@ function SuperAdminDashboardView({
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total students" value={overview.totalStudents} icon={Users} trend={{ value: 12, label: "vs last month" }} />
         <StatCard label="Total instructors" value={overview.totalInstructors} icon={GraduationCap} trend={{ value: 8, label: "vs last month" }} />
-        <StatCard label="Total courses" value={overview.totalCourses} icon={BookOpen} hint="Catalog foundation ready" />
+        <StatCard label="Total courses" value={overview.totalCourses} icon={BookOpen} hint="LMS catalog" />
         <StatCard label="Active classes" value={overview.activeClasses} icon={Layers} hint="Live this week" />
         <StatCard label="Monthly revenue" value={formatCurrency(overview.monthlyRevenue)} icon={DollarSign} trend={{ value: overview.platformGrowth, label: "growth" }} />
         <StatCard label="Instructor wallets" value={formatCurrency(overview.instructorWalletBalance)} icon={Wallet} />

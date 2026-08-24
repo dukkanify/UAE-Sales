@@ -1,17 +1,14 @@
-import { ModulePlaceholder } from "@/components/dashboard";
+"use client";
 
-export const metadata = { title: "My courses" };
+import { CourseCatalogView } from "@/features/courses/components/course-catalog-view";
 
-export default function Page() {
+export default function StudentCoursesPage() {
   return (
-    <ModulePlaceholder
+    <CourseCatalogView
       title="My courses"
-      description="Your enrolled programs will appear here."
-      role="student"
-      href="/student/courses"
-      icon="BookOpen"
-      emptyTitle="My courses module ready"
-      emptyDescription="Architecture is in place. Business logic arrives in a later task."
+      description="Programs you are enrolled in."
+      roleLabel="Student"
+      mode="student"
     />
   );
 }

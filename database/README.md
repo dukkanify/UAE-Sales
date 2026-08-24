@@ -17,12 +17,20 @@ PostgreSQL on **Supabase** with:
 | `001_initial_schema.sql` | Legacy slim profiles (superseded) |
 | `002_auth_rbac_schema.sql` | Full auth + RBAC schema |
 | `003_seed_permissions_countries.sql` | Permissions, role maps, countries, settings |
+| `004_platform_settings_optimization.sql` | Settings indexes, soft-delete profiles, feature flags |
+| `005_course_management_lms.sql` | Courses, categories, modules, lessons, resources, enrollments, progress |
+| `006_live_classes_zoom.sql` | Live classes, Zoom meetings, attendance, recordings, reminders |
 
-Run `002` then `003` in the Supabase SQL editor for a fresh project.
+Run `002` → `003` → `004` → `005` → `006` in the Supabase SQL editor for a fresh project.
 
 ## Local development store
 
-When Supabase env vars are unset, the app uses `.data/aep-auth.json` for users, sessions, OTP challenges, notifications, and logs so authentication works end-to-end locally.
+When Supabase env vars are unset, the app uses:
+
+- `.data/aep-auth.json` — users, sessions, OTP, notifications, logs
+- `.data/aep-settings.json` — platform settings
+- `.data/aep-courses.json` — LMS catalog
+- `.data/aep-classes.json` — live classes, Zoom meetings, attendance, reminders
 
 ## Super Admin seeder
 
