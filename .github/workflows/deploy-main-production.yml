@@ -1,0 +1,71 @@
+name: Deploy Main Production
+
+# Sooqna / default GitHub main line — separate Vercel project from AviatorPass.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: Production – main
+    steps:
+      - name: Prefer Deploy Hook (Sooqna / main production)
+        id: hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.VERCEL_SOOQNA_DEPLOY_HOOK }}
+          FALLBACK_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          HOOK="${DEPLOY_HOOK_URL:-$FALLBACK_HOOK_URL}"
+          if [ -z "$HOOK" ]; then
+            echo "hook=missing" >> "$GITHUB_OUTPUT"
+            echo "No main deploy hook configured — skipping hook trigger."
+            exit 0
+          fi
+          response="$(curl --silent --show-error --write-out '\n%{http_code}' -X POST "$HOOK")"
+          body="$(printf '%s' "$response" | sed '$d')"
+          status="$(printf '%s' "$response" | tail -n 1)"
+          echo "Deploy Hook HTTP $status"
+          echo "$body"
+          if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+            echo "::error::Deploy Hook failed with HTTP $status"
+            exit 1
+          fi
+          echo "hook=ok" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        if: steps.hook.outputs.hook != 'ok'
+
+      - uses: actions/setup-node@v4
+        if: steps.hook.outputs.hook != 'ok'
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Deploy with Vercel token (main / Sooqna)
+        if: steps.hook.outputs.hook != 'ok'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_SOOQNA_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::warning::Missing VERCEL_SOOQNA_DEPLOY_HOOK and VERCEL_TOKEN — configure secrets to enable main deploy."
+            exit 0
+          fi
+          npm install -g vercel@41.7.8
+          npm ci
+          if [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          else
+            vercel link --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects --project sooqna
+            vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          fi
+          vercel build --prod --token="$VERCEL_TOKEN"
+          url="$(vercel deploy --prebuilt --prod --yes --token="$VERCEL_TOKEN" --scope dukkanify-technology-llcs-projects)"
+          echo "Deployed: $url"

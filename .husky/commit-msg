@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# Conventional commit message guidance (warn-only for merge/revert commits).
+MSG_FILE="$1"
+MSG=$(head -n 1 "$MSG_FILE")
+
+# Allow merges, reverts, and automated commits
+case "$MSG" in
+  Merge*|merge*|Revert*|revert*|fixup!*|squash!*)
+    exit 0
+    ;;
+esac
+
+# feat|fix|refactor|docs|chore|test|ci|build|perf|style: description
+if ! printf '%s' "$MSG" | grep -Eq '^(feat|fix|refactor|docs|chore|test|ci|build|perf|style)(\([a-z0-9._/-]+\))?: .{3,}'; then
+  echo "commit-msg: prefer Conventional Commits, e.g." >&2
+  echo "  feat: registration improvements" >&2
+  echo "  fix: authentication bug" >&2
+  echo "  refactor: dashboard architecture" >&2
+  echo "  docs: update project documentation" >&2
+  echo "(warning only — commit was not blocked)" >&2
+fi
+
+exit 0
