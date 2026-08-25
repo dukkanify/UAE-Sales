@@ -436,6 +436,36 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     defaultBody: "A new support ticket was opened.",
     audiences: ["admin", "super_admin"],
   },
+  "ticket.updated": {
+    type: "ticket.updated",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: true,
+    defaultTitle: "Support ticket updated",
+    defaultBody: "Your support ticket status changed.",
+    audiences: ["all"],
+  },
+  "message.group_added": {
+    type: "message.group_added",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: false,
+    defaultTitle: "Added to conversation",
+    defaultBody: "You were added to a group conversation.",
+    audiences: ["all"],
+  },
+  "document.shared": {
+    type: "document.shared",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: true,
+    defaultTitle: "Document shared",
+    defaultBody: "A training document was shared with you in chat.",
+    audiences: ["all"],
+  },
 
   // Instructor / CGI
   "instructor.student_assigned": {

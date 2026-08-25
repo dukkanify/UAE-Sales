@@ -21,13 +21,19 @@ export async function GET(request: Request) {
     const rows = readAuthDb()
       .users.filter((u) => {
         if (u.id === user.id || u.status !== "active") return false;
-        // Students only message faculty/staff — never the full user directory.
+        // Students: instructors / CGI / admin / support — never other students.
         if (user.role === ROLES.STUDENT) return staffRoles.has(u.role);
-        // Instructors / CGI can reach students + staff.
-        if (
-          user.role === ROLES.INSTRUCTOR ||
-          user.role === ROLES.CHIEF_GROUND_INSTRUCTOR
-        ) {
+        // Instructors: students + CGI + admin/support (not peer instructors).
+        if (user.role === ROLES.INSTRUCTOR) {
+          return (
+            u.role === ROLES.STUDENT ||
+            u.role === ROLES.CHIEF_GROUND_INSTRUCTOR ||
+            u.role === ROLES.ADMIN ||
+            u.role === ROLES.SUPER_ADMIN
+          );
+        }
+        // CGI: instructors, students, admin, support.
+        if (user.role === ROLES.CHIEF_GROUND_INSTRUCTOR) {
           return u.role === ROLES.STUDENT || staffRoles.has(u.role);
         }
         // Admin / super_admin: full directory.
@@ -44,10 +50,7 @@ export async function GET(request: Request) {
         };
       })
       .filter(
-        (u) =>
-          !q ||
-          u.fullName.toLowerCase().includes(q) ||
-          u.email.toLowerCase().includes(q),
+        (u) => !q || u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
       )
       .slice(0, 40);
     return NextResponse.json({ success: true, data: rows, error: null });
