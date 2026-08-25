@@ -4,6 +4,7 @@
 
 export const BOOKING_STATUSES = [
   "pending",
+  "pending_payment",
   "confirmed",
   "cancelled",
   "completed",
@@ -18,6 +19,13 @@ export interface BookingSessionType {
   description: string;
   durationMinutes: number;
   active: boolean;
+  /** Price in minor currency units (e.g. fils). 0 = complimentary */
+  priceAmountMinor: number;
+  currency: string;
+  /** When true, booking requires payment before confirmation */
+  paymentRequired: boolean;
+  /** Empty = all platform bookable instructors for this service */
+  instructorIds: string[];
 }
 
 export interface BookingZoomSession {
@@ -89,6 +97,12 @@ export interface AppointmentBooking {
   cancelledAt: string | null;
   cancelledBy: string | null;
   cancelReason: string | null;
+  /** Snapshot of service price at booking time */
+  priceAmountMinor: number;
+  currency: string;
+  paymentRequired: boolean;
+  paymentOrderId: string | null;
+  paidAt: string | null;
 }
 
 export interface BookingSlot {
@@ -126,11 +140,14 @@ export interface PublicBookingCatalog {
   autoCreateZoom: boolean;
   requireConfirmation: boolean;
   timezone: string;
-  sessionTypes: BookingSessionType[];
-  instructors: Array<{
-    id: string;
-    fullName: string;
-    firstName: string | null;
-    lastName: string | null;
-  }>;
+  sessionTypes: Array<
+    BookingSessionType & {
+      instructors: Array<{
+        id: string;
+        fullName: string;
+        firstName: string | null;
+        lastName: string | null;
+      }>;
+    }
+  >;
 }
