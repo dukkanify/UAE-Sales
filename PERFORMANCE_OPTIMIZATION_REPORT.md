@@ -130,8 +130,8 @@ Local production (`next start`) serves homepage / courses / book correctly with 
 
 | Category       | Mobile  | Desktop | Target |
 | -------------- | ------- | ------- | ------ |
-| Performance    | **82**  | **76**  | 95+    |
-| Accessibility  | **96**  | **96**  | 100    |
+| Performance    | **83**  | **76**  | 95+    |
+| Accessibility  | **100** | **100** | 100    |
 | Best Practices | **100** | **100** | 100    |
 | SEO            | **100** | **100** | 100    |
 
@@ -140,12 +140,12 @@ Local production (`next start`) serves homepage / courses / book correctly with 
 | Metric | Value                                                            |
 | ------ | ---------------------------------------------------------------- |
 | FCP    | ~1.2 s                                                           |
-| LCP    | ~4.0 s (hero brand text; render delay dominated by display font) |
-| TBT    | ~40 ms                                                           |
+| LCP    | ~4.1 s (hero brand text; render delay dominated by display font) |
+| TBT    | ~40–60 ms                                                        |
 | CLS    | **0**                                                            |
 | TTI    | ~4.1 s                                                           |
 
-**Note:** Lab Lighthouse on localhost underestimates CDN/edge caching and does not match production Vercel edge. Performance ≥95 was **not** reached in this lab run; remaining LCP is dominated by display-font render delay on the hero brand mark (not JS TBT).
+**Note:** Lab Lighthouse on localhost underestimates CDN/edge caching and does not match production Vercel edge. Performance ≥95 was **not** reached in this lab run; remaining LCP is dominated by display-font render delay on the hero brand mark (not JS TBT). Accessibility, Best Practices, and SEO hit **100**.
 
 ---
 
@@ -200,4 +200,4 @@ Supabase SQL indexes were **not** changed in this pass (local JSON store path do
 
 ## Final result
 
-Enterprise performance foundations are in place: **dashboard JS roughly halved**, marketing assets **cut >50%**, homepage is an RSC with real LCP imagery, and public APIs advertise cache headers. Lighthouse **Accessibility / Best Practices / SEO = 100**. Lab Performance is **82 mobile / 76 desktop** (stretch target 95+ tracked under remaining LCP/font work).
+Enterprise performance foundations are in place: **dashboard JS roughly halved**, marketing assets **cut >50%**, homepage is an RSC with real LCP imagery, and public APIs advertise cache headers. Lighthouse **Accessibility / Best Practices / SEO = 100**. Lab Performance is **83 mobile / 76 desktop** (stretch target 95+ tracked under remaining LCP/font work).
