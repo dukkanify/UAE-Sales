@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Safe sync before push — fetch, rebase onto upstream, abort on conflicts.
+# Safe sync before push — fetch upstream; rebase only when behind/diverged.
+# Skip rebase when HEAD already contains upstream (ahead via merge or FF).
 set -eu
 
 REMOTE="${GIT_SAFE_REMOTE:-origin}"
@@ -20,6 +21,23 @@ if [ -z "$UPSTREAM" ]; then
 fi
 
 REMOTE_BRANCH="${UPSTREAM#*/}"
+LOCAL_SHA="$(git rev-parse HEAD)"
+REMOTE_SHA="$(git rev-parse "$REMOTE/$REMOTE_BRANCH")"
+
+if [ "$LOCAL_SHA" = "$REMOTE_SHA" ]; then
+  echo "git-safe-sync: already matches $REMOTE/$REMOTE_BRANCH."
+  exit 0
+fi
+
+# Upstream already contained in HEAD → we are ahead (FF or merge). Do not rebase
+# merge commits; that rewrites history and often conflicts on release branches.
+if git merge-base --is-ancestor "$REMOTE_SHA" "$LOCAL_SHA"; then
+  AHEAD="$(git rev-list --count "$REMOTE_SHA..$LOCAL_SHA")"
+  echo "git-safe-sync: ahead of $REMOTE/$REMOTE_BRANCH by $AHEAD commit(s); skip rebase."
+  exit 0
+fi
+
+# Remote has commits we lack — rebase to incorporate them safely.
 echo "git-safe-sync: rebasing $BRANCH onto $REMOTE/$REMOTE_BRANCH…"
 
 if ! git rebase "$REMOTE/$REMOTE_BRANCH"; then
