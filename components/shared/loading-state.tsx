@@ -8,7 +8,7 @@ interface LoadingStateProps {
   className?: string;
 }
 
-function LoadingState({ label = "Loading AviatorPass…", className }: LoadingStateProps) {
+function LoadingState({ label = "Loading…", className }: LoadingStateProps) {
   return (
     <div
       className={cn(

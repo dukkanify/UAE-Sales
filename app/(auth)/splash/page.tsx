@@ -23,12 +23,13 @@ export default function SplashPage() {
           {brandingConfig.tagline}
         </p>
         <h1 className="font-display text-5xl font-bold tracking-tight text-white sm:text-6xl">
-          <span className="text-[#8ec4df]">ATPL</span> <span className="text-accent">PASS</span>
+          <span className="text-primary-foreground/90">ATPL</span>{" "}
+          <span className="text-accent">PASS</span>
         </h1>
         <p className="mt-5 text-base leading-relaxed text-white/70">{siteConfig.description}</p>
         <div className="mt-10 flex w-full flex-col gap-3 sm:flex-row sm:justify-center">
           <Button variant="accent" size="lg" asChild>
-            <Link href={routes.login}>Enter platform</Link>
+            <Link href={routes.login}>Sign in</Link>
           </Button>
           <Button
             size="lg"

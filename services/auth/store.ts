@@ -105,6 +105,16 @@ export interface NotificationPreferences {
   emailMarketing: boolean;
   emailProductUpdates: boolean;
   inAppEnabled: boolean;
+  /** Channel toggles */
+  emailEnabled: boolean;
+  pushEnabled: boolean;
+  marketingEnabled: boolean;
+  reminderEnabled: boolean;
+  securityEnabled: boolean;
+  courseEnabled: boolean;
+  bookingEnabled: boolean;
+  paymentEnabled: boolean;
+  messageEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -327,6 +337,15 @@ export function defaultNotificationPreferences(
     emailMarketing: Boolean(marketingConsent),
     emailProductUpdates: Boolean(marketingConsent),
     inAppEnabled: true,
+    emailEnabled: true,
+    pushEnabled: false,
+    marketingEnabled: Boolean(marketingConsent),
+    reminderEnabled: true,
+    securityEnabled: true,
+    courseEnabled: true,
+    bookingEnabled: true,
+    paymentEnabled: true,
+    messageEnabled: true,
     createdAt: ts,
     updatedAt: ts,
   };

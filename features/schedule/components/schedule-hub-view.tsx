@@ -170,7 +170,7 @@ export function ScheduleHubView({
         transition={{ duration: 0.35 }}
         className="space-y-3 border-b border-border/50 pb-8"
       >
-        <h2 className="font-heading text-xl tracking-tight">Next session</h2>
+        <h2 className="font-display text-xl tracking-tight">Next session</h2>
         {next ? (
           <div className="space-y-2">
             <p className="text-2xl font-semibold tracking-tight">{next.title}</p>
@@ -210,7 +210,7 @@ export function ScheduleHubView({
           className="space-y-4 border-b border-border/50 pb-8"
         >
           <div>
-            <h2 className="font-heading text-xl tracking-tight">Schedule builder</h2>
+            <h2 className="font-display text-xl tracking-tight">Schedule builder</h2>
             <p className="text-sm text-muted-foreground">
               Create a one-off or recurring class. ATPL subjects auto-link a lecture assignment.
             </p>
@@ -299,7 +299,7 @@ export function ScheduleHubView({
         transition={{ duration: 0.4, delay: 0.1 }}
         className="space-y-4 border-b border-border/50 pb-8"
       >
-        <h2 className="font-heading text-xl tracking-tight">Upcoming &amp; manage</h2>
+        <h2 className="font-display text-xl tracking-tight">Upcoming &amp; manage</h2>
         <ul className="space-y-4">
           {(overview?.upcoming ?? []).length === 0 ? (
             <li className="text-sm text-muted-foreground">No upcoming sessions.</li>
@@ -402,7 +402,7 @@ export function ScheduleHubView({
         className="space-y-4"
       >
         <div>
-          <h2 className="font-heading text-xl tracking-tight">Timeline</h2>
+          <h2 className="font-display text-xl tracking-tight">Timeline</h2>
           <p className="text-sm text-muted-foreground">
             Chronological class status, reminders, attendance, and ATPL lecture assignments.
           </p>

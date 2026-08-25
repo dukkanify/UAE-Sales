@@ -122,7 +122,7 @@ export function verificationSuccessEmailTemplate(input: { firstName: string; rol
   const name = input.firstName || "Aviator";
   return renderBrandedEmail({
     title: "Email verified — account ready",
-    preheader: `Welcome to AviatorPass, ${name}`,
+    preheader: `Welcome to ATPL PASS, ${name}`,
     bodyHtml: `<p>Hi ${name},</p>
       <p>Your email is verified and your <strong>${input.role}</strong> account is ready.</p>
       <p>Sign in anytime to continue your aviation training journey.</p>`,

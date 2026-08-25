@@ -15,10 +15,7 @@ import {
 } from "@/services/communication/access";
 import { moderateText } from "@/services/communication/moderation-service";
 import { notifyUsers } from "@/services/communication/notify";
-import {
-  readCommunicationDb,
-  writeCommunicationDb,
-} from "@/services/communication/store";
+import { readCommunicationDb, writeCommunicationDb } from "@/services/communication/store";
 import type {
   AttachmentRef,
   SupportTicket,
@@ -165,6 +162,7 @@ export async function updateTicket(input: {
     body: `${updated.ticketNumber} is now ${updated.status.replace(/_/g, " ")}`,
     type: "ticket.updated",
     data: { ticketId: updated.id, status: updated.status },
+    actionUrl: `/support?ticket=${updated.id}`,
   });
 
   await logActivity({
@@ -183,9 +181,14 @@ export async function replyToTicket(input: {
   ticketId: string;
   body: string;
   attachments?: AttachmentRef[];
+  /** Staff-only note — never notified to the requester */
+  isInternal?: boolean;
 }): Promise<TicketReply> {
   const ticket = assertTicketAccess(input.user, input.ticketId);
   const id = generateId();
+  const isStaff = canManageSupport(input.user);
+  const isInternal = Boolean(input.isInternal) && isStaff;
+
   const moderation = moderateText(input.body, {
     contentType: "ticket",
     contentId: id,
@@ -196,7 +199,6 @@ export async function replyToTicket(input: {
   }
 
   const stamp = nowIso();
-  const isStaff = canManageSupport(input.user);
   const reply: TicketReply = {
     id,
     ticketId: ticket.id,
@@ -204,6 +206,7 @@ export async function replyToTicket(input: {
     authorName: input.user.fullName || input.user.email,
     body: moderation.redactedBody ?? input.body.trim(),
     isStaff,
+    isInternal,
     attachments: input.attachments ?? [],
     createdAt: stamp,
   };
@@ -213,20 +216,23 @@ export async function replyToTicket(input: {
     const t = db.tickets.find((x) => x.id === ticket.id);
     if (t) {
       t.updatedAt = stamp;
-      if (isStaff && !t.firstResponseAt) t.firstResponseAt = stamp;
-      if (isStaff && t.status === "open") t.status = "in_progress";
+      if (isStaff && !isInternal && !t.firstResponseAt) t.firstResponseAt = stamp;
+      if (isStaff && !isInternal && t.status === "open") t.status = "in_progress";
       if (!isStaff && t.status === "waiting_customer") t.status = "in_progress";
     }
   });
 
-  const notifyId = isStaff ? ticket.requesterId : ticket.assigneeId;
-  if (notifyId) {
-    await notifyUsers([notifyId], {
-      title: "Ticket reply",
-      body: `${ticket.ticketNumber}: ${reply.body.slice(0, 80)}`,
-      type: "ticket.reply",
-      data: { ticketId: ticket.id, replyId: reply.id },
-    });
+  if (!isInternal) {
+    const notifyId = isStaff ? ticket.requesterId : ticket.assigneeId;
+    if (notifyId) {
+      await notifyUsers([notifyId], {
+        title: "Ticket reply",
+        body: `${ticket.ticketNumber}: ${reply.body.slice(0, 80)}`,
+        type: "ticket.reply",
+        data: { ticketId: ticket.id, replyId: reply.id },
+        actionUrl: `/support?ticket=${ticket.id}`,
+      });
+    }
   }
 
   return reply;
@@ -234,8 +240,9 @@ export async function replyToTicket(input: {
 
 export function listTicketReplies(user: UserProfile, ticketId: string): TicketReply[] {
   assertTicketAccess(user, ticketId);
+  const canSeeInternal = canManageSupport(user);
   return readCommunicationDb()
-    .ticketReplies.filter((r) => r.ticketId === ticketId)
+    .ticketReplies.filter((r) => r.ticketId === ticketId && (canSeeInternal || !r.isInternal))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 
@@ -247,8 +254,7 @@ export function ticketStats() {
       ? 0
       : Math.round(
           withResponse.reduce((sum, t) => {
-            const ms =
-              new Date(t.firstResponseAt!).getTime() - new Date(t.createdAt).getTime();
+            const ms = new Date(t.firstResponseAt!).getTime() - new Date(t.createdAt).getTime();
             return sum + ms / 60000;
           }, 0) / withResponse.length,
         );

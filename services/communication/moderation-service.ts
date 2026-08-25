@@ -4,10 +4,7 @@
 
 import { generateId } from "@/lib/security/crypto";
 import { DEFAULT_BLOCKED_WORDS } from "@/constants/communication";
-import {
-  readCommunicationDb,
-  writeCommunicationDb,
-} from "@/services/communication/store";
+import { readCommunicationDb, writeCommunicationDb } from "@/services/communication/store";
 import type {
   ModerationAction,
   ModerationLog,
@@ -27,88 +24,105 @@ function nowIso() {
 
 export function ensureDefaultModerationRules(): ModerationRule[] {
   const db = readCommunicationDb();
-  if (db.moderationRules.length > 0) return db.moderationRules;
+  if (db.moderationRules.length === 0) {
+    const stamp = nowIso();
+    const rules: ModerationRule[] = [
+      {
+        id: generateId(),
+        kind: "profanity",
+        enabled: true,
+        pattern: DEFAULT_BLOCKED_WORDS.join("|"),
+        action: "block",
+        description: "Block common offensive language",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "hate",
+        enabled: true,
+        pattern: "hate speech|racial slur|go die",
+        action: "block",
+        description: "Block hate speech patterns",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "phone",
+        enabled: true,
+        pattern: "phone",
+        action: "block",
+        description: "Block phone numbers — keep communication on-platform",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "email",
+        enabled: true,
+        pattern: "email",
+        action: "block",
+        description: "Block personal email addresses shared in chat",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "external_contact",
+        enabled: true,
+        pattern: "whatsapp|telegram",
+        action: "block",
+        description: "Block attempts to move conversation off-platform",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "spam_link",
+        enabled: true,
+        pattern: "http",
+        action: "flag",
+        description: "Flag external spam links",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "spam_repeat",
+        enabled: true,
+        pattern: "repeat",
+        action: "flag",
+        description: "Flag repeated identical spam bursts",
+        updatedAt: stamp,
+      },
+      {
+        id: generateId(),
+        kind: "suspicious",
+        enabled: true,
+        pattern: "crypto giveaway|free money|click here now",
+        action: "block",
+        description: "Block suspicious scam phrases",
+        updatedAt: stamp,
+      },
+    ];
 
-  const stamp = nowIso();
-  const rules: ModerationRule[] = [
-    {
-      id: generateId(),
-      kind: "profanity",
-      enabled: true,
-      pattern: DEFAULT_BLOCKED_WORDS.join("|"),
-      action: "block",
-      description: "Block common offensive language",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "hate",
-      enabled: true,
-      pattern: "hate speech|racial slur|go die",
-      action: "block",
-      description: "Block hate speech patterns",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "phone",
-      enabled: true,
-      pattern: "phone",
-      action: "flag",
-      description: "Flag phone numbers / external contact",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "email",
-      enabled: true,
-      pattern: "email",
-      action: "flag",
-      description: "Flag email addresses shared in chat",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "external_contact",
-      enabled: true,
-      pattern: "whatsapp|telegram",
-      action: "flag",
-      description: "Flag attempts to move conversation off-platform",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "spam_link",
-      enabled: true,
-      pattern: "http",
-      action: "flag",
-      description: "Flag external spam links",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "spam_repeat",
-      enabled: true,
-      pattern: "repeat",
-      action: "flag",
-      description: "Flag repeated identical spam bursts",
-      updatedAt: stamp,
-    },
-    {
-      id: generateId(),
-      kind: "suspicious",
-      enabled: true,
-      pattern: "crypto giveaway|free money|click here now",
-      action: "block",
-      description: "Block suspicious scam phrases",
-      updatedAt: stamp,
-    },
-  ];
+    writeCommunicationDb((d) => {
+      d.moderationRules = rules;
+    });
+    return rules;
+  }
 
+  // Harden legacy installs that still only flag phone/email/external contact
+  let changed = false;
   writeCommunicationDb((d) => {
-    d.moderationRules = rules;
+    for (const rule of d.moderationRules) {
+      if (
+        (rule.kind === "phone" || rule.kind === "email" || rule.kind === "external_contact") &&
+        rule.action === "flag"
+      ) {
+        rule.action = "block";
+        rule.updatedAt = nowIso();
+        changed = true;
+      }
+    }
   });
-  return rules;
+  void changed;
+  return readCommunicationDb().moderationRules;
 }
 
 export function listModerationRules(): ModerationRule[] {
@@ -173,11 +187,17 @@ export function moderateText(
   for (const rule of rules) {
     let hit = false;
     if (rule.kind === "profanity" || rule.kind === "hate" || rule.kind === "suspicious") {
-      const parts = rule.pattern.split("|").map((p) => p.trim()).filter(Boolean);
+      const parts = rule.pattern
+        .split("|")
+        .map((p) => p.trim())
+        .filter(Boolean);
       for (const p of parts) {
         if (p && body.toLowerCase().includes(p.toLowerCase())) {
           hit = true;
-          redacted = redacted.replace(new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), "***");
+          redacted = redacted.replace(
+            new RegExp(p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"),
+            "***",
+          );
         }
       }
     } else if (rule.kind === "phone") {
@@ -195,7 +215,10 @@ export function moderateText(
     } else if (rule.kind === "spam_repeat") {
       const recent = meta?.recentBodies ?? [];
       const normalized = body.trim().toLowerCase();
-      if (normalized.length > 8 && recent.filter((r) => r.trim().toLowerCase() === normalized).length >= 2) {
+      if (
+        normalized.length > 8 &&
+        recent.filter((r) => r.trim().toLowerCase() === normalized).length >= 2
+      ) {
         hit = true;
       }
     }

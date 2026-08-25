@@ -9,9 +9,9 @@ export const siteStatic = {
   shortName: "ATPL PASS",
   legalName: "ATPL PASS",
   description:
-    "ATPL PASS — premium live instructor-led Airline Transport Pilot License training. One unified program, every ATPL subject, competency-based progression.",
+    "ATPL PASS — live instructor-led Airline Transport Pilot License training. One program covering every ATPL theory subject with structured progression.",
   tagline: "YOUR AVIATION JOURNEY STARTS HERE",
-  secondaryTagline: "UNLOCK YOUR PILOT LICENSE",
+  secondaryTagline: "AIRLINE TRANSPORT PILOT LICENSE",
   locale: "en",
   direction: "ltr" as const,
   contactEmail: "support@atplpass.com",

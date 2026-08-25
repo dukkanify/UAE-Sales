@@ -61,24 +61,50 @@ function SuperAdminDashboardView({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Executive overview"
-        description="Platform health, growth, and operational controls."
+        title="Platform overview"
+        description="Students, instructors, courses, and revenue across ATPL PASS."
         breadcrumbs={[{ label: "Super Admin" }, { label: "Dashboard" }]}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total students" value={overview.totalStudents} icon={Users} trend={{ value: 12, label: "vs last month" }} />
-        <StatCard label="Total instructors" value={overview.totalInstructors} icon={GraduationCap} trend={{ value: 8, label: "vs last month" }} />
-        <StatCard label="Total courses" value={overview.totalCourses} icon={BookOpen} hint="LMS catalog" />
-        <StatCard label="Active classes" value={overview.activeClasses} icon={Layers} hint="Live this week" />
-        <StatCard label="Monthly revenue" value={formatCurrency(overview.monthlyRevenue)} icon={DollarSign} trend={{ value: overview.platformGrowth, label: "growth" }} />
-        <StatCard label="Instructor wallets" value={formatCurrency(overview.instructorWalletBalance)} icon={Wallet} />
-        <StatCard label="Pending payments" value={overview.pendingPayments} icon={CreditCard} hint="Awaiting settlement" />
-        <StatCard label="Platform growth" value={`${overview.platformGrowth}%`} icon={TrendingUp} trend={{ value: overview.platformGrowth }} />
+        <StatCard label="Students" value={overview.totalStudents} icon={Users} />
+        <StatCard label="Instructors" value={overview.totalInstructors} icon={GraduationCap} />
+        <StatCard label="Courses" value={overview.totalCourses} icon={BookOpen} />
+        <StatCard
+          label="Active classes"
+          value={overview.activeClasses}
+          icon={Layers}
+          hint="Live or scheduled this week"
+        />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Monthly revenue"
+          value={formatCurrency(overview.monthlyRevenue)}
+          icon={DollarSign}
+          hint={
+            overview.platformGrowth
+              ? `${overview.platformGrowth >= 0 ? "+" : ""}${overview.platformGrowth}% vs prior period`
+              : undefined
+          }
+        />
+        <StatCard
+          label="Instructor wallets"
+          value={formatCurrency(overview.instructorWalletBalance)}
+          icon={Wallet}
+        />
+        <StatCard
+          label="Pending payments"
+          value={overview.pendingPayments}
+          icon={CreditCard}
+          hint="Awaiting settlement"
+        />
+        <StatCard label="Period growth" value={`${overview.platformGrowth}%`} icon={TrendingUp} />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <ChartCard title="Student growth" description="New student registrations over time">
+        <ChartCard title="Student growth" description="Cumulative student registrations">
           <AreaTrendChart data={growth} gradientId="saGrowthFill" />
         </ChartCard>
         <ChartCard title="Revenue trend" description="Monthly platform revenue">
@@ -87,7 +113,7 @@ function SuperAdminDashboardView({
         <ChartCard title="Course enrollments" description="By program track">
           <BarsChart data={enrollments} />
         </ChartCard>
-        <ChartCard title="Attendance overview" description="Live session attendance this week">
+        <ChartCard title="Attendance" description="Live session attendance this week">
           <BarsChart data={attendance} />
         </ChartCard>
       </div>
@@ -97,11 +123,36 @@ function SuperAdminDashboardView({
       <div className="grid gap-4 lg:grid-cols-2">
         <QuickActions
           actions={[
-            { label: "Create Admin", href: "/super-admin/admins", icon: UserPlus, description: "Invite a new administrator" },
-            { label: "Create Instructor", href: "/super-admin/instructors", icon: GraduationCap, description: "Add teaching staff" },
-            { label: "Create Course", href: "/super-admin/courses", icon: BookOpen, description: "Open course builder shell" },
-            { label: "View Reports", href: "/super-admin/reports", icon: FileBarChart, description: "Analytics & exports" },
-            { label: "Platform Settings", href: "/super-admin/settings", icon: Settings, description: "System configuration" },
+            {
+              label: "Create admin",
+              href: "/super-admin/admins",
+              icon: UserPlus,
+              description: "Invite an administrator",
+            },
+            {
+              label: "Add instructor",
+              href: "/super-admin/instructors",
+              icon: GraduationCap,
+              description: "Onboard teaching staff",
+            },
+            {
+              label: "Create course",
+              href: "/super-admin/courses",
+              icon: BookOpen,
+              description: "Open the course catalog",
+            },
+            {
+              label: "Reports",
+              href: "/super-admin/reports",
+              icon: FileBarChart,
+              description: "Analytics and exports",
+            },
+            {
+              label: "Platform settings",
+              href: "/super-admin/settings",
+              icon: Settings,
+              description: "System configuration",
+            },
           ]}
         />
         <RecentActivity items={activity} viewAllHref="/super-admin/activity-logs" />

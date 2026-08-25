@@ -57,7 +57,7 @@ function RegisterShell({ initialRole = "student" }: { initialRole?: RegisterRole
         aria-hidden
       />
 
-      <Card className="relative z-10 w-full max-w-[32rem] overflow-hidden border-border/50 bg-card/95 shadow-[0_28px_80px_-36px_rgba(3,8,12,0.65)] backdrop-blur-sm">
+      <Card className="relative z-10 w-full max-w-[32rem] overflow-visible border-border/50 bg-card/95 shadow-[0_28px_80px_-36px_rgba(3,8,12,0.65)] backdrop-blur-sm">
         <div
           className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary/40"
           aria-hidden

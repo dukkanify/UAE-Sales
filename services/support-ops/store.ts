@@ -1,10 +1,11 @@
 /**
  * Support / ops durable store (Tasks 017 / 021).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   BackupVerificationReport,
   BugReport,
@@ -53,8 +54,9 @@ export interface SupportOpsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-support-ops.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-support-ops.json");
+}
 
 export const DEFAULT_SLA: SlaPolicy = {
   critical: { responseHours: 2, resolutionHours: 8 },
@@ -100,66 +102,57 @@ function emptyDb(): SupportOpsDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<SupportOpsDatabase>): SupportOpsDatabase {
+  const base = emptyDb();
+  return {
+    ...base,
+    ...raw,
+    sla: { ...DEFAULT_SLA, ...(raw.sla ?? {}) },
+    hypercare: {
+      ...DEFAULT_HYPERCARE,
+      ...(raw.hypercare ?? {}),
+      checkIns: raw.hypercare?.checkIns ?? [],
+      watchModules: raw.hypercare?.watchModules ?? DEFAULT_HYPERCARE.watchModules,
+    },
+    counters: { ...base.counters, ...(raw.counters ?? {}) },
+    supportRequests: raw.supportRequests ?? [],
+    bugs: raw.bugs ?? [],
+    changeRequests: raw.changeRequests ?? [],
+    featureRequests: raw.featureRequests ?? [],
+    releases: raw.releases ?? [],
+    maintenanceLogs: raw.maintenanceLogs ?? [],
+    incidents: (raw.incidents ?? []).map((inc) => ({
+      ...inc,
+      affectedModule: inc.affectedModule ?? "general",
+      rootCause: inc.rootCause ?? null,
+      resolution: inc.resolution ?? null,
+      preventiveAction: inc.preventiveAction ?? null,
+    })),
+    roadmapItems: raw.roadmapItems ?? [],
+    healthLogs: raw.healthLogs ?? [],
+    alerts: raw.alerts ?? [],
+    backupReports: raw.backupReports ?? [],
+    knowledgeArticles: raw.knowledgeArticles ?? [],
+    feedback: raw.feedback ?? [],
+    optimizationNotes: (raw.optimizationNotes ?? []).map((n) => {
+      const legacy = n as OptimizationNote & { action?: string };
+      return {
+        ...n,
+        recommendedAction: legacy.recommendedAction ?? legacy.action ?? "",
+      };
+    }),
+    seedVersion: Number(raw.seedVersion ?? (raw.seeded ? 1 : 0)),
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensureSupportOpsStore(): SupportOpsDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<SupportOpsDatabase>;
-    const base = emptyDb();
-    return {
-      ...base,
-      ...raw,
-      sla: { ...DEFAULT_SLA, ...(raw.sla ?? {}) },
-      hypercare: {
-        ...DEFAULT_HYPERCARE,
-        ...(raw.hypercare ?? {}),
-        checkIns: raw.hypercare?.checkIns ?? [],
-        watchModules: raw.hypercare?.watchModules ?? DEFAULT_HYPERCARE.watchModules,
-      },
-      counters: { ...base.counters, ...(raw.counters ?? {}) },
-      supportRequests: raw.supportRequests ?? [],
-      bugs: raw.bugs ?? [],
-      changeRequests: raw.changeRequests ?? [],
-      featureRequests: raw.featureRequests ?? [],
-      releases: raw.releases ?? [],
-      maintenanceLogs: raw.maintenanceLogs ?? [],
-      incidents: (raw.incidents ?? []).map((inc) => ({
-        ...inc,
-        affectedModule: inc.affectedModule ?? "general",
-        rootCause: inc.rootCause ?? null,
-        resolution: inc.resolution ?? null,
-        preventiveAction: inc.preventiveAction ?? null,
-      })),
-      roadmapItems: raw.roadmapItems ?? [],
-      healthLogs: raw.healthLogs ?? [],
-      alerts: raw.alerts ?? [],
-      backupReports: raw.backupReports ?? [],
-      knowledgeArticles: raw.knowledgeArticles ?? [],
-      feedback: raw.feedback ?? [],
-      optimizationNotes: (raw.optimizationNotes ?? []).map((n) => {
-        const legacy = n as OptimizationNote & { action?: string };
-        return {
-          ...n,
-          recommendedAction: legacy.recommendedAction ?? legacy.action ?? "",
-        };
-      }),
-      seedVersion: Number(raw.seedVersion ?? (raw.seeded ? 1 : 0)),
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<SupportOpsDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function writeSupportOpsStore(db: SupportOpsDatabase) {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
 }
 
 export function nextNumber(

@@ -1,14 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  BookOpen,
-  ClipboardList,
-  Lightbulb,
-  Search,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { BookOpen, ClipboardList, Lightbulb, Search, Sparkles, Wand2 } from "lucide-react";
 
 import { PageHeader } from "@/components/shared/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -140,7 +133,7 @@ function AiHubView({ roleLabel, mode }: AiHubViewProps) {
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-card to-sky-500/5">
+      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-card to-accent/5">
         <CardContent className="flex flex-wrap items-center gap-3 p-5">
           <Sparkles className="size-6 text-primary" />
           <div className="min-w-0 flex-1">
@@ -168,9 +161,7 @@ function AiHubView({ roleLabel, mode }: AiHubViewProps) {
             <Button size="sm" onClick={() => void runSearch()}>
               Search
             </Button>
-            {searchInterp ? (
-              <p className="text-xs text-muted-foreground">{searchInterp}</p>
-            ) : null}
+            {searchInterp ? <p className="text-xs text-muted-foreground">{searchInterp}</p> : null}
             <div className="space-y-2">
               {searchResults.map((r) => (
                 <a
@@ -286,7 +277,11 @@ function AiHubView({ roleLabel, mode }: AiHubViewProps) {
               <Button size="sm" variant="outline" onClick={() => void runWrite("email")}>
                 Email
               </Button>
-              <Button size="sm" variant="outline" onClick={() => void runWrite("course_description")}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void runWrite("course_description")}
+              >
                 Course description
               </Button>
               <Button size="sm" variant="outline" onClick={() => void runWrite("study_guide")}>

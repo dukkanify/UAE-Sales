@@ -10,7 +10,7 @@ export default function ComingSoonPage() {
     <SystemPage
       code="Soon"
       title="Coming soon"
-      description="This part of AviatorPass is under construction. Check back shortly."
+      description="This section is not available yet. Return to the academy home page or sign in to continue."
       actionHref={routes.home}
       actionLabel="Back to home"
     />

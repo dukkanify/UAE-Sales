@@ -88,6 +88,11 @@ export function ensureCommunicationSeeded(): void {
       body: "Could you clarify the NOTAM interpretation question from yesterday's live class?",
       attachments: [],
       deliveryStatus: "delivered",
+      shareKind: "text",
+      replyToId: null,
+      replyPreview: null,
+      reactions: [],
+      pinned: false,
       moderated: false,
       moderationFlags: [],
       deletedAt: null,
@@ -102,6 +107,11 @@ export function ensureCommunicationSeeded(): void {
       body: "Absolutely — focus on the Q-code and validity period first. I pinned a summary in the course community.",
       attachments: [],
       deliveryStatus: "delivered",
+      shareKind: "lesson_notes",
+      replyToId: null,
+      replyPreview: null,
+      reactions: [],
+      pinned: true,
       moderated: false,
       moderationFlags: [],
       deletedAt: null,
@@ -201,7 +211,7 @@ export function ensureCommunicationSeeded(): void {
 
   const announcement: Announcement = {
     id: generateId(),
-    title: "Welcome to the AviatorPass Communication Center",
+    title: "Welcome to the ATPL PASS Communication Center",
     bodyHtml:
       "<p>Messaging, communities, announcements, and support tickets are now live inside the platform.</p>",
     target: "platform",

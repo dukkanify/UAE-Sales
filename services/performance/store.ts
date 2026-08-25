@@ -1,10 +1,16 @@
 /**
  * Performance reports durable store (.data/aep-performance-reports.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
+import {
+  clearJsonFileCache,
+  dataDir,
+  readJsonFile,
+  writeJsonFile,
+} from "@/lib/data/json-file-store";
 import type { PerformanceReport } from "@/types/performance-reports";
 
 export interface PerformanceReportsDatabase {
@@ -12,44 +18,37 @@ export interface PerformanceReportsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-performance-reports.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-performance-reports.json");
+}
 
 function emptyDb(): PerformanceReportsDatabase {
   return { reports: [], seeded: false };
 }
 
-let cache: PerformanceReportsDatabase | null = null;
+function normalizeDb(raw: Partial<PerformanceReportsDatabase>): PerformanceReportsDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    reports: raw.reports ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
 
 export function readPerformanceDb(): PerformanceReportsDatabase {
-  if (cache) return cache;
-  try {
-    if (existsSync(DATA_FILE)) {
-      const parsed = JSON.parse(readFileSync(DATA_FILE, "utf8")) as PerformanceReportsDatabase;
-      cache = {
-        reports: parsed.reports ?? [],
-        seeded: Boolean(parsed.seeded),
-      };
-      return cache;
-    }
-  } catch {
-    // fall through
-  }
-  cache = emptyDb();
-  return cache;
+  const raw = readJsonFile<Partial<PerformanceReportsDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function writePerformanceDb(
   mutator: (db: PerformanceReportsDatabase) => void,
 ): PerformanceReportsDatabase {
-  const db = structuredClone(readPerformanceDb());
+  const db = readPerformanceDb();
   mutator(db);
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-  cache = db;
+  writeJsonFile(dataFile(), db);
   return db;
 }
 
 export function resetPerformanceDbCache(): void {
-  cache = null;
+  clearJsonFileCache(dataFile());
 }

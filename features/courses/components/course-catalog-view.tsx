@@ -129,7 +129,7 @@ function CourseCatalogView({
                 ) : (
                   <p className="mt-3 text-xs">
                     Teaching tools (lessons player, attendance) arrive later.{" "}
-                    <Link href="/instructor/lessons" className="text-primary hover:underline">
+                    <Link href="/instructor/courses" className="text-primary hover:underline">
                       Lessons
                     </Link>
                   </p>
