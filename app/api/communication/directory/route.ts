@@ -39,6 +39,12 @@ export async function GET(request: Request) {
         // Admin / super_admin: full directory.
         return true;
       })
+      .filter((u) => {
+        if (!q) return true;
+        const p = toUserProfile(u);
+        const hay = `${p.fullName} ${p.email} ${u.role}`.toLowerCase();
+        return hay.includes(q);
+      })
       .map((u) => {
         const p = toUserProfile(u);
         return {
@@ -49,9 +55,6 @@ export async function GET(request: Request) {
           role: u.role,
         };
       })
-      .filter(
-        (u) => !q || u.fullName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
-      )
       .slice(0, 40);
     return NextResponse.json({ success: true, data: rows, error: null });
   } catch (error) {
