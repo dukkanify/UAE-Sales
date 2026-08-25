@@ -3,14 +3,12 @@
 import * as React from "react";
 import Link from "@/components/ui/app-link";
 import {
-  Bookmark,
   BookOpen,
   CalendarDays,
   Clock3,
   FolderOpen,
   PlayCircle,
   Search,
-  Star,
   UserRound,
   Video,
 } from "lucide-react";
@@ -67,20 +65,28 @@ function LearningDashboardView() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Learning journey"
-        description="Resume lessons, track progress, and stay ahead of live classes."
+        title="Student dashboard"
+        description="Resume lessons, track subject progress, and prepare for live sessions."
         breadcrumbs={[{ label: "Student" }, { label: "Dashboard" }]}
       />
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-28 rounded-2xl" />
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
           ))}
         </div>
       ) : error ? (
         <Card>
-          <CardContent className="py-8 text-center text-sm text-destructive">{error}</CardContent>
+          <CardContent className="space-y-3 py-8 text-center">
+            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-sm text-muted-foreground">
+              Refresh the page, or open your courses to continue studying.
+            </p>
+            <Button asChild variant="outline">
+              <Link href="/student/courses">Go to courses</Link>
+            </Button>
+          </CardContent>
         </Card>
       ) : overview ? (
         <>
@@ -88,7 +94,7 @@ function LearningDashboardView() {
             <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
               <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <CardDescription>Continue learning</CardDescription>
+                  <CardDescription>Continue where you left off</CardDescription>
                   <CardTitle className="font-display text-2xl tracking-tight">
                     {overview.resume.lessonTitle}
                   </CardTitle>
@@ -99,7 +105,7 @@ function LearningDashboardView() {
                 <Button asChild size="lg">
                   <Link href={resumeHref}>
                     <PlayCircle className="size-4" />
-                    Resume last lesson
+                    Resume lesson
                   </Link>
                 </Button>
               </CardHeader>
@@ -108,25 +114,17 @@ function LearningDashboardView() {
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="Active courses" value={overview.activeCourses} icon={BookOpen} />
-            <StatCard label="Completed courses" value={overview.completedCourses} icon={Star} />
             <StatCard
-              label="Upcoming live class"
-              value={overview.upcomingLiveClass ? "Scheduled" : "None"}
-              hint={overview.upcomingLiveClass ?? "No upcoming sessions"}
-              icon={Video}
-            />
-            <StatCard label="Learning hours" value={`${overview.learningHours}h`} icon={Clock3} />
-            <StatCard
-              label="Progress"
+              label="Course progress"
               value={`${Math.round(overview.progressPercent)}%`}
               icon={PlayCircle}
             />
-            <StatCard label="Assignments" value={overview.assignments} icon={FolderOpen} />
-            <StatCard label="Notifications" value={overview.notifications} icon={Bookmark} />
+            <StatCard label="Learning hours" value={`${overview.learningHours}h`} icon={Clock3} />
             <StatCard
-              label="Weekly goal"
-              value={`${overview.weeklyGoalPercent}%`}
-              icon={CalendarDays}
+              label="Next live class"
+              value={overview.upcomingLiveClass ? "Scheduled" : "None"}
+              hint={overview.upcomingLiveClass ?? "No sessions on the calendar yet"}
+              icon={Video}
             />
           </div>
 
@@ -145,51 +143,37 @@ function LearningDashboardView() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             <RecentActivity items={activity} title="Recent activity" />
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">My student account</CardTitle>
-                  <CardDescription>
-                    View and edit your personal details, contact info, and emergency contacts.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button asChild variant="outline">
-                    <Link href="/student/profile">
-                      <UserRound className="size-4" />
-                      Open my account
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base">Next live class</CardTitle>
-                  <CardDescription>
-                    {overview.upcomingLiveClass ?? "Nothing scheduled yet"}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button asChild variant="outline">
-                    <Link href="/student/calendar">Open calendar</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Next live class</CardTitle>
+                <CardDescription>
+                  {overview.upcomingLiveClass ??
+                    "Nothing scheduled yet — check the calendar for upcoming sessions."}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex flex-wrap gap-2">
+                <Button asChild variant="outline">
+                  <Link href="/student/calendar">
+                    <CalendarDays className="size-4" />
+                    Open calendar
+                  </Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href="/student/profile">
+                    <UserRound className="size-4" />
+                    My account
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
 
           <QuickActions
             actions={[
-              { label: "Continue Learning", href: resumeHref, icon: PlayCircle },
-              {
-                label: "Join Next Live Class",
-                href: "/student/calendar",
-                icon: Video,
-              },
-              { label: "Open Calendar", href: "/student/calendar", icon: CalendarDays },
-              { label: "My Account", href: "/student/profile", icon: UserRound },
-              { label: "View Resources", href: "/student/resources", icon: FolderOpen },
-              { label: "Search", href: "/student/search", icon: Search },
+              { label: "Continue learning", href: resumeHref, icon: PlayCircle },
+              { label: "Live classes", href: "/student/calendar", icon: Video },
+              { label: "Study resources", href: "/student/resources", icon: FolderOpen },
+              { label: "Search academy", href: "/student/search", icon: Search },
             ]}
           />
         </>

@@ -224,7 +224,7 @@ function StudentBookingView() {
             </p>
             <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
               Book your{" "}
-              <span className="bg-gradient-to-r from-[#5BA3C9] to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 live session
               </span>
             </h1>

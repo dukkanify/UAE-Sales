@@ -11,4 +11,3 @@ export type { CalendarEvent } from "./calendar-widget";
 export { DataTable } from "./data-table";
 export type { DataTableColumn } from "./data-table";
 export { ProgressWidget } from "./progress-widget";
-export { ModulePlaceholder } from "./module-placeholder";

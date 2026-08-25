@@ -148,7 +148,7 @@ function AtplProgramPageContent({ subjects, enrollHref, priceLabel }: AtplProgra
             Ready to enroll in the ATPL Program?
           </h2>
           <p className="mx-auto mt-5 max-w-md text-white/55">
-            Start your journey with live instructor-led training and access to every ATPL subject.
+            Begin with live instructor-led training and access to every ATPL subject.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3">
             <Button size="lg" variant="accent" className="hero-cta-primary px-10" asChild>

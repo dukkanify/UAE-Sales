@@ -1,6 +1,5 @@
 /**
- * Dashboard metrics — real user counts from auth store + foundation placeholders
- * for courses/classes/revenue (business modules not yet implemented).
+ * Dashboard metrics — live counts from auth, courses, classes, finance, and communication stores.
  */
 
 import { ensureDemoUsersSeeded } from "@/services/auth/demo-users";
@@ -13,6 +12,8 @@ import { readCoursesDb } from "@/services/courses/store";
 import { getClassStats } from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
 import { readClassesDb } from "@/services/classes/store";
+import { ensureCommunicationSeeded } from "@/services/communication/seed";
+import { readCommunicationDb } from "@/services/communication/store";
 import type { SeriesPoint } from "@/components/dashboard/chart-types";
 import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
@@ -33,6 +34,21 @@ export { ensureDemoUsersSeeded };
 
 function countByRole(users: StoredUser[], role: Role): number {
   return users.filter((u) => u.role === role).length;
+}
+
+function communicationOpsCounts() {
+  ensureCommunicationSeeded();
+  const comm = readCommunicationDb();
+  const monthPrefix = new Date().toISOString().slice(0, 7);
+  return {
+    communityReports: comm.moderationLogs.filter((l) => l.action === "flag" || l.action === "block")
+      .length,
+    blogActivity: comm.blogPosts.filter(
+      (p) =>
+        p.status === "published" &&
+        (p.publishedAt?.startsWith(monthPrefix) || p.updatedAt.startsWith(monthPrefix)),
+    ).length,
+  };
 }
 
 export function getPlatformOverview() {
@@ -76,8 +92,7 @@ export function getPlatformOverview() {
     pendingPayments: finance.pendingPayments,
     platformGrowth: growth,
     pendingApprovals: db.users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
-    communityReports: 2,
-    blogActivity: 8,
+    ...communicationOpsCounts(),
     liveClasses: classStats.liveNow,
     activeSessions: db.sessions.filter((s) => !s.revokedAt).length,
   };
@@ -381,7 +396,6 @@ export function getAdminOverview() {
     courses: courseStats.totalCourses,
     liveClasses,
     pendingApprovals: users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
-    communityReports: 2,
-    blogActivity: 8,
+    ...communicationOpsCounts(),
   };
 }
