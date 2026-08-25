@@ -12,6 +12,7 @@ const exploreLinks = [
   { href: routes.courses, label: "ATPL Program" },
   { href: "/#about", label: "About" },
   { href: "/#instructors", label: "Instructors" },
+  { href: routes.book, label: "Private Session" },
   { href: "/#contact", label: "Contact" },
 ] as const;
 

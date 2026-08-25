@@ -9,6 +9,7 @@ import {
   listMyBookings,
 } from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 
 export async function GET() {
   try {
@@ -33,6 +34,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const user = await requirePermission(PERMISSIONS.BOOKINGS_OWN);
     const body = (await request.json().catch(() => null)) as {
       instructorId?: string;

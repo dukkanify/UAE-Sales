@@ -21,15 +21,16 @@ import {
   utcHourFromIso,
   type ResolvedBookableDay,
 } from "@/features/bookings/lib/slot-utils";
+import { formatMinor } from "@/services/payments/money";
 import type { BookingSlot, PublicBookingCatalog } from "@/types/bookings";
 
 type Step = "when" | "details" | "otp" | "done";
 
 const STEPS: Array<{ id: Step; label: string; short: string }> = [
-  { id: "when", label: "When", short: "Time" },
-  { id: "details", label: "Details", short: "You" },
-  { id: "otp", label: "Confirm", short: "Code" },
-  { id: "done", label: "Ready", short: "Zoom" },
+  { id: "when", label: "Service & time", short: "Book" },
+  { id: "details", label: "Review", short: "Review" },
+  { id: "otp", label: "Confirm", short: "Confirm" },
+  { id: "done", label: "Confirmed", short: "Done" },
 ];
 
 async function publicFetch<T>(url: string, init?: RequestInit) {
@@ -111,11 +112,15 @@ function PublicBookingStudio() {
     setCatalogError(null);
     const res = await publicFetch<PublicBookingCatalog>("/api/public/bookings");
     if (res.success && res.data) {
-      setCatalog(res.data);
       const types = res.data.sessionTypes ?? [];
-      const instructors = res.data.instructors ?? [];
-      setSessionTypeId((prev) => prev || types[0]?.id || "");
-      setInstructorId((prev) => prev || instructors[0]?.id || "");
+      setCatalog(res.data);
+      const firstType = types[0];
+      setSessionTypeId((prev) => prev || firstType?.id || "");
+      setInstructorId((prev) => {
+        const pool = firstType?.instructors ?? [];
+        if (prev && pool.some((i) => i.id === prev)) return prev;
+        return pool[0]?.id || "";
+      });
       setDate((prev) => prev || format(new Date(), "yyyy-MM-dd"));
       setStep("when");
       return;
@@ -166,7 +171,16 @@ function PublicBookingStudio() {
   }, [date, instructorId, sessionTypeId, step]);
 
   const selectedType = catalog?.sessionTypes?.find((t) => t.id === sessionTypeId);
-  const selectedInstructor = catalog?.instructors?.find((i) => i.id === instructorId);
+  const serviceInstructors = React.useMemo(() => selectedType?.instructors ?? [], [selectedType]);
+  const selectedInstructor = serviceInstructors.find((i) => i.id === instructorId);
+
+  React.useEffect(() => {
+    if (!selectedType) return;
+    setInstructorId((prev) => {
+      if (serviceInstructors.some((i) => i.id === prev)) return prev;
+      return serviceInstructors[0]?.id || "";
+    });
+  }, [sessionTypeId, selectedType, serviceInstructors]);
   const groupedSlots = React.useMemo(() => groupOpenSlots(slots), [slots]);
   const openCount = groupedSlots.reduce((n, g) => n + g.slots.length, 0);
   const activeStep = stepIndex(step);
@@ -274,24 +288,27 @@ function PublicBookingStudio() {
   return (
     <div className="platform-altitude landing-root">
       <section className="booking-hero text-white">
-        <div className="container-app relative z-10 py-10 sm:py-14">
-          <p className="landing-kicker text-accent">AviatorPass live</p>
-          <h1 className="mt-3 max-w-[12ch] font-display text-[clamp(2.1rem,4.8vw,3.4rem)] font-semibold tracking-[-0.04em] leading-[1.02] text-white">
-            AviatorPass
+        <div className="container-app relative z-10 py-10 sm:py-16">
+          <p className="landing-kicker text-accent">Premium standalone service</p>
+          <h1 className="mt-3 max-w-[14ch] font-display text-[clamp(2.1rem,4.8vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-white">
+            Private Session
           </h1>
-          <p className="mt-3 max-w-[26ch] font-display text-[clamp(1.15rem,2.2vw,1.55rem)] font-semibold tracking-[-0.03em] leading-snug text-white/92">
-            Book live Zoom coaching
+          <p className="mt-3 max-w-[32ch] font-display text-[clamp(1.1rem,2.2vw,1.5rem)] font-semibold leading-snug tracking-[-0.03em] text-white/92">
+            One-to-one with a certified AviatorPass instructor
           </p>
-          <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/65 sm:text-[0.95rem]">
-            Pick a time, confirm by email, join Zoom — your learner account opens when you confirm.
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/65 sm:text-[0.95rem]">
+            Book private coaching, mock exams, interview prep, and mentoring on Zoom. This is a
+            separate premium service — not included automatically with the ATPL Program unless your
+            administrator specifies it.
           </p>
-          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">
             <span className="inline-flex items-center gap-1.5 text-accent/90">
               <Sparkles className="h-3.5 w-3.5" />
-              Instant hold
+              Certified instructors
             </span>
-            <span>Email OTP</span>
-            <span>Zoom lobby</span>
+            <span>Live Zoom</span>
+            <span>Email confirmation</span>
+            <span>Calendar invite</span>
           </div>
         </div>
       </section>
@@ -323,9 +340,9 @@ function PublicBookingStudio() {
             <div className="booking-step-panel">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div className="min-w-0">
-                  <h2 className="booking-step-heading">Choose your Zoom window</h2>
+                  <h2 className="booking-step-heading">Choose your private session</h2>
                   <p className="booking-step-lead">
-                    Session, instructor, and an open GMT time — only bookable slots appear.
+                    Select a service, instructor, and available time — only open slots are shown.
                   </p>
                 </div>
                 <p className="shrink-0 text-sm font-medium tabular-nums text-muted-foreground">
@@ -349,9 +366,15 @@ function PublicBookingStudio() {
                       onClick={() => setSessionTypeId(t.id)}
                     >
                       <span className="booking-option-title">{t.name}</span>
-                      {t.durationMinutes ? (
-                        <span className="booking-option-meta">{t.durationMinutes} min</span>
+                      {t.description ? (
+                        <span className="booking-option-meta line-clamp-2">{t.description}</span>
                       ) : null}
+                      <span className="booking-option-meta">
+                        {t.durationMinutes} min
+                        {t.paymentRequired && t.priceAmountMinor > 0
+                          ? ` · ${formatMinor(t.priceAmountMinor, t.currency)}`
+                          : " · Complimentary"}
+                      </span>
                     </button>
                   ))}
                 </div>
@@ -368,7 +391,7 @@ function PublicBookingStudio() {
                     value={instructorId}
                     onChange={(e) => setInstructorId(e.target.value)}
                   >
-                    {(catalog.instructors ?? []).map((i) => (
+                    {(serviceInstructors ?? []).map((i) => (
                       <option key={i.id} value={i.id}>
                         {i.fullName}
                       </option>
@@ -496,22 +519,30 @@ function PublicBookingStudio() {
               >
                 <ArrowLeft className="h-4 w-4" /> Back to times
               </button>
-              <h2 className="booking-step-heading">Your details</h2>
+              <h2 className="booking-step-heading">Review your booking</h2>
               <p className="booking-step-lead">
-                Confirm by email — we create learner access and prepare your Zoom lobby.
+                Confirm your details — we create learner access and prepare your Zoom meeting.
               </p>
 
               <div className="mt-4 bg-[var(--surface-ink)] px-4 py-3.5 text-white">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">
-                  Hold summary
+                  Session summary
                 </p>
-                <p className="mt-1.5 font-display text-lg font-semibold tracking-tight leading-snug">
+                <p className="mt-1.5 font-display text-lg font-semibold leading-snug tracking-tight">
                   {selectedType?.name}
                 </p>
                 <p className="mt-1 text-sm leading-snug text-white/65">
                   {selectedInstructor?.fullName}
                   {selectedSlot ? ` · ${formatSlotDateTime(selectedSlot)}` : ""}
                 </p>
+                {selectedType?.paymentRequired && selectedType.priceAmountMinor > 0 ? (
+                  <p className="mt-2 text-sm text-accent">
+                    Fee: {formatMinor(selectedType.priceAmountMinor, selectedType.currency)} — pay
+                    after email confirmation (Tabby/Tamara where available)
+                  </p>
+                ) : (
+                  <p className="mt-2 text-sm text-white/55">No payment required for this service</p>
+                )}
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">

@@ -13,6 +13,7 @@ import { readAuthDb, toUserProfile } from "@/services/auth/store";
 import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { BookingAccessError } from "@/services/bookings/access";
 import { defaultBookingSettings, readBookingsDb, writeBookingsDb } from "@/services/bookings/store";
+import { sendPrivateSessionConfirmationEmails } from "@/services/bookings/booking-notifications";
 import type {
   AppointmentBooking,
   BookingJoinPayload,
@@ -29,7 +30,7 @@ import {
   provisionStandaloneZoomMeeting,
 } from "@/services/classes/zoom-service";
 
-const ACTIVE_BOOKING: BookingStatus[] = ["pending", "confirmed"];
+const ACTIVE_BOOKING: BookingStatus[] = ["pending", "pending_payment", "confirmed"];
 const GUEST_HOLD_TTL_MS = 15 * 60_000;
 
 function buildUserNameMap(): Map<string, string> {
@@ -92,7 +93,58 @@ function normalizeBooking(b: AppointmentBooking): AppointmentBooking {
     guestFirstName: b.guestFirstName ?? null,
     guestLastName: b.guestLastName ?? null,
     guestVerified: Boolean(b.guestVerified),
+    priceAmountMinor: typeof b.priceAmountMinor === "number" ? b.priceAmountMinor : 0,
+    currency: b.currency || "KWD",
+    paymentRequired: Boolean(b.paymentRequired),
+    paymentOrderId: b.paymentOrderId ?? null,
+    paidAt: b.paidAt ?? null,
   };
+}
+
+function sessionPricingSnapshot(sessionType: {
+  priceAmountMinor: number;
+  currency: string;
+  paymentRequired: boolean;
+}) {
+  return {
+    priceAmountMinor: sessionType.priceAmountMinor,
+    currency: sessionType.currency,
+    paymentRequired: sessionType.paymentRequired && sessionType.priceAmountMinor > 0,
+  };
+}
+
+function resolveInitialBookingStatus(
+  settings: BookingSettings,
+  paymentRequired: boolean,
+): BookingStatus {
+  if (paymentRequired) return "pending_payment";
+  if (settings.requireConfirmation) return "pending";
+  return "confirmed";
+}
+
+async function finalizeConfirmedBooking(
+  booking: AppointmentBooking,
+  actorId: string,
+): Promise<AppointmentBooking> {
+  const settings = getBookingSettings();
+  let next = booking;
+
+  if (settings.autoCreateZoom && !next.zoom) {
+    const zoom = await provisionZoomForBooking(next, actorId);
+    writeBookingsDb((db) => {
+      const idx = db.bookings.findIndex((b) => b.id === next.id);
+      if (idx >= 0) {
+        next = { ...db.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
+        db.bookings[idx] = next;
+      }
+    });
+  }
+
+  if (next.status === "confirmed") {
+    void sendPrivateSessionConfirmationEmails(next).catch(() => undefined);
+  }
+
+  return normalizeBooking(next);
 }
 
 async function provisionZoomForBooking(
@@ -218,6 +270,20 @@ export function listBookableInstructors(): UserProfile[] {
   return filtered;
 }
 
+/** Instructors assigned to a specific private session service. */
+export function listBookableInstructorsForSession(sessionTypeId: string): UserProfile[] {
+  const settings = getBookingSettings();
+  const sessionType = settings.sessionTypes.find((t) => t.id === sessionTypeId && t.active);
+  if (!sessionType) return [];
+
+  const platform = listBookableInstructors();
+  if (!sessionType.instructorIds.length) return platform;
+
+  const allow = new Set(sessionType.instructorIds);
+  const filtered = platform.filter((i) => allow.has(i.id));
+  return filtered.length > 0 ? filtered : platform;
+}
+
 function overlaps(aStart: Date, aEnd: Date, bStart: Date, bEnd: Date): boolean {
   return aStart < bEnd && bStart < aEnd;
 }
@@ -237,9 +303,9 @@ export function getAvailableSlots(input: {
   const sessionType = settings.sessionTypes.find((t) => t.id === input.sessionTypeId && t.active);
   if (!sessionType) throw new BookingAccessError("Session type not available", 404);
 
-  const instructors = listBookableInstructors();
+  const instructors = listBookableInstructorsForSession(input.sessionTypeId);
   if (!instructors.some((i) => i.id === input.instructorId)) {
-    throw new BookingAccessError("Instructor not available for booking", 400);
+    throw new BookingAccessError("Instructor not available for this service", 400);
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date)) {
@@ -396,9 +462,9 @@ export async function createBooking(input: {
   const sessionType = settings.sessionTypes.find((t) => t.id === input.sessionTypeId && t.active);
   if (!sessionType) throw new BookingAccessError("Session type not available", 404);
 
-  const instructors = listBookableInstructors();
+  const instructors = listBookableInstructorsForSession(input.sessionTypeId);
   if (!instructors.some((i) => i.id === input.instructorId)) {
-    throw new BookingAccessError("Instructor not available", 400);
+    throw new BookingAccessError("Instructor not available for this service", 400);
   }
 
   const startsAt = parseISO(input.startsAt);
@@ -419,8 +485,9 @@ export async function createBooking(input: {
     throw new BookingAccessError("Selected slot is not available", 409);
   }
 
+  const pricing = sessionPricingSnapshot(sessionType);
   const now = new Date().toISOString();
-  const status: BookingStatus = settings.requireConfirmation ? "pending" : "confirmed";
+  const status = resolveInitialBookingStatus(settings, pricing.paymentRequired);
   let booking: AppointmentBooking = {
     id: generateId(),
     studentId: input.user.id,
@@ -442,6 +509,9 @@ export async function createBooking(input: {
     cancelledAt: null,
     cancelledBy: null,
     cancelReason: null,
+    ...pricing,
+    paymentOrderId: null,
+    paidAt: null,
   };
 
   writeBookingsDb((db) => {
@@ -460,15 +530,8 @@ export async function createBooking(input: {
     db.bookings.push(booking);
   });
 
-  if (status === "confirmed" && settings.autoCreateZoom) {
-    const zoom = await provisionZoomForBooking(booking, input.user.id);
-    writeBookingsDb((db) => {
-      const idx = db.bookings.findIndex((b) => b.id === booking.id);
-      if (idx >= 0) {
-        booking = { ...db.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
-        db.bookings[idx] = booking;
-      }
-    });
+  if (status === "confirmed") {
+    booking = await finalizeConfirmedBooking(booking, input.user.id);
   }
 
   await logActivity({
@@ -487,10 +550,7 @@ export function listMyBookings(user: UserProfile): BookingListItem[] {
   let rows = db.bookings;
   if (user.role === ROLES.STUDENT) {
     rows = rows.filter((b) => b.studentId === user.id);
-  } else if (
-    user.role === ROLES.INSTRUCTOR ||
-    user.role === ROLES.CHIEF_GROUND_INSTRUCTOR
-  ) {
+  } else if (user.role === ROLES.INSTRUCTOR || user.role === ROLES.CHIEF_GROUND_INSTRUCTOR) {
     // Instructors and CGI only see sessions they teach — never the full platform book.
     rows = rows.filter((b) => b.instructorId === user.id);
   } else {
@@ -574,14 +634,9 @@ export async function updateBookingStatus(input: {
   });
 
   if (input.status === "confirmed" && settings.autoCreateZoom && !next.zoom) {
-    const zoom = await provisionZoomForBooking(next, input.user.id);
-    writeBookingsDb((d) => {
-      const idx = d.bookings.findIndex((b) => b.id === next.id);
-      if (idx >= 0) {
-        next = { ...d.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
-        d.bookings[idx] = next;
-      }
-    });
+    next = await finalizeConfirmedBooking(next, input.user.id);
+  } else if (input.status === "confirmed") {
+    void sendPrivateSessionConfirmationEmails(next).catch(() => undefined);
   }
 
   if (input.status === "cancelled" && next.zoom) {
@@ -677,13 +732,17 @@ export function getPublicBookingCatalog(): PublicBookingCatalog {
     autoCreateZoom: settings.autoCreateZoom,
     requireConfirmation: settings.requireConfirmation,
     timezone: settings.timezone,
-    sessionTypes: settings.sessionTypes.filter((t) => t.active),
-    instructors: listBookableInstructors().map((i) => ({
-      id: i.id,
-      fullName: i.fullName || i.email,
-      firstName: i.firstName,
-      lastName: i.lastName,
-    })),
+    sessionTypes: settings.sessionTypes
+      .filter((t) => t.active)
+      .map((t) => ({
+        ...t,
+        instructors: listBookableInstructorsForSession(t.id).map((i) => ({
+          id: i.id,
+          fullName: i.fullName || i.email,
+          firstName: i.firstName,
+          lastName: i.lastName,
+        })),
+      })),
   };
 }
 
@@ -724,9 +783,9 @@ export async function createGuestBookingHold(input: {
   const sessionType = settings.sessionTypes.find((t) => t.id === input.sessionTypeId && t.active);
   if (!sessionType) throw new BookingAccessError("Session type not available", 404);
 
-  const instructors = listBookableInstructors();
+  const instructors = listBookableInstructorsForSession(input.sessionTypeId);
   if (!instructors.some((i) => i.id === input.instructorId)) {
-    throw new BookingAccessError("Instructor not available", 400);
+    throw new BookingAccessError("Instructor not available for this service", 400);
   }
 
   const startsAt = parseISO(input.startsAt);
@@ -743,6 +802,7 @@ export async function createGuestBookingHold(input: {
   );
   if (!match) throw new BookingAccessError("Selected slot is not available", 409);
 
+  const pricing = sessionPricingSnapshot(sessionType);
   const now = new Date().toISOString();
   const booking: AppointmentBooking = {
     id: generateId(),
@@ -765,6 +825,9 @@ export async function createGuestBookingHold(input: {
     cancelledAt: null,
     cancelledBy: null,
     cancelReason: null,
+    ...pricing,
+    paymentOrderId: null,
+    paidAt: null,
   };
 
   writeBookingsDb((db) => {
@@ -811,7 +874,9 @@ export async function finalizeGuestBooking(input: {
     return booking;
   }
 
-  const status: BookingStatus = settings.requireConfirmation ? "pending" : "confirmed";
+  const status = booking.paymentRequired
+    ? "pending_payment"
+    : resolveInitialBookingStatus(settings, false);
   let next = booking;
 
   writeBookingsDb((d) => {
@@ -827,15 +892,8 @@ export async function finalizeGuestBooking(input: {
     d.bookings[idx] = next;
   });
 
-  if (status === "confirmed" && settings.autoCreateZoom && !next.zoom) {
-    const zoom = await provisionZoomForBooking(next, input.userId);
-    writeBookingsDb((d) => {
-      const idx = d.bookings.findIndex((b) => b.id === next.id);
-      if (idx >= 0) {
-        next = { ...d.bookings[idx]!, zoom, updatedAt: new Date().toISOString() };
-        d.bookings[idx] = next;
-      }
-    });
+  if (status === "confirmed") {
+    next = await finalizeConfirmedBooking(next, input.userId);
   }
 
   await logActivity({
@@ -844,6 +902,50 @@ export async function finalizeGuestBooking(input: {
     entityType: "booking",
     entityId: next.id,
     metadata: { guestFinalized: true, status },
+  });
+
+  return normalizeBooking(next);
+}
+
+/** Mark a pending_payment booking as paid and confirm with Zoom + emails. */
+export async function confirmBookingPayment(input: {
+  bookingId: string;
+  userId: string;
+  paymentOrderId?: string;
+}): Promise<AppointmentBooking> {
+  const existing = readBookingsDb().bookings.find((b) => b.id === input.bookingId);
+  if (!existing) throw new BookingAccessError("Booking not found", 404);
+  if (existing.status !== "pending_payment") {
+    throw new BookingAccessError("Booking is not awaiting payment", 400);
+  }
+  if (existing.studentId && existing.studentId !== input.userId) {
+    throw new BookingAccessError("Not allowed", 403);
+  }
+
+  const now = new Date().toISOString();
+  let next = normalizeBooking(existing);
+
+  writeBookingsDb((d) => {
+    const idx = d.bookings.findIndex((b) => b.id === input.bookingId);
+    if (idx < 0) throw new BookingAccessError("Booking not found", 404);
+    next = {
+      ...normalizeBooking(d.bookings[idx]!),
+      status: "confirmed",
+      paidAt: now,
+      paymentOrderId: input.paymentOrderId ?? d.bookings[idx]!.paymentOrderId,
+      updatedAt: now,
+    };
+    d.bookings[idx] = next;
+  });
+
+  next = await finalizeConfirmedBooking(next, input.userId);
+
+  await logActivity({
+    actorId: input.userId,
+    action: ACTIVITY_ACTIONS.BOOKING_UPDATED,
+    entityType: "booking",
+    entityId: next.id,
+    metadata: { paid: true },
   });
 
   return normalizeBooking(next);
