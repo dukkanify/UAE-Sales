@@ -6,7 +6,7 @@ export type RegistrationDialCountry = "KW" | "AE";
 
 export const REGISTRATION_PHONE_COUNTRIES = [
   { code: "KW" as const, dialCode: "+965", flag: "🇰🇼", label: "Kuwait" },
-  { code: "AE" as const, dialCode: "+971", flag: "🇦🇪", label: "United Arab Emirates" },
+  { code: "AE" as const, dialCode: "+971", flag: "🇦🇪", label: "UAE" },
 ] as const;
 
 const KW_LOCAL_LENGTH = 8;

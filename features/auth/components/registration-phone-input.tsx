@@ -91,7 +91,8 @@ function RegistrationPhoneInput({
       <Label htmlFor="registration-phone-local">Phone number</Label>
       <div
         className={cn(
-          "flex overflow-hidden rounded-md border border-input bg-background ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
+          // overflow-visible so the country listbox is not clipped (UAE +971 is 2nd option)
+          "flex rounded-md border border-input bg-background ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
           displayError && "border-destructive focus-within:ring-destructive",
         )}
       >
@@ -103,7 +104,7 @@ function RegistrationPhoneInput({
             aria-expanded={selectorOpen}
             aria-label={`Country code, ${selected.label} ${selected.dialCode}`}
             onClick={() => setSelectorOpen((v) => !v)}
-            className="flex h-10 min-w-[7.25rem] items-center gap-1.5 px-2.5 text-sm text-foreground hover:bg-muted/40 disabled:opacity-50 sm:min-w-[8.5rem] sm:px-3"
+            className="flex h-10 min-w-[7.25rem] items-center gap-1.5 rounded-l-md px-2.5 text-sm text-foreground hover:bg-muted/40 disabled:opacity-50 sm:min-w-[8.5rem] sm:px-3"
           >
             <span className="text-base leading-none" aria-hidden>
               {selected.flag}
@@ -115,14 +116,14 @@ function RegistrationPhoneInput({
             <ul
               role="listbox"
               aria-label="Phone country code"
-              className="absolute left-0 top-full z-20 mt-1 min-w-[12rem] overflow-hidden rounded-md border border-border bg-popover py-1 shadow-md"
+              className="absolute left-0 bottom-full z-50 mb-1 min-w-[14rem] overflow-hidden rounded-md border border-border bg-popover py-1 shadow-md"
             >
               {REGISTRATION_PHONE_COUNTRIES.map((option) => (
                 <li key={option.code} role="option" aria-selected={option.code === dialCountry}>
                   <button
                     type="button"
                     className={cn(
-                      "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted",
+                      "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm hover:bg-muted",
                       option.code === dialCountry && "bg-muted/60 font-medium",
                     )}
                     onClick={() => pickCountry(option.code)}
@@ -151,7 +152,7 @@ function RegistrationPhoneInput({
           disabled={disabled}
           aria-invalid={Boolean(displayError)}
           aria-describedby={displayError ? "registration-phone-error" : "registration-phone-hint"}
-          className="h-10 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+          className="h-10 rounded-none rounded-r-md border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
         />
       </div>
       {displayError ? (

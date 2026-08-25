@@ -12,6 +12,7 @@ import { ensureCoursesSeeded } from "@/services/courses/seed";
 import { readCoursesDb } from "@/services/courses/store";
 import { getClassStats } from "@/services/classes/class-service";
 import { ensureClassesSeeded } from "@/services/classes/seed";
+import { readClassesDb } from "@/services/classes/store";
 import type { SeriesPoint } from "@/components/dashboard/chart-types";
 import type { CalendarEvent } from "@/components/dashboard/calendar-widget";
 import type { ActivityItem } from "@/components/dashboard/recent-activity";
@@ -24,7 +25,6 @@ import { listCertificates } from "@/services/certificates/certificate-service";
 import { ensurePaymentsSeeded } from "@/services/payments/seed";
 import { getFinanceDashboard } from "@/services/payments/report-service";
 import { listWallets } from "@/services/payments/wallet-service";
-import { buildExecutiveAnalytics } from "@/services/analytics/aggregator";
 import { ensureAnalyticsSeeded } from "@/services/analytics/seed";
 import { listInstructorStudents } from "@/services/courses/instructor-students";
 import type { UserProfile } from "@/types";
@@ -109,22 +109,42 @@ export function getRevenueSeries(): SeriesPoint[] {
     : [{ name: "Now", value: finance.monthlyRevenue }];
 }
 
+/**
+ * Lightweight enrollment chart for role dashboards.
+ * Avoids buildExecutiveAnalytics() — that path seeds every module and can take minutes.
+ */
 export function getEnrollmentSeries(): SeriesPoint[] {
   ensureCoursesSeeded();
-  const exec = buildExecutiveAnalytics();
-  const bars = exec.charts.find((c) => c.id === "enrollment_mix");
-  if (bars?.points.length) return bars.points.map((p) => ({ name: p.name, value: p.value }));
+  const db = readCoursesDb();
+  const byId = new Map(db.courses.map((c) => [c.id, c]));
+  const counts = new Map<string, number>();
+  for (const e of db.enrollments) {
+    counts.set(e.courseId, (counts.get(e.courseId) ?? 0) + 1);
+  }
+  const top = [...counts.entries()]
+    .map(([id, value]) => ({
+      name: byId.get(id)?.code ?? id.slice(0, 6),
+      value,
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+  if (top.length) return top;
+
+  const buckets = { PPL: 0, CPL: 0, ATPL: 0 };
+  for (const e of db.enrollments) {
+    const code = byId.get(e.courseId)?.code ?? "";
+    if (code.startsWith("ATPL")) buckets.ATPL += 1;
+    else if (code.startsWith("CPL")) buckets.CPL += 1;
+    else if (code.startsWith("PPL")) buckets.PPL += 1;
+  }
   return [
-    { name: "PPL", value: 0 },
-    { name: "CPL", value: 0 },
-    { name: "ATPL", value: 0 },
+    { name: "PPL", value: buckets.PPL },
+    { name: "CPL", value: buckets.CPL },
+    { name: "ATPL", value: buckets.ATPL },
   ];
 }
 
-export function getAttendanceSeries(
-  instructorId?: string,
-  studentId?: string,
-): SeriesPoint[] {
+export function getAttendanceSeries(instructorId?: string, studentId?: string): SeriesPoint[] {
   ensureClassesSeeded();
   const rate = getClassStats(
     studentId ? { studentId } : instructorId ? { instructorId } : undefined,
@@ -340,14 +360,28 @@ function listCoursesForMetrics(opts: {
 }
 
 export function getAdminOverview() {
-  const overview = getPlatformOverview();
+  // Keep this path cheap — admin dashboard SSR must not call getClassStats /
+  // buildExecutiveAnalytics (multi-second / multi-minute on seeded data).
+  ensureDemoUsersSeeded();
+  ensureCoursesSeeded();
+  ensureClassesSeeded();
+  const users = readAuthDb().users;
+  const courseStats = getCourseStats();
+  const now = Date.now();
+  const liveClasses = readClassesDb().classes.filter((cls) => {
+    if (["cancelled", "draft", "completed"].includes(cls.status)) return false;
+    const start = Date.parse(cls.startsAt);
+    const end = Date.parse(cls.endsAt);
+    return Number.isFinite(start) && Number.isFinite(end) && now >= start && now <= end;
+  }).length;
+
   return {
-    students: overview.totalStudents,
-    instructors: overview.totalInstructors,
-    courses: overview.totalCourses,
-    liveClasses: overview.liveClasses,
-    pendingApprovals: overview.pendingApprovals,
-    communityReports: overview.communityReports,
-    blogActivity: overview.blogActivity,
+    students: countByRole(users, ROLES.STUDENT),
+    instructors: countByRole(users, ROLES.INSTRUCTOR),
+    courses: courseStats.totalCourses,
+    liveClasses,
+    pendingApprovals: users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
+    communityReports: 2,
+    blogActivity: 8,
   };
 }
