@@ -22,7 +22,7 @@ const exo2 = Exo_2({
   weight: ["600", "700"],
   variable: "--font-exo-2",
   display: "swap",
-  preload: false,
+  preload: true,
   adjustFontFallback: true,
 });
 

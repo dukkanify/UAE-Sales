@@ -76,12 +76,12 @@ function AtplPassHomepage({ subjects, enrollHref }: AtplPassHomepageProps) {
       <section className="atpl-hero relative isolate -mt-[4.75rem] min-h-[100svh] overflow-hidden pt-[4.75rem]">
         <div className="atpl-hero-bg absolute inset-0" aria-hidden>
           <Image
-            src="/images/marketing/hero-aircraft.webp"
+            src="/images/marketing/hero-aircraft.jpg"
             alt=""
             fill
             priority
-            sizes="100vw"
-            quality={78}
+            sizes="(max-width: 1200px) 100vw, 1200px"
+            quality={72}
             className="object-cover object-[center_25%]"
           />
         </div>
@@ -89,26 +89,26 @@ function AtplPassHomepage({ subjects, enrollHref }: AtplPassHomepageProps) {
         <div className="atpl-hero-glow absolute inset-0" aria-hidden />
 
         <div className="container-app relative z-10 flex min-h-[calc(100svh-4.75rem)] flex-col justify-center pb-20 pt-16 sm:pb-28">
-          <p className="animate-in-up atpl-hero-brand" aria-hidden>
+          <p className="atpl-hero-brand" aria-hidden>
             <span className="text-white">ATPL</span>
             <span className="atpl-hero-brand-pass"> PASS</span>
           </p>
 
-          <p className="animate-in-up atpl-kicker atpl-kicker-hero mt-8">{HERO.kicker}</p>
+          <p className="atpl-kicker atpl-kicker-hero mt-8">{HERO.kicker}</p>
 
-          <h1 className="animate-in-up-delay-1 mt-5 max-w-[18ch] font-display text-[clamp(1.85rem,4.2vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-white/96">
+          <h1 className="mt-5 max-w-[18ch] font-display text-[clamp(1.85rem,4.2vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-white/96">
             {HERO.headline}
           </h1>
 
-          <p className="animate-in-up-delay-2 mt-7 max-w-2xl text-[1.05rem] leading-relaxed text-white/82 sm:text-lg">
+          <p className="animate-in-up mt-7 max-w-2xl text-[1.05rem] leading-relaxed text-white/82 sm:text-lg">
             {HERO.subheadline}
           </p>
 
-          <p className="animate-in-up-delay-2 mt-4 max-w-xl text-sm leading-relaxed text-white/65">
+          <p className="animate-in-up-delay-1 mt-4 max-w-xl text-sm leading-relaxed text-white/65">
             {HERO.audience}
           </p>
 
-          <div className="animate-in-up-delay-3 mt-12 flex flex-wrap items-center gap-3">
+          <div className="animate-in-up-delay-2 mt-12 flex flex-wrap items-center gap-3">
             <Button size="lg" variant="accent" className="hero-cta-primary px-9" asChild>
               <Link href={enrollHref}>
                 {HERO.primaryCta}
@@ -125,7 +125,7 @@ function AtplPassHomepage({ subjects, enrollHref }: AtplPassHomepageProps) {
             </Button>
           </div>
 
-          <div className="animate-in-up-delay-3 mt-14 flex flex-wrap gap-3">
+          <div className="animate-in-up-delay-2 mt-14 flex flex-wrap gap-3">
             {PROGRAM.badges.map((badge) => (
               <span key={badge} className="atpl-badge">
                 {badge}

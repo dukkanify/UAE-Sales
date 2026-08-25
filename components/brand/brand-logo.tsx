@@ -54,7 +54,7 @@ function BrandLogo({
     );
     if (!resolvedHref) return textLogo;
     return (
-      <Link href={resolvedHref} className="inline-flex items-center" aria-label={name}>
+      <Link href={resolvedHref} className="inline-flex items-center" aria-label="ATPL PASS">
         {textLogo}
       </Link>
     );
