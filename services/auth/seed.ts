@@ -7,6 +7,7 @@ import { ACCOUNT_STATUS } from "@/constants/account-status";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { ROLES } from "@/constants/roles";
 import { getServerEnv } from "@/config/env";
+import { agentLog } from "@/lib/debug/agent-log";
 import { generateId } from "@/lib/security/crypto";
 import { findUserByEmail, readAuthDb, writeAuthDb } from "@/services/auth/store";
 import { logActivity, logAudit } from "@/services/auth/activity-log";
@@ -14,6 +15,14 @@ import { logActivity, logAudit } from "@/services/auth/activity-log";
 let seededInProcess = false;
 
 export function ensureSuperAdminSeeded(): void {
+  // #region agent log
+  agentLog({
+    hypothesisId: "C",
+    location: "auth/seed.ts:ensureSuperAdminSeeded",
+    message: "ensureSuperAdminSeeded entry",
+    data: { seededInProcess },
+  });
+  // #endregion
   if (seededInProcess) return;
 
   const db = readAuthDb();

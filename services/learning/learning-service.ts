@@ -22,6 +22,7 @@ import {
 } from "@/services/learning/planner-service";
 import { ensureLearningSeeded } from "@/services/learning/seed";
 import { readLearningDb, writeLearningDb } from "@/services/learning/store";
+import { agentLog } from "@/lib/debug/agent-log";
 import { generateId } from "@/lib/security/crypto";
 import type {
   CourseLearningState,
@@ -116,9 +117,7 @@ export function getResumeTarget(studentId: string): LearningDashboardOverview["r
   }
   const course = getCourseById(row.courseId);
   const detail = getCourseDetail(row.courseId);
-  const lesson = detail?.modules
-    .flatMap((m) => m.lessons)
-    .find((l) => l.id === row.lessonId);
+  const lesson = detail?.modules.flatMap((m) => m.lessons).find((l) => l.id === row.lessonId);
   return {
     courseId: row.courseId,
     courseTitle: course?.title ?? "Course",
@@ -128,44 +127,95 @@ export function getResumeTarget(studentId: string): LearningDashboardOverview["r
 }
 
 export function getLearningDashboard(user: UserProfile): LearningDashboardOverview {
-  ensureCoursesSeeded();
-  ensureClassesSeeded();
-  ensureLearningSeeded();
-  syncGoalHoursFromProgress(user.id);
-  const overall = getOverallProgress(user.id);
-  const notifications = listNotifications(user.id, { pageSize: 1 });
+  // #region agent log
+  agentLog({
+    hypothesisId: "A",
+    location: "learning-service.ts:getLearningDashboard",
+    message: "getLearningDashboard entry",
+    data: { userIdPrefix: user.id.slice(0, 8), role: user.role },
+  });
+  // #endregion
+  try {
+    ensureCoursesSeeded();
+    // #region agent log
+    agentLog({
+      hypothesisId: "B",
+      location: "learning-service.ts:getLearningDashboard",
+      message: "before ensureClassesSeeded",
+      data: {},
+    });
+    // #endregion
+    ensureClassesSeeded();
+    // #region agent log
+    agentLog({
+      hypothesisId: "A",
+      location: "learning-service.ts:getLearningDashboard",
+      message: "before ensureLearningSeeded",
+      data: {},
+    });
+    // #endregion
+    ensureLearningSeeded();
+    syncGoalHoursFromProgress(user.id);
+    const overall = getOverallProgress(user.id);
+    const notifications = listNotifications(user.id, { pageSize: 1 });
 
-  // Upcoming live class for this student
-  const allowed = new Set(
-    readClassesDb()
-      .participants.filter((p) => p.userId === user.id)
-      .map((p) => p.liveClassId),
-  );
-  const upcoming = listLiveClasses({ status: "upcoming", pageSize: 20 }).data.filter((c) =>
-    allowed.has(c.id),
-  )[0];
+    // Upcoming live class for this student
+    const allowed = new Set(
+      readClassesDb()
+        .participants.filter((p) => p.userId === user.id)
+        .map((p) => p.liveClassId),
+    );
+    const upcoming = listLiveClasses({ status: "upcoming", pageSize: 20 }).data.filter((c) =>
+      allowed.has(c.id),
+    )[0];
 
-  const goals = listGoals(user.id).filter((g) => g.status === "active" && g.period === "weekly");
-  const weeklyGoal = goals[0];
-  const weeklyGoalPercent = weeklyGoal
-    ? Math.min(100, Math.round((weeklyGoal.completedHours / weeklyGoal.targetHours) * 100))
-    : 0;
+    const goals = listGoals(user.id).filter((g) => g.status === "active" && g.period === "weekly");
+    const weeklyGoal = goals[0];
+    const weeklyGoalPercent = weeklyGoal
+      ? Math.min(100, Math.round((weeklyGoal.completedHours / weeklyGoal.targetHours) * 100))
+      : 0;
 
-  return {
-    activeCourses: overall.activeCourses,
-    completedCourses: overall.completedCourses,
-    upcomingLiveClass: upcoming
-      ? `${upcoming.title} · ${new Date(upcoming.startsAt).toLocaleString()}`
-      : null,
-    upcomingLiveClassId: upcoming?.id ?? null,
-    learningHours: overall.learningHours,
-    progressPercent: overall.progressPercent,
-    assignments: 0,
-    notifications: notifications.unreadCount,
-    resume: getResumeTarget(user.id),
-    recentActivity: listHistory(user.id, { limit: 8 }),
-    weeklyGoalPercent,
-  };
+    // #region agent log
+    agentLog({
+      hypothesisId: "A",
+      location: "learning-service.ts:getLearningDashboard",
+      message: "getLearningDashboard success",
+      data: { activeCourses: overall.activeCourses, progressPercent: overall.progressPercent },
+    });
+    // #endregion
+
+    return {
+      activeCourses: overall.activeCourses,
+      completedCourses: overall.completedCourses,
+      upcomingLiveClass: upcoming
+        ? `${upcoming.title} · ${new Date(upcoming.startsAt).toLocaleString()}`
+        : null,
+      upcomingLiveClassId: upcoming?.id ?? null,
+      learningHours: overall.learningHours,
+      progressPercent: overall.progressPercent,
+      assignments: 0,
+      notifications: notifications.unreadCount,
+      resume: getResumeTarget(user.id),
+      recentActivity: listHistory(user.id, { limit: 8 }),
+      weeklyGoalPercent,
+    };
+  } catch (error) {
+    // #region agent log
+    agentLog({
+      hypothesisId: "A",
+      location: "learning-service.ts:getLearningDashboard",
+      message: "getLearningDashboard THREW",
+      data: {
+        code:
+          error && typeof error === "object" && "code" in error
+            ? String((error as { code?: string }).code)
+            : "",
+        errMessage: error instanceof Error ? error.message : String(error),
+      },
+    });
+    // #endregion
+    throw error;
+  }
 }
 
 export function listResourceLibrary(
@@ -232,11 +282,7 @@ export function registerOfflineCache(input: {
   };
   writeLearningDb((d) => {
     d.offlineCache = d.offlineCache.filter(
-      (c) =>
-        !(
-          c.studentId === input.studentId &&
-          c.lessonId === input.lessonId
-        ),
+      (c) => !(c.studentId === input.studentId && c.lessonId === input.lessonId),
     );
     d.offlineCache.push(entry);
   });
