@@ -65,6 +65,21 @@ function dayKey(iso: string) {
 }
 
 function MessagingCenter({ basePath }: { basePath: string }) {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="space-y-4 p-4">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-[620px] w-full rounded-2xl" />
+        </div>
+      }
+    >
+      <MessagingCenterInner basePath={basePath} />
+    </React.Suspense>
+  );
+}
+
+function MessagingCenterInner({ basePath }: { basePath: string }) {
   const searchParams = useSearchParams();
   const [conversations, setConversations] = React.useState<ConversationRow[]>([]);
   const [totalUnread, setTotalUnread] = React.useState(0);
@@ -251,13 +266,14 @@ function MessagingCenter({ basePath }: { basePath: string }) {
     setMessages((prev) => [...prev, optimistic]);
     setDraft("");
     setPendingFiles([]);
+    const replyToId = replyTo?.id ?? null;
     setReplyTo(null);
     const result = await commJson<Message>(`/api/communication/conversations/${activeId}`, "POST", {
       action: "send",
       body,
       attachments,
-      replyToId: replyTo?.id ?? null,
-      shareKind,
+      replyToId,
+      shareKind: shareKind === "system" ? "text" : shareKind,
     });
     if (!result.success) {
       setError(result.error);
@@ -674,11 +690,13 @@ function MessagingCenter({ basePath }: { basePath: string }) {
                       <SelectValue placeholder="Share type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(MESSAGE_SHARE_KIND_LABELS).map(([k, label]) => (
-                        <SelectItem key={k} value={k}>
-                          {label}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(MESSAGE_SHARE_KIND_LABELS)
+                        .filter(([k]) => k !== "system")
+                        .map(([k, label]) => (
+                          <SelectItem key={k} value={k}>
+                            {label}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                   <input
