@@ -20,20 +20,11 @@ import {
 } from "recharts";
 
 import type { SeriesPoint } from "@/components/dashboard/chart-types";
+import { CHART_COLORS } from "@/components/dashboard/chart-types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-export const CHART_COLORS = [
-  "#143048",
-  "#CCA04C",
-  "#7C7B80",
-  "#2F8F5B",
-  "#0D2235",
-  "#C48422",
-  "#74B2D1",
-  "#F3E0B8",
-];
-
+export { CHART_COLORS };
 interface ChartCardProps {
   title: string;
   description?: string;

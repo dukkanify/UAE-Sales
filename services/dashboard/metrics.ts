@@ -25,7 +25,6 @@ import { listCertificates } from "@/services/certificates/certificate-service";
 import { ensurePaymentsSeeded } from "@/services/payments/seed";
 import { getFinanceDashboard } from "@/services/payments/report-service";
 import { listWallets } from "@/services/payments/wallet-service";
-import { ensureAnalyticsSeeded } from "@/services/analytics/seed";
 import { listInstructorStudents } from "@/services/courses/instructor-students";
 import type { UserProfile } from "@/types";
 
@@ -36,17 +35,41 @@ function countByRole(users: StoredUser[], role: Role): number {
 }
 
 export function getPlatformOverview() {
+  // Keep SSR cheap: seed only what we count; avoid analytics executive path.
   ensureDemoUsersSeeded();
   ensureCoursesSeeded();
   ensureClassesSeeded();
   ensurePaymentsSeeded();
-  ensureAnalyticsSeeded();
   const db = readAuthDb();
   const students = countByRole(db.users, ROLES.STUDENT);
   const instructors = countByRole(db.users, ROLES.INSTRUCTOR);
   const admins = countByRole(db.users, ROLES.ADMIN) + countByRole(db.users, ROLES.SUPER_ADMIN);
   const courseStats = getCourseStats();
-  const classStats = getClassStats();
+  const now = Date.now();
+  const classes = readClassesDb().classes;
+  let liveNow = 0;
+  let upcoming = 0;
+  let cancelled = 0;
+  let today = 0;
+  const dayStart = new Date();
+  dayStart.setHours(0, 0, 0, 0);
+  const dayEnd = new Date();
+  dayEnd.setHours(23, 59, 59, 999);
+  const dayStartMs = dayStart.getTime();
+  const dayEndMs = dayEnd.getTime();
+  for (const cls of classes) {
+    if (cls.status === "cancelled") {
+      cancelled += 1;
+      continue;
+    }
+    if (["draft", "completed"].includes(cls.status)) continue;
+    const start = Date.parse(cls.startsAt);
+    const end = Date.parse(cls.endsAt);
+    if (!Number.isFinite(start) || !Number.isFinite(end)) continue;
+    if (now >= start && now <= end) liveNow += 1;
+    if (start > now) upcoming += 1;
+    if (start >= dayStartMs && start <= dayEndMs) today += 1;
+  }
   const finance = getFinanceDashboard();
   const wallets = listWallets();
   const growth =
@@ -67,10 +90,10 @@ export function getPlatformOverview() {
     publishedCourses: courseStats.publishedCourses,
     draftCourses: courseStats.draftCourses,
     activeCourseStudents: courseStats.activeStudents,
-    activeClasses: classStats.liveNow + classStats.today,
-    upcomingClasses: classStats.upcoming,
-    cancelledClasses: classStats.cancelled,
-    attendanceRate: classStats.attendanceRate,
+    activeClasses: liveNow + today,
+    upcomingClasses: upcoming,
+    cancelledClasses: cancelled,
+    attendanceRate: 0,
     monthlyRevenue: finance.monthlyRevenue,
     instructorWalletBalance: wallets.reduce((s, w) => s + w.availableBalance, 0),
     pendingPayments: finance.pendingPayments,
@@ -78,7 +101,7 @@ export function getPlatformOverview() {
     pendingApprovals: db.users.filter((u) => u.status === ACCOUNT_STATUS.PENDING).length,
     communityReports: 2,
     blogActivity: 8,
-    liveClasses: classStats.liveNow,
+    liveClasses: liveNow,
     activeSessions: db.sessions.filter((s) => !s.revokedAt).length,
   };
 }

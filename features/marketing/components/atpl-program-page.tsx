@@ -18,7 +18,8 @@ function AtplProgramPageContent({ subjects, enrollHref, priceLabel }: AtplProgra
         <div
           className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage: "url(/images/marketing/hero-aircraft.jpg)",
+            backgroundImage:
+              'image-set(url("/images/marketing/hero-aircraft.webp") type("image/webp"), url("/images/marketing/hero-aircraft.jpg") type("image/jpeg"))',
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}

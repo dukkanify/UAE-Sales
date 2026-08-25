@@ -4,11 +4,13 @@ import { LearningDashboardView } from "@/features/learning";
 import { routes } from "@/constants/routes";
 import { ROLES } from "@/constants/roles";
 import { getCurrentSession } from "@/services/auth/auth-service";
+import { getLearningDashboard } from "@/services/learning/learning-service";
 
 export default async function StudentDashboardPage() {
   const { user } = await getCurrentSession();
   if (!user) redirect(routes.login);
   if (user.role !== ROLES.STUDENT) redirect(routes.accessDenied);
 
-  return <LearningDashboardView />;
+  const overview = getLearningDashboard(user);
+  return <LearningDashboardView overview={overview} />;
 }

@@ -1,5 +1,4 @@
-"use client";
-
+import Image from "next/image";
 import Link from "@/components/ui/app-link";
 import {
   ArrowUpRight,
@@ -75,14 +74,17 @@ function AtplPassHomepage({ subjects, enrollHref }: AtplPassHomepageProps) {
     <>
       {/* —— Hero —— */}
       <section className="atpl-hero relative isolate -mt-[4.75rem] min-h-[100svh] overflow-hidden pt-[4.75rem]">
-        <div
-          className="atpl-hero-bg absolute inset-0"
-          style={{
-            backgroundImage:
-              "url(/images/marketing/hero-aircraft.jpg), url(/images/marketing/hero-cockpit.jpg), url(/images/hero-aviation.svg)",
-          }}
-          aria-hidden
-        />
+        <div className="atpl-hero-bg absolute inset-0" aria-hidden>
+          <Image
+            src="/images/marketing/hero-aircraft.webp"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            quality={78}
+            className="object-cover object-[center_25%]"
+          />
+        </div>
         <div className="atpl-hero-overlay absolute inset-0" aria-hidden />
         <div className="atpl-hero-glow absolute inset-0" aria-hidden />
 

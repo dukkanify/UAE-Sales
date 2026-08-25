@@ -1,6 +1,7 @@
 @import "tailwindcss";
-@import "./landing.css";
-@import "./atpl-pass-home.css";
+
+/* Marketing-only CSS (landing.css, atpl-pass-home.css) loads from
+   app/(marketing)/layout.tsx so dashboards do not pay for hero/landing bytes. */
 
 /* =============================================================================
    AviatorPass — Official brand guidelines

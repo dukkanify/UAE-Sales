@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { TrendingDown, TrendingUp } from "lucide-react";
 
@@ -20,11 +19,7 @@ function StatCard({ label, value, hint, icon: Icon, trend, className }: StatCard
   const positive = (trend?.value ?? 0) >= 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <div className="animate-in-up">
       <Card className={cn("overflow-hidden", className)}>
         <CardContent className="p-5">
           <div className="flex items-start justify-between gap-3">
@@ -63,7 +58,7 @@ function StatCard({ label, value, hint, icon: Icon, trend, className }: StatCard
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

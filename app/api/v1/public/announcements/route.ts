@@ -8,9 +8,19 @@ export const GET = withApiHandler(async (request) => {
   await requirePublicOrAuth(request);
   const url = new URL(request.url);
   const p = parsePagination(url);
-  const data = cacheWrap(`v1:public:announcements:${p.page}`, 30, ["announcements", "public"], () => {
-    const rows = listAnnouncements({ status: "published" });
-    return paginate(rows, p.page, p.pageSize);
+  const data = cacheWrap(
+    `v1:public:announcements:${p.page}`,
+    30,
+    ["announcements", "public"],
+    () => {
+      const rows = listAnnouncements({ status: "published" });
+      return paginate(rows, p.page, p.pageSize);
+    },
+  );
+  return ok(data, {
+    meta: { rateLimit: "60/min/ip" },
+    headers: {
+      "Cache-Control": "public, max-age=15, s-maxage=30, stale-while-revalidate=120",
+    },
   });
-  return ok(data, { meta: { rateLimit: "60/min/ip" } });
 });

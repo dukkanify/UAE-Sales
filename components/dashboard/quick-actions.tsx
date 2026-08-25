@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "@/components/ui/app-link";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -28,13 +27,8 @@ function QuickActions({ title = "Quick actions", actions, className }: QuickActi
         <CardTitle className="text-base">{title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-2 sm:grid-cols-2">
-        {actions.map((action, index) => (
-          <motion.div
-            key={action.href + action.label}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.3 }}
-          >
+        {actions.map((action) => (
+          <div key={action.href + action.label} className="animate-in-up">
             <Button
               asChild
               variant="outline"
@@ -54,7 +48,7 @@ function QuickActions({ title = "Quick actions", actions, className }: QuickActi
                 </span>
               </Link>
             </Button>
-          </motion.div>
+          </div>
         ))}
       </CardContent>
     </Card>

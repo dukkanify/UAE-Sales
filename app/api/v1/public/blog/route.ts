@@ -12,5 +12,10 @@ export const GET = withApiHandler(async (request) => {
     const posts = listBlogPosts({ status: "published", q: p.q });
     return paginate(posts, p.page, p.pageSize);
   });
-  return ok(data, { meta: { rateLimit: "60/min/ip" } });
+  return ok(data, {
+    meta: { rateLimit: "60/min/ip" },
+    headers: {
+      "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300",
+    },
+  });
 });

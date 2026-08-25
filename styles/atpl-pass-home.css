@@ -39,12 +39,13 @@
 
 /* —— Hero —— */
 .atpl-hero-bg {
-  background-size: cover, cover, cover;
-  background-position:
-    center 25%,
-    center 55%,
-    center top;
-  background-repeat: no-repeat;
+  /* Image provided via next/image child for LCP / AVIF·WebP */
+  background-color: #0d2235;
+}
+
+.atpl-hero-bg img {
+  object-fit: cover;
+  object-position: center 25%;
   filter: saturate(1.12) brightness(1.08) contrast(1.02);
 }
 
@@ -128,14 +129,22 @@
   position: relative;
   background:
     linear-gradient(180deg, rgba(244, 246, 248, 0.94) 0%, rgba(237, 241, 244, 0.98) 100%),
-    url("/images/marketing/section-runway.jpg") center / cover no-repeat;
+    image-set(
+        url("/images/marketing/section-runway.webp") type("image/webp"),
+        url("/images/marketing/section-runway.jpg") type("image/jpeg")
+      )
+      center / cover no-repeat;
 }
 
 .atpl-section-instructors {
   position: relative;
   background:
     linear-gradient(180deg, rgba(13, 34, 53, 0.92) 0%, rgba(20, 48, 72, 0.88) 100%),
-    url("/images/marketing/hero-cockpit.jpg") center / cover no-repeat;
+    image-set(
+        url("/images/marketing/hero-cockpit.webp") type("image/webp"),
+        url("/images/marketing/hero-cockpit.jpg") type("image/jpeg")
+      )
+      center / cover no-repeat;
   color: white;
 }
 
@@ -159,7 +168,11 @@
 .atpl-section-program {
   background:
     linear-gradient(135deg, rgba(13, 34, 53, 0.92) 0%, rgba(20, 48, 72, 0.88) 100%),
-    url("/images/marketing/hero-cockpit.jpg") center / cover no-repeat;
+    image-set(
+        url("/images/marketing/hero-cockpit.webp") type("image/webp"),
+        url("/images/marketing/hero-cockpit.jpg") type("image/jpeg")
+      )
+      center / cover no-repeat;
   color: white;
 }
 
@@ -457,11 +470,8 @@
 }
 
 @media (max-width: 640px) {
-  .atpl-hero-bg {
-    background-position:
-      65% 20%,
-      center 70%,
-      center top;
+  .atpl-hero-bg img {
+    object-position: 65% 20%;
   }
 
   .atpl-section {
