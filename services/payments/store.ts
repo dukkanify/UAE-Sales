@@ -1,10 +1,11 @@
 /**
  * Payments durable store (.data/aep-payments.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 marketing SSR.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   CatalogProduct,
   Coupon,
@@ -56,8 +57,9 @@ export interface PaymentsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-payments.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-payments.json");
+}
 
 function defaultSettings(): PaymentSettings {
   return {
@@ -104,43 +106,35 @@ function emptyDb(): PaymentsDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<PaymentsDatabase>): PaymentsDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    settings: { ...defaultSettings(), ...(raw.settings ?? {}) },
+    products: raw.products ?? [],
+    coupons: raw.coupons ?? [],
+    couponUsages: raw.couponUsages ?? [],
+    orders: raw.orders ?? [],
+    payments: raw.payments ?? [],
+    invoices: raw.invoices ?? [],
+    subscriptions: raw.subscriptions ?? [],
+    wallets: raw.wallets ?? [],
+    walletTransactions: raw.walletTransactions ?? [],
+    payouts: raw.payouts ?? [],
+    refunds: raw.refunds ?? [],
+    transactionLogs: raw.transactionLogs ?? [],
+    regionalRules: raw.regionalRules ?? [],
+    installmentPlans: raw.installmentPlans ?? [],
+    installmentSchedule: raw.installmentSchedule ?? [],
+    installmentReminders: raw.installmentReminders ?? [],
+    kycDocuments: raw.kycDocuments ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensurePaymentsStore(): PaymentsDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<PaymentsDatabase>;
-    return {
-      ...emptyDb(),
-      ...raw,
-      settings: { ...defaultSettings(), ...(raw.settings ?? {}) },
-      products: raw.products ?? [],
-      coupons: raw.coupons ?? [],
-      couponUsages: raw.couponUsages ?? [],
-      orders: raw.orders ?? [],
-      payments: raw.payments ?? [],
-      invoices: raw.invoices ?? [],
-      subscriptions: raw.subscriptions ?? [],
-      wallets: raw.wallets ?? [],
-      walletTransactions: raw.walletTransactions ?? [],
-      payouts: raw.payouts ?? [],
-      refunds: raw.refunds ?? [],
-      transactionLogs: raw.transactionLogs ?? [],
-      regionalRules: raw.regionalRules ?? [],
-      installmentPlans: raw.installmentPlans ?? [],
-      installmentSchedule: raw.installmentSchedule ?? [],
-      installmentReminders: raw.installmentReminders ?? [],
-      kycDocuments: raw.kycDocuments ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<PaymentsDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readPaymentsDb(): PaymentsDatabase {
@@ -150,6 +144,6 @@ export function readPaymentsDb(): PaymentsDatabase {
 export function writePaymentsDb(mutator: (db: PaymentsDatabase) => void): PaymentsDatabase {
   const db = ensurePaymentsStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
   return db;
 }
