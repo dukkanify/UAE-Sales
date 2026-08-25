@@ -81,6 +81,39 @@ describe("readonly JSON stores (SSR safety)", () => {
     expect(ensureClassesStore().seeded).toBe(true);
   });
 
+  it("getLearningDashboard survives read-only .data", async () => {
+    chdirReadOnlyData();
+    const { getLearningDashboard } = await import("@/services/learning/learning-service");
+    const overview = getLearningDashboard({
+      id: "u_ro_student",
+      email: "ro.student@example.com",
+      firstName: "RO",
+      lastName: "Student",
+      fullName: "RO Student",
+      phone: null,
+      countryCode: null,
+      nationality: null,
+      dateOfBirth: null,
+      gender: null,
+      city: null,
+      bio: null,
+      emergencyContactName: null,
+      emergencyContactPhone: null,
+      avatarUrl: null,
+      timezone: "Asia/Kuwait",
+      language: "en",
+      role: "student",
+      status: "active",
+      emailVerified: true,
+      profileComplete: true,
+      lastLoginAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    expect(overview.activeCourses).toBeGreaterThanOrEqual(0);
+    expect(Array.isArray(overview.recentActivity)).toBe(true);
+  });
+
   it("still reads existing on-disk JSON when present before lock", () => {
     const root = mkdtempSync(path.join(tmpdir(), "aep-ro-seeded-"));
     const data = path.join(root, ".data");
