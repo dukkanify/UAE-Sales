@@ -1,10 +1,16 @@
 /**
  * Instructor Assignment Engine durable store (.data/aep-assignment.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
+import {
+  clearJsonFileCache,
+  dataDir,
+  readJsonFile,
+  writeJsonFile,
+} from "@/lib/data/json-file-store";
 import type {
   AssignmentEngineSettings,
   AssignmentRequest,
@@ -22,8 +28,9 @@ export interface AssignmentDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-assignment.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-assignment.json");
+}
 
 function defaultSettings(): AssignmentEngineSettings {
   return {
@@ -47,42 +54,33 @@ function emptyDb(): AssignmentDatabase {
   };
 }
 
-let cache: AssignmentDatabase | null = null;
+function normalizeDb(raw: Partial<AssignmentDatabase>): AssignmentDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    settings: { ...defaultSettings(), ...(raw.settings ?? {}) },
+    availabilityWindows: raw.availabilityWindows ?? [],
+    availabilityBlocks: raw.availabilityBlocks ?? [],
+    requests: raw.requests ?? [],
+    queue: raw.queue ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
 
 export function readAssignmentDb(): AssignmentDatabase {
-  if (cache) return cache;
-  try {
-    if (existsSync(DATA_FILE)) {
-      const parsed = JSON.parse(readFileSync(DATA_FILE, "utf8")) as AssignmentDatabase;
-      cache = {
-        ...emptyDb(),
-        ...parsed,
-        settings: { ...defaultSettings(), ...(parsed.settings ?? {}) },
-        availabilityWindows: parsed.availabilityWindows ?? [],
-        availabilityBlocks: parsed.availabilityBlocks ?? [],
-        requests: parsed.requests ?? [],
-        queue: parsed.queue ?? [],
-      };
-      return cache;
-    }
-  } catch {
-    // fall through
-  }
-  cache = emptyDb();
-  return cache;
+  const raw = readJsonFile<Partial<AssignmentDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function writeAssignmentDb(mutator: (db: AssignmentDatabase) => void): AssignmentDatabase {
-  const db = structuredClone(readAssignmentDb());
+  const db = readAssignmentDb();
   mutator(db);
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-  cache = db;
+  writeJsonFile(dataFile(), db);
   return db;
 }
 
 export function resetAssignmentDbCache(): void {
-  cache = null;
+  clearJsonFileCache(dataFile());
 }
 
 export function updateAssignmentEngineSettings(

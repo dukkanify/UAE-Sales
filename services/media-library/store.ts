@@ -1,15 +1,17 @@
 /**
  * Aviation media library store.
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
 import { DEFAULT_MEDIA_LIBRARY_CATEGORIES } from "@/constants/media-library";
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type { MediaLibraryDatabase } from "@/types/media-library";
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-media-library.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-media-library.json");
+}
 
 function emptyDb(): MediaLibraryDatabase {
   return {
@@ -19,27 +21,25 @@ function emptyDb(): MediaLibraryDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<MediaLibraryDatabase>): MediaLibraryDatabase {
+  const categories = [...(raw.categories ?? [])];
+  const byId = new Map(categories.map((c) => [c.id, c]));
+  for (const cat of DEFAULT_MEDIA_LIBRARY_CATEGORIES) {
+    if (!byId.has(cat.id)) categories.push(cat);
+  }
+  categories.sort((a, b) => a.sortOrder - b.sortOrder);
+  return {
+    ...emptyDb(),
+    ...raw,
+    categories,
+    assets: raw.assets ?? [],
+    seeded: raw.seeded !== undefined ? Boolean(raw.seeded) : true,
+  };
+}
+
 function ensureStore(): MediaLibraryDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as MediaLibraryDatabase;
-    // Ensure default categories exist; keep custom ones
-    const byId = new Map(raw.categories.map((c) => [c.id, c]));
-    for (const cat of DEFAULT_MEDIA_LIBRARY_CATEGORIES) {
-      if (!byId.has(cat.id)) raw.categories.push(cat);
-    }
-    raw.categories.sort((a, b) => a.sortOrder - b.sortOrder);
-    return raw;
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<MediaLibraryDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readMediaLibraryDb(): MediaLibraryDatabase {
@@ -51,6 +51,6 @@ export function writeMediaLibraryDb(
 ): MediaLibraryDatabase {
   const db = ensureStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
   return db;
 }

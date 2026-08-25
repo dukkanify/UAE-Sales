@@ -1,6 +1,6 @@
 /**
  * Regression: raw writeFileSync stores 500'd Server Components on read-only hosts
- * (Vercel). support-ops + payments must use json-file-store memory fallback.
+ * (Vercel). Durable stores must use json-file-store memory fallback.
  */
 
 import { chmodSync, mkdtempSync, mkdirSync, writeFileSync } from "fs";
@@ -10,6 +10,8 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { clearJsonFileCache } from "@/lib/data/json-file-store";
 import { getAtplProgramMarketing } from "@/lib/marketing/atpl-program-marketing";
+import { ensureClassesStore, writeClassesDb } from "@/services/classes/store";
+import { ensureLearningStore, writeLearningDb } from "@/services/learning/store";
 import { ensurePaymentsStore, writePaymentsDb } from "@/services/payments/store";
 import { ensureSupportOpsStore, writeSupportOpsStore } from "@/services/support-ops/store";
 import { getMaintenancePublicStatus } from "@/services/support-ops/support-ops-service";
@@ -59,6 +61,24 @@ describe("readonly JSON stores (SSR safety)", () => {
     ).not.toThrow();
     expect(ensurePaymentsStore().seeded).toBe(true);
     expect(() => getAtplProgramMarketing()).not.toThrow();
+  });
+
+  it("learning + classes stores survive read-only .data (student dashboard)", () => {
+    chdirReadOnlyData();
+    expect(() => ensureLearningStore()).not.toThrow();
+    expect(() => ensureClassesStore()).not.toThrow();
+    expect(() =>
+      writeLearningDb((d) => {
+        d.seeded = true;
+      }),
+    ).not.toThrow();
+    expect(() =>
+      writeClassesDb((d) => {
+        d.seeded = true;
+      }),
+    ).not.toThrow();
+    expect(ensureLearningStore().seeded).toBe(true);
+    expect(ensureClassesStore().seeded).toBe(true);
   });
 
   it("still reads existing on-disk JSON when present before lock", () => {

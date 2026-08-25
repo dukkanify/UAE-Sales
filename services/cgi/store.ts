@@ -1,10 +1,16 @@
 /**
  * CGI / ATPL journey durable store (.data/aep-cgi.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
+import {
+  clearJsonFileCache,
+  dataDir,
+  readJsonFile,
+  writeJsonFile,
+} from "@/lib/data/json-file-store";
 import type {
   AtplJourneySettings,
   AtplLectureAssignment,
@@ -22,8 +28,9 @@ export interface CgiDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-cgi.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-cgi.json");
+}
 
 function defaultSettings(): AtplJourneySettings {
   return {
@@ -45,40 +52,31 @@ function emptyDb(): CgiDatabase {
   };
 }
 
-let cache: CgiDatabase | null = null;
+function normalizeDb(raw: Partial<CgiDatabase>): CgiDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    settings: { ...defaultSettings(), ...(raw.settings ?? {}) },
+    subjectAssignments: raw.subjectAssignments ?? [],
+    lectureAssignments: raw.lectureAssignments ?? [],
+    notes: raw.notes ?? [],
+    audit: raw.audit ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
 
 export function readCgiDb(): CgiDatabase {
-  if (cache) return cache;
-  try {
-    if (existsSync(DATA_FILE)) {
-      const parsed = JSON.parse(readFileSync(DATA_FILE, "utf8")) as CgiDatabase;
-      cache = {
-        ...emptyDb(),
-        ...parsed,
-        settings: { ...defaultSettings(), ...(parsed.settings ?? {}) },
-        subjectAssignments: parsed.subjectAssignments ?? [],
-        lectureAssignments: parsed.lectureAssignments ?? [],
-        notes: parsed.notes ?? [],
-        audit: parsed.audit ?? [],
-      };
-      return cache;
-    }
-  } catch {
-    // fall through
-  }
-  cache = emptyDb();
-  return cache;
+  const raw = readJsonFile<Partial<CgiDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function writeCgiDb(mutator: (db: CgiDatabase) => void): CgiDatabase {
-  const db = structuredClone(readCgiDb());
+  const db = readCgiDb();
   mutator(db);
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-  cache = db;
+  writeJsonFile(dataFile(), db);
   return db;
 }
 
 export function resetCgiDbCache(): void {
-  cache = null;
+  clearJsonFileCache(dataFile());
 }

@@ -1,10 +1,16 @@
 /**
  * Mock Exam Booking durable store (.data/aep-mock-exams.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 
+import {
+  clearJsonFileCache,
+  dataDir,
+  readJsonFile,
+  writeJsonFile,
+} from "@/lib/data/json-file-store";
 import type {
   MockExamCertificate,
   MockExamExtraFee,
@@ -22,8 +28,9 @@ export interface MockExamsDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-mock-exams.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-mock-exams.json");
+}
 
 export function defaultMockExamSettings(): MockExamSettings {
   const now = new Date().toISOString();
@@ -173,41 +180,33 @@ function emptyDb(): MockExamsDatabase {
   };
 }
 
-let cache: MockExamsDatabase | null = null;
+function normalizeDb(raw: Partial<MockExamsDatabase>): MockExamsDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    settings: { ...defaultMockExamSettings(), ...(raw.settings ?? {}) },
+    examTypes: raw.examTypes?.length ? raw.examTypes : defaultExamTypes(),
+    extraFees: raw.extraFees?.length ? raw.extraFees : defaultExtraFees(),
+    sessions: raw.sessions ?? [],
+    certificates: raw.certificates ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
 
 export function readMockExamsDb(): MockExamsDatabase {
-  if (cache) return cache;
-  try {
-    if (existsSync(DATA_FILE)) {
-      const parsed = JSON.parse(readFileSync(DATA_FILE, "utf8")) as MockExamsDatabase;
-      cache = {
-        settings: { ...defaultMockExamSettings(), ...(parsed.settings ?? {}) },
-        examTypes: parsed.examTypes?.length ? parsed.examTypes : defaultExamTypes(),
-        extraFees: parsed.extraFees?.length ? parsed.extraFees : defaultExtraFees(),
-        sessions: parsed.sessions ?? [],
-        certificates: parsed.certificates ?? [],
-        seeded: Boolean(parsed.seeded),
-      };
-      return cache;
-    }
-  } catch {
-    // fall through
-  }
-  cache = emptyDb();
-  return cache;
+  const raw = readJsonFile<Partial<MockExamsDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function writeMockExamsDb(mutator: (db: MockExamsDatabase) => void): MockExamsDatabase {
-  const db = structuredClone(readMockExamsDb());
+  const db = readMockExamsDb();
   mutator(db);
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-  cache = db;
+  writeJsonFile(dataFile(), db);
   return db;
 }
 
 export function resetMockExamsDbCache(): void {
-  cache = null;
+  clearJsonFileCache(dataFile());
 }
 
 export function ensureMockExamsSeeded(): void {
