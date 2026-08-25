@@ -13,10 +13,10 @@ export const HERO = {
   kicker: "International Aviation Academy",
   headline: "Master the Airline Transport Pilot License with live, instructor-led excellence",
   subheadline:
-    "ATPL PASS is a premium aviation training platform for ambitious pilots pursuing the Airline Transport Pilot License. Every session is live, every module is structured, and every milestone is tracked — so you train with the precision the industry demands.",
+    "ATPL PASS delivers live ATPL theory with certified instructors, structured subject modules, and measurable progress — prepared for regulatory exams and professional operations.",
   audience:
-    "Built for dedicated ATPL candidates in Kuwait, the UAE, and across the Gulf who expect professional standards, not self-paced shortcuts.",
-  primaryCta: "Start Your ATPL Journey",
+    "Built for ATPL candidates in Kuwait, the UAE, and across the Gulf who expect professional standards.",
+  primaryCta: "Enrol in ATPL PASS",
   secondaryCta: "Explore the Program",
 } as const;
 
@@ -46,7 +46,7 @@ export const ABOUT = {
     },
     {
       title: "Professional Integrity",
-      body: "Transparent training paths, honest feedback, and enterprise-grade support.",
+      body: "Transparent training paths, honest feedback, and dedicated academy support.",
     },
   ],
   whyChoose: [
@@ -55,7 +55,7 @@ export const ABOUT = {
     "Structured learning paths with assignments and performance reviews",
     "Mock examinations and practice assessments built into the program",
     "Digital certificates and progress reports on a secure platform",
-    "Premium student support through a dedicated academy channel",
+    "Dedicated academy support for students and instructors",
   ],
 } as const;
 
@@ -108,7 +108,7 @@ export const WHY_CHOOSE = {
 
 export const PLATFORM_FEATURES = {
   kicker: "Platform Features",
-  title: "Everything you need in one academy-grade system",
+  title: "Tools built for live ATPL training",
   items: [
     {
       title: "Live Classes",
@@ -116,11 +116,11 @@ export const PLATFORM_FEATURES = {
     },
     {
       title: "Student Dashboard",
-      body: "Your command centre for schedules, progress, and announcements.",
+      body: "Schedules, progress, and academy notices in one place.",
     },
     { title: "Progress Tracking", body: "Visual milestones across every ATPL subject module." },
     { title: "Certificates", body: "Verifiable credentials upon module and program completion." },
-    { title: "Instructor Feedback", body: "Personalised guidance on assignments and performance." },
+    { title: "Instructor Feedback", body: "Clear guidance on assignments and performance." },
     {
       title: "Performance Reports",
       body: "Detailed analytics on quiz scores and competency trends.",
@@ -131,7 +131,7 @@ export const PLATFORM_FEATURES = {
     },
     {
       title: "Secure Platform",
-      body: "Enterprise-grade authentication, data protection, and access control.",
+      body: "Protected accounts, controlled access, and audited academy operations.",
     },
     {
       title: "Modern Learning Experience",
@@ -252,9 +252,9 @@ export const CONTACT = {
 } as const;
 
 export const FINAL_CTA = {
-  kicker: "Ready for takeoff",
-  title: "Begin your ATPL journey with confidence",
-  body: "Join the ATPL Program and access every subject, every live session, and every resource — in one premium academy experience.",
-  primaryCta: "Start Your ATPL Journey",
+  kicker: "Next step",
+  title: "Train with live instructors on a structured ATPL path",
+  body: "Join ATPL PASS for every subject, live session, and study resource — organised in one academy platform.",
+  primaryCta: "Enrol in ATPL PASS",
   secondaryCta: "Log in",
 } as const;

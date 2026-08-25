@@ -206,7 +206,7 @@ function FloatingAiAssistant() {
             transition={{ duration: 0.2 }}
             className="fixed bottom-5 end-5 z-50 flex h-[min(640px,calc(100vh-2.5rem))] w-[min(420px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
           >
-            <div className="flex items-center gap-2 border-b bg-gradient-to-r from-primary/10 via-card to-sky-500/10 px-4 py-3">
+            <div className="flex items-center gap-2 border-b bg-gradient-to-r from-primary/10 via-card to-accent/10 px-4 py-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
                 <Bot className="size-4" />
               </div>

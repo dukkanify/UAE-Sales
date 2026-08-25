@@ -4,13 +4,37 @@
 
 export type ConversationKind =
   | "direct"
+  | "support"
   | "course_group"
   | "class_group"
   | "study_group"
   | "instructor_group"
   | "admin_group";
 
-export type MessageDeliveryStatus = "sent" | "delivered" | "read";
+export type MessageDeliveryStatus = "sending" | "sent" | "delivered" | "read" | "failed";
+
+/** Training share payloads inside chat */
+export type MessageShareKind =
+  | "text"
+  | "homework"
+  | "lesson_notes"
+  | "study_material"
+  | "pdf_manual"
+  | "flight_document"
+  | "performance_report"
+  | "instructor_feedback"
+  | "mock_exam_file"
+  | "certificate"
+  | "system";
+
+export type MessageReactionEmoji = "👍" | "❤️" | "✅" | "👀" | "🎉";
+
+export interface MessageReaction {
+  emoji: MessageReactionEmoji;
+  userId: string;
+  userName: string;
+  createdAt: string;
+}
 
 export type CommunityKind = "course" | "subject" | "batch" | "instructor" | "general";
 
@@ -18,27 +42,12 @@ export type PostVisibility = "public" | "members" | "announcement";
 
 export type BlogPostStatus = "draft" | "scheduled" | "published" | "archived";
 
-export type TicketType =
-  | "technical"
-  | "course"
-  | "payment"
-  | "general"
-  | "account"
-  | "bug";
+export type TicketType = "technical" | "course" | "payment" | "general" | "account" | "bug";
 
 export type TicketStatus =
-  | "open"
-  | "in_progress"
-  | "waiting_customer"
-  | "resolved"
-  | "closed";
+  "open" | "in_progress" | "waiting_customer" | "escalated" | "resolved" | "closed";
 
-export type AnnouncementTarget =
-  | "platform"
-  | "course"
-  | "group"
-  | "instructor"
-  | "student";
+export type AnnouncementTarget = "platform" | "course" | "group" | "instructor" | "student";
 
 export type ModerationAction = "allow" | "block" | "flag" | "redact";
 
@@ -95,11 +104,22 @@ export interface Message {
   body: string;
   attachments: AttachmentRef[];
   deliveryStatus: MessageDeliveryStatus;
+  shareKind: MessageShareKind;
+  replyToId: string | null;
+  replyPreview: string | null;
+  reactions: MessageReaction[];
+  pinned: boolean;
   moderated: boolean;
   moderationFlags: string[];
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PresenceState {
+  userId: string;
+  status: "online" | "offline";
+  lastSeenAt: string;
 }
 
 export interface TypingState {
@@ -234,6 +254,8 @@ export interface TicketReply {
   authorName: string;
   body: string;
   isStaff: boolean;
+  /** Staff-only note — never shown to requester */
+  isInternal: boolean;
   attachments: AttachmentRef[];
   createdAt: string;
 }

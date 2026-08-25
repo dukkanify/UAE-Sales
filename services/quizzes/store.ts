@@ -1,10 +1,11 @@
 /**
  * Assessment durable store (.data/aep-quizzes.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   BankQuestion,
   InstructorReview,
@@ -26,8 +27,9 @@ export interface QuizzesDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-quizzes.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-quizzes.json");
+}
 
 function emptyDb(): QuizzesDatabase {
   return {
@@ -42,30 +44,24 @@ function emptyDb(): QuizzesDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<QuizzesDatabase>): QuizzesDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    categories: raw.categories ?? [],
+    questions: raw.questions ?? [],
+    quizzes: raw.quizzes ?? [],
+    quizQuestions: raw.quizQuestions ?? [],
+    attempts: raw.attempts ?? [],
+    answers: raw.answers ?? [],
+    reviews: raw.reviews ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensureQuizzesStore(): QuizzesDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as QuizzesDatabase;
-    return {
-      categories: raw.categories ?? [],
-      questions: raw.questions ?? [],
-      quizzes: raw.quizzes ?? [],
-      quizQuestions: raw.quizQuestions ?? [],
-      attempts: raw.attempts ?? [],
-      answers: raw.answers ?? [],
-      reviews: raw.reviews ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<QuizzesDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readQuizzesDb(): QuizzesDatabase {
@@ -75,6 +71,6 @@ export function readQuizzesDb(): QuizzesDatabase {
 export function writeQuizzesDb(mutator: (db: QuizzesDatabase) => void): QuizzesDatabase {
   const db = ensureQuizzesStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
   return db;
 }

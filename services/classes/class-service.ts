@@ -12,7 +12,6 @@ import {
 import { ROLES } from "@/constants/roles";
 import { logActivity, logAudit } from "@/services/auth/activity-log";
 import { readAuthDb } from "@/services/auth/store";
-import { createNotification } from "@/services/notifications/notification-service";
 import { listEnrollments } from "@/services/courses/enrollment-service";
 import { getCourseById } from "@/services/courses/course-service";
 import { ensureCoursesSeeded } from "@/services/courses/seed";
@@ -184,8 +183,7 @@ export function getClassStats(
   let rows = readClassesDb().classes.filter((c) => !c.deletedAt);
   if (opts.instructorId) {
     rows = rows.filter(
-      (c) =>
-        c.instructorId === opts.instructorId || c.assistantInstructorId === opts.instructorId,
+      (c) => c.instructorId === opts.instructorId || c.assistantInstructorId === opts.instructorId,
     );
   }
   if (opts.studentId) {
@@ -257,9 +255,9 @@ async function notifyUsers(
   type: string,
   data: Record<string, unknown>,
 ) {
-  for (const userId of [...new Set(userIds)]) {
-    await createNotification({ userId, title, body, type, data, channel: "in_app" });
-  }
+  const { notifyUsers: emitToUsers } =
+    await import("@/services/notifications/notification-service");
+  await emitToUsers(userIds, { title, body, type, data });
 }
 
 export async function createLiveClass(

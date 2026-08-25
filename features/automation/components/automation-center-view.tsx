@@ -221,7 +221,7 @@ export function AutomationCenterView() {
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3 border-b border-border/50 pb-6"
       >
-        <h2 className="font-heading text-xl tracking-tight">Platform pulse</h2>
+        <h2 className="font-display text-xl tracking-tight">System status</h2>
         <p className="text-sm text-muted-foreground">
           Status {overview?.platform.platformStatus ?? "…"} · Domains{" "}
           {overview?.stats.domainsEnabled ?? 0}/{overview?.stats.domainsTotal ?? 0} active · Email{" "}
@@ -248,7 +248,7 @@ export function AutomationCenterView() {
         className="space-y-6"
       >
         <div>
-          <h2 className="font-heading text-xl tracking-tight">Domain controls</h2>
+          <h2 className="font-display text-xl tracking-tight">Domain controls</h2>
           <p className="text-sm text-muted-foreground">
             Edit hot settings inline, or open the full console for deep operations.
           </p>

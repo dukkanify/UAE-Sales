@@ -1,5 +1,6 @@
 /**
  * Communication attachments — local public/uploads/communication with Supabase readiness.
+ * Virus-scan hook runs before persistence.
  */
 
 import { mkdirSync, writeFileSync, existsSync } from "fs";
@@ -12,6 +13,7 @@ import { uploadFile as uploadToSupabase } from "@/services/storage/storage-servi
 import { COMM_ATTACHMENT_MIME_ALLOW } from "@/constants/communication";
 import { CommunicationError } from "@/services/communication/access";
 import { writeCommunicationDb } from "@/services/communication/store";
+import { virusScanHook } from "@/lib/security/upload";
 import type { AttachmentRef } from "@/types/communication";
 
 function guessExt(mime: string) {
@@ -28,6 +30,11 @@ function guessExt(mime: string) {
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
     "application/vnd.ms-powerpoint": ".ppt",
     "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+    "audio/mpeg": ".mp3",
+    "audio/mp4": ".m4a",
+    "audio/wav": ".wav",
+    "audio/webm": ".webm",
+    "audio/ogg": ".ogg",
   };
   return map[mime] ?? "";
 }
@@ -39,14 +46,18 @@ export async function uploadCommunicationAttachment(input: {
   const settings = getPlatformSettings();
   const maxBytes = settings.security.maxUploadSizeMb * 1024 * 1024;
   if (input.file.size > maxBytes) {
-    throw new CommunicationError(
-      `File exceeds ${settings.security.maxUploadSizeMb}MB limit`,
-    );
+    throw new CommunicationError(`File exceeds ${settings.security.maxUploadSizeMb}MB limit`);
   }
 
   const mime = input.file.type || "application/octet-stream";
   if (mime !== "application/octet-stream" && !COMM_ATTACHMENT_MIME_ALLOW.has(mime)) {
     throw new CommunicationError(`File type ${mime} is not allowed`);
+  }
+
+  const buffer = Buffer.from(await input.file.arrayBuffer());
+  const scan = await virusScanHook(buffer);
+  if (!scan.clean) {
+    throw new CommunicationError("Attachment failed security scan", 422);
   }
 
   const ext = path.extname(input.file.name) || guessExt(mime);
@@ -56,7 +67,8 @@ export async function uploadCommunicationAttachment(input: {
   let publicUrl: string;
 
   if (settings.storage.provider === "supabase" && isSupabaseConfigured()) {
-    const result = await uploadToSupabase(relativePath, input.file);
+    const blob = new File([buffer], input.file.name, { type: mime });
+    const result = await uploadToSupabase(relativePath, blob);
     if (!result.success || !result.data) {
       throw new CommunicationError(result.error ?? "Supabase upload failed");
     }
@@ -64,7 +76,6 @@ export async function uploadCommunicationAttachment(input: {
   } else {
     const dir = path.join(process.cwd(), "public", "uploads", "communication", input.actorId);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    const buffer = Buffer.from(await input.file.arrayBuffer());
     writeFileSync(path.join(dir, fileName), buffer);
     publicUrl = `/uploads/communication/${input.actorId}/${fileName}`;
   }

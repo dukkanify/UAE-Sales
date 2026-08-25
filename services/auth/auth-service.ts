@@ -44,6 +44,7 @@ import {
 } from "@/services/auth/session-service";
 import { getPlatformSettings } from "@/services/settings/settings-service";
 import { describeDeviceFromUserAgent } from "@/lib/security/device-fingerprint";
+import { emitNotification } from "@/services/notifications/notification-service";
 
 export interface RequestContext {
   ipAddress?: string | null;
@@ -378,6 +379,17 @@ export async function requestOtp(input: {
     });
   }
 
+  if (existing?.id) {
+    void emitNotification({
+      userId: existing.id,
+      type: "account.otp_sent",
+      title: "Verification code sent",
+      body: `A one-time code was sent for ${input.purpose.replaceAll("_", " ")}.`,
+      dedupeKey: `otp:${input.purpose}:${existing.id}:${Math.floor(Date.now() / 60_000)}`,
+      email: false,
+    });
+  }
+
   return {
     success: true,
     data: {
@@ -638,6 +650,28 @@ export async function verifyOtp(input: {
     },
     ...input.ctx,
   });
+
+  if (input.deviceFingerprint) {
+    const fingerprintSeen = readAuthDb().activityLogs.filter(
+      (l) =>
+        l.actorId === profile.id &&
+        l.action === ACTIVITY_ACTIONS.LOGIN &&
+        typeof l.metadata?.deviceFingerprint === "string" &&
+        l.metadata.deviceFingerprint === String(input.deviceFingerprint).slice(0, 8),
+    ).length;
+    if (fingerprintSeen <= 1) {
+      void emitNotification({
+        userId: profile.id,
+        type: "security.login_new_device",
+        title: "New device login",
+        body: input.deviceLabel
+          ? `Signed in from ${input.deviceLabel}.`
+          : "A new device signed in to your account.",
+        email: true,
+        dedupeKey: `login_device:${profile.id}:${String(input.deviceFingerprint).slice(0, 12)}`,
+      });
+    }
+  }
 
   const redirectTo =
     profile.role === ROLES.INSTRUCTOR && profile.status === ACCOUNT_STATUS.PENDING
