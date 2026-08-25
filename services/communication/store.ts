@@ -18,6 +18,7 @@ import type {
   Message,
   ModerationLog,
   ModerationRule,
+  PresenceState,
   SupportTicket,
   TicketReply,
   TypingState,
@@ -27,6 +28,7 @@ export interface CommunicationDatabase {
   conversations: Conversation[];
   messages: Message[];
   typing: TypingState[];
+  presence: PresenceState[];
   communities: Community[];
   posts: CommunityPost[];
   comments: CommentRecord[];
@@ -50,6 +52,7 @@ function emptyDb(): CommunicationDatabase {
     conversations: [],
     messages: [],
     typing: [],
+    presence: [],
     communities: [],
     posts: [],
     comments: [],
@@ -70,8 +73,16 @@ function normalizeDb(raw: Partial<CommunicationDatabase>): CommunicationDatabase
     ...emptyDb(),
     ...raw,
     conversations: raw.conversations ?? [],
-    messages: raw.messages ?? [],
+    messages: (raw.messages ?? []).map((m) => ({
+      ...m,
+      shareKind: m.shareKind ?? "text",
+      replyToId: m.replyToId ?? null,
+      replyPreview: m.replyPreview ?? null,
+      reactions: m.reactions ?? [],
+      pinned: Boolean(m.pinned),
+    })),
     typing: raw.typing ?? [],
+    presence: raw.presence ?? [],
     communities: raw.communities ?? [],
     posts: raw.posts ?? [],
     comments: raw.comments ?? [],
@@ -79,7 +90,10 @@ function normalizeDb(raw: Partial<CommunicationDatabase>): CommunicationDatabase
     blogPosts: raw.blogPosts ?? [],
     announcements: raw.announcements ?? [],
     tickets: raw.tickets ?? [],
-    ticketReplies: raw.ticketReplies ?? [],
+    ticketReplies: (raw.ticketReplies ?? []).map((r) => ({
+      ...r,
+      isInternal: Boolean(r.isInternal),
+    })),
     attachments: raw.attachments ?? [],
     moderationRules: raw.moderationRules ?? [],
     moderationLogs: raw.moderationLogs ?? [],
