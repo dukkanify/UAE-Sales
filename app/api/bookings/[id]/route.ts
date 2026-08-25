@@ -5,6 +5,7 @@ import { requirePermission } from "@/services/auth/guards";
 import { enrichBooking, updateBookingStatus } from "@/services/bookings/booking-service";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 import { BOOKING_STATUSES, type BookingStatus } from "@/types/bookings";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 
 interface Ctx {
   params: Promise<{ id: string }>;
@@ -12,6 +13,9 @@ interface Ctx {
 
 export async function PATCH(request: Request, ctx: Ctx) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const user = await requirePermission(PERMISSIONS.BOOKINGS_OWN);
     const { id } = await ctx.params;
     const body = (await request.json().catch(() => null)) as {

@@ -50,9 +50,11 @@ async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
 
   // Edge-friendly TTL cache — avoid a same-origin round-trip on every HTML request.
   const now = Date.now();
-  const cached = (globalThis as typeof globalThis & {
-    __aepMaintenanceCache?: { at: number; enabled: boolean };
-  }).__aepMaintenanceCache;
+  const cached = (
+    globalThis as typeof globalThis & {
+      __aepMaintenanceCache?: { at: number; enabled: boolean };
+    }
+  ).__aepMaintenanceCache;
   if (cached && now - cached.at < 15_000) {
     return cached.enabled;
   }
@@ -65,16 +67,20 @@ async function isMaintenanceEnabled(request: NextRequest): Promise<boolean> {
       next: { revalidate: 15 },
     });
     if (!res.ok) {
-      (globalThis as typeof globalThis & {
-        __aepMaintenanceCache?: { at: number; enabled: boolean };
-      }).__aepMaintenanceCache = { at: now, enabled: false };
+      (
+        globalThis as typeof globalThis & {
+          __aepMaintenanceCache?: { at: number; enabled: boolean };
+        }
+      ).__aepMaintenanceCache = { at: now, enabled: false };
       return false;
     }
     const json = (await res.json()) as { data?: { enabled?: boolean } };
     const enabled = Boolean(json.data?.enabled);
-    (globalThis as typeof globalThis & {
-      __aepMaintenanceCache?: { at: number; enabled: boolean };
-    }).__aepMaintenanceCache = { at: now, enabled };
+    (
+      globalThis as typeof globalThis & {
+        __aepMaintenanceCache?: { at: number; enabled: boolean };
+      }
+    ).__aepMaintenanceCache = { at: now, enabled };
     return enabled;
   } catch {
     return false;
@@ -91,6 +97,7 @@ export async function middleware(request: NextRequest) {
     "/classes": "/courses",
     "/booking": "/book",
     "/bookings": "/book",
+    "/private-session": "/book",
     "/zoom": "/live",
     "/live-zoom": "/live",
     "/flight-path": "/flightpath",
