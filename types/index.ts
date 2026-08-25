@@ -85,10 +85,23 @@ export interface NotificationRecord {
   userId: string;
   title: string;
   body: string;
-  channel: "in_app" | "email";
+  channel: "in_app" | "email" | "push" | "mobile";
   type: string;
+  /** Catalog category for filters */
+  category?: string;
+  priority?: "critical" | "high" | "medium" | "low" | "informational";
+  actionUrl?: string | null;
+  /** unread | read | archived | deleted */
+  status?: "unread" | "read" | "archived" | "deleted";
   data: Record<string, unknown>;
+  /** Smart grouping key (similar events collapse in UI) */
+  groupKey?: string | null;
+  /** Idempotency / anti-spam key */
+  dedupeKey?: string | null;
   readAt: string | null;
+  archivedAt?: string | null;
+  deletedAt?: string | null;
+  emailSentAt?: string | null;
   createdAt: string;
 }
 

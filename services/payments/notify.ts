@@ -1,9 +1,8 @@
 /**
- * Soft notifications for payment events (+ CR009 email automation).
+ * Soft notifications for payment events (+ email via central engine).
  */
 
-import { emailPaymentUpdate } from "@/services/email/automation-service";
-import { createNotification } from "@/services/notifications/notification-service";
+import { emitNotification } from "@/services/notifications/notification-service";
 
 export async function notifyPayment(
   userId: string,
@@ -15,23 +14,19 @@ export async function notifyPayment(
     amountLabel?: string;
     reference?: string;
     email?: boolean;
+    actionUrl?: string | null;
   },
 ) {
-  await createNotification({
+  await emitNotification({
     userId,
     title: input.title,
     body: input.body,
     type: input.type,
     data: input.data,
-  });
-
-  if (input.email === false) return;
-
-  await emailPaymentUpdate({
-    userId,
-    title: input.title,
-    detail: input.body,
+    actionUrl: input.actionUrl ?? "/student/payments",
     amountLabel: input.amountLabel,
     reference: input.reference,
+    email: input.email,
+    dedupeKey: input.reference ? `payment:${input.type}:${input.reference}` : null,
   });
 }

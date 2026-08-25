@@ -189,6 +189,17 @@ export async function createCertificate(input: {
       actorId: input.user.id,
       meta: { certificateId: certificate.id, courseId: input.courseId },
     });
+    const { emitNotification } = await import("@/services/notifications/notification-service");
+    await emitNotification({
+      userId: input.studentId,
+      type: "certificate.issued",
+      title: "Certificate issued",
+      body: `Your certificate for ${course.title} is ready.`,
+      actionUrl: "/student/certificates",
+      data: { certificateId: certificate.id, courseId: input.courseId },
+      dedupeKey: `certificate:${certificate.id}`,
+      email: false,
+    });
   }
 
   return certificate;

@@ -53,6 +53,8 @@ export const routes = {
       sessions: "/api/auth/sessions",
     },
     notifications: "/api/notifications",
+    notificationPreferences: "/api/notifications/preferences",
+    notificationUnreadCount: "/api/notifications/unread-count",
     activityLogs: "/api/admin/activity-logs",
   },
 } as const;

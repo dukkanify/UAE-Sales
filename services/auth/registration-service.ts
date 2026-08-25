@@ -416,6 +416,36 @@ export async function finalizeEnterpriseRegistration(input: {
 
   await emailRegistrationWelcome({ userId: created.id, actorId: created.id });
 
+  const { emitNotification, notifyRole } =
+    await import("@/services/notifications/notification-service");
+  await emitNotification({
+    userId: created.id,
+    type: "account.created",
+    title: "Account created",
+    body: "Welcome to AviatorPass — your account is ready.",
+    actionUrl: "/complete-profile",
+    email: false,
+  });
+  await emitNotification({
+    userId: created.id,
+    type: "account.welcome",
+    title: "Welcome aboard",
+    body: "Your AviatorPass journey starts here.",
+    email: false,
+  });
+  await notifyRole("admin", {
+    title: "New registration",
+    body: `${created.email} joined as ${created.role}.`,
+    type: "admin.registration",
+    data: { userId: created.id, email: created.email, role: created.role },
+  });
+  await notifyRole("super_admin", {
+    title: "New registration",
+    body: `${created.email} joined as ${created.role}.`,
+    type: "admin.registration",
+    data: { userId: created.id, email: created.email, role: created.role },
+  });
+
   const verifiedTpl = verificationSuccessEmailTemplate({
     firstName: created.firstName || "Aviator",
     role: created.role,
