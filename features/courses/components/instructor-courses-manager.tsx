@@ -141,7 +141,7 @@ function InstructorCoursesManager() {
                     Edit
                   </Button>
                   <Button size="sm" variant="ghost" asChild>
-                    <Link href="/instructor/lessons">Lessons</Link>
+                    <Link href="/instructor/courses">Courses</Link>
                   </Button>
                 </div>
               </CardContent>

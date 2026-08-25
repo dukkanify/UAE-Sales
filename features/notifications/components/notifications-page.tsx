@@ -211,7 +211,7 @@ function NotificationsPageView({ roleSegment }: NotificationsPageViewProps) {
               [
                 ["inAppEnabled", "In-app"],
                 ["emailEnabled", "Email"],
-                ["pushEnabled", "Push (coming soon)"],
+                ["pushEnabled", "Push notifications"],
                 ["securityEnabled", "Security"],
                 ["reminderEnabled", "Reminders"],
                 ["courseEnabled", "Courses"],

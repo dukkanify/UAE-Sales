@@ -211,7 +211,7 @@ export function ensureCommunicationSeeded(): void {
 
   const announcement: Announcement = {
     id: generateId(),
-    title: "Welcome to the AviatorPass Communication Center",
+    title: "Welcome to the ATPL PASS Communication Center",
     bodyHtml:
       "<p>Messaging, communities, announcements, and support tickets are now live inside the platform.</p>",
     target: "platform",

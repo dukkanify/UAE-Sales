@@ -37,12 +37,12 @@ export function renderAutomationTemplate(
   switch (event) {
     case "registration":
       payload = {
-        title: subjectOverride ?? "Welcome to AviatorPass",
+        title: subjectOverride ?? "Welcome to ATPL PASS",
         preheader: "Your account is ready.",
         bodyHtml: `<p>Hello ${name},</p>
           <p>Welcome aboard. Your AviatorPass account is verified and ready.</p>
-          <p>${detail || "Explore courses, book sessions, and track your ATPL journey from your dashboard."}</p>
-          <p>${cta} to get started.</p>`,
+          <p>${detail || "Open your dashboard to view courses, live sessions, and study progress."}</p>
+          <p>${cta} to continue.</p>`,
       };
       break;
     case "payment":

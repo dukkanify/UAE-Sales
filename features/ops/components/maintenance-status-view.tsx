@@ -35,7 +35,7 @@ export function MaintenanceStatusView({ status }: { status: MaintenanceStatus })
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
           <Wrench className="h-7 w-7 text-[#CCA04C]" aria-hidden />
         </div>
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-[#5BA3C9]">
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-accent">
           {status.platformName}
         </p>
         <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
