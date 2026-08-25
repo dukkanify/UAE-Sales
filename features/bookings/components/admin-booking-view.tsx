@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { bookingFetch, bookingJson } from "@/features/bookings/lib/api";
+import { SessionTypeAdminPanel } from "@/features/bookings/components/session-type-admin-panel";
 import type { BookingListItem, BookingSettings } from "@/types/bookings";
 import type { UserProfile } from "@/types";
 
@@ -92,8 +93,8 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Bookings"
-        description="Control 24/7 Zoom self-booking and manage appointments."
+        title="Private sessions"
+        description="Manage premium standalone booking services, appointments, and Zoom sessions."
         breadcrumbs={[{ label: roleLabel }, { label: "Bookings" }]}
         actions={
           <div className="inline-flex items-center gap-2">
@@ -276,26 +277,15 @@ function AdminBookingView({ roleLabel }: AdminBookingViewProps) {
               </div>
             </div>
 
-            <div>
-              <Label>Session types</Label>
-              <ul className="mt-2 space-y-2">
-                {settings.sessionTypes.map((t) => (
-                  <li
-                    key={t.id}
-                    className="flex items-center justify-between rounded-xl bg-muted/30 px-3 py-2.5 text-sm"
-                  >
-                    <div>
-                      <p className="font-medium">{t.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {t.durationMinutes} min · {t.description}
-                      </p>
-                    </div>
-                    <Badge variant={t.active ? "default" : "outline"}>
-                      {t.active ? "Active" : "Off"}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
+            <div className="space-y-5">
+              <SessionTypeAdminPanel
+                settings={settings}
+                instructors={instructors}
+                saving={saving}
+                onChange={(sessionTypes) =>
+                  setSettings((prev) => (prev ? { ...prev, sessionTypes } : prev))
+                }
+              />
             </div>
           </div>
         )
