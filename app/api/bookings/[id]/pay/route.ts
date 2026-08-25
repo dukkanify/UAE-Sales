@@ -4,9 +4,13 @@ import { PERMISSIONS } from "@/constants/permissions";
 import { bookingErrorResponse } from "@/app/api/bookings/_utils";
 import { requirePermission } from "@/services/auth/guards";
 import { confirmBookingPayment } from "@/services/bookings/booking-service";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     const user = await requirePermission(PERMISSIONS.BOOKINGS_OWN);
     const { id } = await context.params;
     const body = (await request.json().catch(() => ({}))) as { paymentOrderId?: string };
