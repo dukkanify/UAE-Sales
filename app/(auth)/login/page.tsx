@@ -18,15 +18,15 @@ import { siteConfig } from "@/config/site";
 import { brandingConfig } from "@/config/branding";
 
 export const metadata: Metadata = {
-  title: "Enter platform",
-  description: `Enter the ${siteConfig.name} aviation course platform with email OTP.`,
+  title: "Sign in",
+  description: `Sign in to ${siteConfig.name} with a one-time email code.`,
 };
 
 export default function LoginPage() {
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4 py-12">
       <div className="hero-aviation absolute inset-0" />
-      <div className="absolute inset-0 bg-[#0B1A24]/55 backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-[var(--surface-ink)]/55 backdrop-blur-[2px]" />
       <Card className="relative z-10 w-full max-w-md border-border/60 shadow-medium">
         <CardHeader className="space-y-5 text-center">
           <div className="flex justify-center">
@@ -36,9 +36,9 @@ export default function LoginPage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-accent">
               {brandingConfig.tagline}
             </p>
-            <CardTitle className="font-display text-2xl">Enter platform</CardTitle>
+            <CardTitle className="font-display text-2xl">Sign in</CardTitle>
             <CardDescription>
-              Use your email for a one-time code — then continue your ATPL course path.
+              Enter your email to receive a one-time code for secure access.
             </CardDescription>
           </div>
         </CardHeader>
@@ -48,9 +48,9 @@ export default function LoginPage() {
           </Suspense>
         </CardContent>
         <CardFooter className="justify-center text-sm text-muted-foreground">
-          New to AviatorPass?{" "}
+          New to ATPL PASS?{" "}
           <Link href={routes.register} className="ml-1 font-medium text-primary hover:underline">
-            Join as student or instructor
+            Create a student or instructor account
           </Link>
         </CardFooter>
       </Card>
