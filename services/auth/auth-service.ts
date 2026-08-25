@@ -2,7 +2,6 @@ import { getServerEnv } from "@/config/env";
 import { ACCOUNT_STATUS, AUTHENTICATABLE_STATUSES } from "@/constants/account-status";
 import { ACTIVITY_ACTIONS } from "@/constants/activity-actions";
 import { getPermissionsForRole, ROLE_DASHBOARD, ROLES, type Role } from "@/constants/roles";
-import { agentLog } from "@/lib/debug/agent-log";
 import {
   clearSessionCookies,
   hashSessionToken,
@@ -204,101 +203,58 @@ export async function getCurrentSession(): Promise<{
   user: UserProfile | null;
   permissions: ReturnType<typeof getPermissionsForRole>;
 }> {
-  // #region agent log
-  agentLog({
-    hypothesisId: "C",
-    location: "auth-service.ts:getCurrentSession",
-    message: "getCurrentSession entry",
-    data: {},
-  });
-  // #endregion
-  try {
-    ensureSuperAdminSeeded();
+  ensureSuperAdminSeeded();
 
-    const parsed = await readSessionCookie();
-    if (!parsed) {
-      // #region agent log
-      agentLog({
-        hypothesisId: "C",
-        location: "auth-service.ts:getCurrentSession",
-        message: "no session cookie",
-        data: {},
-      });
-      // #endregion
-      return { user: null, permissions: [] };
-    }
+  const parsed = await readSessionCookie();
+  if (!parsed) {
+    return { user: null, permissions: [] };
+  }
 
-    const db = readAuthDb();
-    const session = db.sessions.find((s) => s.id === parsed.payload.sid);
-    if (!session || session.revokedAt) {
-      await clearSessionCookies();
-      return { user: null, permissions: [] };
-    }
+  const db = readAuthDb();
+  const session = db.sessions.find((s) => s.id === parsed.payload.sid);
+  if (!session || session.revokedAt) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
 
-    if (new Date(session.expiresAt).getTime() <= Date.now()) {
-      writeAuthDb((d) => {
-        const s = d.sessions.find((x) => x.id === session.id);
-        if (s) s.revokedAt = nowIso();
-      });
-      await clearSessionCookies();
-      return { user: null, permissions: [] };
-    }
-
-    if (session.tokenHash !== hashSessionToken(parsed.rawToken)) {
-      await clearSessionCookies();
-      return { user: null, permissions: [] };
-    }
-
-    if (session.tokenHash !== parsed.payload.th) {
-      await clearSessionCookies();
-      return { user: null, permissions: [] };
-    }
-
-    const user = findUserById(session.userId);
-    if (!user) {
-      await clearSessionCookies();
-      return { user: null, permissions: [] };
-    }
-
-    if (user.status === ACCOUNT_STATUS.SUSPENDED || user.status === ACCOUNT_STATUS.INACTIVE) {
-      return { user: toUserProfile(user), permissions: [] };
-    }
-
+  if (new Date(session.expiresAt).getTime() <= Date.now()) {
     writeAuthDb((d) => {
       const s = d.sessions.find((x) => x.id === session.id);
-      if (s) s.lastActiveAt = nowIso();
+      if (s) s.revokedAt = nowIso();
     });
-
-    // #region agent log
-    agentLog({
-      hypothesisId: "C",
-      location: "auth-service.ts:getCurrentSession",
-      message: "getCurrentSession success",
-      data: { role: user.role, userIdPrefix: user.id.slice(0, 8) },
-    });
-    // #endregion
-
-    return {
-      user: toUserProfile(user),
-      permissions: getPermissionsForRole(user.role),
-    };
-  } catch (error) {
-    // #region agent log
-    agentLog({
-      hypothesisId: "C",
-      location: "auth-service.ts:getCurrentSession",
-      message: "getCurrentSession THREW",
-      data: {
-        code:
-          error && typeof error === "object" && "code" in error
-            ? String((error as { code?: string }).code)
-            : "",
-        errMessage: error instanceof Error ? error.message : String(error),
-      },
-    });
-    // #endregion
-    throw error;
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
   }
+
+  if (session.tokenHash !== hashSessionToken(parsed.rawToken)) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (session.tokenHash !== parsed.payload.th) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  const user = findUserById(session.userId);
+  if (!user) {
+    await clearSessionCookies();
+    return { user: null, permissions: [] };
+  }
+
+  if (user.status === ACCOUNT_STATUS.SUSPENDED || user.status === ACCOUNT_STATUS.INACTIVE) {
+    return { user: toUserProfile(user), permissions: [] };
+  }
+
+  writeAuthDb((d) => {
+    const s = d.sessions.find((x) => x.id === session.id);
+    if (s) s.lastActiveAt = nowIso();
+  });
+
+  return {
+    user: toUserProfile(user),
+    permissions: getPermissionsForRole(user.role),
+  };
 }
 
 export async function requestOtp(input: {

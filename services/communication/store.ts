@@ -1,10 +1,11 @@
 /**
  * Communication Center durable store (.data/aep-communication.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   Announcement,
   AttachmentRef,
@@ -40,8 +41,9 @@ export interface CommunicationDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-communication.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-communication.json");
+}
 
 function emptyDb(): CommunicationDatabase {
   return {
@@ -63,39 +65,31 @@ function emptyDb(): CommunicationDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<CommunicationDatabase>): CommunicationDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    conversations: raw.conversations ?? [],
+    messages: raw.messages ?? [],
+    typing: raw.typing ?? [],
+    communities: raw.communities ?? [],
+    posts: raw.posts ?? [],
+    comments: raw.comments ?? [],
+    blogCategories: raw.blogCategories ?? [],
+    blogPosts: raw.blogPosts ?? [],
+    announcements: raw.announcements ?? [],
+    tickets: raw.tickets ?? [],
+    ticketReplies: raw.ticketReplies ?? [],
+    attachments: raw.attachments ?? [],
+    moderationRules: raw.moderationRules ?? [],
+    moderationLogs: raw.moderationLogs ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensureCommunicationStore(): CommunicationDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<CommunicationDatabase>;
-    return {
-      ...emptyDb(),
-      ...raw,
-      conversations: raw.conversations ?? [],
-      messages: raw.messages ?? [],
-      typing: raw.typing ?? [],
-      communities: raw.communities ?? [],
-      posts: raw.posts ?? [],
-      comments: raw.comments ?? [],
-      blogCategories: raw.blogCategories ?? [],
-      blogPosts: raw.blogPosts ?? [],
-      announcements: raw.announcements ?? [],
-      tickets: raw.tickets ?? [],
-      ticketReplies: raw.ticketReplies ?? [],
-      attachments: raw.attachments ?? [],
-      moderationRules: raw.moderationRules ?? [],
-      moderationLogs: raw.moderationLogs ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<CommunicationDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readCommunicationDb(): CommunicationDatabase {
@@ -107,6 +101,6 @@ export function writeCommunicationDb(
 ): CommunicationDatabase {
   const db = ensureCommunicationStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
   return db;
 }

@@ -1,11 +1,11 @@
 /**
  * Live classes durable store (.data/aep-classes.json).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
-import { agentLog } from "@/lib/debug/agent-log";
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   AttendanceRecord,
   LiveClass,
@@ -27,8 +27,9 @@ export interface ClassesDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-classes.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-classes.json");
+}
 
 function emptyDb(): ClassesDatabase {
   return {
@@ -43,59 +44,24 @@ function emptyDb(): ClassesDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<ClassesDatabase>): ClassesDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    classes: raw.classes ?? [],
+    zoomMeetings: raw.zoomMeetings ?? [],
+    recurringRules: raw.recurringRules ?? [],
+    attendance: raw.attendance ?? [],
+    participants: raw.participants ?? [],
+    recordings: raw.recordings ?? [],
+    reminders: raw.reminders ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensureClassesStore(): ClassesDatabase {
-  // #region agent log
-  agentLog({
-    hypothesisId: "B",
-    location: "classes/store.ts:ensureClassesStore",
-    message: "ensureClassesStore entry",
-    data: {
-      dataDirExists: existsSync(DATA_DIR),
-      dataFileExists: existsSync(DATA_FILE),
-    },
-  });
-  // #endregion
-  try {
-    if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-    if (!existsSync(DATA_FILE)) {
-      const db = emptyDb();
-      writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-      return db;
-    }
-    try {
-      const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as ClassesDatabase;
-      return {
-        classes: raw.classes ?? [],
-        zoomMeetings: raw.zoomMeetings ?? [],
-        recurringRules: raw.recurringRules ?? [],
-        attendance: raw.attendance ?? [],
-        participants: raw.participants ?? [],
-        recordings: raw.recordings ?? [],
-        reminders: raw.reminders ?? [],
-        seeded: Boolean(raw.seeded),
-      };
-    } catch {
-      const db = emptyDb();
-      writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-      return db;
-    }
-  } catch (error) {
-    // #region agent log
-    agentLog({
-      hypothesisId: "B",
-      location: "classes/store.ts:ensureClassesStore",
-      message: "ensureClassesStore THREW",
-      data: {
-        code:
-          error && typeof error === "object" && "code" in error
-            ? String((error as { code?: string }).code)
-            : "",
-        errMessage: error instanceof Error ? error.message : String(error),
-      },
-    });
-    // #endregion
-    throw error;
-  }
+  const raw = readJsonFile<Partial<ClassesDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readClassesDb(): ClassesDatabase {
@@ -105,32 +71,6 @@ export function readClassesDb(): ClassesDatabase {
 export function writeClassesDb(mutator: (db: ClassesDatabase) => void): ClassesDatabase {
   const db = ensureClassesStore();
   mutator(db);
-  // #region agent log
-  agentLog({
-    hypothesisId: "B",
-    location: "classes/store.ts:writeClassesDb",
-    message: "writeClassesDb before writeFileSync",
-    data: { seeded: db.seeded, classesLen: db.classes.length },
-  });
-  // #endregion
-  try {
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-  } catch (error) {
-    // #region agent log
-    agentLog({
-      hypothesisId: "B",
-      location: "classes/store.ts:writeClassesDb",
-      message: "writeClassesDb THREW",
-      data: {
-        code:
-          error && typeof error === "object" && "code" in error
-            ? String((error as { code?: string }).code)
-            : "",
-        errMessage: error instanceof Error ? error.message : String(error),
-      },
-    });
-    // #endregion
-    throw error;
-  }
+  writeJsonFile(dataFile(), db);
   return db;
 }

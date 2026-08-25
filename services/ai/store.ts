@@ -1,10 +1,11 @@
 /**
  * AI durable store — conversations, usage, feedback, plans, logs (not LLM weights).
+ * Uses json-file-store so read-only hosts (Vercel) never 500 Server Components.
  */
 
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
+import { dataDir, readJsonFile, writeJsonFile } from "@/lib/data/json-file-store";
 import type {
   AiConversation,
   AiFeedback,
@@ -29,8 +30,9 @@ export interface AiDatabase {
   seeded: boolean;
 }
 
-const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "aep-ai.json");
+function dataFile() {
+  return path.join(dataDir(), "aep-ai.json");
+}
 
 function emptyDb(): AiDatabase {
   return {
@@ -47,34 +49,26 @@ function emptyDb(): AiDatabase {
   };
 }
 
+function normalizeDb(raw: Partial<AiDatabase>): AiDatabase {
+  return {
+    ...emptyDb(),
+    ...raw,
+    conversations: raw.conversations ?? [],
+    messages: raw.messages ?? [],
+    usage: raw.usage ?? [],
+    feedback: raw.feedback ?? [],
+    prompts: raw.prompts ?? [],
+    recommendations: raw.recommendations ?? [],
+    studyPlans: raw.studyPlans ?? [],
+    logs: raw.logs ?? [],
+    rateWindow: raw.rateWindow ?? [],
+    seeded: Boolean(raw.seeded),
+  };
+}
+
 export function ensureAiStore(): AiDatabase {
-  if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
-  if (!existsSync(DATA_FILE)) {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
-  try {
-    const raw = JSON.parse(readFileSync(DATA_FILE, "utf8")) as Partial<AiDatabase>;
-    return {
-      ...emptyDb(),
-      ...raw,
-      conversations: raw.conversations ?? [],
-      messages: raw.messages ?? [],
-      usage: raw.usage ?? [],
-      feedback: raw.feedback ?? [],
-      prompts: raw.prompts ?? [],
-      recommendations: raw.recommendations ?? [],
-      studyPlans: raw.studyPlans ?? [],
-      logs: raw.logs ?? [],
-      rateWindow: raw.rateWindow ?? [],
-      seeded: Boolean(raw.seeded),
-    };
-  } catch {
-    const db = emptyDb();
-    writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
-    return db;
-  }
+  const raw = readJsonFile<Partial<AiDatabase>>(dataFile(), emptyDb);
+  return normalizeDb(raw);
 }
 
 export function readAiDb(): AiDatabase {
@@ -84,6 +78,6 @@ export function readAiDb(): AiDatabase {
 export function writeAiDb(mutator: (db: AiDatabase) => void): AiDatabase {
   const db = ensureAiStore();
   mutator(db);
-  writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf8");
+  writeJsonFile(dataFile(), db);
   return db;
 }
