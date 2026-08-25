@@ -30,11 +30,25 @@ export async function GET(request: Request) {
       );
     }
 
-    // Public health — no user counts / internal inventory
+    // Public health — no user counts / internal inventory.
+    // deployment.* lets ops confirm which git SHA/aliases Vercel is serving.
+    const deployment = {
+      gitSha:
+        process.env.VERCEL_GIT_COMMIT_SHA ??
+        process.env.GITHUB_SHA ??
+        process.env.COMMIT_SHA ??
+        null,
+      gitRef: process.env.VERCEL_GIT_COMMIT_REF ?? process.env.GITHUB_REF_NAME ?? null,
+      vercelEnv: process.env.VERCEL_ENV ?? null,
+      vercelUrl: process.env.VERCEL_URL ?? null,
+      target: process.env.VERCEL_TARGET_ENV ?? null,
+    };
+
     return NextResponse.json({
       status: snapshot.status === "degraded" ? "degraded" : "ok",
       service: snapshot.service,
       env: snapshot.env,
+      deployment,
       checks: deep
         ? snapshot.checks
         : snapshot.checks.filter((c) => ["app", "database", "storage"].includes(c.id)),
