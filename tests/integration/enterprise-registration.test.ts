@@ -27,8 +27,10 @@ function uniqueEmail(prefix: string) {
 }
 
 function uniquePhone() {
-  const n = Math.floor(10000000 + Math.random() * 89999999);
-  return `+965${n}`;
+  const prefixes = ["5", "6", "9"] as const;
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)]!;
+  const suffix = Math.floor(1_000_000 + Math.random() * 8_999_999);
+  return `+965${prefix}${suffix}`;
 }
 
 const strongPassword = "Secret12!";

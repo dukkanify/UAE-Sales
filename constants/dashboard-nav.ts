@@ -129,9 +129,7 @@ export const ADMIN_NAV: DashboardNavItem[] = [
 export const INSTRUCTOR_NAV: DashboardNavItem[] = [
   { label: "Dashboard", href: "/instructor/dashboard", icon: "dashboard" },
   { label: "My Courses", href: "/instructor/courses", icon: "courses" },
-  { label: "Lessons", href: "/instructor/lessons", icon: "lessons" },
   { label: "Students", href: "/instructor/students", icon: "students" },
-  { label: "Assignments", href: "/instructor/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/instructor/quizzes", icon: "quizzes" },
   { label: "Certificates", href: "/instructor/certificates", icon: "certificates" },
   { label: "Calendar", href: "/instructor/calendar", icon: "calendar" },
@@ -183,7 +181,6 @@ export const STUDENT_NAV: DashboardNavItem[] = [
   { label: "Mock exams", href: "/student/mock-exams", icon: "quizzes" },
   { label: "History", href: "/student/history", icon: "history" },
   { label: "Search", href: "/student/search", icon: "search" },
-  { label: "Assignments", href: "/student/assignments", icon: "assignments" },
   { label: "Quizzes", href: "/student/quizzes", icon: "quizzes" },
   { label: "Progress", href: "/student/progress", icon: "activity" },
   {

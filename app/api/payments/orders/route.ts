@@ -17,6 +17,7 @@ import {
 import { canManageFinance } from "@/services/payments/access";
 import { paymentErrorResponse } from "@/app/api/payments/_utils";
 import type { PaymentMethodBrand } from "@/types/payments";
+import { enforceMutatingApiSecurity } from "@/lib/security/api-guard";
 
 export async function GET(request: Request) {
   try {
@@ -81,6 +82,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const blocked = await enforceMutatingApiSecurity(request);
+    if (blocked) return blocked;
+
     ensurePaymentsSeeded();
     const user = await requirePermission(PERMISSIONS.BILLING_OWN);
     const body = (await request.json().catch(() => null)) as {
