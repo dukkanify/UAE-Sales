@@ -178,11 +178,10 @@ Supabase SQL indexes were **not** changed in this pass (local JSON store path do
 ## Remaining recommendations
 
 1. **LCP ≥95:** subset/self-host Exo 2 with `size-adjust`, or use body font for the decorative hero brand mark; measure again on Vercel production with Speed Insights.
-2. **Accessibility =100:** audit remaining gold-on-cream chips sitewide; consider `text-primary` for ultra-small labels.
-3. **JSON store scale (TD-001):** stream/index `.data/*.json` instead of full-file parse (~6.7 MB auth).
-4. **Dynamic-import** heavy shells (`platform-settings-shell`, `ops-center-shell`) by tab.
-5. **Bundle analyzer** in CI (`@next/bundle-analyzer`) for regression budgets.
-6. **Promote** this branch through `aviatorpass` production once Vercel deploy credentials/hooks are configured.
+2. **JSON store scale (TD-001):** stream/index `.data/*.json` instead of full-file parse (~6.7 MB auth).
+3. **Dynamic-import** heavy shells (`platform-settings-shell`, `ops-center-shell`) by tab.
+4. **Bundle analyzer** in CI (`@next/bundle-analyzer`) for regression budgets.
+5. **Promote** this branch through `aviatorpass` production once Vercel deploy credentials/hooks are configured.
 
 ---
 
@@ -201,4 +200,4 @@ Supabase SQL indexes were **not** changed in this pass (local JSON store path do
 
 ## Final result
 
-Enterprise performance foundations are in place: **dashboard JS roughly halved**, marketing assets **cut >50%**, homepage is an RSC with real LCP imagery, and public APIs advertise cache headers. Lighthouse SEO and Best Practices hit **100**; Performance and Accessibility remain below the stretch targets in local lab and are tracked in remaining recommendations.
+Enterprise performance foundations are in place: **dashboard JS roughly halved**, marketing assets **cut >50%**, homepage is an RSC with real LCP imagery, and public APIs advertise cache headers. Lighthouse **Accessibility / Best Practices / SEO = 100**. Lab Performance is **82 mobile / 76 desktop** (stretch target 95+ tracked under remaining LCP/font work).
