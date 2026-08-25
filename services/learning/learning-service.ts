@@ -22,6 +22,7 @@ import {
 } from "@/services/learning/planner-service";
 import { ensureLearningSeeded } from "@/services/learning/seed";
 import { readLearningDb, writeLearningDb } from "@/services/learning/store";
+import { newDashboardCorrelationId, safeDashboardQuery } from "@/lib/dashboard/safe-load";
 import { generateId } from "@/lib/security/crypto";
 import type {
   CourseLearningState,
@@ -125,29 +126,139 @@ export function getResumeTarget(studentId: string): LearningDashboardOverview["r
   };
 }
 
+export function emptyLearningDashboardOverview(): LearningDashboardOverview {
+  return {
+    activeCourses: 0,
+    completedCourses: 0,
+    upcomingLiveClass: null,
+    upcomingLiveClassId: null,
+    learningHours: 0,
+    progressPercent: 0,
+    assignments: 0,
+    notifications: 0,
+    resume: null,
+    recentActivity: [],
+    weeklyGoalPercent: 0,
+  };
+}
+
 export function getLearningDashboard(user: UserProfile): LearningDashboardOverview {
-  ensureCoursesSeeded();
-  ensureClassesSeeded();
-  ensureLearningSeeded();
-  syncGoalHoursFromProgress(user.id);
-  const overall = getOverallProgress(user.id);
-  const notifications = listNotifications(user.id, { pageSize: 1 });
+  const correlationId = newDashboardCorrelationId();
+  const path = "/student/dashboard";
+  const base = {
+    userId: user.id,
+    role: user.role,
+    correlationId,
+    path,
+  };
 
-  // Upcoming live class for this student
-  const allowed = new Set(
-    readClassesDb()
-      .participants.filter((p) => p.userId === user.id)
-      .map((p) => p.liveClassId),
-  );
-  const upcoming = listLiveClasses({ status: "upcoming", pageSize: 20 }).data.filter((c) =>
-    allowed.has(c.id),
-  )[0];
+  safeDashboardQuery({
+    ...base,
+    label: "ensureCoursesSeeded",
+    fallback: undefined,
+    run: () => {
+      ensureCoursesSeeded();
+    },
+  });
+  safeDashboardQuery({
+    ...base,
+    label: "ensureClassesSeeded",
+    fallback: undefined,
+    run: () => {
+      ensureClassesSeeded();
+    },
+  });
+  safeDashboardQuery({
+    ...base,
+    label: "ensureLearningSeeded",
+    fallback: undefined,
+    run: () => {
+      ensureLearningSeeded();
+    },
+  });
+  safeDashboardQuery({
+    ...base,
+    label: "syncGoalHoursFromProgress",
+    fallback: undefined,
+    run: () => {
+      syncGoalHoursFromProgress(user.id);
+    },
+  });
 
-  const goals = listGoals(user.id).filter((g) => g.status === "active" && g.period === "weekly");
-  const weeklyGoal = goals[0];
-  const weeklyGoalPercent = weeklyGoal
-    ? Math.min(100, Math.round((weeklyGoal.completedHours / weeklyGoal.targetHours) * 100))
-    : 0;
+  const overall = safeDashboardQuery({
+    ...base,
+    label: "getOverallProgress",
+    fallback: {
+      activeCourses: 0,
+      completedCourses: 0,
+      learningHours: 0,
+      progressPercent: 0,
+      lessonsStarted: 0,
+      lessonsCompleted: 0,
+    },
+    run: () => getOverallProgress(user.id),
+  });
+
+  const notifications = safeDashboardQuery({
+    ...base,
+    label: "listNotifications",
+    fallback: {
+      data: [],
+      page: 1,
+      pageSize: 1,
+      total: 0,
+      totalPages: 0,
+      unreadCount: 0,
+    },
+    run: () => listNotifications(user.id, { pageSize: 1 }),
+  });
+
+  const upcoming = safeDashboardQuery({
+    ...base,
+    label: "upcomingLiveClass",
+    fallback: null as ReturnType<typeof listLiveClasses>["data"][number] | null,
+    run: () => {
+      const allowed = new Set(
+        readClassesDb()
+          .participants.filter((p) => p.userId === user.id)
+          .map((p) => p.liveClassId),
+      );
+      return (
+        listLiveClasses({ status: "upcoming", pageSize: 20 }).data.filter((c) =>
+          allowed.has(c.id),
+        )[0] ?? null
+      );
+    },
+  });
+
+  const weeklyGoalPercent = safeDashboardQuery({
+    ...base,
+    label: "weeklyGoalPercent",
+    fallback: 0,
+    run: () => {
+      const goals = listGoals(user.id).filter(
+        (g) => g.status === "active" && g.period === "weekly",
+      );
+      const weeklyGoal = goals[0];
+      return weeklyGoal
+        ? Math.min(100, Math.round((weeklyGoal.completedHours / weeklyGoal.targetHours) * 100))
+        : 0;
+    },
+  });
+
+  const resume = safeDashboardQuery({
+    ...base,
+    label: "getResumeTarget",
+    fallback: null,
+    run: () => getResumeTarget(user.id),
+  });
+
+  const recentActivity = safeDashboardQuery({
+    ...base,
+    label: "listHistory",
+    fallback: [],
+    run: () => listHistory(user.id, { limit: 8 }),
+  });
 
   return {
     activeCourses: overall.activeCourses,
@@ -160,8 +271,8 @@ export function getLearningDashboard(user: UserProfile): LearningDashboardOvervi
     progressPercent: overall.progressPercent,
     assignments: 0,
     notifications: notifications.unreadCount,
-    resume: getResumeTarget(user.id),
-    recentActivity: listHistory(user.id, { limit: 8 }),
+    resume,
+    recentActivity,
     weeklyGoalPercent,
   };
 }
