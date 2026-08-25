@@ -134,16 +134,21 @@ Unit suite `tests/unit/enterprise-messaging.test.ts` covers peer matrix, moderat
 
 ## 7. Testing Results
 
-| Gate                                            | Result                                                     |
-| ----------------------------------------------- | ---------------------------------------------------------- |
-| `npm run typecheck`                             | Pass (after Message / TicketReply field fixes)             |
-| `npm run lint`                                  | Run as part of final validation                            |
-| Unit: peer matrix                               | Pass                                                       |
-| Unit: moderation (profanity / phone / WhatsApp) | Pass                                                       |
-| Unit: support conversation idempotence          | Pass                                                       |
-| Unit: send + read receipts + shareKind          | Pass                                                       |
-| Unit: delete window                             | Pass                                                       |
-| Manual UI smoke                                 | Messaging center: Support chat, directory, attach, compose |
+| Gate                                            | Result                                                                                        |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `npm run typecheck`                             | ✅ Pass                                                                                       |
+| `npm run lint`                                  | ✅ Pass                                                                                       |
+| Full vitest suite                               | ✅ 158 tests / 45 files                                                                       |
+| Unit: peer matrix                               | ✅                                                                                            |
+| Unit: moderation (profanity / phone / WhatsApp) | ✅                                                                                            |
+| Unit: support conversation idempotence          | ✅                                                                                            |
+| Unit: send + read receipts + shareKind          | ✅                                                                                            |
+| Unit: delete window                             | ✅                                                                                            |
+| API E2E (student OTP session)                   | ✅ Support create/send, moderation 422, instructor DM + `lesson_notes`, directory peer filter |
+| Manual UI                                       | ✅ Messaging center + Support thread; Suspense fix cleared `useSearchParams` console errors   |
+
+API evidence: `messaging-api-e2e.log` (Support send, phone block, instructor DM).  
+UI evidence: Support chat with system welcome + receipts (`messaging-support-open.png`).
 
 ---
 
