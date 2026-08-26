@@ -28,6 +28,7 @@
     "uat": "node scripts/uat-smoke.mjs",
     "git:sync": "bash scripts/git-safe-sync.sh",
     "git:status": "node scripts/git-enterprise-status.mjs",
+    "verify:isolation": "node scripts/verify-product-isolation.mjs",
     "db:generate": "prisma generate --schema=database/prisma/schema.prisma",
     "db:push": "prisma db push --schema=database/prisma/schema.prisma",
     "db:studio": "prisma studio --schema=database/prisma/schema.prisma"

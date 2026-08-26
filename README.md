@@ -2,8 +2,9 @@
 
 **Professional ATPL aviation training platform**
 
-Package name: `aviatorpass`. Preferred GitHub repository name: **`AviatorPass`**
-(`dukkanify/UAE-Sales` should be renamed in GitHub → Settings → General → Repository name).
+Package name: `aviatorpass`. Preferred dedicated GitHub repository name: **`AviatorPass`**.
+
+> **Isolation:** This tip is AviatorPass-only. Do not mix marketplace product checkouts into this working tree. See `PROJECT_SEPARATION_REPORT.md`.
 
 Next.js App Router platform with role-based dashboards, LMS, live classes, payments, analytics, AI assistant, mobile API, and production operations.
 
