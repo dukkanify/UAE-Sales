@@ -1,29 +1,29 @@
-# Git workflow
+# Git workflow (AviatorPass only)
 
-## Branch model
+## Product isolation
 
-This repository contains **Sooqna** (`main`) and **AviatorPass** (`aviatorpass` production, `develop` integration).
+This branch tip is **AviatorPass only**. Do **not** merge AviatorPass work into marketplace `main`, and do **not** check out Sooqna trees into this working directory without a clean `node_modules` / `.next` wipe (prefer a separate git worktree or Cloud Agent environment).
 
-| Branch        | Purpose                                                   |
-| ------------- | --------------------------------------------------------- |
-| `main`        | Sooqna production-ready; CI + deploy to Sooqna Vercel     |
-| `aviatorpass` | AviatorPass production; CI + deploy to AviatorPass Vercel |
-| `develop`     | AviatorPass integration / staging                         |
-| `feature/*`   | Feature work (preferred for new tasks)                    |
-| `hotfix/*`    | Production hotfixes off `aviatorpass`                     |
-| `cursor/*`    | Cloud Agent convention (equivalent to `feature/*`)        |
+| Branch        | Purpose                                               |
+| ------------- | ----------------------------------------------------- |
+| `aviatorpass` | AviatorPass production; deploys to AviatorPass Vercel |
+| `develop`     | AviatorPass integration / staging                     |
+| `feature/*`   | Feature work (preferred for new tasks)                |
+| `hotfix/*`    | Production hotfixes off `aviatorpass`                 |
+| `cursor/*`    | Cloud Agent convention (equivalent to `feature/*`)    |
+
+> Historical note: GitHub remote `dukkanify/UAE-Sales` still hosts a divergent Sooqna product on branch `main`. That product must use its own Vercel project, secrets, and ideally a separate repository. AviatorPass workflows on this tip no longer include Sooqna deploy jobs.
 
 ## Flow
 
 ```
 feature/* or cursor/*  →  develop  →  aviatorpass  (AviatorPass production)
-feature/*              →  main       (Sooqna production)
 hotfix/*               →  aviatorpass (urgent AviatorPass fixes)
 ```
 
 ## Pull requests
 
-1. Open PR into `develop` (AviatorPass) or `main` (Sooqna)
+1. Open PR into `develop` (integration) or `aviatorpass` (production hotfix)
 2. CI must pass: format, lint, typecheck, vitest, build, e2e
 3. Use draft PRs until UAT/smoke is green
 4. Merge only when required checks are green (branch protection)
@@ -83,8 +83,9 @@ npm run git:status
 
 | Trigger            | Workflow                            | Target             |
 | ------------------ | ----------------------------------- | ------------------ |
-| Push `main`        | `deploy-main-production.yml`        | Sooqna Vercel      |
 | Push `aviatorpass` | `deploy-aviatorpass-production.yml` | AviatorPass Vercel |
+
+Requires AviatorPass-only secret `VERCEL_AVIATORPASS_DEPLOY_HOOK` (or `VERCEL_TOKEN` + AviatorPass project id). Never reuse marketplace deploy hooks.
 
 ## Semantic versioning
 
