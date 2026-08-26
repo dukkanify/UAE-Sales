@@ -8,22 +8,32 @@
 
 ## Summary
 
-| Gate                                | Result                   | Evidence                                                                                                                                                                |
-| ----------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| History export (AEP root)           | **PASS**                 | `/tmp/AviatorPass-export` first commit = AEP foundation; log `/opt/cursor/artifacts/aviatorpass-migration-export.log`                                                   |
-| Sooqna-only ancestry dropped        | **PASS**                 | Graft + `git-filter-repo`; marketplace `main` tip not exported                                                                                                          |
-| Product isolation script            | **PASS**                 | `npm run verify:isolation`                                                                                                                                              |
-| Typecheck / unit tests              | **PASS**                 | See CI / local runs on migration branch                                                                                                                                 |
-| Production build                    | **PASS**                 | `npm run build` — log `/opt/cursor/artifacts/aviatorpass-migration-build.log`                                                                                           |
-| Create `dukkanify/AviatorPass`      | **NOT VISIBLE TO AGENT** | User marked external action complete, but installation token still gets **404**; org search `AviatorPass` → **0** repos. Cursor App can only see `dukkanify/UAE-Sales`. |
-| Push to dedicated remote            | **BLOCKED**              | Bundle ready at `/opt/cursor/artifacts/aviatorpass-history.bundle` (tip includes migration docs)                                                                        |
-| GitHub Actions on new repo          | **BLOCKED**              | Requires push                                                                                                                                                           |
-| Vercel Git re-link                  | **BLOCKED**              | Operator action                                                                                                                                                         |
-| Vercel Production SHA from new repo | **BLOCKED**              | Live still on `UAE-Sales` / `71c0923` until promote + re-link                                                                                                           |
-| Preview deployments on new repo     | **BLOCKED**              | Requires Git connection                                                                                                                                                 |
-| Zero Sooqna refs (active paths)     | **PASS (policy)**        | Active workflows/docs point at AviatorPass; intentional negatives remain in `verify:isolation` + `docs/archive/`                                                        |
+| Gate                                | Result            | Evidence                                                                                                              |
+| ----------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
+| History export (AEP root)           | **PASS**          | `/tmp/AviatorPass-export` first commit = AEP foundation; log `/opt/cursor/artifacts/aviatorpass-migration-export.log` |
+| Sooqna-only ancestry dropped        | **PASS**          | Graft + `git-filter-repo`; marketplace `main` tip not exported                                                        |
+| Product isolation script            | **PASS**          | `npm run verify:isolation`                                                                                            |
+| Typecheck / unit tests              | **PASS**          | See CI / local runs on migration branch                                                                               |
+| Production build                    | **PASS**          | `npm run build` — log `/opt/cursor/artifacts/aviatorpass-migration-build.log`                                         |
+| Create `dukkanify/AviatorPass`      | **PASS**          | https://github.com/dukkanify/AviatorPass (public, empty)                                                              |
+| Push to dedicated remote            | **BLOCKED**       | `cursor[bot]` HTTP 403; mirror branches on UAE-Sales: `aviatorpass-dedicated-*`                                       |
+| GitHub Actions on new repo          | **BLOCKED**       | Requires push                                                                                                         |
+| Vercel Git re-link                  | **BLOCKED**       | Operator action                                                                                                       |
+| Vercel Production SHA from new repo | **BLOCKED**       | Live still on `UAE-Sales` / `71c0923` until promote + re-link                                                         |
+| Preview deployments on new repo     | **BLOCKED**       | Requires Git connection                                                                                               |
+| Zero Sooqna refs (active paths)     | **PASS (policy)** | Active workflows/docs point at AviatorPass; intentional negatives remain in `verify:isolation` + `docs/archive/`      |
 
-**Cutover is incomplete until the dedicated GitHub repository exists and Vercel is re-linked.**
+**Cutover is incomplete until history is pushed to `dukkanify/AviatorPass` and Vercel is re-linked.**
+
+### Mirror branches (interim, on UAE-Sales)
+
+| Branch                              | Target on AviatorPass | Tip       |
+| ----------------------------------- | --------------------- | --------- |
+| `aviatorpass-dedicated-main`        | `main`                | `504cf10` |
+| `aviatorpass-dedicated-aviatorpass` | `aviatorpass`         | `504cf10` |
+| `aviatorpass-dedicated-develop`     | `develop`             | `3fe2c8a` |
+
+Push helper: `bash scripts/push-from-mirror-branches.sh` (requires AviatorPass write token).
 
 ---
 
