@@ -302,7 +302,7 @@
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: #7a551f;
 }
 
 .atpl-subject-badge {
@@ -310,12 +310,12 @@
   margin-top: 1rem;
   padding: 0.3rem 0.65rem;
   border-radius: 999px;
-  background: rgba(204, 160, 76, 0.1);
+  background: rgba(204, 160, 76, 0.16);
   font-size: 0.62rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9e712e;
+  color: #6f4e1f;
 }
 
 /* —— Learning method —— */
