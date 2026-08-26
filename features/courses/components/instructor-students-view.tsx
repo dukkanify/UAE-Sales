@@ -32,39 +32,41 @@ function InstructorStudentsView({ students }: { students: InstructorStudentRow[]
         />
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Course</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Progress</TableHead>
-                <TableHead>Enrolled</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {students.map((row) => (
-                <TableRow key={`${row.id}-${row.courseId}`}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{row.studentName}</p>
-                      <p className="text-xs text-muted-foreground">{row.studentEmail}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{row.courseTitle}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="capitalize">
-                      {row.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{Math.round(row.progressPercent)}%</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {new Date(row.enrolledAt).toLocaleDateString()}
-                  </TableCell>
+          <div className="table-scroll">
+            <Table className="min-w-[36rem]">
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Course</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Progress</TableHead>
+                  <TableHead>Enrolled</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {students.map((row) => (
+                  <TableRow key={`${row.id}-${row.courseId}`}>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium">{row.studentName}</p>
+                        <p className="text-xs text-muted-foreground">{row.studentEmail}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{row.courseTitle}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {row.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{Math.round(row.progressPercent)}%</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(row.enrolledAt).toLocaleDateString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
     </div>

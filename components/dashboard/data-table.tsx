@@ -70,7 +70,11 @@ function DataTable<T extends { id: string }>({
     if (query.trim() && searchKeys?.length) {
       const q = query.toLowerCase();
       rows = rows.filter((row) =>
-        searchKeys.some((key) => String(row[key] ?? "").toLowerCase().includes(q)),
+        searchKeys.some((key) =>
+          String(row[key] ?? "")
+            .toLowerCase()
+            .includes(q),
+        ),
       );
     }
     if (sortKey) {
@@ -88,8 +92,7 @@ function DataTable<T extends { id: string }>({
   const currentPage = Math.min(page, totalPages);
   const pageRows = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const allSelected =
-    pageRows.length > 0 && pageRows.every((row) => selected.has(row.id));
+  const allSelected = pageRows.length > 0 && pageRows.every((row) => selected.has(row.id));
 
   const toggleAll = () => {
     setSelected((prev) => {
@@ -122,12 +125,7 @@ function DataTable<T extends { id: string }>({
           {filters}
           {selected.size > 0 ? bulkActions : null}
           {onExport ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => onExport(filtered)}
-            >
+            <Button type="button" variant="outline" size="sm" onClick={() => onExport(filtered)}>
               <Download className="h-4 w-4" />
               Export
             </Button>
@@ -136,12 +134,16 @@ function DataTable<T extends { id: string }>({
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-soft">
-        <div className="max-h-[560px] overflow-auto">
-          <Table>
+        <div className="table-scroll max-h-[min(560px,70dvh)]">
+          <Table className="min-w-[36rem]">
             <TableHeader className="sticky top-0 z-10 bg-card">
               <TableRow>
                 <TableHead className="w-10">
-                  <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all" />
+                  <Checkbox
+                    checked={allSelected}
+                    onCheckedChange={toggleAll}
+                    aria-label="Select all"
+                  />
                 </TableHead>
                 {columns.map((col) => (
                   <TableHead
@@ -211,13 +213,13 @@ function DataTable<T extends { id: string }>({
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <p className="text-xs text-muted-foreground">
           {filtered.length} result{filtered.length === 1 ? "" : "s"}
           {selected.size ? ` · ${selected.size} selected` : ""}
         </p>
-        <Pagination>
-          <PaginationContent>
+        <Pagination className="mx-0 w-full justify-end sm:w-auto">
+          <PaginationContent className="flex-wrap">
             <PaginationItem>
               <PaginationPrevious
                 href="#"

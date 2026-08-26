@@ -143,7 +143,12 @@ function NotificationBell() {
           ) : null}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[380px] p-0 shadow-lg">
+      <PopoverContent
+        align="end"
+        sideOffset={8}
+        collisionPadding={12}
+        className="panel-viewport w-[min(24rem,calc(100vw-1.25rem))] max-w-[calc(100vw-1.25rem)] p-0 shadow-lg"
+      >
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div>
             <p className="font-display text-sm font-semibold">Notification center</p>

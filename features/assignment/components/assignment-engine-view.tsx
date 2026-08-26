@@ -153,8 +153,8 @@ export function AssignmentEngineView({ initial }: { initial: Snapshot }) {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-tight">Assign / reassign instructor</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>ATPL subject</Label>
             <Select value={courseId} onValueChange={setCourseId}>
               <SelectTrigger>
@@ -169,7 +169,7 @@ export function AssignmentEngineView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[220px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Instructor</Label>
             <Select value={instructorId} onValueChange={setInstructorId}>
               <SelectTrigger>
@@ -184,7 +184,7 @@ export function AssignmentEngineView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[220px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Preferred start (optional)</Label>
             <Input
               type="datetime-local"
@@ -309,8 +309,8 @@ export function AssignmentEngineView({ initial }: { initial: Snapshot }) {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-tight">Instructor calendar</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Instructor</Label>
             <Select value={calendarInstructorId} onValueChange={setCalendarInstructorId}>
               <SelectTrigger>

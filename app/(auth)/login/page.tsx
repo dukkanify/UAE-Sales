@@ -47,9 +47,9 @@ export default function LoginPage() {
             <LoginForm />
           </Suspense>
         </CardContent>
-        <CardFooter className="justify-center text-sm text-muted-foreground">
+        <CardFooter className="flex flex-wrap justify-center gap-x-1 gap-y-1 text-center text-sm text-muted-foreground">
           New to ATPL PASS?{" "}
-          <Link href={routes.register} className="ml-1 font-medium text-primary hover:underline">
+          <Link href={routes.register} className="font-medium text-primary hover:underline">
             Create a student or instructor account
           </Link>
         </CardFooter>

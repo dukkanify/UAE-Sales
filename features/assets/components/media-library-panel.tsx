@@ -195,18 +195,18 @@ export function MediaLibraryPanel({ embedded = false }: { embedded?: boolean }) 
           <CardTitle className="text-base">Add category</CardTitle>
           <CardDescription>Future categories without code changes.</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
+        <CardContent className="form-row-responsive">
           <Input
             placeholder="id_snake_case"
             value={newCatId}
             onChange={(e) => setNewCatId(e.target.value)}
-            className="max-w-[200px]"
+            className="w-full min-w-0 sm:max-w-[200px]"
           />
           <Input
             placeholder="Label"
             value={newCatLabel}
             onChange={(e) => setNewCatLabel(e.target.value)}
-            className="max-w-[220px]"
+            className="w-full min-w-0 sm:max-w-[220px]"
           />
           <Button onClick={() => void addCategory()} disabled={busy || !newCatId.trim()}>
             <Plus className="me-2 size-4" />
@@ -215,11 +215,11 @@ export function MediaLibraryPanel({ embedded = false }: { embedded?: boolean }) 
         </CardContent>
       </Card>
 
-      <div className="flex flex-wrap items-end gap-2">
-        <div className="space-y-1">
+      <div className="form-row-responsive">
+        <div className="min-w-0 space-y-1">
           <Label>Filter category</Label>
           <Select value={categoryId} onValueChange={setCategoryId}>
-            <SelectTrigger className="w-[220px]">
+            <SelectTrigger className="w-full sm:w-[220px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -232,10 +232,10 @@ export function MediaLibraryPanel({ embedded = false }: { embedded?: boolean }) 
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           <Label>Kind</Label>
           <Select value={kind} onValueChange={setKind}>
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full sm:w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -248,9 +248,13 @@ export function MediaLibraryPanel({ embedded = false }: { embedded?: boolean }) 
             </SelectContent>
           </Select>
         </div>
-        <div className="space-y-1">
+        <div className="min-w-0 space-y-1">
           <Label>Search</Label>
-          <Input value={q} onChange={(e) => setQ(e.target.value)} className="w-[200px]" />
+          <Input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="w-full min-w-0 sm:w-[200px]"
+          />
         </div>
         <Button variant="ghost" size="icon" onClick={() => void load()} aria-label="Refresh">
           <RefreshCw className="size-4" />

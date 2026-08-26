@@ -6,6 +6,7 @@ import {
   BellOff,
   Check,
   CheckCheck,
+  ChevronLeft,
   Copy,
   Headphones,
   MessageSquare,
@@ -335,8 +336,13 @@ function MessagingCenterInner({ basePath }: { basePath: string }) {
 
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-      <div className="grid min-h-[620px] overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:grid-cols-[340px_1fr]">
-        <aside className="border-b border-border lg:border-b-0 lg:border-r">
+      <div className="grid min-h-[min(70dvh,620px)] overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
+        <aside
+          className={cn(
+            "min-w-0 border-b border-border lg:block lg:border-b-0 lg:border-r",
+            activeId ? "hidden lg:block" : "block",
+          )}
+        >
           <div className="space-y-3 border-b border-border p-4">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
@@ -424,9 +430,14 @@ function MessagingCenterInner({ basePath }: { basePath: string }) {
           </div>
         </aside>
 
-        <section className="flex min-h-[520px] flex-col">
+        <section
+          className={cn(
+            "flex min-h-[min(60dvh,520px)] min-w-0 flex-col",
+            activeId ? "flex" : "hidden lg:flex",
+          )}
+        >
           {!activeId ? (
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center text-muted-foreground">
+            <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center text-muted-foreground sm:p-8">
               <MessageSquare className="size-10 opacity-50" />
               <p>Select a conversation or start a secure chat.</p>
               <Button variant="outline" onClick={() => void openSupport()}>
@@ -435,23 +446,35 @@ function MessagingCenterInner({ basePath }: { basePath: string }) {
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
-                <div>
-                  <p className="font-display text-lg">{active?.title}</p>
-                  {typing.length > 0 ? (
-                    <p className="animate-pulse text-xs text-accent">
-                      {typing.map((t) => t.userName).join(", ")} typing…
-                    </p>
-                  ) : (
-                    <p className="text-xs text-muted-foreground">
-                      {peerPresence?.status === "online" ? "Online" : "Offline"} ·{" "}
-                      {CONVERSATION_KIND_LABELS[active?.kind ?? "direct"]}
-                    </p>
-                  )}
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-3 sm:px-4">
+                <div className="flex min-w-0 items-start gap-2">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="touch-target shrink-0 lg:hidden"
+                    aria-label="Back to conversations"
+                    onClick={() => setActiveId(null)}
+                  >
+                    <ChevronLeft className="size-5" />
+                  </Button>
+                  <div className="min-w-0">
+                    <p className="truncate font-display text-lg">{active?.title}</p>
+                    {typing.length > 0 ? (
+                      <p className="animate-pulse text-xs text-accent">
+                        {typing.map((t) => t.userName).join(", ")} typing…
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        {peerPresence?.status === "online" ? "Online" : "Offline"} ·{" "}
+                        {CONVERSATION_KIND_LABELS[active?.kind ?? "direct"]}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex max-w-full flex-wrap gap-2">
                   <Input
-                    className="h-8 w-40"
+                    className="h-8 w-full min-w-0 sm:w-40"
                     placeholder="Search thread"
                     value={threadSearch}
                     onChange={(e) => setThreadSearch(e.target.value)}
