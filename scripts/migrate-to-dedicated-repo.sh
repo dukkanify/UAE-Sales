@@ -8,6 +8,8 @@ EXPORT_DIR="${EXPORT_DIR:-/tmp/AviatorPass-export}"
 AEP_ROOT_SHA="${AEP_ROOT_SHA:-381d5b385559e376d8c40d1a52c1dc1347aef085}"
 NEW_REMOTE="${NEW_REMOTE:-https://github.com/dukkanify/AviatorPass.git}"
 SOURCE_REMOTE="${SOURCE_REMOTE:-https://github.com/dukkanify/UAE-Sales.git}"
+# Prefer explicit tip (migration branch) so export includes latest migration docs/scripts
+SOURCE_REF="${SOURCE_REF:-HEAD}"
 PUSH="${PUSH:-0}"
 
 export PATH="${HOME}/.local/bin:${PATH}"
@@ -29,10 +31,19 @@ mkdir -p "${EXPORT_DIR}"
 git clone --no-local "${ROOT_SRC}" "${EXPORT_DIR}"
 cd "${EXPORT_DIR}"
 
-# Prefer origin tips when available
+# Prefer origin tips when available; otherwise use SOURCE_REF (migration HEAD)
 git fetch origin aviatorpass develop 2>/dev/null || true
-git checkout -B aviatorpass "origin/aviatorpass" 2>/dev/null || git checkout -B aviatorpass
-git branch -f develop "origin/develop" 2>/dev/null || git branch develop aviatorpass 2>/dev/null || true
+if git rev-parse --verify "origin/aviatorpass" >/dev/null 2>&1; then
+  # Start from latest migration tip if ahead of aviatorpass, else aviatorpass
+  TIP="${SOURCE_REF}"
+  if [[ "${TIP}" == "HEAD" ]]; then
+    TIP=$(git -C "${ROOT_SRC}" rev-parse HEAD)
+  fi
+  git checkout -B aviatorpass "${TIP}"
+else
+  git checkout -B aviatorpass "${SOURCE_REF}"
+fi
+git branch -f develop "origin/develop" 2>/dev/null || git branch -f develop aviatorpass 2>/dev/null || true
 
 # Drop marketplace default branch from export if present
 git branch -D main 2>/dev/null || true
