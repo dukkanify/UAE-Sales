@@ -13,7 +13,9 @@ export type EmailEventType =
   | "seller_proof"
   | "chat_message"
   | "password_reset"
-  | "featured_paid";
+  | "featured_paid"
+  | "stripe_active"
+  | "stripe_requirements";
 
 export type EmailDeliveryStatus = "pending" | "sent" | "failed" | "skipped";
 

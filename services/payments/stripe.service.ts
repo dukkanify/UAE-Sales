@@ -18,7 +18,7 @@ function keyFingerprint(secret: string): string {
   return `${secret.slice(0, 8)}:${secret.slice(-4)}:${secret.length}`;
 }
 
-async function getStripeClient(): Promise<Stripe> {
+export async function getStripeClient(): Promise<Stripe> {
   await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     throw new Error("STRIPE_NOT_CONFIGURED");

@@ -5,7 +5,7 @@ export default function AdminStripePage() {
   return (
     <AdminShell
       activePath="/admin/stripe"
-      description="حالة الربط، روابط لوحة Stripe، الطلبات المرتبطة، وسجل أحداث الدفع."
+      description="ربط Stripe Connect، حالة التفعيل، مفاتيح المنصة، والطلبات المرتبطة."
       title="إدارة Stripe"
     >
       <AdminStripePanel />

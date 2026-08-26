@@ -1,5 +1,6 @@
 "use client";
 
+import { AdminStripeConnectPanel } from "@/features/admin/components/AdminStripeConnectPanel";
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -167,9 +168,12 @@ export function AdminStripePanel() {
 
   if (!data) {
     return (
-      <Card className="p-8 text-center" variant="flat">
-        <p className="text-sm text-muted">جاري تحميل حالة Stripe...</p>
-      </Card>
+      <div className="grid gap-5">
+        <AdminStripeConnectPanel mode="manage" />
+        <Card className="p-8 text-center" variant="flat">
+          <p className="text-sm text-muted">جاري تحميل حالة مفاتيح المنصة...</p>
+        </Card>
+      </div>
     );
   }
 
@@ -177,6 +181,11 @@ export function AdminStripePanel() {
 
   return (
     <div className="grid gap-5">
+      <AdminStripeConnectPanel
+        key={`connect-${status.configured ? "ready" : "waiting"}`}
+        mode="manage"
+      />
+
       <div className="admin-ops__status-row">
         <div
           className={`admin-ops__status-chip${
@@ -218,10 +227,10 @@ export function AdminStripePanel() {
       </div>
 
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">ربط Stripe من لوحة الأدمن</h2>
+        <h2 className="admin-ops__panel-title">مفاتيح منصة Stripe</h2>
         <p className="admin-ops__panel-sub">
-          الصق مفاتيح Live هنا لتفعيل الدفع مباشرة. تُحفظ مشفّرة في قاعدة البيانات.
-          لا تضع مفاتيح في الكود أو Git.
+          مطلوبة لإنشاء حسابات Connect وروابط الإعداد على الخادم فقط. لا تُعرض
+          Secret Key في المتصفح بعد الحفظ.
         </p>
 
         {message ? (
@@ -315,7 +324,8 @@ export function AdminStripePanel() {
             3. أحداث:{" "}
             <code className="text-xs">checkout.session.completed</code>،{" "}
             <code className="text-xs">payment_intent.*</code>،{" "}
-            <code className="text-xs">charge.refunded</code>
+            <code className="text-xs">charge.refunded</code>،{" "}
+            <code className="text-xs">account.updated</code>
           </li>
           <li>4. الصق Signing secret (`whsec_...`) واضغط حفظ وتفعيل</li>
         </ol>
