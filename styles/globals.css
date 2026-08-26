@@ -108,7 +108,8 @@
   --popover: #ffffff;
   --popover-foreground: #0b1a24;
   --muted: var(--sky-mist);
-  --muted-foreground: var(--academic-grey);
+  /* Darker than brand Academic Grey (#7C7B80) for WCAG AA body contrast on white */
+  --muted-foreground: #5f5e63;
   --academic: var(--academic-grey);
   --academic-foreground: #ffffff;
   --border: var(--mist-grey);
