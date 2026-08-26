@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches:
+      - main
       - develop
       - aviatorpass
       - "feature/**"
@@ -10,6 +11,7 @@ on:
       - "cursor/**"
   pull_request:
     branches:
+      - main
       - develop
       - aviatorpass
 
@@ -96,7 +98,7 @@ jobs:
           test -n "${{ github.head_ref }}"
           case "${{ github.head_ref }}" in
             cursor/*|feature/*|hotfix/*) echo "Branch prefix OK" ;;
-            develop|aviatorpass) echo "integration branch OK" ;;
+            main|develop|aviatorpass) echo "integration branch OK" ;;
             *) echo "::warning::Prefer feature/*, hotfix/*, or cursor/* branches" ;;
           esac
 

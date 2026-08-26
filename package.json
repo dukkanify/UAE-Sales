@@ -42,6 +42,11 @@
     "supabase"
   ],
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dukkanify/AviatorPass.git"
+  },
+  "homepage": "https://aviatorpass.vercel.app",
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",

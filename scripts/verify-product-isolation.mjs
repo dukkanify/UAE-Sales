@@ -84,16 +84,15 @@ if (fs.existsSync(apDeploy)) {
   errors.push("missing .github/workflows/deploy-aviatorpass-production.yml");
 }
 
-// 6) CI must not target marketplace main
+// 6) CI must target AviatorPass production branches only (main is OK once dedicated repo)
 const ci = path.join(root, ".github/workflows/ci.yml");
 if (fs.existsSync(ci)) {
   const txt = fs.readFileSync(ci, "utf8");
-  // Allow mention only in comments? Prefer zero branch trigger for main.
-  if (/^\s*-\s*main\s*$/m.test(txt)) {
-    errors.push("ci.yml still triggers on branch main");
-  }
   if (!/NEXT_PUBLIC_APP_NAME:\s*AviatorPass/.test(txt)) {
     errors.push("ci.yml missing NEXT_PUBLIC_APP_NAME: AviatorPass");
+  }
+  if (/project sooqna|VERCEL_SOOQNA|sooqna-web/i.test(txt)) {
+    errors.push("ci.yml references marketplace product");
   }
 }
 
