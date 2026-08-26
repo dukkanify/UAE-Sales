@@ -3,7 +3,6 @@ name: CI
 on:
   push:
     branches:
-      - main
       - develop
       - aviatorpass
       - "feature/**"
@@ -11,7 +10,6 @@ on:
       - "cursor/**"
   pull_request:
     branches:
-      - main
       - develop
       - aviatorpass
 
@@ -36,6 +34,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Product isolation
+        run: npm run verify:isolation
       - name: Format check
         run: npm run format:check
       - name: Lint
@@ -96,7 +96,7 @@ jobs:
           test -n "${{ github.head_ref }}"
           case "${{ github.head_ref }}" in
             cursor/*|feature/*|hotfix/*) echo "Branch prefix OK" ;;
-            main|develop|aviatorpass) echo "integration branch OK" ;;
+            develop|aviatorpass) echo "integration branch OK" ;;
             *) echo "::warning::Prefer feature/*, hotfix/*, or cursor/* branches" ;;
           esac
 

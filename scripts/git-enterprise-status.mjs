@@ -94,7 +94,7 @@ ${status}
 
 Required checks on PRs: \`quality\`, \`e2e\`, \`merge-gate\` (see \`.github/workflows/ci.yml\`).
 
-## Branch model (AviatorPass)
+## Branch model (AviatorPass only)
 
 | Branch | Role |
 |--------|------|
@@ -102,14 +102,15 @@ Required checks on PRs: \`quality\`, \`e2e\`, \`merge-gate\` (see \`.github/work
 | \`develop\` | Integration / staging |
 | \`feature/*\` | Feature work |
 | \`hotfix/*\` | Production hotfixes |
-| \`main\` | Sooqna product line (separate deploy) |
+| \`cursor/*\` | Cloud Agent feature tips |
 
 ## Deployment
 
 | Trigger | Workflow | Status |
 |---------|----------|--------|
-| Push \`main\` | \`deploy-main-production.yml\` | Sooqna Vercel (requires \`VERCEL_SOOQNA_DEPLOY_HOOK\` or token) |
 | Push \`aviatorpass\` | \`deploy-aviatorpass-production.yml\` | AviatorPass Vercel (requires \`VERCEL_AVIATORPASS_DEPLOY_HOOK\` or token) |
+
+> This tip does not deploy marketplace products. Keep AviatorPass secrets isolated from any other Vercel project.
 
 Production health (AviatorPass): \`${trySh("curl -sS -o /dev/null -w '%{http_code}' --max-time 15 https://aviatorpass.vercel.app/api/health 2>/dev/null") ?? "unknown"}\` on \`/api/health\`
 
