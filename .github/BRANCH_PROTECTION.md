@@ -1,24 +1,17 @@
-# Branch protection (repository admin)
+# Branch protection (AviatorPass)
 
-This repo hosts **two product lines** on different branches:
+This tip is **AviatorPass only**. Protect AviatorPass integration and production branches.
 
-| Branch        | Product                 | Production deploy                            |
-| ------------- | ----------------------- | -------------------------------------------- |
-| `main`        | Sooqna                  | `deploy-main-production.yml`                 |
-| `aviatorpass` | AviatorPass LMS         | `deploy-aviatorpass-production.yml`          |
-| `develop`     | AviatorPass integration | CI only (Vercel preview via Git integration) |
+| Branch        | Product                 | Production deploy                   |
+| ------------- | ----------------------- | ----------------------------------- |
+| `aviatorpass` | AviatorPass LMS         | `deploy-aviatorpass-production.yml` |
+| `develop`     | AviatorPass integration | CI only (Vercel preview via Git)    |
+
+> Do not open AviatorPass PRs into marketplace `main`. Marketplace product lines must live on their own branch protection / Vercel project / (preferably) repository.
 
 ## Recommended protection rules
 
 Apply via **GitHub → Settings → Branches → Add rule** (or `gh api` as org admin).
-
-### `main`
-
-- Require pull request before merging
-- Require status checks: `quality`, `e2e`
-- Require branches to be up to date
-- Do not allow force pushes
-- Do not allow deletions
 
 ### `aviatorpass` (AviatorPass production)
 
@@ -27,6 +20,7 @@ Apply via **GitHub → Settings → Branches → Add rule** (or `gh api` as org 
 - Require branches to be up to date
 - Restrict who can push (release managers / admins)
 - Do not allow force pushes
+- Do not allow deletions
 
 ### `develop`
 
@@ -36,8 +30,7 @@ Apply via **GitHub → Settings → Branches → Add rule** (or `gh api` as org 
 ## Admin CLI (requires `gh auth` with admin scope)
 
 ```bash
-# Example — adjust team slugs for your org
-gh api repos/dukkanify/UAE-Sales/branches/main/protection \
+gh api repos/dukkanify/UAE-Sales/branches/aviatorpass/protection \
   --method PUT \
   --field required_status_checks='{"strict":true,"contexts":["quality","e2e"]}' \
   --field enforce_admins=true \
@@ -47,14 +40,12 @@ gh api repos/dukkanify/UAE-Sales/branches/main/protection \
   --field allow_deletions=false
 ```
 
-Repeat for `aviatorpass` with the same check contexts.
+Repeat for `develop` with the desired check contexts.
 
-## Safe push (local)
+## Secrets isolation
 
-`git push` runs `.husky/pre-push`:
+| Environment                | Allowed secrets                                                           |
+| -------------------------- | ------------------------------------------------------------------------- |
+| `Production – aviatorpass` | `VERCEL_AVIATORPASS_DEPLOY_HOOK`, AviatorPass `VERCEL_TOKEN` / project id |
 
-1. `scripts/git-safe-sync.sh` — fetch + rebase; **stops on conflict**
-2. `npm run typecheck`
-3. `npm run test`
-
-Never use `git push --force` on protected branches.
+Never store marketplace (`sooqna`) deploy hooks in the AviatorPass environment.

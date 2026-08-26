@@ -17,7 +17,7 @@ Point **Hostinger DNS** at the **Vercel** project that serves AviatorPass so we 
 2. Add:
    - `dubai-test.blog`
    - `www.dubai-test.blog` (redirect → apex, or reverse)
-3. Confirm the project Production branch is the AviatorPass tip you want to test (not marketplace `main` if that still serves Sooqna).
+3. Confirm the project Production branch is the AviatorPass tip you want (`aviatorpass`). Never point this AviatorPass Vercel project at unrelated product branches.
 
 ## 2) DNS at Hostinger (hPanel)
 
