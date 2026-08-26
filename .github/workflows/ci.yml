@@ -36,6 +36,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Product isolation
+        run: npm run verify:isolation
       - name: Format check
         run: npm run format:check
       - name: Lint

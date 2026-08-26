@@ -59,3 +59,7 @@ test-results/
 !.env.example
 !.env.production.example
 !.env.staging.example
+
+# Never commit marketplace product data into AviatorPass tips
+.data/sooqna*
+.sooqna/

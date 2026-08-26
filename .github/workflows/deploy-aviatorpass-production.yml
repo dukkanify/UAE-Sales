@@ -2,7 +2,9 @@ name: Deploy AviatorPass Production
 
 on:
   push:
-    branches: [aviatorpass]
+    # New dedicated repo defaults to `main` (= AviatorPass production tip).
+    # Keep `aviatorpass` for compatibility during cutover from UAE-Sales.
+    branches: [main, aviatorpass]
   workflow_dispatch:
 
 concurrency:
@@ -14,19 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production – aviatorpass
     steps:
+      # AviatorPass-only hook — never fall back to a shared/Sooqna deploy hook.
       - name: Prefer Deploy Hook (instant production rebuild of aviatorpass tip)
         id: hook
         env:
           DEPLOY_HOOK_URL: ${{ secrets.VERCEL_AVIATORPASS_DEPLOY_HOOK }}
-          FALLBACK_HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK }}
         run: |
-          HOOK="${DEPLOY_HOOK_URL:-$FALLBACK_HOOK_URL}"
-          if [ -z "$HOOK" ]; then
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
             echo "hook=missing" >> "$GITHUB_OUTPUT"
-            echo "No deploy hook secret configured."
+            echo "No VERCEL_AVIATORPASS_DEPLOY_HOOK configured."
             exit 0
           fi
-          response="$(curl --silent --show-error --write-out '\n%{http_code}' -X POST "$HOOK")"
+          response="$(curl --silent --show-error --write-out '\n%{http_code}' -X POST "$DEPLOY_HOOK_URL")"
           body="$(printf '%s' "$response" | sed '$d')"
           status="$(printf '%s' "$response" | tail -n 1)"
           echo "Deploy Hook HTTP $status"
@@ -54,11 +55,12 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::Missing VERCEL_AVIATORPASS_DEPLOY_HOOK (preferred) or VERCEL_TOKEN. Cannot promote AviatorPass to production without Vercel credentials."
+            echo "::error::Missing VERCEL_AVIATORPASS_DEPLOY_HOOK (preferred) or VERCEL_TOKEN. Cannot promote AviatorPass without AviatorPass-specific Vercel credentials."
             exit 1
           fi
           npm install -g vercel@41.7.8
           npm ci
+          # Hard-pin to the AviatorPass Vercel project — never sooqna / shared defaults.
           if [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
             vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
           else

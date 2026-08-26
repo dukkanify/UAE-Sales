@@ -1,35 +1,27 @@
-# Vercel — AviatorPass
+# Vercel — AviatorPass (dedicated GitHub repo)
 
-## Live
+## Project
 
-| Item               | Value                                                  |
-| ------------------ | ------------------------------------------------------ |
-| Project            | `dukkanify-technology-llcs-projects/aviatorpass`       |
-| Production URL     | https://aviatorpass.vercel.app                         |
-| Custom domains     | `dubai-test.blog`, `www.dubai-test.blog` (DNS pending) |
-| Git production tip | Branch **`aviatorpass`** (pushed from AviatorPass tip) |
+| Item                        | Value                                            |
+| --------------------------- | ------------------------------------------------ |
+| Vercel project              | `dukkanify-technology-llcs-projects/aviatorpass` |
+| GitHub repo (after cutover) | `dukkanify/AviatorPass`                          |
+| Production URL              | https://aviatorpass.vercel.app                   |
+| Production branch           | `main` (or `aviatorpass` during cutover)         |
 
-## Why the first deploy showed Sooqna
+## Cutover steps
 
-The Vercel project was linked to GitHub repo `UAE-Sales` with **Production Branch = `main`**.  
-`main` is still the marketplace (Sooqna). AviatorPass lives on feature tips / branch `aviatorpass`.
+1. Vercel → **aviatorpass** → Settings → Git → **Disconnect** `UAE-Sales`.
+2. **Connect** `dukkanify/AviatorPass`.
+3. Set Production Branch = `main`.
+4. Ensure Deploy Hook secret in GitHub Environment matches this project only.
+5. Push to `main` or fire `VERCEL_AVIATORPASS_DEPLOY_HOOK`.
+6. Verify `/api/health` → `deployment.gitSha` matches new repo tip.
 
-## What we fixed
+## Preview
 
-1. CLI deploy of the AviatorPass working tree → production alias `aviatorpass.vercel.app`
-2. Env vars: `NEXT_PUBLIC_APP_NAME=AviatorPass`, demo OTP, `AUTH_SECRET`, app URL
-3. Ignored build step: only git refs `aviatorpass` and `cursor/rename-aviatorpass-0987` build; **`main` (Sooqna) is skipped**
-4. Domains attached: `dubai-test.blog` + `www`
+PRs into `main` / `develop` on `dukkanify/AviatorPass` should create Vercel Preview deployments automatically once Git is connected.
 
-## Hostinger DNS (required for dubai-test.blog)
+## Isolation
 
-| Type  | Name  | Value                  |
-| ----- | ----- | ---------------------- |
-| A     | `@`   | `76.76.21.21`          |
-| CNAME | `www` | `cname.vercel-dns.com` |
-
-Or switch nameservers to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`.
-
-## Dashboard tip
-
-Vercel → Project **aviatorpass** → Settings → Git → set **Production Branch** to `aviatorpass` (API cannot change this field; ignore-build already blocks `main`).
+This Vercel project must not be linked to marketplace repositories. Marketplace (`sooqna`) stays on its own Vercel project + `UAE-Sales` (or future Sooqna repo).

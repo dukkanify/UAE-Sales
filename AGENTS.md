@@ -2,7 +2,15 @@
 
 ## Cursor Cloud specific instructions
 
-This repo is **Aviation Education Platform (AEP)** — Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS 4 for **AviatorPass**.
+This workspace tip is **Aviation Education Platform (AEP)** — Next.js 15 (App Router) + React 19 + TypeScript + Tailwind CSS 4 for **AviatorPass**.
+
+### Product isolation (mandatory)
+
+- Target GitHub repository after cutover: `dukkanify/AviatorPass` (see `REPOSITORY_MIGRATION_PLAN.md`).
+- Treat this tree as **AviatorPass-only**. Package name must be `aviatorpass`.
+- Prefer a separate Cloud Agent / worktree for any other product. After accidental foreign branch checkout: `rm -rf node_modules .next *.tsbuildinfo` then `npm ci`.
+- Data files are `.data/aep-*.json` only. Deploy secrets must be AviatorPass-specific (`VERCEL_AVIATORPASS_DEPLOY_HOOK`).
+- See `PROJECT_SEPARATION_REPORT.md`, `REPOSITORY_MIGRATION_PLAN.md`, and `docs/GIT_WORKFLOW.md`.
 
 Standard commands live in `package.json` (`dev`, `build`, `start`, `lint`, `typecheck`); see `README.md`. Notes:
 
