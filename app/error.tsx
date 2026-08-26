@@ -36,7 +36,8 @@ export default function Error({
           Something went wrong
         </h1>
         <p className="mt-4 text-base text-muted-foreground">
-          {error.message || "An unexpected error occurred. You can try again or return home."}
+          We could not load this page. Try again, or return to the home page. If the problem
+          continues, contact academy support.
         </p>
         {error.digest ? (
           <p className="mt-2 font-mono text-xs text-muted-foreground/70">Ref: {error.digest}</p>

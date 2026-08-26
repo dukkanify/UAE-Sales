@@ -53,15 +53,15 @@ function categoryColor(category?: string): string {
     case "security":
       return "border-l-destructive";
     case "payment":
-      return "border-l-emerald-500";
+      return "border-l-success";
     case "booking":
     case "reminder":
-      return "border-l-sky-500";
+      return "border-l-accent";
     case "course":
     case "assignment":
-      return "border-l-indigo-500";
+      return "border-l-primary";
     case "message":
-      return "border-l-violet-500";
+      return "border-l-primary/60";
     default:
       return "border-l-border";
   }

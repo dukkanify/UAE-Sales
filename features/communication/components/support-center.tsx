@@ -23,6 +23,7 @@ function SupportCenter({ manage = false }: { manage?: boolean }) {
   const [description, setDescription] = React.useState("");
   const [type, setType] = React.useState<TicketType>("general");
   const [reply, setReply] = React.useState("");
+  const [internalNote, setInternalNote] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const load = React.useCallback(async () => {
@@ -73,12 +74,14 @@ function SupportCenter({ manage = false }: { manage?: boolean }) {
       action: "reply",
       ticketId: activeId,
       body: reply,
+      isInternal: manage ? internalNote : false,
     });
     if (!result.success) {
       setError(result.error);
       return;
     }
     setReply("");
+    setInternalNote(false);
     void loadTicket(activeId);
     void load();
   }
@@ -178,9 +181,7 @@ function SupportCenter({ manage = false }: { manage?: boolean }) {
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>
-                  {tickets.find((t) => t.id === activeId)?.subject}
-                </CardTitle>
+                <CardTitle>{tickets.find((t) => t.id === activeId)?.subject}</CardTitle>
                 <p className="text-sm text-muted-foreground">
                   {tickets.find((t) => t.id === activeId)?.description}
                 </p>
@@ -197,24 +198,44 @@ function SupportCenter({ manage = false }: { manage?: boolean }) {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   {replies.map((r) => (
-                    <div key={r.id} className="rounded-md border border-border px-3 py-2 text-sm">
+                    <div
+                      key={r.id}
+                      className={cn(
+                        "rounded-md border border-border px-3 py-2 text-sm",
+                        r.isInternal && "border-amber-500/40 bg-amber-500/5",
+                      )}
+                    >
                       <p className="text-xs text-muted-foreground">
                         {r.authorName}
-                        {r.isStaff ? " · staff" : ""} · {new Date(r.createdAt).toLocaleString()}
+                        {r.isStaff ? " · staff" : ""}
+                        {r.isInternal ? " · internal note" : ""} ·{" "}
+                        {new Date(r.createdAt).toLocaleString()}
                       </p>
                       <p className="mt-1 whitespace-pre-wrap">{r.body}</p>
                     </div>
                   ))}
                 </div>
-                <div className="flex gap-2">
-                  <Textarea
-                    value={reply}
-                    onChange={(e) => setReply(e.target.value)}
-                    placeholder="Reply…"
-                  />
-                  <Button className="self-end" onClick={() => void sendReply()}>
-                    <Send className="size-4" />
-                  </Button>
+                <div className="space-y-2">
+                  {manage ? (
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={internalNote}
+                        onChange={(e) => setInternalNote(e.target.checked)}
+                      />
+                      Internal note (not visible to requester)
+                    </label>
+                  ) : null}
+                  <div className="flex gap-2">
+                    <Textarea
+                      value={reply}
+                      onChange={(e) => setReply(e.target.value)}
+                      placeholder={internalNote ? "Internal note…" : "Reply…"}
+                    />
+                    <Button className="self-end" onClick={() => void sendReply()}>
+                      <Send className="size-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

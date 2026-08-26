@@ -29,9 +29,9 @@ export const otpSchema = z
 export const nameSchema = z
   .string()
   .trim()
-  .min(2, "Must be at least 2 characters")
-  .max(80, "Must be at most 80 characters")
-  .regex(/^[\p{L}\p{M}' -]+$/u, "Names may only include letters, spaces, apostrophes, and hyphens");
+  .min(2, "Enter at least 2 characters")
+  .max(80, "Use 80 characters or fewer")
+  .regex(/^[\p{L}\p{M}' -]+$/u, "Use letters, spaces, apostrophes, or hyphens only");
 
 /** Registration phone — Kuwait (+965) or UAE (+971) mobile only. */
 export const registrationPhoneSchema = z

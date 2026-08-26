@@ -1,5 +1,5 @@
 /**
- * Communication Center access helpers.
+ * Communication Center access helpers + enterprise messaging peer matrix.
  */
 
 import { PERMISSIONS } from "@/constants/permissions";
@@ -14,6 +14,17 @@ export class CommunicationError extends Error {
     this.name = "CommunicationError";
     this.status = status;
   }
+}
+
+const STAFF = new Set<string>([
+  ROLES.INSTRUCTOR,
+  ROLES.CHIEF_GROUND_INSTRUCTOR,
+  ROLES.ADMIN,
+  ROLES.SUPER_ADMIN,
+]);
+
+export function isStaffRole(role: string): boolean {
+  return STAFF.has(role);
 }
 
 export function canModerateCommunities(user: UserProfile): boolean {
@@ -90,20 +101,50 @@ export function assertCanManageSupport(user: UserProfile) {
   if (!canManageSupport(user)) throw new CommunicationError("Support management required", 403);
 }
 
-/** Direct messaging peer rules */
+/**
+ * Enterprise peer rules (directory must stay in lockstep):
+ * - Students: instructors, CGI, admin, support/super_admin — NEVER other students
+ * - Instructors: assigned students + CGI + admin + support
+ * - CGI: instructors, students, admin, support
+ * - Admin / Super Admin: everyone
+ */
 export function assertCanMessagePeer(actor: UserProfile, peerRole: string) {
   assertCanMessage(actor);
-  if (actor.role === ROLES.SUPER_ADMIN) return;
-  if (actor.role === ROLES.ADMIN) return;
-  if (actor.role === ROLES.INSTRUCTOR) {
-    if (peerRole === ROLES.STUDENT || peerRole === ROLES.INSTRUCTOR || peerRole === ROLES.ADMIN) {
-      return;
-    }
-  }
+  if (actor.role === ROLES.SUPER_ADMIN || actor.role === ROLES.ADMIN) return;
+
   if (actor.role === ROLES.STUDENT) {
-    if (peerRole === ROLES.INSTRUCTOR || peerRole === ROLES.ADMIN || peerRole === ROLES.STUDENT) {
+    if (peerRole === ROLES.STUDENT) {
+      throw new CommunicationError("Students cannot message other students", 403);
+    }
+    if (isStaffRole(peerRole)) return;
+    throw new CommunicationError("Not allowed to message this user", 403);
+  }
+
+  if (actor.role === ROLES.INSTRUCTOR) {
+    // Assigned students + CGI + admin/support — not peer instructors
+    if (
+      peerRole === ROLES.STUDENT ||
+      peerRole === ROLES.CHIEF_GROUND_INSTRUCTOR ||
+      peerRole === ROLES.ADMIN ||
+      peerRole === ROLES.SUPER_ADMIN
+    ) {
       return;
     }
+    throw new CommunicationError("Not allowed to message this user", 403);
   }
+
+  if (actor.role === ROLES.CHIEF_GROUND_INSTRUCTOR) {
+    if (
+      peerRole === ROLES.STUDENT ||
+      peerRole === ROLES.INSTRUCTOR ||
+      peerRole === ROLES.ADMIN ||
+      peerRole === ROLES.SUPER_ADMIN ||
+      peerRole === ROLES.CHIEF_GROUND_INSTRUCTOR
+    ) {
+      return;
+    }
+    throw new CommunicationError("Not allowed to message this user", 403);
+  }
+
   throw new CommunicationError("Not allowed to message this user", 403);
 }

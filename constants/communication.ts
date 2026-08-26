@@ -13,6 +13,7 @@ import type {
 
 export const CONVERSATION_KIND_LABELS: Record<ConversationKind, string> = {
   direct: "Direct message",
+  support: "Support",
   course_group: "Course group",
   class_group: "Class group",
   study_group: "Study group",
@@ -41,6 +42,7 @@ export const TICKET_STATUS_LABELS: Record<TicketStatus, string> = {
   open: "Open",
   in_progress: "In progress",
   waiting_customer: "Waiting for customer",
+  escalated: "Escalated",
   resolved: "Resolved",
   closed: "Closed",
 };
@@ -74,6 +76,11 @@ export const COMM_ATTACHMENT_MIME_ALLOW = new Set([
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
   "application/zip",
   "application/x-zip-compressed",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/wav",
+  "audio/webm",
+  "audio/ogg",
 ]);
 
 export const DEFAULT_BLOCKED_WORDS = [
@@ -88,3 +95,19 @@ export const DEFAULT_BLOCKED_WORDS = [
 export const COMM_PAGE_SIZE = 30;
 export const TYPING_TTL_MS = 4000;
 export const MESSAGE_POLL_MS = 2500;
+export const PRESENCE_TTL_MS = 45_000;
+export const MESSAGE_DELETE_WINDOW_MS = 15 * 60 * 1000;
+
+export const MESSAGE_SHARE_KIND_LABELS: Record<string, string> = {
+  text: "Message",
+  homework: "Homework",
+  lesson_notes: "Lesson notes",
+  study_material: "Study material",
+  pdf_manual: "PDF manual",
+  flight_document: "Flight document",
+  performance_report: "Performance report",
+  instructor_feedback: "Instructor feedback",
+  mock_exam_file: "Mock exam file",
+  certificate: "Certificate",
+  system: "System",
+};

@@ -44,7 +44,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     delivery: "immediate",
     emailDefault: true,
     defaultTitle: "Account created",
-    defaultBody: "Welcome to AviatorPass — your account is ready.",
+    defaultBody: "Welcome to ATPL PASS — your account is ready.",
     audiences: ["all"],
   },
   "account.email_verified": {
@@ -84,7 +84,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     delivery: "immediate",
     emailDefault: true,
     defaultTitle: "Welcome aboard",
-    defaultBody: "Your AviatorPass journey starts here.",
+    defaultBody: "Your ATPL PASS account is ready. Open your dashboard to continue.",
     audiences: ["student"],
   },
   "account.profile_updated": {
@@ -158,7 +158,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     emailDefault: false,
     groupKey: "course.progress_milestone",
     defaultTitle: "Progress milestone",
-    defaultBody: "Nice work — you hit a learning milestone.",
+    defaultBody: "You reached a learning milestone in your ATPL program.",
     audiences: ["student"],
   },
 
@@ -435,6 +435,36 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     defaultTitle: "Support ticket created",
     defaultBody: "A new support ticket was opened.",
     audiences: ["admin", "super_admin"],
+  },
+  "ticket.updated": {
+    type: "ticket.updated",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: true,
+    defaultTitle: "Support ticket updated",
+    defaultBody: "Your support ticket status changed.",
+    audiences: ["all"],
+  },
+  "message.group_added": {
+    type: "message.group_added",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: false,
+    defaultTitle: "Added to conversation",
+    defaultBody: "You were added to a group conversation.",
+    audiences: ["all"],
+  },
+  "document.shared": {
+    type: "document.shared",
+    category: "message",
+    priority: "medium",
+    delivery: "immediate",
+    emailDefault: true,
+    defaultTitle: "Document shared",
+    defaultBody: "A training document was shared with you in chat.",
+    audiences: ["all"],
   },
 
   // Instructor / CGI

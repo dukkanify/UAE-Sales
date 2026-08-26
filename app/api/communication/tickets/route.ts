@@ -63,6 +63,7 @@ export async function POST(request: Request) {
       body?: string;
       status?: TicketStatus;
       assigneeId?: string | null;
+      isInternal?: boolean;
     } | null;
 
     if (body?.action === "reply" && body.ticketId) {
@@ -70,6 +71,7 @@ export async function POST(request: Request) {
         user,
         ticketId: body.ticketId,
         body: body.body ?? "",
+        isInternal: body.isInternal,
       });
       return NextResponse.json({ success: true, data: reply, error: null });
     }

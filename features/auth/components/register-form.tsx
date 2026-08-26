@@ -303,7 +303,7 @@ function RegisterForm({
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               autoComplete="given-name"
-              placeholder="Alex"
+              placeholder="First name"
               aria-invalid={Boolean(errors.firstName)}
               required
             />
@@ -320,7 +320,7 @@ function RegisterForm({
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               autoComplete="family-name"
-              placeholder="Reed"
+              placeholder="Last name"
               aria-invalid={Boolean(errors.lastName)}
               required
             />
@@ -338,7 +338,7 @@ function RegisterForm({
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="you@example.com"
+            placeholder="name@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={Boolean(errors.email)}
@@ -389,7 +389,7 @@ function RegisterForm({
               value={nationality}
               onChange={(e) => setNationality(e.target.value)}
               autoComplete="country-name"
-              placeholder="Kuwaiti"
+              placeholder="Nationality"
               aria-invalid={Boolean(errors.nationality)}
               required
             />
