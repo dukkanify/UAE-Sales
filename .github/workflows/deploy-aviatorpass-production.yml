@@ -2,7 +2,9 @@ name: Deploy AviatorPass Production
 
 on:
   push:
-    branches: [aviatorpass]
+    # New dedicated repo defaults to `main` (= AviatorPass production tip).
+    # Keep `aviatorpass` for compatibility during cutover from UAE-Sales.
+    branches: [main, aviatorpass]
   workflow_dispatch:
 
 concurrency:
