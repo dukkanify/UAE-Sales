@@ -218,7 +218,7 @@ export async function getOrCreateSupportConversation(user: UserProfile): Promise
       conversationId: conv.id,
       senderId: "system",
       senderName: "AviatorPass Support",
-      body: "Welcome to Support. Describe your issue and our team will reply here. All history stays in this conversation.",
+      body: "Welcome to Support. Share your question here and our academy team will reply in this conversation. Your history is kept securely on the platform.",
       attachments: [],
       deliveryStatus: "delivered",
       shareKind: "system",

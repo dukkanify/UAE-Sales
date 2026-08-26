@@ -50,8 +50,8 @@ function AdminDashboardView({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Operations dashboard"
-        description="Daily management of students, instructors, courses, and content."
+        title="Admin dashboard"
+        description="Students, instructors, classes, and academy content."
         breadcrumbs={[{ label: "Admin" }, { label: "Dashboard" }]}
       />
 
@@ -60,9 +60,27 @@ function AdminDashboardView({
         <StatCard label="Instructors" value={overview.instructors} icon={GraduationCap} />
         <StatCard label="Courses" value={overview.courses} icon={BookOpen} />
         <StatCard label="Live classes" value={overview.liveClasses} icon={Layers} />
-        <StatCard label="Pending approvals" value={overview.pendingApprovals} icon={ClipboardList} hint="Awaiting review" />
-        <StatCard label="Community reports" value={overview.communityReports} icon={Megaphone} />
-        <StatCard label="Blog activity" value={overview.blogActivity} icon={BookOpen} hint="Posts this month" />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          label="Pending approvals"
+          value={overview.pendingApprovals}
+          icon={ClipboardList}
+          hint="Accounts awaiting review"
+        />
+        <StatCard
+          label="Moderation queue"
+          value={overview.communityReports}
+          icon={Megaphone}
+          hint="Flagged or blocked items"
+        />
+        <StatCard
+          label="Published posts"
+          value={overview.blogActivity}
+          icon={BookOpen}
+          hint="Updated this month"
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -77,10 +95,10 @@ function AdminDashboardView({
       <div className="grid gap-4 lg:grid-cols-2">
         <QuickActions
           actions={[
-            { label: "Add Student", href: "/admin/students", icon: UserPlus },
-            { label: "Add Instructor", href: "/admin/instructors", icon: GraduationCap },
-            { label: "Schedule Class", href: "/admin/classes", icon: Layers },
-            { label: "Publish Announcement", href: "/admin/blog", icon: Megaphone },
+            { label: "Add student", href: "/admin/students", icon: UserPlus },
+            { label: "Add instructor", href: "/admin/instructors", icon: GraduationCap },
+            { label: "Schedule class", href: "/admin/classes", icon: Layers },
+            { label: "Announcements", href: "/admin/announcements", icon: Megaphone },
           ]}
         />
         <div className="space-y-4">

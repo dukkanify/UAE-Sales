@@ -44,7 +44,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     delivery: "immediate",
     emailDefault: true,
     defaultTitle: "Account created",
-    defaultBody: "Welcome to AviatorPass — your account is ready.",
+    defaultBody: "Welcome to ATPL PASS — your account is ready.",
     audiences: ["all"],
   },
   "account.email_verified": {
@@ -84,7 +84,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     delivery: "immediate",
     emailDefault: true,
     defaultTitle: "Welcome aboard",
-    defaultBody: "Your AviatorPass journey starts here.",
+    defaultBody: "Your ATPL PASS account is ready. Open your dashboard to continue.",
     audiences: ["student"],
   },
   "account.profile_updated": {
@@ -158,7 +158,7 @@ export const NOTIFICATION_CATALOG: Record<string, NotificationTypeDefinition> = 
     emailDefault: false,
     groupKey: "course.progress_milestone",
     defaultTitle: "Progress milestone",
-    defaultBody: "Nice work — you hit a learning milestone.",
+    defaultBody: "You reached a learning milestone in your ATPL program.",
     audiences: ["student"],
   },
 

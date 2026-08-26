@@ -52,8 +52,8 @@ function InstructorDashboardView({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Teaching workspace"
-        description="Courses, schedule, students, and earnings at a glance."
+        title="Instructor dashboard"
+        description="Your courses, live sessions, students, and earnings."
         breadcrumbs={[{ label: "Instructor" }, { label: "Dashboard" }]}
       />
 
@@ -62,10 +62,17 @@ function InstructorDashboardView({
         <StatCard label="Today's classes" value={overview.todaysClasses} icon={Video} />
         <StatCard label="Upcoming classes" value={overview.upcomingClasses} icon={CalendarPlus} />
         <StatCard label="Students" value={overview.students} icon={Users} />
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Assignments" value={overview.assignments} icon={ClipboardList} />
         <StatCard label="Quizzes" value={overview.quizzes} icon={HelpCircle} />
         <StatCard label="Earnings" value={formatCurrency(overview.earnings)} icon={Wallet} />
-        <StatCard label="Wallet balance" value={formatCurrency(overview.walletBalance)} icon={Wallet} />
+        <StatCard
+          label="Wallet balance"
+          value={formatCurrency(overview.walletBalance)}
+          icon={Wallet}
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
@@ -83,10 +90,10 @@ function InstructorDashboardView({
 
       <QuickActions
         actions={[
-          { label: "Create Lesson", href: "/instructor/lessons", icon: BookOpen },
-          { label: "Schedule Zoom Session", href: "/instructor/calendar", icon: Video },
-          { label: "Upload Material", href: "/instructor/courses", icon: FileUp },
-          { label: "Create Quiz", href: "/instructor/quizzes", icon: HelpCircle },
+          { label: "Manage courses", href: "/instructor/courses", icon: BookOpen },
+          { label: "Schedule session", href: "/instructor/calendar", icon: Video },
+          { label: "Upload material", href: "/instructor/courses", icon: FileUp },
+          { label: "Create quiz", href: "/instructor/quizzes", icon: HelpCircle },
         ]}
       />
     </div>

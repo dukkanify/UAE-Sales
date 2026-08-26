@@ -118,7 +118,7 @@ export function EmailAutomationView({
         animate={{ opacity: 1, y: 0 }}
         className="space-y-2 border-b border-border/50 pb-6"
       >
-        <h2 className="font-heading text-xl tracking-tight">Delivery</h2>
+        <h2 className="font-display text-xl tracking-tight">Delivery</h2>
         <p className="text-sm text-muted-foreground">
           SMTP {overview?.smtpConfigured ? "configured" : "outbox mode"} · Notifications{" "}
           {overview?.emailNotificationsEnabled ? "on" : "off"} · Dispatched{" "}
@@ -134,7 +134,7 @@ export function EmailAutomationView({
         className="space-y-4 border-b border-border/50 pb-8"
       >
         <div>
-          <h2 className="font-heading text-xl tracking-tight">Event catalog</h2>
+          <h2 className="font-display text-xl tracking-tight">Event catalog</h2>
           <p className="text-sm text-muted-foreground">
             Enable or pause automation types without changing domain services.
           </p>
@@ -174,7 +174,7 @@ export function EmailAutomationView({
         className="space-y-4 border-b border-border/50 pb-8"
       >
         <div>
-          <h2 className="font-heading text-xl tracking-tight">Manual dispatch</h2>
+          <h2 className="font-display text-xl tracking-tight">Manual dispatch</h2>
           <p className="text-sm text-muted-foreground">
             Send a branded test for any event into SMTP or the durable outbox.
           </p>
@@ -228,7 +228,7 @@ export function EmailAutomationView({
         transition={{ delay: 0.15 }}
         className="space-y-4"
       >
-        <h2 className="font-heading text-xl tracking-tight">Recent automation</h2>
+        <h2 className="font-display text-xl tracking-tight">Recent automation</h2>
         <ul className="space-y-3">
           {(overview?.recent ?? []).length === 0 ? (
             <li className="text-sm text-muted-foreground">No automation dispatches yet.</li>

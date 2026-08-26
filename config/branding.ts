@@ -11,7 +11,7 @@ export const brandingConfig = {
   platformName: siteStatic.name,
   companyName: siteStatic.legalName,
   tagline: "YOUR AVIATION JOURNEY STARTS HERE",
-  secondaryTagline: "UNLOCK YOUR PILOT LICENSE",
+  secondaryTagline: "AIRLINE TRANSPORT PILOT LICENSE",
   paletteName: "Aviator Blue & Aviator Gold",
   language: siteStatic.language,
   englishOnly: siteStatic.englishOnly,
