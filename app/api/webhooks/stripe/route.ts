@@ -16,6 +16,7 @@ import {
 } from "@/services/payments/order-service";
 import { markListingFeatured } from "@/services/payments/featured-checkout.service";
 import { getOrderById } from "@/services/payments/order-store";
+import { syncConnectAccountFromWebhook } from "@/services/payments/stripe-connect.service";
 import { verifyStripeWebhook } from "@/services/payments/stripe.service";
 
 export async function POST(request: Request) {
@@ -99,6 +100,43 @@ export async function POST(request: Request) {
           type: "charge.refunded.synced",
           payload: { paymentIntentId, chargeId: charge.id, refundId },
         });
+        break;
+      }
+      case "account.updated":
+      case "account.external_account.created":
+      case "account.external_account.updated":
+      case "capability.updated": {
+        const accountObject =
+          event.type === "capability.updated"
+            ? null
+            : (event.data.object as Stripe.Account | Stripe.BankAccount | Stripe.Card);
+        let accountId: string | undefined;
+        if (event.type === "account.updated") {
+          accountId = (event.data.object as Stripe.Account).id;
+        } else if (event.type.startsWith("account.external_account")) {
+          const external = event.data.object as Stripe.BankAccount | Stripe.Card;
+          accountId =
+            typeof external.account === "string"
+              ? external.account
+              : external.account?.id;
+        } else if (event.type === "capability.updated") {
+          const capability = event.data.object as Stripe.Capability;
+          accountId =
+            typeof capability.account === "string"
+              ? capability.account
+              : capability.account?.id;
+        }
+
+        if (event.type === "account.updated" && accountObject) {
+          await syncConnectAccountFromWebhook(accountObject as Stripe.Account);
+        } else if (accountId) {
+          const { getStripeClient } = await import(
+            "@/services/payments/stripe.service"
+          );
+          const stripe = await getStripeClient();
+          const account = await stripe.accounts.retrieve(accountId);
+          await syncConnectAccountFromWebhook(account);
+        }
         break;
       }
       default:
