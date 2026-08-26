@@ -23,6 +23,7 @@
     "backup": "node scripts/backup-data.mjs daily",
     "backup:weekly": "node scripts/backup-data.mjs weekly",
     "backup:monthly": "node scripts/backup-data.mjs monthly",
+    "demo:seed": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vitest run tests/unit/demo-accounts.test.ts",
     "acceptance": "node scripts/acceptance-smoke.mjs",
     "uat": "node scripts/uat-smoke.mjs",
     "git:sync": "bash scripts/git-safe-sync.sh",
