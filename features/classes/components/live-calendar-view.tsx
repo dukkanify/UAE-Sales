@@ -238,62 +238,67 @@ function MonthGrid({
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-      <div className="grid grid-cols-7 border-b border-border/60 bg-muted/40">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-          <div
-            key={d}
-            className="px-2 py-3 text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-          >
-            {d}
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 auto-rows-fr">
-        {days.map((day, i) => {
-          const dayEvents = eventsOn(day);
-          const outside = !isSameMonth(day, cursor);
-          const today = isToday(day);
-          return (
-            <button
-              key={day.toISOString()}
-              type="button"
-              onClick={() => onSelectDay(day)}
-              className={cn(
-                "group relative min-h-[5.5rem] border-b border-r border-border/40 p-2 text-left transition-colors hover:bg-primary/[0.04] sm:min-h-24",
-                i % 7 === 6 && "border-r-0",
-                outside && "bg-muted/20",
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
-                  today
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : outside
-                      ? "text-muted-foreground/50"
-                      : "text-foreground group-hover:bg-muted",
-                )}
+      <div className="table-scroll">
+        <div className="min-w-[36rem]">
+          <div className="grid grid-cols-7 border-b border-border/60 bg-muted/40">
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+              <div
+                key={d}
+                className="px-1 py-3 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground sm:px-2 sm:text-[11px] sm:tracking-[0.14em]"
               >
-                {format(day, "d")}
-              </span>
-              <div className="mt-1.5 space-y-1">
-                {dayEvents.slice(0, 2).map((e) => (
-                  <div
-                    key={e.id}
-                    className="truncate rounded-md border-l-2 border-accent bg-primary/8 px-1.5 py-0.5 text-[10px] font-medium text-primary"
-                  >
-                    <span className="text-muted-foreground">{e.time}</span> {e.title}
-                  </div>
-                ))}
-                {dayEvents.length > 2 ? (
-                  <p className="px-1 text-[10px] font-medium text-accent">
-                    +{dayEvents.length - 2} more
-                  </p>
-                ) : null}
+                <span className="sm:hidden">{d.slice(0, 1)}</span>
+                <span className="hidden sm:inline">{d}</span>
               </div>
-            </button>
-          );
-        })}
+            ))}
+          </div>
+          <div className="grid grid-cols-7 auto-rows-fr">
+            {days.map((day, i) => {
+              const dayEvents = eventsOn(day);
+              const outside = !isSameMonth(day, cursor);
+              const today = isToday(day);
+              return (
+                <button
+                  key={day.toISOString()}
+                  type="button"
+                  onClick={() => onSelectDay(day)}
+                  className={cn(
+                    "group relative min-h-[5.5rem] border-b border-r border-border/40 p-2 text-left transition-colors hover:bg-primary/[0.04] sm:min-h-24",
+                    i % 7 === 6 && "border-r-0",
+                    outside && "bg-muted/20",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold transition-colors",
+                      today
+                        ? "bg-primary text-primary-foreground shadow-soft"
+                        : outside
+                          ? "text-muted-foreground/50"
+                          : "text-foreground group-hover:bg-muted",
+                    )}
+                  >
+                    {format(day, "d")}
+                  </span>
+                  <div className="mt-1.5 space-y-1">
+                    {dayEvents.slice(0, 2).map((e) => (
+                      <div
+                        key={e.id}
+                        className="truncate rounded-md border-l-2 border-accent bg-primary/8 px-1.5 py-0.5 text-[10px] font-medium text-primary"
+                      >
+                        <span className="text-muted-foreground">{e.time}</span> {e.title}
+                      </div>
+                    ))}
+                    {dayEvents.length > 2 ? (
+                      <p className="px-1 text-[10px] font-medium text-accent">
+                        +{dayEvents.length - 2} more
+                      </p>
+                    ) : null}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

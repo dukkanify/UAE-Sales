@@ -135,8 +135,8 @@ export function MockExamAdminView({ roleLabel = "Super Admin" }: { roleLabel?: s
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold tracking-tight">Admin configuration</h2>
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="min-w-[180px] space-y-1.5">
+            <div className="form-row-responsive">
+              <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
                 <Label>Pricing mode</Label>
                 <Select
                   value={pricingMode}
@@ -179,8 +179,8 @@ export function MockExamAdminView({ roleLabel = "Super Admin" }: { roleLabel?: s
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold tracking-tight">Complete session</h2>
-            <div className="flex flex-wrap items-end gap-3">
-              <div className="min-w-[240px] space-y-1.5">
+            <div className="form-row-responsive">
+              <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
                 <Label>Session</Label>
                 <Select value={completeId} onValueChange={setCompleteId}>
                   <SelectTrigger>

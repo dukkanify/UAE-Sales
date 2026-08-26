@@ -86,8 +86,8 @@ function BrandLogo({
         className={cn(
           "h-11 w-auto object-contain object-left",
           variant === "mark" && "h-11 w-11",
-          variant === "full" && "h-10 w-auto max-w-[360px] sm:h-11",
-          variant === "dark" && "h-10 w-auto max-w-[360px] sm:h-11",
+          variant === "full" && "h-10 w-auto max-w-[min(360px,85vw)] sm:h-11",
+          variant === "dark" && "h-10 w-auto max-w-[min(360px,85vw)] sm:h-11",
           variant === "stacked" && "h-28 w-auto max-w-[180px]",
         )}
         decoding="async"

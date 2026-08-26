@@ -42,9 +42,9 @@ function PhoneInput({
   id,
 }: PhoneInputProps) {
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div className={cn("flex min-w-0 gap-2", className)}>
       <Select value={dialCode} onValueChange={onDialCodeChange} disabled={disabled}>
-        <SelectTrigger className="w-[120px] rounded-xl" aria-label="Country dial code">
+        <SelectTrigger className="w-[6.5rem] shrink-0 rounded-xl" aria-label="Country dial code">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -62,7 +62,7 @@ function PhoneInput({
         value={value}
         disabled={disabled}
         placeholder={placeholder}
-        className="rounded-xl"
+        className="min-w-0 flex-1 rounded-xl"
         onChange={(e) => onValueChange?.(e.target.value.replace(/[^\d\s-]/g, ""))}
       />
     </div>

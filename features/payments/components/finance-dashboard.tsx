@@ -264,15 +264,15 @@ function FinanceDashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex flex-wrap gap-2">
+            <div className="form-row-responsive">
               <Input
-                className="max-w-[140px]"
+                className="w-full min-w-0 sm:max-w-[140px]"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="CODE"
               />
               <Input
-                className="max-w-[100px]"
+                className="w-full min-w-0 sm:max-w-[100px]"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="%"

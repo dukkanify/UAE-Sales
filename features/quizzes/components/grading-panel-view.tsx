@@ -108,7 +108,7 @@ function GradingPanelView({ basePath = "/instructor/quizzes" }: GradingPanelView
         </Button>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Attempts</CardTitle>

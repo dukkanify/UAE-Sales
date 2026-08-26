@@ -302,7 +302,7 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
   }, [isLoading, user, role, router]);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="page-shell flex bg-background">
       <CommandPalette open={commandOpen} onOpenChange={setCommandOpen} />
       <div className="hidden lg:block">
         <RoleSidebar
@@ -315,19 +315,27 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
 
       <div
         className={cn(
-          "flex min-h-screen flex-1 flex-col transition-[padding] duration-300",
+          "flex min-h-dvh min-w-0 flex-1 flex-col transition-[padding] duration-300",
           collapsed ? "lg:pl-[72px]" : "lg:pl-64",
         )}
       >
-        <header className="sticky top-0 z-20 border-b border-border/70 bg-card/75 backdrop-blur-xl">
-          <div className="flex h-14 items-center gap-2 px-3 sm:gap-3 sm:px-4 lg:px-6">
+        <header className="sticky top-0 z-20 border-b border-border/70 bg-card/75 pt-[env(safe-area-inset-top,0px)] backdrop-blur-xl">
+          <div className="flex h-14 items-center gap-1.5 px-2 sm:gap-3 sm:px-4 lg:px-6">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="touch-target lg:hidden"
+                  aria-label="Open menu"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 p-0">
+              <SheetContent
+                side="left"
+                className="w-[min(18rem,calc(100vw-2.5rem))] p-0 pb-[env(safe-area-inset-bottom,0px)]"
+              >
                 <SheetTitle className="sr-only">Navigation</SheetTitle>
                 <RoleSidebar role={role} navItems={items} className="border-0" />
               </SheetContent>
@@ -357,7 +365,17 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
               />
             </div>
 
-            <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="touch-target md:hidden"
+              aria-label="Open search"
+              onClick={() => setCommandOpen(true)}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
+            <div className="ml-auto flex min-w-0 items-center gap-0.5 sm:gap-2">
               <LanguageSelector />
               <ThemeToggle />
               <NotificationBell />
@@ -366,8 +384,8 @@ function RoleShell({ role, navItems, children }: RoleShellProps) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-6">
-          <div key={role} className="animate-in-fade">
+        <main className="min-w-0 flex-1 p-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-4 lg:p-6">
+          <div key={role} className="animate-in-fade min-w-0">
             {children}
           </div>
         </main>

@@ -41,18 +41,19 @@ function Header() {
     <header
       className={cn(
         "site-header sticky top-0 z-40 text-white transition-[background-color,border-color,backdrop-filter,box-shadow,padding] duration-300",
+        "pt-[env(safe-area-inset-top,0px)]",
         solid
           ? "border-b border-white/10 bg-[var(--surface-ink)]/80 shadow-[0_1px_0_0_rgba(204,160,76,0.14)] backdrop-blur-2xl"
           : "border-b border-transparent bg-transparent",
       )}
     >
-      <div className="container-app relative flex h-[4.5rem] items-center justify-between gap-3 sm:h-[4.85rem]">
-        <div className="relative z-10 min-w-0 shrink-0">
+      <div className="container-app relative flex h-[4.25rem] items-center justify-between gap-2 sm:h-[4.85rem] sm:gap-3">
+        <div className="relative z-10 min-w-0 shrink">
           <BrandLogo
             variant="dark"
             href={routes.home}
             priority
-            className="[&_img]:h-11 [&_img]:max-w-[360px] sm:[&_img]:h-12"
+            className="[&_img]:h-9 [&_img]:max-w-[min(220px,55vw)] sm:[&_img]:h-11 sm:[&_img]:max-w-[300px] md:[&_img]:h-12 md:[&_img]:max-w-[360px]"
           />
         </div>
 
@@ -105,7 +106,7 @@ function Header() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative z-10 rounded-xl text-white hover:bg-white/10 md:hidden"
+          className="touch-target relative z-10 shrink-0 rounded-xl text-white hover:bg-white/10 md:hidden"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-nav"
@@ -118,9 +119,12 @@ function Header() {
       {open ? (
         <div
           id="mobile-nav"
-          className="animate-in-fade border-t border-white/10 bg-[var(--surface-ink)]/96 backdrop-blur-2xl md:hidden"
+          className="animate-in-fade max-h-[min(70dvh,32rem)] overflow-y-auto border-t border-white/10 bg-[var(--surface-ink)]/96 backdrop-blur-2xl md:hidden"
         >
-          <nav className="container-app flex flex-col gap-1 py-4" aria-label="Mobile">
+          <nav
+            className="container-app flex flex-col gap-1 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+            aria-label="Mobile"
+          >
             {NAV_ITEMS.map((item) => {
               const itemPath = navPathname(item.href);
               const active =
@@ -132,7 +136,7 @@ function Header() {
                   key={navHrefKey(item.href)}
                   href={item.href}
                   className={cn(
-                    "rounded-xl px-3 py-3 text-sm font-medium transition",
+                    "touch-target flex items-center rounded-xl px-3 py-3 text-sm font-medium transition",
                     active
                       ? "bg-white/10 text-white shadow-[inset_3px_0_0_0_var(--accent)]"
                       : "text-white/75 hover:bg-white/8 hover:text-white",
@@ -145,12 +149,12 @@ function Header() {
             <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
               <Button
                 variant="outline"
-                className="border-white/20 bg-transparent text-white hover:bg-white/10"
+                className="h-12 border-white/20 bg-transparent text-white hover:bg-white/10"
                 asChild
               >
                 <Link href={routes.login}>Log in</Link>
               </Button>
-              <Button variant="accent" className="hero-cta-primary" asChild>
+              <Button variant="accent" className="hero-cta-primary h-12" asChild>
                 <Link href={routes.courses}>
                   ATPL Program
                   <ArrowUpRight className="h-4 w-4" />
