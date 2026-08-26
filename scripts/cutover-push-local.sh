@@ -24,15 +24,31 @@ fi
 
 export GH_TOKEN="${AVIATORPASS_PUSH_TOKEN:-${GITHUB_TOKEN}}"
 
-echo "==> Verifying PAT (length ${#GH_TOKEN})"
-if ! GH_TOKEN="$GH_TOKEN" gh api -X PUT repos/dukkanify/AviatorPass/contents/.cutover-preflight \
+can_write=false
+if GH_TOKEN="$GH_TOKEN" gh api -X PUT repos/dukkanify/AviatorPass/contents/.cutover-preflight \
   -f message='cutover preflight' -f content='b2s=' >/dev/null 2>&1; then
-  echo "ERROR: PAT cannot write to dukkanify/AviatorPass (Contents API 403)." >&2
-  echo "Regenerate the fine-grained PAT with Repository permission: Contents = Read and write." >&2
-  echo "Select repository: dukkanify/AviatorPass. Then re-run this script." >&2
+  can_write=true
+  echo "PAT write check: OK"
+else
+  echo "WARN: PAT cannot write via Contents API (fine-grained token needs Contents: Read and write)."
+fi
+
+use_ssh=false
+if [[ -f "${AVIATORPASS_SSH_KEY:-/tmp/aviatorpass-deploy}" ]]; then
+  use_ssh=true
+  echo "Using SSH deploy key: ${AVIATORPASS_SSH_KEY:-/tmp/aviatorpass-deploy}"
+fi
+
+if [[ "$can_write" != true && "$use_ssh" != true ]]; then
+  echo "ERROR: No working push credentials." >&2
+  echo "Fix fine-grained PAT (Contents: Read and write on dukkanify/AviatorPass)" >&2
+  echo "OR add deploy key to the repo and set AVIATORPASS_SSH_KEY to the private key path." >&2
+  if [[ -f /tmp/aviatorpass-deploy.pub ]]; then
+    echo "Suggested deploy key (add at GitHub → AviatorPass → Settings → Deploy keys):" >&2
+    cat /tmp/aviatorpass-deploy.pub >&2
+  fi
   exit 1
 fi
-echo "PAT write check: OK"
 
 # Restore product tag if present in filtered history
 if ! git rev-parse v0.1.0-beta >/dev/null 2>&1; then
@@ -54,19 +70,32 @@ git remote remove legacy-uae-sales 2>/dev/null || true
 git remote add origin "$TARGET_URL"
 git remote add legacy-uae-sales "$LEGACY_URL"
 
-GIT_CONFIG_GLOBAL="$TMP_GIT_CONFIG" GIT_CONFIG_SYSTEM=/dev/null gh auth setup-git >/dev/null
+GIT_CONFIG_GLOBAL="$TMP_GIT_CONFIG" GIT_CONFIG_SYSTEM=/dev/null gh auth setup-git >/dev/null 2>&1 || true
 
 push_git() {
-  GIT_CONFIG_GLOBAL="$TMP_GIT_CONFIG" GIT_CONFIG_SYSTEM=/dev/null git \
-    -c "credential.helper=" \
-    "$@"
+  if [[ "$use_ssh" == true ]]; then
+    local key="${AVIATORPASS_SSH_KEY:-/tmp/aviatorpass-deploy}"
+    GIT_CONFIG_GLOBAL="$TMP_GIT_CONFIG" GIT_CONFIG_SYSTEM=/dev/null \
+      GIT_SSH_COMMAND="ssh -i ${key} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new" \
+      git -c "credential.helper=" "$@"
+  else
+    GIT_CONFIG_GLOBAL="$TMP_GIT_CONFIG" GIT_CONFIG_SYSTEM=/dev/null git \
+      -c "credential.helper=" \
+      "$@"
+  fi
 }
 
+push_remote="origin"
+if [[ "$use_ssh" == true ]]; then
+  git remote set-url origin "git@github.com:dukkanify/AviatorPass.git"
+  push_remote="origin"
+fi
+
 echo "==> Pushing all branches"
-push_git -C "$EXPORT_DIR" push origin --all
+push_git -C "$EXPORT_DIR" push "$push_remote" --all
 
 echo "==> Pushing all tags"
-push_git -C "$EXPORT_DIR" push origin --tags
+push_git -C "$EXPORT_DIR" push "$push_remote" --tags
 
 echo "==> Cutover push complete"
 git log -1 --oneline main
