@@ -1,14 +1,9 @@
 name: Push AviatorPass Migration
 
-# One-time cutover: push filtered history to dukkanify/AviatorPass.
+# One-time cutover: push mirror branches → dukkanify/AviatorPass
 # Requires repository secret AVIATORPASS_PUSH_TOKEN (classic PAT, repo scope on AviatorPass).
 on:
   workflow_dispatch:
-    inputs:
-      source_ref:
-        description: "Source ref on UAE-Sales (default: aviatorpass)"
-        required: false
-        default: "aviatorpass"
 
 permissions:
   contents: read
@@ -17,36 +12,31 @@ jobs:
   push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.source_ref }}
-          fetch-depth: 0
-
       - name: Validate push token
         env:
           AVIATORPASS_PUSH_TOKEN: ${{ secrets.AVIATORPASS_PUSH_TOKEN }}
         run: |
           if [ -z "$AVIATORPASS_PUSH_TOKEN" ]; then
-            echo "::error::Missing AVIATORPASS_PUSH_TOKEN. Create a classic PAT with repo scope for dukkanify/AviatorPass and add it as a repository secret on UAE-Sales."
+            echo "::error::Missing AVIATORPASS_PUSH_TOKEN. Add a classic PAT with repo scope for dukkanify/AviatorPass."
             exit 1
           fi
 
-      - name: Export and push AviatorPass history
+      - name: Push mirror branches to AviatorPass
         env:
-          PUSH: "1"
-          NEW_REMOTE: "https://github.com/dukkanify/AviatorPass.git"
-          SOURCE_REF: ${{ github.sha }}
           AVIATORPASS_PUSH_TOKEN: ${{ secrets.AVIATORPASS_PUSH_TOKEN }}
         run: |
-          pip install --user git-filter-repo
-          export PATH="${HOME}/.local/bin:${PATH}"
-          bash scripts/migrate-to-dedicated-repo.sh
-          cd /tmp/AviatorPass-export
-          git remote set-url origin "https://x-access-token:${AVIATORPASS_PUSH_TOKEN}@github.com/dukkanify/AviatorPass.git"
-          git push -u origin main
-          git push origin aviatorpass:aviatorpass
-          git push origin develop:develop
-          echo "Pushed branches: main, aviatorpass, develop"
+          set -euo pipefail
+          git clone --branch aviatorpass-dedicated-main \
+            "https://x-access-token:${AVIATORPASS_PUSH_TOKEN}@github.com/dukkanify/UAE-Sales.git" \
+            /tmp/ap-push
+          cd /tmp/ap-push
+          git remote add aviatorpass "https://x-access-token:${AVIATORPASS_PUSH_TOKEN}@github.com/dukkanify/AviatorPass.git"
+          git push -u aviatorpass HEAD:main
+          git fetch origin aviatorpass-dedicated-aviatorpass:refs/heads/aviatorpass
+          git push aviatorpass aviatorpass:aviatorpass
+          git fetch origin aviatorpass-dedicated-develop:refs/heads/develop
+          git push aviatorpass develop:develop
+          echo "Pushed main, aviatorpass, develop"
           git log -1 --oneline main
 
       - name: Verify remote branches

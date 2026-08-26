@@ -79,6 +79,8 @@ gh api repos/dukkanify/UAE-Sales/commits/aviatorpass-dedicated-main --jq .sha
 
 ## 3. Push attempt (agent)
 
+**Latest retry:** 2026-08-26 19:50 UTC — still **403**.
+
 ```text
 remote: Permission to dukkanify/AviatorPass.git denied to cursor[bot].
 fatal: unable to access 'https://github.com/dukkanify/AviatorPass.git/': The requested URL returned error: 403
