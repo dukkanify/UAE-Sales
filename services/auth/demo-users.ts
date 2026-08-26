@@ -1,396 +1,175 @@
 /**
  * Demo user seeder for local LMS / dashboard population.
- * Kept outside metrics to avoid circular imports with courses seed.
+ * Permanent accounts are defined in constants/demo-accounts.ts.
  */
 
+import {
+  DEMO_ACCOUNT_PASSWORD,
+  DEMO_ACCOUNTS,
+  demoAvatarDataUri,
+  type DemoAccountDefinition,
+} from "@/constants/demo-accounts";
+import { ACCOUNT_STATUS } from "@/constants/account-status";
+import { ROLES } from "@/constants/roles";
+import { generateId, hashPassword } from "@/lib/security/crypto";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
 import { isStudentProfileComplete, writeAuthDb, type StoredUser } from "@/services/auth/store";
-import { ROLES, type Role } from "@/constants/roles";
-import { ACCOUNT_STATUS } from "@/constants/account-status";
-import { generateId } from "@/lib/security/crypto";
-
-type DemoUser = Partial<StoredUser> & {
-  email: string;
-  role: Role;
-  firstName: string;
-  lastName: string;
-};
 
 export function ensureDemoUsersSeeded(): void {
   ensureSuperAdminSeeded();
-  // Always idempotent — seedFreshDemoUsers skips emails that already exist.
-  seedFreshDemoUsers();
-  ensureCgiDemoUser();
-  ensureCaptainInstructorDemo();
-  ensureSecondaryInstructorDemo();
-  backfillDemoStudentDetails();
+  upsertDemoCatalogUsers({ reactivatePermanent: false });
 }
 
-function backfillDemoStudentDetails(): void {
-  const enrich: Record<
-    string,
-    Pick<
-      StoredUser,
-      | "phone"
-      | "nationality"
-      | "dateOfBirth"
-      | "gender"
-      | "city"
-      | "bio"
-      | "emergencyContactName"
-      | "emergencyContactPhone"
-      | "countryCode"
-    >
-  > = {
-    "student.one@eagerpilots.com": {
-      phone: "+201001112233",
-      countryCode: "EG",
-      nationality: "Egyptian",
-      dateOfBirth: "1998-04-12",
-      gender: "male",
-      city: "Cairo",
-      bio: "ATPL theory candidate focusing on meteorology and navigation.",
-      emergencyContactName: "Hassan Khalil",
-      emergencyContactPhone: "+201009998877",
-    },
-    "student.two@eagerpilots.com": {
-      phone: "+966501234567",
-      countryCode: "SA",
-      nationality: "Saudi",
-      dateOfBirth: "1999-11-03",
-      gender: "female",
-      city: "Riyadh",
-      bio: "Working through Performance and Mass & Balance modules.",
-      emergencyContactName: "Noura Nasser",
-      emergencyContactPhone: "+966509876543",
-    },
-    "student.four@eagerpilots.com": {
-      phone: "+447700900123",
-      countryCode: "GB",
-      nationality: "British",
-      dateOfBirth: "1997-07-21",
-      gender: "female",
-      city: "London",
-      bio: null,
-      emergencyContactName: null,
-      emergencyContactPhone: null,
-    },
-    "abdulaziz@aviatorpass.com": {
-      phone: "+96550012345",
-      countryCode: "KW",
-      nationality: "Kuwaiti",
-      dateOfBirth: "1996-01-18",
-      gender: "male",
-      city: "Kuwait City",
-      bio: "Full ATPL ground school track.",
-      emergencyContactName: "Family contact",
-      emergencyContactPhone: "+96550098765",
-    },
-  };
-
-  writeAuthDb((d) => {
-    for (const user of d.users) {
-      const patch = enrich[user.email];
-      if (!patch) continue;
-      if (user.phone && user.nationality) continue;
-      Object.assign(user, patch);
-      user.profileComplete = isStudentProfileComplete(user);
-      user.updatedAt = new Date().toISOString();
-    }
+/**
+ * Force-refresh permanent demo accounts (profiles, avatars, passwords, active status).
+ * Does not override a Super Admin suspension of non-permanent accounts.
+ */
+export function resetPermanentDemoAccounts(options?: { password?: string }): void {
+  ensureSuperAdminSeeded();
+  upsertDemoCatalogUsers({
+    reactivatePermanent: true,
+    forceProfile: true,
+    password: options?.password ?? DEMO_ACCOUNT_PASSWORD,
   });
 }
 
-function seedFreshDemoUsers(): void {
+function upsertDemoCatalogUsers(options: {
+  reactivatePermanent: boolean;
+  forceProfile?: boolean;
+  password?: string;
+}): void {
   const now = new Date().toISOString();
-  const demo: DemoUser[] = [
-    {
-      email: "admin@eagerpilots.com",
-      role: ROLES.ADMIN,
-      firstName: "Amina",
-      lastName: "Hassan",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-    },
-    {
-      email: "cgi@eagerpilots.com",
-      role: ROLES.CHIEF_GROUND_INSTRUCTOR,
-      firstName: "Nadia",
-      lastName: "Al Fahad",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "KW",
-      phone: "+96550011122",
-      nationality: "Kuwaiti",
-      city: "Kuwait City",
-      bio: "Chief Ground Instructor for the ATPL theory journey.",
-    },
-    {
-      email: "instructor.one@eagerpilots.com",
-      role: ROLES.INSTRUCTOR,
-      firstName: "Abdulaziz",
-      lastName: "Alshoail",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "KW",
-      phone: "+96550000001",
-      nationality: "Kuwaiti",
-      city: "Kuwait City",
-      bio: "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.",
-    },
-    {
-      email: "instructor.two@eagerpilots.com",
-      role: ROLES.INSTRUCTOR,
-      firstName: "Sara",
-      lastName: "Al Mansoori",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "AE",
-      phone: "+971509998877",
-      nationality: "Emirati",
-      city: "Abu Dhabi",
-    },
-    {
-      email: "student.one@eagerpilots.com",
-      role: ROLES.STUDENT,
-      firstName: "Omar",
-      lastName: "Khalil",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "EG",
-      phone: "+201001112233",
-      nationality: "Egyptian",
-      dateOfBirth: "1998-04-12",
-      gender: "male",
-      city: "Cairo",
-      bio: "ATPL theory candidate focusing on meteorology and navigation.",
-      emergencyContactName: "Hassan Khalil",
-      emergencyContactPhone: "+201009998877",
-    },
-    {
-      email: "student.two@eagerpilots.com",
-      role: ROLES.STUDENT,
-      firstName: "Layla",
-      lastName: "Nasser",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "SA",
-      phone: "+966501234567",
-      nationality: "Saudi",
-      dateOfBirth: "1999-11-03",
-      gender: "female",
-      city: "Riyadh",
-      bio: "Working through Performance and Mass & Balance modules.",
-      emergencyContactName: "Noura Nasser",
-      emergencyContactPhone: "+966509876543",
-    },
-    {
-      email: "student.three@eagerpilots.com",
-      role: ROLES.STUDENT,
-      firstName: "Noah",
-      lastName: "Brooks",
-      status: ACCOUNT_STATUS.PENDING,
-      profileComplete: false,
-      emailVerified: true,
-      countryCode: "US",
-    },
-    {
-      email: "student.four@eagerpilots.com",
-      role: ROLES.STUDENT,
-      firstName: "Mia",
-      lastName: "Chen",
-      status: ACCOUNT_STATUS.SUSPENDED,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "GB",
-      phone: "+447700900123",
-      nationality: "British",
-      dateOfBirth: "1997-07-21",
-      gender: "female",
-      city: "London",
-    },
-    {
-      email: "abdulaziz@aviatorpass.com",
-      role: ROLES.STUDENT,
-      firstName: "Abdulaziz",
-      lastName: "Alshoail",
-      status: ACCOUNT_STATUS.ACTIVE,
-      profileComplete: true,
-      emailVerified: true,
-      countryCode: "KW",
-      phone: "+96550012345",
-      nationality: "Kuwaiti",
-      dateOfBirth: "1996-01-18",
-      gender: "male",
-      city: "Kuwait City",
-      bio: "Full ATPL ground school track.",
-      emergencyContactName: "Family contact",
-      emergencyContactPhone: "+96550098765",
-    },
-  ];
+  const password = options.password ?? DEMO_ACCOUNT_PASSWORD;
+  const { hash, salt } = hashPassword(password);
 
   writeAuthDb((d) => {
-    for (const row of demo) {
-      if (d.users.some((u) => u.email === row.email)) continue;
-      d.users.push({
-        id: generateId(),
-        email: row.email,
-        firstName: row.firstName,
-        lastName: row.lastName,
-        phone: row.phone ?? null,
-        countryCode: row.countryCode ?? null,
-        nationality: row.nationality ?? null,
-        dateOfBirth: row.dateOfBirth ?? null,
-        gender: row.gender ?? null,
-        city: row.city ?? null,
-        bio: row.bio ?? null,
-        emergencyContactName: row.emergencyContactName ?? null,
-        emergencyContactPhone: row.emergencyContactPhone ?? null,
-        avatarUrl: null,
-        timezone: "UTC",
-        language: "en",
-        role: row.role,
-        status: row.status ?? ACCOUNT_STATUS.ACTIVE,
-        emailVerified: row.emailVerified ?? true,
-        profileComplete: row.profileComplete ?? true,
-        passwordHash: null,
-        passwordSalt: null,
-        lastLoginAt: null,
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
-  });
-}
-
-/** Align primary instructor with Captain Abdulaziz Alshoail (customer journeys). */
-function ensureCaptainInstructorDemo(): void {
-  writeAuthDb((d) => {
-    const now = new Date().toISOString();
-    let instructor = d.users.find((u) => u.email === "instructor.one@eagerpilots.com");
-    if (!instructor) {
-      instructor = {
-        id: generateId(),
-        email: "instructor.one@eagerpilots.com",
-        firstName: "Abdulaziz",
-        lastName: "Alshoail",
-        phone: "+96550000001",
-        countryCode: "KW",
-        nationality: "Kuwaiti",
-        dateOfBirth: null,
-        gender: null,
-        city: "Kuwait City",
-        bio: "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.",
-        emergencyContactName: null,
-        emergencyContactPhone: null,
-        avatarUrl: null,
-        timezone: "UTC",
-        language: "en",
-        role: ROLES.INSTRUCTOR,
-        status: ACCOUNT_STATUS.ACTIVE,
-        emailVerified: true,
-        profileComplete: true,
-        passwordHash: null,
-        passwordSalt: null,
-        lastLoginAt: null,
-        createdAt: now,
-        updatedAt: now,
-      };
-      d.users.push(instructor);
-      return;
-    }
-    if (instructor.firstName === "Abdulaziz" && instructor.lastName === "Alshoail") {
-      if (instructor.status !== ACCOUNT_STATUS.ACTIVE) {
-        instructor.status = ACCOUNT_STATUS.ACTIVE;
-        instructor.updatedAt = now;
+    for (const def of DEMO_ACCOUNTS) {
+      const existing = d.users.find((u) => u.email === def.email);
+      if (!existing) {
+        d.users.push(buildStoredUser(def, now, hash, salt));
+        continue;
       }
-      return;
+
+      const shouldRefresh =
+        options.forceProfile ||
+        !existing.avatarUrl ||
+        !existing.phone ||
+        existing.timezone === "UTC" ||
+        !existing.passwordHash;
+
+      if (shouldRefresh || options.reactivatePermanent) {
+        applyDemoProfile(existing, def, now, {
+          reactivate: options.reactivatePermanent && def.permanent,
+          setPassword: Boolean(options.forceProfile || !existing.passwordHash),
+          hash,
+          salt,
+        });
+      }
     }
-    instructor.firstName = "Abdulaziz";
-    instructor.lastName = "Alshoail";
-    instructor.countryCode = "KW";
-    instructor.city = "Kuwait City";
-    instructor.nationality = "Kuwaiti";
-    instructor.status = ACCOUNT_STATUS.ACTIVE;
-    instructor.bio =
-      "Captain Abdulaziz Alshoail — AviatorPass lead instructor for PPL, Basics of Aviation, and live Zoom programs.";
-    instructor.updatedAt = now;
+
+    // Keep Super Admin email from env aligned with permanent demo profile when present.
+    const superAdmin = d.users.find((u) => u.role === ROLES.SUPER_ADMIN);
+    if (superAdmin && options.forceProfile) {
+      if (!superAdmin.avatarUrl) {
+        superAdmin.avatarUrl = demoAvatarDataUri(
+          `${superAdmin.firstName?.[0] ?? "S"}${superAdmin.lastName?.[0] ?? "A"}`,
+        );
+      }
+      if (!superAdmin.passwordHash) {
+        superAdmin.passwordHash = hash;
+        superAdmin.passwordSalt = salt;
+      }
+      if (options.reactivatePermanent) {
+        superAdmin.status = ACCOUNT_STATUS.ACTIVE;
+        superAdmin.emailVerified = true;
+        superAdmin.profileComplete = true;
+      }
+      superAdmin.updatedAt = now;
+    }
   });
 }
 
-/** Ensure a second active instructor exists for public booking studio. */
-function ensureSecondaryInstructorDemo(): void {
-  writeAuthDb((d) => {
-    const email = "instructor.two@eagerpilots.com";
-    if (d.users.some((u) => u.email === email)) return;
-    const now = new Date().toISOString();
-    d.users.push({
-      id: generateId(),
-      email,
-      firstName: "Sara",
-      lastName: "Al Mansoori",
-      phone: "+971509998877",
-      countryCode: "AE",
-      nationality: "Emirati",
-      dateOfBirth: null,
-      gender: null,
-      city: "Abu Dhabi",
-      bio: null,
-      emergencyContactName: null,
-      emergencyContactPhone: null,
-      avatarUrl: null,
-      timezone: "UTC",
-      language: "en",
-      role: ROLES.INSTRUCTOR,
-      status: ACCOUNT_STATUS.ACTIVE,
-      emailVerified: true,
-      profileComplete: true,
-      passwordHash: null,
-      passwordSalt: null,
-      lastLoginAt: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-  });
+function buildStoredUser(
+  def: DemoAccountDefinition,
+  now: string,
+  hash: string,
+  salt: string,
+): StoredUser {
+  const initials = `${def.firstName[0] ?? "A"}${def.lastName[0] ?? "P"}`;
+  const user: StoredUser = {
+    id: generateId(),
+    email: def.email,
+    firstName: def.firstName,
+    lastName: def.lastName,
+    phone: def.phone,
+    countryCode: def.countryCode,
+    nationality: def.nationality,
+    dateOfBirth: def.dateOfBirth,
+    gender: def.gender,
+    city: def.city,
+    bio: def.bio,
+    emergencyContactName: def.emergencyContactName,
+    emergencyContactPhone: def.emergencyContactPhone,
+    avatarUrl: demoAvatarDataUri(initials),
+    timezone: def.timezone,
+    language: def.language,
+    role: def.role,
+    status: def.status,
+    emailVerified: def.emailVerified,
+    profileComplete: def.profileComplete,
+    passwordHash: hash,
+    passwordSalt: salt,
+    lastLoginAt: null,
+    createdAt: now,
+    updatedAt: now,
+  };
+  if (def.role === ROLES.STUDENT) {
+    user.profileComplete = isStudentProfileComplete(user);
+  }
+  return user;
 }
 
-/** Backfill CGI demo account on existing databases. */
-function ensureCgiDemoUser(): void {
-  const email = "cgi@eagerpilots.com";
-  writeAuthDb((d) => {
-    if (d.users.some((u) => u.email === email)) return;
-    const now = new Date().toISOString();
-    d.users.push({
-      id: generateId(),
-      email,
-      firstName: "Nadia",
-      lastName: "Al Fahad",
-      phone: "+96550011122",
-      countryCode: "KW",
-      nationality: "Kuwaiti",
-      dateOfBirth: null,
-      gender: null,
-      city: "Kuwait City",
-      bio: "Chief Ground Instructor for the ATPL theory journey.",
-      emergencyContactName: null,
-      emergencyContactPhone: null,
-      avatarUrl: null,
-      timezone: "UTC",
-      language: "en",
-      role: ROLES.CHIEF_GROUND_INSTRUCTOR,
-      status: ACCOUNT_STATUS.ACTIVE,
-      emailVerified: true,
-      profileComplete: true,
-      passwordHash: null,
-      passwordSalt: null,
-      lastLoginAt: null,
-      createdAt: now,
-      updatedAt: now,
-    });
-  });
+function applyDemoProfile(
+  user: StoredUser,
+  def: DemoAccountDefinition,
+  now: string,
+  opts: {
+    reactivate: boolean;
+    setPassword: boolean;
+    hash: string;
+    salt: string;
+  },
+): void {
+  user.firstName = def.firstName;
+  user.lastName = def.lastName;
+  user.phone = def.phone;
+  user.countryCode = def.countryCode;
+  user.nationality = def.nationality;
+  user.dateOfBirth = def.dateOfBirth;
+  user.gender = def.gender;
+  user.city = def.city;
+  user.bio = def.bio;
+  user.emergencyContactName = def.emergencyContactName;
+  user.emergencyContactPhone = def.emergencyContactPhone;
+  user.timezone = def.timezone;
+  user.language = def.language;
+  user.role = def.role;
+  user.emailVerified = def.emailVerified;
+  user.avatarUrl =
+    user.avatarUrl ?? demoAvatarDataUri(`${def.firstName[0] ?? "A"}${def.lastName[0] ?? "P"}`);
+
+  if (opts.reactivate) {
+    user.status = ACCOUNT_STATUS.ACTIVE;
+  } else if (user.status !== ACCOUNT_STATUS.SUSPENDED && user.status !== ACCOUNT_STATUS.INACTIVE) {
+    user.status = def.status;
+  }
+
+  if (opts.setPassword) {
+    user.passwordHash = opts.hash;
+    user.passwordSalt = opts.salt;
+  }
+
+  user.profileComplete =
+    def.role === ROLES.STUDENT ? isStudentProfileComplete(user) : def.profileComplete;
+  user.updatedAt = now;
 }
