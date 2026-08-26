@@ -8,20 +8,20 @@
 
 ## Summary
 
-| Gate                                | Result            | Evidence                                                                                                              |
-| ----------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------- |
-| History export (AEP root)           | **PASS**          | `/tmp/AviatorPass-export` first commit = AEP foundation; log `/opt/cursor/artifacts/aviatorpass-migration-export.log` |
-| Sooqna-only ancestry dropped        | **PASS**          | Graft + `git-filter-repo`; marketplace `main` tip not exported                                                        |
-| Product isolation script            | **PASS**          | `npm run verify:isolation`                                                                                            |
-| Typecheck / unit tests              | **PASS**          | See CI / local runs on migration branch                                                                               |
-| Production build                    | **PASS**          | `npm run build` — log `/opt/cursor/artifacts/aviatorpass-migration-build.log`                                         |
-| Create `dukkanify/AviatorPass`      | **BLOCKED**       | `gh repo create` → 403 Resource not accessible by integration                                                         |
-| Push to dedicated remote            | **BLOCKED**       | Repo does not exist yet                                                                                               |
-| GitHub Actions on new repo          | **BLOCKED**       | Requires push                                                                                                         |
-| Vercel Git re-link                  | **BLOCKED**       | Operator action                                                                                                       |
-| Vercel Production SHA from new repo | **BLOCKED**       | Live still on `UAE-Sales` / `71c0923` until promote + re-link                                                         |
-| Preview deployments on new repo     | **BLOCKED**       | Requires Git connection                                                                                               |
-| Zero Sooqna refs (active paths)     | **PASS (policy)** | Active workflows/docs point at AviatorPass; intentional negatives remain in `verify:isolation` + `docs/archive/`      |
+| Gate                                | Result                   | Evidence                                                                                                                                                                |
+| ----------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| History export (AEP root)           | **PASS**                 | `/tmp/AviatorPass-export` first commit = AEP foundation; log `/opt/cursor/artifacts/aviatorpass-migration-export.log`                                                   |
+| Sooqna-only ancestry dropped        | **PASS**                 | Graft + `git-filter-repo`; marketplace `main` tip not exported                                                                                                          |
+| Product isolation script            | **PASS**                 | `npm run verify:isolation`                                                                                                                                              |
+| Typecheck / unit tests              | **PASS**                 | See CI / local runs on migration branch                                                                                                                                 |
+| Production build                    | **PASS**                 | `npm run build` — log `/opt/cursor/artifacts/aviatorpass-migration-build.log`                                                                                           |
+| Create `dukkanify/AviatorPass`      | **NOT VISIBLE TO AGENT** | User marked external action complete, but installation token still gets **404**; org search `AviatorPass` → **0** repos. Cursor App can only see `dukkanify/UAE-Sales`. |
+| Push to dedicated remote            | **BLOCKED**              | Bundle ready at `/opt/cursor/artifacts/aviatorpass-history.bundle` (tip includes migration docs)                                                                        |
+| GitHub Actions on new repo          | **BLOCKED**              | Requires push                                                                                                                                                           |
+| Vercel Git re-link                  | **BLOCKED**              | Operator action                                                                                                                                                         |
+| Vercel Production SHA from new repo | **BLOCKED**              | Live still on `UAE-Sales` / `71c0923` until promote + re-link                                                                                                           |
+| Preview deployments on new repo     | **BLOCKED**              | Requires Git connection                                                                                                                                                 |
+| Zero Sooqna refs (active paths)     | **PASS (policy)**        | Active workflows/docs point at AviatorPass; intentional negatives remain in `verify:isolation` + `docs/archive/`                                                        |
 
 **Cutover is incomplete until the dedicated GitHub repository exists and Vercel is re-linked.**
 
@@ -69,10 +69,32 @@ gh repo create dukkanify/AviatorPass --public \
 # empty repo — no README
 ```
 
-Agent attempt result:
+Agent attempt results:
 
 ```text
-GraphQL: Resource not accessible by integration (createRepository)
+createRepository: 403 Resource not accessible by integration
+GET dukkanify/AviatorPass: 404 Not Found (even after user marked external action complete)
+Installation repositories visible to agent token: dukkanify/UAE-Sales only
+```
+
+**Required next step:** Grant the **Cursor** GitHub App access to `dukkanify/AviatorPass` (org Settings → GitHub Apps → Cursor → Repository access), **or** push manually with an owner PAT.
+
+### Manual push from owner machine
+
+```bash
+# Option A — migration script
+git clone https://github.com/dukkanify/UAE-Sales.git
+cd UAE-Sales && git checkout cursor/repository-migration-0987
+PUSH=1 NEW_REMOTE=https://github.com/dukkanify/AviatorPass.git \
+  bash scripts/migrate-to-dedicated-repo.sh
+
+# Option B — from agent-produced bundle
+git clone https://github.com/dukkanify/AviatorPass.git
+cd AviatorPass
+git pull /path/to/aviatorpass-history.bundle main
+git push -u origin main
+git pull ../aviatorpass-history.bundle aviatorpass develop
+git push origin aviatorpass develop
 ```
 
 ---
