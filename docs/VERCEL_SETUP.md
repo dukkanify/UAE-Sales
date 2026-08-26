@@ -1,4 +1,4 @@
-# Vercel — AviatorPass
+# Vercel — AviatorPass (isolated)
 
 ## Live
 
@@ -7,19 +7,14 @@
 | Project            | `dukkanify-technology-llcs-projects/aviatorpass`       |
 | Production URL     | https://aviatorpass.vercel.app                         |
 | Custom domains     | `dubai-test.blog`, `www.dubai-test.blog` (DNS pending) |
-| Git production tip | Branch **`aviatorpass`** (pushed from AviatorPass tip) |
+| Git production tip | Branch **`aviatorpass`** only                          |
 
-## Why the first deploy showed Sooqna
+## Isolation rules (mandatory)
 
-The Vercel project was linked to GitHub repo `UAE-Sales` with **Production Branch = `main`**.  
-`main` is still the marketplace (Sooqna). AviatorPass lives on feature tips / branch `aviatorpass`.
-
-## What we fixed
-
-1. CLI deploy of the AviatorPass working tree → production alias `aviatorpass.vercel.app`
-2. Env vars: `NEXT_PUBLIC_APP_NAME=AviatorPass`, demo OTP, `AUTH_SECRET`, app URL
-3. Ignored build step: only git refs `aviatorpass` and `cursor/rename-aviatorpass-0987` build; **`main` (Sooqna) is skipped**
-4. Domains attached: `dubai-test.blog` + `www`
+1. **Production Branch** = `aviatorpass` (never marketplace `main`).
+2. **Ignored Build Step** (or Git filter): build only `aviatorpass`, `develop`, and `cursor/*` / `feature/*` AviatorPass tips — skip unrelated product refs.
+3. Deploy secrets must be AviatorPass-only: `VERCEL_AVIATORPASS_DEPLOY_HOOK` (preferred). Do **not** fall back to a shared marketplace deploy hook.
+4. Marketplace Vercel project (`sooqna`) must not deploy AviatorPass branches; disconnect or ignore those refs there.
 
 ## Hostinger DNS (required for dubai-test.blog)
 
@@ -32,4 +27,8 @@ Or switch nameservers to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`.
 
 ## Dashboard tip
 
-Vercel → Project **aviatorpass** → Settings → Git → set **Production Branch** to `aviatorpass` (API cannot change this field; ignore-build already blocks `main`).
+Vercel → Project **aviatorpass** → Settings → Git → set **Production Branch** to `aviatorpass` (API cannot change this field).
+
+## Env
+
+Use `.env.production.example` / `.env.staging.example` for AviatorPass. Data stores are `.data/aep-*.json` (never marketplace auth stores).
