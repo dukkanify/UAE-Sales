@@ -37,6 +37,7 @@ import {
   validateOtpToken,
 } from "@/services/auth/otp-service";
 import { ensureSuperAdminSeeded } from "@/services/auth/seed";
+import { ensurePlatformDemoEnvironment } from "@/services/demo/platform-demo-seed";
 import {
   maxAllowedSessions,
   revokeExcessSessions,
@@ -278,8 +279,11 @@ export async function requestOtp(input: {
   }>
 > {
   ensureSuperAdminSeeded();
-  // CI / local demo: ensure student.one etc. exist before login OTP.
-  if (demoOtpEnabled()) ensureDemoUsersSeeded();
+  // CI / local demo: ensure permanent demo accounts + sample LMS data before login OTP.
+  if (demoOtpEnabled()) {
+    ensureDemoUsersSeeded();
+    ensurePlatformDemoEnvironment();
+  }
 
   const email = sanitizeEmail(input.email);
   const existing = findUserByEmail(email);
