@@ -25,11 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  analyticsFetch,
-  analyticsJson,
-  buildAnalyticsQuery,
-} from "@/features/analytics/lib/api";
+import { analyticsFetch, analyticsJson, buildAnalyticsQuery } from "@/features/analytics/lib/api";
 import type {
   AnalyticsScope,
   ChartSeries,
@@ -84,9 +80,7 @@ function AnalyticsHubView({
   defaultScope = "executive",
   allowedScopes,
 }: AnalyticsHubViewProps) {
-  const [scopes, setScopes] = React.useState<AnalyticsScope[]>(
-    allowedScopes ?? [defaultScope],
-  );
+  const [scopes, setScopes] = React.useState<AnalyticsScope[]>(allowedScopes ?? [defaultScope]);
   const [scope, setScope] = React.useState<AnalyticsScope>(defaultScope);
   const [dateFrom, setDateFrom] = React.useState("");
   const [dateTo, setDateTo] = React.useState("");
@@ -174,7 +168,10 @@ function AnalyticsHubView({
       name: scheduleName,
       scope,
       frequency,
-      recipients: recipients.split(",").map((s) => s.trim()).filter(Boolean),
+      recipients: recipients
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
       filters,
     });
     if (!result.success) {
@@ -255,9 +252,7 @@ function AnalyticsHubView({
             onClick={() => setScope(s)}
           >
             {SCOPE_LABELS[s]}
-            {prefs?.favoriteDashboardIds.includes(s) ? (
-              <Pin className="ms-1 size-3" />
-            ) : null}
+            {prefs?.favoriteDashboardIds.includes(s) ? <Pin className="ms-1 size-3" /> : null}
           </Button>
         ))}
         <Button size="sm" variant="ghost" onClick={() => void favoriteScope()}>
@@ -323,8 +318,8 @@ function AnalyticsHubView({
           <CardHeader>
             <CardTitle className="text-base">Course analytics</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-x-auto">
-            <table className="w-full text-sm">
+          <CardContent className="table-scroll">
+            <table className="w-full min-w-[36rem] text-sm">
               <thead>
                 <tr className="border-b text-start text-muted-foreground">
                   <th className="py-2 pe-3 text-start">Course</th>
@@ -432,7 +427,8 @@ function AnalyticsHubView({
                 <div key={s.id} className="rounded-lg border px-3 py-2 text-sm">
                   <p className="font-medium">{s.name}</p>
                   <p className="text-muted-foreground">
-                    {s.frequency} · next {s.nextRunAt ? new Date(s.nextRunAt).toLocaleString() : "—"}
+                    {s.frequency} · next{" "}
+                    {s.nextRunAt ? new Date(s.nextRunAt).toLocaleString() : "—"}
                   </p>
                 </div>
               ))}
@@ -458,7 +454,9 @@ function AnalyticsHubView({
             </Button>
           ))}
           {!prefs?.widgets.length ? (
-            <p className="text-sm text-muted-foreground">Default widgets will appear after first load.</p>
+            <p className="text-sm text-muted-foreground">
+              Default widgets will appear after first load.
+            </p>
           ) : null}
           {visibleWidgets.length ? (
             <p className="w-full text-xs text-muted-foreground">
@@ -483,9 +481,7 @@ function AnalyticsHubView({
               </span>
             </div>
           ))}
-          {!history.length ? (
-            <p className="text-muted-foreground">No exports yet.</p>
-          ) : null}
+          {!history.length ? <p className="text-muted-foreground">No exports yet.</p> : null}
         </CardContent>
       </Card>
     </div>

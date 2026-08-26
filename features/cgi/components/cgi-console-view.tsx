@@ -129,8 +129,8 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
         <p className="text-sm text-muted-foreground">
           Sets the default opening subject for new ATPL student plans.
         </p>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>First subject</Label>
             <Select value={firstSubjectCourseId} onValueChange={setFirstSubjectCourseId}>
               <SelectTrigger>
@@ -165,8 +165,8 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
         <p className="text-sm text-muted-foreground">
           Assign the ATPL subject order for a student and unlock the opening subject.
         </p>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Student</Label>
             <Select value={studentId} onValueChange={setStudentId}>
               <SelectTrigger>
@@ -181,7 +181,7 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[220px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>First subject</Label>
             <Select value={studentFirstSubject} onValueChange={setStudentFirstSubject}>
               <SelectTrigger>
@@ -231,8 +231,8 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-tight">Change instructor</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Subject</Label>
             <Select value={changeCourseId} onValueChange={setChangeCourseId}>
               <SelectTrigger>
@@ -247,7 +247,7 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[220px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Instructor</Label>
             <Select value={changeInstructorId} onValueChange={setChangeInstructorId}>
               <SelectTrigger>
@@ -281,12 +281,12 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-tight">Distribute lecture</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[180px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Title</Label>
             <Input value={lectureTitle} onChange={(e) => setLectureTitle(e.target.value)} />
           </div>
-          <div className="min-w-[200px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Subject</Label>
             <Select value={lectureCourseId} onValueChange={setLectureCourseId}>
               <SelectTrigger>
@@ -301,7 +301,7 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[200px] space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Instructor</Label>
             <Select value={lectureInstructorId} onValueChange={setLectureInstructorId}>
               <SelectTrigger>
@@ -372,8 +372,8 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold tracking-tight">Follow-up note</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[220px] space-y-1.5">
+        <div className="form-row-responsive">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Student</Label>
             <Select value={noteTarget} onValueChange={setNoteTarget}>
               <SelectTrigger>
@@ -388,7 +388,7 @@ export function CgiConsoleView({ initial }: { initial: Snapshot }) {
               </SelectContent>
             </Select>
           </div>
-          <div className="min-w-[280px] flex-1 space-y-1.5">
+          <div className="min-w-0 w-full sm:w-auto sm:min-w-[180px] space-y-1.5">
             <Label>Note</Label>
             <Textarea value={noteBody} onChange={(e) => setNoteBody(e.target.value)} rows={2} />
           </div>

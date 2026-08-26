@@ -10,13 +10,7 @@ interface PageHeaderProps {
   className?: string;
 }
 
-function PageHeader({
-  title,
-  description,
-  breadcrumbs,
-  actions,
-  className,
-}: PageHeaderProps) {
+function PageHeader({ title, description, breadcrumbs, actions, className }: PageHeaderProps) {
   return (
     <div className={cn("mb-8", className)}>
       {breadcrumbs ? <Breadcrumb items={breadcrumbs} /> : null}
@@ -31,7 +25,11 @@ function PageHeader({
             </p>
           ) : null}
         </div>
-        {actions ? <div className="flex shrink-0 items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex w-full min-w-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
+            {actions}
+          </div>
+        ) : null}
       </div>
     </div>
   );

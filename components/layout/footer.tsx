@@ -30,7 +30,12 @@ function Footer() {
       <div className="container-app relative z-10">
         <div className="site-footer-top">
           <div className="site-footer-brand">
-            <BrandLogo variant="text" href={routes.home} />
+            {/* Single official lockup — same PNG used in the marketing header */}
+            <BrandLogo
+              variant="dark"
+              href={routes.home}
+              className="[&_img]:h-10 [&_img]:max-w-[240px] sm:[&_img]:h-11 sm:[&_img]:max-w-[280px]"
+            />
             <p className="site-footer-tagline">
               {brandingConfig.tagline}. Premium live ATPL training —{" "}
               {siteStatic.locations.join(" · ")}.

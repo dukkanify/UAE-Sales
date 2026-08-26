@@ -186,7 +186,7 @@ function FloatingAiAssistant() {
       <motion.button
         type="button"
         aria-label="Open AI assistant"
-        className="fixed bottom-5 end-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] end-[max(1.25rem,env(safe-area-inset-right,0px))] z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.96 }}
         onClick={() => {
@@ -204,7 +204,7 @@ function FloatingAiAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 12, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-5 end-5 z-50 flex h-[min(640px,calc(100vh-2.5rem))] w-[min(420px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
+            className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] end-[max(1.25rem,env(safe-area-inset-right,0px))] z-50 flex h-[min(640px,calc(100dvh-2.5rem))] w-[min(420px,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
           >
             <div className="flex items-center gap-2 border-b bg-gradient-to-r from-primary/10 via-card to-accent/10 px-4 py-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">

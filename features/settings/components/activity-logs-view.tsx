@@ -26,7 +26,9 @@ function ActivityLogsView() {
     void (async () => {
       setLoading(true);
       const [activityRes, auditRes] = await Promise.all([
-        authFetch<PaginatedResponse<ActivityLogRecord>>("/api/admin/activity-logs?page=1&pageSize=50"),
+        authFetch<PaginatedResponse<ActivityLogRecord>>(
+          "/api/admin/activity-logs?page=1&pageSize=50",
+        ),
         authFetch<PaginatedResponse<AuditLogRecord>>("/api/admin/audit-logs?page=1&pageSize=50"),
       ]);
       setActivity(activityRes.data?.data ?? []);
@@ -53,8 +55,8 @@ function ActivityLogsView() {
         </TabsList>
 
         <TabsContent value="activity" className="mt-4">
-          <div className="rounded-xl border border-border bg-card shadow-soft">
-            <Table>
+          <div className="table-scroll rounded-xl border border-border bg-card shadow-soft">
+            <Table className="min-w-[36rem]">
               <TableHeader>
                 <TableRow>
                   <TableHead>When</TableHead>
@@ -101,8 +103,8 @@ function ActivityLogsView() {
         </TabsContent>
 
         <TabsContent value="audit" className="mt-4">
-          <div className="rounded-xl border border-border bg-card shadow-soft">
-            <Table>
+          <div className="table-scroll rounded-xl border border-border bg-card shadow-soft">
+            <Table className="min-w-[36rem]">
               <TableHeader>
                 <TableRow>
                   <TableHead>When</TableHead>

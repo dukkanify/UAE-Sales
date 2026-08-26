@@ -26,8 +26,7 @@ const SheetOverlay = React.forwardRef<
 ));
 SheetOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
+interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
   side?: "left" | "right";
 }
 
@@ -42,9 +41,9 @@ const SheetContent = React.forwardRef<
       className={cn(
         "fixed z-50 h-full gap-4 bg-card shadow-medium transition ease-in-out data-[state=closed]:duration-200 data-[state=open]:duration-300 data-[state=open]:animate-in data-[state=closed]:animate-out",
         side === "left" &&
-          "inset-y-0 left-0 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+          "inset-y-0 left-0 max-w-[min(20rem,calc(100vw-2rem))] data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]",
         side === "right" &&
-          "inset-y-0 right-0 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+          "inset-y-0 right-0 max-w-[min(20rem,calc(100vw-2rem))] data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]",
         className,
       )}
       {...props}
