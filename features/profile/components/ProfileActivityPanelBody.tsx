@@ -34,6 +34,9 @@ export function ProfileActivityPanelBody({
                 الوظائف، الحجوزات، الخدمات، الطلبات، والإعلانات — من الخادم مباشرة.
               </p>
             </div>
+            <Link className="text-xs font-semibold text-primary hover:underline" href="/activities">
+              صفحة النشاطات
+            </Link>
             <Link className="text-xs font-semibold text-primary hover:underline" href="/notifications">
               الإشعارات
             </Link>

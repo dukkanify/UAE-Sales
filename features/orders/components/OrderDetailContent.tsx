@@ -44,6 +44,8 @@ export function OrderDetailContent({
   const [proofUrlsText, setProofUrlsText] = useState("");
   const [proofNote, setProofNote] = useState("");
   const [proofFiles, setProofFiles] = useState<FileList | null>(null);
+  const [disputeWindowDays, setDisputeWindowDays] = useState<number | null>(null);
+  const [nowMs] = useState(() => Date.now());
   const [sessionUserId] = useState(() => getSessionUser()?.id ?? null);
   const [ratingInfo, setRatingInfo] = useState<{
     canRate: boolean;
@@ -84,6 +86,23 @@ export function OrderDetailContent({
       cancelled = true;
     };
   }, [order, orderId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/site-settings")
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        const days = Number(data?.disputeWindowDays ?? 7);
+        setDisputeWindowDays(Number.isFinite(days) && days > 0 ? days : 7);
+      })
+      .catch(() => {
+        if (!cancelled) setDisputeWindowDays(7);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleConfirmReceived() {
     const user = getSessionUser();
@@ -280,6 +299,24 @@ export function OrderDetailContent({
     Boolean(order.sellerProofAt) ||
     (order.sellerProofUrls && order.sellerProofUrls.length > 0);
 
+  let disputeWindowLabel = "";
+  if (canDispute && disputeWindowDays != null) {
+    const start = new Date(order.paidAt ?? order.createdAt).getTime();
+    const ends = start + disputeWindowDays * 24 * 60 * 60 * 1000;
+    const remainingMs = ends - nowMs;
+    if (remainingMs <= 0) {
+      disputeWindowLabel = "انتهت مهلة فتح النزاع لهذا الطلب.";
+    } else {
+      const hours = Math.ceil(remainingMs / (60 * 60 * 1000));
+      disputeWindowLabel =
+        hours <= 24
+          ? `تبقّى أقل من ${hours} ساعة لفتح نزاع.`
+          : hours <= 48
+            ? `تبقّى حوالي ${hours} ساعة لفتح نزاع (تنبيه 48 ساعة).`
+            : `مهلة النزاع: حتى ${new Date(ends).toLocaleString("ar-AE")}.`;
+    }
+  }
+
   return (
     <section className="app-container page-padding">
       <PageHero
@@ -298,10 +335,13 @@ export function OrderDetailContent({
         {error ? <FormMessage variant="error">{error}</FormMessage> : null}
 
         <Card className="p-6" variant="flat">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="muted">{statusLabels[order.status]}</Badge>
-            <Badge variant="escrow">{order.escrowStatus}</Badge>
-          </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="muted">{statusLabels[order.status]}</Badge>
+              <Badge variant="escrow">{order.escrowStatus}</Badge>
+            </div>
+            {disputeWindowLabel ? (
+              <p className="mt-3 text-xs text-muted">{disputeWindowLabel}</p>
+            ) : null}
           <div className="mt-4 grid gap-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted">البائع</span>
