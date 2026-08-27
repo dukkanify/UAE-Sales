@@ -12,7 +12,7 @@ Product flows (register, listings, checkout, orders, disputes, admin, support, e
 | Emails | `RESEND_API_KEY`, verified `EMAIL_FROM_ADDRESS=no-reply@sooqna.site` | In-app notifications still work; Resend mail is logged as failed |
 | Canonical URLs | `NEXT_PUBLIC_APP_URL=https://sooqna.site` | Email links may point at localhost |
 | Session HMAC | `SESSION_SECRET` (or `NEXTAUTH_SECRET`) | Weak/default signing if unset |
-| Dispute cron | `CRON_SECRET` + scheduler hitting `/api/cron/dispute-reminders` | 48h/24h/expired reminders will not run |
+| Dispute cron | `CRON_SECRET` + Vercel Cron (`vercel.json` hourly → `/api/cron/dispute-reminders`) | Without secret Production returns `CRON_SECRET_REQUIRED` (fail-closed) |
 
 See [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 
