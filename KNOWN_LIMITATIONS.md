@@ -28,3 +28,7 @@ See [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 | **RBAC** | Module-level flags (not full View/Add/Edit/Delete/Approve/Export matrix). Super Admin empty permissions; Sub Admin assigned modules; Save Permissions required. |
 | **UAE PASS** | Hidden until `NEXT_PUBLIC_ENABLE_UAE_PASS=true` |
 | **Automated tests** | None — validate with `npm run lint`, `npm run build`, and browser QA |
+
+## Production redeploy note (2026-08-27)
+
+After changing Vercel Production env vars for project **sooqna** (e.g. `CRON_SECRET`), Production must be redeployed so https://sooqna.site picks up the new runtime. Env var edits alone do not update the active deployment.
