@@ -1,33 +1,36 @@
 import type { QuoteRequest } from "@/types/domain/quote-request";
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { createPayloadCollectionStore } from "@/services/db/durable-json-collection";
 
-const FILE = "quote-requests.json";
+const store = createPayloadCollectionStore<QuoteRequest>({
+  table: "quote_requests",
+  fileName: "sooqna-quote-requests.json",
+});
 
 const DUPLICATE_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function getQuoteRequestsForProvider(
   providerId: string,
 ): Promise<QuoteRequest[]> {
-  const all = await loadCollection<QuoteRequest>(FILE);
+  const all = await store.listAll();
   return all.filter((item) => item.providerId === providerId);
 }
 
 export async function getQuoteRequestsForUser(
   userId: string,
 ): Promise<QuoteRequest[]> {
-  const all = await loadCollection<QuoteRequest>(FILE);
+  const all = await store.listAll();
   return all.filter((item) => item.requesterId === userId);
 }
 
 export async function getAllQuoteRequests(): Promise<QuoteRequest[]> {
-  return loadCollection<QuoteRequest>(FILE);
+  return store.listAll();
 }
 
 export async function findRecentQuoteRequest(
   requesterId: string,
   listingId: string,
 ): Promise<QuoteRequest | undefined> {
-  const all = await loadCollection<QuoteRequest>(FILE);
+  const all = await store.listAll();
   const cutoff = Date.now() - DUPLICATE_WINDOW_MS;
   return all.find(
     (item) =>
@@ -40,7 +43,6 @@ export async function findRecentQuoteRequest(
 export async function createQuoteRequest(
   input: Omit<QuoteRequest, "id" | "status" | "createdAt">,
 ): Promise<QuoteRequest> {
-  const all = await loadCollection<QuoteRequest>(FILE);
   const now = new Date().toISOString();
   const request: QuoteRequest = {
     ...input,
@@ -49,8 +51,7 @@ export async function createQuoteRequest(
     createdAt: now,
     updatedAt: now,
   };
-  all.unshift(request);
-  await saveCollection(FILE, all);
+  await store.upsert(request);
   return request;
 }
 
@@ -58,10 +59,10 @@ export async function updateQuoteRequestStatus(
   id: string,
   status: QuoteRequest["status"],
 ): Promise<QuoteRequest | undefined> {
-  const all = await loadCollection<QuoteRequest>(FILE);
-  const index = all.findIndex((item) => item.id === id);
-  if (index < 0) return undefined;
-  all[index] = { ...all[index], status, updatedAt: new Date().toISOString() };
-  await saveCollection(FILE, all);
-  return all[index];
+  const all = await store.listAll();
+  const current = all.find((item) => item.id === id);
+  if (!current) return undefined;
+  const next = { ...current, status, updatedAt: new Date().toISOString() };
+  await store.upsert(next);
+  return next;
 }

@@ -1,8 +1,11 @@
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { createPayloadCollectionStore } from "@/services/db/durable-json-collection";
 import { getAllOrders } from "@/services/payments/order-store";
 import type { AdminDisputePatch, AdminDisputeRecord } from "@/types/domain/admin";
 
-const FILE = "disputes.json";
+const store = createPayloadCollectionStore<AdminDisputeRecord>({
+  table: "marketplace_disputes",
+  fileName: "sooqna-disputes.json",
+});
 
 function isPlaceholderDispute(row: AdminDisputeRecord): boolean {
   return (
@@ -12,12 +15,10 @@ function isPlaceholderDispute(row: AdminDisputeRecord): boolean {
 }
 
 async function loadDisputes(): Promise<AdminDisputeRecord[]> {
-  const stored = await loadCollection<AdminDisputeRecord>(FILE).catch(
-    () => [] as AdminDisputeRecord[],
-  );
+  const stored = await store.listAll();
   const live = stored.filter((row) => !isPlaceholderDispute(row));
   if (live.length !== stored.length) {
-    await saveCollection(FILE, live);
+    await store.replaceAll(live);
   }
   return live.map((row) => ({ ...row }));
 }
@@ -53,12 +54,10 @@ export async function createDispute(input: {
         : undefined,
   };
 
-  disputes.unshift(record);
-  await saveCollection(FILE, disputes);
+  await store.upsert(record);
   return { ...record };
 }
 
-/** Merge persisted disputes with live disputed orders from the site. */
 export async function getAdminDisputes(): Promise<AdminDisputeRecord[]> {
   const [stored, orders] = await Promise.all([loadDisputes(), getAllOrders()]);
   const byOrder = new Map(stored.map((row) => [row.orderId, row]));
@@ -90,11 +89,11 @@ export async function patchAdminDispute(
   patch: AdminDisputePatch,
 ): Promise<AdminDisputeRecord | undefined> {
   const disputes = await getAdminDisputes();
-  const index = disputes.findIndex((item) => item.id === id);
-  if (index < 0) return undefined;
-  disputes[index] = { ...disputes[index], ...patch };
-  await saveCollection(FILE, disputes);
-  return { ...disputes[index] };
+  const current = disputes.find((item) => item.id === id);
+  if (!current) return undefined;
+  const next = { ...current, ...patch };
+  await store.upsert(next);
+  return { ...next };
 }
 
 export async function getOpenDisputeCount(): Promise<number> {

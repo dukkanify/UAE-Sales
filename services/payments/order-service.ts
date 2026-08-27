@@ -555,6 +555,7 @@ export async function submitSellerProof(
   sellerId: string,
   proofUrls: string[],
   note?: string,
+  items?: Array<{ storageUrl: string; kind?: "photo" | "video" | "document" }>,
 ): Promise<Order | undefined> {
   const order = await getOrderById(orderId);
   if (!order) return undefined;
@@ -568,21 +569,55 @@ export async function submitSellerProof(
     throw new Error("INVALID_STATUS");
   }
 
-  const urls = proofUrls.map((url) => url.trim()).filter(Boolean);
-  if (urls.length === 0) {
+  const { replaceSellerEvidenceSet } = await import(
+    "@/services/payments/escrow-evidence-store"
+  );
+
+  const evidenceItems =
+    items && items.length > 0
+      ? items.map((item) => ({
+          storageUrl: item.storageUrl,
+          kind: item.kind ?? (item.storageUrl.includes("video") ? "video" : "photo"),
+        }))
+      : proofUrls.map((url) => ({
+          storageUrl: url,
+          kind: (url.includes("video") || /\.(mp4|webm)(\?|$)/i.test(url)
+            ? "video"
+            : "photo") as "photo" | "video",
+        }));
+
+  if (evidenceItems.length === 0) {
     throw new Error("INVALID_PROOF");
   }
 
+  let evidence;
+  try {
+    evidence = await replaceSellerEvidenceSet({
+      orderId,
+      listingId: order.listingId,
+      transactionId: order.stripePaymentIntentId ?? order.id,
+      uploadedBy: sellerId,
+      items: evidenceItems,
+      note,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "INVALID_PROOF";
+    throw new Error(message === "EVIDENCE_REQUIRED" ? "INVALID_PROOF" : message);
+  }
+
+  const urls = evidence.map((item) => item.storageUrl);
   const updated = await updateOrder(
     orderId,
     {
       sellerProofUrls: urls,
       sellerProofNote: note?.trim() || undefined,
       sellerProofAt: new Date().toISOString(),
+      status: order.status === "paid_held_in_escrow" ? "delivered" : order.status,
     },
     {
       type: "seller_proof_submitted",
-      message: "رفع البائع إثبات التسليم / المطابقة",
+      message: "رفع البائع إثبات التسليم / المطابقة (مضمون)",
+      metadata: { evidenceCount: String(evidence.length) },
     },
   );
 
@@ -595,6 +630,8 @@ export async function submitSellerProof(
       type: "seller_proof",
       title: "إثبات من البائع",
       body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+      href: `/orders/${order.id}`,
+      dedupeKey: `seller_proof:${order.id}:${updated.sellerProofAt}`,
     });
     void emailOrderStatusToUser({
       userId: order.buyerId,
@@ -632,6 +669,15 @@ export async function confirmBuyerMatch(
     return order;
   }
 
+  const { saveBuyerEvidenceConfirmation } = await import(
+    "@/services/payments/escrow-evidence-store"
+  );
+  await saveBuyerEvidenceConfirmation({
+    orderId,
+    buyerId,
+    confirmed: true,
+  });
+
   const matchAt = new Date().toISOString();
   const released = await releaseEscrowToSeller(
     order,
@@ -649,6 +695,8 @@ export async function confirmBuyerMatch(
       type: "buyer_match",
       title: "تم تأكيد المطابقة",
       body: `تم تأكيد مطابقة طلب «${order.listingTitle}» وتحرير الضمان.`,
+      href: `/orders/${order.id}`,
+      dedupeKey: `buyer_match:${order.id}`,
     });
   }
 

@@ -28,7 +28,7 @@ const RECEIVED_KINDS = new Set<ActivityKind>([
 const STATUS_OPTIONS: Partial<Record<ActivityKind, { value: string; label: string }[]>> = {
   job_application: [
     { value: "viewed", label: "تمت المشاهدة" },
-    { value: "shortlisted", label: "Shortlisted" },
+    { value: "shortlisted", label: "قائمة مختصرة" },
     { value: "accepted", label: "مقبول" },
     { value: "rejected", label: "مرفوض" },
   ],

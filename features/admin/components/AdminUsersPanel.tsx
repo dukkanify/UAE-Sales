@@ -12,6 +12,7 @@ import { getSessionUser } from "@/services/storage";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
+import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
 
@@ -35,11 +36,29 @@ function statusBadgeVariant(
   return "rejected";
 }
 
+function isSuperAdminRecord(user: Pick<AdminUserRecord, "role" | "adminPermissions">) {
+  return (
+    user.role === "admin" &&
+    (!user.adminPermissions || user.adminPermissions.length === 0)
+  );
+}
+
 export function AdminUsersPanel() {
   const [users, setUsers] = useState<AdminUserRecord[]>([]);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending">("all");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [draftPermissions, setDraftPermissions] = useState<
+    Record<string, AdminPermission[]>
+  >({});
+  const [message, setMessage] = useState<{
+    text: string;
+    variant: "success" | "error";
+  } | null>(null);
+  const session = getSessionUser();
+  const sessionIsSuper = Boolean(
+    session && isSuperAdminRecord({ role: session.role ?? "user", adminPermissions: session.adminPermissions }),
+  );
 
   useEffect(() => {
     const user = getSessionUser();
@@ -49,7 +68,7 @@ export function AdminUsersPanel() {
       .then((data) => {
         const nextUsers = (data.users ?? []) as AdminUserRecord[];
         setUsers(nextUsers);
-        if (nextUsers.some((user) => user.accountStatus === "pending")) {
+        if (nextUsers.some((item) => item.accountStatus === "pending")) {
           setStatusFilter("pending");
         }
       })
@@ -92,39 +111,75 @@ export function AdminUsersPanel() {
       >
     >,
   ) {
-    const session = getSessionUser();
-    if (!session) return;
     setBusyId(id);
+    setMessage(null);
     try {
       const response = await adminFetch(`/api/admin/users/${id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
       });
       const data = await response.json();
-      if (response.ok && data.user) {
+      if (!response.ok) {
+        setMessage({
+          variant: "error",
+          text:
+            data.error === "CANNOT_MODIFY_SUPER_ADMIN"
+              ? "لا يمكن لمدير فرعي تعديل مدير أعلى."
+              : data.error === "SELF_ESCALATION"
+                ? "لا يمكنك توسيع صلاحياتك بنفسك."
+                : data.message ?? "تعذر حفظ التغيير.",
+        });
+        return;
+      }
+      if (data.user) {
         setUsers((prev) =>
           prev.map((user) => (user.id === id ? data.user : user)),
         );
+        setDraftPermissions((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        if (patch.adminPermissions) {
+          setMessage({
+            variant: "success",
+            text: "تم حفظ صلاحيات المدير بنجاح.",
+          });
+        }
       }
     } finally {
       setBusyId(null);
     }
   }
 
-  function togglePermission(user: AdminUserRecord, permission: AdminPermission) {
-    const current = user.adminPermissions ?? [];
+  function draftFor(user: AdminUserRecord): AdminPermission[] {
+    return draftPermissions[user.id] ?? user.adminPermissions ?? [];
+  }
+
+  function toggleDraftPermission(user: AdminUserRecord, permission: AdminPermission) {
+    const current = draftFor(user);
     const has = current.includes(permission);
     const next = has
       ? current.filter((item) => item !== permission)
       : [...current, permission];
-    void patchUser(user.id, { adminPermissions: next });
+    setDraftPermissions((prev) => ({ ...prev, [user.id]: next }));
+  }
+
+  function hasUnsavedPermissions(user: AdminUserRecord): boolean {
+    const draft = draftPermissions[user.id];
+    if (!draft) return false;
+    const saved = user.adminPermissions ?? [];
+    if (draft.length !== saved.length) return true;
+    return draft.some((item) => !saved.includes(item));
   }
 
   return (
     <div className="grid gap-4">
+      {message ? (
+        <FormMessage variant={message.variant}>{message.text}</FormMessage>
+      ) : null}
+
       <Card className="p-4" variant="flat">
         <div className="flex flex-wrap items-end gap-3">
           <div className="min-w-[220px] flex-1">
@@ -176,6 +231,11 @@ export function AdminUsersPanel() {
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Badge variant="muted">{roleLabels[user.role]}</Badge>
+                  {user.role === "admin" ? (
+                    <Badge variant={isSuperAdminRecord(user) ? "verified" : "pending"}>
+                      {isSuperAdminRecord(user) ? "مدير أعلى" : "مدير فرعي"}
+                    </Badge>
+                  ) : null}
                   <Badge variant={statusBadgeVariant(user.accountStatus)}>
                     {statusLabels[user.accountStatus]}
                   </Badge>
@@ -240,29 +300,53 @@ export function AdminUsersPanel() {
                   إعادة تفعيل
                 </Button>
               )}
-              {user.role !== "admin" ? (
+              {user.role !== "admin" && sessionIsSuper ? (
                 <Button
                   loading={busyId === user.id}
-                  onClick={() => patchUser(user.id, { role: "admin" })}
+                  onClick={() =>
+                    patchUser(user.id, {
+                      role: "admin",
+                      adminPermissions: ["listings", "orders"],
+                    })
+                  }
                   size="sm"
                   variant="secondary"
                 >
-                  ترقية لمدير
+                  إنشاء مدير فرعي
+                </Button>
+              ) : null}
+              {user.role === "admin" &&
+              !isSuperAdminRecord(user) &&
+              sessionIsSuper &&
+              user.id !== session?.id ? (
+                <Button
+                  loading={busyId === user.id}
+                  onClick={() =>
+                    patchUser(user.id, {
+                      role: "user",
+                      adminPermissions: [],
+                    })
+                  }
+                  size="sm"
+                  variant="ghost"
+                >
+                  إلغاء صلاحية المدير
                 </Button>
               ) : null}
             </div>
-            {user.role === "admin" ? (
+            {user.role === "admin" &&
+            sessionIsSuper &&
+            !(isSuperAdminRecord(user) && user.id !== session?.id) ? (
               <div className="mt-4 rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 p-3">
                 <p className="text-xs font-semibold text-ink">
-                  صلاحيات الإدارة
+                  صلاحيات الإدارة (مدير فرعي)
                 </p>
                 <p className="mt-1 text-[11px] text-muted">
-                  فارغة = وصول كامل. فعّل صلاحيات محددة لتقييد الوصول.
+                  عدّل الصلاحيات ثم اضغط حفظ. لا يتم الحفظ تلقائياً.
                 </p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-2">
                   {ALL_ADMIN_PERMISSIONS.map((permission) => {
-                    const checked =
-                      (user.adminPermissions ?? []).includes(permission);
+                    const checked = draftFor(user).includes(permission);
                     return (
                       <label
                         key={permission}
@@ -270,8 +354,11 @@ export function AdminUsersPanel() {
                       >
                         <input
                           checked={checked}
-                          disabled={busyId === user.id}
-                          onChange={() => togglePermission(user, permission)}
+                          disabled={
+                            busyId === user.id ||
+                            (user.id === session?.id && !sessionIsSuper)
+                          }
+                          onChange={() => toggleDraftPermission(user, permission)}
                           type="checkbox"
                         />
                         {ADMIN_PERMISSION_LABELS[permission]}
@@ -279,7 +366,45 @@ export function AdminUsersPanel() {
                     );
                   })}
                 </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    disabled={!hasUnsavedPermissions(user)}
+                    loading={busyId === user.id}
+                    onClick={() =>
+                      patchUser(user.id, {
+                        adminPermissions: draftFor(user),
+                      })
+                    }
+                    size="sm"
+                    type="button"
+                  >
+                    حفظ الصلاحيات
+                  </Button>
+                  {hasUnsavedPermissions(user) ? (
+                    <Button
+                      onClick={() =>
+                        setDraftPermissions((prev) => {
+                          const next = { ...prev };
+                          delete next[user.id];
+                          return next;
+                        })
+                      }
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                    >
+                      إلغاء
+                    </Button>
+                  ) : null}
+                </div>
               </div>
+            ) : null}
+            {user.role === "admin" &&
+            isSuperAdminRecord(user) &&
+            user.id !== session?.id ? (
+              <p className="mt-3 text-xs text-muted">
+                مدير أعلى — لا يمكن لمدير فرعي تعديل صلاحياته.
+              </p>
             ) : null}
           </Card>
         ))

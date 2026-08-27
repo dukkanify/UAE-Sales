@@ -1,7 +1,10 @@
 import type { Order, OrderAuditEvent, OrderStatus } from "@/types/domain/order";
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { createPayloadCollectionStore } from "@/services/db/durable-json-collection";
 
-const ORDERS_FILE = "orders.json";
+const store = createPayloadCollectionStore<Order>({
+  table: "marketplace_orders",
+  fileName: "sooqna-orders.json",
+});
 
 function createAuditEvent(
   type: string,
@@ -18,7 +21,7 @@ function createAuditEvent(
 }
 
 export async function getAllOrders(): Promise<Order[]> {
-  return loadCollection<Order>(ORDERS_FILE);
+  return store.listAll();
 }
 
 export async function getOrderById(orderId: string): Promise<Order | undefined> {
@@ -72,7 +75,6 @@ export async function findPendingOrder(
 export async function createOrder(
   input: Omit<Order, "auditLog" | "createdAt" | "updatedAt">,
 ): Promise<Order> {
-  const orders = await getAllOrders();
   const now = new Date().toISOString();
   const order: Order = {
     ...input,
@@ -84,8 +86,7 @@ export async function createOrder(
       }),
     ],
   };
-  orders.unshift(order);
-  await saveCollection(ORDERS_FILE, orders);
+  await store.upsert(order);
   return order;
 }
 
@@ -94,11 +95,9 @@ export async function updateOrder(
   patch: Partial<Order>,
   audit?: { type: string; message: string; metadata?: Record<string, string> },
 ): Promise<Order | undefined> {
-  const orders = await getAllOrders();
-  const index = orders.findIndex((order) => order.id === orderId);
-  if (index === -1) return undefined;
+  const existing = await getOrderById(orderId);
+  if (!existing) return undefined;
 
-  const existing = orders[index];
   const updated: Order = {
     ...existing,
     ...patch,
@@ -107,8 +106,7 @@ export async function updateOrder(
       ? [...existing.auditLog, createAuditEvent(audit.type, audit.message, audit.metadata)]
       : existing.auditLog,
   };
-  orders[index] = updated;
-  await saveCollection(ORDERS_FILE, orders);
+  await store.upsert(updated);
   return updated;
 }
 
@@ -122,11 +120,11 @@ export function isValidOrderTransition(
 ): boolean {
   const allowed: Record<OrderStatus, OrderStatus[]> = {
     pending_payment: ["paid_held_in_escrow", "refunded"],
-    paid_held_in_escrow: ["delivered", "confirmed", "disputed", "refunded"],
+    paid_held_in_escrow: ["delivered", "disputed", "refunded", "confirmed"],
     delivered: ["confirmed", "disputed", "refunded"],
     confirmed: ["released", "disputed", "refunded"],
-    released: ["refunded"],
-    disputed: ["refunded", "released"],
+    released: [],
+    disputed: ["released", "refunded"],
     refunded: [],
   };
   return allowed[current]?.includes(next) ?? false;
