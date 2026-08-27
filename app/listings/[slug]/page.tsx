@@ -9,6 +9,7 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
 import { getListingBySlug, getRelatedListings } from "@/services/listings";
+import { getValidSessionUser } from "@/services/auth/require-session";
 import { listingDescription, listingTitle } from "@/shared/i18n/listing-copy";
 import { getRequestLocale } from "@/shared/i18n/locale";
 import { tx } from "@/shared/i18n/tx";
@@ -23,7 +24,9 @@ export async function generateStaticParams() {
     getListings(),
     getMyListings(),
   ]);
-  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
+  return [...listings, ...userListings]
+    .filter((listing) => listing.status === "active")
+    .map((listing) => ({ slug: listing.slug }));
 }
 
 export async function generateMetadata({
@@ -60,6 +63,13 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
   if (!listing) notFound();
+
+  const session = await getValidSessionUser();
+  const isOwner = Boolean(session && listing.seller.id === session.id);
+  const isAdmin = session?.role === "admin";
+  if (listing.status !== "active" && !isOwner && !isAdmin) {
+    notFound();
+  }
 
   const locale = await getRequestLocale();
   const [categories, relatedListings] = await Promise.all([

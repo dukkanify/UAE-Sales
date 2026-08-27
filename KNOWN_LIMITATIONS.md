@@ -18,8 +18,9 @@ See [STRIPE_GO_LIVE.md](./STRIPE_GO_LIVE.md).
 
 | Area | Limitation |
 |------|------------|
-| **Data storage** | Listings/orders still use file `data-store` (Vercel `/tmp`). **User accounts** use Postgres (`DATABASE_URL`) in production, or `.data/sooqna-auth-users.json` locally. Cookie/localStorage proofs are not the source of truth. |
-| **Seller payouts** | No Stripe Connect yet — escrow is an internal ledger; payouts are operational from the platform Stripe balance |
+| **Data storage** | **Users, OTP, notifications, listings catalog, featured payments** prefer Postgres (`DATABASE_URL`). Remaining orders/disputes/chat still use file `data-store` (Vercel `/tmp`). Cookie/localStorage proofs are not the source of truth. |
+| **Sessions** | Signed HMAC session cookies (`SESSION_SECRET` / `NEXTAUTH_SECRET`). Client cannot forge profiles via `/api/auth/session`. |
+| **Seller payouts** | Stripe Connect onboarding available from `/admin/stripe`; seller marketplace payouts still operational pending full Connect payout wiring |
 | **Images** | Client-side compression / data URLs; no cloud object storage |
 | **UAE PASS** | Hidden until `NEXT_PUBLIC_ENABLE_UAE_PASS=true` |
 | **Automated tests** | None — validate with `npm run lint`, `npm run build`, and browser QA |

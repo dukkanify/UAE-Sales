@@ -88,7 +88,7 @@ export function LoginForm({ variant = "default" }: LoginFormProps) {
       }
 
       setSessionUser(data.user as UserProfile);
-      await persistSessionCookie(data.user);
+      await persistSessionCookie();
       await syncFavoritesAfterLogin(data.user.id);
       trackAuthEventClient("login_verified");
       router.push(getSafeNextPath(data.redirectTo ?? nextParam, "/profile"));

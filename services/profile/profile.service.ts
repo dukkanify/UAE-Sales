@@ -1,15 +1,15 @@
 import { redirect } from "next/navigation";
 import type { UserProfile } from "@/types";
-import { getSessionFromCookie } from "@/services/auth/session-cookie";
+import { getValidSessionUser } from "@/services/auth/require-session";
 
-/** Session user from httpOnly cookie — null when guest. */
+/** Session user from signed cookie + DB — null when guest. */
 export async function getCurrentUser(): Promise<UserProfile | null> {
-  return getSessionFromCookie();
+  return getValidSessionUser();
 }
 
 /** Require a logged-in user or redirect to login. */
 export async function requireCurrentUser(nextPath: string): Promise<UserProfile> {
-  const user = await getSessionFromCookie();
+  const user = await getValidSessionUser();
   if (!user) {
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
@@ -21,7 +21,7 @@ export async function updateUserProfileDraft(
   payload: Partial<UserProfile>,
 ): Promise<UserProfile | null> {
   void payload;
-  const session = await getSessionFromCookie();
+  const session = await getValidSessionUser();
   if (!session || session.id !== userId) return session;
   return session;
 }

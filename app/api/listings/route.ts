@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import { getSessionFromCookie } from "@/services/auth/session-cookie";
+import {
+  getValidSessionUser,
+} from "@/services/auth/require-session";
 import { isMarketplaceAccountReady } from "@/services/auth/account-access";
 import { notifyListingSubmitted } from "@/services/listings/listing-notifications";
 import { getListingById, upsertListing } from "@/services/listings/listing-store";
@@ -8,7 +10,7 @@ import type { Listing } from "@/types";
 /** Authenticated upsert used by listing create/edit forms to sync site data into the catalog store. */
 export async function POST(request: Request) {
   try {
-    const session = await getSessionFromCookie();
+    const session = await getValidSessionUser();
     if (!session) {
       return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
     }
@@ -28,8 +30,18 @@ export async function POST(request: Request) {
     }
 
     const existing = await getListingById(body.listing.id);
+    // Free listings always enter moderation; draft reserved for unpaid featured.
+    const requestedStatus = body.listing.status;
+    const safeStatus =
+      requestedStatus === "draft"
+        ? "draft"
+        : requestedStatus === "active" && existing?.status === "active"
+          ? "active"
+          : "pending_review";
+
     const listing = await upsertListing({
       ...body.listing,
+      status: safeStatus,
       seller: {
         ...body.listing.seller,
         id: session.id,
@@ -37,7 +49,7 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!existing && listing.status !== "draft") {
+    if (!existing && listing.status === "pending_review") {
       void notifyListingSubmitted(listing);
     }
 

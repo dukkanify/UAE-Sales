@@ -29,6 +29,7 @@ export async function notifyListingSubmitted(listing: Listing): Promise<void> {
         body: `إعلان «${listing.title}» قيد المراجعة وسيظهر بعد الموافقة.`,
         bodyEn: `“${listing.title}” is under review and will go live after approval.`,
         href: `/listings/${listing.slug}`,
+        dedupeKey: `listing_received:${listing.id}`,
       }),
     "listing_received in-app",
   );
@@ -50,6 +51,7 @@ export async function notifyListingApproved(listing: Listing): Promise<void> {
         body: `إعلان «${listing.title}» منشور الآن ويمكن للمشترين مشاهدته.`,
         bodyEn: `Your listing has been approved and is now live.`,
         href: `/listings/${listing.slug}`,
+        dedupeKey: `listing_approved:${listing.id}:${listing.status}`,
       }),
     "listing_approved in-app",
   );
@@ -78,6 +80,7 @@ export async function notifyListingRejected(
           ? `We could not publish “${listing.title}”: ${reason}`
           : `We could not publish “${listing.title}” in its current form. Edit it and resubmit.`,
         href: "/dashboard/listings",
+        dedupeKey: `listing_rejected:${listing.id}:${listing.postedAt ?? ""}`,
       }),
     "listing_rejected in-app",
   );
@@ -102,6 +105,7 @@ export async function notifyListingFeaturedPaid(listing: Listing): Promise<void>
         body: `تم تأكيد دفع تمييز «${listing.title}» وسيظهر في الأقسام المميزة.`,
         bodyEn: `Featured payment for “${listing.title}” is confirmed. It will appear in featured sections.`,
         href: `/listings/${listing.slug}`,
+        dedupeKey: `listing_featured:${listing.id}`,
       }),
     "listing_featured in-app",
   );

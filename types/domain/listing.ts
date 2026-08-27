@@ -113,6 +113,16 @@ export type Listing = {
   /** User-entered dynamic fields (local / new listings) */
   categorySpecs?: CategorySpecs;
   contactPhone?: string;
+  /** Shown to the seller when status is rejected. */
+  rejectionReason?: string;
+  /** Append-only status transitions for audit. */
+  statusHistory?: {
+    at: string;
+    from?: ListingStatus;
+    to: ListingStatus;
+    byUserId?: string;
+    note?: string;
+  }[];
 };
 
 export type ListingSearchFilters = {
