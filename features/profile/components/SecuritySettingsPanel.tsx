@@ -73,7 +73,7 @@ export function SecuritySettingsPanel() {
 
       if (data.user) {
         setSessionUser(data.user);
-        await persistSessionCookie(data.user);
+        await persistSessionCookie();
       }
       trackAuthEventClient("password_added");
       setMessage("تم حفظ كلمة المرور بنجاح.");

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getSessionFromCookie } from "@/services/auth/session-cookie";
+import { getValidSessionUser } from "@/services/auth/require-session";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
 import { emailChatMessage } from "@/services/email/notification-emails";
 
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: "INVALID_INPUT" }, { status: 400 });
     }
 
-    const session = await getSessionFromCookie();
+    const session = await getValidSessionUser();
     const senderId = session?.id;
     if (senderId && senderId === parsed.data.recipientUserId) {
       return NextResponse.json({ ok: true, skipped: true });

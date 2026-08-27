@@ -79,7 +79,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             };
 
             setSessionUser(updatedUser);
-            void persistSessionCookie(updatedUser);
+            void persistSessionCookie();
             setDisplayUser(updatedUser);
             setSaveMessage("تم حفظ التغييرات محلياً.");
           }}

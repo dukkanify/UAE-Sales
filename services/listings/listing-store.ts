@@ -8,15 +8,17 @@ import {
   computeExpiresAt,
   expireStaleListings,
 } from "@/services/listings/listing-expiry";
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import {
+  loadPersistedListings,
+  persistAllListings,
+  seedListings,
+} from "@/services/listings/listing-persistence";
 import type { Listing } from "@/types";
 import type {
   AdminListingCreateInput,
   AdminListingPatch,
   AdminListingRecord,
 } from "@/types/domain/admin";
-
-const FILE = "listings.json";
 
 let cacheRows: Listing[] | null = null;
 let inflight: Promise<Listing[]> | null = null;
@@ -33,19 +35,6 @@ function hydrateCatalogPhones(listings: Listing[]): Listing[] {
     const phone = phones.get(listing.id);
     return phone ? { ...listing, contactPhone: phone } : listing;
   });
-}
-
-function seedListings(): Listing[] {
-  const byId = new Map<string, Listing>();
-  for (const listing of [...marketplaceListings, ...marketplaceUserListings]) {
-    byId.set(listing.id, { ...listing });
-  }
-  // Keep a small moderation backlog for demo ops.
-  const seeded = Array.from(byId.values());
-  for (const listing of seeded.slice(0, 3)) {
-    listing.status = "pending_review";
-  }
-  return seeded;
 }
 
 /** Merge newly added mock inventory into an older persisted catalog. */
@@ -66,7 +55,7 @@ async function mergeMissingSeedListings(stored: Listing[]): Promise<Listing[]> {
   }
 
   const merged = Array.from(byId.values());
-  await saveCollection(FILE, merged);
+  await persistAllListings(merged);
   return merged;
 }
 
@@ -85,7 +74,7 @@ async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
   const settings = await getAdminSettings();
   const changed = expireStaleListings(listings, settings.listingActiveDays);
   if (changed > 0) {
-    await saveCollection(FILE, listings);
+    await persistAllListings(listings);
   }
   return listings;
 }
@@ -98,13 +87,11 @@ async function loadListingsUncached(): Promise<Listing[]> {
 
   if (!inflight) {
     inflight = (async () => {
-      const stored = await loadCollection<Listing>(FILE).catch(
-        () => [] as Listing[],
-      );
+      const stored = await loadPersistedListings().catch(() => [] as Listing[]);
       if (stored.length === 0) {
         const seeded = seedListings();
         await applyListingExpiry(seeded);
-        await saveCollection(FILE, seeded);
+        await persistAllListings(seeded);
         return setCache(seeded);
       }
       const merged = hydrateCatalogPhones(await mergeMissingSeedListings(stored));
@@ -113,7 +100,7 @@ async function loadListingsUncached(): Promise<Listing[]> {
         return Boolean(listing.contactPhone) && !before?.contactPhone;
       });
       if (phonesAdded) {
-        await saveCollection(FILE, merged);
+        await persistAllListings(merged);
       }
       await applyListingExpiry(merged);
       return setCache(merged);
@@ -152,17 +139,41 @@ export async function upsertListing(listing: Listing): Promise<Listing> {
   const listings = await loadListingsUncached();
   const settings = await getAdminSettings();
   const postedAt = listing.postedAt ?? new Date().toISOString();
+  const index = listings.findIndex((item) => item.id === listing.id);
+  const previous = index >= 0 ? listings[index] : undefined;
+  const history = [...(listing.statusHistory ?? previous?.statusHistory ?? [])];
+  if (!previous) {
+    history.push({
+      at: postedAt,
+      to: listing.status,
+      byUserId: listing.seller.id,
+      note: "created",
+    });
+  } else if (previous.status !== listing.status) {
+    history.push({
+      at: new Date().toISOString(),
+      from: previous.status,
+      to: listing.status,
+      byUserId: listing.seller.id,
+    });
+  }
   const next: Listing = {
     ...listing,
     postedAt,
     expiresAt:
       listing.expiresAt ??
       computeExpiresAt(postedAt, settings.listingActiveDays),
+    statusHistory: history,
+    rejectionReason:
+      listing.status === "rejected"
+        ? listing.rejectionReason ?? previous?.rejectionReason
+        : listing.status === "active"
+          ? undefined
+          : listing.rejectionReason ?? previous?.rejectionReason,
   };
-  const index = listings.findIndex((item) => item.id === listing.id);
   if (index >= 0) listings[index] = next;
   else listings.unshift(next);
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
   return { ...next };
 }
@@ -237,12 +248,35 @@ export async function patchListingRecord(
   const listings = await loadListingsUncached();
   const index = listings.findIndex((item) => item.id === id);
   if (index < 0) return undefined;
-  const listingPatch = {
+  const previous = listings[index];
+  const history = [...(previous.statusHistory ?? [])];
+  if (patch.status && patch.status !== previous.status) {
+    history.push({
+      at: new Date().toISOString(),
+      from: previous.status,
+      to: patch.status,
+      note: patch.rejectReason,
+    });
+  }
+  listings[index] = {
+    ...previous,
     ...(patch.status ? { status: patch.status } : {}),
     ...(typeof patch.isFeatured === "boolean" ? { isFeatured: patch.isFeatured } : {}),
+    ...(patch.status === "rejected"
+      ? {
+          rejectionReason:
+            patch.rejectReason?.trim() || previous.rejectionReason,
+        }
+      : {}),
+    ...(patch.status === "active"
+      ? {
+          rejectionReason: undefined,
+          postedAt: previous.postedAt ?? new Date().toISOString(),
+        }
+      : {}),
+    statusHistory: history,
   };
-  listings[index] = { ...listings[index], ...listingPatch };
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
   return { ...listings[index] };
 }
@@ -274,7 +308,7 @@ export async function setListingFeatured(
     isPremium: featured ? true : current.isPremium,
     featuredUntil,
   };
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
   return { ...listings[index] };
 }
@@ -290,7 +324,7 @@ export async function deleteListingById(
     return false;
   }
   listings.splice(index, 1);
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
   return true;
 }
@@ -308,7 +342,7 @@ export async function renewListing(id: string): Promise<Listing | undefined> {
     expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
     status: "pending_review",
   };
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
   return { ...listings[index] };
 }
@@ -334,7 +368,7 @@ export async function updateSellerListingRating(
     changed = true;
   }
   if (!changed) return;
-  await saveCollection(FILE, listings);
+  await persistAllListings(listings);
   setCache(listings);
 }
 
