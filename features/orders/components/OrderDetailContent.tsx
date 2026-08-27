@@ -43,6 +43,7 @@ export function OrderDetailContent({
   const [confirmMessage, setConfirmMessage] = useState("");
   const [proofUrlsText, setProofUrlsText] = useState("");
   const [proofNote, setProofNote] = useState("");
+  const [proofFiles, setProofFiles] = useState<FileList | null>(null);
   const [sessionUserId] = useState(() => getSessionUser()?.id ?? null);
   const [ratingInfo, setRatingInfo] = useState<{
     canRate: boolean;
@@ -165,12 +166,44 @@ export function OrderDetailContent({
       return;
     }
 
-    const proofUrls = proofUrlsText
+    const urlItems = proofUrlsText
       .split(/[\n,]/)
       .map((item) => item.trim())
-      .filter(Boolean);
-    if (proofUrls.length === 0) {
-      setError("أضف رابط إثبات واحد على الأقل.");
+      .filter(Boolean)
+      .map((storageUrl) => ({
+        storageUrl,
+        kind: (/\.(mp4|webm)(\?|$)/i.test(storageUrl) || storageUrl.includes("video")
+          ? "video"
+          : "photo") as "photo" | "video",
+      }));
+
+    const fileItems: Array<{ storageUrl: string; kind: "photo" | "video" }> = [];
+    if (proofFiles && proofFiles.length > 0) {
+      for (const file of Array.from(proofFiles).slice(0, 12)) {
+        if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+          setError("يُسمح بصور JPEG/PNG/WebP أو فيديو MP4/WebM فقط.");
+          return;
+        }
+        if (file.size > 4_500_000) {
+          setError("حجم الملف كبير جداً (الحد تقريباً 4.5MB لكل ملف).");
+          return;
+        }
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result ?? ""));
+          reader.onerror = () => reject(new Error("READ_FAILED"));
+          reader.readAsDataURL(file);
+        });
+        fileItems.push({
+          storageUrl: dataUrl,
+          kind: file.type.startsWith("video/") ? "video" : "photo",
+        });
+      }
+    }
+
+    const items = [...fileItems, ...urlItems];
+    if (items.length === 0) {
+      setError("أضف صوراً/فيديو أو رابط إثبات واحد على الأقل.");
       return;
     }
 
@@ -182,19 +215,26 @@ export function OrderDetailContent({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          proofUrls,
+          items,
           note: proofNote.trim() || undefined,
         }),
       });
       const data = await response.json();
       if (!response.ok) {
-        setError("تعذر رفع إثبات البائع.");
+        const map: Record<string, string> = {
+          FILE_TOO_LARGE: "حجم أحد الملفات كبير جداً.",
+          INVALID_IMAGE_TYPE: "نوع الصورة غير مدعوم.",
+          INVALID_VIDEO_TYPE: "نوع الفيديو غير مدعوم.",
+          TOO_MANY_FILES: "الحد الأقصى 12 ملفاً.",
+        };
+        setError(map[data.error] ?? "تعذر رفع إثبات البائع.");
         return;
       }
       setOrder(data.order);
       setConfirmMessage("تم رفع إثبات التسليم بنجاح.");
       setProofUrlsText("");
       setProofNote("");
+      setProofFiles(null);
     } catch {
       setError("تعذر رفع إثبات البائع.");
     } finally {
@@ -336,24 +376,36 @@ export function OrderDetailContent({
 
         {showSellerProofForm ? (
           <Card className="p-6" variant="flat">
-            <h3 className="text-sm font-semibold text-ink">رفع إثبات التسليم</h3>
+            <h3 className="text-sm font-semibold text-ink">
+              رفع إثبات التسليم (مضمون)
+            </h3>
             <p className="mt-1 text-sm text-muted">
-              أرفق روابط صور أو مستندات تثبت تسليم السلعة للمشتري.
+              ارفع صوراً أو فيديو حديث للمنتج بعد الدفع. يراجعها المشتري قبل تحرير
+              الضمان.
             </p>
             <form className="mt-4 grid gap-3" onSubmit={handleSubmitProof}>
+              <label className="grid gap-1.5 text-sm">
+                <span className="font-medium text-ink">صور / فيديو</span>
+                <input
+                  accept="image/jpeg,image/png,image/webp,video/mp4,video/webm"
+                  className="block w-full text-sm text-muted file:me-3 file:rounded-md file:border-0 file:bg-surface-muted file:px-3 file:py-2 file:text-sm file:font-semibold file:text-ink"
+                  multiple
+                  onChange={(event) => setProofFiles(event.target.files)}
+                  type="file"
+                />
+              </label>
               <Textarea
-                label="روابط الإثبات"
-                hint="رابط واحد في كل سطر أو مفصول بفاصلة."
+                label="روابط إضافية (اختياري)"
+                hint="رابط واحد في كل سطر إن لزم."
                 value={proofUrlsText}
                 onChange={(event) => setProofUrlsText(event.target.value)}
-                required
                 placeholder="https://..."
               />
               <Input
                 label="ملاحظة (اختياري)"
                 value={proofNote}
                 onChange={(event) => setProofNote(event.target.value)}
-                placeholder="مثال: تم التسليم مع رقم تتبع..."
+                placeholder="مثال: صور حديثة للمنتج قبل الشحن..."
               />
               <Button loading={isSubmittingProof} type="submit" variant="accent">
                 رفع الإثبات
