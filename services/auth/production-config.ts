@@ -33,6 +33,10 @@ export type ProductionConfigSnapshot = {
   stripeCurrency: string;
   mockCheckoutAllowed: boolean;
   featuredCheckoutAvailable: boolean;
+  /** True when SESSION_SECRET or NEXTAUTH_SECRET is set (boolean only; never the value). */
+  sessionSecretConfigured: boolean;
+  /** True when CRON_SECRET is set (boolean only; never the value). */
+  cronSecretConfigured: boolean;
   missing: string[];
 };
 
@@ -99,10 +103,20 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
   const stripeCurrency = getStripeCurrency();
   const mockCheckoutAllowed = isMockCheckoutAllowed();
   const featuredCheckoutAvailable = stripeConfigured || mockCheckoutAllowed;
+  const sessionSecretConfigured = Boolean(
+    process.env.SESSION_SECRET?.trim() || process.env.NEXTAUTH_SECRET?.trim(),
+  );
+  const cronSecretConfigured = Boolean(process.env.CRON_SECRET?.trim());
 
   const missing: string[] = [];
   if (!database.configured) {
     missing.push("DATABASE_URL");
+  }
+  if (process.env.NODE_ENV === "production" && !sessionSecretConfigured) {
+    missing.push("SESSION_SECRET");
+  }
+  if (process.env.NODE_ENV === "production" && !cronSecretConfigured) {
+    missing.push("CRON_SECRET");
   }
   if (!resendConfigured) {
     missing.push("RESEND_API_KEY");
@@ -150,6 +164,8 @@ export function getProductionConfigSnapshot(): ProductionConfigSnapshot {
     stripeCurrency,
     mockCheckoutAllowed,
     featuredCheckoutAvailable,
+    sessionSecretConfigured,
+    cronSecretConfigured,
     missing,
   };
 }
