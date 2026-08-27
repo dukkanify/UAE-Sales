@@ -1,180 +1,85 @@
 # Sooqna — Full Technical Remediation Report
 
-**Branches:**  
-- `#259` `cursor/full-technical-remediation-37ba` (merged) — sessions, OTP, listings, notifications  
-- `#260` `cursor/p0-orders-escrow-durable-37ba` — orders, escrow evidence, activities, dispute reminders, RBAC save UX  
+**Date:** 2026-08-27 (updated)  
+**Production:** https://sooqna.site  
 
-**Date:** 2026-08-27  
-**Scope:** Production readiness vs technical notes (Tasks 1–27)
+**Merged:** `#260` → `main` `5903294` (includes `1a5140e`)  
+**Open:** `#261` `cursor/vercel-dispute-cron-37ba` — daily Vercel cron + secret presence booleans  
 
 Statuses: **PASS** | **PARTIAL** | **FAIL** | **BLOCKED**
 
-Lint/build alone is **not** completion.
-
----
-
-## Executive summary
-
-### Slice A (merged #259)
-1. Signed HMAC sessions (no cookie forge)
-2. Postgres OTP / notifications / listings / featured payments
-3. Listing moderation coerce + public detail gate
-4. Notification dedupe + platform notify helper
-
-### Slice B (PR #260)
-1. **Orders, disputes, jobs, viewings, quotes** → Postgres payload tables (durable)
-2. **Stripe webhook claims** → atomic Postgres `INSERT ON CONFLICT`
-3. **مضمون escrow evidence** entity + seller file upload + buyer confirmation records
-4. `GET /api/orders/[id]/evidence` for parties/admin
-5. **Dispute window reminders** — 48h / 24h / expired via `POST /api/cron/dispute-reminders` + durable dedupe
-6. **RBAC UX** — draft permissions + «حفظ الصلاحيات»; super-only role/permission changes; self-escalation blocked
-7. **My Activities** hub at `/activities` (header + profile links)
-8. **Contact form** field-level validation errors
-
-**Still not DONE:** cloud object storage for evidence, full View/Add/Edit/Delete/Approve/Export RBAC matrix, Playwright E2E, most P1/P2 spreadsheet items, production manual E2E proof.
-
----
-
-## P0 Critical
-
-### Task 1 — Auth / Accounts / Email
-| Item | Status |
-|------|--------|
-| Durable users in Postgres | **PASS** |
-| Same repository login/register | **PASS** |
-| Duplicate email normalize | **PASS** |
-| Password hashing | **PASS** |
-| Logout session-only | **PASS** |
-| Signed session + middleware | **PASS** |
-| Forgot/reset password | **PASS** |
-| OTP email-only in production | **PASS** |
-| Live E2E on production | **BLOCKED** (manual + secrets) |
-
-### Task 2 — Notifications
-| Item | Status |
-|------|--------|
-| Bell + page same API | **PASS** |
-| Durable store | **PASS** |
-| Dedupe keys | **PARTIAL** (core paths + dispute reminders) |
-| All business events | **PARTIAL** |
-| Email failure isolation | **PASS** |
-
-### Task 3 — Listing lifecycle
-| Item | Status |
-|------|--------|
-| No publish without review | **PASS** |
-| Admin pending + owner visibility | **PASS** |
-| `active` = published | **PASS** |
-| Rejection reason + statusHistory | **PARTIAL** |
-| Expiry/renew | **PASS** |
-| Durable catalog | **PASS** |
-
-### Task 4 — Featured + Stripe
-| Item | Status |
-|------|--------|
-| Pay before featured | **PASS** |
-| Durable featured payments | **PASS** |
-| Webhook idempotency (durable) | **PASS** |
-| Production Stripe keys | **BLOCKED** |
-
-### Task 8–10 Activities
-| Item | Status |
-|------|--------|
-| Job applications durable | **PASS** |
-| Viewing bookings durable | **PASS** |
-| Quote requests durable | **PASS** |
-| Unified user hub `/activities` | **PASS** (this iteration) |
-| Seller/company activity management | **PARTIAL** (ActivityFeed received scope) |
-| Admin activities console filters | **PARTIAL** |
-
-### Task 12 — RBAC
-| Item | Status |
-|------|--------|
-| Module permissions + Save button (no auto-save) | **PASS** (this iteration) |
-| Super create/demote sub-admin | **PASS** |
-| Block sub-admin modifying super / self-escalation | **PASS** |
-| Permission audit on save | **PASS** |
-| Full View/Add/Edit/Delete/Approve/Export matrix | **FAIL** (still module flags) |
-
-### Task 13 — مضمون Escrow evidence
-| Item | Status |
-|------|--------|
-| Evidence records linked to order/transaction | **PASS** |
-| Seller upload photos/video (validated) | **PASS** (data URL + type/size) |
-| Buyer confirmation stored | **PASS** |
-| Admin can fetch evidence | **PASS** (`/evidence`) |
-| Private object storage / AV scan | **PARTIAL** / **FAIL** |
-
-### Task 14 — Disputes
-| Item | Status |
-|------|--------|
-| Durable dispute store | **PASS** |
-| Linked to escrow + window enforcement | **PASS** |
-| 48h/24h/expired reminders | **PASS** (cron + durable sent markers; needs `CRON_SECRET` + scheduler in prod) |
-| Order UI window countdown | **PASS** |
-
-### Task 16 — Contact Us
-| Item | Status |
-|------|--------|
-| Field-level errors + mapping | **PASS** (this iteration) |
-
----
-
-## P1 / P2 (high-level)
-
-| Tasks | Status |
-|-------|--------|
-| 5–7 Dynamic forms / category builder / search | **PARTIAL** |
-| 11 Dashboard Excel export | **PARTIAL** / **FAIL** |
-| 15 Ratings | **PARTIAL** |
-| 17 Header/footer (activities link added) | **PARTIAL** |
-| 18–19 Legal / Abu Dhabi visuals | **PARTIAL** / **FAIL** |
-| 20–27 Safeguards / monitoring / backup / i18n / perf / E2E | mostly **PARTIAL**/**FAIL** |
-
----
-
-## DB / API (this PR)
-
-**Migration:** `migrations/004_orders_escrow_activities.sql`
-
-Tables: `marketplace_orders`, `marketplace_disputes`, `escrow_evidence`, `escrow_evidence_confirmations`, `stripe_webhook_claims`, `payment_event_logs`, `job_applications`, `viewing_bookings`, `quote_requests`, `dispute_reminders`
-
-**APIs:**
-- `POST /api/orders/[id]/seller-proof` — `items[{storageUrl,kind}]` + validation errors
-- `GET /api/orders/[id]/evidence` — party/admin evidence history
-- `POST|GET /api/cron/dispute-reminders` — 48h/24h/expired (Bearer `CRON_SECRET` in production)
-- `PATCH /api/admin/users/[id]` — super-only role/permissions; `CANNOT_MODIFY_SUPER_ADMIN` / `SELF_ESCALATION`
-- Contact `POST /api/support` — `fieldErrors` map
-
-**UI:** `/activities`, Admin «حفظ الصلاحيات», order dispute window label, seller proof file picker
-
-**Helper:** `services/db/durable-json-collection.ts`, `services/payments/dispute-reminders.ts`
-
----
-
-## Validation
-
-| Check | Result |
-|-------|--------|
-| `npm run lint` | **PASS** |
-| `npm run build` | **PASS** |
-| Production E2E proof | **BLOCKED** until deploy + Stripe + Resend + cron + manual QA |
-
----
-
-## Unresolved blockers
-
-1. Stripe Live keys on production  
-2. Evidence still stores data URLs / HTTPS links — need object storage for scale  
-3. Chat + favorites + some admin JSON stores still ephemeral  
-4. No Playwright E2E suite  
-5. Production must set `SESSION_SECRET`, `CRON_SECRET`, and schedule dispute-reminder cron  
-6. Full spreadsheet P1/P2
-
----
-
-## Definition of done (honest)
-
 **Project is NOT COMPLETE.**
 
-Critical durability for auth, listings, notifications, orders, escrow evidence, lead activities, and dispute reminders is designed for Postgres. End-to-end production proof must still be run after merge/deploy.
+---
+
+## Critical production verification (this pass)
+
+| Check | Status | Evidence (no secret values) |
+|------|--------|------------------------------|
+| PR #260 on main / prior Production deploy | **PASS** | `5903294` Production deployment success |
+| `CRON_SECRET` visible to running Production | **FAIL** | `POST /api/cron/dispute-reminders` → `503 CRON_SECRET_REQUIRED` (not `401`) |
+| `SESSION_SECRET` visible to running Production | **BLOCKED** | Cannot confirm until deploy with `sessionSecretConfigured` boolean ships; status `missing` currently lists Stripe keys only (pre-boolean code) |
+| Cron unauthorized rejected | **PARTIAL** | Fail-closed `503` while unset; expected after set: `401 UNAUTHORIZED` |
+| Cron authorized execution | **BLOCKED** | Secret not loaded on live process; agent has no secret to send |
+| PR #261 CI / Preview | **FAIL** → fix in progress | Vercel: Hobby limited to **daily** crons; hourly `0 * * * *` rejected. Updated to `0 6 * * *` |
+| Merge #261 | **BLOCKED** | CI must be green; agent cannot merge (gh write disabled) |
+| Vercel Cron registered | **BLOCKED** | Needs #261 merge + Hobby-compatible schedule + working `CRON_SECRET` |
+| Stripe Live | **FAIL** | `stripeConfigured=false`; webhook `STRIPE_NOT_CONFIGURED` |
+| Postgres + Resend | **PASS** | `databaseConfigured=true`, `resendConfigured=true`, `demoOtpServerEnabled=false` |
+
+---
+
+## Critical flows
+
+| Flow | Status | Notes |
+|------|--------|-------|
+| Register | **PASS** | Durable; `emailDelivered`; **no OTP in API** |
+| Email verify → activate | **BLOCKED** | Needs readable inbox / test account |
+| Login / Logout / Login | **BLOCKED** | Needs verified account |
+| Forgot / Reset password | **PARTIAL** | Request-link smoke **PASS**; complete reset **BLOCKED** |
+| Create listing → review → approve → publish → search | **BLOCKED** | Needs user + admin sessions |
+| Featured → Stripe → approve | **BLOCKED** | Stripe unset |
+| Job apply → activities → employer → admin → notify | **BLOCKED** | Needs auth |
+| Property viewing booking end-to-end | **BLOCKED** | Needs auth |
+| Services quote/booking end-to-end | **BLOCKED** | Needs auth |
+| Purchase → payment → order → escrow | **BLOCKED** | Stripe unset |
+| مضمون evidence → buyer confirm | **BLOCKED** | Needs paid order |
+| Dispute open + 48h/24h/expired reminders | **BLOCKED** | Needs orders + cron secret + cron registration |
+| Persistence after refresh/redeploy | **PARTIAL** | Auth Postgres configured; full marketplace proof incomplete |
+| No cross-user leakage / RBAC live | **BLOCKED** | Needs multi-account E2E |
+| Cron spoofing protection | **PARTIAL** | Fail-closed without secret; full Bearer matrix **BLOCKED** |
+| Arabic RTL | **PASS** | `dir=rtl` `lang=ar` |
+| English LTR without Arabic UI leak | **FAIL** / **PARTIAL** | `dir=ltr` after locale cookie; Arabic category labels still visible |
+| Contact field-level errors | **PASS** | `fieldErrors` returned |
+| Notifications/admin unauthenticated | **PASS** | `401` |
+
+---
+
+## Tasks 1–27 (summary)
+
+| Band | Status |
+|------|--------|
+| P0 Auth/email/listings/notifications code | **PARTIAL** (live E2E incomplete) |
+| P0 Stripe/Featured/Orders/Escrow/Dispute cron | **FAIL** / **BLOCKED** |
+| P1 forms/search/dashboard/ratings/activities UX | **PARTIAL** |
+| P2 legal/visuals/i18n/perf/E2E suite | **PARTIAL** / **FAIL** |
+
+---
+
+## Code changes in #261 (this iteration)
+
+1. `vercel.json` schedule → `0 6 * * *` (Hobby-compatible daily)  
+2. `/api/auth/status` config gains **booleans only**: `sessionSecretConfigured`, `cronSecretConfigured`; names added to `missing` when absent in production  
+3. Cron route comment documents Hobby daily limit  
+
+---
+
+## Manual actions still required
+
+1. Confirm `SESSION_SECRET` + `CRON_SECRET` are on Vercel project **sooqna** → Environment **Production**, then **Redeploy** until unauthorized cron returns **401** (not 503).  
+2. Wait for #261 Preview/CI green, then **merge #261** to main (agent cannot merge).  
+3. Confirm Vercel Cron Jobs UI shows daily job for `/api/cron/dispute-reminders`.  
+4. Configure Stripe Live keys + webhook.  
+5. Provide verified test accounts or a readable inbox for full auth + marketplace E2E.  
+
+Do **not** paste secret values into chat, git, logs, or screenshots.

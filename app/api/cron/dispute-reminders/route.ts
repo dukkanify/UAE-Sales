@@ -3,7 +3,8 @@ import { processDisputeReminders } from "@/services/payments/dispute-reminders";
 
 /**
  * Cron / ops endpoint for dispute window reminders (48h, 24h, expired).
- * Protect with CRON_SECRET header when configured.
+ * Protect with CRON_SECRET (Authorization: Bearer or x-cron-secret).
+ * Vercel Hobby allows at most one run/day — schedule is daily in vercel.json.
  */
 export async function POST(request: Request) {
   const configured = process.env.CRON_SECRET?.trim();
