@@ -260,30 +260,106 @@ const electronicsFields: CategoryFieldDefinition[] = [
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
     { label: "جديد", value: "new" },
     { label: "مستعمل", value: "used" },
-    { label: "ممتاز", value: "excellent" },
   ]},
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accessories", label: "الملحقات", type: "textarea", required: true },
 ];
 
 const jobFields: CategoryFieldDefinition[] = [
-  { key: "company", label: "الشركة", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "position", label: "المسمى الوظيفي", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "salary", label: "الراتب", type: "text", required: true, searchable: true },
-  { key: "experience", label: "الخبرة", type: "text", required: true },
-  { key: "employmentType", label: "نوع التوظيف", type: "select", required: true, options: [
-    { label: "دوام كامل", value: "دوام كامل" },
-    { label: "دوام جزئي", value: "دوام جزئي" },
-    { label: "عقد", value: "عقد" },
-    { label: "عن بُعد", value: "عن بُعد" },
-  ]},
-  { key: "location", label: "الموقع", type: "text", required: true, searchable: true },
-  { key: "nationality", label: "الجنسية", type: "text", required: true },
-  { key: "gender", label: "الجنس", type: "select", required: true, options: [
-    { label: "ذكر", value: "ذكر" },
-    { label: "أنثى", value: "أنثى" },
-    { label: "أي", value: "أي" },
-  ]},
+  {
+    key: "listingType",
+    label: "نوع الإعلان",
+    type: "select",
+    required: true,
+    titlePart: true,
+    options: [
+      { label: "شاغر وظيفي", value: "vacancy" },
+      { label: "باحث عن عمل", value: "seeker" },
+    ],
+    note: "اختر نوع الإعلان لتظهر الحقول المناسبة. صورة الإعلان اختيارية.",
+  },
+  {
+    key: "company",
+    label: "الشركة",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+  },
+  {
+    key: "position",
+    label: "المسمى الوظيفي",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+  },
+  {
+    key: "salary",
+    label: "الراتب / المتوقع",
+    type: "text",
+    required: true,
+    searchable: true,
+  },
+  {
+    key: "experience",
+    label: "الخبرة",
+    type: "text",
+    required: true,
+  },
+  {
+    key: "employmentType",
+    label: "نوع التوظيف",
+    type: "select",
+    required: true,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+    options: [
+      { label: "دوام كامل", value: "دوام كامل" },
+      { label: "دوام جزئي", value: "دوام جزئي" },
+      { label: "عقد", value: "عقد" },
+      { label: "عن بُعد", value: "عن بُعد" },
+    ],
+  },
+  {
+    key: "availability",
+    label: "التوفر للبدء",
+    type: "select",
+    required: true,
+    showWhen: { key: "listingType", values: ["seeker"] },
+    options: [
+      { label: "فوري", value: "فوري" },
+      { label: "خلال أسبوعين", value: "خلال أسبوعين" },
+      { label: "خلال شهر", value: "خلال شهر" },
+      { label: "مرن", value: "مرن" },
+    ],
+  },
+  {
+    key: "location",
+    label: "الموقع",
+    type: "text",
+    required: true,
+    searchable: true,
+  },
+  {
+    key: "nationality",
+    label: "الجنسية",
+    type: "text",
+    required: false,
+    showWhen: { key: "listingType", values: ["seeker"] },
+  },
+  {
+    key: "gender",
+    label: "الجنس المطلوب",
+    type: "select",
+    required: false,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+    options: [
+      { label: "ذكر", value: "ذكر" },
+      { label: "أنثى", value: "أنثى" },
+      { label: "أي", value: "أي" },
+    ],
+  },
 ];
 
 const serviceFields: CategoryFieldDefinition[] = [
@@ -300,8 +376,30 @@ const serviceFields: CategoryFieldDefinition[] = [
 
 const foodFields: CategoryFieldDefinition[] = [
   {
+    key: "saleType",
+    label: "نوع البيع",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "بالجملة", value: "wholesale" },
+      { label: "تجزئة", value: "retail" },
+    ],
+    note: "لا يُستخدم جديد/مستعمل للطعام — اختر بالجملة أو تجزئة.",
+  },
+  {
+    key: "unitPrice",
+    label: "السعر حسب الوحدة",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: AED 35 / كرتون أو AED 12 / وجبة",
+    note: "يجب أن يطابق التسعير نوع البيع المختار.",
+  },
+  {
     key: "cuisine",
-    label: "نوع المطبخ",
+    label: "نوع المطبخ / المنتج",
     type: "select",
     required: true,
     titlePart: true,
@@ -323,7 +421,7 @@ const foodFields: CategoryFieldDefinition[] = [
     type: "text",
     required: true,
     searchable: true,
-    placeholder: "مثال: وجبة لشخصين",
+    placeholder: "مثال: كرتون 24 قطعة أو وجبة لشخصين",
   },
   {
     key: "delivery",
@@ -354,8 +452,61 @@ const foodFields: CategoryFieldDefinition[] = [
     type: "text",
     required: true,
     searchable: true,
-    placeholder: "مثال: دبي — الخليج التجاري",
+    placeholder: "مثال: أبوظبي — الكورنيش",
     note: "اكتب الإمارة والمنطقة.",
+  },
+];
+
+const furnitureFields: CategoryFieldDefinition[] = [
+  {
+    key: "furnitureType",
+    label: "نوع الأثاث",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "غرف نوم", value: "غرف نوم" },
+      { label: "كنب", value: "كنب" },
+      { label: "طاولات طعام", value: "طاولات طعام" },
+      { label: "أثاث خارجي", value: "أثاث خارجي" },
+      { label: "أخرى", value: "other" },
+    ],
+  },
+  {
+    key: "furnitureTypeOther",
+    label: "حدد النوع (أخرى)",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    placeholder: "اكتب نوع الأثاث",
+    showWhen: { key: "furnitureType", values: ["other"] },
+    note: "تُحفظ كاقتراح للمراجعة الإدارية قبل إضافتها للقائمة العامة.",
+  },
+  {
+    key: "condition",
+    label: "الحالة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "جديد", value: "new" },
+      { label: "مستعمل", value: "used" },
+    ],
+  },
+  {
+    key: "material",
+    label: "الخامة",
+    type: "text",
+    required: false,
+    searchable: true,
+  },
+  {
+    key: "city",
+    label: "المدينة / المنطقة",
+    type: "text",
+    required: true,
+    searchable: true,
   },
 ];
 
@@ -367,6 +518,7 @@ export const DYNAMIC_CATEGORY_IDS = [
   "jobs",
   "services",
   "food",
+  "furniture",
 ] as const;
 
 export type DynamicCategoryId = (typeof DYNAMIC_CATEGORY_IDS)[number];
@@ -379,6 +531,7 @@ const categoryFieldMap: Record<DynamicCategoryId, CategoryFieldDefinition[]> = {
   jobs: jobFields,
   services: serviceFields,
   food: foodFields,
+  furniture: furnitureFields,
 };
 
 export function isDynamicCategory(categoryId: string): categoryId is DynamicCategoryId {

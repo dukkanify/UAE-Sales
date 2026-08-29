@@ -7,23 +7,30 @@ import {
   ALL_ADMIN_PERMISSIONS,
   ADMIN_PERMISSION_LABELS,
   hasAdminPermission,
+  hasAdminAction,
 } from "@/services/auth/admin-permission-checks";
-import type { AdminPermission, UserProfile } from "@/types/domain/user";
+import type {
+  AdminAction,
+  AdminPermission,
+  UserProfile,
+} from "@/types/domain/user";
 
 export {
   ALL_ADMIN_PERMISSIONS,
   ADMIN_PERMISSION_LABELS,
   hasAdminPermission,
+  hasAdminAction,
 };
 
 export async function requireAdminPermission(
   permission: AdminPermission,
+  action: AdminAction = "view",
 ): Promise<UserProfile | NextResponse> {
   const admin = await requireAdminUser();
   if (!isSessionUser(admin)) {
     return admin;
   }
-  if (!hasAdminPermission(admin, permission)) {
+  if (!hasAdminAction(admin, permission, action)) {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
   return admin;

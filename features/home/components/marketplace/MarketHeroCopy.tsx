@@ -12,18 +12,18 @@ const COPY = {
     titleBefore: "بيع وشراء بثقة في",
     titleAccent: "الإمارات",
     leadDesktop:
-      "كل ما تحتاجه من سيارات، عقارات، إلكترونيات وخدمات في منصة إماراتية واحدة مع ضمان مالي يحمي المشتري والبائع.",
+      "كل ما تحتاجه من سيارات، عقارات، إلكترونيات وخدمات في منصة إماراتية واحدة — بيع وشراء بثقة عبر سوقنا.",
     leadMobile:
-      "بيع وشراء السيارات والعقارات والإلكترونيات والوظائف والخدمات — بضمان مالي يحمي الطرفين.",
+      "بيع وشراء السيارات والعقارات والإلكترونيات والوظائف والخدمات في منصة إماراتية واحدة.",
   },
   en: {
     chip: "From the UAE to the world",
     titleBefore: "Buy and sell with confidence in",
     titleAccent: "the UAE",
     leadDesktop:
-      "Everything you need in cars, property, electronics, and services on one UAE platform, with escrow that protects buyer and seller.",
+      "Everything you need in cars, property, electronics, and services on one UAE marketplace — buy and sell with confidence on Sooqna.",
     leadMobile:
-      "Buy and sell cars, property, electronics, jobs, and services — with escrow that protects both sides.",
+      "Buy and sell cars, property, electronics, jobs, and services on one UAE marketplace.",
   },
 } as const;
 

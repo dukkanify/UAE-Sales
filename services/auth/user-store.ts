@@ -377,7 +377,14 @@ export async function updateUserOnboarding(
 export async function updateUserAdmin(
   userId: string,
   patch: Partial<
-    Pick<StoredUser, "isVerified" | "accountStatus" | "role" | "adminPermissions">
+    Pick<
+      StoredUser,
+      | "isVerified"
+      | "accountStatus"
+      | "role"
+      | "adminPermissions"
+      | "adminActionMatrix"
+    >
   >,
 ): Promise<StoredUser | null> {
   const user = await findUserById(userId);
@@ -406,6 +413,7 @@ export function toAdminUserRecord(
   joinedAt: string;
   listingsCount: number;
   adminPermissions?: StoredUser["adminPermissions"];
+  adminActionMatrix?: StoredUser["adminActionMatrix"];
 } {
   return {
     id: user.id,
@@ -420,6 +428,7 @@ export function toAdminUserRecord(
     joinedAt: user.joinedAt,
     listingsCount,
     adminPermissions: user.adminPermissions,
+    adminActionMatrix: user.adminActionMatrix,
   };
 }
 

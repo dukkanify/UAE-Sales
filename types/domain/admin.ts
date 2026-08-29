@@ -1,7 +1,12 @@
 import type { CategoryIconName } from "./category";
 import type { CategorySpecs } from "./category-fields";
 import type { ListingCondition, ListingStatus } from "./listing";
-import type { AccountStatus, AdminPermission, UserRole } from "./user";
+import type {
+  AccountStatus,
+  AdminActionMatrix,
+  AdminPermission,
+  UserRole,
+} from "./user";
 
 export type DisputeStatus =
   | "open"
@@ -23,12 +28,17 @@ export type AdminUserRecord = {
   joinedAt: string;
   listingsCount: number;
   adminPermissions?: AdminPermission[];
+  adminActionMatrix?: AdminActionMatrix;
 };
 
 export type AdminUserPatch = Partial<
   Pick<
     AdminUserRecord,
-    "isVerified" | "accountStatus" | "role" | "adminPermissions"
+    | "isVerified"
+    | "accountStatus"
+    | "role"
+    | "adminPermissions"
+    | "adminActionMatrix"
   >
 >;
 
