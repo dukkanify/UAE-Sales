@@ -372,6 +372,26 @@ export function useAddListingForm(categories: Category[]) {
         // Free listings can still proceed from local storage if sync fails.
       }
 
+      // Furniture "Other" custom value → admin approval queue (no hardcoded temp option).
+      const otherValue = String(parsed.categorySpecs?.furnitureTypeOther ?? "").trim();
+      if (
+        categoryId === "furniture" &&
+        String(parsed.categorySpecs?.furnitureType ?? "") === "other" &&
+        otherValue.length >= 2
+      ) {
+        void fetch("/api/option-suggestions", {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            categoryId: "furniture",
+            fieldKey: "furnitureType",
+            value: otherValue,
+            listingId: id,
+          }),
+        }).catch(() => undefined);
+      }
+
       router.push(`/listings/local/${id}`);
     },
     [featuredCheckoutAvailable, imageFiles, router, selectedCategoryId],

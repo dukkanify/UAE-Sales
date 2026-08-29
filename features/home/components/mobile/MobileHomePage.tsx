@@ -11,8 +11,8 @@ import {
   MobilePreviewStrip,
   MobilePromoBanner,
 } from "@/features/home/components/mobile";
-import { MarketEscrow } from "@/features/home/components/marketplace/MarketEscrow";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import type { Category, Listing } from "@/types";
 import "./mobile-home.css";
 
@@ -44,25 +44,26 @@ export function MobileHomePage({
     <>
       <MobileHomeShell fullWidth>
         <MobileHomeHeader />
-        <main className="mobile-home-main">
-          <MobileHeroBlock categories={categories} />
-          <MobileCategoryGrid categories={categories} />
-          <MobilePromoBanner />
-          <MobilePreviewStrip listings={featuredListings} />
-          <MobileFeaturedRail listings={featuredListings} />
-          <MobileNearbyRail listings={nearbyListings} />
-          <MobileEmiratesSection />
-          {sectionListings.map((section) => (
-            <MobileCategoryRail
-              key={section.categoryId}
-              categorySlug={categoryById(section.categoryId)}
-              listings={section.items}
-              title={section.title}
-            />
-          ))}
-          <MarketEscrow />
-          <MobileAppDownload previewListings={appPreviewListings} />
-        </main>
+        <LocalizedTree>
+          <main className="mobile-home-main">
+            <MobileHeroBlock categories={categories} />
+            <MobileCategoryGrid categories={categories} />
+            <MobilePromoBanner />
+            <MobilePreviewStrip listings={featuredListings} />
+            <MobileFeaturedRail listings={featuredListings} />
+            <MobileNearbyRail listings={nearbyListings} />
+            <MobileEmiratesSection />
+            {sectionListings.map((section) => (
+              <MobileCategoryRail
+                key={section.categoryId}
+                categorySlug={categoryById(section.categoryId)}
+                listings={section.items}
+                title={section.title}
+              />
+            ))}
+            <MobileAppDownload previewListings={appPreviewListings} />
+          </main>
+        </LocalizedTree>
       </MobileHomeShell>
       <SiteFooter />
     </>

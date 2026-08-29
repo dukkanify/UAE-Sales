@@ -1,7 +1,6 @@
 import {
   MarketCategoryGrid,
   MarketCategorySection,
-  MarketEscrow,
   MarketFeatured,
   MarketHeader,
   MarketHero,
@@ -12,6 +11,7 @@ import {
 import { DeferredHomeBelowFold } from "@/features/home/components/marketplace/DeferredHomeBelowFold";
 import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { getCategories } from "@/services/categories";
 import { getHomeFeed } from "@/services/listings/home-feed";
 import { headers } from "next/headers";
@@ -70,31 +70,32 @@ export default async function Home() {
   return (
     <>
       <MarketHeader />
-      <main>
-        <MarketHero categories={categories} />
-        <MarketCategoryGrid categories={categories} />
-        <MarketPromoBanner />
-        <MarketPreviewStrip categories={categoryMeta} listings={feed.preview} />
-        <MarketFeatured categories={categoryMeta} listings={feed.featured} />
-        <MarketNearbySection listings={feed.nearbySource} />
-        {aboveFoldSections.map((section) => (
-          <MarketCategorySection
-            key={section.categoryId}
-            categoryId={section.categoryId}
-            categorySlug={section.categorySlug}
-            description={section.description}
-            eyebrow={section.eyebrow}
-            listings={section.listings}
-            title={section.title}
-            variant={section.variant}
+      <LocalizedTree>
+        <main>
+          <MarketHero categories={categories} />
+          <MarketCategoryGrid categories={categories} />
+          <MarketPromoBanner />
+          <MarketPreviewStrip categories={categoryMeta} listings={feed.preview} />
+          <MarketFeatured categories={categoryMeta} listings={feed.featured} />
+          <MarketNearbySection listings={feed.nearbySource} />
+          {aboveFoldSections.map((section) => (
+            <MarketCategorySection
+              key={section.categoryId}
+              categoryId={section.categoryId}
+              categorySlug={section.categorySlug}
+              description={section.description}
+              eyebrow={section.eyebrow}
+              listings={section.listings}
+              title={section.title}
+              variant={section.variant}
+            />
+          ))}
+          <DeferredHomeBelowFold
+            appPreviewListings={appPreviewListings}
+            sections={belowFoldSections}
           />
-        ))}
-        <MarketEscrow />
-        <DeferredHomeBelowFold
-          appPreviewListings={appPreviewListings}
-          sections={belowFoldSections}
-        />
-      </main>
+        </main>
+      </LocalizedTree>
       <SiteFooter />
     </>
   );
