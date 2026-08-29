@@ -24,6 +24,8 @@ const footerCompanyLinks = [
   { label: "الأمان", href: "/safety" },
   { label: "الشروط والأحكام", href: "/terms" },
   { label: "سياسة الخصوصية", href: "/privacy" },
+  { label: "سياسة الضمان المالي", href: "/escrow-policy" },
+  { label: "سياسة النزاعات", href: "/dispute-policy" },
 ] as const;
 
 const footerCategoryLinks = [

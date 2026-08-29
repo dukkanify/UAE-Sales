@@ -17,6 +17,17 @@ export type AdminPermission =
   | "settings"
   | "categories";
 
+/** Granular RBAC actions per admin module (spreadsheet matrix). */
+export type AdminAction =
+  | "view"
+  | "add"
+  | "edit"
+  | "delete"
+  | "approve"
+  | "export";
+
+export type AdminActionMatrix = Partial<Record<AdminPermission, AdminAction[]>>;
+
 export type AccountStatus = "pending" | "active" | "suspended";
 
 export type RegistrationSource =
@@ -61,6 +72,8 @@ export type UserProfile = {
   role?: UserRole;
   /** When role is admin, empty/undefined = full access; otherwise gated permissions. */
   adminPermissions?: AdminPermission[];
+  /** Optional per-module action matrix. Missing matrix = all actions for granted modules. */
+  adminActionMatrix?: AdminActionMatrix;
   subscription?: string;
   walletBalance?: number;
   businessProfile?: BusinessProfile;

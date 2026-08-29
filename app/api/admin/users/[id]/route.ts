@@ -53,7 +53,9 @@ export async function PATCH(request: Request, context: RouteParams) {
   // Only super admins may change roles or module permissions.
   if (
     !actorIsSuper &&
-    (body.role !== undefined || body.adminPermissions !== undefined)
+    (body.role !== undefined ||
+      body.adminPermissions !== undefined ||
+      body.adminActionMatrix !== undefined)
   ) {
     return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
   }
@@ -100,6 +102,7 @@ export async function PATCH(request: Request, context: RouteParams) {
               : body.adminPermissions.join(",")
           }`
         : null,
+      body.adminActionMatrix ? "مصفوفة إجراءات محدّثة" : null,
     ]
       .filter(Boolean)
       .join(" · "),

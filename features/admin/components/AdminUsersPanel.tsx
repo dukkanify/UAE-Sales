@@ -3,9 +3,11 @@
 import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { AdminPermission, AdminUserRecord } from "@/types";
+import type { AdminAction, AdminActionMatrix, AdminPermission, AdminUserRecord } from "@/types";
 import {
+  ALL_ADMIN_ACTIONS,
   ALL_ADMIN_PERMISSIONS,
+  ADMIN_ACTION_LABELS,
   ADMIN_PERMISSION_LABELS,
 } from "@/services/auth/admin-permission-checks";
 import { getSessionUser } from "@/services/storage";
@@ -50,6 +52,9 @@ export function AdminUsersPanel() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [draftPermissions, setDraftPermissions] = useState<
     Record<string, AdminPermission[]>
+  >({});
+  const [draftMatrices, setDraftMatrices] = useState<
+    Record<string, AdminActionMatrix>
   >({});
   const [message, setMessage] = useState<{
     text: string;
@@ -107,7 +112,11 @@ export function AdminUsersPanel() {
     patch: Partial<
       Pick<
         AdminUserRecord,
-        "isVerified" | "accountStatus" | "role" | "adminPermissions"
+        | "isVerified"
+        | "accountStatus"
+        | "role"
+        | "adminPermissions"
+        | "adminActionMatrix"
       >
     >,
   ) {
@@ -141,7 +150,12 @@ export function AdminUsersPanel() {
           delete next[id];
           return next;
         });
-        if (patch.adminPermissions) {
+        setDraftMatrices((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
+        if (patch.adminPermissions || patch.adminActionMatrix) {
           setMessage({
             variant: "success",
             text: "تم حفظ صلاحيات المدير بنجاح.",
@@ -157,6 +171,10 @@ export function AdminUsersPanel() {
     return draftPermissions[user.id] ?? user.adminPermissions ?? [];
   }
 
+  function draftMatrixFor(user: AdminUserRecord): AdminActionMatrix {
+    return draftMatrices[user.id] ?? user.adminActionMatrix ?? {};
+  }
+
   function toggleDraftPermission(user: AdminUserRecord, permission: AdminPermission) {
     const current = draftFor(user);
     const has = current.includes(permission);
@@ -164,14 +182,52 @@ export function AdminUsersPanel() {
       ? current.filter((item) => item !== permission)
       : [...current, permission];
     setDraftPermissions((prev) => ({ ...prev, [user.id]: next }));
+    if (has) {
+      setDraftMatrices((prev) => {
+        const matrix = { ...(prev[user.id] ?? user.adminActionMatrix ?? {}) };
+        delete matrix[permission];
+        return { ...prev, [user.id]: matrix };
+      });
+    } else {
+      setDraftMatrices((prev) => ({
+        ...prev,
+        [user.id]: {
+          ...(prev[user.id] ?? user.adminActionMatrix ?? {}),
+          [permission]: [...ALL_ADMIN_ACTIONS],
+        },
+      }));
+    }
+  }
+
+  function toggleDraftAction(
+    user: AdminUserRecord,
+    permission: AdminPermission,
+    action: AdminAction,
+  ) {
+    const matrix = { ...draftMatrixFor(user) };
+    const current = matrix[permission] ?? [...ALL_ADMIN_ACTIONS];
+    const has = current.includes(action);
+    const next = has
+      ? current.filter((item) => item !== action)
+      : [...current, action];
+    matrix[permission] = next;
+    setDraftMatrices((prev) => ({ ...prev, [user.id]: matrix }));
   }
 
   function hasUnsavedPermissions(user: AdminUserRecord): boolean {
     const draft = draftPermissions[user.id];
-    if (!draft) return false;
-    const saved = user.adminPermissions ?? [];
-    if (draft.length !== saved.length) return true;
-    return draft.some((item) => !saved.includes(item));
+    const draftMatrix = draftMatrices[user.id];
+    if (!draft && !draftMatrix) return false;
+    if (draft) {
+      const saved = user.adminPermissions ?? [];
+      if (draft.length !== saved.length || draft.some((item) => !saved.includes(item))) {
+        return true;
+      }
+    }
+    if (draftMatrix) {
+      return JSON.stringify(draftMatrix) !== JSON.stringify(user.adminActionMatrix ?? {});
+    }
+    return false;
   }
 
   return (
@@ -339,30 +395,54 @@ export function AdminUsersPanel() {
             !(isSuperAdminRecord(user) && user.id !== session?.id) ? (
               <div className="mt-4 rounded-[var(--radius-xl)] border border-border bg-surface-muted/40 p-3">
                 <p className="text-xs font-semibold text-ink">
-                  صلاحيات الإدارة (مدير فرعي)
+                  مصفوفة الصلاحيات (عرض / إضافة / تعديل / حذف / اعتماد / تصدير)
                 </p>
                 <p className="mt-1 text-[11px] text-muted">
-                  عدّل الصلاحيات ثم اضغط حفظ. لا يتم الحفظ تلقائياً.
+                  فعّل الوحدة ثم حدد الإجراءات. الحفظ صريح عبر زر الحفظ — لا يتم الحفظ تلقائياً.
                 </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="mt-3 grid gap-3">
                   {ALL_ADMIN_PERMISSIONS.map((permission) => {
                     const checked = draftFor(user).includes(permission);
+                    const actions =
+                      draftMatrixFor(user)[permission] ?? [...ALL_ADMIN_ACTIONS];
                     return (
-                      <label
+                      <div
                         key={permission}
-                        className="flex items-center gap-2 text-xs text-ink"
+                        className="rounded-[var(--radius-lg)] border border-border/70 bg-surface p-2"
                       >
-                        <input
-                          checked={checked}
-                          disabled={
-                            busyId === user.id ||
-                            (user.id === session?.id && !sessionIsSuper)
-                          }
-                          onChange={() => toggleDraftPermission(user, permission)}
-                          type="checkbox"
-                        />
-                        {ADMIN_PERMISSION_LABELS[permission]}
-                      </label>
+                        <label className="flex items-center gap-2 text-xs font-semibold text-ink">
+                          <input
+                            checked={checked}
+                            disabled={
+                              busyId === user.id ||
+                              (user.id === session?.id && !sessionIsSuper)
+                            }
+                            onChange={() => toggleDraftPermission(user, permission)}
+                            type="checkbox"
+                          />
+                          {ADMIN_PERMISSION_LABELS[permission]}
+                        </label>
+                        {checked ? (
+                          <div className="mt-2 flex flex-wrap gap-2 ps-5">
+                            {ALL_ADMIN_ACTIONS.map((action) => (
+                              <label
+                                key={action}
+                                className="flex items-center gap-1 text-[11px] text-muted"
+                              >
+                                <input
+                                  checked={actions.includes(action)}
+                                  disabled={busyId === user.id}
+                                  onChange={() =>
+                                    toggleDraftAction(user, permission, action)
+                                  }
+                                  type="checkbox"
+                                />
+                                {ADMIN_ACTION_LABELS[action]}
+                              </label>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
                     );
                   })}
                 </div>
@@ -373,6 +453,7 @@ export function AdminUsersPanel() {
                     onClick={() =>
                       patchUser(user.id, {
                         adminPermissions: draftFor(user),
+                        adminActionMatrix: draftMatrixFor(user),
                       })
                     }
                     size="sm"
@@ -382,13 +463,18 @@ export function AdminUsersPanel() {
                   </Button>
                   {hasUnsavedPermissions(user) ? (
                     <Button
-                      onClick={() =>
+                      onClick={() => {
                         setDraftPermissions((prev) => {
                           const next = { ...prev };
                           delete next[user.id];
                           return next;
-                        })
-                      }
+                        });
+                        setDraftMatrices((prev) => {
+                          const next = { ...prev };
+                          delete next[user.id];
+                          return next;
+                        });
+                      }}
                       size="sm"
                       type="button"
                       variant="ghost"
