@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import {
   isSessionUser,
   requireAdminUser,
@@ -19,20 +18,8 @@ import {
 import {
   clearStripeCredentials,
   maskSecret,
-  saveStripeCredentials,
 } from "@/services/payments/stripe-credentials-store";
 import { resetStripeClient } from "@/services/payments/stripe.service";
-import Stripe from "stripe";
-
-const saveSchema = z.object({
-  secretKey: z.string().optional(),
-  publishableKey: z.string().optional(),
-  webhookSecret: z.string().optional(),
-  clearSecret: z.boolean().optional(),
-  clearPublishable: z.boolean().optional(),
-  clearWebhook: z.boolean().optional(),
-  testConnection: z.boolean().optional(),
-});
 
 async function buildStripePayload() {
   const config = await ensureStripeConfigLoaded(true);
@@ -100,7 +87,24 @@ export async function GET() {
   return NextResponse.json(await buildStripePayload());
 }
 
-export async function PUT(request: Request) {
+/** Browser key paste is disabled — platform keys belong in Vercel Production. */
+export async function PUT() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
+  }
+
+  return NextResponse.json(
+    {
+      error: "USE_VERCEL_ENV",
+      message:
+        "إعداد Stripe الرئيسي غير مكتمل عبر واجهة المتصفح. اضبط المفاتيح في Vercel Production ثم أعد النشر.",
+    },
+    { status: 403 },
+  );
+}
+
+export async function DELETE() {
   const admin = await requireAdminUser();
   if (!isSessionUser(admin)) {
     return admin;
@@ -111,68 +115,10 @@ export async function PUT(request: Request) {
       {
         error: "ENV_MANAGED",
         message:
-          "Stripe secret is already set in Vercel environment variables. Update keys there, or remove STRIPE_SECRET_KEY to manage from admin.",
+          "المفاتيح مضبوطة عبر Vercel ولا يمكن حذفها من لوحة الأدمن.",
       },
       { status: 409 },
     );
-  }
-
-  const body = await request.json().catch(() => null);
-  const parsed = saveSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
-  }
-
-  try {
-    await saveStripeCredentials(parsed.data);
-    resetStripeClient();
-    await ensureStripeConfigLoaded(true);
-
-    let connection: { ok: boolean; mode?: string | null; error?: string } | null =
-      null;
-    if (parsed.data.testConnection !== false && isStripeConfigured()) {
-      try {
-        const stripe = new Stripe(getStripeSecretKey()!, {
-          apiVersion: "2026-06-24.dahlia",
-        });
-        const balance = await stripe.balance.retrieve();
-        connection = {
-          ok: true,
-          mode: balance.livemode ? "live" : "test",
-        };
-      } catch (error) {
-        connection = {
-          ok: false,
-          error: error instanceof Error ? error.message : "CONNECTION_FAILED",
-        };
-      }
-    }
-
-    return NextResponse.json({
-      ok: true,
-      connection,
-      ...(await buildStripePayload()),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "SAVE_FAILED";
-    const status =
-      message === "INVALID_SECRET_KEY" ||
-      message === "INVALID_PUBLISHABLE_KEY" ||
-      message === "INVALID_WEBHOOK_SECRET"
-        ? 400
-        : 500;
-    return NextResponse.json({ error: message }, { status });
-  }
-}
-
-export async function DELETE() {
-  const admin = await requireAdminUser();
-  if (!isSessionUser(admin)) {
-    return admin;
-  }
-
-  if (process.env.STRIPE_SECRET_KEY?.trim()) {
-    return NextResponse.json({ error: "ENV_MANAGED" }, { status: 409 });
   }
 
   await clearStripeCredentials();

@@ -7,10 +7,8 @@ import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { Badge } from "@/shared/ui/Badge";
-import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
-import { Input } from "@/shared/ui/Input";
 
 type StripePayload = {
   counts: {
@@ -60,16 +58,9 @@ type StripePayload = {
   };
 };
 
+/** Platform keys live in Vercel Production — never paste secrets in the browser. */
 export function AdminStripePanel() {
   const [data, setData] = useState<StripePayload | null>(null);
-  const [secretKey, setSecretKey] = useState("");
-  const [publishableKey, setPublishableKey] = useState("");
-  const [webhookSecret, setWebhookSecret] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<{
-    text: string;
-    variant: "success" | "error";
-  } | null>(null);
 
   useEffect(() => {
     const user = getSessionUser();
@@ -86,92 +77,12 @@ export function AdminStripePanel() {
     };
   }, []);
 
-  async function saveCredentials(event: React.FormEvent) {
-    event.preventDefault();
-    setBusy(true);
-    setMessage(null);
-    try {
-      const res = await adminFetch("/api/admin/stripe", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          secretKey: secretKey.trim() || undefined,
-          publishableKey: publishableKey.trim() || undefined,
-          webhookSecret: webhookSecret.trim() || undefined,
-          testConnection: true,
-        }),
-      });
-      const payload = await res.json();
-      if (!res.ok) {
-        const map: Record<string, string> = {
-          ENV_MANAGED:
-            "المفاتيح مضبوطة من Vercel. احذف STRIPE_SECRET_KEY من البيئة لإدارتها من هنا.",
-          INVALID_SECRET_KEY:
-            "Secret Key غير صالح. يجب أن يبدأ بـ sk_live_ أو sk_test_ (ليس mk_).",
-          INVALID_PUBLISHABLE_KEY:
-            "Publishable Key غير صالح. يجب أن يبدأ بـ pk_live_ أو pk_test_.",
-          INVALID_WEBHOOK_SECRET:
-            "Webhook Secret غير صالح. يجب أن يبدأ بـ whsec_.",
-        };
-        setMessage({
-          variant: "error",
-          text: map[payload.error] ?? payload.message ?? "تعذر حفظ المفاتيح.",
-        });
-        return;
-      }
-      if (payload?.status) setData(payload as StripePayload);
-      setSecretKey("");
-      setPublishableKey("");
-      setWebhookSecret("");
-      const connectionOk = payload.connection?.ok;
-      setMessage({
-        variant: connectionOk === false ? "error" : "success",
-        text:
-          connectionOk === false
-            ? `تم الحفظ لكن الاتصال فشل: ${payload.connection?.error ?? "تحقق من المفتاح"}`
-            : connectionOk
-              ? "تم تفعيل Stripe بنجاح والتحقق من الاتصال."
-              : "تم حفظ مفاتيح Stripe.",
-      });
-    } catch {
-      setMessage({ variant: "error", text: "تعذر حفظ المفاتيح." });
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function clearCredentials() {
-    if (!window.confirm("حذف مفاتيح Stripe المحفوظة من لوحة الأدمن؟")) return;
-    setBusy(true);
-    setMessage(null);
-    try {
-      const res = await adminFetch("/api/admin/stripe", { method: "DELETE" });
-      const payload = await res.json();
-      if (!res.ok) {
-        setMessage({
-          variant: "error",
-          text:
-            payload.error === "ENV_MANAGED"
-              ? "المفاتيح مضبوطة من Vercel ولا يمكن حذفها من هنا."
-              : "تعذر الحذف.",
-        });
-        return;
-      }
-      if (payload?.status) setData(payload as StripePayload);
-      setMessage({ variant: "success", text: "تم حذف مفاتيح الأدمن." });
-    } catch {
-      setMessage({ variant: "error", text: "تعذر الحذف." });
-    } finally {
-      setBusy(false);
-    }
-  }
-
   if (!data) {
     return (
       <div className="grid gap-5">
         <AdminStripeConnectPanel mode="manage" />
         <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm text-muted">جاري تحميل حالة مفاتيح المنصة...</p>
+          <p className="text-sm text-muted">جاري تحميل حالة Stripe...</p>
         </Card>
       </div>
     );
@@ -184,151 +95,74 @@ export function AdminStripePanel() {
       <AdminStripeConnectPanel
         key={`connect-${status.configured ? "ready" : "waiting"}`}
         mode="manage"
+        platformConfigured={status.configured}
       />
 
-      <div className="admin-ops__status-row">
-        <div
-          className={`admin-ops__status-chip${
-            status.configured
-              ? " admin-ops__status-chip--ok"
-              : " admin-ops__status-chip--warn"
-          }`}
-        >
-          Secret Key: {status.secretKeyPresent ? "موجود" : "ناقص"}
-        </div>
-        <div
-          className={`admin-ops__status-chip${
-            status.publishableConfigured ? " admin-ops__status-chip--ok" : ""
-          }`}
-        >
-          Publishable: {status.publishableConfigured ? "موجود" : "ناقص"}
-        </div>
-        <div
-          className={`admin-ops__status-chip${
-            status.webhookConfigured ? " admin-ops__status-chip--ok" : ""
-          }`}
-        >
-          Webhook: {status.webhookConfigured ? "موجود" : "ناقص"}
-        </div>
-        <div className="admin-ops__status-chip">
-          المصدر:{" "}
-          {status.source === "env"
-            ? "Vercel Env"
-            : status.source === "admin"
-              ? "لوحة الأدمن"
-              : "غير مضبوط"}
-        </div>
-        <div className="admin-ops__status-chip">
-          العملة {status.currency.toUpperCase()}
-        </div>
-        <div className="admin-ops__status-chip">
-          Mock: {status.mockAllowed ? "مسموح" : "مغلق"}
-        </div>
-      </div>
-
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">مفاتيح منصة Stripe</h2>
+        <h2 className="admin-ops__panel-title">إعداد المنصة (خوادم)</h2>
         <p className="admin-ops__panel-sub">
-          مطلوبة لإنشاء حسابات Connect وروابط الإعداد على الخادم فقط. لا تُعرض
-          Secret Key في المتصفح بعد الحفظ.
+          مفاتيح Stripe الرئيسية تُضبط مرة واحدة عبر Vercel Production. لا تُدخل Secret
+          Key أو Webhook Secret في المتصفح.
         </p>
 
-        {message ? (
+        {!status.configured ? (
           <div className="mt-3">
-            <FormMessage variant={message.variant}>{message.text}</FormMessage>
+            <FormMessage variant="error">
+              إعداد Stripe الرئيسي غير مكتمل. يرجى إكمال إعدادات المنصة.
+            </FormMessage>
           </div>
-        ) : null}
-
-        {status.envManaged ? (
-          <FormMessage variant="error">
-            المفاتيح مضبوطة حالياً عبر متغيرات Vercel. لإدارتها من هنا احذف{" "}
-            <code className="text-xs">STRIPE_SECRET_KEY</code> من Production ثم
-            Redeploy.
-          </FormMessage>
         ) : (
-          <form className="mt-4 grid gap-3" onSubmit={saveCredentials}>
-            <Input
-              autoComplete="off"
-              disabled={busy}
-              label={`Secret Key ${status.secretKeyMasked ? `(${status.secretKeyMasked})` : ""}`}
-              onChange={(event) => setSecretKey(event.target.value)}
-              placeholder="sk_live_..."
-              type="password"
-              value={secretKey}
-            />
-            <Input
-              autoComplete="off"
-              disabled={busy}
-              label={`Publishable Key ${status.publishableKeyMasked ? `(${status.publishableKeyMasked})` : ""}`}
-              onChange={(event) => setPublishableKey(event.target.value)}
-              placeholder="pk_live_..."
-              type="password"
-              value={publishableKey}
-            />
-            <Input
-              autoComplete="off"
-              disabled={busy}
-              label={`Webhook Secret ${status.webhookSecretMasked ? `(${status.webhookSecretMasked})` : ""}`}
-              onChange={(event) => setWebhookSecret(event.target.value)}
-              placeholder="whsec_..."
-              type="password"
-              value={webhookSecret}
-            />
-            <p className="text-xs text-muted">
-              أنشئ Webhook على{" "}
-              <code className="text-[0.7rem]">{status.webhookEndpoint}</code> ثم
-              الصق Signing secret هنا. اترك الحقل فارغاً إذا لم تغيّره.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Button loading={busy} type="submit">
-                حفظ وتفعيل
-              </Button>
-              <Button
-                disabled={busy || status.source !== "admin"}
-                onClick={clearCredentials}
-                type="button"
-                variant="ghost"
-              >
-                حذف مفاتيح الأدمن
-              </Button>
-              <a
-                className="admin-ops__chip-link"
-                href={links.apiKeys}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                فتح API Keys
-              </a>
-              <a
-                className="admin-ops__chip-link"
-                href={links.webhooks}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                فتح Webhooks
-              </a>
-            </div>
-          </form>
+          <div className="mt-3">
+            <FormMessage variant="success">
+              إعداد Stripe الرئيسي مكتمل على الخادم. يمكنك متابعة ربط Connect أدناه.
+            </FormMessage>
+          </div>
         )}
 
-        <ol className="mt-4 grid gap-2 text-sm text-muted">
-          <li>
-            1. انسخ <strong className="text-ink">sk_live_</strong> و{" "}
-            <strong className="text-ink">pk_live_</strong> من Stripe → API keys
-          </li>
-          <li>
-            2. Webhooks → Add endpoint →{" "}
-            <code className="text-xs">{status.webhookEndpoint}</code>
-          </li>
-          <li>
-            3. أحداث:{" "}
-            <code className="text-xs">checkout.session.completed</code>،{" "}
-            <code className="text-xs">payment_intent.*</code>،{" "}
-            <code className="text-xs">charge.refunded</code>،{" "}
-            <code className="text-xs">account.updated</code>
-          </li>
-          <li>4. الصق Signing secret (`whsec_...`) واضغط حفظ وتفعيل</li>
-        </ol>
+        <div className="admin-ops__status-row" style={{ marginTop: "1rem" }}>
+          <div
+            className={`admin-ops__status-chip${
+              status.configured
+                ? " admin-ops__status-chip--ok"
+                : " admin-ops__status-chip--warn"
+            }`}
+          >
+            المنصة: {status.configured ? "جاهزة" : "غير مكتملة"}
+          </div>
+          <div
+            className={`admin-ops__status-chip${
+              status.publishableConfigured ? " admin-ops__status-chip--ok" : ""
+            }`}
+          >
+            Publishable: {status.publishableConfigured ? "مضبوط" : "ناقص"}
+          </div>
+          <div
+            className={`admin-ops__status-chip${
+              status.webhookConfigured ? " admin-ops__status-chip--ok" : ""
+            }`}
+          >
+            Webhook: {status.webhookConfigured ? "مضبوط" : "ناقص"}
+          </div>
+          <div className="admin-ops__status-chip">
+            المصدر:{" "}
+            {status.source === "env"
+              ? "Vercel Env"
+              : status.source === "admin"
+                ? "مخزّن على الخادم"
+                : "غير مضبوط"}
+          </div>
+          <div className="admin-ops__status-chip">
+            العملة {status.currency.toUpperCase()}
+          </div>
+          <div className="admin-ops__status-chip">
+            Mock: {status.mockAllowed ? "مسموح" : "مغلق"}
+          </div>
+        </div>
+
+        <p className="mt-3 text-xs text-muted">
+          Webhook endpoint:{" "}
+          <code className="text-[0.7rem]">{status.webhookEndpoint}</code>
+        </p>
       </section>
 
       <section className="admin-ops__panel">
@@ -344,7 +178,6 @@ export function AdminStripePanel() {
             ["Customers", links.customers],
             ["Balance", links.balances],
             ["Disputes", links.disputes],
-            ["API Keys", links.apiKeys],
           ].map(([label, href]) => (
             <a
               key={label}
