@@ -51,7 +51,7 @@ export function CompleteAccountContent({ token }: CompleteAccountContentProps) {
         }
 
         setSessionUser(data.user as UserProfile);
-        await persistSessionCookie(data.user);
+        await persistSessionCookie();
         router.push(data.redirectTo ?? "/orders");
       },
       [router, token],

@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import type { CategoryFieldDefinition, CategorySpecs, Listing, ListingCondition } from "@/types";
 import { getCategoryFields, isDynamicCategory } from "@/shared/constants/category-fields";
 import { BrandCombobox } from "@/shared/ui/BrandCombobox";
@@ -51,10 +54,20 @@ function getSpecValue(
   return value;
 }
 
+function fieldVisible(
+  field: CategoryFieldDefinition,
+  specs: Record<string, string>,
+): boolean {
+  if (!field.showWhen) return true;
+  const current = specs[field.showWhen.key] ?? "";
+  return field.showWhen.values.includes(current);
+}
+
 function renderField(
   field: CategoryFieldDefinition,
   defaults: CategoryFieldsDefaults | undefined,
   selectedFeatures: string[],
+  onSpecChange: (key: string, value: string) => void,
 ) {
   const name = `spec_${field.key}`;
   const defaultValue = getSpecValue(defaults, field.key);
@@ -67,6 +80,7 @@ function renderField(
         defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
         label={field.label}
         name={name}
+        onChange={(event) => onSpecChange(field.key, event.target.value)}
         placeholder={field.placeholder}
         required={field.required}
       />
@@ -81,6 +95,7 @@ function renderField(
         defaultValue={defaultValue !== undefined ? String(defaultValue) : undefined}
         label={field.label}
         name={name}
+        onChange={(event) => onSpecChange(field.key, event.target.value)}
         options={field.options ?? []}
         required={field.required}
       />
@@ -135,6 +150,7 @@ function renderField(
       label={field.label}
       min={field.type === "number" ? "0" : undefined}
       name={name}
+      onChange={(event) => onSpecChange(field.key, event.target.value)}
       placeholder={field.placeholder}
       required={field.required}
       type={field.type === "number" ? "number" : "text"}
@@ -158,137 +174,182 @@ export function CategoryFieldsForm({
   showContact = false,
   stepLabel,
 }: CategoryFieldsFormProps) {
+  const fallbackFields = useMemo(
+    () => (isDynamicCategory(categoryId) ? getCategoryFields(categoryId) : []),
+    [categoryId],
+  );
+  const [remoteFields, setRemoteFields] = useState<{
+    categoryId: string;
+    fields: CategoryFieldDefinition[];
+  } | null>(null);
+
+  useEffect(() => {
+    if (!isDynamicCategory(categoryId)) return;
+    let cancelled = false;
+    void fetch(`/api/category-fields?categoryId=${encodeURIComponent(categoryId)}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled || !Array.isArray(data?.fields) || data.fields.length === 0) return;
+        setRemoteFields({
+          categoryId,
+          fields: data.fields as CategoryFieldDefinition[],
+        });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryId]);
+
+  const allFields =
+    remoteFields?.categoryId === categoryId ? remoteFields.fields : fallbackFields;
+
+  const [specs, setSpecs] = useState<Record<string, string>>(() => {
+    const initial: Record<string, string> = {};
+    for (const field of fallbackFields) {
+      const value = getSpecValue(defaults, field.key);
+      if (value !== undefined) initial[field.key] = String(value);
+    }
+    return initial;
+  });
+
   if (!isDynamicCategory(categoryId)) {
     return null;
   }
 
-  const fields = getCategoryFields(categoryId).filter(
-    (field) => field.type !== "checkbox-group",
+  const fields = allFields.filter(
+    (field) => field.type !== "checkbox-group" && fieldVisible(field, specs),
   );
-  const featureField = getCategoryFields(categoryId).find(
-    (field) => field.type === "checkbox-group",
-  );
+  const featureField = allFields.find((field) => field.type === "checkbox-group");
   const selectedFeatures = buildSelectedFeatures(defaults);
   const conditionDefault =
     defaults?.categorySpecs?.condition !== undefined
       ? String(defaults.categorySpecs.condition)
       : defaults?.condition;
 
+  function onSpecChange(key: string, value: string) {
+    setSpecs((prev) => ({ ...prev, [key]: value }));
+  }
+
   return (
     <LocalizedTree>
-    <Card key={categoryId} className={addListingStepCardClass}>
-      {stepLabel ? (
-        <p className="text-xs font-bold uppercase tracking-wide text-secondary">
-          {stepLabel}
+      <Card key={`${categoryId}-${allFields.length}`} className={addListingStepCardClass}>
+        {stepLabel ? (
+          <p className="text-xs font-bold uppercase tracking-wide text-secondary">
+            {stepLabel}
+          </p>
+        ) : null}
+        <h2 className={`${stepLabel ? "mt-1" : ""} ${addListingStepTitleClass}`}>
+          {heading}
+        </h2>
+        <p className={addListingStepDescClass}>
+          الحقول تتغير تلقائياً حسب القسم — ابحث عن الماركة بكتابة أول حروفها.
         </p>
-      ) : null}
-      <h2 className={`${stepLabel ? "mt-1" : ""} ${addListingStepTitleClass}`}>
-        {heading}
-      </h2>
-      <p className={addListingStepDescClass}>
-        الحقول تتغير تلقائياً حسب القسم — ابحث عن الماركة بكتابة أول حروفها.
-      </p>
 
-      <div className={addListingDynamicFieldsGridClass}>
-        {fields.map((field) => {
-          const spansFullWidth = field.type === "textarea";
+        <div className={addListingDynamicFieldsGridClass}>
+          {fields.map((field) => {
+            const spansFullWidth = field.type === "textarea";
 
-          if (field.key === "condition" && conditionDefault) {
+            if (field.key === "condition" && conditionDefault) {
+              return (
+                <div
+                  key={field.key}
+                  className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
+                >
+                  <Select
+                    compact
+                    defaultValue={String(conditionDefault)}
+                    label={field.label}
+                    name={`spec_${field.key}`}
+                    onChange={(event) => onSpecChange(field.key, event.target.value)}
+                    options={field.options ?? []}
+                    required={field.required}
+                  />
+                  {errors[field.key] ? (
+                    <FormMessage variant="error">{String(errors[field.key])}</FormMessage>
+                  ) : null}
+                </div>
+              );
+            }
+
             return (
-              <div key={field.key} className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}>
-                <Select
-                  compact
-                  defaultValue={String(conditionDefault)}
-                  label={field.label}
-                  name={`spec_${field.key}`}
-                  options={field.options ?? []}
-                  required={field.required}
-                />
+              <div
+                key={field.key}
+                className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
+              >
+                {renderField(field, defaults, selectedFeatures, onSpecChange)}
+                {field.note ? (
+                  <p className="mt-1 text-xs text-muted">{field.note}</p>
+                ) : null}
                 {errors[field.key] ? (
                   <FormMessage variant="error">{String(errors[field.key])}</FormMessage>
                 ) : null}
               </div>
             );
-          }
+          })}
 
-          return (
-            <div
-              key={field.key}
-              className={`min-w-0 ${spansFullWidth ? "col-span-2" : ""}`}
-            >
-              {renderField(field, defaults, selectedFeatures)}
-              {field.note ? (
-                <p className="mt-1 text-xs text-muted">{field.note}</p>
-              ) : null}
-              {errors[field.key] ? (
-                <FormMessage variant="error">{String(errors[field.key])}</FormMessage>
-              ) : null}
+          {featureField && fieldVisible(featureField, specs) ? (
+            <div className="col-span-2 min-w-0">
+              {renderField(featureField, defaults, selectedFeatures, onSpecChange)}
             </div>
-          );
-        })}
-
-        {featureField ? (
-          <div className="col-span-2 min-w-0">
-            {renderField(featureField, defaults, selectedFeatures)}
-          </div>
-        ) : null}
-      </div>
-
-      <div className={addListingStepFooterClass}>
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-2">
-          <div className="col-span-2 sm:col-span-1">
-            <Input
-              compact
-              defaultValue={defaults?.price}
-              inputMode="numeric"
-              label="السعر بالدرهم"
-              min="1"
-              name="price"
-              placeholder="اكتب السعر"
-              required
-              type="number"
-            />
-            {errors.price ? (
-              <FormMessage variant="error">{errors.price}</FormMessage>
-            ) : null}
-          </div>
-        </div>
-
-        <div>
-          <Textarea
-            compact
-            defaultValue={defaults?.description}
-            label="الوصف"
-            name="description"
-            placeholder="اكتب وصفاً واضحاً ومفصلاً للإعلان..."
-            required
-          />
-          {errors.description ? (
-            <FormMessage variant="error">{errors.description}</FormMessage>
           ) : null}
         </div>
 
-        {showContact ? (
+        <div className={addListingStepFooterClass}>
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-2">
+            <div className="col-span-2 sm:col-span-1">
+              <Input
+                compact
+                defaultValue={defaults?.price}
+                inputMode="numeric"
+                label="السعر بالدرهم"
+                min="1"
+                name="price"
+                placeholder="اكتب السعر"
+                required
+                type="number"
+              />
+              {errors.price ? (
+                <FormMessage variant="error">{errors.price}</FormMessage>
+              ) : null}
+            </div>
+          </div>
+
           <div>
-            <Input
+            <Textarea
               compact
-              defaultValue={defaults?.contactPhone}
-              label="رقم التواصل"
-              name="contact"
-              placeholder="05xxxxxxxx"
-              type="tel"
+              defaultValue={defaults?.description}
+              label="الوصف"
+              name="description"
+              placeholder="اكتب وصفاً واضحاً ومفصلاً للإعلان..."
+              required
             />
-            {errors.contact ? (
-              <FormMessage variant="error">{errors.contact}</FormMessage>
+            {errors.description ? (
+              <FormMessage variant="error">{errors.description}</FormMessage>
             ) : null}
           </div>
-        ) : null}
 
-        {errors.title ? (
-          <FormMessage variant="error">{errors.title}</FormMessage>
-        ) : null}
-      </div>
-    </Card>
+          {showContact ? (
+            <div>
+              <Input
+                compact
+                defaultValue={defaults?.contactPhone}
+                label="رقم التواصل"
+                name="contact"
+                placeholder="05xxxxxxxx"
+                type="tel"
+              />
+              {errors.contact ? (
+                <FormMessage variant="error">{errors.contact}</FormMessage>
+              ) : null}
+            </div>
+          ) : null}
+
+          {errors.title ? (
+            <FormMessage variant="error">{errors.title}</FormMessage>
+          ) : null}
+        </div>
+      </Card>
     </LocalizedTree>
   );
 }

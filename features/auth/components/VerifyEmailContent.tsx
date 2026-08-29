@@ -41,7 +41,7 @@ export function VerifyEmailContent({ initialOtp = null }: VerifyEmailContentProp
       const user = data?.user;
       if (user) {
         setSessionUser(user);
-        await persistSessionCookie(user);
+        await persistSessionCookie();
         await syncFavoritesAfterLogin(user.id);
         router.push(data.redirectTo ?? "/profile");
         return;

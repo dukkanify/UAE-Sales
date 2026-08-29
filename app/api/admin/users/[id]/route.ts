@@ -28,6 +28,38 @@ export async function PATCH(request: Request, context: RouteParams) {
     return NextResponse.json({ error: "NOT_FOUND" }, { status: 404 });
   }
 
+  const actorIsSuper =
+    !admin.adminPermissions || admin.adminPermissions.length === 0;
+  const targetIsSuper =
+    current.role === "admin" &&
+    (!current.adminPermissions || current.adminPermissions.length === 0);
+
+  // Sub-admins cannot modify super admins.
+  if (!actorIsSuper && targetIsSuper) {
+    return NextResponse.json({ error: "CANNOT_MODIFY_SUPER_ADMIN" }, { status: 403 });
+  }
+
+  // Prevent self-escalation to full super admin or broader modules.
+  if (admin.id === id && body.adminPermissions) {
+    const currentPerms = new Set(admin.adminPermissions ?? []);
+    const nextPerms = body.adminPermissions;
+    const expandingToSuper = nextPerms.length === 0 && currentPerms.size > 0;
+    const addingModules = nextPerms.some((item) => !currentPerms.has(item));
+    if (expandingToSuper || (currentPerms.size > 0 && addingModules)) {
+      return NextResponse.json({ error: "SELF_ESCALATION" }, { status: 403 });
+    }
+  }
+
+  // Only super admins may change roles or module permissions.
+  if (
+    !actorIsSuper &&
+    (body.role !== undefined ||
+      body.adminPermissions !== undefined ||
+      body.adminActionMatrix !== undefined)
+  ) {
+    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+  }
+
   if (body.accountStatus === "active" && current.accountStatus === "pending") {
     if (!current.emailVerifiedAt) {
       return NextResponse.json(
@@ -63,6 +95,14 @@ export async function PATCH(request: Request, context: RouteParams) {
           : "إلغاء توثيق"
         : null,
       body.role ? `دور ${body.role}` : null,
+      body.adminPermissions
+        ? `صلاحيات: ${
+            body.adminPermissions.length === 0
+              ? "مدير أعلى"
+              : body.adminPermissions.join(",")
+          }`
+        : null,
+      body.adminActionMatrix ? "مصفوفة إجراءات محدّثة" : null,
     ]
       .filter(Boolean)
       .join(" · "),

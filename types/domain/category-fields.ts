@@ -24,6 +24,8 @@ export type CategoryFieldDefinition = {
   titlePart?: boolean;
   /** Searchable in query matching */
   searchable?: boolean;
+  /** Show field only when another spec matches one of the values */
+  showWhen?: { key: string; values: string[] };
 };
 
 export type CategorySpecValue = string | number | boolean;

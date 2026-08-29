@@ -9,7 +9,7 @@ function sessionVersionOf(user: { sessionVersion?: number } | null | undefined):
 
 export async function getValidSessionUser(): Promise<UserProfile | null> {
   const session = await getSessionFromCookie();
-  if (!session) return null;
+  if (!session?.id) return null;
 
   const stored = await findUserById(session.id);
   if (!stored) return null;

@@ -40,6 +40,8 @@ export type {
 
 export type {
   AccountType,
+  AdminAction,
+  AdminActionMatrix,
   AdminPermission,
   UserProfile,
   UserRole,

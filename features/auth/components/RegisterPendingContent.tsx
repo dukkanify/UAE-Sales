@@ -27,7 +27,7 @@ export function RegisterPendingContent() {
         if (cancelled) return;
         const nextUser = (data?.user as UserProfile | undefined) ?? session;
         setSessionUser(nextUser);
-        await persistSessionCookie(nextUser);
+        await persistSessionCookie();
         if (isMarketplaceAccountReady(nextUser)) {
           router.replace("/profile");
           return;

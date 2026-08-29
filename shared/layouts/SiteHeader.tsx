@@ -244,6 +244,13 @@ export function SiteHeader() {
                   >
                     {copy.account}
                   </Link>
+                  <Link
+                    className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
+                    href="/activities"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    نشاطاتي
+                  </Link>
                   <Button
                     className="w-full justify-start"
                     onClick={() => {
