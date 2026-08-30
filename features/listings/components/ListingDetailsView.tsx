@@ -4,6 +4,7 @@ import type { Category, Listing } from "@/types";
 import { EscrowProtectionCard } from "@/features/listings/components/EscrowProtectionCard";
 import { ListingPlatformNotice } from "@/features/listings/components/ListingPlatformNotice";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
+import { ListingDisputeEntry } from "@/features/listings/components/ListingDisputeEntry";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
 import { ListingLocationMap } from "@/features/listings/components/ListingLocationMap";
 import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
@@ -105,6 +106,7 @@ export function ListingDetailsView({
             </div>
 
             <ListingDetailToolbar listing={listing} />
+            <ListingDisputeEntry listing={listing} />
             <ListingLocationMap listing={listing} />
 
             <div className="marketplace-panel mt-6 p-6">
@@ -119,7 +121,8 @@ export function ListingDetailsView({
               <SellerPanel listing={listing} />
             </div>
             <ListingSafetyTips />
-            <div className="mt-6 lg:hidden">
+            <div className="mt-6 grid gap-6 lg:hidden">
+              <EscrowProtectionCard listing={listing} />
               <ListingPlatformNotice listing={listing} />
             </div>
           </div>

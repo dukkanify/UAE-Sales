@@ -4,6 +4,8 @@ import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 import { escrowProtectionSteps } from "@/services/content/homepage-marketplace.content";
+import { Button } from "@/shared/ui/Button";
+import { getListingDisputePath } from "@/shared/listings/listing-url";
 
 type EscrowProtectionCardProps = {
   listing: Listing;
@@ -46,6 +48,15 @@ export function EscrowProtectionCard({ listing }: EscrowProtectionCardProps) {
           </li>
         ))}
       </ol>
+      <div className="mt-4">
+        <Button fullWidth href={getListingDisputePath(listing)} size="sm" variant="secondary">
+          <Icon name="shield" size={14} />
+          فتح نزاع
+        </Button>
+        <p className="mt-2 text-xs font-medium leading-6 text-muted">
+          للنزاع على طلب مدفوع عبر الضمان خلال المهلة المحددة.
+        </p>
+      </div>
     </Card>
   );
 }

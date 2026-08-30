@@ -1,15 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import type { Order } from "@/types";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
+import { Select } from "@/shared/ui/Select";
 import { Textarea } from "@/shared/ui/Textarea";
 
 type NewDisputeFormProps = {
+  listingId?: string;
   orderId: string;
 };
 
@@ -22,22 +26,65 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_INPUT: "تحقق من البيانات المدخلة.",
 };
 
-export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
+const DISPUTABLE_STATUSES: Order["status"][] = [
+  "paid_held_in_escrow",
+  "delivered",
+  "confirmed",
+];
+
+export function NewDisputeForm({ listingId = "", orderId }: NewDisputeFormProps) {
   const router = useRouter();
+  const [selectedOrderId, setSelectedOrderId] = useState(orderId);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [reason, setReason] = useState("");
   const [evidenceUrl, setEvidenceUrl] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    const user = getSessionUser();
+    if (!user) return;
+    fetch(`/api/orders?userId=${encodeURIComponent(user.id)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const rows = (data.orders ?? []) as Order[];
+        setOrders(rows);
+        if (orderId) return;
+        const matching = rows.filter(
+          (row) =>
+            (!listingId || row.listingId === listingId) &&
+            DISPUTABLE_STATUSES.includes(row.status),
+        );
+        if (matching[0]) setSelectedOrderId(matching[0].id);
+      })
+      .catch(() => setOrders([]));
+  }, [listingId, orderId]);
+
+  const listingOrders = useMemo(() => {
+    const source = listingId
+      ? orders.filter((row) => row.listingId === listingId)
+      : orders;
+    return source.filter((row) => DISPUTABLE_STATUSES.includes(row.status));
+  }, [listingId, orders]);
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSuccess("");
 
+    const targetOrderId = selectedOrderId.trim();
     const user = getSessionUser();
     if (!user) {
-      router.push(`/login?next=/disputes/new?orderId=${encodeURIComponent(orderId)}`);
+      const next = listingId
+        ? `/disputes/new?listingId=${encodeURIComponent(listingId)}`
+        : `/disputes/new?orderId=${encodeURIComponent(targetOrderId)}`;
+      router.push(`/login?next=${encodeURIComponent(next)}`);
+      return;
+    }
+
+    if (!targetOrderId) {
+      setError("اختر الطلب المراد فتح النزاع عليه.");
       return;
     }
 
@@ -54,7 +101,7 @@ export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`/api/orders/${orderId}/dispute`, {
+      const response = await fetch(`/api/orders/${targetOrderId}/dispute`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,7 +117,7 @@ export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
       }
 
       setSuccess("تم فتح النزاع بنجاح. يمكنك متابعة حالة الطلب من صفحة الطلب.");
-      router.push(`/orders/${orderId}`);
+      router.push(`/orders/${targetOrderId}`);
     } catch {
       setError("تعذر فتح النزاع. حاول مرة أخرى.");
     } finally {
@@ -78,40 +125,60 @@ export function NewDisputeForm({ orderId }: NewDisputeFormProps) {
     }
   }
 
-  if (!orderId) {
-    return (
-      <Card className="p-6" variant="flat">
-        <FormMessage variant="error">
-          أضف رقم الطلب عبر الرابط، مثال: /disputes/new?orderId=...
-        </FormMessage>
-      </Card>
-    );
-  }
-
   return (
     <Card className="p-6" variant="flat">
       <form className="grid gap-4" onSubmit={handleSubmit}>
-        <Input
-          disabled
-          label="رقم الطلب"
-          readOnly
-          value={orderId}
-        />
+        {listingOrders.length > 0 ? (
+          <Select
+            label="الطلب"
+            name="orderId"
+            onChange={(event) => setSelectedOrderId(event.target.value)}
+            options={listingOrders.map((row) => ({
+              label: `${row.listingTitle} — ${row.id}`,
+              value: row.id,
+            }))}
+            required
+            value={selectedOrderId}
+          />
+        ) : (
+          <Input
+            hint={
+              listingId
+                ? "أدخل رقم الطلب المدفوع عبر الضمان لهذا الإعلان."
+                : "أدخل رقم الطلب من صفحة طلباتي."
+            }
+            label="رقم الطلب"
+            onChange={(event) => setSelectedOrderId(event.target.value)}
+            placeholder="order-..."
+            required
+            value={selectedOrderId}
+          />
+        )}
+        {listingId && listingOrders.length === 0 ? (
+          <p className="rounded-[var(--radius-md)] border border-border bg-surface-muted px-4 py-3 text-sm font-medium text-muted">
+            لا يوجد طلب ضمان مفتوح لهذا الإعلان في حسابك. يمكنك إدخال رقم الطلب يدوياً أو
+            مراجعة{" "}
+            <Link className="font-bold text-ink underline" href="/orders">
+              طلباتي
+            </Link>
+            .
+          </p>
+        ) : null}
         <Textarea
-          label="سبب النزاع"
           hint="اشرح المشكلة بوضوح (١٠ أحرف على الأقل)."
-          value={reason}
-          onChange={(event) => setReason(event.target.value)}
-          required
+          label="سبب النزاع"
           minLength={10}
+          onChange={(event) => setReason(event.target.value)}
           placeholder="مثال: المنتج وصل بحالة مختلفة عن الوصف..."
+          required
+          value={reason}
         />
         <Input
-          label="روابط أدلة (اختياري)"
           hint="يمكنك إدخال أكثر من رابط مفصول بفاصلة أو سطر جديد."
-          value={evidenceUrl}
+          label="روابط أدلة (اختياري)"
           onChange={(event) => setEvidenceUrl(event.target.value)}
           placeholder="https://..."
+          value={evidenceUrl}
         />
         {error ? <FormMessage variant="error">{error}</FormMessage> : null}
         {success ? <FormMessage variant="success">{success}</FormMessage> : null}
