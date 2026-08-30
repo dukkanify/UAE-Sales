@@ -1,0 +1,781 @@
+[
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?q=%D9%86%D8%AE%D9%84%D8%A9+%D8%AC%D9%85%D9%8A%D8%B1%D8%A7&_rsc=5CB68i4pnAekjehf",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=Mercedes&_rsc=5CB68i4pnAekjehf",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/services?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/pets?_rsc=13NgZlZIvZBw7nGb",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/mobiles?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/electronics?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=MacBook&_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=%D9%81%D9%8A%D9%84%D8%A7&_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=%D8%B4%D9%82%D8%A9&_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=iPhone&_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?q=Patrol&_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=tXyZJ52UQVBCVsD3",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/categories",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/categories/kids?q=%D9%85%D8%B3%D8%AA%D9%84%D8%B2%D9%85%D8%A7%D8%AA&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?q=%D8%B9%D8%B7%D9%88%D8%B1&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/jobs?q=%D8%AA%D9%88%D8%B5%D9%8A%D9%84&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/jobs?q=%D9%85%D8%A8%D9%8A%D8%B9%D8%A7%D8%AA&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?q=%D9%81%D9%84%D9%84&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?q=%D8%B4%D9%82%D9%82%20%D9%84%D9%84%D8%A8%D9%8A%D8%B9&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?q=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%85%D8%B3%D8%AA%D8%B9%D9%85%D9%84%D8%A9&_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/kids?q=%D9%85%D9%84%D8%A7%D8%A8%D8%B3%20%D8%A3%D8%B7%D9%81%D8%A7%D9%84&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/kids?q=%D8%A3%D9%84%D8%B9%D8%A7%D8%A8&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/kids?q=%D8%B9%D8%B1%D8%A8%D8%A7%D8%AA%20%D8%A3%D8%B7%D9%81%D8%A7%D9%84&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/pets?q=%D9%85%D8%B3%D8%AA%D9%84%D8%B2%D9%85%D8%A7%D8%AA&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/pets?q=%D9%82%D8%B7%D8%B7&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/pets?q=%D9%83%D9%84%D8%A7%D8%A8&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/services?_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/services?q=%D8%AA%D9%83%D9%8A%D9%8A%D9%81&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/services?q=%D8%AA%D9%86%D8%B8%D9%8A%D9%81&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/services?q=%D8%B5%D9%8A%D8%A7%D9%86%D8%A9&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?q=%D9%85%D9%84%D8%A7%D8%A8%D8%B3&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?q=%D8%AD%D9%82%D8%A7%D8%A6%D8%A8&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?q=%D8%B3%D8%A7%D8%B9%D8%A7%D8%AA&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/categories/cars",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?category=mobiles&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=e9-3f6YZ980-ReMC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=electronics&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=cars&sort=price_asc&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=cars&maxPrice=50000&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?city=%D8%A3%D8%A8%D9%88%D8%B8%D8%A8%D9%8A&category=cars&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?q=%D9%82%D8%B7%D8%B9%20%D8%BA%D9%8A%D8%A7%D8%B1&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?q=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A6%D9%8A%D8%A9&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?q=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%85%D8%B3%D8%AA%D8%B9%D9%85%D9%84%D8%A9&_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=YVxpvEdPr-VBcOXN",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/search",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?condition=new&_rsc=6grVij_EUBxTWnLP",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=electronics&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=mobiles&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/featured",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?category=real-estate&_rsc=vzbcl0qWWRq8x9ae",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?city=%D8%AF%D8%A8%D9%8A&_rsc=vzbcl0qWWRq8x9ae",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=mobiles&_rsc=7WEKRCiJ3Ki60wzk",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=electronics&_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=real-estate&_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=cars&_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?city=%D8%A3%D8%A8%D9%88%D8%B8%D8%A8%D9%8A&_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?maxPrice=50000&_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=zbKS01xEANSwOY3x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=vzbcl0qWWRq8x9ae",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/listings/mercedes-amg-g63-2024",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?_rsc=3u3Sqz4xisiz78RA",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/login",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/?_rsc=_H_fFy2_Q06N8BA7",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=Np_f4bKx0hJifXtE",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/register",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?_rsc=YHJgCYC7z7ItAmEk",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/escrow",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?next=/profile&_rsc=-BWkZmpznHZJhfK6",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=Np_f4bKx0hJifXtE",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/wallet",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?next=/profile&_rsc=FqCX5NwwrJXH1fJ_",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=_H_fFy2_Q06N8BA7",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/support",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/?_rsc=cPJYfKRFJD4qVAbK",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=46qMJHMzAKK_QjhB",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/disputes/new",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?_rsc=oihlRseWYQpNKvdt",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/listings/new",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?_rsc=vXVcD-Jz5L6dh4nm",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?next=/listings/new&_rsc=SDB4XwIZIzmjX32x",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/profile",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?next=/profile&_rsc=TU5lP1DtV-OjooSd",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=Np_f4bKx0hJifXtE",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/dashboard/listings",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?_rsc=_H_fFy2_Q06N8BA7",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=_H_fFy2_Q06N8BA7",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/chat",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?next=/chat&_rsc=a45mDPm6lU2v_U1Z",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/login?_rsc=VMYL4OBw6ypIzB8h",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=Np_f4bKx0hJifXtE",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/checkout",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?_rsc=vkpK55NMpgpyKbEg",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/orders",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/login?next=/orders&_rsc=P8rM09jvWVfHUw3D",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=Np_f4bKx0hJifXtE",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/admin",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/categories/fashion?_rsc=5CB68i4pnAekjehf",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/fashion?_rsc=Z3O-9rwDkOuz-L8v",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/search",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/search?city=%D8%A3%D8%A8%D9%88%D8%B8%D8%A8%D9%8A&_rsc=6grVij_EUBxTWnLP",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?category=cars&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?city=%D8%A3%D8%A8%D9%88%D8%B8%D8%A8%D9%8A&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?city=%D8%AF%D8%A8%D9%8A&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?condition=new&_rsc=MnWTrh3l-09yAlSG",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/listings/mercedes-amg-g63-2024",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/?_rsc=6eflXjSGOt6PWdC8",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?_rsc=6eflXjSGOt6PWdC8",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/search?_rsc=6eflXjSGOt6PWdC8",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?_rsc=rRernV3tK2Tow8Kc",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=ZjvJf86IDetaoYiF",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/login",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/?_rsc=_H_fFy2_Q06N8BA7",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/categories",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/categories/electronics?_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?_rsc=tzCSiEiJItzpO0SC",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/mobiles?_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/electronics?_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/electronics?q=%D9%83%D8%A7%D9%85%D9%8A%D8%B1%D8%A7%D8%AA&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/electronics?q=%D9%84%D8%A7%D8%A8%D8%AA%D9%88%D8%A8%D8%A7%D8%AA&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?q=%D9%81%D9%84%D9%84&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/real-estate?q=%D8%B4%D9%82%D9%82%20%D9%84%D9%84%D8%A5%D9%8A%D8%AC%D8%A7%D8%B1&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      },
+      {
+        "url": "https://sooqna.site/categories/cars?q=%D8%B3%D9%8A%D8%A7%D8%B1%D8%A7%D8%AA%20%D9%83%D9%87%D8%B1%D8%A8%D8%A7%D8%A6%D9%8A%D8%A9&_rsc=b_6lnPdKfliJZfOR",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  {
+    "route": "/admin",
+    "viewport": "mobile",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": [
+      {
+        "url": "https://sooqna.site/?_rsc=sW2A7HEmFQnSVIMx",
+        "method": "GET",
+        "error": "net::ERR_ABORTED"
+      }
+    ]
+  }
+]
