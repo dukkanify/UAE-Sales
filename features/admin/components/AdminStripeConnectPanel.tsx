@@ -32,13 +32,48 @@ export type ConnectStatusPayload = {
 type Props = {
   /** When true, sync status on mount and show return messaging. */
   mode?: "manage" | "return" | "refresh";
+  /** Optional hint from parent platform status load. */
+  platformConfigured?: boolean;
 };
 
-function yesNo(value: boolean): string {
-  return value ? "نعم" : "لا";
+const AUTO_REDIRECT_MS = 1500;
+
+function primaryCtaLabel(
+  status: ConnectStatusPayload["status"],
+  mode: Props["mode"],
+): string {
+  if (mode === "return") return "إكمال الإعداد";
+  if (status === "NOT_CONNECTED") return "ربط Stripe";
+  if (status === "SETUP_REQUIRED") return "إكمال إعداد Stripe";
+  if (status === "REQUIREMENTS_DUE" || status === "RESTRICTED") {
+    return "إكمال الإعداد";
+  }
+  return "متابعة إلى Stripe";
 }
 
-export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
+function headlineForStatus(status: ConnectStatusPayload): string {
+  switch (status.status) {
+    case "NOT_CONNECTED":
+      return "ربط Stripe";
+    case "SETUP_REQUIRED":
+      return "إكمال إعداد Stripe";
+    case "UNDER_VERIFICATION":
+      return "قيد التحقق من Stripe";
+    case "REQUIREMENTS_DUE":
+      return "معلومات إضافية مطلوبة";
+    case "ACTIVE":
+      return "Stripe متصل ومفعّل";
+    case "RESTRICTED":
+      return "حساب Stripe مقيّد";
+    default:
+      return status.statusLabelAr;
+  }
+}
+
+export function AdminStripeConnectPanel({
+  mode = "manage",
+  platformConfigured: platformHint,
+}: Props) {
   const [connect, setConnect] = useState<ConnectStatusPayload | null>(null);
   const [busy, setBusy] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
@@ -75,7 +110,7 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
           text:
             payload?.message ??
             (payload?.error === "STRIPE_NOT_CONFIGURED"
-              ? "اضبط مفاتيح Stripe للمنصة أولاً قبل بدء ربط Connect."
+              ? "إعداد Stripe الرئيسي غير مكتمل. يرجى إكمال إعدادات المنصة."
               : "تعذر بدء إعداد Stripe."),
         });
         if (payload?.connect) setConnect(payload.connect);
@@ -93,6 +128,8 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
 
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
     (async () => {
       try {
         if (mode === "return") {
@@ -108,7 +145,7 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
             if (status.status === "ACTIVE") {
               setMessage({
                 variant: "success",
-                text: "تم ربط Stripe بنجاح.",
+                text: "تم تفعيل حساب Stripe بنجاح.",
               });
             } else if (
               status.status === "REQUIREMENTS_DUE" ||
@@ -116,7 +153,7 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
             ) {
               setMessage({
                 variant: "error",
-                text: "يحتاج Stripe إلى معلومات إضافية لإكمال تفعيل الحساب.",
+                text: "يحتاج Stripe إلى معلومات إضافية لإكمال التحقق.",
               });
             } else if (status.status === "UNDER_VERIFICATION") {
               setMessage({
@@ -143,7 +180,9 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
         ) {
           autoStarted.current = true;
           setRedirecting(true);
-          await startOnboarding(true);
+          timer = setTimeout(() => {
+            if (!cancelled) void startOnboarding(true);
+          }, AUTO_REDIRECT_MS);
         }
       } catch {
         if (!cancelled) {
@@ -154,8 +193,10 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
         }
       }
     })();
+
     return () => {
       cancelled = true;
+      if (timer) clearTimeout(timer);
     };
   }, [loadStatus, mode, startOnboarding]);
 
@@ -204,10 +245,13 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
     }
   }
 
+  const platformReady =
+    connect?.platformConfigured ?? platformHint ?? false;
+
   if (!connect && mode !== "refresh") {
     return (
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">ربط Stripe Connect</h2>
+        <h2 className="admin-ops__panel-title">ربط Stripe</h2>
         <p className="admin-ops__panel-sub">جاري تحميل حالة الحساب...</p>
       </section>
     );
@@ -216,9 +260,9 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
   if (redirecting || mode === "refresh") {
     return (
       <section className="admin-ops__panel">
-        <h2 className="admin-ops__panel-title">ربط Stripe Connect</h2>
+        <h2 className="admin-ops__panel-title">ربط Stripe</h2>
         <p className="admin-ops__panel-sub" style={{ marginTop: "0.75rem" }}>
-          جاري تحويلك إلى Stripe لإكمال إعداد حساب الدفع...
+          جاري تحويلك إلى Stripe لإكمال ربط حساب الدفع...
         </p>
         {message ? (
           <div className="mt-3">
@@ -227,7 +271,7 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
         ) : null}
         <div className="mt-4 flex flex-wrap gap-2">
           <Button loading={busy} onClick={() => startOnboarding(false)} type="button">
-            متابعة إعداد Stripe
+            متابعة إلى Stripe
           </Button>
         </div>
       </section>
@@ -238,7 +282,7 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
 
   return (
     <section className="admin-ops__panel">
-      <h2 className="admin-ops__panel-title">ربط Stripe Connect</h2>
+      <h2 className="admin-ops__panel-title">{headlineForStatus(status)}</h2>
       <p className="admin-ops__panel-sub">
         يتم جمع معلومات الشركة والتحقق المصرفي والهوية عبر Stripe فقط — لا تُدخل
         بيانات بنكية أو وثائق هوية داخل سوقنا.
@@ -250,11 +294,10 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
         </div>
       ) : null}
 
-      {!status.platformConfigured ? (
+      {!platformReady ? (
         <div className="mt-3">
           <FormMessage variant="error">
-            مفاتيح المنصة غير مضبوطة. احفظ Secret Key أولاً في القسم أدناه ثم ابدأ
-            ربط Connect.
+            إعداد Stripe الرئيسي غير مكتمل. يرجى إكمال إعدادات المنصة.
           </FormMessage>
         </div>
       ) : null}
@@ -273,20 +316,20 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
           الحالة: {status.statusLabelAr}
         </div>
         <div className="admin-ops__status-chip">
-          Charges: {yesNo(status.chargesEnabled)}
+          Charges: {status.chargesEnabled ? "enabled" : "disabled"}
         </div>
         <div className="admin-ops__status-chip">
-          Payouts: {yesNo(status.payoutsEnabled)}
+          Payouts: {status.payoutsEnabled ? "enabled" : "disabled"}
         </div>
         <div className="admin-ops__status-chip">
-          التحقق:{" "}
-          {status.detailsSubmitted
-            ? status.status === "UNDER_VERIFICATION"
-              ? "قيد المراجعة"
-              : status.status === "ACTIVE"
-                ? "مكتمل"
-                : status.statusLabelAr
-            : "غير مكتمل"}
+          Verification:{" "}
+          {status.status === "ACTIVE"
+            ? "complete"
+            : status.status === "UNDER_VERIFICATION"
+              ? "pending"
+              : status.detailsSubmitted
+                ? "submitted"
+                : "incomplete"}
         </div>
         {status.updatedAt ? (
           <div className="admin-ops__status-chip">
@@ -297,7 +340,8 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
 
       {status.stripeAccountId ? (
         <p className="mt-3 text-xs text-muted">
-          Account ID: <code className="text-[0.7rem]">{status.stripeAccountId}</code>
+          Account ID:{" "}
+          <code className="text-[0.7rem]">{status.stripeAccountId}</code>
         </p>
       ) : null}
 
@@ -310,18 +354,15 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
       <div className="mt-4 flex flex-wrap gap-2">
         {status.status === "NOT_CONNECTED" ||
         status.status === "SETUP_REQUIRED" ||
-        status.status === "REQUIREMENTS_DUE" ? (
+        status.status === "REQUIREMENTS_DUE" ||
+        status.status === "RESTRICTED" ? (
           <Button
-            disabled={!status.platformConfigured}
+            disabled={!platformReady}
             loading={busy}
             onClick={() => startOnboarding(false)}
             type="button"
           >
-            {mode === "return"
-              ? "إكمال الإعداد"
-              : status.status === "NOT_CONNECTED"
-                ? "ربط Stripe"
-                : "متابعة إعداد Stripe"}
+            {primaryCtaLabel(status.status, mode)}
           </Button>
         ) : null}
 
@@ -332,12 +373,12 @@ export function AdminStripeConnectPanel({ mode = "manage" }: Props) {
             type="button"
             variant="ghost"
           >
-            فتح لوحة Stripe
+            فتح Stripe Dashboard
           </Button>
         ) : null}
 
         <Button
-          disabled={busy || !status.platformConfigured || !status.stripeAccountId}
+          disabled={busy || !platformReady || !status.stripeAccountId}
           onClick={refreshStatus}
           type="button"
           variant="ghost"

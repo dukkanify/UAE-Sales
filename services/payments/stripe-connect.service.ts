@@ -46,13 +46,16 @@ const STATUS_LABELS: Record<
   { ar: string; en: string }
 > = {
   NOT_CONNECTED: { ar: "غير متصل", en: "Not connected" },
-  SETUP_REQUIRED: { ar: "يلزم الإعداد", en: "Setup required" },
-  UNDER_VERIFICATION: { ar: "قيد التحقق", en: "Under verification" },
+  SETUP_REQUIRED: { ar: "إكمال إعداد Stripe", en: "Complete Stripe setup" },
+  UNDER_VERIFICATION: {
+    ar: "قيد التحقق من Stripe",
+    en: "Under Stripe review",
+  },
   REQUIREMENTS_DUE: {
     ar: "معلومات إضافية مطلوبة",
     en: "Additional information required",
   },
-  ACTIVE: { ar: "مفعّل", en: "Active" },
+  ACTIVE: { ar: "Stripe متصل ومفعّل", en: "Stripe connected and active" },
   RESTRICTED: { ar: "مقيد", en: "Restricted" },
 };
 
@@ -151,11 +154,10 @@ function toPublicStatus(
   }
 
   const labels = STATUS_LABELS[record.stripeOnboardingStatus];
+  // Auto-redirect only for first-time connect (NOT_CONNECTED). Incomplete
+  // setup / requirements use explicit CTAs so admins are not surprise-redirected.
   const shouldAutoRedirect =
-    platformConfigured &&
-    (record.stripeOnboardingStatus === "NOT_CONNECTED" ||
-      record.stripeOnboardingStatus === "REQUIREMENTS_DUE" ||
-      record.stripeOnboardingStatus === "SETUP_REQUIRED");
+    platformConfigured && record.stripeOnboardingStatus === "NOT_CONNECTED";
 
   return {
     status: record.stripeOnboardingStatus,
@@ -171,10 +173,7 @@ function toPublicStatus(
     connectedAt: record.stripeConnectedAt,
     updatedAt: record.stripeUpdatedAt,
     platformConfigured,
-    shouldAutoRedirect:
-      shouldAutoRedirect &&
-      (record.stripeOnboardingStatus === "NOT_CONNECTED" ||
-        record.stripeOnboardingStatus === "REQUIREMENTS_DUE"),
+    shouldAutoRedirect,
     canOpenDashboard:
       record.stripeDetailsSubmitted &&
       record.stripeOnboardingStatus !== "NOT_CONNECTED",

@@ -1,116 +1,114 @@
-# Stripe Connect Automatic Onboarding — Sooqna
+# Stripe Connect One-Click Onboarding — Sooqna
 
-## Summary
+**Date (UTC):** 2026-08-29  
+**Production host:** https://sooqna.site  
+**Branch:** `cursor/stripe-connect-onboarding-37ba`
 
-`/admin/stripe` now starts **Stripe Connect Express** onboarding automatically for authorized admins (payments permission). Sooqna never collects bank, KYC, or identity documents — Stripe’s hosted onboarding does.
+## Overall status
 
-## Flow
+**NOT COMPLETE on Production** — platform LIVE keys are still unset (`stripeConfigured=false`). Code UX for one-click Connect (no browser key paste) is implemented and ready once Vercel Production keys are configured.
 
-1. Admin opens `/admin/stripe`
-2. Server checks Connect status for the authenticated admin (`ownerUserId`)
-3. If no `stripeAccountId`:
-   - Create Express account server-side (idempotent per user)
-   - Persist Connect fields in Postgres (or local `.data` fallback)
-   - Create a fresh Account Link
-   - Redirect to Stripe
-4. If `stripeAccountId` already exists: **reuse** it — never create a duplicate
-5. If requirements are due: create a **new** Account Link and redirect
-6. Return URL: `/admin/stripe/return` → retrieve account from Stripe → update DB → show status
-7. Refresh URL: `/admin/stripe/refresh` → new Account Link → redirect (expired links are never reused)
+## What changed
 
-## Statuses (server-verified)
+### Removed from normal `/admin/stripe` UX
+- Editable Secret Key / Publishable Key / Webhook Secret fields
+- “حفظ وتفعيل” paste flow
+- Step-by-step paste instructions
 
-| Code | Arabic label |
-|------|----------------|
-| `NOT_CONNECTED` | غير متصل |
-| `SETUP_REQUIRED` | يلزم الإعداد |
-| `UNDER_VERIFICATION` | قيد التحقق |
-| `REQUIREMENTS_DUE` | معلومات إضافية مطلوبة |
-| `ACTIVE` | مفعّل |
-| `RESTRICTED` | مقيد |
-
-**Active is never inferred from the redirect alone.** Status comes from Stripe `charges_enabled`, `payouts_enabled`, `details_submitted`, and `requirements.*`.
-
-Auto-redirect message (for `NOT_CONNECTED` / `REQUIREMENTS_DUE`):
-
-> جاري تحويلك إلى Stripe لإكمال إعداد حساب الدفع...
-
-Fallback CTA: **متابعة إعداد Stripe**
-
-## Database fields
-
-Table `stripe_connect_accounts` (Postgres) / `stripe-connect-accounts.json` fallback:
-
-- `stripeAccountId`
-- `stripeOnboardingStatus`
-- `stripeChargesEnabled`
-- `stripePayoutsEnabled`
-- `stripeDetailsSubmitted`
-- `stripeRequirementsStatus`
-- `stripeConnectedAt`
-- `stripeUpdatedAt`
-- Linked via `ownerUserId` (admin/company entity)
-
-No bank account numbers or KYC documents are stored.
-
-## APIs
-
-| Method | Path | Purpose |
-|--------|------|---------|
-| GET | `/api/admin/stripe/connect` | Status (+ live sync when platform keys exist) |
-| POST | `/api/admin/stripe/connect` `{ action: "onboard" }` | Ensure account + Account Link URL |
-| POST | `/api/admin/stripe/connect` `{ action: "refresh-status" }` | Pull status from Stripe |
-| POST | `/api/admin/stripe/connect` `{ action: "dashboard" }` | Express login link when appropriate |
-
-Auth: `requireAdminPermission("payments")`. Ownership is always the session user — client cannot supply `stripeAccountId`.
-
-## Webhooks
-
-`/api/webhooks/stripe` now handles (idempotent via existing event claim):
-
-- `account.updated`
-- `account.external_account.created` / `updated`
-- `capability.updated`
-
-On status change: DB update + in-app notification + optional email  
-(“تم تفعيل حساب Stripe الخاص بك بنجاح.” / “يحتاج Stripe إلى معلومات إضافية…”).
-
-## Security
-
-- Account + Account Link creation: **server-side only**
-- `STRIPE_SECRET_KEY` never exposed to the client
-- Platform keys remain env-managed or admin-encrypted store (existing flow)
-- Webhook signature verification unchanged
-
-## Production env (do not commit values)
+### Platform configuration (Vercel only)
+Required Production env vars:
 
 - `STRIPE_SECRET_KEY`
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_APP_URL=https://sooqna.site`
 
-Webhook endpoint should include Connect account events in addition to Checkout events.
+`PUT /api/admin/stripe` now returns **403 `USE_VERCEL_ENV`** — secrets must not be pasted from the browser.
 
-## Files
+If platform config is missing, UI shows only:
 
-- `services/payments/stripe-connect-store.ts`
-- `services/payments/stripe-connect.service.ts`
-- `app/api/admin/stripe/connect/route.ts`
-- `features/admin/components/AdminStripeConnectPanel.tsx`
-- `app/admin/stripe/return/page.tsx`
-- `app/admin/stripe/refresh/page.tsx`
-- Webhook + notification/email type extensions
+> إعداد Stripe الرئيسي غير مكتمل. يرجى إكمال إعدادات المنصة.
 
-## QA checklist
+### One-click Connect
+When platform is configured and no connected account exists:
 
-1. Admin with no Connect account → `/admin/stripe` auto-redirects to Stripe (when platform keys exist)
-2. Complete onboarding → `/admin/stripe/return` shows server-verified status
-3. Abandon onboarding → Continue Setup works later
-4. Expired Account Link → `/admin/stripe/refresh` issues a new link
-5. Existing `stripeAccountId` → no second Connect account
-6. Requirements due → `REQUIREMENTS_DUE` + Continue Setup
-7. `account.updated` webhook → Sooqna status updates
+1. Admin opens `/admin/stripe`
+2. Message: «جاري تحويلك إلى Stripe لإكمال ربط حساب الدفع...» (~1.5s)
+3. Server creates/reuses Express account (`ensureConnectAccount` — no duplicates)
+4. Fresh Account Link → redirect to Stripe hosted onboarding
+5. Fallback CTA: **متابعة إلى Stripe**
 
-## Prerequisite
+Stripe collects KYC/bank/company data. Sooqna never does.
 
-Connect onboarding requires a valid platform **Secret Key** (env or admin paste). Without it, the Connect panel prompts to configure platform keys first and does not redirect.
+### Return / refresh
+| URL | Behavior |
+|-----|----------|
+| `/admin/stripe/return` | Server `refresh-status` → retrieve account from Stripe API → update DB |
+| `/admin/stripe/refresh` | New Account Link (never reuse expired URLs) → redirect |
+
+Status is **never** trusted from query params.
+
+### Smart statuses (A–F)
+
+| Case | Status | UI |
+|------|--------|-----|
+| A | Platform missing | Config warning only |
+| B | `NOT_CONNECTED` | Auto-redirect + **ربط Stripe** |
+| C | `SETUP_REQUIRED` | **إكمال إعداد Stripe** |
+| D | `UNDER_VERIFICATION` | **قيد التحقق من Stripe** |
+| E | `REQUIREMENTS_DUE` | **معلومات إضافية مطلوبة** + **إكمال الإعداد** |
+| F | `ACTIVE` | **Stripe متصل ومفعّل** + Charges/Payouts/Verification |
+| — | `RESTRICTED` | Reason + **إكمال الإعداد** |
+
+Actions: ربط Stripe · إكمال الإعداد · تحديث الحالة · فتح Stripe Dashboard
+
+### Persistence (`stripe_connect_accounts`)
+- `stripeAccountId`
+- `stripeOnboardingStatus`
+- `stripeChargesEnabled` / `stripePayoutsEnabled` / `stripeDetailsSubmitted`
+- `stripeRequirementsStatus` / `stripeDisabledReason`
+- `stripeConnectedAt` / `stripeUpdatedAt`
+- Owned by `ownerUserId` (session admin)
+
+### Webhooks (idempotent)
+`https://sooqna.site/api/webhooks/stripe` continues to sync:
+
+- `account.updated`
+- `account.external_account.created` / `updated`
+- `capability.updated`
+
+Notifications on status change (activation / additional info).
+
+### Unchanged (must not break)
+Checkout · Featured · Orders · Refunds · Internal escrow ledger · Platform webhook payment events
+
+## Security
+- Browser never receives `STRIPE_SECRET_KEY` or `STRIPE_WEBHOOK_SECRET`
+- No bank/KYC documents stored in Sooqna
+- Client cannot supply `stripeAccountId`
+- Connect APIs require `payments` admin permission + session ownership
+
+## Production QA checklist
+
+| # | Test | Result |
+|---|------|--------|
+| 1 | `stripeConfigured=true` after Vercel LIVE keys | **BLOCKED** — keys unset |
+| 2 | `/admin/stripe` → auto-redirect when not connected | **BLOCKED** — needs keys + admin session |
+| 3 | Complete Stripe onboarding → return → status sync | **BLOCKED** |
+| 4 | Incomplete onboarding → Continue Setup | **BLOCKED** |
+| 5 | Expired Account Link → `/refresh` new link | **BLOCKED** |
+| 6 | Existing account → no duplicate | Code YES / live **BLOCKED** |
+| 7 | Additional requirements UI | Code YES / live **BLOCKED** |
+| 8 | Charges/Payouts from Stripe API | Code YES / live **BLOCKED** |
+| 9 | Persist across refresh/relogin | Code YES / live **BLOCKED** |
+
+## Manual blocker
+
+Set LIVE Stripe env vars on Vercel project **sooqna** Production and redeploy. Then run Connect E2E with an admin that has `payments` permission.
+
+## Validation
+
+- `npm run lint`
+- `npm run build`
+
+Do **not** mark COMPLETE until the real Connect redirect → Stripe → return → status sync passes on https://sooqna.site.
