@@ -306,11 +306,11 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 72% 58% at 8% 0%, rgb(201 169 98 / 34%), transparent 58%),
-    radial-gradient(ellipse 55% 50% at 100% 8%, rgb(11 22 40 / 14%), transparent 56%),
-    radial-gradient(ellipse 48% 42% at 88% 92%, rgb(201 169 98 / 22%), transparent 62%),
-    radial-gradient(ellipse 42% 36% at 0% 78%, rgb(45 106 79 / 12%), transparent 58%),
-    linear-gradient(165deg, #fbf7f0 0%, #f3ece0 42%, #e9e0d0 100%);
+    radial-gradient(ellipse 72% 58% at 8% 0%, rgb(201 169 98 / 28%), transparent 58%),
+    radial-gradient(ellipse 55% 50% at 100% 8%, rgb(11 22 40 / 10%), transparent 56%),
+    radial-gradient(ellipse 48% 42% at 88% 92%, rgb(201 169 98 / 14%), transparent 62%),
+    radial-gradient(ellipse 42% 36% at 0% 78%, rgb(45 106 79 / 8%), transparent 58%),
+    linear-gradient(165deg, #fbf7f0 0%, #f5efe6 38%, rgb(233 224 208 / 0.72) 100%);
 }
 
 .market-hero__orb {
@@ -339,11 +339,11 @@ textarea {
 }
 
 .market-hero__orb--mist {
-  top: 28%;
+  top: 18%;
   inset-inline-end: 18%;
-  width: 16rem;
-  height: 16rem;
-  background: rgb(255 255 255 / 58%);
+  width: 14rem;
+  height: 14rem;
+  background: rgb(255 255 255 / 28%);
   animation-delay: -12s;
 }
 
@@ -351,17 +351,31 @@ textarea {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: min(64%, 30rem);
+  height: min(78%, 38rem);
   overflow: hidden;
-  opacity: 0.42;
-  mask-image: linear-gradient(to top, black 8%, rgb(0 0 0 / 0.55) 46%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to top, black 8%, rgb(0 0 0 / 0.55) 46%, transparent 100%);
+  opacity: 0.88;
+  mask-image: linear-gradient(
+    to top,
+    black 0%,
+    black 22%,
+    rgb(0 0 0 / 0.85) 48%,
+    rgb(0 0 0 / 0.45) 72%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to top,
+    black 0%,
+    black 22%,
+    rgb(0 0 0 / 0.85) 48%,
+    rgb(0 0 0 / 0.45) 72%,
+    transparent 100%
+  );
 }
 
 .market-hero__photo img {
   object-fit: cover;
-  object-position: center 36%;
-  filter: saturate(1.18) contrast(1.08);
+  object-position: center 42%;
+  filter: saturate(1.12) contrast(1.12) brightness(1.02);
 }
 
 .market-hero__grid {
@@ -369,7 +383,7 @@ textarea {
   inset: 0;
   background-image: url("/brand/pattern.svg");
   background-size: 72px 72px;
-  opacity: 0.32;
+  opacity: 0.16;
   mix-blend-mode: multiply;
 }
 
@@ -377,11 +391,11 @@ textarea {
   position: absolute;
   top: -18%;
   inset-inline: 8%;
-  height: 46%;
+  height: 40%;
   background: linear-gradient(
     118deg,
-    transparent 18%,
-    rgb(255 255 255 / 0.5) 48%,
+    transparent 22%,
+    rgb(255 255 255 / 0.22) 48%,
     transparent 78%
   );
   transform: rotate(-9deg);
@@ -391,8 +405,14 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 55% at 50% 18%, rgb(255 255 255 / 0.28), transparent 70%),
-    linear-gradient(180deg, rgb(250 247 241 / 0.18) 0%, transparent 28%, rgb(250 247 241 / 0.42) 100%);
+    radial-gradient(ellipse 70% 50% at 50% 12%, rgb(255 255 255 / 0.14), transparent 68%),
+    linear-gradient(
+      180deg,
+      rgb(250 247 241 / 0.55) 0%,
+      rgb(250 247 241 / 0.12) 34%,
+      transparent 58%,
+      rgb(250 247 241 / 0.2) 100%
+    );
 }
 
 .market-hero__content {
@@ -600,8 +620,8 @@ html[data-theme="dark"] .market-hero__orb--mist {
 }
 
 html[data-theme="dark"] .market-hero__photo {
-  opacity: 0.34;
-  filter: brightness(0.72) saturate(0.9);
+  opacity: 0.62;
+  filter: brightness(0.82) saturate(1.05);
 }
 
 html[data-theme="dark"] .market-hero__grid {

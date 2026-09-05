@@ -150,11 +150,11 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1500648767791-00dcc994a43e",
   ],
   emirates: [
-    "photo-1512453979798-5ea266f8880c",
+    "photo-1512632578888-169bbbc64f33",
     "photo-1518684079-3c830dcef090",
   ],
   default: [
-    "photo-1512453979798-5ea266f8880c",
+    "photo-1512632578888-169bbbc64f33",
     "photo-1618843479313-40f8afb4b4d8",
     "photo-1600607687939-ce8a6c25118c",
   ],
@@ -163,7 +163,8 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
 /** Verified landmark photos per emirate — location-checked on Unsplash */
 export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   dubai: "photo-1512453979798-5ea266f8880c",
-  "abu-dhabi": "photo-1620148369396-235e930c3caf",
+  // Iconic Sheikh Zayed Grand Mosque — high-contrast landmark for hero/emirate cards
+  "abu-dhabi": "photo-1512632578888-169bbbc64f33",
   sharjah: "photo-1679197982381-7a43e5d910a4",
   ajman: "photo-1593334305856-1c6281efaa18",
   "umm-al-quwain": "photo-1687080625802-967beded8abc",
