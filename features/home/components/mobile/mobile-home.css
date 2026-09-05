@@ -581,7 +581,7 @@
 
 .mobile-home-hero__media {
   position: relative;
-  height: clamp(11rem, 38vw, 14rem);
+  height: clamp(13rem, 44vw, 17rem);
   overflow: hidden;
 }
 
@@ -592,15 +592,16 @@
 }
 
 .mobile-home-hero__bg img {
-  object-position: center 32%;
+  object-position: center 42%;
+  filter: saturate(1.25) contrast(1.14) brightness(1.02);
 }
 
 .mobile-home-hero__media-overlay {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgb(15 23 42 / 12%) 0%, transparent 42%),
-    linear-gradient(0deg, rgb(255 255 255 / 100%) 0%, rgb(255 255 255 / 0%) 36%);
+    linear-gradient(180deg, rgb(15 23 42 / 8%) 0%, transparent 48%),
+    linear-gradient(0deg, rgb(255 255 255 / 72%) 0%, rgb(255 255 255 / 0%) 42%);
   pointer-events: none;
 }
 

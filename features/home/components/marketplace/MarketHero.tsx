@@ -27,9 +27,8 @@ export async function MarketHero({ categories }: MarketHeroProps) {
         <span className="market-hero__orb market-hero__orb--mist" />
         <div className="market-hero__photo">
           <AppImage
-            alt="أفق أبوظبي ومسجد الشيخ زايد"
+            alt="مسجد الشيخ زايد الكبير — أبوظبي"
             className="object-cover"
-            fallback="emirates"
             fill
             priority
             sizes="100vw"
