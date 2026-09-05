@@ -13,7 +13,7 @@ export async function MobileHeroSection() {
       <div className="mobile-home-hero__media">
         <div className="mobile-home-hero__bg">
           <AppImage
-            alt="مسجد الشيخ زايد الكبير — أبوظبي"
+            alt="أفق أبوظبي — أبراج الاتحاد والكورنيش"
             className="object-cover"
             fill
             priority
