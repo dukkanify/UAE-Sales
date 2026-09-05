@@ -1,13 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
 
 type LocationOption = { id: string; name: string };
 
 const EMIRATE_STORAGE_KEY = "sooqna_emirate";
+const EMIRATE_CHANGE_EVENT = "sooqna-emirate-change";
 const ALL_EMIRATES_NAME = "كل الإمارات";
 const DEFAULT_EMIRATE = "أبوظبي";
 
@@ -33,6 +34,21 @@ function readStoredEmirate(): string {
   return DEFAULT_EMIRATE;
 }
 
+function subscribeEmirate(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const handler = () => onStoreChange();
+  window.addEventListener("storage", handler);
+  window.addEventListener(EMIRATE_CHANGE_EVENT, handler);
+  return () => {
+    window.removeEventListener("storage", handler);
+    window.removeEventListener(EMIRATE_CHANGE_EVENT, handler);
+  };
+}
+
+function notifyEmirateChange() {
+  window.dispatchEvent(new Event(EMIRATE_CHANGE_EVENT));
+}
+
 type EmirateLocationSelectProps = {
   className?: string;
   defaultCity?: string;
@@ -48,17 +64,17 @@ export function EmirateLocationSelect({
 }: EmirateLocationSelectProps) {
   const router = useRouter();
   const options = useMemo(() => buildEmirateOptions(), []);
-  const [city, setCity] = useState(defaultCity);
-
-  useEffect(() => {
-    setCity(readStoredEmirate());
-  }, []);
+  const city = useSyncExternalStore(
+    subscribeEmirate,
+    readStoredEmirate,
+    () => defaultCity,
+  );
 
   function handleChange(next: string) {
-    setCity(next);
     onCityChange?.(next);
     try {
       localStorage.setItem(EMIRATE_STORAGE_KEY, next);
+      notifyEmirateChange();
     } catch {
       /* ignore storage errors */
     }
