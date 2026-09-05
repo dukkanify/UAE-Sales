@@ -10,6 +10,7 @@ import { imagesForSlug } from "./listing-images.mock";
 import { resolveSeller, getSellerDemoPhone } from "./sellers.mock";
 import { extrasForSlug } from "./listing-specs.mock";
 import { verticalListingSeeds } from "./listings-verticals.mock";
+import { extraListingSeeds } from "./listings-extra.mock";
 
 type ListingSeed = {
   id: string;
@@ -30,6 +31,7 @@ type ListingSeed = {
   escrowAvailable: boolean;
   featured: boolean;
   premium: boolean;
+  urgent?: boolean;
   views: number;
   postedAt: string;
   contactMethod: ContactMethod;
@@ -38,10 +40,26 @@ type ListingSeed = {
   imageTone: ListingImageTone;
 };
 
+/** Keep demo freshness relative to "now" so "جديد" badges stay meaningful. */
+function toDemoPostedAt(iso: string, id: string): string {
+  const numeric = Number(id.replace(/\D/g, "").slice(-3)) || 1;
+  const daysAgo = Math.min((numeric - 1) % 18, 17);
+  const date = new Date();
+  date.setHours(10, 0, 0, 0);
+  date.setDate(date.getDate() - daysAgo);
+  // Preserve original ordering hint when parseable, else use derived age.
+  const parsed = Date.parse(iso);
+  if (!Number.isNaN(parsed)) {
+    return date.toISOString();
+  }
+  return date.toISOString();
+}
+
 function buildListing(seed: ListingSeed): Listing {
   const seller = resolveSeller(seed.sellerKey);
   const images = [...imagesForSlug(seed.slug)];
   const extras = extrasForSlug(seed.slug);
+  const idNum = Number(seed.id.replace(/\D/g, "").slice(-3)) || 0;
 
   return {
     id: seed.id,
@@ -62,18 +80,16 @@ function buildListing(seed: ListingSeed): Listing {
     status: seed.listingStatus,
     isFeatured: seed.featured,
     isPremium: seed.premium,
+    isUrgent: seed.urgent ?? (seed.featured && idNum % 5 === 1),
     views: seed.views,
     images,
     imageUrl: images[0],
     seller,
     verifiedSeller: seed.verifiedSeller,
     escrowAvailable: seed.escrowAvailable,
-    postedAt: seed.postedAt,
+    postedAt: toDemoPostedAt(seed.postedAt, seed.id),
     contactMethod: seed.contactMethod,
-    contactPhone:
-      seed.contactMethod === "phone" || seed.contactMethod === "both"
-        ? getSellerDemoPhone(seed.sellerKey)
-        : undefined,
+    contactPhone: getSellerDemoPhone(seed.sellerKey),
     deliveryOption: seed.deliveryOption,
     imageTone: seed.imageTone,
     features: extras?.features,
@@ -233,7 +249,7 @@ const listingSeeds: ListingSeed[] = [
     id: "listing-re-001",
     slug: "villa-palm-jumeirah",
     titleArabic: "فيلا فاخرة على نخلة جميرا — 5 غرف مع مسبح خاص",
-    titleEnglish: "Villa Palm Jumeirah",
+    titleEnglish: "Luxury villa on Palm Jumeirah — 5 bedrooms with private pool",
     categoryId: "real-estate",
     subcategory: "فلل",
     price: 18500000,
@@ -261,7 +277,7 @@ const listingSeeds: ListingSeed[] = [
     id: "listing-re-002",
     slug: "apartment-downtown-dubai",
     titleArabic: "شقة فاخرة في داون تاون دبي — إطلالة برج خليفة",
-    titleEnglish: "Apartment Downtown Dubai",
+    titleEnglish: "Luxury apartment in Downtown Dubai — Burj Khalifa view",
     categoryId: "real-estate",
     subcategory: "شقق للبيع",
     price: 3200000,
@@ -317,7 +333,7 @@ const listingSeeds: ListingSeed[] = [
     id: "listing-re-004",
     slug: "office-business-bay",
     titleArabic: "مكتب تجاري في الخليج التجاري — 1,200 قدم مربع",
-    titleEnglish: "Office Business Bay",
+    titleEnglish: "Commercial office in Business Bay — 1,200 sqft",
     categoryId: "real-estate",
     subcategory: "مكاتب",
     price: 1850000,
@@ -375,7 +391,7 @@ const listingSeeds: ListingSeed[] = [
     id: "listing-mob-001",
     slug: "iphone-16-pro-max-256gb",
     titleArabic: "آيفون 16 برو ماكس 256 جيجابايت — جديد بضمان",
-    titleEnglish: "iPhone 16 Pro Max",
+    titleEnglish: "iPhone 16 Pro Max 256GB — new with warranty",
     categoryId: "mobiles",
     subcategory: "آيفون",
     price: 4899,
@@ -1080,6 +1096,7 @@ const listingSeeds: ListingSeed[] = [
     imageTone: "rose",
   },
   ...verticalListingSeeds,
+  ...extraListingSeeds,
 ];
 
 export const marketplaceListings: Listing[] = listingSeeds.map(buildListing);

@@ -1,10 +1,14 @@
+import {
+  isSessionUser,
+  requireAdminUser,
+} from "@/services/auth/require-session";
 import { NextResponse } from "next/server";
 import { getAllJobApplications } from "@/services/job-applications/job-application-store";
 
-export async function GET(request: Request) {
-  const role = request.headers.get("x-admin-role");
-  if (role !== "admin") {
-    return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
+export async function GET() {
+  const admin = await requireAdminUser();
+  if (!isSessionUser(admin)) {
+    return admin;
   }
   const applications = await getAllJobApplications();
   return NextResponse.json({ applications });

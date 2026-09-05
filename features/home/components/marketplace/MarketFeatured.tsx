@@ -20,18 +20,17 @@ export function MarketFeatured({ categories, listings }: MarketFeaturedProps) {
       <MarketSectionHeader
         actionHref="/featured"
         actionLabel="عرض جميع الإعلانات"
-        description="إعلانات مختارة من سوقنا — صور حقيقية، أسعار واضحة، وضمان على كل معاملة."
+        description="إعلانات مختارة من سوقنا — صور حقيقية وأسعار واضحة من بائعين موثوقين."
         eyebrow="Featured"
         title="إعلانات مميزة"
       />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {featured.map((listing, index) => (
+        {featured.map((listing) => (
           <PremiumListingCard
             key={listing.id}
             categoryName={categoryMap.get(listing.categoryId)}
             listing={listing}
-            priority={index < 3}
           />
         ))}
       </div>

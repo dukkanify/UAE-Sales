@@ -81,6 +81,9 @@ export type Order = {
     landmark?: string;
     notes?: string;
     companyName?: string;
+    latitude?: number;
+    longitude?: number;
+    formattedAddress?: string;
   };
   saveAddress?: boolean;
   stripeCheckoutSessionId?: string;
@@ -92,5 +95,9 @@ export type Order = {
   confirmedAt?: string;
   releasedAt?: string;
   refundedAt?: string;
+  sellerProofUrls?: string[];
+  sellerProofNote?: string;
+  sellerProofAt?: string;
+  buyerMatchConfirmedAt?: string;
   auditLog: OrderAuditEvent[];
 };

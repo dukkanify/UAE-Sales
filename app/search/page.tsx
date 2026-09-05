@@ -1,10 +1,15 @@
 import { cities, countries } from "@/shared/constants/locations";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
+import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
+import { getRequestLocale } from "@/shared/i18n/locale";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -59,7 +64,7 @@ export default async function SearchPage({
     sort: getParam(params, "sort") ?? "newest",
   };
 
-  const [categories, listings] = await Promise.all([
+  const [categories, listings, suggestionTitles, locale] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: selectedFilters.category || undefined,
@@ -80,13 +85,24 @@ export default async function SearchPage({
           ? selectedFilters.sort
           : "newest",
     }),
+    getSearchSuggestionTitles(),
+    getRequestLocale(),
   ]);
+
+  const suggestions = buildSearchSuggestions({
+    categories,
+    cities,
+    listings: suggestionTitles,
+    locale,
+    selectedFilters,
+  });
 
   return (
     <>
       <SiteHeader />
-      <main className="bg-[#fdfbf7]">
-        <section className="app-container page-padding">
+      <RecordRecentSearch query={selectedFilters.query} />
+      <main className="bg-background">
+        <section className="app-container page-padding pb-28 lg:pb-8">
           <div className="mb-8">
             <p className="text-xs font-bold text-[#B8955F]">بحث السوق</p>
             <h1 className="mt-1 text-2xl font-bold text-ink md:text-3xl">
@@ -108,6 +124,7 @@ export default async function SearchPage({
                 countries={countries}
                 layout="sidebar"
                 selectedFilters={selectedFilters}
+                suggestions={suggestions}
               />
             </aside>
 
@@ -122,6 +139,7 @@ export default async function SearchPage({
         </section>
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </>
   );
 }

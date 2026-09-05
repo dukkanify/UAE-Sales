@@ -1,23 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { CardShareButton } from "@/shared/components/CardShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { SellerName } from "@/shared/i18n/SellerName";
+import { listingTitle, sellerName } from "@/shared/i18n/listing-copy";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { ListingCardBadges } from "./ListingCardBadges";
+import { isListingVerified } from "./listing-card-badges";
 import {
   getListingHref,
   getListingImageUrl,
   getListingLocation,
   formatPostedTime,
   formatViews,
-  conditionBadgeVariant,
-  conditionLabels,
 } from "./listing-card.utils";
 
 export type PremiumListingCardProps = {
@@ -35,18 +40,15 @@ export const PremiumListingCard = memo(function PremiumListingCard({
   priority = false,
   showStatus = false,
 }: PremiumListingCardProps) {
+  const locale = useLocale();
   const href = getListingHref(listing);
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
-  const shareUrl = useMemo(() => {
-    if (typeof window !== "undefined") {
-      return `${window.location.origin}${href}`;
-    }
-    return href;
-  }, [href]);
+  const shareUrl = href;
+  const displayTitle = listingTitle(listing, locale);
+  const displaySeller = sellerName(listing.seller, locale);
 
-  const isVerified =
-    listing.verifiedSeller ?? listing.seller.isVerified ?? (listing.seller.rating ?? 0) >= 4.8;
+  const isVerified = isListingVerified(listing);
   const showEscrow = showsEscrowProtection(listing);
 
   const imageArea = (
@@ -54,10 +56,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
       className={`marketplace-card-media relative overflow-hidden ${layout === "row" ? "h-full min-h-full w-full" : "aspect-[4/3]"}`}
     >
       {imageUrl ? (
-        <Link className="absolute inset-0" href={href}>
-          <span className="sr-only">{listing.title}</span>
+        <Link aria-hidden className="absolute inset-0" href={href} tabIndex={-1}>
           <AppImage
-            alt={listing.title}
+            alt=""
             className="marketplace-card-image"
             fallbackCategory={listing.categoryId}
             fill
@@ -73,21 +74,19 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </Link>
       ) : null}
 
-      <div className="absolute start-3 top-3 z-10 flex flex-wrap gap-1.5">
-        {listing.isFeatured ? <Badge variant="featured">مميز</Badge> : null}
-        {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-        <Badge variant={conditionBadgeVariant[listing.condition]}>
-          {conditionLabels[listing.condition]}
-        </Badge>
-      </div>
+      <ListingCardBadges listing={listing} />
 
       <div className="absolute end-3 top-3 z-20 flex gap-1.5">
         <FavoriteButton
-          className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--shadow-sm)]"
+          className="card-media-action !min-h-8 !size-8 !min-w-8 !rounded-full !p-0"
           iconOnly
           listing={listing}
         />
-        <CardShareButton title={listing.title} url={shareUrl} />
+        <CardShareButton
+          className="card-media-action"
+          title={displayTitle}
+          url={shareUrl}
+        />
       </div>
 
       {showEscrow ? (
@@ -108,11 +107,11 @@ export const PremiumListingCard = memo(function PremiumListingCard({
         </p>
       ) : null}
 
-      <Link href={href}>
+      <Link className="min-w-0" href={href}>
         <h3
-          className={`line-clamp-2 font-bold leading-snug text-ink transition group-hover:text-primary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
+          className={`line-clamp-2 break-words font-bold leading-snug text-ink transition group-hover:text-secondary ${layout === "card" ? "mt-1 min-h-[2.75rem] text-sm sm:text-base" : "text-sm md:text-base"}`}
         >
-          {listing.title}
+          <ListingTitle listing={listing} />
         </h3>
       </Link>
 
@@ -122,9 +121,9 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="mt-2 flex items-center gap-2">
         {listing.seller.avatarUrl ? (
-          <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-2 ring-white">
+          <span className="relative size-7 shrink-0 overflow-hidden rounded-full ring-2 ring-surface">
             <AppImage
-              alt={listing.seller.name}
+              alt={displaySeller}
               className="object-cover"
               fallback="avatar"
               fill
@@ -133,13 +132,13 @@ export const PremiumListingCard = memo(function PremiumListingCard({
             />
           </span>
         ) : (
-          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-primary-soft text-[0.6rem] font-bold text-primary">
-            {listing.seller.name.slice(0, 2)}
+          <span className="grid size-7 shrink-0 place-items-center rounded-full bg-secondary-soft text-[0.6rem] font-bold text-[#8a7040]">
+            {displaySeller.slice(0, 2)}
           </span>
         )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-semibold text-ink">
-            {listing.seller.name}
+            <SellerName seller={listing.seller} />
             {isVerified ? (
               <Icon
                 aria-label="بائع موثق"
@@ -165,11 +164,11 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-border/80 pt-2.5 text-[0.65rem] font-medium text-muted sm:text-xs">
         <span className="inline-flex items-center gap-1">
-          <Icon name="clock" size={11} />
+          <Icon className="marketplace-card-meta-icon" name="clock" size={13} />
           {formatPostedTime(listing.postedAt)}
         </span>
         <span className="inline-flex items-center gap-1">
-          <Icon name="eye" size={11} />
+          <Icon className="marketplace-card-meta-icon" name="eye" size={13} />
           {formatViews(listing.views)} مشاهدة
         </span>
         {showStatus && listing.status !== "active" ? (
@@ -181,17 +180,21 @@ export const PremiumListingCard = memo(function PremiumListingCard({
 
   if (layout === "row") {
     return (
+      <LocalizedTree>
       <article className="marketplace-card group flex overflow-hidden">
         <div className="relative w-28 shrink-0 sm:w-36">{imageArea}</div>
         <div className="flex min-w-0 flex-1 flex-col">{bodyBlock}</div>
       </article>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <article className="marketplace-card group flex h-full flex-col">
       {imageArea}
       {bodyBlock}
     </article>
+    </LocalizedTree>
   );
 });

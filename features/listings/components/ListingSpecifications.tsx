@@ -5,6 +5,7 @@ import {
   getListingFeatureItems,
   getListingSpecEntries,
 } from "@/shared/listings/listing-specs";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingSpecificationsProps = {
   listing: Listing;
@@ -28,6 +29,7 @@ export function ListingSpecifications({ listing }: ListingSpecificationsProps) {
   }
 
   return (
+    <LocalizedTree>
     <Card className="mt-8 marketplace-panel p-6">
       <h2 className="text-lg font-black text-ink">المواصفات والميزات</h2>
 
@@ -63,7 +65,7 @@ export function ListingSpecifications({ listing }: ListingSpecificationsProps) {
         {showReason ? (
           <p className="rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3 text-muted">
             <span className="font-semibold text-ink">سبب البيع: </span>
-            {listing.reasonForSelling}
+            <span data-ugc>{listing.reasonForSelling}</span>
           </p>
         ) : null}
         {showNegotiable ? (
@@ -74,6 +76,7 @@ export function ListingSpecifications({ listing }: ListingSpecificationsProps) {
         ) : null}
       </div>
     </Card>
+    </LocalizedTree>
   );
 }
 

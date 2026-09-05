@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+
+type LocationOption = { id: string; name: string };
 
 type EmirateLocationSelectProps = {
   className?: string;
@@ -18,6 +20,26 @@ export function EmirateLocationSelect({
   variant = "mobile",
 }: EmirateLocationSelectProps) {
   const [city, setCity] = useState(defaultCity);
+  const [options, setOptions] = useState<LocationOption[]>(cities);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/locations")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return;
+        const list = (data?.locations ?? []) as LocationOption[];
+        if (list.length > 0) {
+          setOptions(list.map((item) => ({ id: item.id, name: item.name })));
+        }
+      })
+      .catch(() => {
+        /* keep constants fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function handleChange(nextCity: string) {
     setCity(nextCity);
@@ -27,7 +49,7 @@ export function EmirateLocationSelect({
   if (variant === "desktop") {
     return (
       <label
-        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 ${className}`.trim()}
+        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5 ${className}`.trim()}
       >
         <Icon className="shrink-0 text-[#B8955F]" name="map" size={14} />
         <span className="min-w-0 truncate text-xs font-bold text-ink">{city}</span>
@@ -37,7 +59,7 @@ export function EmirateLocationSelect({
           onChange={(event) => handleChange(event.target.value)}
           value={city}
         >
-          {cities.map((item) => (
+          {options.map((item) => (
             <option key={item.id} value={item.name}>
               {item.name}
             </option>
@@ -58,7 +80,7 @@ export function EmirateLocationSelect({
         onChange={(event) => handleChange(event.target.value)}
         value={city}
       >
-        {cities.map((item) => (
+        {options.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name}
           </option>

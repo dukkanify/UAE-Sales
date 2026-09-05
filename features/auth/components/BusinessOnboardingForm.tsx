@@ -55,7 +55,7 @@ export function BusinessOnboardingForm() {
 
       if (data.user) {
         setSessionUser(data.user);
-        await persistSessionCookie(data.user);
+        await persistSessionCookie();
       }
       router.push("/dashboard/listings");
     }, [router]),

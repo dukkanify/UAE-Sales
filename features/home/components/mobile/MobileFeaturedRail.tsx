@@ -16,8 +16,8 @@ export function MobileFeaturedRail({ listings }: MobileFeaturedRailProps) {
     <section aria-label="إعلانات مميزة" className="mobile-home-featured">
       <MobileSectionHeader actionHref="/featured" icon="star" title="إعلانات مميزة" />
       <DragScrollRow className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
-        {featured.map((listing, index) => (
-          <MobileFeaturedCard key={listing.id} listing={listing} priority={index < 2} />
+        {featured.map((listing) => (
+          <MobileFeaturedCard key={listing.id} listing={listing} />
         ))}
       </DragScrollRow>
     </section>

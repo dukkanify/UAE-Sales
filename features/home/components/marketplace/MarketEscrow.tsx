@@ -15,7 +15,7 @@ export async function MarketEscrow() {
         title="الضمان المالي"
       />
 
-      <div className="rounded-2xl border border-border bg-[#fdfbf7] p-6 md:p-10">
+      <div className="rounded-2xl border border-border bg-background p-6 md:p-10">
         <div className="hidden lg:block">
           <div className="relative">
             <div
@@ -25,7 +25,7 @@ export async function MarketEscrow() {
             <ol className="grid grid-cols-5 gap-4">
               {steps.map((step, index) => (
                 <li key={step.title} className="text-center">
-                  <span className="relative z-10 mx-auto grid size-12 place-items-center rounded-full border-2 border-[#B8955F]/30 bg-white text-sm font-bold text-ink">
+                  <span className="relative z-10 mx-auto grid size-12 place-items-center rounded-full border-2 border-[#B8955F]/30 bg-surface text-sm font-bold text-ink">
                     {index + 1}
                   </span>
                   <div className="mt-3">
@@ -49,7 +49,7 @@ export async function MarketEscrow() {
           {steps.map((step, index) => (
             <li
               key={step.title}
-              className="flex gap-3 rounded-xl border border-border bg-white p-4"
+              className="flex gap-3 rounded-xl border border-border bg-surface p-4"
             >
               <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#B8955F]/12 text-sm font-bold text-[#8a7040]">
                 {index + 1}

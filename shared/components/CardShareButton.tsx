@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icon } from "@/shared/ui/Icon";
+import { useTx } from "@/shared/i18n/useTx";
 
 type CardShareButtonProps = {
   ariaLabel?: string;
@@ -10,26 +11,39 @@ type CardShareButtonProps = {
   url: string;
 };
 
+function resolveShareUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url;
+  try {
+    return new URL(url, window.location.origin).href;
+  } catch {
+    return url;
+  }
+}
+
 export function CardShareButton({
   ariaLabel = "مشاركة الإعلان",
   className = "",
   title,
   url,
 }: CardShareButtonProps) {
+  const t = useTx();
   const [shared, setShared] = useState(false);
+  const label = t(ariaLabel);
 
   async function handleClick(event: React.MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
 
+    const shareUrl = resolveShareUrl(url);
+
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share({ title, url: shareUrl });
         setShared(true);
         return;
       }
 
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(shareUrl);
       setShared(true);
     } catch {
       setShared(false);
@@ -40,14 +54,14 @@ export function CardShareButton({
 
   return (
     <button
-      aria-label={ariaLabel}
-      className={`focus-ring grid size-8 place-items-center rounded-full bg-white/95 text-ink shadow-[var(--shadow-sm)] transition hover:bg-white ${className}`}
+      aria-label={label}
+      className={`card-media-action focus-ring grid size-8 place-items-center rounded-full transition ${className}`}
       onClick={handleClick}
-      title={ariaLabel}
+      title={label}
       type="button"
     >
-      <Icon name="share-2" size={14} />
-      <span className="sr-only">{shared ? "تمت المشاركة" : ariaLabel}</span>
+      <Icon name="share-2" size={15} />
+      <span className="sr-only">{shared ? t("تمت المشاركة") : label}</span>
     </button>
   );
 }

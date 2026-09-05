@@ -24,16 +24,35 @@ export function getAvailableShippingMethods(
     { id: "pickup", ...SHIPPING_METHOD_CONFIG.pickup },
   ];
 
-  const sameEmirate =
-    sellerEmirate &&
-    buyerEmirate &&
-    sellerEmirate.trim() === buyerEmirate.trim();
+  const sameEmirate = isSameEmirate(sellerEmirate, buyerEmirate);
 
   if (sameEmirate) {
     methods.unshift({ id: "express", ...SHIPPING_METHOD_CONFIG.express });
   }
 
   return methods;
+}
+
+export function isSameEmirate(sellerEmirate?: string, buyerEmirate?: string): boolean {
+  return Boolean(sellerEmirate && buyerEmirate && sellerEmirate.trim() === buyerEmirate.trim());
+}
+
+export function getDeliveryZone(input: {
+  emirate: string;
+  city?: string;
+  area?: string;
+  latitude?: number;
+  longitude?: number;
+}) {
+  return {
+    emirate: input.emirate,
+    city: input.city || input.emirate,
+    area: input.area || input.city || input.emirate,
+    latitude: input.latitude,
+    longitude: input.longitude,
+    hasCourierCoordinates:
+      typeof input.latitude === "number" && typeof input.longitude === "number",
+  };
 }
 
 export function calculateShippingFee(methodId: ShippingMethodId): number {

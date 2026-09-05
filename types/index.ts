@@ -30,9 +30,37 @@ export type {
   SellerType,
 } from "./domain/listing";
 
-export type { City, Country } from "./domain/location";
+export type {
+  City,
+  Country,
+  LocationCreateInput,
+  LocationPatch,
+  LocationRecord,
+} from "./domain/location";
 
-export type { AccountType, UserProfile, UserRole } from "./domain/user";
+export type {
+  AccountType,
+  AdminAction,
+  AdminActionMatrix,
+  AdminPermission,
+  UserProfile,
+  UserRole,
+} from "./domain/user";
+
+export type {
+  AdminCategoryCreateInput,
+  AdminCategoryPatch,
+  AdminCategoryRecord,
+  AdminDisputePatch,
+  AdminDisputeRecord,
+  AdminListingCreateInput,
+  AdminListingPatch,
+  AdminListingRecord,
+  AdminModerationSummary,
+  AdminUserPatch,
+  AdminUserRecord,
+  DisputeStatus,
+} from "./domain/admin";
 
 export type {
   EscrowStatus,
@@ -52,6 +80,7 @@ export type {
 export type {
   AppNotification,
   NotificationType,
+  PushSubscriptionRecord,
 } from "./domain/notification";
 
 export type {
@@ -59,3 +88,5 @@ export type {
   PaymentEventLog,
   StripePaymentMode,
 } from "./domain/payment";
+
+export type { Rating } from "./domain/rating";

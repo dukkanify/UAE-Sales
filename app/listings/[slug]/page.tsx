@@ -8,10 +8,11 @@ import {
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getCategories } from "@/services/categories";
-import {
-  getListingBySlug,
-  getRelatedListings,
-} from "@/services/listings";
+import { getListingBySlug, getRelatedListings } from "@/services/listings";
+import { getValidSessionUser } from "@/services/auth/require-session";
+import { listingDescription, listingTitle } from "@/shared/i18n/listing-copy";
+import { getRequestLocale } from "@/shared/i18n/locale";
+import { tx } from "@/shared/i18n/tx";
 
 type ListingPageProps = {
   params: Promise<{ slug: string }>;
@@ -23,7 +24,9 @@ export async function generateStaticParams() {
     getListings(),
     getMyListings(),
   ]);
-  return [...listings, ...userListings].map((listing) => ({ slug: listing.slug }));
+  return [...listings, ...userListings]
+    .filter((listing) => listing.status === "active")
+    .map((listing) => ({ slug: listing.slug }));
 }
 
 export async function generateMetadata({
@@ -31,10 +34,28 @@ export async function generateMetadata({
 }: ListingPageProps): Promise<Metadata> {
   const { slug } = await params;
   const listing = await getListingBySlug(slug);
-  if (!listing) return { title: `الإعلان غير موجود | Sooqna` };
+  const locale = await getRequestLocale();
+  if (!listing) {
+    return {
+      title: tx(locale, "الإعلان غير موجود"),
+    };
+  }
+  const title = listingTitle(listing, locale);
+  const description = listingDescription(listing, locale).slice(0, 160);
   return {
-    title: `${listing.title} | Sooqna`,
-    description: listing.description,
+    title,
+    description,
+    openGraph: {
+      description,
+      locale: locale === "en" ? "en_AE" : "ar_AE",
+      title,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title,
+    },
   };
 }
 
@@ -43,6 +64,14 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
   const listing = await getListingBySlug(slug);
   if (!listing) notFound();
 
+  const session = await getValidSessionUser();
+  const isOwner = Boolean(session && listing.seller.id === session.id);
+  const isAdmin = session?.role === "admin";
+  if (listing.status !== "active" && !isOwner && !isAdmin) {
+    notFound();
+  }
+
+  const locale = await getRequestLocale();
   const [categories, relatedListings] = await Promise.all([
     getCategories(),
     getRelatedListings(listing.categoryId, listing.id),
@@ -56,12 +85,12 @@ export default async function ListingDetailsPage({ params }: ListingPageProps) {
       <main>
         <ListingDetailsView
           breadcrumbs={[
-            { href: "/", label: "الرئيسية" },
-            { href: "/search", label: "الإعلانات" },
+            { href: "/", label: tx(locale, "الرئيسية") },
+            { href: "/search", label: tx(locale, "الإعلانات") },
             ...(category
-              ? [{ href: `/categories/${category.slug}`, label: category.name }]
+              ? [{ href: `/categories/${category.slug}`, label: tx(locale, category.name) }]
               : []),
-            { label: listing.title },
+            { label: listingTitle(listing, locale) },
           ]}
           category={category}
           listing={listing}

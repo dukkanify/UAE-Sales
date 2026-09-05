@@ -7,6 +7,27 @@ export type AccountType =
 
 export type UserRole = "user" | "business" | "admin";
 
+export type AdminPermission =
+  | "users"
+  | "listings"
+  | "orders"
+  | "disputes"
+  | "payments"
+  | "reports"
+  | "settings"
+  | "categories";
+
+/** Granular RBAC actions per admin module (spreadsheet matrix). */
+export type AdminAction =
+  | "view"
+  | "add"
+  | "edit"
+  | "delete"
+  | "approve"
+  | "export";
+
+export type AdminActionMatrix = Partial<Record<AdminPermission, AdminAction[]>>;
+
 export type AccountStatus = "pending" | "active" | "suspended";
 
 export type RegistrationSource =
@@ -37,6 +58,9 @@ export type UserProfile = {
   joinedAt: string;
   emailVerifiedAt?: string | null;
   accountStatus?: AccountStatus;
+  /** Bumped on password reset so older session cookies stop working. */
+  sessionVersion?: number;
+  passwordUpdatedAt?: string | null;
   onboardingStatus?: OnboardingStatus;
   registrationSource?: RegistrationSource;
   isGuestConverted?: boolean;
@@ -46,11 +70,17 @@ export type UserProfile = {
   favoritesCount?: number;
   listingsCount?: number;
   role?: UserRole;
+  /** When role is admin, empty/undefined = full access; otherwise gated permissions. */
+  adminPermissions?: AdminPermission[];
+  /** Optional per-module action matrix. Missing matrix = all actions for granted modules. */
+  adminActionMatrix?: AdminActionMatrix;
   subscription?: string;
   walletBalance?: number;
   businessProfile?: BusinessProfile;
+  preferredLocale?: "ar" | "en";
 };
 
 export type StoredUser = UserProfile & {
   passwordHash?: string | null;
+  createdAt?: string;
 };

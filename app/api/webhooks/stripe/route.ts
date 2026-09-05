@@ -1,15 +1,26 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { isStripeConfigured } from "@/services/payments/payment-config";
-import { logPaymentEvent } from "@/services/payments/payment-log";
+import {
+  ensureStripeConfigLoaded,
+  isStripeConfigured,
+} from "@/services/payments/payment-config";
+import {
+  claimStripeWebhookEvent,
+  logPaymentEvent,
+  releaseStripeWebhookEvent,
+} from "@/services/payments/payment-log";
 import {
   handleCheckoutSessionCompleted,
   handlePaymentIntentFailed,
+  syncRefundFromStripeCharge,
 } from "@/services/payments/order-service";
+import { markListingFeatured } from "@/services/payments/featured-checkout.service";
 import { getOrderById } from "@/services/payments/order-store";
+import { syncConnectAccountFromWebhook } from "@/services/payments/stripe-connect.service";
 import { verifyStripeWebhook } from "@/services/payments/stripe.service";
 
 export async function POST(request: Request) {
+  await ensureStripeConfigLoaded();
   if (!isStripeConfigured()) {
     return NextResponse.json({ error: "STRIPE_NOT_CONFIGURED" }, { status: 503 });
   }
@@ -23,9 +34,14 @@ export async function POST(request: Request) {
 
   let event: Stripe.Event;
   try {
-    event = verifyStripeWebhook(payload, signature);
+    event = await verifyStripeWebhook(payload, signature);
   } catch {
     return NextResponse.json({ error: "INVALID_SIGNATURE" }, { status: 400 });
+  }
+
+  const claim = await claimStripeWebhookEvent(event.id, event.type);
+  if (claim === "duplicate") {
+    return NextResponse.json({ received: true, duplicate: true });
   }
 
   await logPaymentEvent({
@@ -38,7 +54,14 @@ export async function POST(request: Request) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        await handleCheckoutSessionCompleted(session);
+        if (session.metadata?.type === "featured_listing") {
+          const listingId = session.metadata.listingId;
+          if (listingId) {
+            await markListingFeatured(listingId, session.id);
+          }
+        } else {
+          await handleCheckoutSessionCompleted(session);
+        }
         break;
       }
       case "payment_intent.succeeded": {
@@ -67,16 +90,60 @@ export async function POST(request: Request) {
           typeof charge.payment_intent === "string"
             ? charge.payment_intent
             : charge.payment_intent?.id;
-        await logPaymentEvent({
-          type: "charge.refunded",
-          payload: { paymentIntentId, chargeId: charge.id },
+        const refundId = charge.refunds?.data?.[0]?.id;
+        await syncRefundFromStripeCharge({
+          paymentIntentId,
+          chargeId: charge.id,
+          refundId,
         });
+        await logPaymentEvent({
+          type: "charge.refunded.synced",
+          payload: { paymentIntentId, chargeId: charge.id, refundId },
+        });
+        break;
+      }
+      case "account.updated":
+      case "account.external_account.created":
+      case "account.external_account.updated":
+      case "capability.updated": {
+        const accountObject =
+          event.type === "capability.updated"
+            ? null
+            : (event.data.object as Stripe.Account | Stripe.BankAccount | Stripe.Card);
+        let accountId: string | undefined;
+        if (event.type === "account.updated") {
+          accountId = (event.data.object as Stripe.Account).id;
+        } else if (event.type.startsWith("account.external_account")) {
+          const external = event.data.object as Stripe.BankAccount | Stripe.Card;
+          accountId =
+            typeof external.account === "string"
+              ? external.account
+              : external.account?.id;
+        } else if (event.type === "capability.updated") {
+          const capability = event.data.object as Stripe.Capability;
+          accountId =
+            typeof capability.account === "string"
+              ? capability.account
+              : capability.account?.id;
+        }
+
+        if (event.type === "account.updated" && accountObject) {
+          await syncConnectAccountFromWebhook(accountObject as Stripe.Account);
+        } else if (accountId) {
+          const { getStripeClient } = await import(
+            "@/services/payments/stripe.service"
+          );
+          const stripe = await getStripeClient();
+          const account = await stripe.accounts.retrieve(accountId);
+          await syncConnectAccountFromWebhook(account);
+        }
         break;
       }
       default:
         break;
     }
   } catch (error) {
+    await releaseStripeWebhookEvent(event.id);
     const message = error instanceof Error ? error.message : "WEBHOOK_HANDLER_ERROR";
     return NextResponse.json({ error: message }, { status: 500 });
   }

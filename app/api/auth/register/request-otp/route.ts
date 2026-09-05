@@ -5,15 +5,16 @@ import {
   enforceRateLimit,
   genericOtpResponse,
   otpCooldownResponse,
-  otpSendFailedResponse,
   sendOtpForPurpose,
 } from "@/services/auth/auth-handlers";
+import { EMAIL_ALREADY_REGISTERED_MESSAGE, OTP_SEND_FAILED_MESSAGE } from "@/services/auth/auth-messages";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
 import {
   createPendingUser,
-  deletePendingUser,
   findUserByEmail,
+  isRegisteredAccount,
 } from "@/services/auth/user-store";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 
 const schema = z.object({
   accountType: z.enum(["individual", "company"]),
@@ -39,8 +40,11 @@ export async function POST(request: Request) {
     }
 
     const existing = await findUserByEmail(email);
-    if (existing?.accountStatus === "active" && existing.emailVerifiedAt) {
-      return genericOtpResponse(email);
+    if (existing && isRegisteredAccount(existing)) {
+      return NextResponse.json(
+        { error: "EMAIL_ALREADY_REGISTERED", message: EMAIL_ALREADY_REGISTERED_MESSAGE },
+        { status: 409 },
+      );
     }
 
     const pending = await createPendingUser({
@@ -50,7 +54,7 @@ export async function POST(request: Request) {
     });
 
     try {
-      await sendOtpForPurpose({
+      const sent = await sendOtpForPurpose({
         email,
         fullName: parsed.data.fullName,
         purpose: "REGISTER",
@@ -61,21 +65,30 @@ export async function POST(request: Request) {
           userId: pending.id,
         },
       });
+      trackAuthEvent("registration_otp_sent");
+      return genericOtpResponse(email, {
+        emailDelivered: sent.delivered,
+        ...(canRevealOtpToClient(sent.delivered) ? { otp: sent.code } : {}),
+      });
     } catch (sendError) {
-      await deletePendingUser(pending.id);
-      throw sendError;
+      const cooldown = otpCooldownResponse(sendError);
+      if (cooldown) return cooldown;
+      trackAuthEvent("registration_failed");
+      return genericOtpResponse(email, { emailDelivered: false });
     }
-
-    trackAuthEvent("registration_otp_sent");
-    return genericOtpResponse(email);
   } catch (error) {
     const cooldown = otpCooldownResponse(error);
     if (cooldown) return cooldown;
-    if (error instanceof Error && error.message === "EMAIL_SEND_FAILED") {
-      trackAuthEvent("registration_failed");
-      return otpSendFailedResponse();
+    if (error instanceof Error && error.message === "EMAIL_ALREADY_REGISTERED") {
+      return NextResponse.json(
+        { error: "EMAIL_ALREADY_REGISTERED", message: EMAIL_ALREADY_REGISTERED_MESSAGE },
+        { status: 409 },
+      );
     }
     trackAuthEvent("registration_failed");
-    return otpSendFailedResponse();
+    return NextResponse.json(
+      { error: "EMAIL_SEND_FAILED", message: OTP_SEND_FAILED_MESSAGE },
+      { status: 503 },
+    );
   }
 }

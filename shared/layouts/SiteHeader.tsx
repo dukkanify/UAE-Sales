@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
-import { primaryNavigation } from "@/shared/constants/navigation";
+import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
+import { NotificationBell } from "@/features/notifications/NotificationBell";
+import { LanguageSwitch } from "@/shared/i18n/LanguageSwitch";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocaleMessages } from "@/shared/i18n/useLocale";
+import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -14,6 +21,14 @@ import {
 } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
 import type { UserProfile } from "@/types";
+
+const StickySearchDock = dynamic(
+  () =>
+    import("@/features/search/components/StickySearchDock").then(
+      (mod) => mod.StickySearchDock,
+    ),
+  { ssr: false },
+);
 
 const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
   "/": "home",
@@ -28,8 +43,15 @@ function isActivePath(pathname: string, href: string) {
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const copy = useLocaleMessages();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const isComposeListing = pathname.startsWith("/listings/new");
+  const nav = [
+    { href: "/", label: copy.home },
+    { href: "/categories", label: copy.categories },
+    { href: "/escrow", label: copy.escrowFull },
+  ];
 
   useEffect(() => {
     const syncSession = () => setUser(getSessionUser());
@@ -39,15 +61,37 @@ export function SiteHeader() {
       window.removeEventListener(STORAGE_EVENTS.sessionChange, syncSession);
   }, []);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => setMenuOpen(false), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   return (
+    <LocalizedTree>
+    <>
     <header className="sticky top-0 z-40 border-b border-border/80 bg-surface/90 backdrop-blur-xl">
+      <VerifyAccountBanner />
       <div className="sooqna-header-accent h-0.5" />
       <div className="app-container">
         <div className="flex min-h-[4rem] items-center justify-between gap-4">
           <BrandLogo showTagline={false} size="sm" />
 
           <nav className="hidden items-center gap-0.5 lg:flex">
-            {primaryNavigation.map((item) => {
+            {nav.map((item) => {
               const active = isActivePath(pathname, item.href);
               return (
                 <Link
@@ -67,47 +111,56 @@ export function SiteHeader() {
 
           <form
             action="/search"
-            className="hidden max-w-xs flex-1 items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface-muted/60 px-3 md:flex"
+            className="relative hidden min-w-0 max-w-xs flex-1 md:block"
           >
-            <Icon className="text-muted" name="search" size={16} />
-            <input
-              aria-label="بحث سريع"
-              className="min-h-10 w-full bg-transparent text-sm font-medium text-ink outline-none placeholder:text-muted/60"
+            <SearchTypeahead
+              compact
+              label=""
               name="q"
-              placeholder="ابحث..."
-              type="search"
+              placeholder={copy.searchShort}
             />
           </form>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="hidden items-center gap-2 lg:flex">
+              <LanguageSwitch variant="compact" />
+              <ThemeToggle className="shrink-0" />
+            </div>
+            <NotificationBell
+              badgeClassName="notify-bell__badge"
+              className="notify-bell__site-trigger"
+              iconSize={18}
+            />
             {user ? (
               <Link
                 className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-ink transition hover:bg-surface-muted sm:inline-flex"
                 href="/profile"
               >
-                {user.fullName.split(" ")[0]}
+                {copy.account}
               </Link>
             ) : (
               <Link
-                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-muted hover:text-ink sm:inline-flex"
+                className="hidden rounded-[var(--radius-md)] px-3 py-2 text-sm font-semibold text-primary transition hover:bg-secondary-soft sm:inline-flex"
                 href="/login"
               >
-                دخول
+                {copy.login}
               </Link>
             )}
-            <Button
-              className="sooqna-gold-gradient hidden rounded-full sm:inline-flex"
-              href="/listings/new"
-              size="md"
-              variant="accent"
-            >
-              <Icon className="shrink-0" name="plus" size={16} />
-              أضف إعلانك
-            </Button>
+            {!isComposeListing ? (
+              <Button
+                className="sooqna-gold-gradient hidden rounded-full sm:inline-flex"
+                href="/listings/new"
+                size="md"
+                variant="accent"
+              >
+                <Icon className="shrink-0" name="plus" size={16} />
+                {copy.addListing}
+              </Button>
+            ) : null}
             <button
               aria-expanded={menuOpen}
-              aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-              className="focus-ring grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
+              aria-label={menuOpen ? copy.closeMenu : copy.menu}
+              className="focus-ring motion-press grid size-11 shrink-0 place-items-center overflow-visible rounded-[var(--radius-xl)] border border-border bg-surface text-primary shadow-[var(--shadow-xs)] transition hover:border-secondary/50 lg:hidden"
               onClick={() => setMenuOpen((open) => !open)}
               type="button"
             >
@@ -121,16 +174,13 @@ export function SiteHeader() {
         </div>
 
         {menuOpen ? (
-          <nav aria-label="قائمة الجوال" className="border-t border-border py-3 lg:hidden">
-            <div className="mb-3 flex items-center justify-between rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
-              <p className="text-sm font-bold text-ink">تصفّح سوقنا</p>
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-[0.65rem] font-bold text-primary">
-                أقسام
-              </span>
+          <nav aria-label={copy.menu} className="border-t border-border py-3 lg:hidden">
+            <div className="mb-3 rounded-[1.1rem] bg-gradient-to-l from-secondary/20 via-secondary-soft/50 to-transparent px-3 py-2.5">
+              <p className="text-sm font-bold text-ink">{copy.browse}</p>
             </div>
 
             <div className="grid gap-1.5">
-              {primaryNavigation.map((item) => {
+              {nav.map((item) => {
                 const active = isActivePath(pathname, item.href);
                 const icon = drawerIcons[item.href] ?? "grid";
                 return (
@@ -138,7 +188,7 @@ export function SiteHeader() {
                     key={item.href}
                     className={`flex items-center gap-3 rounded-[1rem] px-3 py-3 text-sm font-bold transition ${
                       active
-                        ? "bg-primary text-white shadow-[0_10px_24px_rgba(15,23,42,0.22)]"
+                        ? "bg-[#0b1628] text-white shadow-[0_10px_24px_rgba(15,23,42,0.22)]"
                         : "bg-surface-muted/70 text-ink hover:bg-secondary-soft/70"
                     }`}
                     href={item.href}
@@ -151,29 +201,39 @@ export function SiteHeader() {
                     >
                       <Icon name={icon} size={18} />
                     </span>
-                    <span className="flex-1 text-right">{item.label}</span>
+                    <span className="flex-1 text-start">{item.label}</span>
                     {active ? (
-                      <span className="text-[0.65rem] font-semibold text-secondary">الحالي</span>
+                      <span className="text-[0.65rem] font-semibold text-secondary">{copy.current}</span>
                     ) : null}
                   </Link>
                 );
               })}
 
+              <div className="mt-1 rounded-[1.1rem] border border-border bg-surface-muted/60 px-3 py-3">
+                <LanguageSwitch />
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <span className="text-sm font-semibold text-ink">{copy.nightMode}</span>
+                  <ThemeToggle className="shrink-0" />
+                </div>
+              </div>
+
               <form action="/search" className="mt-1 px-0.5">
-                <InputShell />
+                <InputShell placeholder={copy.searchPlaceholder} />
               </form>
 
-              <Button
-                className="sooqna-gold-gradient mt-1 rounded-full"
-                fullWidth
-                href="/listings/new"
-                onClick={() => setMenuOpen(false)}
-                size="md"
-                variant="accent"
-              >
-                <Icon className="shrink-0" name="plus" size={16} />
-                أضف إعلانك
-              </Button>
+              {!isComposeListing ? (
+                <Button
+                  className="sooqna-gold-gradient mt-1 rounded-full"
+                  fullWidth
+                  href="/listings/new"
+                  onClick={() => setMenuOpen(false)}
+                  size="md"
+                  variant="accent"
+                >
+                  <Icon className="shrink-0" name="plus" size={16} />
+                  {copy.addListing}
+                </Button>
+              ) : null}
 
               {user ? (
                 <>
@@ -182,7 +242,14 @@ export function SiteHeader() {
                     href="/profile"
                     onClick={() => setMenuOpen(false)}
                   >
-                    حسابي
+                    {copy.account}
+                  </Link>
+                  <Link
+                    className="rounded-[var(--radius-md)] px-4 py-3 text-sm font-medium text-ink"
+                    href="/activities"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    نشاطاتي
                   </Link>
                   <Button
                     className="w-full justify-start"
@@ -194,7 +261,7 @@ export function SiteHeader() {
                     type="button"
                     variant="ghost"
                   >
-                    تسجيل الخروج
+                    {copy.logout}
                   </Button>
                 </>
               ) : (
@@ -203,7 +270,7 @@ export function SiteHeader() {
                   href="/login"
                   onClick={() => setMenuOpen(false)}
                 >
-                  تسجيل الدخول
+                  {copy.loginShort}
                 </Link>
               )}
             </div>
@@ -211,20 +278,19 @@ export function SiteHeader() {
         ) : null}
       </div>
     </header>
+    <StickySearchDock />
+    </>
+    </LocalizedTree>
   );
 }
 
-function InputShell() {
+function InputShell({ placeholder }: { placeholder: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-border bg-surface px-3">
-      <Icon className="text-muted" name="search" size={16} />
-      <input
-        aria-label="بحث"
-        className="min-h-11 w-full bg-transparent text-sm outline-none"
-        name="q"
-        placeholder="ابحث عن أي شيء..."
-        type="search"
-      />
-    </div>
+    <SearchTypeahead
+      compact
+      label=""
+      name="q"
+      placeholder={placeholder}
+    />
   );
 }

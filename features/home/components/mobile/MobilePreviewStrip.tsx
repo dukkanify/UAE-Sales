@@ -19,8 +19,8 @@ export function MobilePreviewStrip({ listings }: MobilePreviewStripProps) {
         إعلانات مميزة الآن — مختارة لك من سوقنا.
       </p>
       <DragScrollRow className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
-        {previews.map((listing, index) => (
-          <MobileFeaturedCard key={listing.id} listing={listing} priority={index < 2} />
+        {previews.map((listing) => (
+          <MobileFeaturedCard key={listing.id} listing={listing} />
         ))}
       </DragScrollRow>
     </section>

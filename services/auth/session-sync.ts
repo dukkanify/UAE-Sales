@@ -1,13 +1,13 @@
 "use client";
 
-import type { UserProfile } from "@/types";
-
-export async function persistSessionCookie(user: UserProfile): Promise<boolean> {
+/**
+ * Refresh the signed httpOnly session from the server (no client profile trust).
+ * Login/register routes already set the cookie; this only re-issues after profile updates.
+ */
+export async function persistSessionCookie(): Promise<boolean> {
   try {
     const response = await fetch("/api/auth/session", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user }),
       credentials: "same-origin",
     });
     return response.ok;

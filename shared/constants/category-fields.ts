@@ -1,4 +1,14 @@
 import type { CategoryFieldDefinition } from "@/types";
+import { colorOptions } from "@/shared/constants/colors";
+import {
+  carBrandOptions,
+  electronicsBrandOptions,
+  mobileBrandOptions,
+} from "@/shared/constants/product-brands";
+import {
+  carModelOptions,
+  mobileModelOptions,
+} from "@/shared/constants/product-models";
 
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
@@ -32,11 +42,48 @@ const carFeatureOptions = [
 ];
 
 const carFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: carBrandOptions,
+    placeholder: "ابحث عن الماركة (Toy… Nissan…)",
+  },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: carModelOptions,
+    placeholder: "ابحث عن الموديل (Patrol… Camry…)",
+  },
+  {
+    key: "condition",
+    label: "حالة السيارة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "جديدة", value: "new" },
+      { label: "مستعملة", value: "used" },
+      { label: "ممتازة", value: "excellent" },
+    ],
+  },
   { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  { key: "city", label: "المدينة", type: "text", required: true, searchable: true },
+  {
+    key: "city",
+    label: "المدينة / المنطقة",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: جميرا، مردف، الكورنيش",
+    note: "اكتب الحي أو المنطقة داخل الإمارة المختارة.",
+  },
   { key: "mileage", label: "العداد (كم)", type: "text", required: true, searchable: true },
   { key: "transmission", label: "ناقل الحركة", type: "select", required: true, options: [
     { label: "أوتوماتيك", value: "أوتوماتيك" },
@@ -56,8 +103,20 @@ const carFields: CategoryFieldDefinition[] = [
     { label: "ياباني", value: "ياباني" },
     { label: "أخرى", value: "أخرى" },
   ]},
-  { key: "exteriorColor", label: "اللون الخارجي", type: "text", required: true },
-  { key: "interiorColor", label: "اللون الداخلي", type: "text", required: true },
+  {
+    key: "exteriorColor",
+    label: "اللون الخارجي",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
+  {
+    key: "interiorColor",
+    label: "اللون الداخلي",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accidentHistory", label: "سجل الحوادث", type: "select", required: true, options: [
     { label: "بدون حوادث", value: "بدون حوادث" },
@@ -105,12 +164,38 @@ const realEstateFields: CategoryFieldDefinition[] = [
   { key: "community", label: "المجتمع", type: "text", required: true, titlePart: true, searchable: true },
   { key: "titleDeedReady", label: "سند الملكية جاهز", type: "select", required: true, options: yesNoOptions },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
-  { key: "city", label: "المدينة", type: "text", required: true, searchable: true },
+  {
+    key: "city",
+    label: "المدينة / المنطقة",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: جميرا، مردف، الكورنيش",
+    note: "اكتب الحي أو المنطقة داخل الإمارة المختارة.",
+  },
 ];
 
 const mobileFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: mobileBrandOptions,
+    placeholder: "ابحث عن الماركة (App… Sam…)",
+  },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: mobileModelOptions,
+    placeholder: "ابحث عن الموديل (iPhone… Galaxy…)",
+  },
   { key: "storage", label: "التخزين", type: "select", required: true, searchable: true, options: [
     { label: "64 GB", value: "64 GB" },
     { label: "128 GB", value: "128 GB" },
@@ -125,48 +210,156 @@ const mobileFields: CategoryFieldDefinition[] = [
     { label: "12 GB", value: "12 GB" },
     { label: "16 GB", value: "16 GB" },
   ]},
-  { key: "color", label: "اللون", type: "text", required: true },
+  {
+    key: "color",
+    label: "اللون",
+    type: "select",
+    required: true,
+    options: colorOptions,
+  },
   { key: "batteryHealth", label: "صحة البطارية", type: "text", required: true },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "purchaseDate", label: "تاريخ الشراء", type: "text", required: true },
   { key: "accessoriesIncluded", label: "الملحقات المرفقة", type: "textarea", required: true },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
-    { label: "جديد", value: "جديد" },
-    { label: "مستعمل", value: "مستعمل" },
-    { label: "ممتاز", value: "ممتاز" },
+    { label: "جديد", value: "new" },
+    { label: "مستعمل", value: "used" },
+    { label: "ممتاز", value: "excellent" },
   ]},
 ];
 
 const electronicsFields: CategoryFieldDefinition[] = [
-  { key: "brand", label: "الماركة", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "model", label: "الموديل", type: "text", required: true, titlePart: true, searchable: true },
+  {
+    key: "brand",
+    label: "الماركة",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: electronicsBrandOptions,
+    placeholder: "ابحث عن الماركة (App… Son…)",
+  },
+  {
+    key: "model",
+    label: "الموديل",
+    type: "combobox",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "MacBook Pro", value: "MacBook Pro" },
+      { label: "MacBook Air", value: "MacBook Air" },
+      { label: "iPad Pro", value: "iPad Pro" },
+      { label: "PlayStation 5", value: "PlayStation 5" },
+      { label: "Xbox Series X", value: "Xbox Series X" },
+      { label: "Nintendo Switch", value: "Nintendo Switch" },
+      { label: "أخرى", value: "أخرى" },
+    ],
+    placeholder: "ابحث أو اكتب الموديل",
+  },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
-    { label: "جديد", value: "جديد" },
-    { label: "مستعمل", value: "مستعمل" },
-    { label: "ممتاز", value: "ممتاز" },
+    { label: "جديد", value: "new" },
+    { label: "مستعمل", value: "used" },
   ]},
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accessories", label: "الملحقات", type: "textarea", required: true },
 ];
 
 const jobFields: CategoryFieldDefinition[] = [
-  { key: "company", label: "الشركة", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "position", label: "المسمى الوظيفي", type: "text", required: true, titlePart: true, searchable: true },
-  { key: "salary", label: "الراتب", type: "text", required: true, searchable: true },
-  { key: "experience", label: "الخبرة", type: "text", required: true },
-  { key: "employmentType", label: "نوع التوظيف", type: "select", required: true, options: [
-    { label: "دوام كامل", value: "دوام كامل" },
-    { label: "دوام جزئي", value: "دوام جزئي" },
-    { label: "عقد", value: "عقد" },
-    { label: "عن بُعد", value: "عن بُعد" },
-  ]},
-  { key: "location", label: "الموقع", type: "text", required: true, searchable: true },
-  { key: "nationality", label: "الجنسية", type: "text", required: true },
-  { key: "gender", label: "الجنس", type: "select", required: true, options: [
-    { label: "ذكر", value: "ذكر" },
-    { label: "أنثى", value: "أنثى" },
-    { label: "أي", value: "أي" },
-  ]},
+  {
+    key: "listingType",
+    label: "نوع الإعلان",
+    type: "select",
+    required: true,
+    titlePart: true,
+    options: [
+      { label: "شاغر وظيفي", value: "vacancy" },
+      { label: "باحث عن عمل", value: "seeker" },
+    ],
+    note: "اختر نوع الإعلان لتظهر الحقول المناسبة. صورة الإعلان اختيارية.",
+  },
+  {
+    key: "company",
+    label: "الشركة",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+  },
+  {
+    key: "position",
+    label: "المسمى الوظيفي",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+  },
+  {
+    key: "salary",
+    label: "الراتب / المتوقع",
+    type: "text",
+    required: true,
+    searchable: true,
+  },
+  {
+    key: "experience",
+    label: "الخبرة",
+    type: "text",
+    required: true,
+  },
+  {
+    key: "employmentType",
+    label: "نوع التوظيف",
+    type: "select",
+    required: true,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+    options: [
+      { label: "دوام كامل", value: "دوام كامل" },
+      { label: "دوام جزئي", value: "دوام جزئي" },
+      { label: "عقد", value: "عقد" },
+      { label: "عن بُعد", value: "عن بُعد" },
+    ],
+  },
+  {
+    key: "availability",
+    label: "التوفر للبدء",
+    type: "select",
+    required: true,
+    showWhen: { key: "listingType", values: ["seeker"] },
+    options: [
+      { label: "فوري", value: "فوري" },
+      { label: "خلال أسبوعين", value: "خلال أسبوعين" },
+      { label: "خلال شهر", value: "خلال شهر" },
+      { label: "مرن", value: "مرن" },
+    ],
+  },
+  {
+    key: "location",
+    label: "الموقع",
+    type: "text",
+    required: true,
+    searchable: true,
+  },
+  {
+    key: "nationality",
+    label: "الجنسية",
+    type: "text",
+    required: false,
+    showWhen: { key: "listingType", values: ["seeker"] },
+  },
+  {
+    key: "gender",
+    label: "الجنس المطلوب",
+    type: "select",
+    required: false,
+    showWhen: { key: "listingType", values: ["vacancy"] },
+    options: [
+      { label: "ذكر", value: "ذكر" },
+      { label: "أنثى", value: "أنثى" },
+      { label: "أي", value: "أي" },
+    ],
+  },
 ];
 
 const serviceFields: CategoryFieldDefinition[] = [
@@ -181,6 +374,142 @@ const serviceFields: CategoryFieldDefinition[] = [
   { key: "experience", label: "سنوات الخبرة", type: "text", required: true },
 ];
 
+const foodFields: CategoryFieldDefinition[] = [
+  {
+    key: "saleType",
+    label: "نوع البيع",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "بالجملة", value: "wholesale" },
+      { label: "تجزئة", value: "retail" },
+    ],
+    note: "لا يُستخدم جديد/مستعمل للطعام — اختر بالجملة أو تجزئة.",
+  },
+  {
+    key: "unitPrice",
+    label: "السعر حسب الوحدة",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: AED 35 / كرتون أو AED 12 / وجبة",
+    note: "يجب أن يطابق التسعير نوع البيع المختار.",
+  },
+  {
+    key: "cuisine",
+    label: "نوع المطبخ / المنتج",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "إماراتي", value: "إماراتي" },
+      { label: "عربي", value: "عربي" },
+      { label: "آسيوي", value: "آسيوي" },
+      { label: "هندي", value: "هندي" },
+      { label: "غربي", value: "غربي" },
+      { label: "حلويات", value: "حلويات" },
+      { label: "مشروبات", value: "مشروبات" },
+      { label: "أخرى", value: "أخرى" },
+    ],
+  },
+  {
+    key: "portion",
+    label: "الحصة / الكمية",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: كرتون 24 قطعة أو وجبة لشخصين",
+  },
+  {
+    key: "delivery",
+    label: "التوصيل",
+    type: "select",
+    required: true,
+    options: [
+      { label: "توصيل متاح", value: "توصيل متاح" },
+      { label: "استلام فقط", value: "استلام فقط" },
+      { label: "كلاهما", value: "كلاهما" },
+    ],
+  },
+  {
+    key: "freshness",
+    label: "الطزاجة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "طازج يومياً", value: "طازج يومياً" },
+      { label: "محضّر عند الطلب", value: "محضّر عند الطلب" },
+      { label: "مجمّد", value: "مجمّد" },
+      { label: "معلّب", value: "معلّب" },
+    ],
+  },
+  {
+    key: "city",
+    label: "المدينة / المنطقة",
+    type: "text",
+    required: true,
+    searchable: true,
+    placeholder: "مثال: أبوظبي — الكورنيش",
+    note: "اكتب الإمارة والمنطقة.",
+  },
+];
+
+const furnitureFields: CategoryFieldDefinition[] = [
+  {
+    key: "furnitureType",
+    label: "نوع الأثاث",
+    type: "select",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    options: [
+      { label: "غرف نوم", value: "غرف نوم" },
+      { label: "كنب", value: "كنب" },
+      { label: "طاولات طعام", value: "طاولات طعام" },
+      { label: "أثاث خارجي", value: "أثاث خارجي" },
+      { label: "أخرى", value: "other" },
+    ],
+  },
+  {
+    key: "furnitureTypeOther",
+    label: "حدد النوع (أخرى)",
+    type: "text",
+    required: true,
+    titlePart: true,
+    searchable: true,
+    placeholder: "اكتب نوع الأثاث",
+    showWhen: { key: "furnitureType", values: ["other"] },
+    note: "تُحفظ كاقتراح للمراجعة الإدارية قبل إضافتها للقائمة العامة.",
+  },
+  {
+    key: "condition",
+    label: "الحالة",
+    type: "select",
+    required: true,
+    options: [
+      { label: "جديد", value: "new" },
+      { label: "مستعمل", value: "used" },
+    ],
+  },
+  {
+    key: "material",
+    label: "الخامة",
+    type: "text",
+    required: false,
+    searchable: true,
+  },
+  {
+    key: "city",
+    label: "المدينة / المنطقة",
+    type: "text",
+    required: true,
+    searchable: true,
+  },
+];
+
 export const DYNAMIC_CATEGORY_IDS = [
   "cars",
   "real-estate",
@@ -188,6 +517,8 @@ export const DYNAMIC_CATEGORY_IDS = [
   "electronics",
   "jobs",
   "services",
+  "food",
+  "furniture",
 ] as const;
 
 export type DynamicCategoryId = (typeof DYNAMIC_CATEGORY_IDS)[number];
@@ -199,6 +530,8 @@ const categoryFieldMap: Record<DynamicCategoryId, CategoryFieldDefinition[]> = {
   electronics: electronicsFields,
   jobs: jobFields,
   services: serviceFields,
+  food: foodFields,
+  furniture: furnitureFields,
 };
 
 export function isDynamicCategory(categoryId: string): categoryId is DynamicCategoryId {

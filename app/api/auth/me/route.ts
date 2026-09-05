@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { getSessionFromCookie } from "@/services/auth/session-cookie";
+import { getValidSessionUser } from "@/services/auth/require-session";
 
 export async function GET() {
-  const user = await getSessionFromCookie();
+  const user = await getValidSessionUser();
   if (!user) {
     return NextResponse.json({ error: "UNAUTHORIZED" }, { status: 401 });
   }

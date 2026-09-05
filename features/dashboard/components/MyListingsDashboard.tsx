@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { demoAccounts } from "@/mock/demo-accounts.mock";
 import type { Category, Listing, ListingStatus } from "@/types";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { listingStatusLabels } from "@/shared/constants/listingStatuses";
-import { DashboardOverviewPanel } from "@/features/dashboard/components/DashboardOverviewPanel";
 import { PremiumListingCard } from "@/features/listings/components/PremiumListingCard";
 import { ListingStatusBadge } from "@/features/listings/components/ListingStatusBadge";
 import { Button } from "@/shared/ui/Button";
@@ -17,7 +15,9 @@ import {
   deleteLocalListing,
   getLocalListingsForSeller,
   getSessionUser,
+  saveLocalListing,
 } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type MyListingsDashboardProps = {
   categories: Category[];
@@ -32,10 +32,9 @@ const statusOrder: ListingStatus[] = [
   "rejected",
 ];
 
-function isDemoSessionUser(email?: string, id?: string) {
-  return demoAccounts.some(
-    (account) => account.profile.email === email || account.profile.id === id,
-  );
+function readFeaturedSuccessFlag(): boolean {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("featured") === "1";
 }
 
 export function MyListingsDashboard({
@@ -44,13 +43,22 @@ export function MyListingsDashboard({
 }: MyListingsDashboardProps) {
   const [activeStatus, setActiveStatus] = useState("all");
   const [localListings, setLocalListings] = useState<Listing[]>([]);
+  const [overrides, setOverrides] = useState<Record<string, Listing>>({});
   const [actionMessage, setActionMessage] = useState("");
-  const [showDemoListings, setShowDemoListings] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [featuredSuccess] = useState(readFeaturedSuccessFlag);
 
   const allListings = useMemo(() => {
-    const demoListings = showDemoListings ? listings : [];
-    return [...localListings, ...demoListings];
-  }, [listings, localListings, showDemoListings]);
+    const byId = new Map<string, Listing>();
+    for (const listing of listings) {
+      byId.set(listing.id, overrides[listing.id] ?? listing);
+    }
+    for (const listing of localListings) {
+      byId.set(listing.id, overrides[listing.id] ?? listing);
+    }
+    return Array.from(byId.values());
+  }, [listings, localListings, overrides]);
 
   const categoryNames = new Map(
     categories.map((category) => [category.id, category.name]),
@@ -79,13 +87,14 @@ export function MyListingsDashboard({
     })),
   ];
 
+  const successMessage =
+    actionMessage ||
+    (featuredSuccess ? "تم تمييز الإعلان بنجاح." : "");
+
   useEffect(() => {
     const syncLocalListings = () => {
       const user = getSessionUser();
-      setLocalListings(
-        user ? getLocalListingsForSeller(user.id) : [],
-      );
-      setShowDemoListings(isDemoSessionUser(user?.email, user?.id));
+      setLocalListings(user ? getLocalListingsForSeller(user.id) : []);
     };
 
     syncLocalListings();
@@ -97,16 +106,76 @@ export function MyListingsDashboard({
     };
   }, []);
 
-  return (
-    <div className="grid gap-5">
-      <DashboardOverviewPanel />
+  function applyListingUpdate(updated: Listing) {
+    setOverrides((prev) => ({ ...prev, [updated.id]: updated }));
+    if (updated.id.startsWith("local-")) {
+      saveLocalListing(updated);
+    }
+  }
 
+  async function handleRenew(listing: Listing) {
+    setBusyId(listing.id);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const response = await fetch(`/api/listings/${listing.id}/renew`, {
+        method: "PATCH",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setActionError("تعذر تجديد الإعلان.");
+        return;
+      }
+      applyListingUpdate(data.listing as Listing);
+      setActionMessage("تم إرسال الإعلان للتجديد وهو قيد المراجعة.");
+    } catch {
+      setActionError("تعذر تجديد الإعلان.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function handleFeature(listing: Listing) {
+    setBusyId(listing.id);
+    setActionError("");
+    setActionMessage("");
+    try {
+      const response = await fetch(`/api/listings/${listing.id}/feature`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setActionError(
+          data.error === "ALREADY_FEATURED"
+            ? "هذا الإعلان مميز بالفعل."
+            : "تعذر بدء تمييز الإعلان.",
+        );
+        return;
+      }
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl as string;
+        return;
+      }
+      if (data.listing) {
+        applyListingUpdate(data.listing as Listing);
+      }
+      setActionMessage("تم تمييز الإعلان بنجاح.");
+    } catch {
+      setActionError("تعذر بدء تمييز الإعلان.");
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  return (
+    <LocalizedTree>
+    <div className="grid gap-5">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           { icon: "check" as const, label: "نشطة", value: counts.active },
           { icon: "clock" as const, label: "قيد المراجعة", value: counts.pending_review },
           { icon: "edit" as const, label: "مسودات", value: counts.draft },
-          { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("ar-AE") },
+          { icon: "eye" as const, label: "مشاهدات", value: totalViews.toLocaleString("en-AE") },
         ].map((stat) => (
           <div key={stat.label} className="marketplace-stat-card p-5">
             <div className="flex items-center justify-between">
@@ -132,9 +201,10 @@ export function MyListingsDashboard({
         </div>
       </div>
 
-      {actionMessage ? (
-        <FormMessage variant="success">{actionMessage}</FormMessage>
+      {successMessage ? (
+        <FormMessage variant="success">{successMessage}</FormMessage>
       ) : null}
+      {actionError ? <FormMessage variant="error">{actionError}</FormMessage> : null}
 
       {filteredListings.length === 0 ? (
         <EmptyState
@@ -154,7 +224,24 @@ export function MyListingsDashboard({
                 listing={listing}
               />
               <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-                <ListingStatusBadge status={listing.status} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <ListingStatusBadge status={listing.status} />
+                  {listing.status === "expired" ? (
+                    <span className="rounded-[var(--radius-md)] border border-error/20 bg-error-soft px-2 py-0.5 text-[11px] font-semibold text-error">
+                      منتهي الصلاحية
+                    </span>
+                  ) : null}
+                  {listing.isFeatured ? (
+                    <span className="rounded-[var(--radius-md)] border border-[#c9a45c]/35 bg-[#c9a45c]/15 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                      مميز
+                    </span>
+                  ) : null}
+                  {listing.status === "draft" ? (
+                    <span className="rounded-[var(--radius-md)] border border-border bg-surface-muted px-2 py-0.5 text-[11px] font-semibold text-muted">
+                      بانتظار الدفع
+                    </span>
+                  ) : null}
+                </div>
                 <div className="flex flex-wrap gap-2">
                 <Button
                   href={
@@ -178,6 +265,26 @@ export function MyListingsDashboard({
                 >
                   تعديل
                 </Button>
+                {listing.status === "expired" ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleRenew(listing)}
+                    size="sm"
+                    variant="accent"
+                  >
+                    تجديد
+                  </Button>
+                ) : null}
+                {!listing.isFeatured && listing.status !== "expired" ? (
+                  <Button
+                    loading={busyId === listing.id}
+                    onClick={() => handleFeature(listing)}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    تمييز الإعلان
+                  </Button>
+                ) : null}
                 {listing.id.startsWith("local-") ? (
                   <Button
                     onClick={() => {
@@ -197,5 +304,6 @@ export function MyListingsDashboard({
         </div>
       )}
     </div>
+    </LocalizedTree>
   );
 }

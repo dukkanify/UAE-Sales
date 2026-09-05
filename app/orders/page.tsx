@@ -2,10 +2,10 @@ import { OrdersListContent } from "@/features/orders/components/OrdersListConten
 import { DashboardShell } from "@/features/dashboard/components/DashboardShell";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
 
 export default async function OrdersPage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser("/orders");
 
   return (
     <>

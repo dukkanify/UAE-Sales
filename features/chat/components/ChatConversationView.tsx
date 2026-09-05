@@ -6,8 +6,10 @@ import type { ChatConversation } from "@/services/chat";
 import {
   addMessageToConversation,
   getChatConversationById,
+  markConversationRead,
 } from "@/services/chat";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
+import { notifyChatEmail } from "@/features/chat/lib/notify-chat-email";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
@@ -15,6 +17,7 @@ import { EmptyState } from "@/shared/ui/EmptyState";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
 import { Input } from "@/shared/ui/Input";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ChatConversationViewProps = {
   conversationId: string;
@@ -28,8 +31,10 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
 
   useEffect(() => {
     const sync = () => {
-      setConversation(getChatConversationById(conversationId) ?? null);
+      const current = getChatConversationById(conversationId) ?? null;
+      setConversation(current);
       setIsReady(true);
+      if (current) markConversationRead(conversationId);
     };
     sync();
     window.addEventListener(STORAGE_EVENTS.chatChange, sync);
@@ -42,6 +47,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
 
   if (!conversation) {
     return (
+      <LocalizedTree>
       <EmptyState
         actionHref="/chat"
         actionLabel="العودة للرسائل"
@@ -49,6 +55,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
         icon="message"
         title="المحادثة غير موجودة"
       />
+      </LocalizedTree>
     );
   }
 
@@ -87,16 +94,29 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
       return;
     }
 
+    const recipientUserId =
+      user.id === conversation.sellerId ? conversation.buyerId : conversation.sellerId;
+    notifyChatEmail({
+      conversationId: conversation.id,
+      listingTitle: conversation.listingTitle,
+      preview: message.trim(),
+      recipientUserId,
+      senderName: user.fullName,
+    });
+
     setConversation(updated);
     setMessage("");
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <Card className="p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-ink">{conversation.listingTitle}</p>
+            <p className="text-sm font-semibold text-ink" data-ugc>
+              {conversation.listingTitle}
+            </p>
             <p className="mt-1 text-xs text-muted">
               مع {conversation.sellerName}
             </p>
@@ -120,7 +140,7 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
                     : "bg-surface-muted text-ink"
                 }`}
               >
-                <p>{item.body}</p>
+                <p data-ugc>{item.body}</p>
                 <p className={`mt-1 text-[0.65rem] ${isMine ? "text-white/70" : "text-muted"}`}>
                   {new Date(item.createdAt).toLocaleString("ar-AE", {
                     day: "numeric",
@@ -155,5 +175,6 @@ export function ChatConversationView({ conversationId }: ChatConversationViewPro
         </form>
       </Card>
     </div>
+    </LocalizedTree>
   );
 }

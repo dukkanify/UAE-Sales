@@ -13,22 +13,35 @@ import {
 import { resolveCheckoutShipping } from "@/services/shipping/shipping.service";
 import { createNotification } from "@/services/payments/notification-store";
 import {
+  emailOrderPaid,
+  emailOrderStatusToUser,
+} from "@/services/email/notification-emails";
+import {
   createOrder,
   findPendingOrder,
   generateOrderId,
+  getOrderByCheckoutSessionId,
   getOrderById,
+  getOrderByPaymentIntentId,
   isValidOrderTransition,
   updateOrder,
 } from "@/services/payments/order-store";
 import { logPaymentEvent } from "@/services/payments/payment-log";
-import { isStripeConfigured, isMockCheckoutAllowed } from "@/services/payments/payment-config";
+import {
+  ensureStripeConfigLoaded,
+  isStripeConfigured,
+  isMockCheckoutAllowed,
+} from "@/services/payments/payment-config";
 import type { CreateCheckoutInput } from "@/services/payments/payment-schemas";
 import {
   createCheckoutSession,
   refundStripePayment,
+  retrieveCheckoutSession,
 } from "@/services/payments/stripe.service";
 import { addWalletTransaction } from "@/services/payments/wallet-ledger";
 import type { ListingSnapshot } from "@/services/payments/listing-resolver";
+import { hydrateListingCatalog } from "@/services/payments/listing-resolver";
+import { getAdminSettings } from "@/services/admin/admin-settings-store";
 import { formatCurrencyLabel } from "@/shared/utils/currency";
 import { normalizeUaePhone } from "@/shared/utils/phone";
 
@@ -77,6 +90,8 @@ function isGuestCheckout(input: CreateCheckoutInput): boolean {
 export async function initiateCheckout(
   input: CreateCheckoutInput,
 ): Promise<CheckoutSessionResult> {
+  await ensureStripeConfigLoaded();
+  await hydrateListingCatalog();
   const context = resolveListingCheckoutContext(input);
   if (!context) {
     throw new Error("LISTING_NOT_FOUND");
@@ -87,6 +102,13 @@ export async function initiateCheckout(
   const buyerEmail = normalizeEmail(input.buyer.email);
   const buyerName = input.buyer.fullName.trim();
   const buyerPhone = normalizeUaePhone(input.buyer.phone ?? "");
+
+  if (guest) {
+    const settings = await getAdminSettings();
+    if (!settings.allowGuestCheckout) {
+      throw new Error("GUEST_CHECKOUT_DISABLED");
+    }
+  }
 
   if (!guest && listing.seller.id === input.buyer.id) {
     throw new Error("CANNOT_BUY_OWN_LISTING");
@@ -101,18 +123,15 @@ export async function initiateCheckout(
     if (input.forceMock && isMockCheckoutAllowed()) {
       return { mode: "mock", orderId: existingPending.id };
     }
-    return {
-      mode: isStripeConfigured() ? "checkout" : "mock",
-      orderId: existingPending.id,
-    };
+    return resumeCheckoutForOrder(existingPending, buyerEmail, listing.title);
   }
 
   let buyerEmirate: string | undefined;
-  if (input.addressId && input.buyer.id) {
+  if (input.deliveryAddress?.emirate) {
+    buyerEmirate = input.deliveryAddress.emirate;
+  } else if (input.addressId && input.buyer.id) {
     const addresses = await getAddressesForUser(input.buyer.id);
     buyerEmirate = addresses.find((item) => item.id === input.addressId)?.emirate;
-  } else if (input.deliveryAddress?.emirate) {
-    buyerEmirate = input.deliveryAddress.emirate;
   }
 
   const shipping = resolveCheckoutShipping({
@@ -159,15 +178,21 @@ export async function initiateCheckout(
           landmark: input.deliveryAddress.landmark,
           notes: input.deliveryAddress.notes,
           companyName: input.deliveryAddress.companyName,
+          latitude: input.deliveryAddress.latitude,
+          longitude: input.deliveryAddress.longitude,
+          formattedAddress: input.deliveryAddress.formattedAddress,
         }
       : undefined,
     saveAddress: input.deliveryAddress?.saveAddress,
   });
 
-  if (!isStripeConfigured() || (input.forceMock && isMockCheckoutAllowed())) {
-    if (input.forceMock && isMockCheckoutAllowed()) {
+  if (!isStripeConfigured()) {
+    if (!isMockCheckoutAllowed()) {
+      throw new Error("STRIPE_NOT_CONFIGURED");
+    }
+    if (input.forceMock) {
       console.warn("[Sooqna Payments] Forced mock checkout (testing).");
-    } else if (process.env.NODE_ENV !== "production") {
+    } else {
       console.warn(
         "[Sooqna Payments] STRIPE_SECRET_KEY is missing — using mock checkout fallback.",
       );
@@ -175,10 +200,57 @@ export async function initiateCheckout(
     return { mode: "mock", orderId: order.id };
   }
 
+  if (input.forceMock && isMockCheckoutAllowed()) {
+    console.warn("[Sooqna Payments] Forced mock checkout (testing).");
+    return { mode: "mock", orderId: order.id };
+  }
+
+  return attachStripeCheckout(order, buyerEmail, listing.title);
+}
+
+async function resumeCheckoutForOrder(
+  order: Order,
+  buyerEmail: string,
+  listingTitle: string,
+): Promise<CheckoutSessionResult> {
+  await ensureStripeConfigLoaded();
+  if (!isStripeConfigured()) {
+    if (!isMockCheckoutAllowed()) {
+      throw new Error("STRIPE_NOT_CONFIGURED");
+    }
+    return { mode: "mock", orderId: order.id };
+  }
+
+  if (order.stripeCheckoutSessionId) {
+    try {
+      const existing = await retrieveCheckoutSession(order.stripeCheckoutSessionId);
+      if (existing.status === "open" && existing.url) {
+        return {
+          mode: "checkout",
+          orderId: order.id,
+          checkoutUrl: existing.url,
+          sessionId: existing.id,
+        };
+      }
+    } catch {
+      // Session missing or unusable — create a fresh one below.
+    }
+  }
+
+  return attachStripeCheckout(order, buyerEmail, listingTitle, true);
+}
+
+async function attachStripeCheckout(
+  order: Order,
+  buyerEmail: string,
+  listingTitle: string,
+  freshSession = false,
+): Promise<CheckoutSessionResult> {
   const session = await createCheckoutSession({
     order,
     buyerEmail,
-    listingTitle: listing.title,
+    listingTitle,
+    freshSession,
   });
 
   await updateOrder(
@@ -227,6 +299,10 @@ async function sendOrderNotifications(order: Order): Promise<void> {
     type: "escrow_held",
     title: "دفعة جديدة محجوزة",
     body: `تم حجز ${formatCurrencyLabel(order.fees.productPrice)} في الضمان لطلب «${order.listingTitle}».`,
+  });
+
+  void emailOrderPaid(order).catch((error) => {
+    console.error("[Sooqna Email] order paid email failed", error);
   });
 }
 
@@ -319,6 +395,16 @@ export async function handleCheckoutSessionCompleted(
     payment_intent?: string | { id: string } | null;
   },
 ): Promise<void> {
+  if (session.metadata?.type === "featured_listing") {
+    const listingId = session.metadata.listingId;
+    if (!listingId) return;
+    const { markListingFeatured } = await import(
+      "@/services/payments/featured-checkout.service"
+    );
+    await markListingFeatured(listingId, session.id);
+    return;
+  }
+
   const orderId = session.metadata?.orderId;
   if (!orderId) return;
 
@@ -349,35 +435,68 @@ export async function handlePaymentIntentFailed(
   );
 }
 
-export async function confirmOrderReceived(
-  orderId: string,
-  buyerId: string,
+/** Shared escrow release path used by buyer confirm / match flows. */
+async function releaseEscrowToSeller(
+  order: Order,
+  audit: { type: string; message: string },
+  options?: { buyerMatchConfirmedAt?: string },
 ): Promise<Order | undefined> {
-  const order = await getOrderById(orderId);
-  if (!order) return undefined;
-  if (order.buyerId !== buyerId) {
-    throw new Error("UNAUTHORIZED");
+  if (order.status === "released" && order.escrowStatus === "released") {
+    if (options?.buyerMatchConfirmedAt && !order.buyerMatchConfirmedAt) {
+      return updateOrder(order.id, {
+        buyerMatchConfirmedAt: options.buyerMatchConfirmedAt,
+      });
+    }
+    return order;
   }
 
-  if (!isValidOrderTransition(order.status, "confirmed")) {
+  const fromHeld =
+    order.status === "paid_held_in_escrow" || order.status === "delivered";
+  const fromConfirmed = order.status === "confirmed";
+
+  if (!fromHeld && !fromConfirmed) {
     throw new Error("INVALID_STATUS");
   }
 
-  const updated = await updateOrder(
-    orderId,
-    {
-      status: "confirmed",
-      escrowStatus: "released",
-      confirmedAt: new Date().toISOString(),
-      releasedAt: new Date().toISOString(),
-    },
-    {
-      type: "buyer_confirmed",
-      message: "أكد المشتري استلام الطلب",
-    },
-  );
+  if (fromHeld && !isValidOrderTransition(order.status, "confirmed")) {
+    throw new Error("INVALID_STATUS");
+  }
+  if (fromConfirmed && !isValidOrderTransition(order.status, "released")) {
+    throw new Error("INVALID_STATUS");
+  }
 
-  if (!updated) return undefined;
+  const now = new Date().toISOString();
+  const matchPatch = options?.buyerMatchConfirmedAt
+    ? { buyerMatchConfirmedAt: options.buyerMatchConfirmedAt }
+    : {};
+
+  let working: Order | undefined;
+  if (fromHeld) {
+    working = await updateOrder(
+      order.id,
+      {
+        status: "confirmed",
+        escrowStatus: "released",
+        confirmedAt: now,
+        releasedAt: now,
+        ...matchPatch,
+      },
+      audit,
+    );
+  } else {
+    working = await updateOrder(
+      order.id,
+      {
+        status: "released",
+        escrowStatus: "released",
+        releasedAt: now,
+        ...matchPatch,
+      },
+      audit,
+    );
+  }
+
+  if (!working) return undefined;
 
   const sellerNet = order.fees.productPrice;
   await addWalletTransaction(order.sellerId, {
@@ -396,29 +515,237 @@ export async function confirmOrderReceived(
     body: `تم تحويل ${formatCurrencyLabel(sellerNet)} إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
   });
 
-  const released = await updateOrder(orderId, { status: "released" });
-  return released;
+  if (order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "order_confirmed",
+      title: "تم تأكيد الاستلام",
+      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
+    });
+    void emailOrderStatusToUser({
+      userId: order.buyerId,
+      fallbackEmail: order.buyerEmail,
+      orderId: order.id,
+      type: "order_confirmed",
+      title: "تم تأكيد الاستلام",
+      subject: `تحديث الطلب — ${order.listingTitle}`,
+      body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
+    }).catch((error) => console.error("[Sooqna Email] order confirmed email failed", error));
+  }
+
+  void emailOrderStatusToUser({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "order_released",
+    title: "تم تحويل المبلغ",
+    subject: `تم تحويل مبلغ الطلب — ${order.listingTitle}`,
+    body: `تم تحويل المبلغ إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
+  }).catch((error) => console.error("[Sooqna Email] order released email failed", error));
+
+  if (working.status === "released") {
+    return working;
+  }
+
+  return updateOrder(order.id, { status: "released" });
 }
 
-export async function refundOrder(
+export async function submitSellerProof(
   orderId: string,
-  adminRole?: string,
+  sellerId: string,
+  proofUrls: string[],
+  note?: string,
+  items?: Array<{ storageUrl: string; kind?: "photo" | "video" | "document" }>,
 ): Promise<Order | undefined> {
-  if (adminRole !== "admin") {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.sellerId !== sellerId) {
     throw new Error("UNAUTHORIZED");
   }
 
+  const eligible =
+    order.status === "paid_held_in_escrow" || order.status === "delivered";
+  if (!eligible) {
+    throw new Error("INVALID_STATUS");
+  }
+
+  const { replaceSellerEvidenceSet } = await import(
+    "@/services/payments/escrow-evidence-store"
+  );
+
+  const evidenceItems =
+    items && items.length > 0
+      ? items.map((item) => ({
+          storageUrl: item.storageUrl,
+          kind: item.kind ?? (item.storageUrl.includes("video") ? "video" : "photo"),
+        }))
+      : proofUrls.map((url) => ({
+          storageUrl: url,
+          kind: (url.includes("video") || /\.(mp4|webm)(\?|$)/i.test(url)
+            ? "video"
+            : "photo") as "photo" | "video",
+        }));
+
+  if (evidenceItems.length === 0) {
+    throw new Error("INVALID_PROOF");
+  }
+
+  let evidence;
+  try {
+    evidence = await replaceSellerEvidenceSet({
+      orderId,
+      listingId: order.listingId,
+      transactionId: order.stripePaymentIntentId ?? order.id,
+      uploadedBy: sellerId,
+      items: evidenceItems,
+      note,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "INVALID_PROOF";
+    throw new Error(message === "EVIDENCE_REQUIRED" ? "INVALID_PROOF" : message);
+  }
+
+  const urls = evidence.map((item) => item.storageUrl);
+  const updated = await updateOrder(
+    orderId,
+    {
+      sellerProofUrls: urls,
+      sellerProofNote: note?.trim() || undefined,
+      sellerProofAt: new Date().toISOString(),
+      status: order.status === "paid_held_in_escrow" ? "delivered" : order.status,
+    },
+    {
+      type: "seller_proof_submitted",
+      message: "رفع البائع إثبات التسليم / المطابقة (مضمون)",
+      metadata: { evidenceCount: String(evidence.length) },
+    },
+  );
+
+  if (!updated) return undefined;
+
+  if (order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "seller_proof",
+      title: "إثبات من البائع",
+      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+      href: `/orders/${order.id}`,
+      dedupeKey: `seller_proof:${order.id}:${updated.sellerProofAt}`,
+    });
+    void emailOrderStatusToUser({
+      userId: order.buyerId,
+      fallbackEmail: order.buyerEmail,
+      orderId: order.id,
+      type: "seller_proof",
+      title: "إثبات من البائع",
+      subject: `إثبات تسليم — ${order.listingTitle}`,
+      body: `رفع البائع إثباتاً لطلب «${order.listingTitle}». راجع الإثبات وأكّد المطابقة.`,
+    }).catch((error) => console.error("[Sooqna Email] seller proof email failed", error));
+  }
+
+  return updated;
+}
+
+/**
+ * Buyer confirms item match after seller proof — preferred release path.
+ * Sets buyerMatchConfirmedAt then releases escrow like confirmOrderReceived.
+ */
+export async function confirmBuyerMatch(
+  orderId: string,
+  buyerId: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.buyerId !== buyerId) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!order.sellerProofAt) {
+    throw new Error("PROOF_REQUIRED");
+  }
+
+  if (order.buyerMatchConfirmedAt && order.status === "released") {
+    return order;
+  }
+
+  const { saveBuyerEvidenceConfirmation } = await import(
+    "@/services/payments/escrow-evidence-store"
+  );
+  await saveBuyerEvidenceConfirmation({
+    orderId,
+    buyerId,
+    confirmed: true,
+  });
+
+  const matchAt = new Date().toISOString();
+  const released = await releaseEscrowToSeller(
+    order,
+    {
+      type: "buyer_match_confirmed",
+      message: "أكد المشتري المطابقة وتم تحويل الضمان",
+    },
+    { buyerMatchConfirmedAt: matchAt },
+  );
+
+  if (released && order.buyerId) {
+    await createNotification({
+      userId: order.buyerId,
+      orderId: order.id,
+      type: "buyer_match",
+      title: "تم تأكيد المطابقة",
+      body: `تم تأكيد مطابقة طلب «${order.listingTitle}» وتحرير الضمان.`,
+      href: `/orders/${order.id}`,
+      dedupeKey: `buyer_match:${order.id}`,
+    });
+  }
+
+  return released;
+}
+
+/** Buyer confirm receipt — requires seller proof before escrow release. */
+export async function confirmOrderReceived(
+  orderId: string,
+  buyerId: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+  if (order.buyerId !== buyerId) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  if (!order.sellerProofAt) {
+    throw new Error("PROOF_REQUIRED");
+  }
+
+  return releaseEscrowToSeller(order, {
+    type: "buyer_confirmed",
+    message: "أكد المشتري استلام الطلب",
+  });
+}
+
+/** Caller must enforce admin session before invoking. */
+export async function refundOrder(
+  orderId: string,
+  options?: { skipStripe?: boolean; stripeRefundId?: string },
+): Promise<Order | undefined> {
   const order = await getOrderById(orderId);
   if (!order) return undefined;
 
   if (order.status === "refunded") return order;
 
-  if (order.stripePaymentIntentId && isStripeConfigured()) {
+  if (
+    !options?.skipStripe &&
+    order.stripePaymentIntentId &&
+    isStripeConfigured()
+  ) {
     const refund = await refundStripePayment(
       order.stripePaymentIntentId,
       orderId,
     );
     await updateOrder(orderId, { stripeRefundId: refund.id });
+  } else if (options?.stripeRefundId) {
+    await updateOrder(orderId, { stripeRefundId: options.stripeRefundId });
   }
 
   const updated = await updateOrder(
@@ -431,7 +758,9 @@ export async function refundOrder(
     },
     {
       type: "order_refunded",
-      message: "تم استرداد المبلغ",
+      message: options?.skipStripe
+        ? "تمت مزامنة الاسترداد من Stripe"
+        : "تم استرداد المبلغ",
     },
   );
 
@@ -455,6 +784,15 @@ export async function refundOrder(
       title: "تم استرداد المبلغ",
       body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
     });
+    void emailOrderStatusToUser({
+      userId: order.buyerId,
+      fallbackEmail: order.buyerEmail,
+      orderId: order.id,
+      type: "order_refunded",
+      title: "تم استرداد المبلغ",
+      subject: `استرداد الطلب — ${order.listingTitle}`,
+      body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
+    }).catch((error) => console.error("[Sooqna Email] refund buyer email failed", error));
   }
 
   await createNotification({
@@ -464,6 +802,169 @@ export async function refundOrder(
     title: "تم استرداد الطلب",
     body: `تم استرداد الطلب «${order.listingTitle}».`,
   });
+  void emailOrderStatusToUser({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "order_refunded",
+    title: "تم استرداد الطلب",
+    subject: `استرداد الطلب — ${order.listingTitle}`,
+    body: `تم استرداد الطلب «${order.listingTitle}».`,
+  }).catch((error) => console.error("[Sooqna Email] refund seller email failed", error));
 
   return updated;
+}
+
+/** Sync local order when Stripe Dashboard issues a refund. */
+export async function syncRefundFromStripeCharge(input: {
+  paymentIntentId?: string;
+  chargeId?: string;
+  refundId?: string;
+}): Promise<Order | undefined> {
+  if (!input.paymentIntentId) return undefined;
+  const order = await getOrderByPaymentIntentId(input.paymentIntentId);
+  if (!order) return undefined;
+  return refundOrder(order.id, {
+    skipStripe: true,
+    stripeRefundId: input.refundId,
+  });
+}
+
+/** Resolve order after Stripe redirect using Checkout Session id. */
+export async function resolveOrderFromCheckoutSession(
+  sessionId: string,
+): Promise<Order | undefined> {
+  if (!sessionId || !isStripeConfigured()) return undefined;
+
+  const local = await getOrderByCheckoutSessionId(sessionId);
+  if (local && local.status !== "pending_payment") return local;
+
+  try {
+    const session = await retrieveCheckoutSession(sessionId);
+    if (session.payment_status === "paid") {
+      await handleCheckoutSessionCompleted(session);
+    }
+    const orderId = session.metadata?.orderId ?? local?.id;
+    if (!orderId) return local;
+    return getOrderById(orderId);
+  } catch {
+    return local;
+  }
+}
+
+/** Admin force-release of held escrow to the seller (no buyer confirmation).
+ * Caller must enforce admin session before invoking. */
+export async function adminReleaseEscrow(
+  orderId: string,
+): Promise<Order | undefined> {
+  const order = await getOrderById(orderId);
+  if (!order) return undefined;
+
+  if (order.escrowStatus === "released" && order.status === "released") {
+    return order;
+  }
+
+  if (order.escrowStatus === "refunded" || order.status === "refunded") {
+    throw new Error("ALREADY_REFUNDED");
+  }
+
+  if (order.escrowStatus !== "held" && order.status !== "paid_held_in_escrow") {
+    throw new Error("NOT_HELD");
+  }
+
+  let working = order;
+
+  if (working.status === "paid_held_in_escrow" || working.status === "delivered") {
+    if (!isValidOrderTransition(working.status, "confirmed")) {
+      throw new Error("INVALID_STATUS");
+    }
+    const confirmed = await updateOrder(
+      orderId,
+      {
+        status: "confirmed",
+        escrowStatus: "released",
+        confirmedAt: new Date().toISOString(),
+        releasedAt: new Date().toISOString(),
+      },
+      {
+        type: "admin_escrow_release",
+        message: "حرّر المدير الضمان إدارياً",
+      },
+    );
+    if (!confirmed) return undefined;
+    working = confirmed;
+  } else if (working.status === "confirmed" || working.status === "disputed") {
+    if (!isValidOrderTransition(working.status, "released")) {
+      throw new Error("INVALID_STATUS");
+    }
+    const releasedMid = await updateOrder(
+      orderId,
+      {
+        status: "released",
+        escrowStatus: "released",
+        releasedAt: new Date().toISOString(),
+      },
+      {
+        type: "admin_escrow_release",
+        message: "حرّر المدير الضمان إدارياً",
+      },
+    );
+    if (!releasedMid) return undefined;
+
+    const sellerNet = order.fees.productPrice;
+    await addWalletTransaction(order.sellerId, {
+      orderId: order.id,
+      type: "escrow_release",
+      amount: sellerNet,
+      description: `تحرير إداري للضمان — ${order.listingTitle}`,
+      status: "completed",
+    });
+
+    await createNotification({
+      userId: order.sellerId,
+      orderId: order.id,
+      type: "order_released",
+      title: "تم تحويل المبلغ",
+      body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+    });
+    void emailOrderStatusToUser({
+      userId: order.sellerId,
+      orderId: order.id,
+      type: "order_released",
+      title: "تم تحويل المبلغ",
+      subject: `تحرير الضمان — ${order.listingTitle}`,
+      body: `حرّرت الإدارة المبلغ إلى رصيدك لطلب «${order.listingTitle}».`,
+    }).catch((error) => console.error("[Sooqna Email] admin release email failed", error));
+
+    return releasedMid;
+  } else {
+    throw new Error("INVALID_STATUS");
+  }
+
+  const sellerNet = order.fees.productPrice;
+  await addWalletTransaction(order.sellerId, {
+    orderId: order.id,
+    type: "escrow_release",
+    amount: sellerNet,
+    description: `تحرير إداري للضمان — ${order.listingTitle}`,
+    status: "completed",
+  });
+
+  await createNotification({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "order_released",
+    title: "تم تحويل المبلغ",
+    body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+  });
+  void emailOrderStatusToUser({
+    userId: order.sellerId,
+    orderId: order.id,
+    type: "order_released",
+    title: "تم تحويل المبلغ",
+    subject: `تحرير الضمان — ${order.listingTitle}`,
+    body: `حرّرت الإدارة المبلغ إلى رصيدك لطلب «${order.listingTitle}».`,
+  }).catch((error) => console.error("[Sooqna Email] admin release email failed", error));
+
+  const released = await updateOrder(orderId, { status: "released" });
+  return released;
 }

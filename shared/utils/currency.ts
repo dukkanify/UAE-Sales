@@ -1,5 +1,10 @@
-const formatterAr = new Intl.NumberFormat("ar-AE", { maximumFractionDigits: 0 });
-const formatterEn = new Intl.NumberFormat("en-AE", { maximumFractionDigits: 0 });
+// Force Latin digits so Node SSR and browser hydration always match.
+const numberFormatOptions: Intl.NumberFormatOptions = {
+  maximumFractionDigits: 0,
+  numberingSystem: "latn",
+};
+const formatterAr = new Intl.NumberFormat("ar-AE", numberFormatOptions);
+const formatterEn = new Intl.NumberFormat("en-AE", numberFormatOptions);
 
 export function formatCurrencyAmount(
   amount: number,

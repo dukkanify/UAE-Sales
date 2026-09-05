@@ -80,11 +80,7 @@ export function MarketAppDownload({ previewListings = [] }: MarketAppDownloadPro
             <div className="market-app-download__device">
               <div className="market-app-download__device-island" />
               <div className="market-app-download__device-screen">
-                {preview.length > 0 ? (
-                  <MobileAppDevicePreview listings={preview} />
-                ) : (
-                  <div className="size-full bg-[#e8edf2]" />
-                )}
+                <MobileAppDevicePreview listings={preview} />
               </div>
             </div>
           </div>

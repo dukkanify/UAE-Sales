@@ -8,10 +8,12 @@ import { StartChatButton } from "@/features/chat/components/StartChatButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
 import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type ListingSummaryProps = {
   category?: Category;
@@ -38,6 +40,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       : listing.city;
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel p-6 lg:sticky lg:top-24 lg:self-start">
       <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
@@ -50,7 +53,7 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
       </div>
 
       <h1 className="mt-4 text-2xl font-black leading-tight text-ink md:text-3xl">
-        {listing.title}
+        <ListingTitle listing={listing} />
       </h1>
 
       <div className="mt-4">
@@ -102,5 +105,6 @@ export function ListingSummary({ category, listing }: ListingSummaryProps) {
         <ShareButton className="w-full" listing={listing} />
       </div>
     </Card>
+    </LocalizedTree>
   );
 }

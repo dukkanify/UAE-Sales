@@ -1,7 +1,6 @@
 import type { Listing } from "@/types";
 import {
   getChatConversations,
-  getDemoChatThreads,
   resolveOrCreateConversation,
 } from "./chat-storage";
 
@@ -12,26 +11,23 @@ export {
   findConversationForListing,
   getChatConversationById,
   getChatConversations,
+  getUnreadChatCount,
+  markConversationRead,
   resolveOrCreateConversation,
 } from "./chat-storage";
 
 export async function getChatThreads() {
-  if (typeof window !== "undefined") {
-    const local = getChatConversations();
-    if (local.length > 0) {
-      return local.map((conversation) => ({
-        id: conversation.id,
-        listingTitle: conversation.listingTitle,
-        participantName: conversation.sellerName,
-        lastMessage:
-          conversation.messages[conversation.messages.length - 1]?.body ?? "",
-        lastMessageAt: conversation.updatedAt,
-        unreadCount: 0,
-        avatarUrl: undefined as string | undefined,
-      }));
-    }
-  }
-  return getDemoChatThreads();
+  if (typeof window === "undefined") return [];
+  return getChatConversations().map((conversation) => ({
+    id: conversation.id,
+    listingTitle: conversation.listingTitle,
+    participantName: conversation.sellerName,
+    lastMessage:
+      conversation.messages[conversation.messages.length - 1]?.body ?? "",
+    lastMessageAt: conversation.updatedAt,
+    unreadCount: 0,
+    avatarUrl: undefined as string | undefined,
+  }));
 }
 
 export function openListingConversation(

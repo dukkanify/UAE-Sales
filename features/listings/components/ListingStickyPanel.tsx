@@ -9,6 +9,8 @@ import { SellerContactActions } from "@/features/listings/components/ListingPrim
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { useToast } from "@/shared/components/ToastProvider";
 import {
   ACTION_LABELS,
@@ -61,6 +63,7 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
       : listing.city;
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel w-full min-w-0 p-6">
         <div className="flex flex-wrap items-center gap-2">
         {category ? <Badge variant="muted">{category.name}</Badge> : null}
@@ -72,7 +75,7 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         ) : null}
         </div>
 
-        <h1 className="mt-4 text-2xl font-black leading-tight text-ink">{listing.title}</h1>
+        <h1 className="mt-4 text-2xl font-black leading-tight text-ink"><ListingTitle listing={listing} /></h1>
         <div className="mt-4">
           <CurrencyAmount amount={listing.price} size="xl" />
         </div>
@@ -121,6 +124,7 @@ export function ListingStickyPanel({ category, listing }: ListingStickyPanelProp
         <ShareButton className="w-full" listing={listing} />
       </div>
     </Card>
+    </LocalizedTree>
   );
 }
 
@@ -196,6 +200,7 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
   }
 
   return (
+    <LocalizedTree>
     <div className="mobile-sticky-bar">
       <div className="mobile-sticky-bar__inner">
         {!isOwn && config.showBuyNow ? (
@@ -212,7 +217,6 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
             <ListingPrimaryAction
               action={config.primaryAction}
               className="mobile-sticky-bar__cta"
-              embedPhoneConfirm={false}
               listing={listing}
               size="sm"
             />
@@ -263,5 +267,6 @@ export function MobileStickyActionBar({ listing }: MobileStickyActionBarProps) {
         ) : null}
       </div>
     </div>
+    </LocalizedTree>
   );
 }

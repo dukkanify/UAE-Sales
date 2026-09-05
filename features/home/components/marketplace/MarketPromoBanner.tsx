@@ -4,12 +4,12 @@ import { Icon } from "@/shared/ui/Icon";
 
 export function MarketPromoBanner() {
   return (
-    <section aria-label="بيع سيارتك" className="border-b border-border/50 bg-white py-8 md:py-10">
+    <section aria-label="بيع سيارتك" className="border-b border-border/50 bg-surface py-8 md:py-10">
       <div className="app-container px-4">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-[#1e293b] to-primary p-6 shadow-[0_16px_40px_rgb(15_23_42/18%)] md:p-8">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0b1628] via-[#1e293b] to-[#0b1628] p-6 shadow-[0_16px_40px_rgb(15_23_42/18%)] md:p-8">
           <span
             aria-hidden
-            className="absolute top-4 end-4 z-10 grid size-9 place-items-center rounded-full border border-secondary/35 bg-primary/85 text-secondary"
+            className="absolute top-4 end-4 z-10 grid size-9 place-items-center rounded-full border border-secondary/35 bg-[#0b1628]/85 text-secondary"
           >
             <Icon name="shield" size={16} />
           </span>
@@ -21,7 +21,7 @@ export function MarketPromoBanner() {
                 وصل لمشتري جادين بسرعة وأمان
               </p>
               <Link
-                className="mt-5 inline-flex min-h-11 items-center gap-1 rounded-full bg-secondary px-5 text-sm font-bold text-primary transition hover:bg-[#d4b87a]"
+                className="mt-5 inline-flex min-h-11 items-center gap-1 rounded-full bg-secondary px-5 text-sm font-bold text-[#0b1628] transition hover:bg-[#d4b87a]"
                 href="/listings/new"
               >
                 ابدأ الآن

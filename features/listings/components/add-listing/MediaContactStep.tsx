@@ -1,3 +1,5 @@
+"use client";
+
 import { AppImage } from "@/shared/components/AppImage";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -10,24 +12,34 @@ import {
   addListingStepTitleClass,
 } from "./utils";
 
+const MAX_IMAGES = 12;
+
 type MediaContactStepProps = {
+  defaultContact?: string;
   errors: AddListingErrors;
+  featuredCheckoutAvailable?: boolean | null;
   imagePreviews: string[];
   onImageChange: (
     fileList: FileList | null,
     mode?: "append" | "replace",
   ) => void;
+  onPackageChange?: (value: string) => void;
+  selectedPackage?: string;
 };
 
 export function MediaContactStep({
+  defaultContact = "",
   errors,
+  featuredCheckoutAvailable = null,
   imagePreviews,
   onImageChange,
+  onPackageChange,
+  selectedPackage = "free",
 }: MediaContactStepProps) {
   const hasImages = imagePreviews.length > 0;
 
   return (
-    <Card className={addListingStepCardClass}>
+    <Card className={addListingStepCardClass} id="add-listing-media">
       <h2 className={addListingStepTitleClass}>3. الصور والتواصل</h2>
       <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
         <div className="grid gap-3">
@@ -58,7 +70,7 @@ export function MediaContactStep({
                   </div>
                 ))}
 
-                {imagePreviews.length < 6 ? (
+                {imagePreviews.length < MAX_IMAGES ? (
                   <label className="grid aspect-[4/3] cursor-pointer place-items-center rounded-[var(--radius-xl)] border border-dashed border-secondary bg-surface p-3 text-center text-xs font-semibold text-primary transition hover:bg-secondary/10">
                     <input
                       accept="image/*"
@@ -86,28 +98,33 @@ export function MediaContactStep({
                     onImageChange(event.target.files, "replace");
                     event.target.value = "";
                   }}
+                  required
                   type="file"
                 />
                 <span>
-                  رفع صور الإعلان
+                  رفع صور الإعلان *
                   <span className="mt-2 block text-xs font-medium text-muted">
-                    اختر حتى 6 صور — ستظهر هنا مباشرة
+                    صورة واحدة على الأقل مطلوبة — حتى {MAX_IMAGES} صور
                   </span>
                 </span>
               </label>
             )}
           </div>
 
+          {errors.images ? (
+            <FormMessage variant="error">{errors.images}</FormMessage>
+          ) : null}
+
           {hasImages ? (
             <p className="text-xs font-medium text-muted">
-              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف في
-              المعاينة
+              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف
             </p>
           ) : null}
         </div>
         <div className="grid gap-4">
           <div>
             <Input
+              defaultValue={defaultContact}
               label="رقم التواصل"
               name="contact"
               placeholder="05xxxxxxxx"
@@ -116,16 +133,46 @@ export function MediaContactStep({
             {errors.contact ? (
               <FormMessage variant="error">{errors.contact}</FormMessage>
             ) : null}
+            {defaultContact ? (
+              <p className="mt-1 text-xs text-muted">
+                تم تعبئة الرقم من ملفك الشخصي — يمكنك تعديله لهذا الإعلان.
+              </p>
+            ) : null}
           </div>
+          <Input
+            label="رابط فيديو (اختياري)"
+            name="videoUrl"
+            placeholder="https://..."
+            type="url"
+          />
           <Select
             label="باقة الإعلان"
             name="package"
+            onChange={(event) => onPackageChange?.(event.target.value)}
             options={[
               { label: "مجانية", value: "free" },
-              { label: "مميز لمدة 7 أيام", value: "featured_7" },
-              { label: "مميز لمدة 30 يوم", value: "featured_30" },
+              {
+                label: "مميز (يتطلب دفعاً)",
+                value: "featured_pending",
+              },
             ]}
+            value={selectedPackage}
           />
+          {selectedPackage === "featured_pending" ? (
+            <>
+              <p className="text-xs text-muted">
+                لن يُنشر الإعلان ولن يُفعَّل التمييز إلا بعد إتمام الدفع بنجاح.
+              </p>
+              {featuredCheckoutAvailable === false ? (
+                <FormMessage variant="error">
+                  بوابة الدفع غير مفعّلة على الموقع حالياً. اختر الباقة المجانية أو حاول لاحقاً.
+                </FormMessage>
+              ) : null}
+            </>
+          ) : null}
+          {errors.package ? (
+            <FormMessage variant="error">{errors.package}</FormMessage>
+          ) : null}
         </div>
       </div>
     </Card>

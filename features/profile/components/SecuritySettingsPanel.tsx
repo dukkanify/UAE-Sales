@@ -60,7 +60,10 @@ export function SecuritySettingsPanel() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ code: otpCode, newPassword: password }),
+        body: JSON.stringify({
+          code: otpCode,
+          newPassword: password.trim(),
+        }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -70,7 +73,7 @@ export function SecuritySettingsPanel() {
 
       if (data.user) {
         setSessionUser(data.user);
-        await persistSessionCookie(data.user);
+        await persistSessionCookie();
       }
       trackAuthEventClient("password_added");
       setMessage("تم حفظ كلمة المرور بنجاح.");

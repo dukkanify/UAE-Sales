@@ -14,4 +14,10 @@ export function isDemoOtpEnabled(): boolean {
   );
 }
 
+/** Whether OTP may be returned to the client (API/UI). Always false in production. */
+export function canRevealOtpToClient(emailDelivered = true): boolean {
+  if (!isDemoOtpEnabled()) return false;
+  return !emailDelivered;
+}
+
 export const DEMO_OTP_CODE = "123456";

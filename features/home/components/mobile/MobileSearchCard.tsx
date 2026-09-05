@@ -14,7 +14,7 @@ type MobileSearchCardProps = {
 
 export function MobileSearchCard({ categories }: MobileSearchCardProps) {
   return (
-    <section aria-label="البحث" className="mobile-home-search-card">
+    <section aria-label="البحث" className="mobile-home-search-card" data-search-anchor>
       <form action="/search" className="mobile-home-search-card__panel">
         <label className="mobile-home-search-card__input-row">
           <span className="sr-only">{HOME_SEARCH_LABELS.query}</span>

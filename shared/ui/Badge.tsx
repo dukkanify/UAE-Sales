@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 
 type BadgeVariant =
   | "verified"
@@ -6,6 +7,7 @@ type BadgeVariant =
   | "escrow"
   | "featured"
   | "new"
+  | "urgent"
   | "sold"
   | "pending"
   | "rejected"
@@ -17,15 +19,16 @@ type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const variantClasses: Record<BadgeVariant, string> = {
-  verified: "border-primary/15 bg-primary-soft text-primary",
-  premium: "border-secondary/25 bg-secondary-soft text-primary",
-  escrow: "border-success/15 bg-success-soft text-success",
-  featured: "border-secondary/20 bg-secondary-soft text-primary",
-  new: "border-accent/15 bg-accent-soft text-accent",
+  verified: "border-emerald-600/20 bg-emerald-50 text-emerald-700",
+  premium: "border-secondary/35 bg-secondary-soft text-[#8a7040]",
+  escrow: "border-success/20 bg-success-soft text-success",
+  featured: "border-[#c9a45c]/35 bg-[#c9a45c] text-[#0b1628]",
+  new: "border-sky-500/25 bg-sky-50 text-sky-700",
+  urgent: "border-rose-600/30 bg-rose-600 text-white",
   sold: "border-border bg-surface-muted text-muted",
-  pending: "border-secondary/25 bg-primary-soft text-primary",
-  rejected: "border-accent/20 bg-accent-soft text-accent",
-  muted: "border-border bg-surface text-muted",
+  pending: "border-amber-500/25 bg-amber-50 text-amber-800",
+  rejected: "border-rose-500/20 bg-rose-50 text-rose-700",
+  muted: "border-border bg-surface-muted text-muted",
 };
 
 export function Badge({
@@ -39,7 +42,7 @@ export function Badge({
       className={`inline-flex items-center rounded-[var(--radius-lg)] border px-2.5 py-0.5 text-xs font-semibold ${variantClasses[variant]} ${className}`}
       {...props}
     >
-      {children}
+      {typeof children === "string" ? <Copy text={children} /> : children}
     </span>
   );
 }

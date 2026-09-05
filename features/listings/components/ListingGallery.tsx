@@ -3,22 +3,27 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { getListingImages } from "@/features/listings/components/listing-card.utils";
+import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
 import { ShareButton } from "@/shared/components/ShareButton";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { Badge } from "@/shared/ui/Badge";
 import { Icon } from "@/shared/ui/Icon";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 type ListingGalleryProps = {
   listing: Listing;
 };
 
 const GALLERY_OVERLAY_BTN_CLASS =
-  "!min-h-0 !size-8 !min-w-0 !rounded-full !border-0 !bg-white/92 !p-0 !shadow-sm backdrop-blur-sm";
+  "card-media-action !min-h-0 !size-8 !min-w-0 !rounded-full !p-0";
 
 export function ListingGallery({ listing }: ListingGalleryProps) {
   const galleryImages = getListingImages(listing);
+  const displayTitle = listingTitle(listing, useLocale());
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -48,7 +53,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
     return (
       <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-surface-muted">
         <AppImage
-          alt={listing.title}
+          alt={displayTitle}
           className="object-cover"
           fallbackCategory={listing.categoryId}
           fill
@@ -62,6 +67,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
   const activeImage = galleryImages[activeIndex];
 
   return (
+    <LocalizedTree>
     <>
       <div className="grid gap-2 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-2">
         <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-2xl)] border border-border shadow-[var(--shadow-lg)]">
@@ -72,7 +78,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
             type="button"
           >
             <AppImage
-              alt={listing.title}
+              alt={displayTitle}
               className="object-cover"
               fallbackCategory={listing.categoryId}
               fill
@@ -83,12 +89,12 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           </button>
 
           <div className="absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-2.5">
-            <div className="hidden min-w-0 flex-1 flex-wrap gap-1.5 lg:flex">
-              {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-              {listing.isPremium ? <Badge variant="premium">بريميوم</Badge> : null}
-              {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+            <div className="hidden min-w-0 flex-1 lg:block">
+              <ListingCardBadges inline listing={listing} />
               {showsEscrowProtection(listing) ? (
-                <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
+                </div>
               ) : null}
             </div>
 
@@ -218,7 +224,7 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           </button>
           <div className="relative aspect-[4/3] w-full max-w-5xl overflow-hidden rounded-[var(--radius-2xl)]">
             <AppImage
-              alt={listing.title}
+              alt={displayTitle}
               className="object-contain"
               fallbackCategory={listing.categoryId}
               fill
@@ -242,5 +248,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         </div>
       ) : null}
     </>
+    </LocalizedTree>
   );
 }

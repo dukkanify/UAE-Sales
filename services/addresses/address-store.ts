@@ -67,3 +67,7 @@ export async function setDefaultAddress(
   await saveCollection(ADDRESSES_FILE, all);
   return updated;
 }
+
+export async function getAllAddresses(): Promise<DeliveryAddress[]> {
+  return loadCollection<DeliveryAddress>(ADDRESSES_FILE);
+}

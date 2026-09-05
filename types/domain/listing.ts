@@ -20,6 +20,8 @@ export type DeliveryOption =
 export type ListingSeller = {
   id: string;
   name: string;
+  /** English display name when locale is English. */
+  nameEnglish?: string;
   rating?: number;
   avatarUrl?: string;
   isVerified?: boolean;
@@ -87,11 +89,19 @@ export type Listing = {
   emirate?: string;
   area?: string;
   images?: string[];
+  /** Optional listing video URL (YouTube / direct link). */
+  videoUrl?: string;
   isPremium?: boolean;
+  /** Urgent sale — highlighted on listing cards. */
+  isUrgent?: boolean;
   /** Eligible for escrow when purchased and paid in full through platform checkout. */
   escrowAvailable?: boolean;
   verifiedSeller?: boolean;
   postedAt?: string;
+  /** ISO timestamp when the listing becomes / became expired. */
+  expiresAt?: string;
+  /** ISO timestamp until which the listing stays featured. */
+  featuredUntil?: string;
   contactMethod?: ContactMethod;
   deliveryOption?: DeliveryOption;
   features?: string[];
@@ -103,6 +113,16 @@ export type Listing = {
   /** User-entered dynamic fields (local / new listings) */
   categorySpecs?: CategorySpecs;
   contactPhone?: string;
+  /** Shown to the seller when status is rejected. */
+  rejectionReason?: string;
+  /** Append-only status transitions for audit. */
+  statusHistory?: {
+    at: string;
+    from?: ListingStatus;
+    to: ListingStatus;
+    byUserId?: string;
+    note?: string;
+  }[];
 };
 
 export type ListingSearchFilters = {

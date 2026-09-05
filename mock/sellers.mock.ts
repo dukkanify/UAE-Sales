@@ -164,6 +164,7 @@ export function resolveSeller(sellerKey: string): ListingSeller {
   return {
     id: seller.id,
     name: seller.name,
+    nameEnglish: seller.nameEnglish,
     rating: seller.rating,
     reviewCount: seller.reviewCount,
     responseTime: seller.responseTime,

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 type ImageChangeMode = "append" | "replace";
 
-export function useImagePreviews(defaultMax = 6) {
+export function useImagePreviews(defaultMax = 12) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const imageFilesRef = useRef<File[]>([]);

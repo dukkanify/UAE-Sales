@@ -1,5 +1,6 @@
 import type { Listing } from "@/types";
 import { INTERMEDIARY_NOTICE, showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -13,6 +14,7 @@ export function ListingPlatformNotice({ listing }: ListingPlatformNoticeProps) {
   }
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel w-full min-w-0 p-6">
       <div className="flex items-center gap-2">
         <span className="grid size-9 place-items-center rounded-[var(--radius-xl)] bg-surface-muted text-muted">
@@ -22,5 +24,6 @@ export function ListingPlatformNotice({ listing }: ListingPlatformNoticeProps) {
       </div>
       <p className="mt-4 text-sm font-medium leading-7 text-muted">{INTERMEDIARY_NOTICE}</p>
     </Card>
+    </LocalizedTree>
   );
 }

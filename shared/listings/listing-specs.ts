@@ -1,5 +1,9 @@
 import type { Listing } from "@/types";
 import { getCategoryFieldLabel, getCategoryFields } from "@/shared/constants/category-fields";
+import {
+  CATEGORY_SEARCH_KEYWORDS,
+  searchTextMatches,
+} from "@/shared/listings/search-text";
 
 export type SpecEntry = {
   key: string;
@@ -32,7 +36,7 @@ function formatValue(key: string, value: string | number | boolean): string {
     return value ? "نعم" : "لا";
   }
   if (key === "area" || key === "areaSqft") {
-    return `${Number(value).toLocaleString("ar-AE")} قدم مربع`;
+    return `${Number(value).toLocaleString("en-AE")} قدم مربع`;
   }
   if (key === "mileage") {
     return `${value} كم`;
@@ -41,7 +45,11 @@ function formatValue(key: string, value: string | number | boolean): string {
 }
 
 function isUserCreatedListing(listing: Listing): boolean {
-  return listing.id.startsWith("local-");
+  return (
+    listing.id.startsWith("local-") ||
+    listing.id.startsWith("admin-") ||
+    Boolean(listing.categorySpecs && Object.keys(listing.categorySpecs).length > 0)
+  );
 }
 
 /** Extract typed mock specs — only for catalog listings */
@@ -149,7 +157,7 @@ export function getListingFeatureItems(listing: Listing): string[] {
 }
 
 export function listingMatchesQuery(listing: Listing, query: string): boolean {
-  const normalized = query.trim().toLowerCase();
+  const normalized = query.trim();
   if (!normalized) return true;
 
   const specValues = listing.categorySpecs
@@ -172,8 +180,10 @@ export function listingMatchesQuery(listing: Listing, query: string): boolean {
     ...(listing.features ?? []),
   ]
     .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
+    .join(" ");
 
-  return haystack.includes(normalized);
+  if (searchTextMatches(haystack, normalized)) return true;
+
+  const categoryKeywords = CATEGORY_SEARCH_KEYWORDS[listing.categoryId] ?? [];
+  return categoryKeywords.some((keyword) => searchTextMatches(keyword, normalized));
 }

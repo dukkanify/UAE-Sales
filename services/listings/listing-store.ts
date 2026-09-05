@@ -1,0 +1,405 @@
+import { cache } from "react";
+import {
+  marketplaceListings,
+  marketplaceUserListings,
+} from "@/mock/listings.mock";
+import { getAdminSettings } from "@/services/admin/admin-settings-store";
+import {
+  computeExpiresAt,
+  expireStaleListings,
+} from "@/services/listings/listing-expiry";
+import {
+  loadPersistedListings,
+  persistAllListings,
+  seedListings,
+} from "@/services/listings/listing-persistence";
+import type { Listing } from "@/types";
+import type {
+  AdminListingCreateInput,
+  AdminListingPatch,
+  AdminListingRecord,
+} from "@/types/domain/admin";
+
+let cacheRows: Listing[] | null = null;
+let inflight: Promise<Listing[]> | null = null;
+let expiryApplied = false;
+
+function hydrateCatalogPhones(listings: Listing[]): Listing[] {
+  const phones = new Map(
+    seedListings()
+      .filter((item) => item.contactPhone)
+      .map((item) => [item.id, item.contactPhone as string]),
+  );
+  return listings.map((listing) => {
+    if (listing.contactPhone?.trim()) return listing;
+    const phone = phones.get(listing.id);
+    return phone ? { ...listing, contactPhone: phone } : listing;
+  });
+}
+
+/** Merge newly added mock inventory into an older persisted catalog. */
+async function mergeMissingSeedListings(stored: Listing[]): Promise<Listing[]> {
+  const seeded = seedListings();
+  if (stored.length >= seeded.length) {
+    return stored;
+  }
+
+  const byId = new Map<string, Listing>();
+  for (const listing of stored) {
+    byId.set(listing.id, { ...listing });
+  }
+  for (const listing of seeded) {
+    if (!byId.has(listing.id)) {
+      byId.set(listing.id, { ...listing });
+    }
+  }
+
+  const merged = Array.from(byId.values());
+  await persistAllListings(merged);
+  return merged;
+}
+
+function cloneListings(listings: Listing[]) {
+  return listings.map((listing) => ({ ...listing }));
+}
+
+function setCache(listings: Listing[]) {
+  cacheRows = cloneListings(listings);
+  return cacheRows;
+}
+
+async function applyListingExpiry(listings: Listing[]): Promise<Listing[]> {
+  if (expiryApplied) return listings;
+  expiryApplied = true;
+  const settings = await getAdminSettings();
+  const changed = expireStaleListings(listings, settings.listingActiveDays);
+  if (changed > 0) {
+    await persistAllListings(listings);
+  }
+  return listings;
+}
+
+async function loadListingsUncached(): Promise<Listing[]> {
+  if (cacheRows) {
+    await applyListingExpiry(cacheRows);
+    return cacheRows;
+  }
+
+  if (!inflight) {
+    inflight = (async () => {
+      const stored = await loadPersistedListings().catch(() => [] as Listing[]);
+      if (stored.length === 0) {
+        const seeded = seedListings();
+        await applyListingExpiry(seeded);
+        await persistAllListings(seeded);
+        return setCache(seeded);
+      }
+      const merged = hydrateCatalogPhones(await mergeMissingSeedListings(stored));
+      const phonesAdded = merged.some((listing) => {
+        const before = stored.find((item) => item.id === listing.id);
+        return Boolean(listing.contactPhone) && !before?.contactPhone;
+      });
+      if (phonesAdded) {
+        await persistAllListings(merged);
+      }
+      await applyListingExpiry(merged);
+      return setCache(merged);
+    })().finally(() => {
+      inflight = null;
+    });
+  }
+
+  return await inflight;
+}
+
+/** Request-deduped catalog read for RSC trees. */
+export const getAllListings = cache(async (): Promise<Listing[]> => {
+  return loadListingsUncached();
+});
+
+/** Sync read for checkout resolvers — uses cache or mock seed fallback. */
+export function getListingSync(idOrSlug: string): Listing | undefined {
+  const source = cacheRows ?? [...marketplaceListings, ...marketplaceUserListings];
+  return source.find(
+    (listing) => listing.id === idOrSlug || listing.slug === idOrSlug,
+  );
+}
+
+export async function getListingById(id: string): Promise<Listing | undefined> {
+  const listings = await getAllListings();
+  return listings.find((listing) => listing.id === id || listing.slug === id);
+}
+
+export async function getListingBySlug(slug: string): Promise<Listing | undefined> {
+  const listings = await getAllListings();
+  return listings.find((listing) => listing.slug === slug);
+}
+
+export async function upsertListing(listing: Listing): Promise<Listing> {
+  const listings = await loadListingsUncached();
+  const settings = await getAdminSettings();
+  const postedAt = listing.postedAt ?? new Date().toISOString();
+  const index = listings.findIndex((item) => item.id === listing.id);
+  const previous = index >= 0 ? listings[index] : undefined;
+  const history = [...(listing.statusHistory ?? previous?.statusHistory ?? [])];
+  if (!previous) {
+    history.push({
+      at: postedAt,
+      to: listing.status,
+      byUserId: listing.seller.id,
+      note: "created",
+    });
+  } else if (previous.status !== listing.status) {
+    history.push({
+      at: new Date().toISOString(),
+      from: previous.status,
+      to: listing.status,
+      byUserId: listing.seller.id,
+    });
+  }
+  const next: Listing = {
+    ...listing,
+    postedAt,
+    expiresAt:
+      listing.expiresAt ??
+      computeExpiresAt(postedAt, settings.listingActiveDays),
+    statusHistory: history,
+    rejectionReason:
+      listing.status === "rejected"
+        ? listing.rejectionReason ?? previous?.rejectionReason
+        : listing.status === "active"
+          ? undefined
+          : listing.rejectionReason ?? previous?.rejectionReason,
+  };
+  if (index >= 0) listings[index] = next;
+  else listings.unshift(next);
+  await persistAllListings(listings);
+  setCache(listings);
+  return { ...next };
+}
+
+function slugifyTitle(title: string) {
+  const base = title
+    .trim()
+    .toLowerCase()
+    .replace(/[^\u0600-\u06FFa-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  return base || `listing-${Date.now()}`;
+}
+
+export async function createListingFromAdmin(
+  input: AdminListingCreateInput,
+): Promise<Listing> {
+  const now = Date.now();
+  const slugBase = slugifyTitle(input.title);
+  const slug = `${slugBase}-${String(now).slice(-5)}`;
+  const sellerName = input.sellerName?.trim() || "إدارة سوقنا";
+  const city = input.city.trim();
+  const emirate = input.emirate?.trim() || city;
+  const settings = await getAdminSettings();
+  const postedAt = new Date().toISOString();
+
+  const listing: Listing = {
+    id: `admin-${now}`,
+    slug,
+    title: input.title.trim(),
+    description:
+      input.description?.trim() ||
+      `إعلان مضاف من لوحة التحكم: ${input.title.trim()}`,
+    categoryId: input.categoryId,
+    city,
+    emirate,
+    area: input.area?.trim() || undefined,
+    country: "الإمارات العربية المتحدة",
+    price: input.price,
+    currency: "AED",
+    condition: input.condition ?? "used",
+    status: input.status ?? "active",
+    isFeatured: Boolean(input.isFeatured),
+    isUrgent: Boolean(input.isUrgent),
+    views: 0,
+    seller: {
+      id: "seller-admin-ops",
+      name: sellerName,
+      rating: 5,
+      isVerified: true,
+      sellerType: "business",
+    },
+    verifiedSeller: true,
+    escrowAvailable: true,
+    postedAt,
+    expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
+    contactMethod: "both",
+    contactPhone: input.contactPhone?.trim() || undefined,
+    deliveryOption: "both",
+    imageTone: "gold",
+    categorySpecs: input.categorySpecs,
+    features: input.features?.length ? input.features : undefined,
+    negotiable: input.negotiable,
+  };
+
+  return upsertListing(listing);
+}
+
+export async function patchListingRecord(
+  id: string,
+  patch: AdminListingPatch,
+): Promise<Listing | undefined> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+  const previous = listings[index];
+  const history = [...(previous.statusHistory ?? [])];
+  if (patch.status && patch.status !== previous.status) {
+    history.push({
+      at: new Date().toISOString(),
+      from: previous.status,
+      to: patch.status,
+      note: patch.rejectReason,
+    });
+  }
+  listings[index] = {
+    ...previous,
+    ...(patch.status ? { status: patch.status } : {}),
+    ...(typeof patch.isFeatured === "boolean" ? { isFeatured: patch.isFeatured } : {}),
+    ...(patch.status === "rejected"
+      ? {
+          rejectionReason:
+            patch.rejectReason?.trim() || previous.rejectionReason,
+        }
+      : {}),
+    ...(patch.status === "active"
+      ? {
+          rejectionReason: undefined,
+          postedAt: previous.postedAt ?? new Date().toISOString(),
+        }
+      : {}),
+    statusHistory: history,
+  };
+  await persistAllListings(listings);
+  setCache(listings);
+  return { ...listings[index] };
+}
+
+export async function setListingFeatured(
+  id: string,
+  featured: boolean,
+  days?: number,
+): Promise<Listing | undefined> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+
+  const settings = days == null ? await getAdminSettings() : null;
+  const featureDays = days ?? settings!.featuredListingDays;
+  const featuredUntil = featured
+    ? computeExpiresAt(new Date().toISOString(), featureDays)
+    : undefined;
+
+  const current = listings[index];
+  // Featured payment completed: leave draft and enter moderation queue.
+  const nextStatus =
+    featured && current.status === "draft" ? "pending_review" : current.status;
+
+  listings[index] = {
+    ...current,
+    status: nextStatus,
+    isFeatured: featured,
+    isPremium: featured ? true : current.isPremium,
+    featuredUntil,
+  };
+  await persistAllListings(listings);
+  setCache(listings);
+  return { ...listings[index] };
+}
+
+export async function deleteListingById(
+  id: string,
+  sellerId?: string,
+): Promise<boolean> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return false;
+  if (sellerId && listings[index].seller.id !== sellerId) {
+    return false;
+  }
+  listings.splice(index, 1);
+  await persistAllListings(listings);
+  setCache(listings);
+  return true;
+}
+
+export async function renewListing(id: string): Promise<Listing | undefined> {
+  const listings = await loadListingsUncached();
+  const index = listings.findIndex((item) => item.id === id);
+  if (index < 0) return undefined;
+
+  const settings = await getAdminSettings();
+  const postedAt = new Date().toISOString();
+  listings[index] = {
+    ...listings[index],
+    postedAt,
+    expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
+    status: "pending_review",
+  };
+  await persistAllListings(listings);
+  setCache(listings);
+  return { ...listings[index] };
+}
+
+/** Update seller.rating / reviewCount on all listings for a seller. */
+export async function updateSellerListingRating(
+  sellerId: string,
+  average: number,
+  reviewCount: number,
+): Promise<void> {
+  const listings = await loadListingsUncached();
+  let changed = false;
+  for (let i = 0; i < listings.length; i += 1) {
+    if (listings[i].seller.id !== sellerId) continue;
+    listings[i] = {
+      ...listings[i],
+      seller: {
+        ...listings[i].seller,
+        rating: average,
+        reviewCount,
+      },
+    };
+    changed = true;
+  }
+  if (!changed) return;
+  await persistAllListings(listings);
+  setCache(listings);
+}
+
+export function toAdminListingRecord(listing: Listing): AdminListingRecord {
+  return {
+    id: listing.id,
+    slug: listing.slug,
+    title: listing.title,
+    sellerName: listing.seller.name,
+    sellerId: listing.seller.id,
+    categoryId: listing.categoryId,
+    price: listing.price,
+    currency: listing.currency,
+    status: listing.status,
+    isFeatured: listing.isFeatured,
+    postedAt: listing.postedAt ?? "",
+    city: listing.city,
+  };
+}
+
+export async function getAdminListingRecords(): Promise<AdminListingRecord[]> {
+  const listings = await getAllListings();
+  return listings.map(toAdminListingRecord);
+}
+
+export async function getListingsModerationSummary() {
+  const listings = await getAllListings();
+  return {
+    totalListings: listings.length,
+    pendingListings: listings.filter((item) => item.status === "pending_review").length,
+    activeListings: listings.filter((item) => item.status === "active").length,
+    featuredListings: listings.filter((item) => item.isFeatured).length,
+  };
+}

@@ -1,7 +1,10 @@
 import type { ViewingBooking } from "@/types/domain/viewing-booking";
-import { loadCollection, saveCollection } from "@/services/payments/data-store";
+import { createPayloadCollectionStore } from "@/services/db/durable-json-collection";
 
-const FILE = "viewing-bookings.json";
+const store = createPayloadCollectionStore<ViewingBooking>({
+  table: "viewing_bookings",
+  fileName: "sooqna-viewing-bookings.json",
+});
 
 const TIME_SLOTS = [
   "09:00",
@@ -33,7 +36,7 @@ export function getAvailableViewingDates(): string[] {
 export async function getViewingBookingsForListing(
   listingId: string,
 ): Promise<ViewingBooking[]> {
-  const all = await loadCollection<ViewingBooking>(FILE);
+  const all = await store.listAll();
   return all.filter(
     (item) => item.listingId === listingId && item.status === "confirmed",
   );
@@ -50,15 +53,22 @@ export async function getAvailableSlotsForListing(
   return TIME_SLOTS.filter((slot) => !taken.has(slot));
 }
 
+export async function getViewingBookingsForSeller(
+  sellerId: string,
+): Promise<ViewingBooking[]> {
+  const all = await store.listAll();
+  return all.filter((item) => item.sellerId === sellerId);
+}
+
 export async function getViewingBookingsForUser(
   userId: string,
 ): Promise<ViewingBooking[]> {
-  const all = await loadCollection<ViewingBooking>(FILE);
+  const all = await store.listAll();
   return all.filter((item) => item.buyerId === userId);
 }
 
 export async function getAllViewingBookings(): Promise<ViewingBooking[]> {
-  return loadCollection<ViewingBooking>(FILE);
+  return store.listAll();
 }
 
 export async function findViewingBooking(
@@ -67,7 +77,7 @@ export async function findViewingBooking(
   date: string,
   time: string,
 ): Promise<ViewingBooking | undefined> {
-  const all = await loadCollection<ViewingBooking>(FILE);
+  const all = await store.listAll();
   return all.find(
     (item) =>
       item.buyerId === buyerId &&
@@ -81,14 +91,26 @@ export async function findViewingBooking(
 export async function createViewingBooking(
   input: Omit<ViewingBooking, "id" | "status" | "createdAt">,
 ): Promise<ViewingBooking> {
-  const all = await loadCollection<ViewingBooking>(FILE);
+  const now = new Date().toISOString();
   const booking: ViewingBooking = {
     ...input,
     id: `view-${Date.now()}`,
-    status: "confirmed",
-    createdAt: new Date().toISOString(),
+    status: "pending",
+    createdAt: now,
+    updatedAt: now,
   };
-  all.unshift(booking);
-  await saveCollection(FILE, all);
+  await store.upsert(booking);
   return booking;
+}
+
+export async function updateViewingBookingStatus(
+  id: string,
+  status: ViewingBooking["status"],
+): Promise<ViewingBooking | undefined> {
+  const all = await store.listAll();
+  const current = all.find((item) => item.id === id);
+  if (!current) return undefined;
+  const next = { ...current, status, updatedAt: new Date().toISOString() };
+  await store.upsert(next);
+  return next;
 }

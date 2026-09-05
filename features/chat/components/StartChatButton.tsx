@@ -3,13 +3,18 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Listing } from "@/types";
-import { openListingConversation } from "@/services/chat";
+import { notifyChatEmail } from "@/features/chat/lib/notify-chat-email";
+import {
+  findConversationForListing,
+  openListingConversation,
+} from "@/services/chat";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { useToast } from "@/shared/components/ToastProvider";
 import { getSessionUser } from "@/services/storage";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type StartChatButtonProps = {
   className?: string;
@@ -59,10 +64,20 @@ export function StartChatButton({
         return;
       }
 
+      const existing = findConversationForListing(listing.id, user.id);
       const conversationId = openListingConversation(listing, {
         id: user.id,
         name: user.fullName,
       });
+      if (!existing && listing.seller.id) {
+        notifyChatEmail({
+          conversationId,
+          listingTitle: listing.title,
+          preview: `مرحباً، أنا مهتم بإعلان «${listing.title}».`,
+          recipientUserId: listing.seller.id,
+          senderName: user.fullName,
+        });
+      }
       router.push(`/chat/${conversationId}`);
     } catch {
       const message = "تعذر فتح المحادثة. حاول مرة أخرى.";
@@ -80,6 +95,7 @@ export function StartChatButton({
 
   if (resolvedLayout === "icon") {
     return (
+      <LocalizedTree>
       <button
         aria-busy={isLoading}
         aria-label="محادثة البائع"
@@ -90,10 +106,12 @@ export function StartChatButton({
       >
         <Icon name="message" size={20} />
       </button>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className={fullWidth ? "w-full" : ""}>
       <Button
         className={className}
@@ -124,5 +142,6 @@ export function StartChatButton({
         </div>
       ) : null}
     </div>
+    </LocalizedTree>
   );
 }

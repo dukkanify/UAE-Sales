@@ -18,6 +18,9 @@ const addressSchema = z.object({
   unit: z.string().optional(),
   landmark: z.string().optional(),
   notes: z.string().optional(),
+  latitude: z.number().gte(-90).lte(90).optional(),
+  longitude: z.number().gte(-180).lte(180).optional(),
+  formattedAddress: z.string().optional(),
   isDefault: z.boolean().optional(),
 });
 

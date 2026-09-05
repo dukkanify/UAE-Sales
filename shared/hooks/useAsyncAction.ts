@@ -12,6 +12,13 @@ export function useAsyncAction<TArgs extends unknown[]>(
 
   const run = useCallback(
     async (...args: TArgs) => {
+      const maybeEvent = args[0] as
+        | { preventDefault?: () => void; persist?: () => void }
+        | undefined;
+      // If used as a form onSubmit handler, block native submit immediately.
+      maybeEvent?.preventDefault?.();
+      maybeEvent?.persist?.();
+
       if (isRunningRef.current) {
         return;
       }

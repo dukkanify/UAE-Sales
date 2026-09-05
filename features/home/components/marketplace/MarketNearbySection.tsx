@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { getNearbyListings } from "@/features/home/components/mobile/mobile-home.config";
 import { getListingHref, getListingImageUrl } from "@/features/listings/components/listing-card.utils";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { MarketSectionHeader, MarketSectionShell } from "./MarketSectionHeader";
 
 type MarketNearbySectionProps = {
@@ -10,6 +15,7 @@ type MarketNearbySectionProps = {
 };
 
 export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
+  const locale = useLocale();
   const nearby = getNearbyListings(listings, 6);
 
   if (nearby.length === 0) return null;
@@ -19,7 +25,7 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
       <MarketSectionHeader
         actionHref="/search"
         actionLabel="عرض الكل"
-        description="إعلانات قريبة من موقعك — تصفّح وتواصل بسرعة."
+        description="إعلانات من مدن الإمارات — تصفّح وتواصل بسرعة."
         eyebrow="Nearby"
         title="القريبة منك"
       />
@@ -32,12 +38,12 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
           return (
             <Link
               key={listing.id}
-              className="group overflow-hidden rounded-2xl border border-border bg-white shadow-[0_8px_24px_rgb(15_23_42/6%)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgb(15_23_42/10%)]"
+              className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_8px_24px_rgb(15_23_42/6%)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_rgb(15_23_42/10%)]"
               href={href}
             >
               <div className="relative aspect-square overflow-hidden">
                 <AppImage
-                  alt={listing.title}
+                  alt={listingTitle(listing, locale)}
                   className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   fallbackCategory={listing.categoryId}
                   fill
@@ -48,7 +54,9 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
                   {distance}
                 </span>
               </div>
-              <p className="line-clamp-2 px-3 py-3 text-sm font-bold text-ink">{listing.title}</p>
+              <p className="line-clamp-2 px-3 py-3 text-sm font-bold text-ink">
+                <ListingTitle listing={listing} />
+              </p>
             </Link>
           );
         })}
