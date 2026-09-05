@@ -150,11 +150,11 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1500648767791-00dcc994a43e",
   ],
   emirates: [
-    "photo-1530716226091-128d3667ebfa",
-    "photo-1494616150024-f6040d5220c0",
+    "photo-1661630804525-a745b42434a8",
+    "photo-1749653652468-98a34f0be831",
   ],
   default: [
-    "photo-1530716226091-128d3667ebfa",
+    "photo-1661630804525-a745b42434a8",
     "photo-1618843479313-40f8afb4b4d8",
     "photo-1600607687939-ce8a6c25118c",
   ],
@@ -163,8 +163,8 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
 /** Verified landmark photos per emirate — location-checked on Unsplash */
 export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   dubai: "photo-1512453979798-5ea266f8880c",
-  // Sheikh Zayed Grand Mosque at night — dramatic blue glow + mirror floor (wow hero)
-  "abu-dhabi": "photo-1530716226091-128d3667ebfa",
+  // Abu Dhabi skyline at dusk — Etihad Towers + Corniche (pro marketplace hero)
+  "abu-dhabi": "photo-1661630804525-a745b42434a8",
   sharjah: "photo-1679197982381-7a43e5d910a4",
   ajman: "photo-1593334305856-1c6281efaa18",
   "umm-al-quwain": "photo-1687080625802-967beded8abc",
@@ -174,7 +174,7 @@ export const emiratePhotoIds: Record<EmirateImageKey, string> = {
 
 export const emirateLandmarkLabels: Record<EmirateImageKey, string> = {
   dubai: "برج خليفة وأفق دبي",
-  "abu-dhabi": "مسجد الشيخ زايد الكبير",
+  "abu-dhabi": "أفق أبوظبي — أبراج الاتحاد",
   sharjah: "أفق الشارقة عند الغروب",
   ajman: "كورنيش عجمان",
   "umm-al-quwain": "شاطئ المانجروف — أم القيوين",
