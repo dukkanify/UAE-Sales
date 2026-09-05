@@ -592,8 +592,8 @@
 }
 
 .mobile-home-hero__bg img {
-  object-position: center 40%;
-  filter: saturate(1.1) contrast(1.08);
+  object-position: center 42%;
+  filter: saturate(1.25) contrast(1.14) brightness(1.02);
 }
 
 .mobile-home-hero__media-overlay {

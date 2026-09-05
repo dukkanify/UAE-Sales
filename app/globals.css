@@ -306,11 +306,11 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 72% 58% at 8% 0%, rgb(201 169 98 / 28%), transparent 58%),
-    radial-gradient(ellipse 55% 50% at 100% 8%, rgb(11 22 40 / 10%), transparent 56%),
-    radial-gradient(ellipse 48% 42% at 88% 92%, rgb(201 169 98 / 14%), transparent 62%),
-    radial-gradient(ellipse 42% 36% at 0% 78%, rgb(45 106 79 / 8%), transparent 58%),
-    linear-gradient(165deg, #fbf7f0 0%, #f5efe6 38%, rgb(233 224 208 / 0.72) 100%);
+    radial-gradient(ellipse 72% 58% at 8% 0%, rgb(201 169 98 / 18%), transparent 58%),
+    radial-gradient(ellipse 55% 50% at 100% 8%, rgb(11 22 40 / 6%), transparent 56%),
+    radial-gradient(ellipse 48% 42% at 88% 92%, rgb(201 169 98 / 10%), transparent 62%),
+    radial-gradient(ellipse 42% 36% at 0% 78%, rgb(45 106 79 / 5%), transparent 58%),
+    linear-gradient(165deg, rgb(251 247 240 / 0.42) 0%, rgb(245 239 230 / 0.22) 38%, rgb(233 224 208 / 0.12) 100%);
 }
 
 .market-hero__orb {
@@ -351,31 +351,32 @@ textarea {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: min(78%, 38rem);
+  height: min(88%, 44rem);
   overflow: hidden;
-  opacity: 0.88;
+  opacity: 0.95;
   mask-image: linear-gradient(
     to top,
     black 0%,
-    black 22%,
-    rgb(0 0 0 / 0.85) 48%,
-    rgb(0 0 0 / 0.45) 72%,
+    black 28%,
+    rgb(0 0 0 / 0.92) 52%,
+    rgb(0 0 0 / 0.55) 74%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to top,
     black 0%,
-    black 22%,
-    rgb(0 0 0 / 0.85) 48%,
-    rgb(0 0 0 / 0.45) 72%,
+    black 28%,
+    rgb(0 0 0 / 0.92) 52%,
+    rgb(0 0 0 / 0.55) 74%,
     transparent 100%
   );
 }
 
 .market-hero__photo img {
   object-fit: cover;
+  /* Night mosque: keep arches + mirror floor in frame */
   object-position: center 42%;
-  filter: saturate(1.12) contrast(1.12) brightness(1.02);
+  filter: saturate(1.28) contrast(1.18) brightness(1.02);
 }
 
 .market-hero__grid {
@@ -405,13 +406,14 @@ textarea {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 12%, rgb(255 255 255 / 0.14), transparent 68%),
+    /* Keep copy readable on the dark night mosque */
+    radial-gradient(ellipse 85% 55% at 50% 0%, rgb(251 247 240 / 0.88), transparent 62%),
     linear-gradient(
       180deg,
-      rgb(250 247 241 / 0.55) 0%,
-      rgb(250 247 241 / 0.12) 34%,
-      transparent 58%,
-      rgb(250 247 241 / 0.2) 100%
+      rgb(250 247 241 / 0.72) 0%,
+      rgb(250 247 241 / 0.22) 28%,
+      transparent 52%,
+      rgb(8 16 32 / 0.35) 100%
     );
 }
 
@@ -620,8 +622,8 @@ html[data-theme="dark"] .market-hero__orb--mist {
 }
 
 html[data-theme="dark"] .market-hero__photo {
-  opacity: 0.62;
-  filter: brightness(0.82) saturate(1.05);
+  opacity: 0.9;
+  filter: brightness(0.95) saturate(1.15);
 }
 
 html[data-theme="dark"] .market-hero__grid {
