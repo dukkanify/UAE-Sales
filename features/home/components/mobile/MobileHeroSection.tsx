@@ -13,7 +13,7 @@ export async function MobileHeroSection() {
       <div className="mobile-home-hero__media">
         <div className="mobile-home-hero__bg">
           <AppImage
-            alt="أفق الإمارات ومطار دولي"
+            alt="أفق أبوظبي ومسجد الشيخ زايد"
             className="object-cover"
             fallback="emirates"
             fill

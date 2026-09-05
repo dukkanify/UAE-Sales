@@ -79,6 +79,54 @@ async function writeJsonFile(listings: Listing[]): Promise<void> {
   await rename(tempPath, target);
 }
 
+export async function upsertListingRow(listing: Listing): Promise<void> {
+  if (await ensureListingsTable()) {
+    const pool = await getOptionalPostgresPool();
+    if (!pool) throw new Error("LISTINGS_STORE_UNAVAILABLE");
+
+    await pool.query(
+      `INSERT INTO ${TABLE} (
+          id, slug, seller_id, category_id, status, is_featured,
+          posted_at, expires_at, updated_at, payload
+        ) VALUES (
+          $1,$2,$3,$4,$5,$6,
+          $7::timestamptz,$8::timestamptz,NOW(),$9::jsonb
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          slug = EXCLUDED.slug,
+          seller_id = EXCLUDED.seller_id,
+          category_id = EXCLUDED.category_id,
+          status = EXCLUDED.status,
+          is_featured = EXCLUDED.is_featured,
+          posted_at = EXCLUDED.posted_at,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = NOW(),
+          payload = EXCLUDED.payload`,
+      [
+        listing.id,
+        listing.slug,
+        listing.seller.id,
+        listing.categoryId,
+        listing.status,
+        Boolean(listing.isFeatured),
+        listing.postedAt ?? null,
+        listing.expiresAt ?? null,
+        JSON.stringify(listing),
+      ],
+    );
+    return;
+  }
+
+  const stored = (await readJsonFile()) ?? [];
+  const index = stored.findIndex((item) => item.id === listing.id);
+  if (index >= 0) {
+    stored[index] = listing;
+  } else {
+    stored.unshift(listing);
+  }
+  await writeJsonFile(stored);
+}
+
 export async function persistAllListings(listings: Listing[]): Promise<void> {
   if (await ensureListingsTable()) {
     const pool = await getOptionalPostgresPool();

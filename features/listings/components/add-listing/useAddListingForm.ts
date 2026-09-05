@@ -152,7 +152,7 @@ function featuredCheckoutError(code?: string): string {
 export function useAddListingForm(categories: Category[]) {
   const router = useRouter();
   const [errors, setErrors] = useState<AddListingErrors & Record<string, string | undefined>>({});
-  const { handleImageChange: setListingImages, imageFiles, imagePreviews } =
+  const { handleImageChange: setListingImages, imageFiles, imagePreviews, setCoverIndex } =
     useImagePreviews();
 
   const handleImageChange = useCallback(
@@ -160,6 +160,13 @@ export function useAddListingForm(categories: Category[]) {
       setListingImages(fileList, 12, mode);
     },
     [setListingImages],
+  );
+
+  const setCover = useCallback(
+    (index: number) => {
+      setCoverIndex(index);
+    },
+    [setCoverIndex],
   );
   const [preview, setPreview] = useState<ListingPreview>(defaultPreview);
   const [selectedCategoryId, setSelectedCategoryId] = useState(
@@ -186,6 +193,7 @@ export function useAddListingForm(categories: Category[]) {
     () => categories.find((category) => category.id === selectedCategoryId),
     [categories, selectedCategoryId],
   );
+  const isJobsCategory = selectedCategoryId === "jobs";
 
   const publishListing = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
@@ -221,7 +229,7 @@ export function useAddListingForm(categories: Category[]) {
       if (!/^(\+971|971|0)?5\d{8}$/.test(contact)) {
         nextErrors.contact = "اكتب رقم تواصل إماراتي صحيح.";
       }
-      if (imageFiles.length === 0) {
+      if (!isJobsCategory && imageFiles.length === 0) {
         nextErrors.images = "أضف صورة حقيقية واحدة على الأقل للمنتج.";
       }
       if (
@@ -246,18 +254,20 @@ export function useAddListingForm(categories: Category[]) {
 
       const price = Number(formData.get("price") ?? 0);
       const description = String(formData.get("description") ?? "").trim();
-      let persistedImages: string[];
-      try {
-        persistedImages = await uploadListingImages(imageFiles);
-      } catch (uploadError) {
-        publishedRef.current = false;
-        const message =
-          uploadError instanceof Error
-            ? uploadError.message
-            : "تعذر معالجة الصور. حاول مرة أخرى.";
-        setErrors({ submit: message });
-        scrollToSubmitError();
-        return;
+      let persistedImages: string[] = [];
+      if (imageFiles.length > 0) {
+        try {
+          persistedImages = await uploadListingImages(imageFiles);
+        } catch (uploadError) {
+          publishedRef.current = false;
+          const message =
+            uploadError instanceof Error
+              ? uploadError.message
+              : "تعذر معالجة الصور. حاول مرة أخرى.";
+          setErrors({ submit: message });
+          scrollToSubmitError();
+          return;
+        }
       }
 
       const cityName = isDynamicCategory(categoryId)
@@ -287,8 +297,8 @@ export function useAddListingForm(categories: Category[]) {
         status: wantsFeatured ? "draft" : "pending_review",
         isFeatured: false,
         views: 0,
-        imageUrl: persistedImages[0],
-        images: persistedImages,
+        ...(persistedImages[0] ? { imageUrl: persistedImages[0] } : {}),
+        ...(persistedImages.length > 0 ? { images: persistedImages } : {}),
         seller: buildSellerFromSession(user),
         imageTone: "gold",
         postedAt,
@@ -394,7 +404,7 @@ export function useAddListingForm(categories: Category[]) {
 
       router.push(`/listings/local/${id}`);
     },
-    [featuredCheckoutAvailable, imageFiles, router, selectedCategoryId],
+    [featuredCheckoutAvailable, imageFiles, isJobsCategory, router, selectedCategoryId],
   );
 
   const { isLoading: isSubmitting, run: submitListing } =
@@ -431,11 +441,13 @@ export function useAddListingForm(categories: Category[]) {
     handleImageChange,
     imagePreviews,
     isAllowed,
+    isJobsCategory,
     isSubmitting,
     preview,
     selectedCategory,
     selectedCategoryId,
     selectedPackage,
+    setCover,
     setPreview,
     setSelectedCategoryId,
     setSelectedPackage,

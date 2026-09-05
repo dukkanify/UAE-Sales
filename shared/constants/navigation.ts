@@ -3,7 +3,6 @@ import { cities } from "@/shared/constants/locations";
 export const primaryNavigation = [
   { label: "الرئيسية", href: "/" },
   { label: "التصنيفات", href: "/categories" },
-  { label: "الضمان المالي", href: "/escrow" },
 ];
 
 /** Display order for footer emirates (Al Ain is not in the current catalog). */

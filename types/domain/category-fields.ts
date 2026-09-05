@@ -4,7 +4,8 @@ export type CategoryFieldType =
   | "select"
   | "combobox"
   | "textarea"
-  | "checkbox-group";
+  | "checkbox-group"
+  | "date";
 
 export type CategoryFieldOption = {
   label: string;

@@ -699,7 +699,7 @@ export function CheckoutWizard({
                 type="button"
                 variant="accent"
               >
-                تأكيد الدفع عبر Stripe
+                تأكيد الدفع
               </Button>
               {mockCheckoutEnabled ? (
                 <Button
@@ -708,7 +708,7 @@ export function CheckoutWizard({
                   type="button"
                   variant="secondary"
                 >
-                  إتمام تجريبي (بدون Stripe)
+                  إتمام تجريبي
                 </Button>
               ) : null}
               <Button

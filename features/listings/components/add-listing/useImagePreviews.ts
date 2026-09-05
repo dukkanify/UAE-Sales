@@ -65,9 +65,24 @@ export function useImagePreviews(defaultMax = 12) {
     setImagePreviews(urls);
   }
 
+  function setCoverIndex(index: number) {
+    if (index <= 0 || index >= imageFilesRef.current.length) return;
+    const files = [...imageFilesRef.current];
+    const urls = [...previewUrlsRef.current];
+    const [file] = files.splice(index, 1);
+    const [url] = urls.splice(index, 1);
+    files.unshift(file);
+    urls.unshift(url);
+    imageFilesRef.current = files;
+    previewUrlsRef.current = urls;
+    setImageFiles(files);
+    setImagePreviews(urls);
+  }
+
   return {
     handleImageChange,
     imageFiles,
     imagePreviews,
+    setCoverIndex,
   };
 }

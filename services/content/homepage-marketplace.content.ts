@@ -17,8 +17,8 @@ export async function getMarketQuickSearches() {
   return [
     { href: "/search?q=Mercedes", label: "Mercedes" },
     { href: "/search?q=Patrol", label: "Patrol" },
-    { href: "/search?q=نخلة+جميرا", label: "Palm Jumeirah" },
-    { href: "/search?q=داون+تاون", label: "Downtown Dubai" },
+    { href: "/search?q=جزيرة+ياس", label: "Yas Island" },
+    { href: "/search?q=كورنيش+أبوظبي", label: "Abu Dhabi Corniche" },
     { href: "/search?q=شقة", label: "Apartment" },
     { href: "/search?q=فيلا", label: "Villa" },
     { href: "/search?q=iPhone", label: "iPhone" },
@@ -104,7 +104,7 @@ export async function getAuthTrustPoints() {
   const activeListings = getActiveListingCount();
 
   return [
-    "ضمان مالي يحمي كل معاملة",
+    "منصة موثوقة للبيع والشراء في الإمارات",
     "توثيق البائعين والمشترين",
     "دعم بالعربية على مدار الساعة",
     uaeActiveListingsLabel(activeListings, locale),

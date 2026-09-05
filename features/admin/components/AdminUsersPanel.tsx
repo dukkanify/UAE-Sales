@@ -73,9 +73,6 @@ export function AdminUsersPanel() {
       .then((data) => {
         const nextUsers = (data.users ?? []) as AdminUserRecord[];
         setUsers(nextUsers);
-        if (nextUsers.some((item) => item.accountStatus === "pending")) {
-          setStatusFilter("pending");
-        }
       })
       .catch(() => setUsers([]));
   }, []);
@@ -101,8 +98,11 @@ export function AdminUsersPanel() {
         );
       })
       .sort((a, b) => {
-        if (a.accountStatus === "pending" && b.accountStatus !== "pending") return -1;
-        if (b.accountStatus === "pending" && a.accountStatus !== "pending") return 1;
+        const aTime = Date.parse(a.joinedAt);
+        const bTime = Date.parse(b.joinedAt);
+        if (Number.isFinite(aTime) && Number.isFinite(bTime)) {
+          return bTime - aTime;
+        }
         return 0;
       });
   }, [users, query, statusFilter]);
