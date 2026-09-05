@@ -4,7 +4,7 @@
 **Production host tested:** https://sooqna.site  
 **Remediation branch:** `cursor/full-26-issue-remediation-37ba`  
 **Production deployment SHA (LIVE at test time):** `df48756`  
-**Remediation tip SHA (this branch, not yet on Production):**   
+**Remediation tip SHA (this branch, not yet on Production):** `deb1db7`
 **Lint:** PASS (`npm run lint`)  
 **Build:** PASS (`npm run build`)
 
