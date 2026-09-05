@@ -12,6 +12,7 @@ import {
   loadPersistedListings,
   persistAllListings,
   seedListings,
+  upsertListingRow,
 } from "@/services/listings/listing-persistence";
 import type { Listing } from "@/types";
 import type {
@@ -173,8 +174,8 @@ export async function upsertListing(listing: Listing): Promise<Listing> {
   };
   if (index >= 0) listings[index] = next;
   else listings.unshift(next);
-  await persistAllListings(listings);
-  setCache(listings);
+  await upsertListingRow(next);
+  cacheRows = null;
   return { ...next };
 }
 
@@ -276,8 +277,8 @@ export async function patchListingRecord(
       : {}),
     statusHistory: history,
   };
-  await persistAllListings(listings);
-  setCache(listings);
+  await upsertListingRow(listings[index]);
+  cacheRows = null;
   return { ...listings[index] };
 }
 
@@ -308,8 +309,8 @@ export async function setListingFeatured(
     isPremium: featured ? true : current.isPremium,
     featuredUntil,
   };
-  await persistAllListings(listings);
-  setCache(listings);
+  await upsertListingRow(listings[index]);
+  cacheRows = null;
   return { ...listings[index] };
 }
 
@@ -342,8 +343,8 @@ export async function renewListing(id: string): Promise<Listing | undefined> {
     expiresAt: computeExpiresAt(postedAt, settings.listingActiveDays),
     status: "pending_review",
   };
-  await persistAllListings(listings);
-  setCache(listings);
+  await upsertListingRow(listings[index]);
+  cacheRows = null;
   return { ...listings[index] };
 }
 
@@ -368,8 +369,11 @@ export async function updateSellerListingRating(
     changed = true;
   }
   if (!changed) return;
-  await persistAllListings(listings);
-  setCache(listings);
+  for (const listing of listings) {
+    if (listing.seller.id !== sellerId) continue;
+    await upsertListingRow(listing);
+  }
+  cacheRows = null;
 }
 
 export function toAdminListingRecord(listing: Listing): AdminListingRecord {

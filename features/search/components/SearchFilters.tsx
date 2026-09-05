@@ -45,7 +45,6 @@ const conditionOptions = [
   { label: "الكل", value: "" },
   { label: "جديد", value: "new" },
   { label: "مستعمل", value: "used" },
-  { label: "ممتاز", value: "excellent" },
 ];
 
 export function SearchFilters({

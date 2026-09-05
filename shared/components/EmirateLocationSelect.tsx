@@ -1,10 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
 
 type LocationOption = { id: string; name: string };
+
+const EMIRATE_STORAGE_KEY = "sooqna_emirate";
+const ALL_EMIRATES_NAME = "كل الإمارات";
+const DEFAULT_EMIRATE = "أبوظبي";
+
+function buildEmirateOptions(): LocationOption[] {
+  const abuDhabi = cities.find((city) => city.id === "abu-dhabi");
+  const rest = cities.filter((city) => city.id !== "abu-dhabi");
+  const ordered = abuDhabi ? [abuDhabi, ...rest] : cities;
+
+  return [
+    { id: "all", name: ALL_EMIRATES_NAME },
+    ...ordered.map((city) => ({ id: city.id, name: city.name })),
+  ];
+}
+
+function readStoredEmirate(): string {
+  if (typeof window === "undefined") return DEFAULT_EMIRATE;
+  try {
+    const stored = localStorage.getItem(EMIRATE_STORAGE_KEY);
+    if (stored) return stored;
+  } catch {
+    /* ignore storage errors */
+  }
+  return DEFAULT_EMIRATE;
+}
 
 type EmirateLocationSelectProps = {
   className?: string;
@@ -15,35 +42,29 @@ type EmirateLocationSelectProps = {
 
 export function EmirateLocationSelect({
   className = "",
-  defaultCity = "دبي",
+  defaultCity = DEFAULT_EMIRATE,
   onCityChange,
   variant = "mobile",
 }: EmirateLocationSelectProps) {
+  const router = useRouter();
+  const options = useMemo(() => buildEmirateOptions(), []);
   const [city, setCity] = useState(defaultCity);
-  const [options, setOptions] = useState<LocationOption[]>(cities);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/locations")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (cancelled) return;
-        const list = (data?.locations ?? []) as LocationOption[];
-        if (list.length > 0) {
-          setOptions(list.map((item) => ({ id: item.id, name: item.name })));
-        }
-      })
-      .catch(() => {
-        /* keep constants fallback */
-      });
-    return () => {
-      cancelled = true;
-    };
+    setCity(readStoredEmirate());
   }, []);
 
-  function handleChange(nextCity: string) {
-    setCity(nextCity);
-    onCityChange?.(nextCity);
+  function handleChange(next: string) {
+    setCity(next);
+    onCityChange?.(next);
+    try {
+      localStorage.setItem(EMIRATE_STORAGE_KEY, next);
+    } catch {
+      /* ignore storage errors */
+    }
+    router.push(
+      next === ALL_EMIRATES_NAME ? "/search" : `/search?city=${encodeURIComponent(next)}`,
+    );
   }
 
   if (variant === "desktop") {

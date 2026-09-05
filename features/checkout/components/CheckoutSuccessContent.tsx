@@ -160,7 +160,7 @@ export function CheckoutSuccessContent({
     return (
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
-          <p className="text-sm text-muted">جاري تأكيد الدفع مع Stripe...</p>
+          <p className="text-sm text-muted">جاري تأكيد الدفع...</p>
         </Card>
       </section>
     );
@@ -182,8 +182,8 @@ export function CheckoutSuccessContent({
       <PageHero
         description={
           isPending
-            ? "استلمنا عودتك من Stripe. ننتظر تأكيد الدفع النهائي."
-            : "شكراً لك. تم استلام طلبك بنجاح."
+            ? "جاري تأكيد الدفع. قد يستغرق الأمر لحظات."
+            : "شكراً لك. تم تأكيد الدفع بنجاح."
         }
         eyebrow="تأكيد الطلب"
         title={isPending ? "بانتظار تأكيد الدفع" : "تم إتمام الشراء"}
@@ -197,7 +197,7 @@ export function CheckoutSuccessContent({
           </FormMessage>
         ) : (
           <FormMessage variant="success">
-            تم الدفع بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.
+            تم تأكيد الدفع بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.
           </FormMessage>
         )}
 

@@ -31,11 +31,13 @@ export function AddListingForm({ categories }: AddListingFormProps) {
     handleImageChange,
     imagePreviews,
     isAllowed,
+    isJobsCategory,
     isSubmitting,
     preview,
     selectedCategory,
     selectedCategoryId,
     selectedPackage,
+    setCover,
     setPreview,
     setSelectedCategoryId,
     setSelectedPackage,
@@ -114,8 +116,10 @@ export function AddListingForm({ categories }: AddListingFormProps) {
           errors={errors}
           featuredCheckoutAvailable={featuredCheckoutAvailable}
           imagePreviews={imagePreviews}
+          imagesRequired={!isJobsCategory}
           onImageChange={handleImageChange}
           onPackageChange={setSelectedPackage}
+          onSetCover={setCover}
           selectedPackage={selectedPackage}
         />
 

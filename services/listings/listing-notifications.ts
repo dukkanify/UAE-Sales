@@ -28,7 +28,7 @@ export async function notifyListingSubmitted(listing: Listing): Promise<void> {
         titleEn: "We received your listing",
         body: `إعلان «${listing.title}» قيد المراجعة وسيظهر بعد الموافقة.`,
         bodyEn: `“${listing.title}” is under review and will go live after approval.`,
-        href: `/listings/${listing.slug}`,
+        href: "/dashboard/listings",
         dedupeKey: `listing_received:${listing.id}`,
       }),
     "listing_received in-app",

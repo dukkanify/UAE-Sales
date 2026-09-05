@@ -10,6 +10,27 @@ import {
   mobileModelOptions,
 } from "@/shared/constants/product-models";
 
+
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: currentYear - 1989 }, (_, index) => {
+  const year = String(currentYear - index);
+  return { label: year, value: year };
+});
+
+const developerOptions = [
+  { label: "إعمار (Emaar)", value: "Emaar" },
+  { label: "الدار (Aldar)", value: "Aldar" },
+  { label: "نخيل (Nakheel)", value: "Nakheel" },
+  { label: "داماك (Damac)", value: "Damac" },
+  { label: "مراس (Meraas)", value: "Meraas" },
+  { label: "شوبا (Sobha)", value: "Sobha" },
+  { label: "إلينغتون (Ellington)", value: "Ellington" },
+  { label: "ريبورتاج (Reportage)", value: "Reportage" },
+  { label: "إيغل هيلز (Eagle Hills)", value: "Eagle Hills" },
+  { label: "ماجد الفطيم", value: "Majid Al Futtaim" },
+  { label: "أخرى", value: "أخرى" },
+];
+
 const emirateOptions = [
   { label: "دبي", value: "دبي" },
   { label: "أبوظبي", value: "أبوظبي" },
@@ -70,10 +91,9 @@ const carFields: CategoryFieldDefinition[] = [
     options: [
       { label: "جديدة", value: "new" },
       { label: "مستعملة", value: "used" },
-      { label: "ممتازة", value: "excellent" },
     ],
   },
-  { key: "year", label: "سنة الصنع", type: "number", required: true, titlePart: true, searchable: true },
+  { key: "year", label: "سنة الصنع", type: "combobox", required: true, titlePart: true, searchable: true, options: yearOptions, placeholder: "اختر أو اكتب السنة" },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
   {
     key: "city",
@@ -111,11 +131,27 @@ const carFields: CategoryFieldDefinition[] = [
     options: colorOptions,
   },
   {
+    key: "exteriorColorOther",
+    label: "اللون الخارجي (أخرى)",
+    type: "text",
+    required: true,
+    placeholder: "اكتب اللون",
+    showWhen: { key: "exteriorColor", values: ["أخرى"] },
+  },
+  {
     key: "interiorColor",
     label: "اللون الداخلي",
     type: "select",
     required: true,
     options: colorOptions,
+  },
+  {
+    key: "interiorColorOther",
+    label: "اللون الداخلي (أخرى)",
+    type: "text",
+    required: true,
+    placeholder: "اكتب اللون",
+    showWhen: { key: "interiorColor", values: ["أخرى"] },
   },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
   { key: "accidentHistory", label: "سجل الحوادث", type: "select", required: true, options: [
@@ -129,7 +165,7 @@ const carFields: CategoryFieldDefinition[] = [
     { label: "غير متوفر", value: "غير متوفر" },
   ]},
   { key: "vin", label: "رقم الهيكل (VIN)", type: "text", required: false },
-  { key: "numberOfKeys", label: "عدد المفاتيح", type: "number", required: true },
+  { key: "numberOfKeys", label: "عدد المفاتيح", type: "number", required: false },
   { key: "features", label: "الميزات", type: "checkbox-group", options: carFeatureOptions },
 ];
 
@@ -160,7 +196,7 @@ const realEstateFields: CategoryFieldDefinition[] = [
     { label: "قيد الإنشاء", value: "قيد الإنشاء" },
     { label: "خطة", value: "خطة" },
   ]},
-  { key: "developer", label: "المطور", type: "text", required: true, searchable: true },
+  { key: "developer", label: "المطور", type: "combobox", required: true, searchable: true, options: developerOptions, placeholder: "ابحث عن اسم المطور" },
   { key: "community", label: "المجتمع", type: "text", required: true, titlePart: true, searchable: true },
   { key: "titleDeedReady", label: "سند الملكية جاهز", type: "select", required: true, options: yesNoOptions },
   { key: "emirate", label: "الإمارة", type: "select", required: true, options: emirateOptions, searchable: true },
@@ -219,12 +255,11 @@ const mobileFields: CategoryFieldDefinition[] = [
   },
   { key: "batteryHealth", label: "صحة البطارية", type: "text", required: true },
   { key: "warranty", label: "الضمان", type: "select", required: true, options: yesNoOptions },
-  { key: "purchaseDate", label: "تاريخ الشراء", type: "text", required: true },
+  { key: "purchaseDate", label: "تاريخ الشراء", type: "date", required: true },
   { key: "accessoriesIncluded", label: "الملحقات المرفقة", type: "textarea", required: true },
   { key: "condition", label: "الحالة", type: "select", required: true, options: [
     { label: "جديد", value: "new" },
     { label: "مستعمل", value: "used" },
-    { label: "ممتاز", value: "excellent" },
   ]},
 ];
 

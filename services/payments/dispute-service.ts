@@ -79,6 +79,7 @@ export async function openDisputeFromOrder(
       type: "order_disputed",
       title: "تم فتح النزاع",
       body: `تم تسجيل نزاعك على طلب «${order.listingTitle}» وسيتم مراجعته.`,
+      href: `/orders/${order.id}`,
     });
     void emailOrderStatusToUser({
       userId: order.buyerId,
@@ -97,6 +98,7 @@ export async function openDisputeFromOrder(
     type: "order_disputed",
     title: "نزاع جديد على طلب",
     body: `فتح المشتري نزاعاً على طلب «${order.listingTitle}» بمبلغ ${formatCurrencyLabel(order.fees.total)}.`,
+    href: `/orders/${order.id}`,
   });
   void emailOrderStatusToUser({
     userId: order.sellerId,

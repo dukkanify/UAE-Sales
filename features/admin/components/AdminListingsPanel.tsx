@@ -79,7 +79,14 @@ export function AdminListingsPanel() {
   const locale = useLocale();
   const [listings, setListings] = useState<AdminListingRecord[]>([]);
   const [categories, setCategories] = useState<AdminCategoryRecord[]>([]);
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(
+    statusFilterOptions.some((option) => option.value === "pending_review")
+      ? "pending_review"
+      : "all",
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("all");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState("");
@@ -130,9 +137,71 @@ export function AdminListingsPanel() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (statusFilter === "all") return listings;
-    return listings.filter((listing) => listing.status === statusFilter);
-  }, [listings, statusFilter]);
+    const q = searchQuery.trim().toLowerCase();
+
+    return listings
+      .filter((listing) =>
+        statusFilter === "all" ? true : listing.status === statusFilter,
+      )
+      .filter((listing) =>
+        categoryFilter === "all" ? true : listing.categoryId === categoryFilter,
+      )
+      .filter((listing) =>
+        cityFilter === "all" ? true : listing.city === cityFilter,
+      )
+      .filter((listing) => {
+        if (!q) return true;
+        const contactPhone = (
+          listing as AdminListingRecord & { contactPhone?: string }
+        ).contactPhone;
+        return (
+          listing.title.toLowerCase().includes(q) ||
+          listing.id.toLowerCase().includes(q) ||
+          listing.slug.toLowerCase().includes(q) ||
+          listing.sellerName.toLowerCase().includes(q) ||
+          (contactPhone?.includes(q) ?? false)
+        );
+      });
+  }, [listings, statusFilter, categoryFilter, cityFilter, searchQuery]);
+
+  const categoryFilterOptions = useMemo(() => {
+    const ids = [...new Set(listings.map((listing) => listing.categoryId))].sort();
+    const labels = new Map(categories.map((category) => [category.id, category.name]));
+    return [
+      { label: "كل الأقسام", value: "all" },
+      ...ids.map((id) => ({
+        label: labels.get(id) ?? id,
+        value: id,
+      })),
+    ];
+  }, [categories, listings]);
+
+  const cityFilterOptions = useMemo(() => {
+    const cities = [...new Set(listings.map((listing) => listing.city).filter(Boolean))].sort();
+    return [
+      { label: "كل المدن", value: "all" },
+      ...cities.map((city) => ({ label: city, value: city })),
+    ];
+  }, [listings]);
+
+  const defaultStatusFilter = statusFilterOptions.some(
+    (option) => option.value === "pending_review",
+  )
+    ? "pending_review"
+    : "all";
+
+  const hasActiveFilters =
+    statusFilter !== defaultStatusFilter ||
+    categoryFilter !== "all" ||
+    cityFilter !== "all" ||
+    searchQuery.trim().length > 0;
+
+  function clearFilters() {
+    setStatusFilter(defaultStatusFilter);
+    setCategoryFilter("all");
+    setCityFilter("all");
+    setSearchQuery("");
+  }
 
   const categoryOptions = useMemo(
     () =>
@@ -474,7 +543,15 @@ export function AdminListingsPanel() {
 
       <Card className="p-4" variant="flat">
         <div className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[200px]">
+          <div className="min-w-[220px] flex-1">
+            <Input
+              label="بحث في الإعلانات"
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="العنوان، المعرّف، الرابط، البائع، الهاتف..."
+              value={searchQuery}
+            />
+          </div>
+          <div className="min-w-[160px]">
             <Select
               label="تصفية حسب الحالة"
               onChange={(event) => setStatusFilter(event.target.value)}
@@ -482,6 +559,27 @@ export function AdminListingsPanel() {
               value={statusFilter}
             />
           </div>
+          <div className="min-w-[160px]">
+            <Select
+              label="القسم"
+              onChange={(event) => setCategoryFilter(event.target.value)}
+              options={categoryFilterOptions}
+              value={categoryFilter}
+            />
+          </div>
+          <div className="min-w-[140px]">
+            <Select
+              label="المدينة"
+              onChange={(event) => setCityFilter(event.target.value)}
+              options={cityFilterOptions}
+              value={cityFilter}
+            />
+          </div>
+          {hasActiveFilters ? (
+            <Button onClick={clearFilters} size="sm" type="button" variant="ghost">
+              مسح الفلاتر
+            </Button>
+          ) : null}
           <p className="pb-2 text-xs text-muted">
             <Icon className="ms-1 inline" name="package" size={14} />
             {listingCountLabel(filtered.length, locale)}

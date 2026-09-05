@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
+import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { SearchTypeahead } from "@/features/search/components/SearchTypeahead";
@@ -30,10 +31,9 @@ const StickySearchDock = dynamic(
   { ssr: false },
 );
 
-const drawerIcons: Record<string, "home" | "grid" | "shield"> = {
+const drawerIcons: Record<string, "home" | "grid"> = {
   "/": "home",
   "/categories": "grid",
-  "/escrow": "shield",
 };
 
 function isActivePath(pathname: string, href: string) {
@@ -50,7 +50,6 @@ export function SiteHeader() {
   const nav = [
     { href: "/", label: copy.home },
     { href: "/categories", label: copy.categories },
-    { href: "/escrow", label: copy.escrowFull },
   ];
 
   useEffect(() => {
@@ -120,6 +119,8 @@ export function SiteHeader() {
               placeholder={copy.searchShort}
             />
           </form>
+
+          <EmirateLocationSelect className="hidden lg:inline-flex" variant="desktop" />
 
           <div className="flex shrink-0 items-center gap-2">
             <div className="hidden items-center gap-2 lg:flex">

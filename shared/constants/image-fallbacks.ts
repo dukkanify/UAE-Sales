@@ -238,7 +238,7 @@ export function galleryFromPool(
   return urls;
 }
 
-export const heroBackgroundUrl = unsplashUrl("photo-1512453979798-5ea266f8880c", 1600);
+export const heroBackgroundUrl = unsplashUrl(emiratePhotoIds["abu-dhabi"], 1600);
 
 /** Verified seller portrait URLs */
 export const sellerAvatarUrls = {

@@ -1,6 +1,7 @@
 "use client";
 
 import { AppImage } from "@/shared/components/AppImage";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -19,11 +20,13 @@ type MediaContactStepProps = {
   errors: AddListingErrors;
   featuredCheckoutAvailable?: boolean | null;
   imagePreviews: string[];
+  imagesRequired?: boolean;
   onImageChange: (
     fileList: FileList | null,
     mode?: "append" | "replace",
   ) => void;
   onPackageChange?: (value: string) => void;
+  onSetCover?: (index: number) => void;
   selectedPackage?: string;
 };
 
@@ -32,8 +35,10 @@ export function MediaContactStep({
   errors,
   featuredCheckoutAvailable = null,
   imagePreviews,
+  imagesRequired = true,
   onImageChange,
   onPackageChange,
+  onSetCover,
   selectedPackage = "free",
 }: MediaContactStepProps) {
   const hasImages = imagePreviews.length > 0;
@@ -66,6 +71,16 @@ export function MediaContactStep({
                       <span className="absolute start-2 top-2 rounded-[var(--radius-md)] bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
                         الغلاف
                       </span>
+                    ) : onSetCover ? (
+                      <Button
+                        className="absolute bottom-2 start-2 !min-h-0 px-2 py-1 text-[10px]"
+                        onClick={() => onSetCover(index)}
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                      >
+                        تعيين كغلاف
+                      </Button>
                     ) : null}
                   </div>
                 ))}
@@ -98,13 +113,15 @@ export function MediaContactStep({
                     onImageChange(event.target.files, "replace");
                     event.target.value = "";
                   }}
-                  required
+                  required={imagesRequired}
                   type="file"
                 />
                 <span>
-                  رفع صور الإعلان *
+                  {imagesRequired ? "رفع صور الإعلان *" : "رفع صور الإعلان (اختياري)"}
                   <span className="mt-2 block text-xs font-medium text-muted">
-                    صورة واحدة على الأقل مطلوبة — حتى {MAX_IMAGES} صور
+                    {imagesRequired
+                      ? `صورة واحدة على الأقل مطلوبة — حتى ${MAX_IMAGES} صور`
+                      : `يمكنك إضافة حتى ${MAX_IMAGES} صورة`}
                   </span>
                 </span>
               </label>
@@ -117,7 +134,8 @@ export function MediaContactStep({
 
           {hasImages ? (
             <p className="text-xs font-medium text-muted">
-              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف
+              تم اختيار {imagePreviews.length} صورة
+              {imagesRequired ? " — الصورة الأولى تظهر كغلاف" : ""}
             </p>
           ) : null}
         </div>

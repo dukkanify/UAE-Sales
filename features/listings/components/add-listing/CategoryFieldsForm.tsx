@@ -141,6 +141,9 @@ function renderField(
     );
   }
 
+  const inputType =
+    field.type === "number" ? "number" : field.type === "date" ? "date" : "text";
+
   return (
     <Input
       key={field.key}
@@ -153,7 +156,7 @@ function renderField(
       onChange={(event) => onSpecChange(field.key, event.target.value)}
       placeholder={field.placeholder}
       required={field.required}
-      type={field.type === "number" ? "number" : "text"}
+      type={inputType}
     />
   );
 }

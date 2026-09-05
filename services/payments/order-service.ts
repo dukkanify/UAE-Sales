@@ -291,6 +291,7 @@ async function sendOrderNotifications(order: Order): Promise<void> {
     type: "order_paid",
     title: "تم الدفع بنجاح",
     body: `تم دفع مبلغ ${formatCurrencyLabel(order.fees.total)} لطلب «${order.listingTitle}». المبلغ محجوز في الضمان.`,
+    href: `/orders/${order.id}`,
   });
 
   await createNotification({
@@ -299,6 +300,7 @@ async function sendOrderNotifications(order: Order): Promise<void> {
     type: "escrow_held",
     title: "دفعة جديدة محجوزة",
     body: `تم حجز ${formatCurrencyLabel(order.fees.productPrice)} في الضمان لطلب «${order.listingTitle}».`,
+    href: `/orders/${order.id}`,
   });
 
   void emailOrderPaid(order).catch((error) => {
@@ -513,6 +515,7 @@ async function releaseEscrowToSeller(
     type: "order_released",
     title: "تم تحويل المبلغ",
     body: `تم تحويل ${formatCurrencyLabel(sellerNet)} إلى رصيدك المتاح لطلب «${order.listingTitle}».`,
+    href: `/orders/${order.id}`,
   });
 
   if (order.buyerId) {
@@ -522,6 +525,7 @@ async function releaseEscrowToSeller(
       type: "order_confirmed",
       title: "تم تأكيد الاستلام",
       body: `تم تأكيد طلب «${order.listingTitle}» وتحويل المبلغ للبائع.`,
+      href: `/orders/${order.id}`,
     });
     void emailOrderStatusToUser({
       userId: order.buyerId,
@@ -783,6 +787,7 @@ export async function refundOrder(
       type: "order_refunded",
       title: "تم استرداد المبلغ",
       body: `تم استرداد دفعتك لطلب «${order.listingTitle}».`,
+      href: `/orders/${order.id}`,
     });
     void emailOrderStatusToUser({
       userId: order.buyerId,
@@ -801,6 +806,7 @@ export async function refundOrder(
     type: "order_refunded",
     title: "تم استرداد الطلب",
     body: `تم استرداد الطلب «${order.listingTitle}».`,
+    href: `/orders/${order.id}`,
   });
   void emailOrderStatusToUser({
     userId: order.sellerId,
@@ -925,6 +931,7 @@ export async function adminReleaseEscrow(
       type: "order_released",
       title: "تم تحويل المبلغ",
       body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+      href: `/orders/${order.id}`,
     });
     void emailOrderStatusToUser({
       userId: order.sellerId,
@@ -955,6 +962,7 @@ export async function adminReleaseEscrow(
     type: "order_released",
     title: "تم تحويل المبلغ",
     body: `حرّرت الإدارة ${formatCurrencyLabel(sellerNet)} إلى رصيدك لطلب «${order.listingTitle}».`,
+    href: `/orders/${order.id}`,
   });
   void emailOrderStatusToUser({
     userId: order.sellerId,

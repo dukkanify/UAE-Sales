@@ -134,12 +134,33 @@ export function NotificationBell({
     setPushUi(readPushUi());
     const data = await fetchNotifications();
     setItems(data.notifications);
+    setUnread(data.unread);
+    lastUnread.current = data.unread;
     setFreshIds(new Set(data.notifications.filter((item) => !item.read).map((item) => item.id)));
-    if (data.unread > 0) {
-      const nextUnread = await markNotificationsRead();
-      setUnread(nextUnread);
-      lastUnread.current = nextUnread;
-    }
+  }
+
+  async function markItemRead(item: AppNotification) {
+    if (item.read) return;
+    const nextUnread = await markNotificationsRead([item.id]);
+    setUnread(nextUnread);
+    lastUnread.current = nextUnread;
+    setItems((current) =>
+      current.map((row) => (row.id === item.id ? { ...row, read: true } : row)),
+    );
+    setFreshIds((current) => {
+      const next = new Set(current);
+      next.delete(item.id);
+      return next;
+    });
+  }
+
+  async function markAllRead() {
+    if (unread <= 0) return;
+    const nextUnread = await markNotificationsRead();
+    setUnread(nextUnread);
+    lastUnread.current = nextUnread;
+    setItems((current) => current.map((row) => ({ ...row, read: true })));
+    setFreshIds(new Set());
   }
 
   if (!user) {
@@ -227,11 +248,7 @@ export function NotificationBell({
                         href={item.href}
                         onClick={() => {
                           setOpen(false);
-                          setFreshIds((current) => {
-                            const next = new Set(current);
-                            next.delete(item.id);
-                            return next;
-                          });
+                          void markItemRead(item);
                         }}
                       >
                         {content}
@@ -266,6 +283,17 @@ export function NotificationBell({
               <p className="notify-bell__hint">
                 على الآيفون: أضف سوقنا إلى الشاشة الرئيسية حتى تصلك التنبيهات والتطبيق مغلق.
               </p>
+            ) : null}
+            {unread > 0 ? (
+              <button
+                className="notify-bell__action"
+                onClick={() => {
+                  void markAllRead();
+                }}
+                type="button"
+              >
+                تعيين الكل كمقروء
+              </button>
             ) : null}
             <Link
               className="notify-bell__action"

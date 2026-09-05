@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/shared/components/BrandLogo";
+import { EmirateLocationSelect } from "@/shared/components/EmirateLocationSelect";
 import { VerifyAccountBanner } from "@/features/auth/components/VerifyAccountBanner";
 import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { NotificationBell } from "@/features/notifications/NotificationBell";
@@ -31,7 +32,6 @@ export function MarketHeader() {
     { href: "/", icon: "home" as const, label: copy.home },
     { href: "/categories", icon: "grid" as const, label: copy.categories },
     { href: "/featured", icon: "star" as const, label: copy.featured },
-    { href: "/escrow", icon: "shield" as const, label: copy.escrow },
     { href: "/search", icon: "search" as const, label: copy.explore },
   ];
 
@@ -97,6 +97,7 @@ export function MarketHeader() {
           </nav>
 
           <div className="market-header__actions">
+            <EmirateLocationSelect className="market-header__bar-control--desktop" variant="desktop" />
             <LanguageSwitch
               className="market-header__lang market-header__bar-control--desktop"
               variant="compact"

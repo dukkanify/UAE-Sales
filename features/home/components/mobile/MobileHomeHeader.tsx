@@ -15,10 +15,9 @@ import { useLocaleMessages } from "@/shared/i18n/useLocale";
 import { ThemeToggle } from "@/shared/theme/ThemeToggle";
 import { Icon } from "@/shared/ui/Icon";
 
-const drawerIcons: Record<string, "home" | "grid" | "shield" | "star" | "search"> = {
+const drawerIcons: Record<string, "home" | "grid" | "star" | "search"> = {
   "/": "home",
   "/categories": "grid",
-  "/escrow": "shield",
   "/featured": "star",
   "/search": "search",
 };
@@ -136,7 +135,6 @@ export function MobileHomeHeader() {
               const labels: Record<string, string> = {
                 "/": copy.home,
                 "/categories": copy.categories,
-                "/escrow": copy.escrowFull,
               };
               return (
                 <Link
