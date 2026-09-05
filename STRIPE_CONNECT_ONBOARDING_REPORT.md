@@ -1,114 +1,104 @@
 # Stripe Connect One-Click Onboarding — Sooqna
 
-**Date (UTC):** 2026-08-29  
+**Date (UTC):** 2026-08-30  
 **Production host:** https://sooqna.site  
-**Branch:** `cursor/stripe-connect-onboarding-37ba`
+**Live deployment commit:** `4d3408d` (Merge #267 — one-click Connect UX)  
+**`main` tip:** `4d3408d` — **MATCH**
 
 ## Overall status
 
-**NOT COMPLETE on Production** — platform LIVE keys are still unset (`stripeConfigured=false`). Code UX for one-click Connect (no browser key paste) is implemented and ready once Vercel Production keys are configured.
+# NOT COMPLETE
 
-## What changed
+One-click Connect code is **deployed to Production**, but the Production **runtime still does not see Stripe keys**.
 
-### Removed from normal `/admin/stripe` UX
-- Editable Secret Key / Publishable Key / Webhook Secret fields
-- “حفظ وتفعيل” paste flow
-- Step-by-step paste instructions
+Live `GET https://sooqna.site/api/auth/status`:
 
-### Platform configuration (Vercel only)
-Required Production env vars:
+| Flag | Value |
+|------|--------|
+| `stripeConfigured` | **false** |
+| `stripePublishableConfigured` | **false** |
+| `stripeWebhookConfigured` | **false** |
+| `featuredCheckoutAvailable` | **false** |
+| `mockCheckoutAllowed` | **false** |
+| `missing` includes | `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` (+ `CRON_SECRET`) |
 
-- `STRIPE_SECRET_KEY`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `NEXT_PUBLIC_APP_URL=https://sooqna.site`
+`POST /api/webhooks/stripe` (invalid/missing signature) → **503 `STRIPE_NOT_CONFIGURED`**  
+(Expected when configured + bad signature: **400**)
 
-`PUT /api/admin/stripe` now returns **403 `USE_VERCEL_ENV`** — secrets must not be pasted from the browser.
+Therefore LIVE Connect redirect → Stripe → return → status sync **cannot** be marked COMPLETE.
 
-If platform config is missing, UI shows only:
+---
 
-> إعداد Stripe الرئيسي غير مكتمل. يرجى إكمال إعدادات المنصة.
+## Verification checklist (requested)
 
-### One-click Connect
-When platform is configured and no connected account exists:
+| # | Requirement | Result |
+|---|-------------|--------|
+| 1 | `stripeConfigured = true` | **FAIL** — still `false` after Production deploy `4d3408d` |
+| 2 | No Stripe keys exposed to browser | **PASS** (so far) — `/api/auth/status` has no `sk_`/`whsec_`/`pk_live_…` values; secrets are boolean flags only |
+| 3 | `/admin/stripe` no longer shows missing-config warning when configured | **N/A / PARTIAL** — platform not configured, so warning **correctly** shows «إعداد Stripe الرئيسي غير مكتمل…». Key paste form **removed** in deployed #267 code |
+| 4 | One-click Connect E2E | **BLOCKED** — needs `stripeConfigured=true` + admin session |
+| 5 | Reuse existing `stripeAccountId` | Code **PASS** (`ensureConnectAccount`); live **BLOCKED** |
+| 6 | charges/payouts/details/requirements | Code **PASS**; live **BLOCKED** |
+| 7 | Webhook endpoint live | Endpoint exists; returns **503** until secret key present |
+| 8 | Signature validation + idempotency | Code **PASS**; live signature reject not proven (blocked by 503) |
+| 9 | Checkout / Featured / Orders not broken | Featured still correctly unavailable (`featuredCheckoutAvailable=false`); mock off; no architecture change to payment path in #267 |
+| 10 | `npm run lint` / `npm run build` | **PASS** on Connect branch prior to merge; re-run on this verify branch |
+| 11 | Latest `main` on Production | **PASS** — Production deployment `6166501767` = `4d3408d` |
+| 12 | Report updated | This document |
 
-1. Admin opens `/admin/stripe`
-2. Message: «جاري تحويلك إلى Stripe لإكمال ربط حساب الدفع...» (~1.5s)
-3. Server creates/reuses Express account (`ensureConnectAccount` — no duplicates)
-4. Fresh Account Link → redirect to Stripe hosted onboarding
-5. Fallback CTA: **متابعة إلى Stripe**
+---
 
-Stripe collects KYC/bank/company data. Sooqna never does.
+## Code shipped (#267)
 
-### Return / refresh
-| URL | Behavior |
-|-----|----------|
-| `/admin/stripe/return` | Server `refresh-status` → retrieve account from Stripe API → update DB |
-| `/admin/stripe/refresh` | New Account Link (never reuse expired URLs) → redirect |
+- Removed browser Secret/Publishable/Webhook paste fields from `/admin/stripe`
+- `PUT /api/admin/stripe` → **403 `USE_VERCEL_ENV`**
+- Connect auto-redirect for `NOT_CONNECTED` (~1.5s) + fallback CTA
+- Smart A–F status CTAs; return/refresh sync from Stripe API
+- Account reuse; Checkout/Featured/Orders untouched
 
-Status is **never** trusted from query params.
+---
 
-### Smart statuses (A–F)
+## Root cause of LIVE blocker
 
-| Case | Status | UI |
-|------|--------|-----|
-| A | Platform missing | Config warning only |
-| B | `NOT_CONNECTED` | Auto-redirect + **ربط Stripe** |
-| C | `SETUP_REQUIRED` | **إكمال إعداد Stripe** |
-| D | `UNDER_VERIFICATION` | **قيد التحقق من Stripe** |
-| E | `REQUIREMENTS_DUE` | **معلومات إضافية مطلوبة** + **إكمال الإعداد** |
-| F | `ACTIVE` | **Stripe متصل ومفعّل** + Charges/Payouts/Verification |
-| — | `RESTRICTED` | Reason + **إكمال الإعداد** |
+User reported keys configured in Vercel, but **sooqna Production runtime still lists all three Stripe vars in `missing`**.
 
-Actions: ربط Stripe · إكمال الإعداد · تحديث الحالة · فتح Stripe Dashboard
+Likely causes to check manually:
 
-### Persistence (`stripe_connect_accounts`)
-- `stripeAccountId`
-- `stripeOnboardingStatus`
-- `stripeChargesEnabled` / `stripePayoutsEnabled` / `stripeDetailsSubmitted`
-- `stripeRequirementsStatus` / `stripeDisabledReason`
-- `stripeConnectedAt` / `stripeUpdatedAt`
-- Owned by `ownerUserId` (session admin)
+1. Variables attached to **Preview** only, not **Production**
+2. Wrong Vercel project (not **sooqna**)
+3. Name typo / different env names
+4. Keys saved but Production deploy did not pick them up (already redeployed as `4d3408d` — still missing)
 
-### Webhooks (idempotent)
-`https://sooqna.site/api/webhooks/stripe` continues to sync:
+**Required action:** On Vercel → project **sooqna** → Settings → Environment Variables → **Production**:
 
-- `account.updated`
-- `account.external_account.created` / `updated`
-- `capability.updated`
+- `STRIPE_SECRET_KEY` = `sk_live_…`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` = `pk_live_…`
+- `STRIPE_WEBHOOK_SECRET` = Live webhook `whsec_…` for `https://sooqna.site/api/webhooks/stripe`
 
-Notifications on status change (activation / additional info).
+Then **Redeploy Production** and confirm:
 
-### Unchanged (must not break)
-Checkout · Featured · Orders · Refunds · Internal escrow ledger · Platform webhook payment events
+```http
+GET https://sooqna.site/api/auth/status
+→ stripeConfigured: true
+→ missing does not include Stripe keys
 
-## Security
-- Browser never receives `STRIPE_SECRET_KEY` or `STRIPE_WEBHOOK_SECRET`
-- No bank/KYC documents stored in Sooqna
-- Client cannot supply `stripeAccountId`
-- Connect APIs require `payments` admin permission + session ownership
+POST https://sooqna.site/api/webhooks/stripe  (bad signature)
+→ HTTP 400 (not 503)
+```
 
-## Production QA checklist
+Then provide admin credentials for Connect E2E (`SOOQNA_ADMIN_EMAIL` / `SOOQNA_ADMIN_PASSWORD`).
 
-| # | Test | Result |
-|---|------|--------|
-| 1 | `stripeConfigured=true` after Vercel LIVE keys | **BLOCKED** — keys unset |
-| 2 | `/admin/stripe` → auto-redirect when not connected | **BLOCKED** — needs keys + admin session |
-| 3 | Complete Stripe onboarding → return → status sync | **BLOCKED** |
-| 4 | Incomplete onboarding → Continue Setup | **BLOCKED** |
-| 5 | Expired Account Link → `/refresh` new link | **BLOCKED** |
-| 6 | Existing account → no duplicate | Code YES / live **BLOCKED** |
-| 7 | Additional requirements UI | Code YES / live **BLOCKED** |
-| 8 | Charges/Payouts from Stripe API | Code YES / live **BLOCKED** |
-| 9 | Persist across refresh/relogin | Code YES / live **BLOCKED** |
+---
 
-## Manual blocker
+## Definition of Done
 
-Set LIVE Stripe env vars on Vercel project **sooqna** Production and redeploy. Then run Connect E2E with an admin that has `payments` permission.
+**NOT met.** Do not mark Stripe Connect COMPLETE until:
 
-## Validation
+1. `stripeConfigured=true` on sooqna.site  
+2. LIVE Connect: `/admin/stripe` → Stripe → return → server-side status sync passes  
+3. Webhook signature rejection proven (400)  
+4. No secrets exposed  
 
-- `npm run lint`
-- `npm run build`
+## Final verdict
 
-Do **not** mark COMPLETE until the real Connect redirect → Stripe → return → status sync passes on https://sooqna.site.
+**NOT COMPLETE** — Production code is current (`4d3408d`); Production Stripe env injection is still failing at runtime.
