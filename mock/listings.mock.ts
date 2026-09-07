@@ -57,7 +57,7 @@ function toDemoPostedAt(iso: string, id: string): string {
 
 function buildListing(seed: ListingSeed): Listing {
   const seller = resolveSeller(seed.sellerKey);
-  const images = [...imagesForSlug(seed.slug)];
+  const images = [...imagesForSlug(seed.slug, seed.categoryId)];
   const extras = extrasForSlug(seed.slug);
   const idNum = Number(seed.id.replace(/\D/g, "").slice(-3)) || 0;
 
