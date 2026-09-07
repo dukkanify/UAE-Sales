@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { Listing, ListingSearchFilters } from "@/types";
 import { listingMatchesQuery } from "@/shared/listings/listing-specs";
+import { isListingFeaturedActive } from "@/features/listings/components/listing-card-badges";
 import {
   getAllListings,
   getListingBySlug as getStoredListingBySlug,
@@ -24,7 +25,9 @@ export async function getListingBySlug(slug: string): Promise<Listing | undefine
 
 export const getFeaturedListings = cache(async (): Promise<Listing[]> => {
   const listings = await getAllListings();
-  return listings.filter((listing) => listing.isFeatured && listing.status === "active");
+  return listings.filter(
+    (listing) => isListingFeaturedActive(listing) && listing.status === "active",
+  );
 });
 
 export async function getRelatedListings(
@@ -83,7 +86,7 @@ export async function searchListings(
         : true,
     )
     .filter((listing) =>
-      filters.featured ? listing.isFeatured === true : true,
+      filters.featured ? isListingFeaturedActive(listing) : true,
     )
     .filter((listing) =>
       filters.premium ? listing.isPremium === true : true,

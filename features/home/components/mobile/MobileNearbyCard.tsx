@@ -33,16 +33,21 @@ export const MobileNearbyCard = memo(function MobileNearbyCard({
       href={href}
     >
       <div className="mobile-home-nearby-card__media">
-        <AppImage
-          alt={alt}
-          className="object-cover"
-          fallbackCategory={listing.categoryId}
-          fill
-          loading={priority ? undefined : "lazy"}
-          priority={priority}
-          sizes="140px"
-          src={imageUrl}
-        />
+        {imageUrl ? (
+          <AppImage
+            alt={alt}
+            className="object-cover"
+            fill
+            loading={priority ? undefined : "lazy"}
+            priority={priority}
+            sizes="140px"
+            src={imageUrl}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-surface-muted text-[0.65rem] font-semibold text-muted">
+            لا توجد صورة
+          </div>
+        )}
         <span className="mobile-home-nearby-card__distance">{distance}</span>
       </div>
       <p className="mobile-home-nearby-card__title">

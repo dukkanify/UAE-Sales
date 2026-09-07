@@ -56,7 +56,6 @@ function toVideoEmbedUrl(url: string): string | null {
 function GalleryMedia({
   item,
   alt,
-  categoryId,
   className,
   fill = false,
   priority = false,
@@ -64,7 +63,6 @@ function GalleryMedia({
 }: {
   item: GalleryMediaItem;
   alt: string;
-  categoryId: string;
   className?: string;
   fill?: boolean;
   priority?: boolean;
@@ -75,7 +73,6 @@ function GalleryMedia({
       <AppImage
         alt={alt}
         className={className}
-        fallbackCategory={categoryId}
         fill={fill}
         priority={priority}
         sizes={sizes}
@@ -147,7 +144,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
         <AppImage
           alt={displayTitle}
           className="object-cover"
-          fallbackCategory={listing.categoryId}
           fill
           sizes="(max-width: 1024px) 100vw, 60vw"
           src=""
@@ -172,7 +168,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           >
             <GalleryMedia
               alt={displayTitle}
-              categoryId={listing.categoryId}
               className="object-cover"
               fill
               item={activeItem}
@@ -263,7 +258,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                   <AppImage
                     alt={`صورة ${index + 1}`}
                     className="object-cover"
-                    fallbackCategory={listing.categoryId}
                     fill
                     loading="lazy"
                     sizes="76px"
@@ -295,7 +289,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
                 <AppImage
                   alt={`صورة ${index + 1}`}
                   className="object-cover"
-                  fallbackCategory={listing.categoryId}
                   fill
                   loading="lazy"
                   sizes="56px"
@@ -336,7 +329,6 @@ export function ListingGallery({ listing }: ListingGalleryProps) {
           <div className="relative aspect-[4/3] w-full max-w-5xl overflow-hidden rounded-[var(--radius-2xl)]">
             <GalleryMedia
               alt={displayTitle}
-              categoryId={listing.categoryId}
               className="object-contain"
               fill
               item={activeItem}

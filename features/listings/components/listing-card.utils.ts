@@ -1,4 +1,3 @@
-import { imagesForSlug } from "@/mock/listing-images.mock";
 import type { Listing } from "@/types";
 
 export const listingPriceFormatter = new Intl.NumberFormat("ar-AE", {
@@ -19,36 +18,22 @@ export function getListingLocation(listing: Listing): string {
   return listing.emirate ?? listing.city;
 }
 
-import { getCategoryFallbackUrl } from "@/shared/constants/image-fallbacks";
-
-/** Canonical gallery for mock listings — slug map wins over stale embedded URLs. */
+/**
+ * Real listing media only — never substitute Unsplash/stock as seller photos.
+ * Empty array means the UI should show a neutral "no image" state.
+ */
 export function getListingImages(listing: Listing): string[] {
-  if (listing.id.startsWith("local-")) {
-    if (listing.images?.length) {
-      return listing.images;
-    }
-    if (listing.imageUrl) {
-      return [listing.imageUrl];
-    }
-    return [];
+  const fromGallery = (listing.images ?? [])
+    .map((url) => url?.trim())
+    .filter((url): url is string => Boolean(url));
+  if (fromGallery.length > 0) {
+    return fromGallery;
   }
-
-  const curated = imagesForSlug(listing.slug);
-  if (curated.length > 0) {
-    return curated;
-  }
-
-  if (listing.images?.length) {
-    return listing.images;
-  }
-  if (listing.imageUrl) {
-    return [listing.imageUrl];
-  }
-
-  return [getCategoryFallbackUrl(listing.categoryId)];
+  const cover = listing.imageUrl?.trim();
+  return cover ? [cover] : [];
 }
 
-export function getListingImageUrl(listing: Listing): string {
+export function getListingImageUrl(listing: Listing): string | undefined {
   return getListingImages(listing)[0];
 }
 

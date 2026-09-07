@@ -19,14 +19,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "INVALID_INPUT" }, { status: 400 });
   }
 
-  if (parsed.data.password !== parsed.data.confirmPassword) {
+  const password = parsed.data.password.trim();
+  const confirmPassword = parsed.data.confirmPassword.trim();
+
+  if (password !== confirmPassword) {
     return NextResponse.json(
       { error: "PASSWORD_MISMATCH", message: "كلمتا المرور غير متطابقتين." },
       { status: 400 },
     );
   }
 
-  if (!isStrongPassword(parsed.data.password)) {
+  if (!isStrongPassword(password)) {
     return NextResponse.json(
       {
         error: "WEAK_PASSWORD",
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "USER_NOT_FOUND" }, { status: 404 });
   }
 
-  const passwordHash = hashPassword(parsed.data.password);
+  const passwordHash = hashPassword(password);
   const updated = await markGuestConverted(consumed.userId, passwordHash, true);
   if (!updated) {
     return NextResponse.json({ error: "UPDATE_FAILED" }, { status: 500 });

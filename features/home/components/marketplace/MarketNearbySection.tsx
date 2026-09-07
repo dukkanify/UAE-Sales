@@ -42,14 +42,19 @@ export function MarketNearbySection({ listings }: MarketNearbySectionProps) {
               href={href}
             >
               <div className="relative aspect-square overflow-hidden">
-                <AppImage
-                  alt={listingTitle(listing, locale)}
-                  className="object-cover transition duration-500 group-hover:scale-[1.03]"
-                  fallbackCategory={listing.categoryId}
-                  fill
-                  sizes="(max-width: 768px) 50vw, 16vw"
-                  src={imageUrl}
-                />
+                {imageUrl ? (
+                  <AppImage
+                    alt={listingTitle(listing, locale)}
+                    className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                    fill
+                    sizes="(max-width: 768px) 50vw, 16vw"
+                    src={imageUrl}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-surface-muted text-xs font-semibold text-muted">
+                    لا توجد صورة
+                  </div>
+                )}
                 <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pb-2 pt-8 text-center text-xs font-bold text-white">
                   {distance}
                 </span>

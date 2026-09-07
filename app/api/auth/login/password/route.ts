@@ -11,7 +11,7 @@ import {
 import { verifyPassword } from "@/services/auth/password.service";
 import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
-import { INVALID_CREDENTIALS_MESSAGE } from "@/services/auth/auth-messages";
+import { INVALID_CREDENTIALS_MESSAGE, PASSWORD_NOT_SET_MESSAGE, ACCOUNT_UNVERIFIED_MESSAGE, ACCOUNT_SUSPENDED_MESSAGE, AUTH_STORE_UNAVAILABLE_MESSAGE } from "@/services/auth/auth-messages";
 import { AuthStoreError } from "@/services/auth/user-persistence";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 
@@ -70,10 +70,21 @@ export async function POST(request: Request) {
         // Fall through to invalid-credentials if restore fails.
       }
     }
+
+    if (stored && !stored.passwordHash) {
+      return NextResponse.json(
+        {
+          error: "PASSWORD_NOT_SET",
+          message: PASSWORD_NOT_SET_MESSAGE,
+        },
+        { status: 403 },
+      );
+    }
+
     if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
       if (stored.accountStatus === "suspended") {
         return NextResponse.json(
-          { error: "ACCOUNT_SUSPENDED", message: "تم إيقاف هذا الحساب." },
+          { error: "ACCOUNT_SUSPENDED", message: ACCOUNT_SUSPENDED_MESSAGE },
           { status: 403 },
         );
       }
@@ -85,7 +96,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             error: "ACCOUNT_UNVERIFIED",
-            message: "أكمل التحقق من بريدك أولاً قبل تسجيل الدخول.",
+            message: ACCOUNT_UNVERIFIED_MESSAGE,
             redirectTo: `/verify-email?${params.toString()}`,
           },
           { status: 403 },
@@ -122,7 +133,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof AuthStoreError) {
       return NextResponse.json(
-        { error: "LOGIN_FAILED", message: "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا." },
+        { error: "LOGIN_FAILED", message: AUTH_STORE_UNAVAILABLE_MESSAGE },
         { status: 503 },
       );
     }

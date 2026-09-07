@@ -1,6 +1,5 @@
 import type { Listing } from "@/types";
-import { marketplaceListings } from "@/mock/listings.mock";
-import { imagesForSlug } from "@/mock/listing-images.mock";
+import { getListingImageUrl } from "@/features/listings/components/listing-card.utils";
 
 /** Preferred showcase slugs for the app-download phone mockup. */
 export const APP_PREVIEW_LISTING_SLUGS = [
@@ -12,15 +11,15 @@ export const APP_PREVIEW_LISTING_SLUGS = [
   "apartment-downtown-dubai",
 ] as const;
 
-export function getAppPreviewImageUrl(slug: string, fallback: string): string {
-  return imagesForSlug(slug)[0] ?? fallback;
+export function getAppPreviewImageUrl(listing: Listing): string | undefined {
+  return getListingImageUrl(listing);
 }
 
 function hasCover(listing: Listing): boolean {
-  return Boolean(listing.images?.[0] || listing.imageUrl);
+  return Boolean(getListingImageUrl(listing));
 }
 
-/** Ranked catalog cards for the phone screen — never depends on a single slug. */
+/** Ranked catalog cards for the phone screen — real covers only, no mock fallback. */
 export function resolveAppPreviewListings(listings: Listing[]): Listing[] {
   const seen = new Set<string>();
   const picked: Listing[] = [];
@@ -38,12 +37,6 @@ export function resolveAppPreviewListings(listings: Listing[]): Listing[] {
   for (const listing of listings) {
     if (picked.length >= 6) break;
     take(listing);
-  }
-  if (picked.length < 3) {
-    for (const listing of marketplaceListings) {
-      if (picked.length >= 6) break;
-      take(listing);
-    }
   }
   return picked;
 }

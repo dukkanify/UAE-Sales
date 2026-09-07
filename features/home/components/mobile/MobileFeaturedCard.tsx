@@ -40,16 +40,21 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
     <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
       <div className="mobile-home-featured-card__media">
         <Link aria-hidden className="absolute inset-0" href={href} tabIndex={-1}>
-          <AppImage
-            alt=""
-            className={`mobile-home-featured-card__image ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
-            fallbackCategory={listing.categoryId}
-            fill
-            loading={priority ? undefined : "lazy"}
-            priority={priority}
-            sizes="280px"
-            src={imageUrl}
-          />
+          {imageUrl ? (
+            <AppImage
+              alt=""
+              className={`mobile-home-featured-card__image ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
+              fill
+              loading={priority ? undefined : "lazy"}
+              priority={priority}
+              sizes="280px"
+              src={imageUrl}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-surface-muted text-xs font-semibold text-muted">
+              لا توجد صورة
+            </div>
+          )}
         </Link>
 
         <ListingCardBadges className="!start-2 !top-2" listing={listing} />
