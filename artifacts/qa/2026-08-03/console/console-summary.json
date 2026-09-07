@@ -1,0 +1,280 @@
+[
+  {
+    "route": "/",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=njFlXMF2jZxwbM6jG0BAa' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/categories",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=esMFuyqn7hRniUuJDQb5T' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=esMFuyqn7hRniUuJDQb5T' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/categories/cars",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5WO04r5VKmZjWJge6zGff' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5WO04r5VKmZjWJge6zGff' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/search",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=vEA0Pv3F3bemfeu4qC8zn' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=vEA0Pv3F3bemfeu4qC8zn' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/featured",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=s3JkYV5QOlayi1zpn1qqy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=s3JkYV5QOlayi1zpn1qqy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/listings/mercedes-amg-g63-2024",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=X26j7SxO93hA1eDL6iFDq' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=X26j7SxO93hA1eDL6iFDq' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/login",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=OJRCeXuvyQUfPDT30MIe9' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/register",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/escrow",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/wallet",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/support",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/disputes/new",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/listings/new",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/profile",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/dashboard/listings",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=rAuxRw4dBAReZchFQJxPZ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/chat",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/checkout",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=xeQXg_KzM8vuDSSWxbuNI' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/orders",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin",
+    "viewport": "desktop",
+    "consoleErrors": [],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=meCrQtBa8BEbWnC6a-5Sh' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/search",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/listings/mercedes-amg-g63-2024",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=5t5vieBIYIwXhS0d6SOTJ' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/login",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=9KdRSypv3NmWe1sLkzQB_' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=NWfc8BsyDa5yLYQk73ybH' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=NWfc8BsyDa5yLYQk73ybH' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/categories",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=RGbFCRwtqNqjegXa9aufI' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin",
+    "viewport": "mobile",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=zpYlboPzxUX9YSVrxvGQ2' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=SNliJe-R4sP57dVD5JfDd' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=SNliJe-R4sP57dVD5JfDd' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin/analytics",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=8wTC-9i-nijOztE1f7jrL' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=8wTC-9i-nijOztE1f7jrL' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin/listings",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=QwAJu-DUY3FFjniSVKtVS' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=QwAJu-DUY3FFjniSVKtVS' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin/users",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=KPWFGxkCRaN3hoYoH-tvy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE",
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=KPWFGxkCRaN3hoYoH-tvy' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin/orders",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=uD8AE8XXGrVCswCO1RYl2' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  },
+  {
+    "route": "/admin/settings",
+    "viewport": "desktop",
+    "consoleErrors": [
+      "WebSocket connection to 'ws://127.0.0.1:3000/_next/webpack-hmr?id=bSxShcL3RIPn77WdkqPNB' failed: Error during WebSocket handshake: net::ERR_INVALID_HTTP_RESPONSE"
+    ],
+    "pageErrors": [],
+    "failedRequests": []
+  }
+]
