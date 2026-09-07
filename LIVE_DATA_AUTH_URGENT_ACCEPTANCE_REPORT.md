@@ -4,7 +4,7 @@
 **Production URL:** https://sooqna.site  
 **Production SHA (at email E2E):** `238caf8` / tip docs `0986a2f`  
 **Deployment ID (pre-reset-fix):** `6312569152`  
-**Email/OTP fix branch:** `cursor/p0-email-otp-delivery-37ba` (`654bd0c`) — await password-reset Resend send
+**Email/OTP fix branch:** `cursor/p0-email-otp-delivery-37ba` — await password-reset + listing notify Resend sends
 
 ---
 
@@ -88,9 +88,10 @@ Safe failure copy when send fails: «تعذر إرسال رمز التحقق ح�
 
 ### NOTIFICATIONS / ADMIN
 
-| ID | Check | Result |
-|----|-------|--------|
-| M–U | Listing notify / history / admin visibility | **BLOCKED** until after L deploy + admin credentials for moderated listing flow |
+| ID | Check | Result | Notes |
+|----|-------|--------|-------|
+| S | New user visible in Admin | **PASS** (spot) | Fresh verified `*@uberip.com` users appear in `GET /api/admin/users` via `admin@sooqna.demo` |
+| M–R, T–U | Listing submit/approve/reject notify + history | **PENDING deploy** | Same `void`→freeze bug fixed on listing create + admin approve/reject; re-test after merge |
 
 ---
 
