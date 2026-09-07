@@ -69,6 +69,7 @@ export function LocalListingEdit({ listingId }: LocalListingEditProps) {
         onImageChange={handleImageChange}
         showContact={showContactInMedia}
         title={isDynamic ? "الصور" : "الصور والتواصل"}
+        videoUrl={listing.videoUrl}
       />
 
       {saveMessage ? (

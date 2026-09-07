@@ -115,7 +115,17 @@ export function OrderStatusContent({ token }: OrderStatusContentProps) {
               {order.deliveryAddressSnapshot.area}، {order.deliveryAddressSnapshot.city}،{" "}
               {order.deliveryAddressSnapshot.emirate}
             </p>
-            <p className="mt-1 text-sm text-muted">{order.deliveryAddressSnapshot.street}</p>
+            <p className="mt-1 text-sm text-muted">
+              {order.deliveryAddressSnapshot.formattedAddress ||
+                order.deliveryAddressSnapshot.street}
+            </p>
+            {typeof order.deliveryAddressSnapshot.latitude === "number" &&
+            typeof order.deliveryAddressSnapshot.longitude === "number" ? (
+              <p className="mt-1 text-xs text-muted" dir="ltr">
+                {order.deliveryAddressSnapshot.latitude.toFixed(5)},{" "}
+                {order.deliveryAddressSnapshot.longitude.toFixed(5)}
+              </p>
+            ) : null}
           </Card>
         ) : null}
 

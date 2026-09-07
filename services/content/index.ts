@@ -7,5 +7,4 @@ export {
   getMarketEscrowSteps,
   getMarketHeroBackground,
   getMarketQuickSearches,
-  getMarketTrustStats,
 } from "./homepage-marketplace.content";

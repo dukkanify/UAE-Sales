@@ -4,7 +4,10 @@ export type AddListingErrors = {
   category?: string;
   contact?: string;
   description?: string;
+  images?: string;
+  package?: string;
   price?: string;
+  submit?: string;
   title?: string;
 };
 

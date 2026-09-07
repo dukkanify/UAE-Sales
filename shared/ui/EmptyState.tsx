@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 import { Button } from "@/shared/ui/Button";
 import { Icon } from "@/shared/ui/Icon";
 
@@ -41,19 +42,19 @@ export function EmptyState({
       </span>
       {eyebrow ? (
         <p className="mt-6 text-xs font-bold tracking-wide text-[#B8955F] uppercase">
-          {eyebrow}
+          <Copy text={eyebrow} />
         </p>
       ) : null}
       <h2 className={`${eyebrow ? "mt-2" : "mt-6"} text-xl font-black text-ink sm:text-2xl`}>
-        {title}
+        <Copy text={title} />
       </h2>
       <p className="mx-auto mt-3 max-w-md text-sm font-medium leading-7 text-muted">
-        {description}
+        <Copy text={description} />
       </p>
       {children}
       {actionHref && actionLabel ? (
         <Button className="mt-7" href={actionHref} variant="primary">
-          {actionLabel}
+          <Copy text={actionLabel} />
         </Button>
       ) : null}
     </div>

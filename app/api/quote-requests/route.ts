@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { sendQuoteRequestEmails } from "@/services/email/email.service";
+import { findStoredEmail, listingPublicUrl } from "@/services/listings/listing-action-mail";
 import { createNotification } from "@/services/payments/notification-store";
 import {
   assertNotOwnListing,
@@ -88,22 +90,48 @@ export async function POST(request: Request) {
       ? "تم إرسال طلب حجز الخدمة"
       : "تم إرسال طلب عرض السعر";
 
+  const listingHref = listing
+    ? listing.id.startsWith("local-")
+      ? `/listings/local/${listing.id}`
+      : `/listings/${listing.slug}`
+    : payload.listingSlug
+      ? `/listings/${payload.listingSlug}`
+      : "/search";
+
   await Promise.all([
     createNotification({
       userId: payload.requesterId,
       type: "quote_request",
       title,
       body: `تم إرسال طلبك لـ «${payload.listingTitle}». سيتواصل مزود الخدمة معك قريباً.`,
+      href: listingHref,
     }),
     createNotification({
       userId: payload.providerId,
       type: "quote_request",
       title: "طلب خدمة جديد",
       body: `${payload.requesterName} طلب عرض سعر لـ «${payload.listingTitle}».`,
+      href: listingHref,
     }),
   ]);
 
-  return NextResponse.json({ quoteRequest });
+  const providerEmail = await findStoredEmail(payload.providerId);
+  const emailed = await sendQuoteRequestEmails({
+    buyer: { email: payload.requesterEmail, name: payload.requesterName },
+    seller: providerEmail
+      ? { email: providerEmail, name: payload.providerName }
+      : undefined,
+    listingTitle: payload.listingTitle,
+    listingUrl: listingPublicUrl({
+      listingId: payload.listingId,
+      listingSlug: payload.listingSlug,
+    }),
+    kind: payload.kind,
+    preferredDate: payload.preferredDate,
+    preferredTime: payload.preferredTime,
+  });
+
+  return NextResponse.json({ quoteRequest, emailed: emailed.buyerEmailed });
 }
 
 export async function GET(request: Request) {

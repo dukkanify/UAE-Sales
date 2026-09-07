@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { UserProfile } from "@/types";
@@ -14,14 +14,10 @@ import {
   getSessionUser,
 } from "@/services/storage";
 import { removeSessionCookie } from "@/services/auth/session-sync";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type DashboardShellProps = {
-  activePath:
-    | "/profile"
-    | "/orders"
-    | "/dashboard/listings"
-    | "/dashboard/business-onboarding"
-    | "/chat";
+  activePath?: string;
   children: ReactNode;
   description: string;
   title: string;
@@ -34,8 +30,27 @@ const dashboardLinks = [
   { href: "/dashboard/listings", icon: "grid" as const, label: "إعلاناتي" },
   { href: "/listings/new", icon: "plus" as const, label: "إضافة إعلان" },
   { href: "/wallet", icon: "wallet" as const, label: "المحفظة" },
+  { href: "/escrow", icon: "shield" as const, label: "الضمان" },
   { href: "/chat", icon: "message" as const, label: "الرسائل" },
 ] as const;
+
+function isDashboardLinkActive(pathname: string, href: string) {
+  if (href === "/profile") return pathname === "/profile";
+  if (href === "/listings/new") return pathname.startsWith("/listings/new");
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function accountInitials(fullName: string) {
+  const parts = fullName
+    .trim()
+    .split(/\s+/)
+    .filter((part) => part && !/^sooqna$/i.test(part) && part !== "سوقنا");
+  if (parts.length === 0) return "ح";
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("");
+}
 
 export function DashboardShell({
   activePath,
@@ -44,9 +59,12 @@ export function DashboardShell({
   title,
   user,
 }: DashboardShellProps) {
+  const pathname = usePathname();
   const [isAllowed, setIsAllowed] = useState(false);
   const [displayUser, setDisplayUser] = useState(user);
   const router = useRouter();
+  const loginNext = activePath || pathname || "/profile";
+  const onWalletPage = pathname === "/wallet" || pathname.startsWith("/wallet/");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -56,29 +74,32 @@ export function DashboardShell({
         setIsAllowed(true);
         return;
       }
-      router.replace(`/login?next=${activePath}`);
+      router.replace(`/login?next=${loginNext}`);
     }, 0);
     return () => window.clearTimeout(timeoutId);
-  }, [activePath, router, user]);
+  }, [loginNext, router, user]);
 
   if (!isAllowed) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <Card className="p-8 text-center" variant="flat">
           <p className="text-sm font-medium text-muted">جاري التحقق من الجلسة...</p>
         </Card>
       </section>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <div className="mb-5 flex gap-2 overflow-x-auto pb-1 lg:hidden">
         {dashboardLinks.map((link) => (
           <Link
             key={link.href}
             className={`inline-flex shrink-0 items-center gap-2 rounded-[var(--radius-xl)] px-3.5 py-2 text-sm font-medium transition ${
-              link.href === activePath
+              isDashboardLinkActive(pathname, link.href)
                 ? "bg-primary text-white"
                 : "border border-border bg-surface text-muted"
             }`}
@@ -95,7 +116,7 @@ export function DashboardShell({
           <Card className="p-5" variant="flat">
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-[var(--radius-xl)] bg-primary text-xs font-semibold text-white">
-                {displayUser.fullName.slice(0, 2)}
+                {accountInitials(displayUser.fullName)}
               </span>
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-ink">
@@ -111,7 +132,7 @@ export function DashboardShell({
                 <Link
                   key={link.href}
                   className={`flex items-center gap-2.5 rounded-[var(--radius-xl)] px-3 py-2.5 text-sm font-medium transition ${
-                    link.href === activePath
+                    isDashboardLinkActive(pathname, link.href)
                       ? "bg-primary text-white"
                       : "text-muted hover:bg-surface-muted hover:text-ink"
                   }`}
@@ -122,7 +143,7 @@ export function DashboardShell({
                 </Link>
               ))}
               <button
-                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-right text-sm font-medium text-muted transition hover:bg-surface-muted"
+                className="mt-2 rounded-[var(--radius-xl)] px-3 py-2.5 text-start text-sm font-medium text-muted transition hover:bg-surface-muted"
                 onClick={() => {
                   clearSessionUser();
                   void removeSessionCookie();
@@ -135,7 +156,7 @@ export function DashboardShell({
             </nav>
           </Card>
 
-          <WalletBalanceCard />
+          {onWalletPage ? null : <WalletBalanceCard />}
         </aside>
 
         <div>
@@ -144,5 +165,6 @@ export function DashboardShell({
         </div>
       </div>
     </section>
+    </LocalizedTree>
   );
 }

@@ -26,8 +26,8 @@ export function MobileCategoryRail({
         title={title}
       />
       <DragScrollRow className="mobile-home-featured__track mobile-home-scroll flex w-full max-w-full flex-nowrap overflow-x-auto overscroll-x-contain">
-        {items.map((listing, index) => (
-          <MobileFeaturedCard key={listing.id} listing={listing} priority={index < 2} />
+        {items.map((listing) => (
+          <MobileFeaturedCard key={listing.id} listing={listing} />
         ))}
       </DragScrollRow>
     </section>

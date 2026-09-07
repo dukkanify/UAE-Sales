@@ -3,8 +3,11 @@ import { BRAND } from "@/shared/constants/brand";
 import { notFound } from "next/navigation";
 import { cities, countries } from "@/shared/constants/locations";
 import { CategoryHero } from "@/features/categories/components/CategoryHero";
+import { MobileBottomNav } from "@/features/home/components/mobile/MobileBottomNav";
+import { RecordRecentSearch } from "@/features/search/components/RecordRecentSearch";
 import { SearchFilters } from "@/features/search/components/SearchFilters";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList";
+import { buildSearchSuggestions } from "@/features/search/components/search-suggestions";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { ChipLink } from "@/shared/ui/ChipLink";
@@ -14,7 +17,11 @@ import {
   getCategories,
   getCategoryBySlug,
 } from "@/services/categories";
+import { getSearchSuggestionTitles } from "@/services/listings/home-feed";
 import { searchListings } from "@/services/listings";
+import { resultsCountLabel } from "@/shared/i18n/count-labels";
+import { getRequestLocale } from "@/shared/i18n/locale";
+import { tx } from "@/shared/i18n/tx";
 
 const ESCROW_CHECKOUT_CATEGORIES = new Set([
   "mobiles",
@@ -57,10 +64,29 @@ export async function generateMetadata({
 }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return { title: `القسم غير موجود | Sooqna` };
+  const locale = await getRequestLocale();
+  if (!category) {
+    return { title: tx(locale, "القسم غير موجود") };
+  }
+  const name = tx(locale, category.name);
+  const description =
+    locale === "en"
+      ? `Browse ${name} listings on Sooqna.`
+      : `تصفح إعلانات ${category.name} في ${BRAND.nameAr}.`;
   return {
-    title: `${category.name} | Sooqna`,
-    description: `تصفح إعلانات ${category.name} في ${BRAND.nameAr}.`,
+    title: name,
+    description,
+    openGraph: {
+      description,
+      locale: locale === "en" ? "en_AE" : "ar_AE",
+      title: name,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      description,
+      title: name,
+    },
   };
 }
 
@@ -73,6 +99,7 @@ export default async function CategoryPage({
   if (!category) notFound();
 
   const selectedFilters = {
+    category: category.id,
     city: getParam(queryParams, "city") ?? "",
     condition: getParam(queryParams, "condition") ?? "",
     country: getParam(queryParams, "country") ?? "",
@@ -82,7 +109,7 @@ export default async function CategoryPage({
     sort: getParam(queryParams, "sort") ?? "newest",
   };
 
-  const [categories, listings] = await Promise.all([
+  const [categories, listings, suggestionTitles, locale] = await Promise.all([
     getCategories(),
     searchListings({
       categoryId: category.id,
@@ -103,13 +130,24 @@ export default async function CategoryPage({
           ? selectedFilters.sort
           : "newest",
     }),
+    getSearchSuggestionTitles(),
+    getRequestLocale(),
   ]);
+
+  const suggestions = buildSearchSuggestions({
+    categories,
+    cities,
+    listings: suggestionTitles,
+    locale,
+    selectedFilters,
+  });
 
   return (
     <>
       <SiteHeader />
+      <RecordRecentSearch query={selectedFilters.query} />
       <main>
-        <section className="app-container page-padding">
+        <section className="app-container page-padding pb-28 lg:pb-8">
           <Breadcrumbs
             items={[
               { href: "/", label: "الرئيسية" },
@@ -140,13 +178,14 @@ export default async function CategoryPage({
                 layout="sidebar"
                 selectedFilters={selectedFilters}
                 showCategory={false}
+                suggestions={suggestions}
               />
             </aside>
 
             <div>
               <div className="mt-0 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm font-semibold text-ink">
-                  {listings.length.toLocaleString("ar-AE")} نتيجة
+                  {resultsCountLabel(listings.length, locale)}
                 </p>
                 {ESCROW_CHECKOUT_CATEGORIES.has(category.id) ? (
                   <Badge variant="escrow">ضمان مالي على الإعلانات المؤهلة</Badge>
@@ -166,6 +205,7 @@ export default async function CategoryPage({
         </section>
       </main>
       <SiteFooter />
+      <MobileBottomNav />
     </>
   );
 }

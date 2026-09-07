@@ -1,5 +1,7 @@
 "use client";
 
+import { useTx } from "@/shared/i18n/useTx";
+
 type Tab = {
   count?: number;
   id: string;
@@ -13,6 +15,7 @@ type TabsProps = {
 };
 
 export function Tabs({ activeId, onChange, tabs }: TabsProps) {
+  const t = useTx();
   return (
     <div className="flex flex-wrap gap-2" role="tablist">
       {tabs.map((tab) => {
@@ -31,7 +34,7 @@ export function Tabs({ activeId, onChange, tabs }: TabsProps) {
             role="tab"
             type="button"
           >
-            {tab.label}
+            {t(tab.label)}
             {typeof tab.count === "number" ? (
               <span
                 className={`rounded-[var(--radius-sm)] px-1.5 py-0.5 text-xs font-medium ${

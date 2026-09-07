@@ -1,25 +1,44 @@
 import { Suspense } from "react";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { VerifyEmailContent } from "@/features/auth/components/VerifyEmailContent";
+import { readOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
-export default function VerifyEmailPage() {
+type VerifyEmailPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function getParam(
+  params: Record<string, string | string[] | undefined>,
+  key: string,
+) {
+  const value = params[key];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function VerifyEmailPage({
+  searchParams,
+}: VerifyEmailPageProps) {
+  const params = await searchParams;
+  const email = getParam(params, "email") ?? "";
+  const initialOtp = email ? await readOtpDisplayCookie(email) : null;
+
   return (
     <>
       <SiteHeader />
       <main className="auth-page">
         <AuthShell
-          description="أدخل رمز التحقق المرسل إلى بريدك الإلكتروني لإكمال العملية."
+          description="أدخل رمز التحقق المرسل إلى بريدك. بعد التحقق من الشخص يُعتمد حسابك بسهولة."
           footerAction={{
             href: "/login",
             label: "تسجيل الدخول",
             prompt: "لديك حساب؟",
           }}
-          title="التحقق من البريد الإلكتروني"
+          title="تحقق من الشخص"
         >
           <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
-            <VerifyEmailContent />
+            <VerifyEmailContent initialOtp={initialOtp} />
           </Suspense>
         </AuthShell>
       </main>

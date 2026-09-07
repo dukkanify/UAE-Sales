@@ -6,7 +6,8 @@ import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 import { getMarketEscrowSteps } from "@/services/content/homepage-marketplace.content";
 import { getEscrowSummary, getEscrowTransactions } from "@/services/escrowService";
-import { getCurrentUser } from "@/services/profile";
+import { requireCurrentUser } from "@/services/profile";
+import { getRequestLocale, intlLocale } from "@/shared/i18n/locale";
 
 const statusLabels = {
   held: "محجوز",
@@ -15,10 +16,12 @@ const statusLabels = {
 } as const;
 
 export default async function EscrowPage() {
-  const [user, transactions, summary, steps] = await Promise.all([
-    getCurrentUser(),
-    getEscrowTransactions(),
-    getEscrowSummary(),
+  const user = await requireCurrentUser("/escrow");
+  const locale = await getRequestLocale();
+  const dateLocale = intlLocale(locale);
+  const [transactions, summary, steps] = await Promise.all([
+    getEscrowTransactions(user.id),
+    getEscrowSummary(user.id),
     getMarketEscrowSteps(),
   ]);
 
@@ -27,7 +30,7 @@ export default async function EscrowPage() {
       <SiteHeader />
       <main>
         <DashboardShell
-          activePath="/profile"
+          activePath="/escrow"
           description="متابعة المبالغ المحجوزة والمعاملات المحمية بين المشتري والبائع."
           title="الضمان المالي"
           user={user}
@@ -50,28 +53,34 @@ export default async function EscrowPage() {
 
             <Card className="p-6" variant="flat">
               <h2 className="text-sm font-semibold text-ink">معاملاتك</h2>
-              <ul className="mt-4 grid gap-3">
-                {transactions.map((txn) => (
-                  <li
-                    key={txn.id}
-                    className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border px-4 py-3"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-ink">
-                        {txn.listingTitle}
-                      </p>
-                      <p className="mt-0.5 text-xs text-muted">
-                        مع {txn.buyer} ·{" "}
-                        {new Date(txn.createdAt).toLocaleDateString("ar-AE")}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CurrencyAmount amount={txn.amount} size="sm" />
-                      <Badge variant="escrow">{statusLabels[txn.status]}</Badge>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+              {transactions.length === 0 ? (
+                <p className="mt-4 text-sm leading-7 text-muted">
+                  لا توجد معاملات ضمان بعد. عند إتمام شراء عبر الضمان ستظهر هنا.
+                </p>
+              ) : (
+                <ul className="mt-4 grid gap-3">
+                  {transactions.map((txn) => (
+                    <li
+                      key={txn.id}
+                      className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-xl)] border border-border px-4 py-3"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-ink" data-ugc>
+                          {txn.listingTitle}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted">
+                          مع {txn.buyer} ·{" "}
+                          {new Date(txn.createdAt).toLocaleDateString(dateLocale)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <CurrencyAmount amount={txn.amount} size="sm" />
+                        <Badge variant="escrow">{statusLabels[txn.status]}</Badge>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </Card>
 
             <Card className="p-6" variant="flat">

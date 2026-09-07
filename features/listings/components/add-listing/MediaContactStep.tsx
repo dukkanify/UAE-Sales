@@ -1,4 +1,7 @@
+"use client";
+
 import { AppImage } from "@/shared/components/AppImage";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -10,24 +13,38 @@ import {
   addListingStepTitleClass,
 } from "./utils";
 
+const MAX_IMAGES = 12;
+
 type MediaContactStepProps = {
+  defaultContact?: string;
   errors: AddListingErrors;
+  featuredCheckoutAvailable?: boolean | null;
   imagePreviews: string[];
+  imagesRequired?: boolean;
   onImageChange: (
     fileList: FileList | null,
     mode?: "append" | "replace",
   ) => void;
+  onPackageChange?: (value: string) => void;
+  onSetCover?: (index: number) => void;
+  selectedPackage?: string;
 };
 
 export function MediaContactStep({
+  defaultContact = "",
   errors,
+  featuredCheckoutAvailable = null,
   imagePreviews,
+  imagesRequired = true,
   onImageChange,
+  onPackageChange,
+  onSetCover,
+  selectedPackage = "free",
 }: MediaContactStepProps) {
   const hasImages = imagePreviews.length > 0;
 
   return (
-    <Card className={addListingStepCardClass}>
+    <Card className={addListingStepCardClass} id="add-listing-media">
       <h2 className={addListingStepTitleClass}>3. الصور والتواصل</h2>
       <div className={`${addListingStepBodyClass} md:grid-cols-2`}>
         <div className="grid gap-3">
@@ -54,11 +71,21 @@ export function MediaContactStep({
                       <span className="absolute start-2 top-2 rounded-[var(--radius-md)] bg-primary px-2 py-0.5 text-[10px] font-bold text-white">
                         الغلاف
                       </span>
+                    ) : onSetCover ? (
+                      <Button
+                        className="absolute bottom-2 start-2 !min-h-0 px-2 py-1 text-[10px]"
+                        onClick={() => onSetCover(index)}
+                        size="sm"
+                        type="button"
+                        variant="secondary"
+                      >
+                        تعيين كغلاف
+                      </Button>
                     ) : null}
                   </div>
                 ))}
 
-                {imagePreviews.length < 6 ? (
+                {imagePreviews.length < MAX_IMAGES ? (
                   <label className="grid aspect-[4/3] cursor-pointer place-items-center rounded-[var(--radius-xl)] border border-dashed border-secondary bg-surface p-3 text-center text-xs font-semibold text-primary transition hover:bg-secondary/10">
                     <input
                       accept="image/*"
@@ -86,28 +113,36 @@ export function MediaContactStep({
                     onImageChange(event.target.files, "replace");
                     event.target.value = "";
                   }}
+                  required={imagesRequired}
                   type="file"
                 />
                 <span>
-                  رفع صور الإعلان
+                  {imagesRequired ? "رفع صور الإعلان *" : "رفع صور الإعلان (اختياري)"}
                   <span className="mt-2 block text-xs font-medium text-muted">
-                    اختر حتى 6 صور — ستظهر هنا مباشرة
+                    {imagesRequired
+                      ? `صورة واحدة على الأقل مطلوبة — حتى ${MAX_IMAGES} صور`
+                      : `يمكنك إضافة حتى ${MAX_IMAGES} صورة`}
                   </span>
                 </span>
               </label>
             )}
           </div>
 
+          {errors.images ? (
+            <FormMessage variant="error">{errors.images}</FormMessage>
+          ) : null}
+
           {hasImages ? (
             <p className="text-xs font-medium text-muted">
-              تم اختيار {imagePreviews.length} صورة — الصورة الأولى تظهر كغلاف في
-              المعاينة
+              تم اختيار {imagePreviews.length} صورة
+              {imagesRequired ? " — الصورة الأولى تظهر كغلاف" : ""}
             </p>
           ) : null}
         </div>
         <div className="grid gap-4">
           <div>
             <Input
+              defaultValue={defaultContact}
               label="رقم التواصل"
               name="contact"
               placeholder="05xxxxxxxx"
@@ -116,16 +151,46 @@ export function MediaContactStep({
             {errors.contact ? (
               <FormMessage variant="error">{errors.contact}</FormMessage>
             ) : null}
+            {defaultContact ? (
+              <p className="mt-1 text-xs text-muted">
+                تم تعبئة الرقم من ملفك الشخصي — يمكنك تعديله لهذا الإعلان.
+              </p>
+            ) : null}
           </div>
+          <Input
+            label="رابط فيديو (اختياري)"
+            name="videoUrl"
+            placeholder="https://..."
+            type="url"
+          />
           <Select
             label="باقة الإعلان"
             name="package"
+            onChange={(event) => onPackageChange?.(event.target.value)}
             options={[
               { label: "مجانية", value: "free" },
-              { label: "مميز لمدة 7 أيام", value: "featured_7" },
-              { label: "مميز لمدة 30 يوم", value: "featured_30" },
+              {
+                label: "مميز (يتطلب دفعاً)",
+                value: "featured_pending",
+              },
             ]}
+            value={selectedPackage}
           />
+          {selectedPackage === "featured_pending" ? (
+            <>
+              <p className="text-xs text-muted">
+                لن يُنشر الإعلان ولن يُفعَّل التمييز إلا بعد إتمام الدفع بنجاح.
+              </p>
+              {featuredCheckoutAvailable === false ? (
+                <FormMessage variant="error">
+                  بوابة الدفع غير مفعّلة على الموقع حالياً. اختر الباقة المجانية أو حاول لاحقاً.
+                </FormMessage>
+              ) : null}
+            </>
+          ) : null}
+          {errors.package ? (
+            <FormMessage variant="error">{errors.package}</FormMessage>
+          ) : null}
         </div>
       </div>
     </Card>

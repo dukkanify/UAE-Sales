@@ -13,6 +13,7 @@ export type ViewingBooking = {
   notes?: string;
   sellerId: string;
   sellerName: string;
-  status: "confirmed" | "cancelled";
+  status: "pending" | "confirmed" | "cancelled" | "completed";
   createdAt: string;
+  updatedAt?: string;
 };

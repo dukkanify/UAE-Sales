@@ -1,39 +1,28 @@
 import {
-  MarketAppDownload,
   MarketCategoryGrid,
   MarketCategorySection,
-  MarketEmirates,
-  MarketEscrow,
   MarketFeatured,
   MarketHeader,
   MarketHero,
   MarketNearbySection,
   MarketPreviewStrip,
   MarketPromoBanner,
-  MobileAppDownload,
-  MobileCategoryGrid,
-  MobileCategoryRail,
-  MobileEmiratesSection,
-  MobileFeaturedRail,
-  MobileHeroBlock,
-  MobileHomeHeader,
-  MobileHomeShell,
-  MobileNearbyRail,
-  MobilePreviewStrip,
-  MobilePromoBanner,
 } from "@/features/home";
+import { DeferredHomeBelowFold } from "@/features/home/components/marketplace/DeferredHomeBelowFold";
 import { resolveAppPreviewListings } from "@/features/home/components/mobile/mobile-app-preview.config";
-import { mockHomeCategorySections } from "@/mock";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { getCategories } from "@/services/categories";
-import { getFeaturedListings, getListings } from "@/services/listings";
+import { getHomeFeed } from "@/services/listings/home-feed";
+import { headers } from "next/headers";
+import { userAgent } from "next/server";
 
 export default async function Home() {
-  const [categories, featuredListings, allListings] = await Promise.all([
-    getCategories(),
-    getFeaturedListings(),
-    getListings(),
-  ]);
+  const ua = userAgent({ headers: await headers() });
+  const preferMobile =
+    ua.device.type === "mobile" || ua.device.type === "tablet";
+
+  const [categories, feed] = await Promise.all([getCategories(), getHomeFeed()]);
 
   const categoryMeta = categories.map((category) => ({
     id: category.id,
@@ -43,69 +32,70 @@ export default async function Home() {
   const categoryById = (id: string) =>
     categories.find((c) => c.id === id)?.slug ?? id;
 
-  const sectionListings = mockHomeCategorySections.map((section) => ({
-    ...section,
-    items: allListings
-      .filter((listing) => listing.categoryId === section.categoryId)
-      .slice(0, 4),
+  const sectionListings = feed.sections.map((section) => ({
+    categoryId: section.categoryId,
+    categorySlug: categoryById(section.categoryId),
+    description: section.description,
+    eyebrow: section.eyebrow,
+    listings: section.items,
+    title: section.title,
+    variant: section.variant,
   }));
 
-  const appPreviewListings = resolveAppPreviewListings(allListings);
+  const appPreviewListings = resolveAppPreviewListings([
+    ...feed.featured,
+    ...feed.nearbySource,
+    ...feed.sections.flatMap((section) => section.items),
+  ]);
+
+  if (preferMobile) {
+    const { MobileHomePage } = await import(
+      "@/features/home/components/mobile/MobileHomePage"
+    );
+    return (
+      <MobileHomePage
+        appPreviewListings={appPreviewListings}
+        categories={categories}
+        categoryById={categoryById}
+        featuredListings={feed.featured}
+        nearbyListings={feed.nearbySource}
+        sectionListings={feed.sections}
+      />
+    );
+  }
+
+  const aboveFoldSections = sectionListings.slice(0, 2);
+  const belowFoldSections = sectionListings.slice(2);
 
   return (
     <>
-      <div className="lg:hidden">
-        <MobileHomeShell>
-          <MobileHomeHeader />
-          <main className="mobile-home-main">
-            <MobileHeroBlock categories={categories} />
-            <MobileCategoryGrid categories={categories} />
-            <MobilePromoBanner />
-            <MobilePreviewStrip listings={featuredListings} />
-            <MobileFeaturedRail listings={featuredListings} />
-            <MobileNearbyRail listings={allListings} />
-            <MobileEmiratesSection />
-            {sectionListings.map((section) => (
-              <MobileCategoryRail
-                key={section.categoryId}
-                categorySlug={categoryById(section.categoryId)}
-                listings={section.items}
-                title={section.title}
-              />
-            ))}
-            <MarketEscrow />
-            <MobileAppDownload />
-          </main>
-        </MobileHomeShell>
-      </div>
-
-      <div className="hidden lg:contents">
-        <MarketHeader />
+      <MarketHeader />
+      <LocalizedTree>
         <main>
           <MarketHero categories={categories} />
           <MarketCategoryGrid categories={categories} />
           <MarketPromoBanner />
-          <MarketPreviewStrip />
-          <MarketFeatured categories={categoryMeta} listings={featuredListings} />
-          <MarketNearbySection listings={allListings} />
-          <MarketEmirates />
-          {sectionListings.map((section) => (
+          <MarketPreviewStrip categories={categoryMeta} listings={feed.preview} />
+          <MarketFeatured categories={categoryMeta} listings={feed.featured} />
+          <MarketNearbySection listings={feed.nearbySource} />
+          {aboveFoldSections.map((section) => (
             <MarketCategorySection
               key={section.categoryId}
               categoryId={section.categoryId}
-              categorySlug={categoryById(section.categoryId)}
+              categorySlug={section.categorySlug}
               description={section.description}
               eyebrow={section.eyebrow}
-              listings={section.items}
+              listings={section.listings}
               title={section.title}
               variant={section.variant}
             />
           ))}
-          <MarketEscrow />
-          <MarketAppDownload previewListings={appPreviewListings} />
+          <DeferredHomeBelowFold
+            appPreviewListings={appPreviewListings}
+            sections={belowFoldSections}
+          />
         </main>
-      </div>
-
+      </LocalizedTree>
       <SiteFooter />
     </>
   );

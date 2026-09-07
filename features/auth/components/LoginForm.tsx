@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 import { useCallback, useState } from "react";
-import { DemoAccountsPanel } from "@/features/auth/components/DemoAccountsPanel";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { Input } from "@/shared/ui/Input";
@@ -16,6 +15,11 @@ import { syncFavoritesAfterLogin } from "@/services/favorites/favorites-client";
 import { setSessionUser } from "@/services/storage";
 import { getSafeNextPath } from "@/shared/utils/safe-next";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
+
+const ADMIN_DEMO_EMAIL = "admin@sooqna.demo";
+const ADMIN_DEMO_PASSWORD = "Admin@123";
 
 type LoginErrors = {
   email?: string;
@@ -26,24 +30,37 @@ function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function getLoginErrorMessage(data: { message?: string; error?: string }, email: string) {
+function getLoginErrorMessage(data: { message?: string; error?: string }) {
   if (data.error === "INVALID_CREDENTIALS") {
-    if (email.includes("sooqna.demo") || email.includes("uaesales.demo")) {
-      return "بيانات الدخول غير صحيحة. تأكد من البريد وكلمة المرور كما هي: Admin@123 (حرف A كبير).";
-    }
-    return data.message ?? "بيانات الدخول غير صحيحة.";
+    return (
+      data.message ??
+      "بيانات الدخول غير صحيحة. إذا غيّرت كلمة المرور مؤخرًا، استخدم «نسيت كلمة المرور» ثم سجّل الدخول بالكلمة الجديدة."
+    );
   }
 
   return data.message ?? "بيانات الدخول غير صحيحة.";
 }
 
-export function LoginForm() {
+type LoginFormProps = {
+  /** Admin gate: only the credentials form, no demo account grid. */
+  variant?: "default" | "admin";
+};
+
+export function LoginForm({ variant = "default" }: LoginFormProps) {
   const [errors, setErrors] = useState<LoginErrors>({});
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(() =>
+    variant === "admin" ? ADMIN_DEMO_EMAIL : "",
+  );
+  const [password, setPassword] = useState(() =>
+    variant === "admin" ? ADMIN_DEMO_PASSWORD : "",
+  );
   const emailOtpEnabled = isEmailOtpEnabled();
-  const [usePassword, setUsePassword] = useState(!emailOtpEnabled);
+  const [usePassword, setUsePassword] = useState(!emailOtpEnabled || variant === "admin");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next");
+  const isAdminNext = variant === "admin" || Boolean(nextPath?.startsWith("/admin"));
+  const adminDemo = findDemoAccountByIdentifier(ADMIN_DEMO_EMAIL);
 
   const completePasswordLogin = useCallback(
     async (nextEmail: string, nextPassword: string) => {
@@ -63,24 +80,21 @@ export function LoginForm() {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(getLoginErrorMessage(data, normalizedEmail));
+        if (data.error === "ACCOUNT_UNVERIFIED" && typeof data.redirectTo === "string") {
+          router.push(getSafeNextPath(data.redirectTo, "/verify-email"));
+          return;
+        }
+        throw new Error(getLoginErrorMessage(data));
       }
 
       setSessionUser(data.user as UserProfile);
-      await persistSessionCookie(data.user);
+      await persistSessionCookie();
       await syncFavoritesAfterLogin(data.user.id);
       trackAuthEventClient("login_verified");
       router.push(getSafeNextPath(data.redirectTo ?? nextParam, "/profile"));
     },
     [router],
   );
-
-  function fillDemoAccount(nextEmail: string, nextPassword: string) {
-    setEmail(nextEmail);
-    setPassword(nextPassword);
-    setUsePassword(true);
-    setErrors({});
-  }
 
   const { error: submitError, isLoading, run: handleSubmit } = useAsyncAction(
     useCallback(
@@ -131,34 +145,60 @@ export function LoginForm() {
     ),
   );
 
-  const {
-    error: demoLoginError,
-    isLoading: isDemoLoginLoading,
-    run: loginDemoAccount,
-  } = useAsyncAction(
-    useCallback(
-      async (nextEmail: string, nextPassword: string) => {
-        fillDemoAccount(nextEmail, nextPassword);
-        await completePasswordLogin(nextEmail, nextPassword);
-      },
-      [completePasswordLogin],
-    ),
-  );
-
-  const isBusy = isLoading || isDemoLoginLoading;
-  const authError = submitError ?? demoLoginError;
+  const isBusy = isLoading;
+  const authError = submitError;
 
   return (
-    <>
-      <form className="auth-form" noValidate onSubmit={handleSubmit}>
+    <LocalizedTree>
+    <form
+      className="auth-form"
+      method="post"
+      noValidate
+      onSubmit={(event) => {
+        // Prevent native submit (default method was GET → credentials in URL).
+        event.preventDefault();
+        void handleSubmit(event);
+      }}
+    >
         <div className="auth-form__header">
-          <p className="auth-form__eyebrow">تسجيل الدخول</p>
-          <h2 className="auth-form__title">ادخل إلى حسابك</h2>
-          <p className="auth-form__subtitle">
-            {emailOtpEnabled
-              ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
-              : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
+          <p className="auth-form__eyebrow">
+            {isAdminNext ? "دخول آمن" : "تسجيل الدخول"}
           </p>
+          <h2 className="auth-form__title">
+            {isAdminNext ? "بيانات المدير" : "ادخل إلى حسابك"}
+          </h2>
+          <p className="auth-form__subtitle">
+            {isAdminNext
+              ? "أدخل بريد المدير وكلمة المرور للمتابعة."
+              : emailOtpEnabled
+                ? "أدخل بريدك الإلكتروني وسنرسل لك رمز دخول آمن"
+                : "أدخل بريدك الإلكتروني وكلمة المرور للمتابعة"}
+          </p>
+          {variant === "admin" ? (
+            <div className="mt-3 rounded-[var(--radius-lg)] border border-border bg-surface-muted/60 px-3 py-2 text-xs text-muted">
+              <p>
+                حساب المدير التجريبي:{" "}
+                <span className="font-semibold text-ink" dir="ltr">
+                  {ADMIN_DEMO_EMAIL}
+                </span>{" "}
+                /{" "}
+                <span className="font-semibold text-ink" dir="ltr">
+                  {ADMIN_DEMO_PASSWORD}
+                </span>
+              </p>
+              <button
+                className="mt-2 font-semibold text-primary"
+                onClick={() => {
+                  setEmail(ADMIN_DEMO_EMAIL);
+                  setPassword(adminDemo?.password ?? ADMIN_DEMO_PASSWORD);
+                  setErrors({});
+                }}
+                type="button"
+              >
+                تعبئة بيانات المدير
+              </button>
+            </div>
+          ) : null}
         </div>
 
         <Input
@@ -167,7 +207,7 @@ export function LoginForm() {
           label="البريد الإلكتروني"
           name="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder="admin@sooqna.demo"
+          placeholder={variant === "admin" ? ADMIN_DEMO_EMAIL : "name@email.com"}
           required
           type="email"
           value={email}
@@ -180,7 +220,7 @@ export function LoginForm() {
             label="كلمة المرور"
             name="password"
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Admin@123"
+            placeholder={variant === "admin" ? ADMIN_DEMO_PASSWORD : "••••••••"}
             required
             type="password"
             value={password}
@@ -190,7 +230,9 @@ export function LoginForm() {
         {authError ? <FormMessage variant="error">{authError}</FormMessage> : null}
 
         <div className="auth-form__links">
-          {emailOtpEnabled ? (
+          {variant === "admin" ? (
+            <p className="text-muted">وصول محمي لغرفة عمليات سوقنا فقط.</p>
+          ) : emailOtpEnabled ? (
             <button
               className="text-primary"
               onClick={() => setUsePassword((value) => !value)}
@@ -207,7 +249,7 @@ export function LoginForm() {
               أو أكمل الشراء كضيف.
             </p>
           )}
-          {emailOtpEnabled ? (
+          {variant !== "admin" ? (
             <Link className="text-primary" href="/forgot-password">
               نسيت كلمة المرور؟
             </Link>
@@ -215,15 +257,13 @@ export function LoginForm() {
         </div>
 
         <Button fullWidth loading={isBusy} type="submit" variant="accent">
-          {usePassword || !emailOtpEnabled ? "تسجيل الدخول" : "إرسال رمز الدخول"}
+          {usePassword || !emailOtpEnabled || variant === "admin"
+            ? isAdminNext
+              ? "دخول غرفة التحكم"
+              : "تسجيل الدخول"
+            : "إرسال رمز الدخول"}
         </Button>
       </form>
-
-      <DemoAccountsPanel
-        isLoading={isBusy}
-        onFillAccount={fillDemoAccount}
-        onLoginAccount={loginDemoAccount}
-      />
-    </>
+    </LocalizedTree>
   );
 }

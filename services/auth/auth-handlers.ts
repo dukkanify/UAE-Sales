@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
-import { createHash, randomBytes } from "node:crypto";
 import {
   GENERIC_OTP_SENT_MESSAGE,
   OTP_SEND_FAILED_MESSAGE,
   OTP_VERIFY_MESSAGES,
   RESEND_COOLDOWN_MESSAGE,
 } from "@/services/auth/auth-messages";
+import { attachOtpDisplayCookie } from "@/services/auth/otp-display-cookie";
 import { checkRateLimit, getClientIp } from "@/services/auth/rate-limit";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 import { createOtpRequest, invalidateOtpRecord, maskEmail, verifyOtpCode } from "@/services/otp/otp.service";
+import { logProductionConfigIssues } from "@/services/auth/production-config";
 import type { OtpPurpose } from "@/types/domain/otp";
 
 export async function enforceRateLimit(request: Request, email: string): Promise<boolean> {
@@ -17,13 +19,29 @@ export async function enforceRateLimit(request: Request, email: string): Promise
   return emailAllowed && ipAllowed;
 }
 
-export function genericOtpResponse(email: string) {
-  return NextResponse.json({
+export function genericOtpResponse(
+  email: string,
+  extras?: { emailDelivered?: boolean; otp?: string; revealOtp?: boolean },
+) {
+  const emailDelivered = extras?.emailDelivered ?? true;
+  const revealOtp =
+    Boolean(extras?.otp) &&
+    canRevealOtpToClient(emailDelivered) &&
+    Boolean(extras?.revealOtp || !emailDelivered);
+  const response = NextResponse.json({
     ok: true,
-    message: GENERIC_OTP_SENT_MESSAGE,
+    message: emailDelivered
+      ? GENERIC_OTP_SENT_MESSAGE
+      : OTP_SEND_FAILED_MESSAGE,
     maskedEmail: maskEmail(email),
     email,
+    emailDelivered,
+    ...(revealOtp ? { otp: extras?.otp } : {}),
   });
+  if (revealOtp && extras?.otp) {
+    attachOtpDisplayCookie(response, email, extras.otp);
+  }
+  return response;
 }
 
 export function otpSendFailedResponse() {
@@ -67,13 +85,47 @@ export async function handleOtpVerify(input: {
   return result;
 }
 
+/** Sends registration OTP. Keeps OTP record when email fails so resend can recover. */
+export async function sendRegistrationVerifyOtp(input: {
+  email: string;
+  fullName: string;
+  userId: string;
+  accountType: string;
+}): Promise<{ delivered: boolean; code: string }> {
+  logProductionConfigIssues("registration-otp");
+  const { code } = await createOtpRequest({
+    email: input.email,
+    purpose: "REGISTER",
+    userId: input.userId,
+    metadata: {
+      fullName: input.fullName,
+      accountType: input.accountType,
+      userId: input.userId,
+    },
+  });
+
+  const senders = await import("@/services/email/email.service");
+  const delivered = await senders.sendRegistrationOtp({
+    email: input.email,
+    name: input.fullName,
+    otp: code,
+  });
+
+  if (!delivered && !canRevealOtpToClient(false)) {
+    // Keep OTP so the user can resend after RESEND_API_KEY is configured.
+    return { delivered: false, code };
+  }
+
+  return { delivered, code };
+}
+
 export async function sendOtpForPurpose(input: {
   email: string;
   fullName: string;
   purpose: OtpPurpose;
   userId?: string;
   metadata?: Record<string, string>;
-}) {
+}): Promise<{ delivered: boolean; code: string }> {
   const { record, code } = await createOtpRequest({
     email: input.email,
     purpose: input.purpose,
@@ -83,74 +135,37 @@ export async function sendOtpForPurpose(input: {
 
   const senders = await import("@/services/email/email.service");
   const payload = { email: input.email, name: input.fullName, otp: code };
+  let delivered = false;
 
-  try {
-    switch (input.purpose) {
-      case "REGISTER":
-        await senders.sendRegistrationOtp(payload);
-        break;
-      case "LOGIN":
-        await senders.sendLoginOtp(payload);
-        break;
-      case "PASSWORD_RESET":
-        await senders.sendPasswordResetOtp(payload);
-        break;
-      case "SET_PASSWORD":
-        await senders.sendSetPasswordOtp(payload);
-        break;
-      case "EMAIL_CHANGE":
-        await senders.sendEmailChangeOtp(payload);
-        break;
-      default:
-        await senders.sendLoginOtp(payload);
-    }
-  } catch (error) {
-    await invalidateOtpRecord(record.id);
-    throw error;
+  switch (input.purpose) {
+    case "REGISTER":
+      delivered = await senders.sendRegistrationOtp(payload);
+      break;
+    case "LOGIN":
+      delivered = await senders.sendLoginOtp(payload);
+      break;
+    case "PASSWORD_RESET":
+      delivered = await senders.sendPasswordResetOtp(payload);
+      break;
+    case "SET_PASSWORD":
+      delivered = await senders.sendSetPasswordOtp(payload);
+      break;
+    case "EMAIL_CHANGE":
+      delivered = await senders.sendEmailChangeOtp(payload);
+      break;
+    default:
+      delivered = await senders.sendLoginOtp(payload);
   }
+
+  if (!delivered && input.purpose === "REGISTER" && !canRevealOtpToClient(false)) {
+    return { delivered: false, code };
+  }
+
+  if (!delivered && input.purpose !== "REGISTER") {
+    await invalidateOtpRecord(record.id);
+    throw new Error("EMAIL_SEND_FAILED");
+  }
+
+  return { delivered, code };
 }
 
-export function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
-
-const RESET_TOKEN_TTL_MS = 10 * 60 * 1000;
-
-export async function storeResetToken(email: string, token: string) {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const withoutStale = tokens.filter((item) => item.email !== email);
-  withoutStale.unshift({
-    email,
-    token,
-    expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-  });
-  await saveCollection("password-reset-tokens.json", withoutStale);
-}
-
-export async function consumeResetToken(email: string, token: string): Promise<boolean> {
-  const { saveCollection, loadCollection } = await import("@/services/payments/data-store");
-  const tokens = await loadCollection<{
-    email: string;
-    expiresAt: string;
-    token: string;
-  }>("password-reset-tokens.json");
-  const match = tokens.find(
-    (item) =>
-      item.email === email &&
-      item.token === token &&
-      new Date(item.expiresAt).getTime() > Date.now(),
-  );
-  if (!match) return false;
-  await saveCollection(
-    "password-reset-tokens.json",
-    tokens.filter((item) => item.token !== match.token),
-  );
-  return true;
-}

@@ -6,6 +6,11 @@ import { Button } from "@/shared/ui/Button";
 import { Input } from "@/shared/ui/Input";
 import { Select } from "@/shared/ui/Select";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import {
+  SearchTypeahead,
+  type SearchSuggestion,
+} from "./SearchTypeahead";
 
 type SearchFiltersProps = {
   action?: string;
@@ -27,6 +32,7 @@ type SearchFiltersProps = {
     sort?: string;
   };
   showCategory?: boolean;
+  suggestions?: SearchSuggestion[];
 };
 
 const sortOptions = [
@@ -39,7 +45,6 @@ const conditionOptions = [
   { label: "الكل", value: "" },
   { label: "جديد", value: "new" },
   { label: "مستعمل", value: "used" },
-  { label: "ممتاز", value: "excellent" },
 ];
 
 export function SearchFilters({
@@ -50,6 +55,7 @@ export function SearchFilters({
   layout = "bar",
   selectedFilters,
   showCategory = true,
+  suggestions = [],
 }: SearchFiltersProps) {
   const isSidebar = layout === "sidebar";
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -74,16 +80,19 @@ export function SearchFilters({
 
   if (!isSidebar) {
     return (
+      <LocalizedTree>
       <div className="marketplace-panel p-5 md:p-6">
         <form
           action={action}
           className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7"
         >
-          <Input
+          <SearchTypeahead
             defaultValue={selectedFilters.query}
             label="كلمة البحث"
             name="q"
             placeholder="سيارة، هاتف، عقار..."
+            selectedFilters={selectedFilters}
+            suggestions={suggestions}
           />
           <Select
             defaultValue={selectedFilters.country}
@@ -157,14 +166,16 @@ export function SearchFilters({
           </div>
         </form>
       </div>
+      </LocalizedTree>
     );
   }
 
   return (
-    <div className="marketplace-panel overflow-hidden p-0">
+    <LocalizedTree>
+    <div className="marketplace-panel flex max-h-none flex-col overflow-hidden p-0 lg:max-h-[calc(100vh-6.5rem)]">
       <button
         aria-expanded={mobileOpen}
-        className="flex w-full items-center justify-between gap-3 border-b border-border/70 px-4 py-3 text-start lg:hidden"
+        className="flex w-full shrink-0 items-center justify-between gap-3 border-b border-border/70 px-4 py-3 text-start lg:hidden"
         onClick={() => setMobileOpen((open) => !open)}
         type="button"
       >
@@ -184,18 +195,24 @@ export function SearchFilters({
         />
       </button>
 
-      <div className={`px-4 py-3 ${mobileOpen ? "block" : "hidden"} lg:block`}>
-        <h2 className="mb-2 hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
-
-        <form action={action} className="grid gap-2.5">
-          <Input
+      <form
+        action={action}
+        className={`${mobileOpen ? "flex" : "hidden"} min-h-0 flex-1 flex-col lg:flex`}
+      >
+        <div className="relative z-20 shrink-0 space-y-2.5 overflow-visible px-4 pt-3">
+          <h2 className="hidden text-xs font-bold text-ink lg:block">تصفية النتائج</h2>
+          <SearchTypeahead
             compact
             defaultValue={selectedFilters.query}
             label="كلمة البحث"
             name="q"
             placeholder="سيارة، هاتف، عقار..."
+            selectedFilters={selectedFilters}
+            suggestions={suggestions}
           />
+        </div>
 
+        <div className="min-h-0 flex-1 space-y-2.5 overflow-x-hidden overflow-y-auto px-4 pt-2.5">
           <div className="grid grid-cols-2 gap-2">
             <Select
               compact
@@ -287,12 +304,20 @@ export function SearchFilters({
               </div>
             </div>
           </details>
+        </div>
 
-          <Button className="w-full" size="sm" type="submit" variant="primary">
+        <div className="shrink-0 border-t border-border/70 bg-surface px-4 py-3">
+          <Button
+            className="motion-press w-full"
+            size="sm"
+            type="submit"
+            variant="primary"
+          >
             تطبيق الفلاتر
           </Button>
-        </form>
-      </div>
+        </div>
+      </form>
     </div>
+    </LocalizedTree>
   );
 }

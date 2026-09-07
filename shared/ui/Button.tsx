@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, MouseEventHandler, ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 import { Icon } from "@/shared/ui/Icon";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "accent";
@@ -56,15 +57,23 @@ export function Button({
   const inner = (
     <>
       {loading ? <Icon className="animate-spin" name="clock" size={16} /> : null}
-      {content}
+      {typeof content === "string" ? <Copy text={content} /> : content}
     </>
   );
 
   if (href && !loading) {
+    const isAppPath = href.startsWith("/") && !href.startsWith("//");
+    if (isAppPath) {
+      return (
+        <Link aria-busy={loading} className={classes} href={href} onClick={onClick}>
+          {inner}
+        </Link>
+      );
+    }
     return (
-      <Link aria-busy={loading} className={classes} href={href} onClick={onClick}>
+      <a aria-busy={loading} className={classes} href={href} onClick={onClick}>
         {inner}
-      </Link>
+      </a>
     );
   }
 

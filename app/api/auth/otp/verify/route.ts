@@ -1,19 +1,17 @@
-import { createHash, randomBytes } from "node:crypto";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import type { UserProfile } from "@/types";
-import { findDemoAccountByIdentifier } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
 import {
   sendLoginVerificationEmail,
   sendOtpEmail,
-  sendWelcomeEmail,
 } from "@/services/email/email.service";
+import { completePersonVerification } from "@/services/auth/signup-approval";
+import { issuePasswordResetToken } from "@/services/auth/password-reset-token";
+import { emailPasswordResetLink } from "@/services/email/notification-emails";
+import { findUserByEmail, getRedirectAfterAuth, toUserProfile } from "@/services/auth/user-store";
 import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
 import type { OtpPurpose } from "@/types/domain/otp";
-
-const RESET_TOKEN_TTL_MS = 10 * 60 * 1000;
 
 const verifySchema = z.object({
   code: z.string().length(6),
@@ -27,27 +25,6 @@ const resendSchema = z.object({
   fullName: z.string().optional(),
 });
 
-function createResetToken(email: string): string {
-  return createHash("sha256")
-    .update(`${randomBytes(32).toString("hex")}:${email}:${Date.now()}`)
-    .digest("hex");
-}
-
-function buildRegisteredUser(
-  email: string,
-  metadata?: Record<string, string>,
-): UserProfile {
-  return {
-    id: `user-${Date.now()}`,
-    fullName: metadata?.fullName ?? "مستخدم سوقنا",
-    email,
-    phone: metadata?.phone ?? "",
-    city: metadata?.city ?? "دبي",
-    accountType: (metadata?.accountType as UserProfile["accountType"]) ?? "individual",
-    isVerified: true,
-    joinedAt: new Date().toISOString().slice(0, 10),
-  };
-}
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -68,10 +45,10 @@ export async function POST(request: Request) {
       });
 
       if (parsed.data.purpose === "LOGIN") {
-        const account = findDemoAccountByIdentifier(email);
+        const stored = await findUserByEmail(email);
         await sendLoginVerificationEmail({
           email,
-          name: account?.profile.fullName ?? "مستخدم سوقنا",
+          name: stored?.fullName ?? "مستخدم سوقنا",
           otp: code,
         });
       } else {
@@ -122,48 +99,51 @@ export async function POST(request: Request) {
   }
 
   if (parsed.data.purpose === "LOGIN") {
-    const account = findDemoAccountByIdentifier(email);
-    if (!account) {
+    const stored = await findUserByEmail(email);
+    if (!stored) {
       return NextResponse.json({ error: "INVALID" }, { status: 400 });
     }
-    await setSessionCookie(account.profile);
-    return NextResponse.json({ ok: true, user: account.profile });
+    const user = toUserProfile(stored);
+    await setSessionCookie(user);
+    return NextResponse.json({
+      ok: true,
+      user,
+      redirectTo: getRedirectAfterAuth(user),
+    });
   }
 
   if (parsed.data.purpose === "REGISTER") {
-    const metadata = result.record.metadata;
-    if (!metadata?.fullName) {
+    const stored = await findUserByEmail(email);
+    if (!stored) {
       return NextResponse.json({ error: "INVALID" }, { status: 400 });
     }
 
-    const user = buildRegisteredUser(email, metadata);
+    const { approved, user } = await completePersonVerification(stored.id);
     await setSessionCookie(user);
-    try {
-      await sendWelcomeEmail({ email: user.email, name: user.fullName });
-    } catch {
-      // Welcome email is non-blocking after account activation
-    }
-    return NextResponse.json({ ok: true, user });
+    return NextResponse.json({
+      ok: true,
+      approved,
+      user,
+      redirectTo: approved ? getRedirectAfterAuth(user) : "/register/pending",
+    });
   }
 
   if (parsed.data.purpose === "PASSWORD_RESET") {
-    const resetToken = createResetToken(email);
-    const { saveCollection, loadCollection } = await import(
-      "@/services/payments/data-store"
-    );
-    const tokens = await loadCollection<{
-      email: string;
-      expiresAt: string;
-      token: string;
-    }>("password-reset-tokens.json");
-    const withoutStale = tokens.filter((item) => item.email !== email);
-    withoutStale.unshift({
-      email,
-      token: resetToken,
-      expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString(),
-    });
-    await saveCollection("password-reset-tokens.json", withoutStale);
-    return NextResponse.json({ ok: true, resetToken, maskedEmail: maskEmail(email) });
+    const stored = await findUserByEmail(email);
+    if (stored?.passwordHash) {
+      const rawToken = await issuePasswordResetToken({
+        email: stored.email,
+        userId: stored.id,
+      });
+      void emailPasswordResetLink({
+        email: stored.email,
+        name: stored.fullName,
+        token: rawToken,
+      }).catch((error) => {
+        console.error("[Sooqna Email] password reset link failed", error);
+      });
+    }
+    return NextResponse.json({ ok: true, maskedEmail: maskEmail(email), redirectTo: "/login" });
   }
 
   return NextResponse.json({ ok: true, metadata: result.record.metadata });

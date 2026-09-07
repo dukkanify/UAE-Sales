@@ -3,6 +3,7 @@ import type { Listing } from "@/types";
 
 export const listingPriceFormatter = new Intl.NumberFormat("ar-AE", {
   maximumFractionDigits: 0,
+  numberingSystem: "latn",
 });
 
 export function getListingHref(listing: Listing): string {
@@ -68,34 +69,35 @@ export const conditionBadgeVariant: Record<
 
 export function formatPostedTime(postedAt?: string): string {
   if (!postedAt) {
-    return "منذ ساعة";
+    return "—";
   }
 
   const posted = new Date(postedAt);
-  const now = new Date();
-  const diffMs = now.getTime() - posted.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffHours < 1) {
-    return "الآن";
-  }
-  if (diffHours < 24) {
-    return `منذ ${diffHours} ساعة`;
-  }
-  if (diffDays === 1) {
-    return "أمس";
-  }
-  if (diffDays < 7) {
-    return `منذ ${diffDays} أيام`;
+  if (Number.isNaN(posted.getTime())) {
+    return "—";
   }
 
-  return posted.toLocaleDateString("ar-AE", {
-    day: "numeric",
-    month: "short",
-  });
+  // Deterministic calendar label — avoid Date.now()/relative time (SSR hydration mismatch).
+  const months = [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ] as const;
+
+  return `${posted.getUTCDate()} ${months[posted.getUTCMonth()]}`;
 }
 
 export function formatViews(views: number): string {
-  return views.toLocaleString("ar-AE");
+  return new Intl.NumberFormat("ar-AE", { numberingSystem: "latn" }).format(
+    views,
+  );
 }

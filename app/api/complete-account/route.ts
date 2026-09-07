@@ -62,5 +62,6 @@ export async function POST(request: Request) {
     ok: true,
     user: profile,
     redirectTo: "/orders",
+    accountProof: passwordHash,
   });
 }

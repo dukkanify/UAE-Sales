@@ -25,8 +25,8 @@ export type EmirateImageKey =
   | "sharjah"
   | "umm-al-quwain";
 
-export function unsplashUrl(photoId: string, width = 1200): string {
-  return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=85`;
+export function unsplashUrl(photoId: string, width = 800): string {
+  return `https://images.unsplash.com/${photoId}?auto=format&fit=crop&w=${width}&q=72`;
 }
 
 /** Verified Unsplash photo IDs — HTTP 200 checked */
@@ -150,11 +150,11 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
     "photo-1500648767791-00dcc994a43e",
   ],
   emirates: [
-    "photo-1512453979798-5ea266f8880c",
-    "photo-1518684079-3c830dcef090",
+    "photo-1661630804525-a745b42434a8",
+    "photo-1749653652468-98a34f0be831",
   ],
   default: [
-    "photo-1512453979798-5ea266f8880c",
+    "photo-1661630804525-a745b42434a8",
     "photo-1618843479313-40f8afb4b4d8",
     "photo-1600607687939-ce8a6c25118c",
   ],
@@ -163,7 +163,8 @@ export const verifiedPhotoPools: Record<ImageFallbackCategory, readonly string[]
 /** Verified landmark photos per emirate — location-checked on Unsplash */
 export const emiratePhotoIds: Record<EmirateImageKey, string> = {
   dubai: "photo-1512453979798-5ea266f8880c",
-  "abu-dhabi": "photo-1620148369396-235e930c3caf",
+  // Abu Dhabi skyline at dusk — Etihad Towers + Corniche (pro marketplace hero)
+  "abu-dhabi": "photo-1661630804525-a745b42434a8",
   sharjah: "photo-1679197982381-7a43e5d910a4",
   ajman: "photo-1593334305856-1c6281efaa18",
   "umm-al-quwain": "photo-1687080625802-967beded8abc",
@@ -173,7 +174,7 @@ export const emiratePhotoIds: Record<EmirateImageKey, string> = {
 
 export const emirateLandmarkLabels: Record<EmirateImageKey, string> = {
   dubai: "برج خليفة وأفق دبي",
-  "abu-dhabi": "مسجد الشيخ زايد الكبير",
+  "abu-dhabi": "أفق أبوظبي — أبراج الاتحاد",
   sharjah: "أفق الشارقة عند الغروب",
   ajman: "كورنيش عجمان",
   "umm-al-quwain": "شاطئ المانجروف — أم القيوين",
@@ -238,7 +239,7 @@ export function galleryFromPool(
   return urls;
 }
 
-export const heroBackgroundUrl = `https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1600&h=900&q=90`;
+export const heroBackgroundUrl = unsplashUrl(emiratePhotoIds["abu-dhabi"], 1600);
 
 /** Verified seller portrait URLs */
 export const sellerAvatarUrls = {

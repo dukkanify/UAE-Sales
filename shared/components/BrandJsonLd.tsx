@@ -1,8 +1,12 @@
 import { BRAND } from "@/shared/constants/brand";
 import { getAppUrl } from "@/shared/constants/site";
+import { getRequestLocale } from "@/shared/i18n/locale";
 
-export function BrandJsonLd() {
+export async function BrandJsonLd() {
+  const locale = await getRequestLocale();
   const siteUrl = getAppUrl();
+  const description =
+    locale === "en" ? BRAND.descriptionEn : BRAND.description;
 
   const schema = {
     "@context": "https://schema.org",
@@ -11,7 +15,7 @@ export function BrandJsonLd() {
         "@type": "Organization",
         "@id": `${siteUrl}/#organization`,
         alternateName: BRAND.nameAr,
-        description: BRAND.description,
+        description,
         logo: `${siteUrl}/brand/logo-horizontal.svg`,
         name: BRAND.nameEn,
         url: siteUrl,
@@ -20,8 +24,8 @@ export function BrandJsonLd() {
         "@type": "WebSite",
         "@id": `${siteUrl}/#website`,
         alternateName: BRAND.nameAr,
-        description: BRAND.description,
-        inLanguage: "ar-AE",
+        description,
+        inLanguage: locale === "en" ? "en-AE" : "ar-AE",
         name: BRAND.nameEn,
         publisher: { "@id": `${siteUrl}/#organization` },
         url: siteUrl,

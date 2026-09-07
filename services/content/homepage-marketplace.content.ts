@@ -3,11 +3,6 @@ import { getActiveListingCount, getEmirateListingHighlights } from "@/mock/catal
 import type { HomeCityHighlight } from "@/types";
 import { getEmirateImageUrl, heroBackgroundUrl } from "@/shared/constants/image-fallbacks";
 
-export type MarketTrustStat = {
-  label: string;
-  value: string;
-};
-
 export type MarketEscrowStep = {
   description: string;
   icon: string;
@@ -18,23 +13,12 @@ export async function getMarketHeroBackground(): Promise<string> {
   return heroBackgroundUrl;
 }
 
-export async function getMarketTrustStats(): Promise<MarketTrustStat[]> {
-  const activeListings = getActiveListingCount();
-
-  return [
-    { label: "إعلان نشط", value: activeListings.toLocaleString("ar-AE") },
-    { label: "مستخدم موثق", value: "18,542" },
-    { label: "معاملة آمنة", value: "12,413" },
-    { label: "تقييم المنصة", value: "4.8/5" },
-  ];
-}
-
 export async function getMarketQuickSearches() {
   return [
     { href: "/search?q=Mercedes", label: "Mercedes" },
     { href: "/search?q=Patrol", label: "Patrol" },
-    { href: "/search?q=نخلة+جميرا", label: "Palm Jumeirah" },
-    { href: "/search?q=داون+تاون", label: "Downtown Dubai" },
+    { href: "/search?q=جزيرة+ياس", label: "Yas Island" },
+    { href: "/search?q=كورنيش+أبوظبي", label: "Abu Dhabi Corniche" },
     { href: "/search?q=شقة", label: "Apartment" },
     { href: "/search?q=فيلا", label: "Villa" },
     { href: "/search?q=iPhone", label: "iPhone" },
@@ -114,12 +98,15 @@ export async function getHomeCityHighlights(): Promise<HomeCityHighlight[]> {
 }
 
 export async function getAuthTrustPoints() {
+  const { getRequestLocale } = await import("@/shared/i18n/locale");
+  const { uaeActiveListingsLabel } = await import("@/shared/i18n/count-labels");
+  const locale = await getRequestLocale();
   const activeListings = getActiveListingCount();
 
   return [
-    "ضمان مالي يحمي كل معاملة",
+    "منصة موثوقة للبيع والشراء في الإمارات",
     "توثيق البائعين والمشترين",
     "دعم بالعربية على مدار الساعة",
-    `${activeListings.toLocaleString("ar-AE")} إعلان نشط في الإمارات`,
+    uaeActiveListingsLabel(activeListings, locale),
   ];
 }

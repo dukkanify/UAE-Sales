@@ -12,6 +12,7 @@ type ListingMediaSectionProps = {
   showContact?: boolean;
   defaultContact?: string;
   title?: string;
+  videoUrl?: string;
 };
 
 export function ListingMediaSection({
@@ -22,6 +23,7 @@ export function ListingMediaSection({
   onImageChange,
   showContact = true,
   title = "الصور والتواصل",
+  videoUrl,
 }: ListingMediaSectionProps) {
   const totalImages = existingImages.length + imagePreviews.length;
 
@@ -93,6 +95,20 @@ export function ListingMediaSection({
               </div>
             </div>
           ) : null}
+
+          {videoUrl ? (
+            <div className="rounded-[var(--radius-xl)] border border-border bg-surface-muted/50 p-3">
+              <p className="text-sm font-semibold text-ink">فيديو الإعلان</p>
+              <a
+                className="mt-1 block break-all text-sm font-medium text-primary underline-offset-2 hover:underline"
+                href={videoUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {videoUrl}
+              </a>
+            </div>
+          ) : null}
         </div>
 
         {showContact ? (
@@ -109,6 +125,13 @@ export function ListingMediaSection({
                 <FormMessage variant="error">{errors.contact}</FormMessage>
               ) : null}
             </div>
+            <Input
+              defaultValue={videoUrl}
+              label="رابط فيديو (اختياري)"
+              name="videoUrl"
+              placeholder="https://..."
+              type="url"
+            />
           </div>
         ) : null}
       </div>

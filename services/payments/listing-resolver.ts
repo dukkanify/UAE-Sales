@@ -1,5 +1,8 @@
-import { mockListings, mockUserListings } from "@/mock";
 import type { Listing } from "@/types";
+import {
+  getAllListings,
+  getListingSync,
+} from "@/services/listings/listing-store";
 
 export type ListingSnapshot = {
   id: string;
@@ -16,15 +19,15 @@ export type ListingSnapshot = {
 };
 
 export function getServerListingById(listingId: string): Listing | undefined {
-  return [...mockListings, ...mockUserListings].find(
-    (listing) => listing.id === listingId || listing.slug === listingId,
-  );
+  return getListingSync(listingId);
 }
 
 export function getServerListingBySlug(slug: string): Listing | undefined {
-  return [...mockListings, ...mockUserListings].find(
-    (listing) => listing.slug === slug,
-  );
+  return getListingSync(slug);
+}
+
+export async function hydrateListingCatalog(): Promise<void> {
+  await getAllListings();
 }
 
 export function toListingSnapshot(listing: Listing): ListingSnapshot {
@@ -33,6 +36,9 @@ export function toListingSnapshot(listing: Listing): ListingSnapshot {
     slug: listing.slug,
     title: listing.title,
     price: listing.price,
+    categoryId: listing.categoryId,
+    emirate: listing.emirate,
+    city: listing.city,
     seller: {
       id: listing.seller.id,
       name: listing.seller.name,

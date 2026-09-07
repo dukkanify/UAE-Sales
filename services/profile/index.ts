@@ -1,1 +1,1 @@
-export { getCurrentUser, updateUserProfileDraft } from "./profile.service";
+export { getCurrentUser, requireCurrentUser, updateUserProfileDraft } from "./profile.service";

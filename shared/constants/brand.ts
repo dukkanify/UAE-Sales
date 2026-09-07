@@ -5,8 +5,18 @@ export const BRAND = {
   taglineEn: "Our Marketplace",
   description:
     "منصة سوق إماراتية موثوقة — بيع وشراء بثقة مع ضمان مالي، محفظة آمنة، ودعم على مدار الساعة.",
-  copyright: "© 2026 سوقنا Sooqna. جميع الحقوق محفوظة.",
+  descriptionEn:
+    "A trusted UAE marketplace — buy and sell with confidence, with escrow protection, a secure wallet, and support around the clock.",
+  copyright: "© 2026 Sooqna. جميع الحقوق محفوظة.",
+  copyrightEn: "© 2026 Sooqna. All rights reserved.",
   domain: "sooqna.site",
+  supportEmail: "support@sooqna.site",
+} as const;
+
+export const DEVELOPER = {
+  nameAr: "شركة دكانيفاي للتكنولوجيا ذ.م.م",
+  nameEn: "Dukkanify Technology LLC",
+  url: "https://dukkanify.com/",
 } as const;
 
 export const BRAND_COLORS = {
@@ -31,6 +41,11 @@ export const STORAGE_EVENTS = {
   recentlyViewedChange: "sooqna-recently-viewed-change",
   chatChange: "sooqna-chat-change",
   favoritesChange: "sooqna-favorites-change",
+  recentSearchesChange: "sooqna-recent-searches-change",
+  savedSearchesChange: "sooqna-saved-searches-change",
+  themeChange: "sooqna-theme-change",
+  notificationsChange: "sooqna-notifications-change",
+  localeChange: "sooqna-locale-change",
 } as const;
 
 export const STORAGE_KEYS = {
@@ -38,8 +53,12 @@ export const STORAGE_KEYS = {
   localListings: "sooqna-local-listings",
   recentlyViewed: "sooqna-recently-viewed",
   savedSearches: "sooqna-saved-searches",
+  recentSearches: "sooqna-recent-searches",
   chatConversations: "sooqna-chat-conversations",
   favorites: "sooqna-favorites",
+  theme: "sooqna-theme",
+  locale: "sooqna-locale",
+  accountProofs: "sooqna-account-proofs",
 } as const;
 
 /** Legacy keys migrated on read */

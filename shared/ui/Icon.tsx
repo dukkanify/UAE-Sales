@@ -44,7 +44,9 @@ type IconName =
   | "baby"
   | "book"
   | "sport"
-  | "food";
+  | "food"
+  | "moon"
+  | "sun";
 
 export type { IconName };
 
@@ -118,6 +120,8 @@ const paths: Partial<Record<IconName, string>> = {
   sport:
     "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm0-14.5L14.5 11H9.5L12 6.5Zm-5.8 3.5h5.6L12 15l-2.8-5Zm0 7 2.8-5 2.8 5H6.2Zm11.6 0h-5.6l2.8-5 2.8 5Z",
   food: "M4 3v8a4 4 0 0 0 8 0V3M12 11v10M18 8V3M18 8a3 3 0 1 1-6 0",
+  moon: "M21 14.3A8.5 8.5 0 1 1 9.7 3 7 7 0 0 0 21 14.3Z",
+  sun: "M12 4V2M12 22v-2M4.9 4.9 3.5 3.5M20.5 20.5 19.1 19.1M4 12H2M22 12h-2M4.9 19.1 3.5 20.5M20.5 3.5 19.1 4.9M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z",
 };
 
 const MENU_LINES = ["M4 7h16", "M4 12h16", "M4 17h16"] as const;
@@ -180,9 +184,9 @@ const WHATSAPP_PATH =
 function ShareNodes() {
   return (
     <>
-      <circle cx="18" cy="5" r="2.4" />
-      <circle cx="6" cy="12" r="2.4" />
-      <circle cx="18" cy="19" r="2.4" />
+      <circle cx="18" cy="5" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
+      <circle cx="6" cy="12" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
+      <circle cx="18" cy="19" data-icon-fill="true" fill="currentColor" r="2.4" stroke="none" />
       <path d="M8.2 10.7 15.8 6.8M8.2 13.3l7.6 3.9" />
     </>
   );
@@ -228,6 +232,7 @@ export function Icon({ className = "", filled = false, name, size = 20 }: IconPr
     <svg
       aria-hidden
       className={className}
+      data-icon={name}
       fill={isFilledIcon ? "currentColor" : "none"}
       height={size}
       stroke={hideStroke ? "none" : "currentColor"}

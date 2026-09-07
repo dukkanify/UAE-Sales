@@ -1,20 +1,17 @@
 import { getAllOrders } from "@/services/payments/order-store";
 
-const MOCK_TRANSACTIONS = [
-  {
-    id: "escrow-001",
-    listingTitle: "آيفون 15 برو 128 جيجابايت",
-    amount: 3200,
-    status: "held" as const,
-    buyer: "سارة الكعبي",
-    createdAt: "2026-06-25T10:15:00+04:00",
-  },
-];
+function isEscrowVisible(status: string) {
+  return status === "held" || status === "released";
+}
 
-export async function getEscrowTransactions() {
+export async function getEscrowTransactions(userId?: string) {
   const orders = await getAllOrders();
-  const live = orders
-    .filter((order) => order.escrowStatus === "held" || order.escrowStatus === "released")
+  return orders
+    .filter((order) => {
+      if (!isEscrowVisible(order.escrowStatus)) return false;
+      if (!userId) return true;
+      return order.buyerId === userId || order.sellerId === userId;
+    })
     .map((order) => ({
       id: order.id,
       listingTitle: order.listingTitle,
@@ -30,25 +27,15 @@ export async function getEscrowTransactions() {
       orderId: order.id,
       stripePaymentIntentId: order.stripePaymentIntentId,
     }));
-
-  return live.length > 0 ? live : MOCK_TRANSACTIONS;
 }
 
-export async function getEscrowSummary() {
-  const orders = await getAllOrders();
-  const held = orders.filter((order) => order.escrowStatus === "held");
-
-  if (held.length === 0) {
-    return {
-      activeHolds: 2,
-      totalProtected: 12413,
-      currency: "AED" as const,
-    };
-  }
+export async function getEscrowSummary(userId?: string) {
+  const transactions = await getEscrowTransactions(userId);
+  const held = transactions.filter((item) => item.status === "held");
 
   return {
     activeHolds: held.length,
-    totalProtected: held.reduce((sum, order) => sum + order.fees.productPrice, 0),
+    totalProtected: held.reduce((sum, item) => sum + item.amount, 0),
     currency: "AED" as const,
   };
 }

@@ -5,6 +5,8 @@ import { ListingDetailsView } from "@/features/listings/components/ListingDetail
 import { Button } from "@/shared/ui/Button";
 import { EmptyState } from "@/shared/ui/EmptyState";
 import { ListingDetailSkeleton } from "@/shared/ui/Skeleton";
+import { listingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { getLocalListingById } from "@/services/storage";
 
 type LocalListingDetailsProps = {
@@ -16,6 +18,8 @@ export function LocalListingDetails({
   categories,
   listingId,
 }: LocalListingDetailsProps) {
+  const locale = useLocale();
+
   if (typeof window === "undefined") {
     return <ListingDetailSkeleton />;
   }
@@ -42,7 +46,7 @@ export function LocalListingDetails({
         breadcrumbs={[
           { href: "/", label: "الرئيسية" },
           { href: "/dashboard/listings", label: "إعلاناتي" },
-          { label: listing.title },
+          { label: listingTitle(listing, locale) },
         ]}
         category={category}
         listing={listing}

@@ -8,13 +8,15 @@ import { Textarea } from "@/shared/ui/Textarea";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { LISTING_ERRORS } from "@/shared/constants/listing-errors";
+import { listingTitle as resolveListingTitle } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { isOwnListing } from "@/shared/listings/listing-ownership";
 import { getSessionUser } from "@/services/storage";
 
 type JobApplicationModalProps = {
   listing: Listing;
   onClose: () => void;
-  onSuccess: (applicationId: string) => void;
+  onSuccess: (applicationId: string, emailed: boolean) => void;
   open: boolean;
 };
 
@@ -24,8 +26,10 @@ export function JobApplicationModal({
   onSuccess,
   open,
 }: JobApplicationModalProps) {
+  const displayTitle = resolveListingTitle(listing, useLocale());
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [emailed, setEmailed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cvFileName, setCvFileName] = useState("");
 
@@ -55,11 +59,6 @@ export function JobApplicationModal({
     const years = Number(form.get("yearsOfExperience"));
     const coverMessage = String(form.get("coverMessage") ?? "").trim();
 
-    if (coverMessage.length < 20) {
-      setError("رسالة التقديم يجب أن تكون 20 حرفاً على الأقل.");
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/job-applications", {
@@ -74,7 +73,7 @@ export function JobApplicationModal({
           applicantEmail: String(form.get("email") ?? user.email),
           phone: String(form.get("phone") ?? ""),
           currentCity: String(form.get("currentCity") ?? ""),
-          yearsOfExperience: years,
+          yearsOfExperience: Number.isFinite(years) ? years : 0,
           availabilityDate: String(form.get("availabilityDate") ?? ""),
           coverMessage,
           cvFileName,
@@ -98,7 +97,8 @@ export function JobApplicationModal({
       }
 
       setSuccess(true);
-      onSuccess(data.application.id);
+      setEmailed(data.emailed === true);
+      onSuccess(data.application.id, data.emailed === true);
     } catch {
       setError("تعذر إرسال الطلب.");
     } finally {
@@ -110,15 +110,22 @@ export function JobApplicationModal({
 
   return (
     <Modal
-      description={`التقديم على: ${listing.title}`}
+      description={`التقديم على: ${displayTitle}`}
       onClose={onClose}
       open={open}
       title="تقديم على الوظيفة"
     >
       {success ? (
-        <FormMessage variant="success">
-          تم إرسال طلب التوظيف بنجاح. سيتم إخطارك عند تحديث الحالة.
-        </FormMessage>
+        <div className="grid gap-4">
+          <FormMessage variant="success">
+            {emailed
+              ? "تم إرسال طلب التوظيف بنجاح. أرسلنا تأكيدًا إلى بريدك، وسيظهر الطلب في إشعارات حسابك."
+              : "تم إرسال طلب التوظيف بنجاح. يظهر الطلب في إشعارات حسابك."}
+          </FormMessage>
+          <Button onClick={onClose} type="button">
+            تم
+          </Button>
+        </div>
       ) : (
         <form className="grid gap-3" onSubmit={handleSubmit}>
           {error ? <FormMessage variant="error">{error}</FormMessage> : null}
@@ -130,12 +137,20 @@ export function JobApplicationModal({
           />
           <Input
             defaultValue={user?.email}
+            dir="ltr"
             label="البريد الإلكتروني"
             name="email"
             required
             type="email"
           />
-          <Input label="رقم الهاتف" name="phone" required type="tel" />
+          <Input
+            defaultValue={user?.phone}
+            dir="ltr"
+            label="رقم الهاتف"
+            name="phone"
+            required
+            type="tel"
+          />
           <Input label="المدينة الحالية" name="currentCity" required />
           <Input
             label="سنوات الخبرة"
@@ -162,10 +177,11 @@ export function JobApplicationModal({
             />
           </div>
           <Textarea
-            label="رسالة التقديم"
+            hint="اختياري — يمكنك إرسال الطلب بدون كتابة أي رسالة."
+            label="رسالة التقديم (اختياري)"
             name="coverMessage"
-            placeholder="اذكر خبرتك ولماذا أنت مناسب لهذه الوظيفة..."
-            required
+            placeholder="اذكر خبرتك أو أي ملاحظة إن رغبت"
+            required={false}
           />
           <div className="flex gap-2">
             <Button loading={isSubmitting} type="submit" variant="accent">

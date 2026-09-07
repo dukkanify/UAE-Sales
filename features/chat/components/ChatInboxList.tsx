@@ -6,8 +6,12 @@ import { STORAGE_EVENTS } from "@/shared/constants/brand";
 import { getChatConversations } from "@/services/chat";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
+import { intlLocale } from "@/shared/i18n/locale";
 
 export function ChatInboxList() {
+  const locale = useLocale();
   const [threads, setThreads] = useState(() =>
     typeof window !== "undefined" ? getChatConversations() : [],
   );
@@ -21,13 +25,16 @@ export function ChatInboxList() {
 
   if (threads.length === 0) {
     return (
+      <LocalizedTree>
       <Card className="p-6 text-center text-sm text-muted">
         لا توجد محادثات بعد. افتح «محادثة البائع» من أي إعلان لبدء محادثة.
       </Card>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <p className="text-sm text-muted">{threads.length} محادثة</p>
       {threads.map((thread) => {
@@ -40,20 +47,20 @@ export function ChatInboxList() {
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate text-sm font-semibold text-ink">
+                  <p className="truncate text-sm font-semibold text-ink" data-ugc>
                     {thread.sellerName}
                   </p>
                   <span className="shrink-0 text-xs text-muted">
-                    {new Date(thread.updatedAt).toLocaleDateString("ar-AE", {
+                    {new Date(thread.updatedAt).toLocaleDateString(intlLocale(locale), {
                       day: "numeric",
                       month: "short",
                     })}
                   </span>
                 </div>
-                <p className="mt-0.5 truncate text-xs font-medium text-primary">
+                <p className="mt-0.5 truncate text-xs font-medium text-primary" data-ugc>
                   {thread.listingTitle}
                 </p>
-                <p className="mt-1 truncate text-sm text-muted">
+                <p className="mt-1 truncate text-sm text-muted" data-ugc>
                   {lastMessage?.body}
                 </p>
               </div>
@@ -63,5 +70,6 @@ export function ChatInboxList() {
         );
       })}
     </div>
+    </LocalizedTree>
   );
 }

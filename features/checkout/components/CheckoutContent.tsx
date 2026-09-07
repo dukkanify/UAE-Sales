@@ -11,6 +11,9 @@ import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { PageHero } from "@/shared/ui/PageHero";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { SellerName } from "@/shared/i18n/SellerName";
 
 type CheckoutContentProps = {
   catalogListing?: Listing;
@@ -136,6 +139,7 @@ export function CheckoutContent({
 
   if (!listing) {
     return (
+      <LocalizedTree>
       <section className="app-container page-padding">
         <PageHero
           description="لم نتمكن من العثور على الإعلان المطلوب."
@@ -144,15 +148,17 @@ export function CheckoutContent({
         />
         <Button href="/search">تصفح الإعلانات</Button>
       </section>
+      </LocalizedTree>
     );
   }
 
   return (
+    <LocalizedTree>
     <section className="app-container page-padding">
       <PageHero
         description={
           showsEscrowProtection(listing)
-            ? "راجع التفاصيل وأكّد الدفع عبر Stripe. المبلغ يُحجز في الضمان حتى تأكيد الاستلام."
+            ? "راجع التفاصيل وأكّد الدفع. المبلغ يُحجز في الضمان حتى تأكيد الاستلام."
             : "راجع التفاصيل وأكّد الدفع عبر نظام الدفع المدمج في المنصة."
         }
         eyebrow="الدفع"
@@ -171,9 +177,11 @@ export function CheckoutContent({
               <Badge variant="verified">محمي بالضمان</Badge>
             </div>
           ) : null}
-          <h2 className="mt-4 text-xl font-black text-ink">{listing.title}</h2>
+          <h2 className="mt-4 text-xl font-black text-ink">
+            <ListingTitle listing={listing} />
+          </h2>
           <p className="mt-2 text-sm text-muted">
-            البائع: {listing.seller.name}
+            البائع: <SellerName seller={listing.seller} />
           </p>
         </Card>
 
@@ -213,5 +221,6 @@ export function CheckoutContent({
         </div>
       </div>
     </section>
+    </LocalizedTree>
   );
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Copy } from "@/shared/i18n/LocalizedTree";
 
 type SectionHeaderProps = {
   action?: ReactNode;
@@ -28,15 +29,15 @@ export function SectionHeader({
       <div className={isCenter ? "max-w-2xl" : "max-w-xl"}>
         {eyebrow ? (
           <p className="mb-2 text-xs font-medium tracking-wide text-secondary uppercase">
-            {eyebrow}
+            <Copy text={eyebrow} />
           </p>
         ) : null}
         <h2 className="text-2xl font-black tracking-tight text-ink md:text-3xl">
-          {title}
+          <Copy text={title} />
         </h2>
         {description ? (
           <p className="mt-2 text-base font-medium leading-8 text-muted">
-            {description}
+            <Copy text={description} />
           </p>
         ) : null}
       </div>

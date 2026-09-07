@@ -1,17 +1,27 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { findDemoAccount } from "@/mock/demo-accounts.mock";
 import { setSessionCookie } from "@/services/auth/session-cookie";
-import { findUserByEmail, toUserProfile, getRedirectAfterAuth } from "@/services/auth/user-store";
+import {
+  ensureDemoAccounts,
+  findUserByEmail,
+  toUserProfile,
+  getRedirectAfterAuth,
+  restoreUserWithPasswordProof,
+} from "@/services/auth/user-store";
 import { verifyPassword } from "@/services/auth/password.service";
-import { getPostLoginPath } from "@/services/auth/auth.service";
-import { getSafeNextPath } from "@/shared/utils/safe-next";
+import { readAccountProofCookie } from "@/services/auth/account-vault";
 import { trackAuthEvent } from "@/services/analytics/auth-events";
+import { INVALID_CREDENTIALS_MESSAGE } from "@/services/auth/auth-messages";
+import { AuthStoreError } from "@/services/auth/user-persistence";
+import { getSafeNextPath } from "@/shared/utils/safe-next";
 
 const schema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
   next: z.string().optional(),
+  accountProof: z.string().min(20).optional(),
+  fullName: z.string().min(1).optional(),
+  accountType: z.enum(["buyer", "seller", "business", "individual", "company"]).optional(),
 });
 
 function passwordMatches(storedHash: string, password: string): boolean {
@@ -33,19 +43,64 @@ export async function POST(request: Request) {
     const email = parsed.data.email.trim().toLowerCase();
     const password = parsed.data.password.trim();
 
-    const demo = findDemoAccount(email, password);
-    if (demo) {
-      await setSessionCookie(demo.profile);
-      trackAuthEvent("login_verified");
-      const redirectTo = getSafeNextPath(
-        parsed.data.next,
-        getPostLoginPath(email, getRedirectAfterAuth(demo.profile)),
-      );
-      return NextResponse.json({ ok: true, user: demo.profile, redirectTo });
+    // Keep demo operator accounts (admin@sooqna.demo, …) usable after DB resets.
+    if (email.endsWith("@sooqna.demo") || email.endsWith("@uaesales.demo")) {
+      try {
+        await ensureDemoAccounts();
+      } catch {
+        // Fall through — login still attempts against whatever is stored.
+      }
     }
 
-    const stored = await findUserByEmail(email);
+    let stored = await findUserByEmail(email);
+    if (!stored) {
+      try {
+        const cookieProof = await readAccountProofCookie(email);
+        const passwordHash = parsed.data.accountProof ?? cookieProof?.passwordHash;
+        if (passwordHash) {
+          stored = await restoreUserWithPasswordProof({
+            email,
+            password,
+            passwordHash,
+            fullName: parsed.data.fullName ?? cookieProof?.fullName,
+            accountType: parsed.data.accountType ?? cookieProof?.accountType,
+          });
+        }
+      } catch {
+        // Fall through to invalid-credentials if restore fails.
+      }
+    }
     if (stored?.passwordHash && passwordMatches(stored.passwordHash, password)) {
+      if (stored.accountStatus === "suspended") {
+        return NextResponse.json(
+          { error: "ACCOUNT_SUSPENDED", message: "تم إيقاف هذا الحساب." },
+          { status: 403 },
+        );
+      }
+      if (stored.accountStatus === "pending" && !stored.emailVerifiedAt) {
+        const params = new URLSearchParams({
+          email,
+          purpose: "REGISTER",
+        });
+        return NextResponse.json(
+          {
+            error: "ACCOUNT_UNVERIFIED",
+            message: "أكمل التحقق من بريدك أولاً قبل تسجيل الدخول.",
+            redirectTo: `/verify-email?${params.toString()}`,
+          },
+          { status: 403 },
+        );
+      }
+      if (stored.accountStatus === "pending") {
+        const user = toUserProfile(stored);
+        await setSessionCookie(user);
+        trackAuthEvent("login_verified");
+        return NextResponse.json({
+          ok: true,
+          user,
+          redirectTo: "/register/pending",
+        });
+      }
       const user = toUserProfile(stored);
       await setSessionCookie(user);
       trackAuthEvent("login_verified");
@@ -53,14 +108,24 @@ export async function POST(request: Request) {
         parsed.data.next,
         getRedirectAfterAuth(user, parsed.data.next),
       );
-      return NextResponse.json({ ok: true, user, redirectTo });
+      return NextResponse.json({
+        ok: true,
+        user,
+        redirectTo,
+      });
     }
 
     return NextResponse.json(
-      { error: "INVALID_CREDENTIALS", message: "بيانات الدخول غير صحيحة." },
+      { error: "INVALID_CREDENTIALS", message: INVALID_CREDENTIALS_MESSAGE },
       { status: 401 },
     );
-  } catch {
+  } catch (error) {
+    if (error instanceof AuthStoreError) {
+      return NextResponse.json(
+        { error: "LOGIN_FAILED", message: "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا." },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       { error: "LOGIN_FAILED", message: "تعذر تسجيل الدخول حاليًا. حاول مرة أخرى." },
       { status: 500 },

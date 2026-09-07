@@ -1,9 +1,31 @@
+import { Suspense } from "react";
+import { AdminLoginStage } from "@/features/auth/components/AdminLoginStage";
 import { AuthShell } from "@/features/auth/components/AuthShell";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import { SiteFooter } from "@/shared/layouts/SiteFooter";
 import { SiteHeader } from "@/shared/layouts/SiteHeader";
 
-export default function LoginPage() {
+type LoginPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+function getParam(
+  params: Record<string, string | string[] | undefined>,
+  key: string,
+) {
+  const value = params[key];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const nextPath = getParam(params, "next") ?? "";
+  const isAdminGate = nextPath.startsWith("/admin");
+
+  if (isAdminGate) {
+    return <AdminLoginStage />;
+  }
+
   return (
     <>
       <SiteHeader />
@@ -17,7 +39,9 @@ export default function LoginPage() {
           }}
           title="مرحباً بك في سوقنا"
         >
-          <LoginForm />
+          <Suspense fallback={<p className="text-sm text-muted">جاري التحميل...</p>}>
+            <LoginForm />
+          </Suspense>
         </AuthShell>
       </main>
       <SiteFooter />

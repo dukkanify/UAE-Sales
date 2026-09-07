@@ -2,20 +2,32 @@
 
 import type { OtpPurpose } from "@/types/domain/otp";
 import type { UserProfile } from "@/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
 import { useAsyncAction } from "@/shared/hooks/useAsyncAction";
 import { maskEmail } from "@/shared/utils/mask-email";
 import { trackAuthEventClient } from "@/services/analytics/auth-events";
+import { useToast } from "@/shared/components/ToastProvider";
+import { isDemoOtpClientEnabled } from "@/shared/constants/feature-flags";
+import {
+  clearOtpFallback,
+  readOtpFallback,
+  saveOtpFallback,
+  subscribeOtpFallback,
+} from "@/features/auth/lib/otp-fallback";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 
 type OtpVerificationProps = {
   email: string;
+  emailDeliveryFailed?: boolean;
   fullName?: string;
+  initialOtp?: string | null;
   maskedEmail?: string;
   nextPath?: string;
   onBack: () => void;
   onVerified?: (data?: {
+    approved?: boolean;
     metadata?: Record<string, string>;
     ok?: boolean;
     redirectTo?: string;
@@ -28,6 +40,11 @@ type OtpVerificationProps = {
 
 const COOLDOWN_SECONDS = 60;
 
+function normalizeOtp(value: string | null | undefined): string | null {
+  if (!value || !/^\d{6}$/.test(value)) return null;
+  return value;
+}
+
 const DEFAULT_VERIFY_ENDPOINTS: Partial<Record<OtpPurpose, string>> = {
   REGISTER: "/api/auth/register/verify-otp",
   LOGIN: "/api/auth/login/verify-otp",
@@ -37,7 +54,9 @@ const DEFAULT_VERIFY_ENDPOINTS: Partial<Record<OtpPurpose, string>> = {
 
 export function OtpVerification({
   email,
+  emailDeliveryFailed = false,
   fullName,
+  initialOtp = null,
   maskedEmail,
   nextPath,
   onBack,
@@ -45,13 +64,35 @@ export function OtpVerification({
   purpose,
   verifyEndpoint,
 }: OtpVerificationProps) {
-  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
+  const { showToast } = useToast();
+  const demoOtpEnabled = isDemoOtpClientEnabled();
+  const serverOtp = demoOtpEnabled ? normalizeOtp(initialOtp) : null;
+  const storedOtp = useSyncExternalStore(
+    subscribeOtpFallback,
+    () => (demoOtpEnabled ? readOtpFallback(email) ?? serverOtp : null),
+    () => serverOtp,
+  );
+  const fallbackOtp = demoOtpEnabled ? storedOtp ?? serverOtp : null;
+  const [digits, setDigits] = useState(() =>
+    serverOtp ? serverOtp.split("") : ["", "", "", "", "", ""],
+  );
   const [otpError, setOtpError] = useState("");
   const [cooldown, setCooldown] = useState(COOLDOWN_SECONDS);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
-  const autoSubmittedRef = useRef("");
+  const autoSubmittedRef = useRef(serverOtp ?? "");
+  const toastedRef = useRef(false);
   const displayEmail = maskedEmail ?? maskEmail(email);
   const endpoint = verifyEndpoint ?? DEFAULT_VERIFY_ENDPOINTS[purpose] ?? "/api/auth/otp/verify";
+
+  useEffect(() => {
+    if (demoOtpEnabled && serverOtp) saveOtpFallback(email, serverOtp);
+  }, [demoOtpEnabled, email, serverOtp]);
+
+  useEffect(() => {
+    if (!demoOtpEnabled || !fallbackOtp || toastedRef.current) return;
+    toastedRef.current = true;
+    showToast(`رمز التحقق: ${fallbackOtp}`);
+  }, [demoOtpEnabled, fallbackOtp, showToast]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -91,6 +132,7 @@ export function OtpVerification({
       }
 
       setOtpError("");
+      clearOtpFallback();
       await onVerified?.(data);
     }, [digits, email, endpoint, nextPath, onVerified, purpose]),
   );
@@ -110,10 +152,15 @@ export function OtpVerification({
       const response = await fetch("/api/auth/otp/resend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, purpose, fullName }),
       });
       const data = await response.json();
       if (!response.ok) {
+        if (response.status === 503 || data.error === "EMAIL_SEND_FAILED") {
+          setOtpError(data.message ?? "تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.");
+          return;
+        }
         if (response.status === 429 && data.retryAfterSeconds) {
           const waitMsg = data.message
             ? String(data.message)
@@ -129,8 +176,19 @@ export function OtpVerification({
       }
       setCooldown(COOLDOWN_SECONDS);
       setOtpError("");
+      if (data.emailDelivered === false) {
+        setOtpError(
+          data.message ?? "تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.",
+        );
+      }
+      if (demoOtpEnabled && typeof data.otp === "string" && /^\d{6}$/.test(data.otp)) {
+        saveOtpFallback(email, data.otp);
+        toastedRef.current = false;
+        autoSubmittedRef.current = data.otp;
+        setDigits(data.otp.split(""));
+      }
       trackAuthEventClient("otp_resend", { purpose });
-    }, [cooldown, email, fullName, purpose]),
+    }, [cooldown, demoOtpEnabled, email, fullName, purpose]),
   );
 
   function applyDigits(nextDigits: string[]) {
@@ -170,19 +228,52 @@ export function OtpVerification({
   }
 
   return (
+    <LocalizedTree>
     <div className="grid gap-4">
       <div>
         <p className="text-xs font-medium tracking-wide text-secondary uppercase">
-          التحقق بالبريد الإلكتروني
+          {purpose === "REGISTER" ? "التحقق من الشخص" : "التحقق بالبريد الإلكتروني"}
         </p>
         <h2 className="mt-1 text-xl font-black text-ink">أدخل رمز التحقق</h2>
         <p className="mt-2 text-sm font-medium text-muted">
-          أرسلنا رمز تحقق مكوّنًا من 6 أرقام إلى بريدك الإلكتروني
+          {purpose === "REGISTER"
+            ? fallbackOtp
+              ? "البريد قد يتأخر. الرمز ظاهر أدناه — أدخله أو اضغط تأكيد."
+              : "أرسلنا رمزًا مكوّنًا من 6 أرقام. بعد التحقق يُعتمد حسابك بسهولة."
+            : "أرسلنا رمز تحقق مكوّنًا من 6 أرقام إلى بريدك الإلكتروني"}
         </p>
         <p className="mt-1 text-sm font-bold text-ink" dir="ltr">
           {displayEmail}
         </p>
+        {fallbackOtp ? (
+          <div className="auth-otp-fallback">
+            <p className="auth-otp-fallback__label">رمز التحقق — البريد قد لا يصل</p>
+            <p className="auth-otp-fallback__code" dir="ltr">
+              {fallbackOtp}
+            </p>
+            <p className="auth-otp-fallback__hint">
+              استخدم هذا الرمز الآن لإكمال التحقق. لا تنتظر رسالة البريد.
+            </p>
+            <button
+              className="auth-otp-fallback__fill"
+              onClick={() => {
+                autoSubmittedRef.current = fallbackOtp;
+                setDigits(fallbackOtp.split(""));
+                setOtpError("");
+              }}
+              type="button"
+            >
+              تعبئة الرمز
+            </button>
+          </div>
+        ) : null}
       </div>
+
+      {emailDeliveryFailed ? (
+        <FormMessage variant="error">
+          تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.
+        </FormMessage>
+      ) : null}
 
       <div className="grid grid-cols-6 gap-2" dir="ltr" role="group" aria-label="رمز التحقق">
         {digits.map((digit, index) => (
@@ -238,5 +329,6 @@ export function OtpVerification({
         </button>
       </div>
     </div>
+    </LocalizedTree>
   );
 }

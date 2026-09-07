@@ -1,8 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useSyncExternalStore } from "react";
 import { cities } from "@/shared/constants/locations";
 import { Icon } from "@/shared/ui/Icon";
+
+type LocationOption = { id: string; name: string };
+
+const EMIRATE_STORAGE_KEY = "sooqna_emirate";
+const EMIRATE_CHANGE_EVENT = "sooqna-emirate-change";
+const ALL_EMIRATES_NAME = "كل الإمارات";
+const DEFAULT_EMIRATE = "أبوظبي";
+
+function buildEmirateOptions(): LocationOption[] {
+  const abuDhabi = cities.find((city) => city.id === "abu-dhabi");
+  const rest = cities.filter((city) => city.id !== "abu-dhabi");
+  const ordered = abuDhabi ? [abuDhabi, ...rest] : cities;
+
+  return [
+    { id: "all", name: ALL_EMIRATES_NAME },
+    ...ordered.map((city) => ({ id: city.id, name: city.name })),
+  ];
+}
+
+function readStoredEmirate(): string {
+  if (typeof window === "undefined") return DEFAULT_EMIRATE;
+  try {
+    const stored = localStorage.getItem(EMIRATE_STORAGE_KEY);
+    if (stored) return stored;
+  } catch {
+    /* ignore storage errors */
+  }
+  return DEFAULT_EMIRATE;
+}
+
+function subscribeEmirate(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => {};
+  const handler = () => onStoreChange();
+  window.addEventListener("storage", handler);
+  window.addEventListener(EMIRATE_CHANGE_EVENT, handler);
+  return () => {
+    window.removeEventListener("storage", handler);
+    window.removeEventListener(EMIRATE_CHANGE_EVENT, handler);
+  };
+}
+
+function notifyEmirateChange() {
+  window.dispatchEvent(new Event(EMIRATE_CHANGE_EVENT));
+}
 
 type EmirateLocationSelectProps = {
   className?: string;
@@ -13,21 +58,35 @@ type EmirateLocationSelectProps = {
 
 export function EmirateLocationSelect({
   className = "",
-  defaultCity = "دبي",
+  defaultCity = DEFAULT_EMIRATE,
   onCityChange,
   variant = "mobile",
 }: EmirateLocationSelectProps) {
-  const [city, setCity] = useState(defaultCity);
+  const router = useRouter();
+  const options = useMemo(() => buildEmirateOptions(), []);
+  const city = useSyncExternalStore(
+    subscribeEmirate,
+    readStoredEmirate,
+    () => defaultCity,
+  );
 
-  function handleChange(nextCity: string) {
-    setCity(nextCity);
-    onCityChange?.(nextCity);
+  function handleChange(next: string) {
+    onCityChange?.(next);
+    try {
+      localStorage.setItem(EMIRATE_STORAGE_KEY, next);
+      notifyEmirateChange();
+    } catch {
+      /* ignore storage errors */
+    }
+    router.push(
+      next === ALL_EMIRATES_NAME ? "/search" : `/search?city=${encodeURIComponent(next)}`,
+    );
   }
 
   if (variant === "desktop") {
     return (
       <label
-        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-[#fdfbf7] px-3 py-1.5 ${className}`.trim()}
+        className={`relative inline-flex min-h-10 max-w-[11rem] items-center gap-2 rounded-full border border-border bg-surface-muted px-3 py-1.5 ${className}`.trim()}
       >
         <Icon className="shrink-0 text-[#B8955F]" name="map" size={14} />
         <span className="min-w-0 truncate text-xs font-bold text-ink">{city}</span>
@@ -37,7 +96,7 @@ export function EmirateLocationSelect({
           onChange={(event) => handleChange(event.target.value)}
           value={city}
         >
-          {cities.map((item) => (
+          {options.map((item) => (
             <option key={item.id} value={item.name}>
               {item.name}
             </option>
@@ -58,7 +117,7 @@ export function EmirateLocationSelect({
         onChange={(event) => handleChange(event.target.value)}
         value={city}
       >
-        {cities.map((item) => (
+        {options.map((item) => (
           <option key={item.id} value={item.name}>
             {item.name}
           </option>

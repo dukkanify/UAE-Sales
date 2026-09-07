@@ -1,8 +1,15 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { Icon } from "@/shared/ui/Icon";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { SellerName } from "@/shared/i18n/SellerName";
+import { sellerName } from "@/shared/i18n/listing-copy";
+import { useLocale } from "@/shared/i18n/useLocale";
 
 type SellerPanelProps = {
   listing: Listing;
@@ -18,6 +25,8 @@ function isUserCreatedListing(listing: Listing): boolean {
 }
 
 export function SellerPanel({ listing }: SellerPanelProps) {
+  const locale = useLocale();
+  const displaySeller = sellerName(listing.seller, locale);
   const isUserListing = isUserCreatedListing(listing);
   const isVerified = isUserListing
     ? Boolean(listing.seller.isVerified || listing.verifiedSeller)
@@ -27,24 +36,52 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           listing.seller.rating,
       );
 
+  const [storeAverage, setStoreAverage] = useState<number | null>(null);
+  const [storeCount, setStoreCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/sellers/${encodeURIComponent(listing.seller.id)}/ratings`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (typeof data.average === "number" && data.count > 0) {
+          setStoreAverage(data.average);
+          setStoreCount(data.count);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [listing.seller.id]);
+
+  const rating =
+    storeAverage ??
+    (typeof listing.seller.rating === "number" ? listing.seller.rating : null);
+  const reviewCount =
+    storeCount ??
+    (typeof listing.seller.reviewCount === "number"
+      ? listing.seller.reviewCount
+      : null);
+
+  const showRating = typeof rating === "number" && rating > 0;
+  const showReviews = typeof reviewCount === "number" && reviewCount > 0;
   const showCompany = listing.seller.sellerType === "business";
-  const showRating =
-    !isUserListing && typeof listing.seller.rating === "number";
-  const showReviews =
-    !isUserListing && typeof listing.seller.reviewCount === "number";
   const showResponseTime = Boolean(listing.seller.responseTime?.trim());
   const showJoinedAt = Boolean(listing.seller.joinedAt?.trim());
   const showTransactions =
     typeof listing.seller.completedTransactions === "number";
 
   return (
+    <LocalizedTree>
     <Card className="marketplace-panel w-full min-w-0 p-6">
       <h2 className="text-base font-black text-ink">البائع</h2>
       <div className="mt-4 flex items-center gap-3">
         {listing.seller.avatarUrl ? (
           <span className="relative size-12 overflow-hidden rounded-[var(--radius-xl)]">
             <AppImage
-              alt={listing.seller.name}
+              alt={displaySeller}
               className="object-cover"
               fallback="avatar"
               fill
@@ -54,19 +91,21 @@ export function SellerPanel({ listing }: SellerPanelProps) {
           </span>
         ) : (
           <span className="grid size-12 place-items-center rounded-[var(--radius-xl)] bg-primary text-sm font-semibold text-white">
-            {listing.seller.name.slice(0, 2)}
+            {displaySeller.slice(0, 2)}
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-ink">{listing.seller.name}</p>
+          <p className="font-semibold text-ink">
+            <SellerName seller={listing.seller} />
+          </p>
           {showRating ? (
             <p className="mt-0.5 inline-flex flex-wrap items-center gap-1 text-sm font-medium text-muted">
               <Icon className="text-secondary" name="star" size={14} />
-              {listing.seller.rating}
+              {rating}
               {showReviews ? (
                 <>
                   <span className="text-border">·</span>
-                  {listing.seller.reviewCount!.toLocaleString("ar-AE")} تقييم
+                  {reviewCount!.toLocaleString("en-AE")} تقييم
                 </>
               ) : null}
             </p>
@@ -100,12 +139,13 @@ export function SellerPanel({ listing }: SellerPanelProps) {
             <div className="flex items-center justify-between rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3">
               <span className="font-medium text-muted">معاملات مكتملة</span>
               <span className="font-semibold text-ink">
-                {listing.seller.completedTransactions!.toLocaleString("ar-AE")}
+                {listing.seller.completedTransactions!.toLocaleString("en-AE")}
               </span>
             </div>
           ) : null}
         </div>
       ) : null}
     </Card>
+    </LocalizedTree>
   );
 }

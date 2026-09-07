@@ -32,6 +32,25 @@ function hasFieldValue(value: string | string[]): boolean {
   return value.length > 0;
 }
 
+function normalizeCondition(value: string): ListingCondition {
+  const normalized = value.trim().toLowerCase();
+  if (
+    normalized === "new" ||
+    value === "جديد" ||
+    value === "جديدة"
+  ) {
+    return "new";
+  }
+  if (
+    normalized === "excellent" ||
+    value === "ممتاز" ||
+    value === "ممتازة"
+  ) {
+    return "excellent";
+  }
+  return "used";
+}
+
 export function parseCategoryForm(
   formData: FormData,
   categoryId: string,
@@ -65,8 +84,20 @@ export function parseCategoryForm(
   }
 
   const fields = getCategoryFields(categoryId);
+  const visibilitySpecs: Record<string, string> = {};
+  for (const field of fields) {
+    if (field.type === "checkbox-group") continue;
+    visibilitySpecs[field.key] = String(formData.get(`spec_${field.key}`) ?? "").trim();
+  }
 
   for (const field of fields) {
+    if (
+      field.showWhen &&
+      !field.showWhen.values.includes(visibilitySpecs[field.showWhen.key] ?? "")
+    ) {
+      continue;
+    }
+
     const raw = readFieldValue(formData, field);
 
     if (field.type === "checkbox-group") {
@@ -86,7 +117,7 @@ export function parseCategoryForm(
     }
 
     if (field.key === "condition") {
-      condition = value as ListingCondition;
+      condition = normalizeCondition(value);
     } else if (field.key === "city") {
       city = value;
     } else if (field.key === "emirate") {
@@ -103,6 +134,12 @@ export function parseCategoryForm(
     }
   }
 
+  // Food: never treat as new/used product condition.
+  if (categoryId === "food") {
+    condition = "used";
+    delete categorySpecs.condition;
+  }
+
   const description = String(formData.get("description") ?? "").trim();
   if (description.length < 20) {
     errors.description = "اكتب وصفاً لا يقل عن 20 حرفاً.";
@@ -115,6 +152,10 @@ export function parseCategoryForm(
 
   const titleParts = fields
     .filter((field) => field.titlePart)
+    .filter((field) => {
+      if (!field.showWhen) return true;
+      return field.showWhen.values.includes(visibilitySpecs[field.showWhen.key] ?? "");
+    })
     .map((field) => categorySpecs[field.key])
     .filter((value) => hasFieldValue(String(value ?? "")));
 

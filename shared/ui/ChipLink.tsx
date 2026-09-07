@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTx } from "@/shared/i18n/useTx";
 
 type ChipLinkProps = {
   active?: boolean;
@@ -7,6 +10,7 @@ type ChipLinkProps = {
 };
 
 export function ChipLink({ active = false, href, label }: ChipLinkProps) {
+  const t = useTx();
   return (
     <Link
       className={`inline-flex min-h-9 items-center rounded-[var(--radius-md)] border px-3.5 py-1.5 text-sm font-medium transition ${
@@ -16,7 +20,7 @@ export function ChipLink({ active = false, href, label }: ChipLinkProps) {
       }`}
       href={href}
     >
-      {label}
+      {t(label)}
     </Link>
   );
 }

@@ -1,38 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { adminFetch } from "@/features/admin/lib/admin-fetch";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { getSessionUser } from "@/services/storage";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 
 type ReportSummary = {
-  totalOrders: number;
+  conversionRate: number;
+  openDisputes: number;
   paidOrders: number;
+  pendingListings: number;
   refundedOrders: number;
-  totalVolume: number;
+  totalGatewayFees: number;
+  totalListings: number;
+  totalOrders: number;
   totalPlatformFees: number;
+  totalUsers: number;
+  totalVolume: number;
 };
 
 type PaymentEvent = {
-  id: string;
-  type: string;
   createdAt: string;
+  id: string;
   orderId?: string;
+  type: string;
+};
+
+type DailyPoint = {
+  date: string;
+  fees: number;
+  label: string;
+  orders: number;
+  volume: number;
 };
 
 export function AdminReportsPanel() {
   const [summary, setSummary] = useState<ReportSummary | null>(null);
   const [events, setEvents] = useState<PaymentEvent[]>([]);
+  const [daily, setDaily] = useState<DailyPoint[]>([]);
+  const [walletAccounts, setWalletAccounts] = useState(0);
+  const [exportRange, setExportRange] = useState("30d");
+  const [exporting, setExporting] = useState(false);
+  const [walletBalances, setWalletBalances] = useState({
+    available: 0,
+    held: 0,
+  });
+
+  async function downloadExcel() {
+    setExporting(true);
+    try {
+      const response = await adminFetch(
+        `/api/admin/export?range=${encodeURIComponent(exportRange)}`,
+      );
+      if (!response.ok) return;
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `sooqna-report-${exportRange}.xls`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   useEffect(() => {
     const user = getSessionUser();
     if (!user || user.role !== "admin") return;
-    fetch("/api/admin/reports", { headers: { "x-admin-role": "admin" } })
+    adminFetch("/api/admin/reports")
       .then((res) => res.json())
       .then((data) => {
         setSummary(data.summary ?? null);
         setEvents(data.recentEvents ?? []);
+        setDaily(data.daily ?? []);
+        setWalletAccounts(data.walletAccounts ?? 0);
+        setWalletBalances(data.walletBalances ?? { available: 0, held: 0 });
       })
       .catch(() => undefined);
   }, []);
@@ -45,59 +91,165 @@ export function AdminReportsPanel() {
     );
   }
 
+  const maxVolume = Math.max(...daily.map((d) => d.volume), 1);
+
   return (
     <div className="grid gap-5">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-5" variant="flat">
-          <p className="text-xs text-muted">إجمالي الطلبات</p>
-          <p className="mt-2 text-2xl font-bold text-ink">{summary.totalOrders}</p>
-        </Card>
-        <Card className="p-5" variant="flat">
-          <p className="text-xs text-muted">طلبات مدفوعة</p>
-          <p className="mt-2 text-2xl font-bold text-ink">{summary.paidOrders}</p>
-        </Card>
-        <Card className="p-5" variant="flat">
-          <p className="text-xs text-muted">مستردة</p>
-          <p className="mt-2 text-2xl font-bold text-ink">{summary.refundedOrders}</p>
-        </Card>
-        <Card className="p-5" variant="flat">
-          <p className="text-xs text-muted">حجم المدفوعات</p>
-          <div className="mt-2">
-            <CurrencyAmount amount={summary.totalVolume} size="lg" />
+      <Card className="flex flex-wrap items-end gap-3 p-4" variant="flat">
+        <label className="grid gap-1 text-xs font-semibold text-ink">
+          نطاق التصدير
+          <select
+            className="rounded-[var(--radius-lg)] border border-border bg-surface px-3 py-2 text-sm"
+            onChange={(event) => setExportRange(event.target.value)}
+            value={exportRange}
+          >
+            <option value="24h">آخر 24 ساعة</option>
+            <option value="7d">آخر 7 أيام</option>
+            <option value="30d">آخر 30 يوم</option>
+            <option value="all">الكل</option>
+          </select>
+        </label>
+        <Button
+          loading={exporting}
+          onClick={() => void downloadExcel()}
+          size="sm"
+          type="button"
+        >
+          تصدير Excel (XLS)
+        </Button>
+        <p className="text-xs text-muted">
+          يشمل Summary وUsers وListings وOrders وPayments وEscrow وDisputes بالدرهم.
+        </p>
+      </Card>
+      <div className="admin-ops__kpi-grid admin-ops__kpi-grid--wide">
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">إجمالي الطلبات</p>
+          <p className="admin-ops__kpi-value">{summary.totalOrders}</p>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">مدفوعة</p>
+          <p className="admin-ops__kpi-value">{summary.paidOrders}</p>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">مستردة</p>
+          <p className="admin-ops__kpi-value">{summary.refundedOrders}</p>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">التحويل</p>
+          <p className="admin-ops__kpi-value">{summary.conversionRate}%</p>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">حجم المدفوعات</p>
+          <div className="admin-ops__kpi-value">
+            <CurrencyAmount amount={summary.totalVolume} size="md" />
           </div>
-        </Card>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">رسوم المنصة</p>
+          <div className="admin-ops__kpi-value">
+            <CurrencyAmount amount={summary.totalPlatformFees} size="md" />
+          </div>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">رسوم البوابة</p>
+          <div className="admin-ops__kpi-value">
+            <CurrencyAmount amount={summary.totalGatewayFees} size="md" />
+          </div>
+        </div>
+        <div className="admin-ops__kpi">
+          <p className="admin-ops__kpi-label">المحافظ</p>
+          <p className="admin-ops__kpi-value">{walletAccounts}</p>
+          <p className="admin-ops__kpi-hint">
+            متاح <CurrencyAmount amount={walletBalances.available} size="sm" />
+          </p>
+        </div>
       </div>
 
-      <Card className="p-6" variant="flat">
-        <p className="text-sm text-muted">رسوم المنصة</p>
-        <div className="mt-2">
-          <CurrencyAmount amount={summary.totalPlatformFees} size="lg" />
+      <section className="admin-ops__panel">
+        <div className="admin-ops__panel-head">
+          <h2 className="admin-ops__panel-title">حجم الأسبوع</h2>
+          <Link className="admin-ops__text-link" href="/admin/analytics">
+            تحليلات أوسع
+          </Link>
         </div>
-      </Card>
-
-      <Card className="p-6" variant="flat">
-        <h2 className="text-sm font-semibold text-ink">سجل أحداث الدفع</h2>
-        <ul className="mt-4 grid gap-2">
-          {events.map((event) => (
-            <li
-              key={event.id}
-              className="rounded-[var(--radius-xl)] bg-surface-muted px-4 py-3 text-sm"
-            >
-              <span className="font-semibold text-ink">{event.type}</span>
-              {event.orderId ? (
-                <span className="text-muted"> — {event.orderId}</span>
-              ) : null}
-              <p className="text-xs text-muted">
-                {new Date(event.createdAt).toLocaleString("ar-AE")}
-              </p>
-            </li>
+        <div className="admin-ops__bars" style={{ marginTop: "1rem" }}>
+          {daily.map((point) => (
+            <div key={point.date} className="admin-ops__bar-col">
+              <div className="admin-ops__bar-track">
+                <div
+                  className="admin-ops__bar-fill"
+                  style={{
+                    height: `${Math.max(8, (point.volume / maxVolume) * 100)}%`,
+                  }}
+                />
+              </div>
+              <p className="admin-ops__bar-value">{point.orders}</p>
+              <p className="admin-ops__bar-label">{point.label}</p>
+            </div>
           ))}
-        </ul>
-      </Card>
+        </div>
+      </section>
 
-      <Link className="text-sm font-semibold text-primary" href="/admin">
-        ← العودة للإدارة
-      </Link>
+      <div className="admin-ops__panels">
+        <section className="admin-ops__panel">
+          <h2 className="admin-ops__panel-title">ملخص السوق</h2>
+          <div
+            className="admin-ops__detail-grid"
+            style={{ marginTop: "0.85rem" }}
+          >
+            <div className="admin-ops__detail-row">
+              <span>المستخدمون</span>
+              <strong>{summary.totalUsers}</strong>
+            </div>
+            <div className="admin-ops__detail-row">
+              <span>الإعلانات</span>
+              <strong>{summary.totalListings}</strong>
+            </div>
+            <div className="admin-ops__detail-row">
+              <span>بانتظار المراجعة</span>
+              <strong>{summary.pendingListings}</strong>
+            </div>
+            <div className="admin-ops__detail-row">
+              <span>نزاعات مفتوحة</span>
+              <strong>{summary.openDisputes}</strong>
+            </div>
+            <div className="admin-ops__detail-row">
+              <span>محجوز في المحافظ</span>
+              <strong>
+                <CurrencyAmount amount={walletBalances.held} size="sm" />
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <section className="admin-ops__panel">
+          <div className="admin-ops__panel-head">
+            <h2 className="admin-ops__panel-title">سجل أحداث الدفع</h2>
+            <Link className="admin-ops__text-link" href="/admin/stripe">
+              Stripe
+            </Link>
+          </div>
+          <ul className="admin-ops__queue" style={{ marginTop: "0.85rem" }}>
+            {events.length === 0 ? (
+              <li className="admin-ops__queue-item">
+                <p className="admin-ops__queue-meta">لا أحداث بعد.</p>
+              </li>
+            ) : (
+              events.map((event) => (
+                <li key={event.id} className="admin-ops__queue-item">
+                  <div>
+                    <p className="admin-ops__queue-label">{event.type}</p>
+                    <p className="admin-ops__queue-meta">
+                      {new Date(event.createdAt).toLocaleString("ar-AE")}
+                      {event.orderId ? ` — ${event.orderId}` : ""}
+                    </p>
+                  </div>
+                </li>
+              ))
+            )}
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

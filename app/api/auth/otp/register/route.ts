@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { emailOtpDisabledResponse } from "@/services/auth/feature-guard";
 import { z } from "zod";
 import { sendOtpEmail } from "@/services/email/email.service";
-import { createOtpRequest, maskEmail } from "@/services/otp/otp.service";
+import { createOtpRequest, invalidateOtpRecord, maskEmail } from "@/services/otp/otp.service";
+import { canRevealOtpToClient } from "@/services/otp/otp-config";
 
 const schema = z.object({
   email: z.string().email(),
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     const email = parsed.data.email.trim().toLowerCase();
-    const { code } = await createOtpRequest({
+    const { record, code } = await createOtpRequest({
       email,
       purpose: "REGISTER",
       metadata: {
@@ -36,16 +37,24 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendOtpEmail({
+    const delivered = await sendOtpEmail({
       email,
       name: parsed.data.fullName,
       otp: code,
     });
 
+    if (!delivered && !canRevealOtpToClient(false)) {
+      await invalidateOtpRecord(record.id);
+      return NextResponse.json({ error: "EMAIL_SEND_FAILED" }, { status: 503 });
+    }
+
+    const revealOtp = canRevealOtpToClient(delivered);
     return NextResponse.json({
       ok: true,
       maskedEmail: maskEmail(email),
       email,
+      emailDelivered: delivered,
+      ...(revealOtp ? { otp: code } : {}),
     });
   } catch (error) {
     if (error instanceof Error && error.message.startsWith("RESEND_COOLDOWN:")) {

@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { sendViewingBookingEmails } from "@/services/email/email.service";
+import {
+  buildGoogleDirectionsUrl,
+  resolveListingMapPoint,
+} from "@/features/listings/lib/listing-map-location";
+import { findStoredEmail, listingPublicUrl } from "@/services/listings/listing-action-mail";
 import { createNotification } from "@/services/payments/notification-store";
 import {
   assertNotOwnListing,
@@ -85,22 +91,58 @@ export async function POST(request: Request) {
 
   const booking = await createViewingBooking(payload);
 
+  const listingHref = listing
+    ? listing.id.startsWith("local-")
+      ? `/listings/local/${listing.id}`
+      : `/listings/${listing.slug}`
+    : payload.listingSlug
+      ? `/listings/${payload.listingSlug}`
+      : "/search";
+
   await Promise.all([
     createNotification({
       userId: payload.buyerId,
       type: "viewing_booking",
       title: "تم تأكيد حجز المعاينة",
       body: `معاينة «${payload.listingTitle}» بتاريخ ${payload.date} الساعة ${payload.time}.`,
+      href: listingHref,
     }),
     createNotification({
       userId: payload.sellerId,
       type: "viewing_booking",
       title: "حجز معاينة جديد",
       body: `${payload.buyerName} حجز معاينة لـ «${payload.listingTitle}».`,
+      href: listingHref,
     }),
   ]);
 
-  return NextResponse.json({ booking });
+  const sellerEmail = await findStoredEmail(payload.sellerId);
+  const mapPoint = listing
+    ? resolveListingMapPoint({
+        area: listing.area,
+        emirate: listing.emirate,
+        city: listing.city,
+      })
+    : null;
+  const emailed = await sendViewingBookingEmails({
+    buyer: { email: payload.buyerEmail, name: payload.buyerName },
+    seller: sellerEmail
+      ? { email: sellerEmail, name: payload.sellerName }
+      : undefined,
+    listingTitle: payload.listingTitle,
+    listingUrl: listingPublicUrl({
+      listingId: payload.listingId,
+      listingSlug: payload.listingSlug,
+    }),
+    date: payload.date,
+    time: payload.time,
+    phone: payload.phone,
+    visitors: payload.visitors,
+    locationLabel: mapPoint?.label,
+    mapUrl: mapPoint ? buildGoogleDirectionsUrl(mapPoint) : undefined,
+  });
+
+  return NextResponse.json({ booking, emailed: emailed.buyerEmailed });
 }
 
 export async function GET(request: Request) {

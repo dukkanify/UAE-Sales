@@ -24,6 +24,10 @@ export async function POST(request: Request) {
     const result = await initiateCheckout(parsed.data);
 
     if (result.mode === "mock") {
+      if (!isMockCheckoutAllowed()) {
+        return NextResponse.json({ error: "STRIPE_NOT_CONFIGURED" }, { status: 503 });
+      }
+
       const paymentResult = await completeMockPayment(result.orderId);
       const params = new URLSearchParams({ orderId: result.orderId });
       if (paymentResult.guestAccessToken) {
@@ -40,28 +44,31 @@ export async function POST(request: Request) {
     }
 
     if (!result.checkoutUrl) {
-      return NextResponse.json({
-        mode: "checkout",
-        orderId: result.orderId,
-        redirectUrl: `/orders/${result.orderId}`,
-      });
+      return NextResponse.json(
+        { error: "CHECKOUT_URL_MISSING", orderId: result.orderId },
+        { status: 502 },
+      );
     }
 
     return NextResponse.json({
       mode: "checkout",
       orderId: result.orderId,
       checkoutUrl: result.checkoutUrl,
+      sessionId: result.sessionId,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
     const status =
       message === "LISTING_NOT_FOUND"
         ? 404
-        : message === "CANNOT_BUY_OWN_LISTING"
+        : message === "CANNOT_BUY_OWN_LISTING" ||
+            message === "GUEST_CHECKOUT_DISABLED"
           ? 403
-          : message === "SHIPPING_UNAVAILABLE"
-            ? 400
-            : 500;
+          : message === "STRIPE_NOT_CONFIGURED"
+            ? 503
+            : message === "SHIPPING_UNAVAILABLE"
+              ? 400
+              : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

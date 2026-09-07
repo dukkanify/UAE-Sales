@@ -1,12 +1,27 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { SESSION_COOKIE_NAME } from "@/services/auth/session-cookie";
+import { peekSessionRoleFromCookieValue } from "@/services/auth/session-token";
 
 const APEX_HOST = "sooqna.site";
+
+function readSessionRole(request: NextRequest): string | null {
+  const raw = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  return peekSessionRoleFromCookieValue(raw);
+}
+
+function redirectToLogin(request: NextRequest, nextPath: string) {
+  const url = request.nextUrl.clone();
+  url.pathname = "/login";
+  url.search = `?next=${encodeURIComponent(nextPath)}`;
+  return NextResponse.redirect(url);
+}
 
 export function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const forwardedProto = request.headers.get("x-forwarded-proto");
   const isProduction = process.env.NODE_ENV === "production";
+  const { pathname } = request.nextUrl;
 
   if (isProduction && host.startsWith("www.")) {
     const url = request.nextUrl.clone();
@@ -20,6 +35,14 @@ export function proxy(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.protocol = "https:";
     return NextResponse.redirect(url, 308);
+  }
+
+  // Admin requires an admin session immediately.
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    const role = readSessionRole(request);
+    if (role !== "admin") {
+      return redirectToLogin(request, `${pathname}${request.nextUrl.search}`);
+    }
   }
 
   const response = NextResponse.next();

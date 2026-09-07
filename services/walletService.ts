@@ -1,26 +1,32 @@
 import type { WalletAccount } from "@/types/domain/wallet";
 import { getWalletAccount } from "@/services/payments/wallet-ledger";
 
-const MOCK_ACTIVITY = [
-  {
-    id: "txn-001",
-    type: "deposit" as const,
-    amount: 1500,
-    description: "إيداع عبر بطاقة بنكية",
-    date: "2026-06-28T14:30:00+04:00",
-    status: "completed" as const,
-  },
-];
+const EMPTY_SUMMARY = {
+  availableBalance: 0,
+  pendingBalance: 0,
+  heldInEscrow: 0,
+  currency: "AED" as const,
+  recentActivity: [] as Array<{
+    id: string;
+    type:
+      | "deposit"
+      | "escrow_hold"
+      | "release"
+      | "withdrawal"
+      | "refund"
+      | "stripe_payment"
+      | "platform_fee"
+      | "escrow_release";
+    amount: number;
+    description: string;
+    date: string;
+    status: "completed" | "pending" | "failed";
+  }>,
+};
 
 export async function getWalletSummaryForUser(userId?: string) {
   if (!userId) {
-    return {
-      availableBalance: 2450,
-      pendingBalance: 850,
-      heldInEscrow: 0,
-      currency: "AED" as const,
-      recentActivity: MOCK_ACTIVITY,
-    };
+    return { ...EMPTY_SUMMARY, recentActivity: [] };
   }
 
   const ledger: WalletAccount = await getWalletAccount(userId);
@@ -49,7 +55,7 @@ export async function getWalletSummaryForUser(userId?: string) {
     pendingBalance: ledger.pendingBalance,
     heldInEscrow: ledger.heldInEscrow,
     currency: ledger.currency,
-    recentActivity: activity.length > 0 ? activity : MOCK_ACTIVITY,
+    recentActivity: activity,
   };
 }
 
@@ -58,5 +64,5 @@ export async function getWalletSummary(userId?: string) {
 }
 
 export async function getSavedListingsCount() {
-  return 4;
+  return 0;
 }

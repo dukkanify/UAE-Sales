@@ -1,4 +1,12 @@
 import type { Order } from "@/types/domain/order";
+import { findUserById } from "@/services/auth/user-store";
+import { sendTransactionalEmail } from "@/services/email/transactional-email";
+import {
+  EMAIL_SITE_URL,
+  emailSiteUrl,
+  escapeEmailHtml,
+} from "@/services/email/sooqna-email-template";
+import { resolveEmailLocale } from "@/shared/i18n/email-locale";
 import { loadCollection, saveCollection } from "@/services/payments/data-store";
 
 const PENDING_EMAILS_FILE = "pending-emails.json";
@@ -13,79 +21,13 @@ export type PendingEmailEvent = {
   status: "pending" | "sent" | "failed";
 };
 
-function getAppBaseUrl(): string {
-  return process.env.NEXT_PUBLIC_APP_URL?.trim() || "http://localhost:3000";
-}
-
-function buildOrderConfirmationHtml(input: {
-  name: string;
-  orderNumber: string;
-  orderTrackingLink: string;
-  setPasswordLink?: string;
-  hasExistingAccount: boolean;
-}): string {
-  const accountSection = input.setPasswordLink
-    ? `<p style="font-size:16px;line-height:1.8;">أنشأنا لك ملفًا مبسطًا باستخدام بريدك الإلكتروني لتسهيل متابعة الطلب.</p>
-       <p style="font-size:16px;line-height:1.8;">لإنشاء كلمة مرور والوصول إلى حسابك لاحقًا:</p>
-       <p style="text-align:center;margin:20px 0;"><a href="${input.setPasswordLink}" style="background:#0B1628;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">إعداد الحساب</a></p>
-       <p style="font-size:14px;line-height:1.8;color:#555;">إذا لم ترغب بإنشاء كلمة مرور الآن، سيبقى طلبك محفوظًا ويمكنك الرجوع إليه من رابط الطلب الآمن.</p>`
-    : input.hasExistingAccount
-      ? `<p style="font-size:16px;line-height:1.8;">لديك حساب سابق بهذا البريد. يمكنك تسجيل الدخول لمتابعة جميع طلباتك.</p>`
-      : "";
-
-  return `
-    <div style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;background:#FAF9F7;color:#0B1628;direction:rtl;text-align:right;">
-      <div style="text-align:center;margin-bottom:24px;">
-        <strong style="font-size:22px;color:#0B1628;">سوقنا Sooqna</strong>
-      </div>
-      <p style="font-size:16px;line-height:1.8;">مرحبًا ${input.name}،</p>
-      <p style="font-size:16px;line-height:1.8;">تم استلام طلبك بنجاح.</p>
-      <p style="font-size:16px;line-height:1.8;">رقم الطلب:<br/><strong>${input.orderNumber}</strong></p>
-      <p style="font-size:16px;line-height:1.8;">يمكنك متابعة حالة الطلب من خلال الرابط التالي:</p>
-      <p style="text-align:center;margin:20px 0;"><a href="${input.orderTrackingLink}" style="background:#0B1628;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;">متابعة الطلب</a></p>
-      ${accountSection}
-      <p style="font-size:14px;margin-top:32px;color:#555;">فريق سوقنا</p>
-    </div>
-  `.trim();
-}
-
-function buildOrderConfirmationText(input: {
-  name: string;
-  orderNumber: string;
-  orderTrackingLink: string;
-  setPasswordLink?: string;
-  hasExistingAccount: boolean;
-}): string {
-  const lines = [
-    `مرحبًا ${input.name}،`,
-    "",
-    "تم استلام طلبك بنجاح.",
-    "",
-    `رقم الطلب: ${input.orderNumber}`,
-    "",
-    "يمكنك متابعة حالة الطلب من خلال الرابط التالي:",
-    input.orderTrackingLink,
-  ];
-
-  if (input.setPasswordLink) {
-    lines.push(
-      "",
-      "أنشأنا لك ملفًا مبسطًا باستخدام بريدك الإلكتروني لتسهيل متابعة الطلب.",
-      "",
-      "لإنشاء كلمة مرور والوصول إلى حسابك لاحقًا:",
-      input.setPasswordLink,
-      "",
-      "إذا لم ترغب بإنشاء كلمة مرور الآن، سيبقى طلبك محفوظًا ويمكنك الرجوع إليه من رابط الطلب الآمن.",
-    );
-  } else if (input.hasExistingAccount) {
-    lines.push(
-      "",
-      "لديك حساب سابق بهذا البريد. يمكنك تسجيل الدخول لمتابعة جميع طلباتك.",
-    );
+function greet(name: string, locale: "ar" | "en"): string {
+  const fallback = locale === "en" ? "Sooqna customer" : "عميل سوقنا";
+  const safe = escapeEmailHtml(name.trim() || fallback);
+  if (locale === "en") {
+    return `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">Hello ${safe},</p>`;
   }
-
-  lines.push("", "فريق سوقنا");
-  return lines.join("\n");
+  return `<p style="font-size:16px;line-height:1.8;margin:0 0 12px;">مرحبًا ${safe}،</p>`;
 }
 
 async function queuePendingEmail(event: Omit<PendingEmailEvent, "id" | "createdAt" | "status">) {
@@ -99,8 +41,6 @@ async function queuePendingEmail(event: Omit<PendingEmailEvent, "id" | "createdA
   await saveCollection(PENDING_EMAILS_FILE, events);
 }
 
-import { deliverEmailSafely } from "@/services/email/email.service";
-
 export async function queueOrderConfirmationEmail(input: {
   order: Order;
   guestAccessToken: string;
@@ -108,66 +48,123 @@ export async function queueOrderConfirmationEmail(input: {
   isNewAccount: boolean;
   hasExistingAccount: boolean;
 }): Promise<void> {
-  const baseUrl = getAppBaseUrl();
-  const orderTrackingLink = `${baseUrl}/order-status?token=${input.guestAccessToken}`;
-  const setPasswordLink = input.accountSetupToken
-    ? `${baseUrl}/complete-account?token=${input.accountSetupToken}`
-    : undefined;
+  try {
+    const orderTrackingLink = `${EMAIL_SITE_URL}/order-status?token=${encodeURIComponent(input.guestAccessToken)}`;
+    const setPasswordLink = input.accountSetupToken
+      ? `${EMAIL_SITE_URL}/complete-account?token=${encodeURIComponent(input.accountSetupToken)}`
+      : undefined;
 
-  const emailPayload = {
-    to: input.order.buyerEmail,
-    subject: "تم استلام طلبك في سوقنا",
-    html: buildOrderConfirmationHtml({
-      name: input.order.buyerName,
-      orderNumber: input.order.id,
-      orderTrackingLink,
-      setPasswordLink,
-      hasExistingAccount: input.hasExistingAccount,
-    }),
-    text: buildOrderConfirmationText({
-      name: input.order.buyerName,
-      orderNumber: input.order.id,
-      orderTrackingLink,
-      setPasswordLink,
-      hasExistingAccount: input.hasExistingAccount,
-    }),
-  };
-
-  const sent = await deliverEmailSafely(emailPayload);
-  const { updateOrder } = await import("@/services/payments/order-store");
-  await updateOrder(input.order.id, {
-    emailDeliveryStatus: sent ? "sent" : "pending",
-  });
-
-  if (!sent) {
-    await queuePendingEmail({
-      type: "order_confirmation",
-      to: input.order.buyerEmail,
-      orderId: input.order.id,
-      payload: {
-        orderTrackingLink,
-        setPasswordLink: setPasswordLink ?? "",
-      },
+    const locale = await resolveEmailLocale({
+      userId: input.order.buyerId,
+      email: input.order.buyerEmail,
     });
-  }
+    const english = locale === "en";
 
-  await queueSellerOrderNotification(input.order);
+    let extraHtml = "";
+    const extraLines: string[] = [];
+    if (setPasswordLink) {
+      extraHtml = english
+        ? `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">We created a simple account with your email so you can track the order. You can set a password later from the link below.</p>
+        <p style="text-align:center;margin:20px 0 8px;"><a href="${setPasswordLink}" style="display:inline-block;padding:12px 22px;background:#C9A227;color:#0B1628;text-decoration:none;border-radius:12px;font-weight:700;">Set up account</a></p>`
+        : `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">أنشأنا لك ملفًا مبسطًا باستخدام بريدك لتسهيل متابعة الطلب. يمكنك إعداد كلمة المرور لاحقًا من الرابط أدناه.</p>
+        <p style="text-align:center;margin:20px 0 8px;"><a href="${setPasswordLink}" style="display:inline-block;padding:12px 22px;background:#C9A227;color:#0B1628;text-decoration:none;border-radius:12px;font-weight:700;">إعداد الحساب</a></p>`;
+      extraLines.push(
+        ...(english
+          ? ["You can set your password from:", setPasswordLink]
+          : ["يمكنك إعداد كلمة المرور من:", setPasswordLink]),
+      );
+    } else if (input.hasExistingAccount) {
+      extraHtml = english
+        ? `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">You already have an account with this email. Sign in to track all of your orders.</p>`
+        : `<p style="font-size:16px;line-height:1.8;margin:12px 0 0;">لديك حساب سابق بهذا البريد. سجّل الدخول لمتابعة جميع طلباتك.</p>`;
+      extraLines.push(
+        english
+          ? "You already have an account with this email. Sign in to track your orders."
+          : "لديك حساب سابق بهذا البريد. سجّل الدخول لمتابعة طلباتك.",
+      );
+    }
+
+    const titleHtml = escapeEmailHtml(input.order.listingTitle);
+    const buyerStatus = await sendTransactionalEmail({
+      type: "order_paid",
+      to: input.order.buyerEmail,
+      userId: input.order.buyerId ?? undefined,
+      entityId: input.order.id,
+      locale,
+      subject: english
+        ? `We received your order — ${input.order.listingTitle}`
+        : `تم استلام طلبك — ${input.order.listingTitle}`,
+      title: english ? "Your order has been received" : "تم استلام طلبك بنجاح",
+      bodyHtml: english
+        ? `${greet(input.order.buyerName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">Payment for “${titleHtml}” succeeded. The amount is held in escrow until receipt is confirmed.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">Order number: <strong>${escapeEmailHtml(input.order.id)}</strong></p>${extraHtml}`
+        : `${greet(input.order.buyerName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">تم دفع طلب «${titleHtml}» بنجاح. المبلغ محجوز في الضمان حتى تأكيد الاستلام.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">رقم الطلب: <strong>${escapeEmailHtml(input.order.id)}</strong></p>${extraHtml}`,
+      bodyLines: english
+        ? [
+            `Payment for “${input.order.listingTitle}” was received.`,
+            `Order number: ${input.order.id}`,
+            ...extraLines,
+          ]
+        : [
+            `تم دفع طلب «${input.order.listingTitle}».`,
+            `رقم الطلب: ${input.order.id}`,
+            ...extraLines,
+          ],
+      ctaHref: orderTrackingLink,
+      ctaLabel: english ? "Track order" : "متابعة الطلب",
+    });
+
+    const { updateOrder } = await import("@/services/payments/order-store");
+    await updateOrder(input.order.id, {
+      emailDeliveryStatus: buyerStatus === "failed" ? "failed" : buyerStatus,
+    });
+
+    if (buyerStatus === "failed") {
+      await queuePendingEmail({
+        type: "order_confirmation",
+        to: input.order.buyerEmail,
+        orderId: input.order.id,
+        payload: {
+          orderTrackingLink,
+          setPasswordLink: setPasswordLink ?? "",
+        },
+      });
+    }
+
+    await queueSellerOrderNotification(input.order);
+  } catch (error) {
+    console.error("[Sooqna Email] guest order confirmation failed", error);
+  }
 }
 
 async function queueSellerOrderNotification(order: Order): Promise<void> {
-  const { findUserById } = await import("@/services/auth/user-store");
   const seller = await findUserById(order.sellerId);
   if (!seller?.email) return;
 
-  const emailPayload = {
-    to: seller.email,
-    subject: `طلب جديد — ${order.listingTitle}`,
-    html: `<p style="font-family:Tahoma,Arial,sans-serif;direction:rtl;text-align:right;">تم استلام طلب جديد لإعلان «${order.listingTitle}».<br/>رقم الطلب: ${order.id}</p>`,
-    text: `تم استلام طلب جديد لإعلان «${order.listingTitle}».\nرقم الطلب: ${order.id}`,
-  };
+  const locale = await resolveEmailLocale({ userId: seller.id, email: seller.email });
+  const english = locale === "en";
+  const titleHtml = escapeEmailHtml(order.listingTitle);
 
-  const sent = await deliverEmailSafely(emailPayload);
-  if (!sent) {
+  const status = await sendTransactionalEmail({
+    type: "order_seller_new",
+    to: seller.email,
+    userId: seller.id,
+    entityId: order.id,
+    locale,
+    subject: english
+      ? `New purchase order — ${order.listingTitle}`
+      : `طلب شراء جديد — ${order.listingTitle}`,
+    title: english ? "New purchase order" : "طلب شراء جديد",
+    bodyHtml: english
+      ? `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">You received a new order for “${titleHtml}”. The amount is held in escrow.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">Order number: <strong>${escapeEmailHtml(order.id)}</strong></p>`
+      : `${greet(seller.fullName, locale)}<p style="font-size:16px;line-height:1.8;margin:0;">وصلك طلب جديد على إعلان «${titleHtml}». المبلغ محجوز في الضمان.</p><p style="font-size:16px;line-height:1.8;margin:12px 0 0;">رقم الطلب: <strong>${escapeEmailHtml(order.id)}</strong></p>`,
+    bodyLines: english
+      ? [`New order for “${order.listingTitle}”.`, `Order number: ${order.id}`]
+      : [`طلب جديد على «${order.listingTitle}».`, `رقم الطلب: ${order.id}`],
+    ctaHref: emailSiteUrl(`/orders/${order.id}`),
+    ctaLabel: english ? "Order details" : "تفاصيل الطلب",
+  });
+
+  if (status === "failed") {
     await queuePendingEmail({
       type: "seller_order_notification",
       to: seller.email,

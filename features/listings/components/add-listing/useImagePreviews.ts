@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 type ImageChangeMode = "append" | "replace";
 
-export function useImagePreviews(defaultMax = 6) {
+export function useImagePreviews(defaultMax = 12) {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const imageFilesRef = useRef<File[]>([]);
@@ -65,9 +65,24 @@ export function useImagePreviews(defaultMax = 6) {
     setImagePreviews(urls);
   }
 
+  function setCoverIndex(index: number) {
+    if (index <= 0 || index >= imageFilesRef.current.length) return;
+    const files = [...imageFilesRef.current];
+    const urls = [...previewUrlsRef.current];
+    const [file] = files.splice(index, 1);
+    const [url] = urls.splice(index, 1);
+    files.unshift(file);
+    urls.unshift(url);
+    imageFilesRef.current = files;
+    previewUrlsRef.current = urls;
+    setImageFiles(files);
+    setImagePreviews(urls);
+  }
+
   return {
     handleImageChange,
     imageFiles,
     imagePreviews,
+    setCoverIndex,
   };
 }

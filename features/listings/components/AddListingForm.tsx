@@ -1,8 +1,10 @@
 "use client";
 
 import type { Category } from "@/types";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { isDynamicCategory } from "@/shared/constants/category-fields";
+import { getSessionUser } from "@/services/storage";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { AddListingStepProgress } from "./add-listing/AddListingStepProgress";
@@ -19,17 +21,26 @@ type AddListingFormProps = {
 
 export function AddListingForm({ categories }: AddListingFormProps) {
   const detailsSectionRef = useRef<HTMLDivElement>(null);
+  const [defaultContact] = useState(
+    () => getSessionUser()?.phone?.trim() ?? "",
+  );
   const {
+    blockReason,
     errors,
+    featuredCheckoutAvailable,
     handleImageChange,
     imagePreviews,
     isAllowed,
+    isJobsCategory,
     isSubmitting,
     preview,
     selectedCategory,
     selectedCategoryId,
+    selectedPackage,
+    setCover,
     setPreview,
     setSelectedCategoryId,
+    setSelectedPackage,
     submitListing,
   } = useAddListingForm(categories);
 
@@ -51,18 +62,25 @@ export function AddListingForm({ categories }: AddListingFormProps) {
 
   if (!isAllowed) {
     return (
+      <LocalizedTree>
       <Card className="overflow-hidden p-8 text-center">
-        <h1 className="text-2xl font-black text-ink">يلزم تسجيل الدخول</h1>
+        <h1 className="text-2xl font-black text-ink">
+          {blockReason === "pending" ? "الحساب بانتظار الاعتماد" : "يلزم تسجيل الدخول"}
+        </h1>
         <p className="mt-3 text-muted">
-          سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد.
+          {blockReason === "pending"
+            ? "بعد التحقق من الشخص يتم اعتماد الحساب بسهولة. يمكنك إضافة إعلان فور التفعيل."
+            : "سيتم توجيهك لتسجيل الدخول قبل إضافة إعلان جديد."}
         </p>
       </Card>
+      </LocalizedTree>
     );
   }
 
   const useDynamicFields = isDynamicCategory(selectedCategoryId);
 
   return (
+    <LocalizedTree>
     <form
       className="grid gap-4 lg:grid-cols-[1fr_22rem] lg:gap-6"
       noValidate
@@ -94,17 +112,38 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         </div>
 
         <MediaContactStep
+          defaultContact={defaultContact}
           errors={errors}
+          featuredCheckoutAvailable={featuredCheckoutAvailable}
           imagePreviews={imagePreviews}
+          imagesRequired={!isJobsCategory}
           onImageChange={handleImageChange}
+          onPackageChange={setSelectedPackage}
+          onSetCover={setCover}
+          selectedPackage={selectedPackage}
         />
 
-        <Card className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5">
-          <p className="font-medium">
-            بعد النشر سيظهر الإعلان في إعلاناتي، صفحة القسم، ونتائج البحث.
-          </p>
+        <Card
+          className="flex flex-wrap items-center justify-between gap-3 bg-primary p-4 text-white sm:gap-4 sm:p-5"
+          id="add-listing-submit"
+        >
+          <div>
+            <p className="font-medium">
+              {selectedPackage === "featured_pending"
+                ? "لا يُنشر الإعلان قبل إتمام الدفع — ستُوجَّه لبوابة Stripe مباشرة."
+                : "بعد الإرسال يُراجع فريق سوقنا إعلانك قبل ظهوره في البحث."}
+            </p>
+            {errors.submit ? (
+              <p
+                className="mt-2 rounded-[var(--radius-md)] border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white"
+                role="alert"
+              >
+                {errors.submit}
+              </p>
+            ) : null}
+          </div>
           <Button className="shrink-0" loading={isSubmitting} type="submit">
-            نشر الإعلان
+            {selectedPackage === "featured_pending" ? "متابعة للدفع" : "إرسال للمراجعة"}
           </Button>
         </Card>
       </div>
@@ -115,5 +154,6 @@ export function AddListingForm({ categories }: AddListingFormProps) {
         selectedCategory={selectedCategory}
       />
     </form>
+    </LocalizedTree>
   );
 }

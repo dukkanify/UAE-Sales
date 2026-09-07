@@ -5,7 +5,7 @@ import { EscrowProtectionCard } from "@/features/listings/components/EscrowProte
 import { ListingPlatformNotice } from "@/features/listings/components/ListingPlatformNotice";
 import { ListingDetailToolbar } from "@/features/listings/components/ListingDetailToolbar";
 import { ListingGallery } from "@/features/listings/components/ListingGallery";
-import { ListingMapPlaceholder } from "@/features/listings/components/ListingMapPlaceholder";
+import { ListingLocationMap } from "@/features/listings/components/ListingLocationMap";
 import { ListingSafetyTips } from "@/features/listings/components/ListingSafetyTips";
 import { ListingSpecifications } from "@/features/listings/components/ListingSpecifications";
 import {
@@ -15,8 +15,13 @@ import {
 import { ListingCard } from "@/features/listings/components/ListingCard";
 import { SellerPanel } from "@/features/listings/components/SellerPanel";
 import { CurrencyAmount } from "@/shared/components/CurrencyAmount";
+import { listingDescription } from "@/shared/i18n/listing-copy";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { LocalizedTree } from "@/shared/i18n/LocalizedTree";
+import { useLocale } from "@/shared/i18n/useLocale";
 import { showsEscrowProtection } from "@/shared/listings/escrow-eligibility";
 import { formatPostedTime } from "@/features/listings/components/listing-card.utils";
+import { getListingCardBadges } from "@/features/listings/components/listing-card-badges";
 import { Badge } from "@/shared/ui/Badge";
 import { Breadcrumbs } from "@/shared/ui/Breadcrumbs";
 import { Icon } from "@/shared/ui/Icon";
@@ -29,18 +34,13 @@ type ListingDetailsViewProps = {
   relatedListings?: Listing[];
 };
 
-const conditionLabels: Record<Listing["condition"], string> = {
-  excellent: "ممتاز",
-  new: "جديد",
-  used: "مستعمل",
-};
-
 export function ListingDetailsView({
   breadcrumbs,
   category,
   listing,
   relatedListings = [],
 }: ListingDetailsViewProps) {
+  const locale = useLocale();
   const escrowProtected = showsEscrowProtection(listing);
   const locationLabel = listing.area
     ? `${listing.area}، ${listing.emirate ?? listing.city}`
@@ -49,6 +49,7 @@ export function ListingDetailsView({
       : listing.city;
 
   return (
+    <LocalizedTree>
     <>
       <section className="app-container page-padding scroll-mt-20 pb-28 lg:pb-8">
         <Breadcrumbs items={breadcrumbs} />
@@ -59,16 +60,18 @@ export function ListingDetailsView({
 
             <div className="mt-4 lg:hidden">
               <div className="flex flex-wrap items-center gap-2">
-                {listing.isFeatured ? <Badge variant="featured">إعلان مميز</Badge> : null}
-                {listing.verifiedSeller ? <Badge variant="verified">بائع موثق</Badge> : null}
+                {getListingCardBadges(listing).map((badge) => (
+                  <Badge key={badge.key} variant={badge.variant}>
+                    {badge.label}
+                  </Badge>
+                ))}
                 {category ? <Badge variant="muted">{category.name}</Badge> : null}
-                <Badge variant="muted">{conditionLabels[listing.condition]}</Badge>
                 {escrowProtected ? (
                   <Badge variant="escrow">ضمان مالي — دفع عبر المنصة</Badge>
                 ) : null}
               </div>
               <h1 className="mt-3 text-2xl font-black leading-tight text-ink">
-                {listing.title}
+                <ListingTitle listing={listing} />
               </h1>
               <div className="mt-2">
                 <CurrencyAmount amount={listing.price} size="lg" />
@@ -88,18 +91,13 @@ export function ListingDetailsView({
             </div>
 
             <ListingDetailToolbar listing={listing} />
-            <ListingMapPlaceholder listing={listing} />
+            <ListingLocationMap listing={listing} />
 
             <div className="marketplace-panel mt-6 p-6">
               <h2 className="text-lg font-black text-ink">وصف الإعلان</h2>
-              <p className="mt-4 text-sm font-medium leading-8 text-muted">
-                {listing.description}
+              <p className="mt-4 text-sm font-medium leading-8 text-muted" data-ugc>
+                {listingDescription(listing, locale)}
               </p>
-              {listing.descriptionEnglish ? (
-                <p className="mt-4 border-t border-border pt-4 text-sm leading-7 text-muted/80">
-                  {listing.descriptionEnglish}
-                </p>
-              ) : null}
             </div>
 
             <ListingSpecifications listing={listing} />
@@ -155,5 +153,6 @@ export function ListingDetailsView({
 
       <MobileStickyActionBar listing={listing} />
     </>
+    </LocalizedTree>
   );
 }

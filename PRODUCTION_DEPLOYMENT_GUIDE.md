@@ -30,6 +30,7 @@ cp .env.production.example .env.production
 | `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Yes |
 | `STRIPE_CURRENCY` | `aed` | Yes |
 | `SESSION_COOKIE_DOMAIN` | `.sooqna.site` | Recommended |
+| `DATABASE_URL` | `postgres://...` (Neon / Vercel Postgres) | **Yes on Vercel** — user accounts must not use `/tmp` |
 
 `NEXT_PUBLIC_APP_URL` must be set before `npm run build` so metadata, sitemap, Stripe redirects, and JSON-LD use the correct domain.
 

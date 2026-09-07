@@ -5,6 +5,9 @@ import { memo } from "react";
 import type { Listing } from "@/types";
 import { AppImage } from "@/shared/components/AppImage";
 import { FavoriteButton } from "@/shared/components/FavoriteButton";
+import { ListingTitle } from "@/shared/i18n/ListingTitle";
+import { ListingCardBadges } from "@/features/listings/components/ListingCardBadges";
+import { isListingVerified } from "@/features/listings/components/listing-card-badges";
 import { formatCurrencyDisplay } from "@/shared/utils/currency";
 import { Icon } from "@/shared/ui/Icon";
 import {
@@ -31,18 +34,14 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
   const imageUrl = getListingImageUrl(listing);
   const location = getListingLocation(listing);
   const photoCount = getListingImages(listing).length;
-  const isVerified =
-    listing.verifiedSeller ??
-    listing.seller.isVerified ??
-    (listing.seller.rating ?? 0) >= 4.8;
+  const isVerified = isListingVerified(listing);
 
   return (
     <article className="mobile-home-featured-card w-[var(--mh-card-width)] min-w-[15.5rem] max-w-[19rem] shrink-0 flex-none snap-start">
       <div className="mobile-home-featured-card__media">
-        <Link className="absolute inset-0" href={href}>
-          <span className="sr-only">{listing.title}</span>
+        <Link aria-hidden className="absolute inset-0" href={href} tabIndex={-1}>
           <AppImage
-            alt={listing.title}
+            alt=""
             className={`mobile-home-featured-card__image ${imageFit === "contain" ? "object-contain" : "object-cover"}`}
             fallbackCategory={listing.categoryId}
             fill
@@ -53,13 +52,11 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
           />
         </Link>
 
-        {listing.isFeatured ? (
-          <span className="mobile-home-featured-card__badge-featured">مميز</span>
-        ) : null}
+        <ListingCardBadges className="!start-2 !top-2" listing={listing} />
 
         <div className="mobile-home-featured-card__actions">
           <FavoriteButton
-            className="!min-h-8 !size-8 !rounded-full !border-0 !bg-white/95 !p-0 !shadow-[var(--mh-shadow-sm)]"
+            className="card-media-action !min-h-8 !size-8 !min-w-8 !rounded-full !p-0"
             iconOnly
             listing={listing}
           />
@@ -79,7 +76,9 @@ export const MobileFeaturedCard = memo(function MobileFeaturedCard({
         </p>
 
         <Link href={href}>
-          <h3 className="mobile-home-featured-card__title">{listing.title}</h3>
+          <h3 className="mobile-home-featured-card__title">
+            <ListingTitle listing={listing} />
+          </h3>
         </Link>
 
         <p className="mobile-home-featured-card__meta">
