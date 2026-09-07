@@ -72,7 +72,6 @@ const emptyForm = {
   sellerName: "",
   contactPhone: "",
   isFeatured: false,
-  isUrgent: false,
 };
 
 export function AdminListingsPanel() {
@@ -319,7 +318,6 @@ export function AdminListingsPanel() {
             condition: parsed.condition,
             status: form.status,
             isFeatured: form.isFeatured,
-            isUrgent: form.isUrgent,
             sellerName: form.sellerName.trim() || undefined,
             contactPhone: contactPhone || undefined,
             categorySpecs: isDynamic ? parsed.categorySpecs : undefined,
@@ -513,19 +511,6 @@ export function AdminListingsPanel() {
                 type="checkbox"
               />
               مميز
-            </label>
-            <label className="inline-flex items-center gap-2">
-              <input
-                checked={form.isUrgent}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    isUrgent: event.target.checked,
-                  }))
-                }
-                type="checkbox"
-              />
-              عاجل
             </label>
           </div>
 

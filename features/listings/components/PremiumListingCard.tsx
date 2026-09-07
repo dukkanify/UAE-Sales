@@ -60,7 +60,6 @@ export const PremiumListingCard = memo(function PremiumListingCard({
           <AppImage
             alt=""
             className="marketplace-card-image"
-            fallbackCategory={listing.categoryId}
             fill
             loading={priority ? undefined : "lazy"}
             priority={priority}
@@ -72,7 +71,14 @@ export const PremiumListingCard = memo(function PremiumListingCard({
             src={imageUrl}
           />
         </Link>
-      ) : null}
+      ) : (
+        <div
+          aria-hidden
+          className="absolute inset-0 flex items-center justify-center bg-surface-muted text-xs font-semibold text-muted"
+        >
+          لا توجد صورة
+        </div>
+      )}
 
       <ListingCardBadges listing={listing} />
 

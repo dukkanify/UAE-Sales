@@ -22,6 +22,17 @@ export const EMAIL_ALREADY_REGISTERED_MESSAGE =
 export const INVALID_CREDENTIALS_MESSAGE =
   "بيانات الدخول غير صحيحة. إذا غيّرت كلمة المرور مؤخرًا، استخدم «نسيت كلمة المرور» ثم سجّل الدخول بالكلمة الجديدة.";
 
+export const PASSWORD_NOT_SET_MESSAGE =
+  "هذا الحساب ليس لديه كلمة مرور بعد. استخدم رمز التحقق أو أكمل إعداد الحساب أولاً.";
+
+export const ACCOUNT_UNVERIFIED_MESSAGE =
+  "أكمل التحقق من بريدك أولاً قبل تسجيل الدخول.";
+
+export const ACCOUNT_SUSPENDED_MESSAGE = "تم إيقاف هذا الحساب.";
+
+export const AUTH_STORE_UNAVAILABLE_MESSAGE =
+  "تعذر الوصول إلى قاعدة بيانات الحسابات. حاول لاحقًا.";
+
 export const PASSWORD_RESET_GENERIC_MESSAGE =
   "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة تعيين كلمة المرور.";
 

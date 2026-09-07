@@ -1,6 +1,7 @@
 import { cache } from "react";
 import type { Listing } from "@/types";
 import { mockHomeCategorySections } from "@/mock";
+import { isListingFeaturedActive } from "@/features/listings/components/listing-card-badges";
 import { getAllListings } from "@/services/listings/listing-store";
 
 export type HomeListingCard = Listing;
@@ -41,7 +42,7 @@ export const getHomeFeed = cache(async (): Promise<HomeFeed> => {
   const active = listings.filter((listing) => listing.status === "active");
 
   const featured = active
-    .filter((listing) => listing.isFeatured)
+    .filter((listing) => isListingFeaturedActive(listing))
     .slice(0, 6)
     .map(slimListingForCard);
 

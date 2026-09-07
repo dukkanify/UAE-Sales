@@ -6,12 +6,19 @@ import {
 } from "@/mock/listings.mock";
 import { getDurableAuthDir } from "@/services/auth/user-persistence";
 import { getOptionalPostgresPool } from "@/services/db/postgres";
+import { isProductionLike } from "@/services/payments/payment-config";
 import type { Listing } from "@/types";
 
 const TABLE = "marketplace_listings";
 const FILE = "sooqna-listings.json";
 
 let postgresReady = false;
+
+function allowMockCatalogSeed(): boolean {
+  if (process.env.ALLOW_MOCK_CATALOG === "true") return true;
+  if (isProductionLike()) return false;
+  return true;
+}
 
 export async function ensureListingsTable(): Promise<boolean> {
   const pool = await getOptionalPostgresPool();
@@ -184,11 +191,12 @@ export async function persistAllListings(listings: Listing[]): Promise<void> {
 export async function loadPersistedListings(): Promise<Listing[]> {
   if (await ensureListingsTable()) {
     const pool = await getOptionalPostgresPool();
-    if (!pool) return seedListings();
+    if (!pool) return allowMockCatalogSeed() ? seedListings() : [];
     const result = await pool.query(
       `SELECT payload FROM ${TABLE} ORDER BY COALESCE(posted_at, updated_at) DESC`,
     );
     if (result.rows.length === 0) {
+      if (!allowMockCatalogSeed()) return [];
       const seeded = seedListings();
       await persistAllListings(seeded);
       return seeded;
@@ -198,6 +206,7 @@ export async function loadPersistedListings(): Promise<Listing[]> {
 
   const stored = await readJsonFile();
   if (!stored || stored.length === 0) {
+    if (!allowMockCatalogSeed()) return [];
     const seeded = seedListings();
     await writeJsonFile(seeded);
     return seeded;

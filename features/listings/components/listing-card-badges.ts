@@ -1,6 +1,6 @@
 import type { Listing } from "@/types";
 
-export type ListingCardBadgeKey = "urgent" | "featured" | "verified" | "new";
+export type ListingCardBadgeKey = "featured" | "verified" | "new";
 
 export type ListingCardBadge = {
   key: ListingCardBadgeKey;
@@ -8,12 +8,18 @@ export type ListingCardBadge = {
   variant: ListingCardBadgeKey;
 };
 
+/** Featured only when DB flag is set and not past featuredUntil. */
+export function isListingFeaturedActive(listing: Listing, nowMs = Date.now()): boolean {
+  if (listing.isFeatured !== true) return false;
+  if (!listing.featuredUntil) return true;
+  const until = Date.parse(listing.featuredUntil);
+  if (Number.isNaN(until)) return true;
+  return until > nowMs;
+}
+
+/** Verified only from explicit verification flags — never invent from rating. */
 export function isListingVerified(listing: Listing): boolean {
-  return Boolean(
-    listing.verifiedSeller ??
-      listing.seller.isVerified ??
-      (listing.seller.rating ?? 0) >= 4.8,
-  );
+  return Boolean(listing.verifiedSeller ?? listing.seller.isVerified);
 }
 
 export function isListingFresh(listing: Listing): boolean {
@@ -21,24 +27,11 @@ export function isListingFresh(listing: Listing): boolean {
   return listing.condition === "new";
 }
 
-export function isListingUrgent(listing: Listing): boolean {
-  if (listing.isUrgent === true) return true;
-  if (listing.features?.some((feature) => /عاجل|urgent/i.test(feature))) {
-    return true;
-  }
-  // Demo catalog fallback when persisted rows predate isUrgent.
-  const idNum = Number(listing.id.replace(/\D/g, "").slice(-3)) || 0;
-  return listing.isFeatured === true && idNum % 5 === 1;
-}
-
 /** Colored classification badges for listing cards — max 3 for clarity. */
 export function getListingCardBadges(listing: Listing): ListingCardBadge[] {
   const badges: ListingCardBadge[] = [];
 
-  if (isListingUrgent(listing)) {
-    badges.push({ key: "urgent", label: "عاجل", variant: "urgent" });
-  }
-  if (listing.isFeatured) {
+  if (isListingFeaturedActive(listing)) {
     badges.push({ key: "featured", label: "مميز", variant: "featured" });
   }
   if (isListingVerified(listing)) {

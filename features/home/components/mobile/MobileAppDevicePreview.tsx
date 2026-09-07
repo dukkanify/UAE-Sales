@@ -6,7 +6,6 @@ import { AppImage } from "@/shared/components/AppImage";
 import { BrandMark } from "@/shared/components/BrandMark";
 import { BRAND } from "@/shared/constants/brand";
 import {
-  getListingImageUrl,
   getListingLocation,
 } from "@/features/listings/components/listing-card.utils";
 import { listingTitle, sellerName } from "@/shared/i18n/listing-copy";
@@ -34,8 +33,8 @@ function useListingCopy(listing: Listing | undefined) {
   };
 }
 
-function coverUrl(listing: Listing): string {
-  return getAppPreviewImageUrl(listing.slug, getListingImageUrl(listing));
+function coverUrl(listing: Listing): string | undefined {
+  return getAppPreviewImageUrl(listing);
 }
 
 function Cover({
@@ -47,17 +46,27 @@ function Cover({
   sizes: string;
   priority?: boolean;
 }) {
+  const src = coverUrl(listing);
+  if (!src) {
+    return (
+      <div
+        aria-hidden
+        className="absolute inset-0 flex items-center justify-center bg-surface-muted text-[0.65rem] font-semibold text-muted"
+      >
+        لا توجد صورة
+      </div>
+    );
+  }
   return (
     <AppImage
       alt=""
       aria-hidden
       className="object-cover"
-      fallbackCategory={listing.categoryId}
       fill
       loading={priority ? "eager" : "lazy"}
       priority={priority}
       sizes={sizes}
-      src={coverUrl(listing)}
+      src={src}
     />
   );
 }

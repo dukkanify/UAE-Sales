@@ -14,6 +14,7 @@ import {
   seedListings,
   upsertListingRow,
 } from "@/services/listings/listing-persistence";
+import { isProductionLike } from "@/services/payments/payment-config";
 import type { Listing } from "@/types";
 import type {
   AdminListingCreateInput,
@@ -25,7 +26,15 @@ let cacheRows: Listing[] | null = null;
 let inflight: Promise<Listing[]> | null = null;
 let expiryApplied = false;
 
+/** Production must not auto-inject mock catalog unless explicitly allowed. */
+function allowMockCatalogSeed(): boolean {
+  if (process.env.ALLOW_MOCK_CATALOG === "true") return true;
+  if (isProductionLike()) return false;
+  return true;
+}
+
 function hydrateCatalogPhones(listings: Listing[]): Listing[] {
+  if (!allowMockCatalogSeed()) return listings;
   const phones = new Map(
     seedListings()
       .filter((item) => item.contactPhone)
@@ -38,8 +47,11 @@ function hydrateCatalogPhones(listings: Listing[]): Listing[] {
   });
 }
 
-/** Merge newly added mock inventory into an older persisted catalog. */
+/** Merge newly added mock inventory into an older persisted catalog (non-prod only). */
 async function mergeMissingSeedListings(stored: Listing[]): Promise<Listing[]> {
+  if (!allowMockCatalogSeed()) {
+    return stored;
+  }
   const seeded = seedListings();
   if (stored.length >= seeded.length) {
     return stored;
@@ -90,6 +102,9 @@ async function loadListingsUncached(): Promise<Listing[]> {
     inflight = (async () => {
       const stored = await loadPersistedListings().catch(() => [] as Listing[]);
       if (stored.length === 0) {
+        if (!allowMockCatalogSeed()) {
+          return setCache([]);
+        }
         const seeded = seedListings();
         await applyListingExpiry(seeded);
         await persistAllListings(seeded);
@@ -118,9 +133,13 @@ export const getAllListings = cache(async (): Promise<Listing[]> => {
   return loadListingsUncached();
 });
 
-/** Sync read for checkout resolvers — uses cache or mock seed fallback. */
+/** Sync read for checkout resolvers — uses cache; empty when cold. */
 export function getListingSync(idOrSlug: string): Listing | undefined {
-  const source = cacheRows ?? [...marketplaceListings, ...marketplaceUserListings];
+  const source =
+    cacheRows ??
+    (allowMockCatalogSeed()
+      ? [...marketplaceListings, ...marketplaceUserListings]
+      : []);
   return source.find(
     (listing) => listing.id === idOrSlug || listing.slug === idOrSlug,
   );
@@ -217,7 +236,6 @@ export async function createListingFromAdmin(
     condition: input.condition ?? "used",
     status: input.status ?? "active",
     isFeatured: Boolean(input.isFeatured),
-    isUrgent: Boolean(input.isUrgent),
     views: 0,
     seller: {
       id: "seller-admin-ops",
