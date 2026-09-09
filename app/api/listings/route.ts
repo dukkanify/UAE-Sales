@@ -50,7 +50,8 @@ export async function POST(request: Request) {
     });
 
     if (!existing && listing.status === "pending_review") {
-      void notifyListingSubmitted(listing);
+      // Await so Vercel does not freeze before in-app + email delivery.
+      await notifyListingSubmitted(listing);
     }
 
     return NextResponse.json({ listing }, { status: 201 });

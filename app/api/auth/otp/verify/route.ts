@@ -135,13 +135,15 @@ export async function POST(request: Request) {
         email: stored.email,
         userId: stored.id,
       });
-      void emailPasswordResetLink({
-        email: stored.email,
-        name: stored.fullName,
-        token: rawToken,
-      }).catch((error) => {
+      try {
+        await emailPasswordResetLink({
+          email: stored.email,
+          name: stored.fullName,
+          token: rawToken,
+        });
+      } catch (error) {
         console.error("[Sooqna Email] password reset link failed", error);
-      });
+      }
     }
     return NextResponse.json({ ok: true, maskedEmail: maskEmail(email), redirectTo: "/login" });
   }

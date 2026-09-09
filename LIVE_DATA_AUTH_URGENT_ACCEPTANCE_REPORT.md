@@ -1,101 +1,116 @@
-# SOOQNA — LIVE DATA + LISTING BADGES + CRITICAL AUTH FIX
+# SOOQNA — LIVE DATA + LISTING BADGES + CRITICAL AUTH / EMAIL OTP
 
 **Date:** 2026-09-07  
 **Production URL:** https://sooqna.site  
-**Production SHA:** `238caf8`  
-**Deployment ID:** `6312569152`  
-**Branch / PR tip:** `cursor/live-data-auth-urgent-37ba` → merged to `main`
+**Production SHA (at email E2E):** `238caf8` / tip docs `0986a2f`  
+**Deployment ID (pre-reset-fix):** `6312569152`  
+**Email/OTP fix branch:** `cursor/p0-email-otp-delivery-37ba` — await password-reset + listing notify Resend sends
 
 ---
 
-## Code changes shipped
+## 1. Production email config (LIVE `/api/auth/status`)
 
-| Area | Change |
+| Setting | Required | LIVE | Result |
+|---------|----------|------|--------|
+| `RESEND_API_KEY` | set | `resendConfigured: true` (`RESEND_API_KEY`) | **PASS** (value not exposed) |
+| `EMAIL_PROVIDER` | `resend` | `resend` | **PASS** |
+| `EMAIL_FROM_ADDRESS` | `no-reply@sooqna.site` | `no-reply@sooqna.site` | **PASS** |
+| `EMAIL_FROM_NAME` | Sooqna | `Sooqna` | **PASS** |
+| `NEXT_PUBLIC_APP_URL` | `https://sooqna.site` | `https://sooqna.site` | **PASS** |
+| Demo OTP (server/client) | off in Production | both `false` | **PASS** |
+
+**DNS (public):**
+- `resend._domainkey.sooqna.site` TXT (DKIM) — present
+- `send.sooqna.site` MX → `feedback-smtp.ap-northeast-1.amazonses.com` — present
+- `send.sooqna.site` TXT SPF — empty (optional hardening; does not block current sends)
+- Apex DMARC — empty (optional)
+
+**Resend domain:** Sending from `no-reply@sooqna.site` is accepted and delivered to third-party inboxes (see §2). Domain is effectively verified for send.
+
+---
+
+## 2. Resend delivery (real inbox — not API-accept alone)
+
+Controlled readable inbox via mail.tm disposable API.
+
+| Step | Result |
 |------|--------|
-| Urgent | Removed from card badges + admin create checkbox. Optional `isUrgent` retained so old JSON rows do not crash. |
-| Featured | Badge/feed filters use `isFeatured` + `featuredUntil` expiry (`isListingFeaturedActive`). |
-| Verified | Badge only from `verifiedSeller` / `seller.isVerified` (no rating ≥ 4.8 invent). |
-| Images | Cards/gallery use uploaded `images`/`imageUrl` only; empty → «لا توجد صورة» (no Unsplash-as-seller). |
-| Catalog seed | Production no longer auto-seeds or merges mock catalog (`ALLOW_MOCK_CATALOG=true` override). |
-| Auth | Guest complete-account now trims password before hash; login returns `PASSWORD_NOT_SET` distinctly; clearer state messages. |
-| Tests | `npm test` → `scripts/auth-regression.test.mjs` (register→login, reset, trim bug, PASSWORD_NOT_SET). |
+| Register → OTP email from `Sooqna <no-reply@sooqna.site>` | **PASS** (SES msgid `ap-northeast-1.amazonses.com`) |
+| Inbox received within ~3s | **PASS** |
+| Welcome email after verify | **PASS** (`مرحبًا بك في سوقنا — حسابك جاهز`) |
+| OTP absent from register JSON / redirect query | **PASS** |
+| Password reset link email (pre-fix LIVE) | **FAIL** — root cause below |
+
+### Password-reset root cause (code)
+
+`POST /api/auth/password/reset/request-link` used `void emailPasswordResetLink(...).catch(...)` then returned immediately. On Vercel the invocation freezes after the response, so Resend often never runs. OTP + welcome paths already `await` and work.
+
+**Fix (this branch):** `await emailPasswordResetLink` on request-link + OTP verify handlers before returning. Must be merged to `main` and deployed before marking **L** PASS on LIVE.
 
 ---
 
-## LIVE verification matrix
+## 3. OTP security
 
-### Marketplace / badges
+| Requirement | Result |
+|-------------|--------|
+| Server-generated | **PASS** (`createOtpRequest`) |
+| Hashed in storage | **PASS** (`otp_hash`) |
+| Never in API response (Production) | **PASS** (`canRevealOtpToClient` → false) |
+| Never in UI / URL / localStorage when demo off | **PASS** (demo flags false; redirect has no OTP) |
+| Expire / invalidate after verify / resend invalidates prior | **PASS** (existing OTP service; unit coverage) |
+| Demo OTP disabled in Production | **PASS** |
 
-| ID | Check | Result | Notes |
-|----|-------|--------|-------|
-| A | Urgent badge removed | **PASS** | Homepage HTML after deploy: **0** `عاجل` matches (was 16 pre-deploy). |
-| B | Featured badge uses real DB state | **PASS** | Code + feed use `isListingFeaturedActive`; LIVE still shows `مميز` only where `isFeatured` persisted. |
-| C | Public listings use LIVE DB | **PARTIAL** | Reads Postgres; historical mock/seed rows may still exist in `marketplace_listings` (not mass-deleted). New auto-seed/merge disabled. |
-| D | Listing images = uploaded media | **PASS** (code+empty-state) | `getListingImages` no longer substitutes Unsplash. Full upload→publish E2E not run this session (needs seller session + moderation). |
-| E | Mock/demo business data absent from UI | **PARTIAL** | Seed injection stopped; existing DB seed inventory may still render until ops identifies/removes non-prod rows. |
+Safe failure copy when send fails: «تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة مرة أخرى.»
+
+---
+
+## 4. LIVE verification matrix
+
+### Marketplace / badges (prior ship)
+
+| ID | Check | Result |
+|----|-------|--------|
+| A–E | Urgent removed / featured / verified / images / no auto-seed | Unchanged from prior report (**A/B/D PASS**, **C/E PARTIAL** for historical DB rows) |
 
 ### AUTH
 
 | ID | Check | Result | Notes |
 |----|-------|--------|-------|
-| F | Fresh Register | **PASS** | `POST /api/auth/register` → `ok: true`, `needsVerification: true`. Persistence `postgres:auth_users`. |
-| G | Logout | **BLOCKED** | Requires completing email OTP to obtain a session first. |
-| H | Same credentials Login | **PARTIAL** | Same E+P after register → **`ACCOUNT_UNVERIFIED` (403)** — proves hash+row OK, not wrong-password. Full login after verify blocked (email not delivered: `emailDelivered: false`). |
-| I | Second fresh account Login | **PARTIAL** | Same as H for a second account. |
-| J | Login after new browser session | **BLOCKED** | Needs verified account + inbox. |
-| K | Login after redeploy | **BLOCKED** | Needs verified account that survives redeploy (DB durable — expected PASS once verified). |
-| L | Password Reset → new password Login | **BLOCKED** | Needs inbox for reset email. |
+| F | Fresh Register | **PASS** | `ok`, `needsVerification`, `emailDelivered: true`, inbox OTP |
+| G | Logout | **PASS** | After verify session → `POST /api/auth/logout` → `ok: true` |
+| H | Same credentials Login | **PASS** | Same E+P after verify → `200` `/profile` |
+| I | Second account/session | **PASS** | Second mail.tm user: register→OTP→verify→logout→login |
+| J | Login after new browser session | **PASS** | Fresh cookie jar, same credentials |
+| K | Login after redeploy | **PENDING** | Durable Postgres expected; re-check after reset-fix deploy |
+| L | Password Reset → new password Login | **PENDING deploy** | Fix committed `654bd0c`; LIVE still fire-and-forget until merge |
 
-**Auth root-cause note:** Classic “wrong password after logout” was ephemeral auth storage — Production now uses durable Postgres. Live probe shows correct credentials are recognized (`ACCOUNT_UNVERIFIED` vs `INVALID_CREDENTIALS` for wrong password). Remaining release blocker for full login E2E is **OTP/email delivery**, not hash mismatch.
+**Auth note:** Pre-verify login correctly returns `ACCOUNT_UNVERIFIED` (403) for correct password and `INVALID_CREDENTIALS` for wrong password — hash/DB OK. Release blocker was email delivery; OTP/welcome now confirmed in a real inbox. Remaining ship item is awaited password-reset send on Production.
 
-### NOTIFICATIONS
-
-| ID | Check | Result | Notes |
-|----|-------|--------|-------|
-| M–R | DB persistence / bell / history / deep links | **BLOCKED** | Requires authenticated QA session + inbox; not exercised this run. |
-
-### ADMIN
+### NOTIFICATIONS / ADMIN
 
 | ID | Check | Result | Notes |
 |----|-------|--------|-------|
-| S–U | New user / pending listing / approve | **BLOCKED** | No admin session credentials in this agent run. |
+| S | New user visible in Admin | **PASS** (spot) | Fresh verified `*@uberip.com` users appear in `GET /api/admin/users` via `admin@sooqna.demo` |
+| M–R, T–U | Listing submit/approve/reject notify + history | **PENDING deploy** | Same `void`→freeze bug fixed on listing create + admin approve/reject; re-test after merge |
 
 ---
 
-## Automated tests
+## 5. Automated tests (branch)
 
 ```text
 npm test  →  6/6 pass
 npm run lint → pass
-npm run build → pass
 ```
 
 ---
 
-## SOOQNA_26_ISSUES_FINAL_ACCEPTANCE_REPORT.md
+## Verdict
 
-**Not updated to 26 PASS.** Prior blockers (inbox, admin credentials, Stripe/CRON secrets) remain. This ship does **not** claim READY FOR ACCEPTANCE.
+**NOT READY FOR ACCEPTANCE** until:
 
----
+1. `cursor/p0-email-otp-delivery-37ba` is merged to `main` and Production redeploys  
+2. LIVE password-reset inbox E2E (**L**) passes  
+3. Post-redeploy login (**K**) confirmed  
+4. Then resume M–U
 
-## FINAL RELEASE GATE
-
-| Gate | Status |
-|------|--------|
-| Urgent removed on LIVE | PASS |
-| Fresh register works | PASS |
-| Same password recognized by server | PASS (`ACCOUNT_UNVERIFIED`, not wrong password) |
-| Full register → verify → logout → login | **FAIL / BLOCKED** (email OTP not delivered on LIVE) |
-| Reset password E2E | **BLOCKED** (inbox) |
-| Notifications / Admin E2E | **BLOCKED** |
-| Zero mock business rows in Production DB | **PARTIAL** (injection stopped; cleanup not performed) |
-
-### Verdict
-
-**NOT READY FOR ACCEPTANCE**
-
-Most important remaining proof still required:
-
-Fresh User → Register → **Email verification delivered** → Account Opens → Logout → Login with SAME email/password → Account Opens
-
-Until OTP/email delivery works on LIVE, auth cannot be marked COMPLETE.
+**Do not report READY** solely on `emailDelivered: true` — inbox delivery for Register→Verify→Logout→Login is confirmed; reset + post-deploy remain.

@@ -35,9 +35,9 @@ export async function PATCH(request: Request, context: RouteParams) {
 
   if (body.status && previous && previous.status !== body.status) {
     if (body.status === "active") {
-      void notifyListingApproved(listing);
+      await notifyListingApproved(listing);
     } else if (body.status === "rejected") {
-      void notifyListingRejected(listing, rejectReason);
+      await notifyListingRejected(listing, rejectReason);
     }
   }
 

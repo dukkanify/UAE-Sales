@@ -49,13 +49,16 @@ export async function POST(request: Request) {
         email: user.email,
         userId: user.id,
       });
-      void emailPasswordResetLink({
-        email: user.email,
-        name: user.fullName,
-        token: rawToken,
-      }).catch((error) => {
+      // Await delivery so the serverless invocation cannot freeze before Resend accepts.
+      try {
+        await emailPasswordResetLink({
+          email: user.email,
+          name: user.fullName,
+          token: rawToken,
+        });
+      } catch (error) {
         console.error("[Sooqna Email] password reset link failed", error);
-      });
+      }
     }
 
     return genericResponse(email);
