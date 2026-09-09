@@ -3,6 +3,7 @@
 import { ShareButton } from "@/shared/components/ShareButton";
 import type { Listing } from "@/types";
 import type { ListingReportReceipt } from "@/types/domain/listing-report";
+import { ListingDisputeEntry } from "@/features/listings/components/ListingDisputeEntry";
 import { ReportListingModal } from "@/features/listings/components/ReportListingModal";
 import { Button } from "@/shared/ui/Button";
 import { FormMessage } from "@/shared/ui/FormMessage";
@@ -45,6 +46,7 @@ export function ListingDetailToolbar({ listing }: ListingDetailToolbarProps) {
         <Icon name="shield" size={14} />
         إبلاغ عن الإعلان
       </Button>
+      <ListingDisputeEntry compact listing={listing} />
       {receipt ? (
         <div className="w-full">
           <FormMessage variant="success">
